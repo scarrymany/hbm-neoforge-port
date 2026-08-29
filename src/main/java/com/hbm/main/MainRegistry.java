@@ -1,10 +1,25 @@
 package com.hbm.main;
 
+import com.hbm.blocks.ModBlocks;
+import com.hbm.capability.ModAttachments;
+import com.hbm.capability.ModCapabilities;
+import com.hbm.config.HbmConfig;
+import com.hbm.creativetabs.ModCreativeTabs;
+import com.hbm.hazard.HazardComponents;
+import com.hbm.inventory.fluid.Fluids;
+import com.hbm.items.HbmDataComponents;
+import com.hbm.items.ModItems;
+import com.hbm.lib.HBMSoundHandler;
+import com.hbm.sound.ModSounds;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
 
 @Mod(MainRegistry.MODID)
 public class MainRegistry {
@@ -12,7 +27,33 @@ public class MainRegistry {
     public static final String MODID = "hbm";
     public static final Logger logger = LoggerFactory.getLogger(MODID);
 
+    public static ServerProxy proxy;
+
+    public static File configDir;
+    public static File configHbmDir;
+
     public MainRegistry(IEventBus modEventBus, ModContainer modContainer) {
         logger.info("HBM's Nuclear Tech - Community Edition (NeoForge port) initializing");
+
+        proxy = FMLLoader.getDist().isClient() ? new ClientProxy() : new ServerProxy();
+
+        configDir = FMLPaths.CONFIGDIR.get().toFile();
+        configHbmDir = new File(configDir, "hbmConfig");
+        if(!configHbmDir.exists()) configHbmDir.mkdirs();
+
+        HbmConfig.register(modContainer);
+
+        HBMSoundHandler.register(modEventBus);
+        ModSounds.register(modEventBus);
+        HazardComponents.register(modEventBus);
+        ModAttachments.register(modEventBus);
+        modEventBus.addListener(ModCapabilities::register);
+        ModItems.register(modEventBus);
+        HbmDataComponents.register(modEventBus);
+        ModBlocks.register(modEventBus);
+        ModCreativeTabs.register(modEventBus);
+        MaterialRegistry.register(modEventBus);
+
+        Fluids.init();
     }
 }
