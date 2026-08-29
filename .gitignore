@@ -1,0 +1,18 @@
+# Reference-only upstream clones, not part of the port
+/upstream/
+
+# Gradle / build
+.gradle/
+build/
+out/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# NeoForge run dirs
+run/
+runs/
+logs/
