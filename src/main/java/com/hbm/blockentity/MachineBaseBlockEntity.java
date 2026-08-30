@@ -357,7 +357,12 @@ public abstract class MachineBaseBlockEntity extends LoadedBaseBlockEntity imple
         if (inventory == null) return null;
         if (side == null) return inventory;
 
-        BlockPos accessorPos = CapabilityContextProvider.getAccessor(this.worldPosition);
+        // .immutable() matches CE's own .toImmutable() at this exact call site (CE's
+        // TileEntityMachineBase.getCapability, ITEM_HANDLER_CAPABILITY branch): accessorPos is used
+        // below as a HashMap key, so a caller-owned BlockPos.MutableBlockPos scratch cursor must be
+        // snapshotted before insertion, or the key's hashCode/equals can change after a later mutation
+        // (e.g. a multiblock proxy advancing its cursor) and silently orphan the cache entry.
+        BlockPos accessorPos = CapabilityContextProvider.getAccessor(this.worldPosition).immutable();
         Map<BlockPos, IItemHandlerModifiable> perAccessor = itemWrapperCache.computeIfAbsent(side, f -> new HashMap<>());
         IItemHandlerModifiable cached = perAccessor.get(accessorPos);
         if (cached != null) return cached;
@@ -406,7 +411,10 @@ public abstract class MachineBaseBlockEntity extends LoadedBaseBlockEntity imple
     public IFluidHandler getFluidHandlerCapability(@Nullable Direction side) {
         if (!enableFluidWrapper) return null;
         if (side == null) return new NTMFluidHandlerWrapper(this, null);
-        BlockPos accessorPos = CapabilityContextProvider.getAccessor(this.worldPosition);
+        // .immutable() matches CE's .toImmutable() at this call site (CE's getCapability,
+        // FLUID_HANDLER_CAPABILITY branch) - see the identical reasoning above in
+        // getItemHandlerCapability: accessorPos is a HashMap key here too.
+        BlockPos accessorPos = CapabilityContextProvider.getAccessor(this.worldPosition).immutable();
         return fluidWrapperCache.computeIfAbsent(accessorPos, acc -> new NTMFluidHandlerWrapper(this, acc));
     }
 

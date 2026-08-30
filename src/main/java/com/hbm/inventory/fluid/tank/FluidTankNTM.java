@@ -281,7 +281,10 @@ public class FluidTankNTM implements Cloneable {
         int max = nbt.getInt(s + "_max");
         if (max > 0) maxFluid = max;
 
-        fluid = Mth.clamp(fluid, 0, max);
+        // Clamp against the field (which keeps its old, valid capacity when "_max" is missing or
+        // non-positive), not the raw local `max` - otherwise a corrupted/legacy save with no "_max"
+        // tag would force fluid to 0 even though maxFluid is still a valid positive capacity.
+        fluid = Mth.clamp(fluid, 0, maxFluid);
 
         type = Fluids.readType(nbt, s + "_type"); //name-based, with legacy numeric-ID fallback
 

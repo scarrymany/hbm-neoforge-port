@@ -12,12 +12,15 @@ import com.mojang.serialization.Codec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,6 +182,30 @@ public class FluidType {
     public ResourceLocation getTexture() {
         return this.texture;
     }
+
+    /**
+     * The vanilla/mod {@link Fluid} this catalog entry maps to, resolved by registry name against
+     * {@link BuiltInRegistries#FLUID} - a passive lookup mirroring CE's own {@code FluidType#getFF()}
+     * ({@code FluidRegistry.getFluid(name)}), not a registration step. Tried first under the
+     * vanilla ("minecraft") namespace (so e.g. {@code WATER}/{@code LAVA} resolve to the real
+     * vanilla fluids), then under this mod's namespace for any Forge/NeoForge-fluid-compat entry
+     * a future pass may register (CE's {@code Fluids#setupForgeFluidCompat}, not yet ported here).
+     * Most {@link FluidType}s have no such registered fluid and this correctly returns null - every
+     * current caller ({@link com.hbm.inventory.fluid.tank.FluidTankNTM},
+     * {@link com.hbm.capability.NTMFluidCapabilityHandler}, {@code NTMFluidContainerWrapper},
+     * {@code IFluidStandardSenderMK2}, {@code IFluidReceiverMK2}) already treats null as the
+     * expected, handled case.
+     */
+    @Nullable
+    public Fluid getFF() {
+        String name = this.getName().toLowerCase(Locale.US);
+
+        Fluid vanilla = BuiltInRegistries.FLUID.getOptional(ResourceLocation.fromNamespaceAndPath("minecraft", name)).orElse(null);
+        if (vanilla != null) return vanilla;
+
+        return BuiltInRegistries.FLUID.getOptional(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, name)).orElse(null);
+    }
+
     public String getTranslationKey() {
         return this.unlocalized;
     }
