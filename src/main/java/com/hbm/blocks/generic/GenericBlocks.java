@@ -394,8 +394,12 @@ public final class GenericBlocks {
         registerBlock("chlorine_gas", () -> new BlockClorine(BlockBehaviour.Properties.of().strength(0.0F, 0.0F).noCollission().noOcclusion().randomTicks()),
                 ModCreativeTabs.MACHINE);
 
-        registerBlock("block_lithium", () -> new BlockHydroreactive(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)),
-                ModCreativeTabs.BLOCKS);
+        // CE's block_lithium is not registered here: Mats.java tags MAT_LITHIUM with
+        // MaterialShapes.BLOCK autogen, so MaterialBlockGenerator.registerAll() already registers
+        // it as lithium_block via this same BlockHydroreactive class - registering it again here
+        // would be duplicate in-game content under two different ids for the same material (the
+        // identical bismuth/tantalium/niobium/lanthanium/zirconium fix already applied to
+        // GenericDecoBlocks.registerBeaconable()).
 
         registerBlock("ore_nether_smoldering",
                 () -> new BlockSmolder(BlockBehaviour.Properties.of().strength(0.4F, 10.0F).sound(SoundType.STONE).lightLevel(state -> 1)),
@@ -436,6 +440,16 @@ public final class GenericBlocks {
         }, null);
     }
 
+    /**
+     * CE's {@code block_boron} and {@code block_lead} are deliberately NOT registered here even
+     * though CE has them as {@link BlockRadResistant} shielding-marker blocks: {@code Mats.java}
+     * tags {@code MAT_BORON}/{@code MAT_LEAD} with {@code MaterialShapes.BLOCK} autogen, so
+     * {@link com.hbm.blocks.MaterialBlockGenerator} already registers them (as suffix-first
+     * {@code boron_block}/{@code lead_block}, via this same {@link BlockRadResistant} class) -
+     * registering them again here would be duplicate in-game content under two different ids for
+     * the same material, the identical issue already fixed for bismuth/tantalium/niobium/
+     * lanthanium/zirconium in {@code GenericDecoBlocks.registerBeaconable()}.
+     */
     private static void registerRadResistant() {
         registerBlock("reinforced_light", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(15.0F, 80.0F).sound(SoundType.STONE).lightLevel(state -> 15)),
                 ModCreativeTabs.BLOCKS);
@@ -449,8 +463,6 @@ public final class GenericBlocks {
                 ModCreativeTabs.BLOCKS);
         registerBlock("cmb_brick_reinforced", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(25.0F, 50_000.0F).sound(SoundType.METAL)),
                 ModCreativeTabs.BLOCKS);
-        registerBlock("block_boron", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)),
-                ModCreativeTabs.BLOCKS);
         registerBlock("ducrete_smooth", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(20.0F, 500.0F).sound(SoundType.STONE), true),
                 ModCreativeTabs.BLOCKS);
         registerBlock("ducrete", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(20.0F, 500.0F).sound(SoundType.STONE), true),
@@ -460,8 +472,6 @@ public final class GenericBlocks {
         registerBlock("ducrete_reinforced", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(20.0F, 1000.0F).sound(SoundType.STONE), true),
                 ModCreativeTabs.BLOCKS);
         registerBlock("block_niter_reinforced", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(15.0F, 6000.0F).sound(SoundType.METAL)),
-                ModCreativeTabs.BLOCKS);
-        registerBlock("block_lead", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)),
                 ModCreativeTabs.BLOCKS);
         registerBlock("block_australium", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)),
                 ModCreativeTabs.BLOCKS);

@@ -57,8 +57,11 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * introducing a second, competing implementation of that concept in the meantime.
  * {@link #registerFertilizerPowder}/{@link #fertilize} reproduce CE's 3x3x3
  * {@code ItemFertilizer.onItemUse} via the confirmed 1.21 {@link BonemealableBlock}/
- * {@link BonemealEvent} APIs, including CE's force-only-on-the-clicked-block chance gate (see
- * {@link #fertilize}'s own javadoc for the exact CE-to-1.21 API mapping).
+ * {@link BonemealEvent} APIs, including CE's actual per-block success semantics: a valid target
+ * counts as success (consumes the item, plays the growth particle) even when its
+ * force-only-on-the-clicked-block chance roll fails - only the actual growth call
+ * ({@code performBonemeal}) is gated by that roll (see {@link #fertilize}'s own javadoc for the
+ * exact CE-to-1.21 API mapping).
  * <p>
  * {@code powder_cement} was CE's one {@code ItemLemon} (basic food, nutrition 2 / saturation 0.5, no
  * special tooltip or effect for this particular item) - it is now constructed directly via the named
@@ -351,10 +354,15 @@ public final class BilletPowderItems {
 
     /**
      * Applies bonemeal-equivalent growth to a single candidate block, matching CE's
-     * {@code ItemFertilizer.fertilize(..., force)}: CE only guaranteed growth on the exact clicked
-     * block ({@code force = true}); the other 26 positions in the 3x3x3 area still had to pass a
-     * random-chance roll to succeed. Here that roll is {@link BonemealableBlock#isBonemealSuccess}
-     * - checked for every position except the center ({@code force = true}), mirroring
+     * {@code ItemFertilizer.fertilize(..., force)} - including its actual (if arguably surprising)
+     * success semantics: CE's {@code canGrow(...)} check (here {@link BonemealEvent#isValidBonemealTarget()})
+     * alone decides success/consumption/particle for a position; CE's {@code force ||
+     * canUseBonemeal(...)} chance roll (here {@link BonemealableBlock#isBonemealSuccess}) only gates
+     * whether the actual growth call ({@code growable.grow(...)}, here
+     * {@link BonemealableBlock#performBonemeal}) fires - a valid target that fails its own chance
+     * roll still counts as success. CE only bypassed the chance roll itself, never the validity
+     * check, on the exact clicked block ({@code force = true}); the other 26 positions in the 3x3x3
+     * area still roll for the actual growth. This mirrors
      * {@link com.hbm.blocks.generic.BlockNTMFlower}/{@link com.hbm.blocks.generic.BlockTallPlant}'s
      * own {@code isValidBonemealTarget} + {@code isBonemealSuccess} + {@code performBonemeal} call
      * shape.
@@ -377,10 +385,9 @@ public final class BilletPowderItems {
 
         RandomSource random = level.getRandom();
         BonemealableBlock growable = (BonemealableBlock) state.getBlock();
-        if (!force && !growable.isBonemealSuccess(level, random, pos, state)) {
-            return false;
+        if (force || growable.isBonemealSuccess(level, random, pos, state)) {
+            growable.performBonemeal(serverLevel, random, pos, state);
         }
-        growable.performBonemeal(serverLevel, random, pos, state);
         return true;
     }
 

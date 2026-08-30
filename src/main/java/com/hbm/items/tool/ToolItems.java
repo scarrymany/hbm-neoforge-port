@@ -312,11 +312,6 @@ public final class ToolItems {
     public static final DeferredItem<Item> CRATE_CALLER = ModItems.ITEMS.register("crate_caller", () -> new ItemCrateCaller(new Item.Properties().stacksTo(1).durability(4)));
     /** Stubbed break-behavior pending {@code ModBlocks.ntm_dirt} - see class javadoc. */
     public static final DeferredItem<Item> MYSTERYSHOVEL = ModItems.ITEMS.register("mysteryshovel", () -> new ItemMS(new Item.Properties().stacksTo(1)));
-    /** Stubbed place-behavior pending an accessible registered door block - see class javadoc. */
-    public static final DeferredItem<Item> DOOR_METAL = ModItems.ITEMS.register("door_metal", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> DOOR_OFFICE = ModItems.ITEMS.register("door_office", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> DOOR_BUNKER = ModItems.ITEMS.register("door_bunker", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> DOOR_RED = ModItems.ITEMS.register("door_red", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
 
     // ==================== GUI-shell items (ItemBook pattern - menu-opening interaction deferred) ====================
 
@@ -374,10 +369,6 @@ public final class ToolItems {
         CreativeTabContents.add(ModCreativeTabs.WEAPON, BALEFIRE_AND_STEEL);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CRATE_CALLER);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, MYSTERYSHOVEL);
-        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_METAL);
-        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_OFFICE);
-        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_BUNKER);
-        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_RED);
 
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, BOOK_GUIDE_BOOK);
         CreativeTabContents.add(ModCreativeTabs.TEMPLATE, BOBMAZON);

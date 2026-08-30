@@ -13,7 +13,9 @@ import net.minecraft.world.level.Level;
  * distinct registry entries, {@code hbm:canned_<name>} (see {@link FoodItems}), per
  * docs/phase1/items_food_gear.md's flattening table. {@link FoodType} keeps CE's
  * {@code EnumFoodType}'s per-variant food/saturation values; the variant itself is now "which item is
- * it" rather than a stack damage value.
+ * it" rather than a stack damage value. One deliberate exception: {@link FoodType#PIZZA}'s
+ * saturation is 0.75F here rather than CE's literal (and near-certainly bugged) 75.0F - see the
+ * comment on that constant.
  * <p>
  * CE gives every can a {@code can_key} on eating (self-contained, ported directly below).
  * {@link FoodType#BHOLE} additionally spawns an {@code EntityVortex} and {@link FoodType#FIST} deals 2
@@ -33,6 +35,12 @@ public class ItemConserve extends Item {
         JIZZ(15, 5F),
         MILK(5, 0.25F),
         ASS(6, 0.75F),
+        // CE's real value is `075F` - a valid decimal float literal (leading zeros are
+        // insignificant on floats; this is NOT octal) equal to 75.0F. CE's own source flags this
+        // as a probable typo ("1.7 has it at 075F, idk why, typo maybe?") but never fixed it, so
+        // 75.0F is technically the live CE behavior. This port deliberately corrects it to 0.75F
+        // instead of reproducing the apparent bug - the one intentional deviation from this
+        // class's otherwise verbatim EnumFoodType fidelity.
         PIZZA(8, 0.75F),
         TUBE(2, 0.25F),
         TOMATO(4, 0.5F),

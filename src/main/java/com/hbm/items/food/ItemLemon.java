@@ -56,6 +56,12 @@ public class ItemLemon extends Item {
                 tooltip.add(Component.literal("This isn't even PTSD mediaction, it's just"));
                 tooltip.add(Component.literal("Ipecac in a different bottle!"));
             }
+            case "med_schizophrenia" -> {
+                tooltip.add(Component.literal("Makes the voices go away. Just for a while."));
+                tooltip.add(Component.literal(""));
+                tooltip.add(Component.literal("..."));
+                tooltip.add(Component.literal("Better not take it."));
+            }
             case "loops" -> tooltip.add(Component.literal("Brøther, may I have some lööps?"));
             case "loop_stew" -> tooltip.add(Component.literal("A very, very healthy breakfast."));
             case "twinkie" -> tooltip.add(Component.literal("Expired 600 years ago!"));

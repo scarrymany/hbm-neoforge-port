@@ -244,6 +244,39 @@ public class ItemEnergy extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        String path = BuiltInRegistries.ITEM.getKey(this).getPath();
+        switch (path) {
+            case "can_smart" -> tooltip.add(Component.literal("Cheap and full of bubbles"));
+            case "can_creature" -> tooltip.add(Component.literal("Basically gasoline in a tin can"));
+            case "can_redbomb" -> tooltip.add(Component.literal("Liquefied explosives"));
+            case "can_mrsugar" -> tooltip.add(Component.literal("An intellectual drink, for the chosen ones!"));
+            case "can_overcharge" -> tooltip.add(Component.literal(
+                    "Possible side effects include heart attacks, seizures or zombification"));
+            case "can_luna" -> tooltip.add(Component.literal("Contains actual selenium and star metal. Tastes like night."));
+            case "can_bepis" -> tooltip.add(Component.literal("beppp"));
+            case "can_breen" -> {
+                tooltip.add(Component.literal("Don't drink the water. They put something in it, to make you forget."));
+                tooltip.add(Component.literal("I don't even know how I got here."));
+            }
+            case "chocolate_milk" -> {
+                tooltip.add(Component.literal("Regular chocolate milk. Safe to drink."));
+                tooltip.add(Component.literal("Totally not made from nitroglycerine."));
+            }
+            case "bottle_nuka" -> tooltip.add(Component.literal("Contains about 210 kcal and 1500 mSv."));
+            case "bottle_cherry" -> tooltip.add(Component.literal(
+                    "Now with severe radiation poisoning in every seventh bottle!"));
+            case "bottle_quantum" -> tooltip.add(Component.literal("Comes with a colorful mix of over 70 isotopes!"));
+            case "bottle2_korl" -> tooltip.add(Component.literal("Contains actual orange juice!"));
+            case "bottle2_fritz" -> tooltip.add(Component.literal("moremore caffeine"));
+            // TODO(MainRegistry.polaroidID follow-up): CE picks between two lines here depending on
+            // MainRegistry.polaroidID == 11 (an unported easter-egg flag); polaroidID doesn't exist in
+            // this port yet, so this always shows CE's non-taint ("else") line.
+            case "bottle_sparkle" -> tooltip.add(Component.literal("The most delicious beverage in the wasteland!"));
+            case "bottle_rad" -> tooltip.add(Component.literal("Tastes like radish and radiation."));
+            default -> {
+            }
+        }
+
         if (requiresOpener) {
             tooltip.add(Component.literal("[Requires bottle opener]"));
         }

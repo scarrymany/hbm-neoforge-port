@@ -12,16 +12,14 @@ import net.minecraft.world.level.Level;
  * bug where the last-constructed {@code ItemHot} silently wins for every other instance's
  * {@link #getHeat}/{@link #heatUp} calls. Not reproduced here: {@link #maxHeat} is a genuine
  * per-instance field instead, which is strictly more correct and changes no observable behavior for
- * any item in this port (none of Phase 1's {@code ItemHot} consumers are registered yet - see the
- * note below).
+ * any item in this port.
  * <p>
  * Not ported: CE's baked-model alpha-blended glow overlay (finding 6 - the whole
  * {@code IModelRegister}/hand-baked-quad rendering system it depends on has no 1.21 equivalent and
- * needs a model/datagen redesign, not a line-for-line port). No CE field constructs this class
- * directly within this area's scope; {@code ingot_chainsteel}/{@code ingot_meteorite}/
- * {@code ingot_meteorite_forged} (the CE fields that use it) are registered as plain items by a
- * different concurrent Phase 1 area pending exactly this class - see this area's final report for
- * the integration note.
+ * needs a model/datagen redesign, not a line-for-line port). {@code ingot_chainsteel}/
+ * {@code ingot_meteorite}/{@code ingot_meteorite_forged} (the CE fields that use it) are constructed
+ * directly by {@link com.hbm.items.IngotNuggetItems}, with maxHeat 100/200/200 confirmed against
+ * CE's {@code ModItems.java} lines 884-886.
  */
 public class ItemHot extends Item {
 

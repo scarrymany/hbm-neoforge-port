@@ -76,6 +76,6 @@ public class BlockGenericStairs extends StairBlock implements ICustomBlockModelR
         ResourceLocation texture = provider.modLoc("block/" + name);
 
         provider.stairsBlock(this, texture);
-        provider.simpleBlockItem(this, provider.models().getExistingFile(texture));
+        provider.simpleBlockItem(this, new net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile(texture));
     }
 }

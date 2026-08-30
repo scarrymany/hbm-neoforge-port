@@ -70,6 +70,6 @@ public class BlockGenericSlab extends SlabBlock implements ICustomBlockModelRegi
         ResourceLocation texture = provider.modLoc("block/" + name);
 
         provider.slabBlock(this, texture, texture);
-        provider.simpleBlockItem(this, provider.models().getExistingFile(texture));
+        provider.simpleBlockItem(this, new net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile(texture));
     }
 }

@@ -51,10 +51,19 @@ import java.util.function.Supplier;
  *     <li>{@link BlockBeaconable} - bismuth, tantalum, niobium, lanthanum, zirconium.</li>
  *     <li>{@link BlockOutgas} - asbestos.</li>
  *     <li>{@link BlockHydroreactive} - lithium.</li>
+ *     <li>{@link BlockFallingBase} - red phosphorus (CE's real {@code block_red_phosphorus} is a
+ *     {@code Material.SAND} falling block, not a plain cube - see the hardness/resistance note below
+ *     for the full CE comparison).</li>
  *     <li>{@link BlockBase} - every other material (titanium, copper, tungsten, aluminium, steel,
  *     cobalt, niter, sulfur, fluorite, beryllium, dura-steel, desh, starmetal, combine steel,
- *     dineutronium, saturnite, slag, carbon, iron, gold, emerald, neodymium, mingrade, technetium,
- *     ghiorsium, red phosphorus, ...).</li>
+ *     dineutronium, saturnite, carbon, iron, gold, emerald, neodymium, mingrade, technetium,
+ *     ghiorsium, ...). <b>Known simplification:</b> slag is grouped here too, but CE's real
+ *     {@code block_slag} (upstream {@code ModBlocks.java} line 624) is
+ *     {@code new BlockMeta(Material.ROCK, SoundType.STONE, "block_slag", "block_slag",
+ *     "block_slag_broken")} - a multi-variant meta-block with a distinct "broken" sub-state, not a
+ *     single-state full cube. This port has no {@code BlockMeta}-equivalent class yet, so slag is
+ *     collapsed to a plain {@link BlockBase} pending one; its 5.0F/10.0F hardness/resistance survives
+ *     the simplification by coincidence.</li>
  * </ul>
  * <p>
  * <b>Hardness/resistance.</b> Taken from CE's real {@code .setHardness(...).setResistance(...)} calls
@@ -65,11 +74,16 @@ import java.util.function.Supplier;
  * {@code _starmetal}/{@code _combine_steel} = 5.0F/300.0F, {@code block_dineutronium} = 5.0F/60000.0F,
  * {@code block_saturnite} = 6.0F/400.0F, {@code block_asbestos} = 10.0F/10.0F). CE has no directly
  * named storage block at all for carbon, iron, gold, the plutonium-RG/americium isotopes, neodymium,
- * technetium, ghiorsium, mingrade, or red phosphorus (this last one only because CE's actual
- * {@code block_white_phosphorus} - a {@code BlockHazard} - is a different behavior class than this
- * material's assigned bucket above; its numeric hardness/resistance, 5.0F/10.0F, is reused regardless
- * of the class mismatch) - these fall back to CE's overwhelming default of 5.0F/10.0F for this whole
- * section, same as every other material not called out with a specific override.
+ * technetium, ghiorsium, mingrade, or slag (slag's real CE analogue, {@code block_slag}, is likewise
+ * 5.0F/10.0F, so the fallback default happens to match anyway) - these fall back to CE's overwhelming
+ * default of 5.0F/10.0F for this whole section, same as every other material not called out with a
+ * specific override. Red phosphorus is a related but distinct case: its real CE analogue is
+ * {@code block_red_phosphorus} ({@link BlockFallingBase}, {@code Material.SAND},
+ * {@code SoundType.SAND}, still 5.0F/10.0F by coincidence) - not {@code block_white_phosphorus}
+ * (a {@code BlockHazard}), which has no corresponding material in {@link Mats} at all. Unlike slag,
+ * this port does carry a ready-made {@link BlockFallingBase} and registers red phosphorus with it
+ * (see the classification list above), so the behavior-class gap is closed rather than simplified
+ * away.
  * <p>
  * <b>Sound/tool.</b> CE's own material blocks split between an explicit {@code SoundType.METAL} call
  * and (for niter/sulfur/fluorite/lead/ra226, which never call {@code setSoundType}) Block's 1.12
@@ -117,7 +131,15 @@ public final class MaterialBlockGenerator {
         HARDNESS_RESISTANCE_OVERRIDES.put(Mats.MAT_SATURN, new float[]{6.0F, 400.0F});
     }
 
-    /** CE's contact-radiation-hazard family (see class javadoc). */
+    /**
+     * CE's contact-radiation-hazard family (see class javadoc). Known gap: CE's real
+     * {@code block_ra226} additionally chains {@code .makeBeaconable()}, layering beacon-base
+     * eligibility on top of the hazard behavior - the one CE material with both traits at once. This
+     * port's single-behavior-class-per-material design has no way to compose {@link BlockHazard} with
+     * {@link BlockBeaconable}'s beacon-base check, so {@code radium_block} loses the beacon-base trait
+     * (contact radiation is preserved). Follow-up for whoever designs a trait/interface-composable
+     * block-behavior system; not fixed here.
+     */
     private static final Set<NTMMaterial> HAZARD_MATERIALS = new HashSet<>(List.of(
             Mats.MAT_PLUTONIUM, Mats.MAT_RGP, Mats.MAT_PU238, Mats.MAT_PU239, Mats.MAT_PU240, Mats.MAT_PU241,
             Mats.MAT_URANIUM, Mats.MAT_U233, Mats.MAT_U235, Mats.MAT_U238,
@@ -177,6 +199,8 @@ public final class MaterialBlockGenerator {
             register(mat, () -> new BlockOutgas(props));
         } else if (mat == Mats.MAT_LITHIUM) {
             register(mat, () -> new BlockHydroreactive(props));
+        } else if (mat == Mats.MAT_PHOSPHORUS) {
+            register(mat, () -> new BlockFallingBase(props));
         } else {
             register(mat, () -> new BlockBase(props));
         }

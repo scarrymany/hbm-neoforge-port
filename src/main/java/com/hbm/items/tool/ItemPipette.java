@@ -91,7 +91,11 @@ public class ItemPipette extends ItemBase {
         return getType(stack) == type && getFill(stack) > 0;
     }
 
-    /** @return the leftover amount that could not be drained (mirrors CE's {@code IFillableItem.tryEmpty}). */
+    /**
+     * @return the amount actually drained, capped at {@code amount} (mirrors CE's {@code
+     *     IFillableItem.tryEmpty}: "provides fluid with the maximum being the requested amount"),
+     *     or the full {@code amount} unchanged if nothing could be drained.
+     */
     public int tryEmpty(FluidType type, int amount, ItemStack stack) {
         if (amount <= 0 || !providesFluid(type, stack)) {
             return amount;
@@ -108,7 +112,7 @@ public class ItemPipette extends ItemBase {
             stack.set(MachineDataComponents.FLUID_AMOUNT.get(), remaining);
         }
 
-        return amount - toDrain;
+        return toDrain;
     }
 
     public FluidType getFirstFluidType(ItemStack stack) {
