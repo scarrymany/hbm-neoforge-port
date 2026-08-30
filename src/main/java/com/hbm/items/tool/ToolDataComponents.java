@@ -10,9 +10,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Data components backing the two pieces of ItemStack state CE stored as raw NBT on tool items in
- * this package: {@code ItemToolAbilityFueled}'s fuel tank level and {@code ItemToolAbilityPower}'s
- * battery charge.
+ * Data components backing ItemStack state CE stored as raw NBT on tool items in this package:
+ * {@code ItemToolAbilityFueled}'s fuel tank level, {@code ItemToolAbilityPower}'s battery charge,
+ * and {@link ItemColtanCompass}'s persisted target deposit coordinates.
  *
  * <p>{@link com.hbm.api.energymk2.IBatteryItem}'s own javadoc anticipates a single shared
  * {@code hbm:battery_charge} component "registered by whichever area owns the mod's data-component
@@ -39,6 +39,20 @@ public final class ToolDataComponents {
             DATA_COMPONENT_TYPES.register("tool_charge", () -> DataComponentType.<Long>builder()
                     .persistent(Codec.LONG)
                     .networkSynchronized(ByteBufCodecs.VAR_LONG)
+                    .build());
+
+    /** {@link ItemColtanCompass} target deposit X coordinate (CE NBT key "colX"). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COLTAN_X =
+            DATA_COMPONENT_TYPES.register("coltan_x", () -> DataComponentType.<Integer>builder()
+                    .persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.INT)
+                    .build());
+
+    /** {@link ItemColtanCompass} target deposit Z coordinate (CE NBT key "colZ"). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COLTAN_Z =
+            DATA_COMPONENT_TYPES.register("coltan_z", () -> DataComponentType.<Integer>builder()
+                    .persistent(Codec.INT)
+                    .networkSynchronized(ByteBufCodecs.INT)
                     .build());
 
     private ToolDataComponents() {

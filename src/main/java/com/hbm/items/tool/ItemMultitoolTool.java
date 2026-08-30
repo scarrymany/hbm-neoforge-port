@@ -1,9 +1,11 @@
 package com.hbm.items.tool;
 
+import com.hbm.items.ICustomItemModelRegister;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
@@ -14,6 +16,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 
 import java.util.List;
 
@@ -32,7 +35,7 @@ import java.util.List;
  * uses), rather than a hand-rolled "drop the block itself" shortcut - this way block-specific silk
  * touch drop rules (double slabs, ores with custom silk drops, etc.) stay correct automatically.
  */
-public class ItemMultitoolTool extends TieredItem {
+public class ItemMultitoolTool extends TieredItem implements ICustomItemModelRegister {
 
     private final boolean silkTouch;
 
@@ -70,5 +73,12 @@ public class ItemMultitoolTool extends TieredItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.literal("Breaks blocks extremely fast"));
         tooltipComponents.add(Component.literal(silkTouch ? "Ores will drop themselves via silk touch" : "Extra drops for ores"));
+    }
+
+    /** Handheld 3D tool, not a flat icon - see {@link ItemToolAbility#registerItemModel} for the full rationale. */
+    @Override
+    public void registerItemModel(ItemModelProvider provider, ResourceLocation modelLocation) {
+        provider.withExistingParent(modelLocation.getPath(), provider.mcLoc("item/handheld"))
+                .texture("layer0", provider.modLoc("item/" + modelLocation.getPath()));
     }
 }

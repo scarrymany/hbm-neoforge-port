@@ -22,8 +22,13 @@ import java.util.function.UnaryOperator;
  * Registers every Phase-1-safe {@code items/tool} content item: the ~40 material-tiered mining
  * tools built on {@link ItemToolAbility}/{@link ItemToolAbilityFueled}/{@link ItemToolAbilityPower}
  * (upstream hbm-ce {@code ModItems.java} lines ~1439-1801), the {@code multitool_dig}/
- * {@code multitool_silk} rungs of {@link ItemMultitoolTool}, and the handful of standalone simple
- * items this package also owns. See {@code docs/phase1/items_tool.md} for the full area survey.
+ * {@code multitool_silk} rungs of {@link ItemMultitoolTool}, the handful of standalone simple
+ * items this package also owns, and the detector/diagnostic, fluid-container, repair-kit, and
+ * GUI-shell items rounding out docs/phase1/items_tool.md bucket (a). Several of the latter group
+ * are registered with a documented stub (missing world-gen block, missing GUI/menu framework, or
+ * missing a cross-cutting system like {@code ConsumableHandler}/{@code PollutionHandler}) rather
+ * than faked behavior - see each item class's own javadoc for specifics. See
+ * {@code docs/phase1/items_tool.md} for the full area survey.
  *
  * <p>Attack damage/speed parity: CE's {@code ItemToolAbility} overrides
  * {@code getItemAttributeModifiers} to apply the constructor's {@code damage}/{@code attackSpeedIn}
@@ -261,6 +266,71 @@ public final class ToolItems {
     /** Durability 0 (CE parity): never actually damageable, so {@link ItemCraftingDegradation#getCraftingRemainingItem} always returns it unchanged - an infinite-use catalyst. */
     public static final DeferredItem<Item> CHEMISTRY_SET_BORON = ModItems.ITEMS.register("chemistry_set_boron", () -> new ItemCraftingDegradation(new Item.Properties().stacksTo(1).durability(0)));
 
+    // ==================== detectors / diagnostics (docs/phase1/items_tool.md bucket (a)) ====================
+
+    public static final DeferredItem<Item> COLTAN_TOOL = ModItems.ITEMS.register("coltan_tool", () -> new ItemColtanCompass(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> DOSIMETER = ModItems.ITEMS.register("dosimeter", () -> new ItemDosimeter(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> GEIGER_COUNTER = ModItems.ITEMS.register("geiger_counter", () -> new ItemGeigerCounter(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> DIGAMMA_DIAGNOSTIC = ModItems.ITEMS.register("digamma_diagnostic", () -> new ItemDigammaDiagnostic(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> LUNG_DIAGNOSTIC = ModItems.ITEMS.register("lung_diagnostic", () -> new ItemLungDiagnostic(new Item.Properties().stacksTo(1)));
+    /** Real per-type density readout; overall tier/fluid summary stubbed - see class javadoc. */
+    public static final DeferredItem<Item> ORE_DENSITY_SCANNER = ModItems.ITEMS.register("ore_density_scanner", () -> new ItemOreDensityScanner(new Item.Properties().stacksTo(1)));
+    /** Stubbed pending {@code ModBlocks.ore_oil}/{@code ore_bedrock_oil} - see class javadoc. */
+    public static final DeferredItem<Item> OIL_DETECTOR = ModItems.ITEMS.register("oil_detector", () -> new ItemOilDetector(new Item.Properties().stacksTo(1)));
+    /** Stubbed pending several missing world-gen blocks - see class javadoc. */
+    public static final DeferredItem<Item> SURVEY_SCANNER = ModItems.ITEMS.register("survey_scanner", () -> new ItemSurveyScanner(new Item.Properties().stacksTo(1)));
+    /** Stubbed pending {@code PollutionHandler} - see class javadoc. */
+    public static final DeferredItem<Item> POLLUTION_DETECTOR = ModItems.ITEMS.register("pollution_detector", () -> new ItemPollutionDetector(new Item.Properties().stacksTo(1)));
+
+    // ==================== repair kits (ItemRepairKit; stubbed pending ConsumableHandler) ====================
+
+    public static final DeferredItem<Item> GUN_KIT_1 = ModItems.ITEMS.register("gun_kit_1", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(9)));
+    public static final DeferredItem<Item> GUN_KIT_2 = ModItems.ITEMS.register("gun_kit_2", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(99)));
+
+    // ==================== fluid containers (ItemCanister/ItemGasCanister/ItemFluidContainerInfinite/ItemPipette) ====================
+
+    public static final DeferredItem<Item> CANISTER_FUEL = ModItems.ITEMS.register("canister_fuel", () -> new ItemCanister(new Item.Properties(), 1000));
+    public static final DeferredItem<Item> GAS_FULL = ModItems.ITEMS.register("gas_full", () -> new ItemGasCanister(new Item.Properties()));
+    public static final DeferredItem<Item> FLUID_BARREL_INFINITE = ModItems.ITEMS.register("fluid_barrel_infinite",
+            () -> new ItemFluidContainerInfinite(new Item.Properties().stacksTo(1), null, 1_000_000_000, 1, true));
+    public static final DeferredItem<Item> INF_WATER = ModItems.ITEMS.register("inf_water",
+            () -> new ItemFluidContainerInfinite(new Item.Properties().stacksTo(1), Fluids.WATER, 50));
+    public static final DeferredItem<Item> INF_WATER_MK2 = ModItems.ITEMS.register("inf_water_mk2",
+            () -> new ItemFluidContainerInfinite(new Item.Properties().stacksTo(1), Fluids.WATER, 500));
+    /** CE: partsTab, not controlTab like the other {@link ItemFluidContainerInfinite} instances above. */
+    public static final DeferredItem<Item> CHLORINE_PINWHEEL = ModItems.ITEMS.register("chlorine_pinwheel",
+            () -> new ItemFluidContainerInfinite(new Item.Properties().stacksTo(1), Fluids.CHLORINE, 1, 2, false));
+    public static final DeferredItem<Item> PIPETTE = ModItems.ITEMS.register("pipette", () -> new ItemPipette(new Item.Properties().stacksTo(1), 1000, true));
+    public static final DeferredItem<Item> PIPETTE_BORON = ModItems.ITEMS.register("pipette_boron", () -> new ItemPipette(new Item.Properties().stacksTo(1), 1000, false));
+    public static final DeferredItem<Item> PIPETTE_LABORATORY = ModItems.ITEMS.register("pipette_laboratory", () -> new ItemPipette(new Item.Properties().stacksTo(1), 50, false));
+
+    // ==================== standalone items with a missing world-gen/paired-block dependency ====================
+
+    /** Stubbed use-behavior pending {@code ModBlocks.balefire} - see class javadoc. */
+    public static final DeferredItem<Item> BALEFIRE_AND_STEEL = ModItems.ITEMS.register("balefire_and_steel", () -> new ItemBalefireMatch(new Item.Properties().stacksTo(1).durability(256)));
+    /** Stubbed place-behavior pending an accessible registered crate block - see class javadoc. */
+    public static final DeferredItem<Item> CRATE_CALLER = ModItems.ITEMS.register("crate_caller", () -> new ItemCrateCaller(new Item.Properties().stacksTo(1).durability(4)));
+    /** Stubbed break-behavior pending {@code ModBlocks.ntm_dirt} - see class javadoc. */
+    public static final DeferredItem<Item> MYSTERYSHOVEL = ModItems.ITEMS.register("mysteryshovel", () -> new ItemMS(new Item.Properties().stacksTo(1)));
+    /** Stubbed place-behavior pending an accessible registered door block - see class javadoc. */
+    public static final DeferredItem<Item> DOOR_METAL = ModItems.ITEMS.register("door_metal", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> DOOR_OFFICE = ModItems.ITEMS.register("door_office", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> DOOR_BUNKER = ModItems.ITEMS.register("door_bunker", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> DOOR_RED = ModItems.ITEMS.register("door_red", () -> new ItemModDoor(new Item.Properties().stacksTo(1)));
+
+    // ==================== GUI-shell items (ItemBook pattern - menu-opening interaction deferred) ====================
+
+    public static final DeferredItem<Item> BOOK_GUIDE_BOOK = ModItems.ITEMS.register("book_guide_book", () -> new ItemGuideBook(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> BOBMAZON = ModItems.ITEMS.register("bobmazon", () -> new ItemCatalog(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> BOBMAZON_HIDDEN = ModItems.ITEMS.register("bobmazon_hidden", () -> new ItemCatalog(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> BOOK_LEMEGETON = ModItems.ITEMS.register("book_lemegeton", () -> new ItemBookLemegeton(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> AMMO_BAG = ModItems.ITEMS.register("ammo_bag", () -> new ItemAmmoBag(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> AMMO_BAG_INFINITE = ModItems.ITEMS.register("ammo_bag_infinite", () -> new ItemAmmoBag(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> CASING_BAG = ModItems.ITEMS.register("casing_bag", () -> new ItemCasingBag(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> PLASTIC_BAG = ModItems.ITEMS.register("plastic_bag", () -> new ItemPlasticBag(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> CONTAINMENT_BOX = ModItems.ITEMS.register("containment_box", () -> new ItemLeadBox(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> TOOLBOX = ModItems.ITEMS.register("toolbox", () -> new ItemToolBox(new Item.Properties().stacksTo(1)));
+
     /** No-op beyond forcing this class to load before {@code ModItems.ITEMS.register(modEventBus)}. */
     public static void registerAll() {
     }
@@ -274,6 +344,51 @@ public final class ToolItems {
         CreativeTabContents.add(ModCreativeTabs.WEAPON, MATCHSTICK);
         CreativeTabContents.add(ModCreativeTabs.CONTROL, CHEMISTRY_SET);
         CreativeTabContents.add(ModCreativeTabs.CONTROL, CHEMISTRY_SET_BORON);
+
+        // ---- bucket (a) additions: detectors/diagnostics, repair kits, fluid containers,
+        // stubbed-dependency standalone items, and GUI-shell items (see docs/phase1/items_tool.md).
+        // Tab choices match CE's own setCreativeTab call at each item's ModItems.java declaration.
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COLTAN_TOOL);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, DOSIMETER);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GEIGER_COUNTER);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, DIGAMMA_DIAGNOSTIC);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, LUNG_DIAGNOSTIC);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, ORE_DENSITY_SCANNER);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, OIL_DETECTOR);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, SURVEY_SCANNER);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, POLLUTION_DETECTOR);
+
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GUN_KIT_1);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GUN_KIT_2);
+
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, CANISTER_FUEL);
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, GAS_FULL);
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, FLUID_BARREL_INFINITE);
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, INF_WATER);
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, INF_WATER_MK2);
+        CreativeTabContents.add(ModCreativeTabs.PARTS, CHLORINE_PINWHEEL);
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, PIPETTE);
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, PIPETTE_BORON);
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, PIPETTE_LABORATORY);
+
+        CreativeTabContents.add(ModCreativeTabs.WEAPON, BALEFIRE_AND_STEEL);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CRATE_CALLER);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, MYSTERYSHOVEL);
+        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_METAL);
+        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_OFFICE);
+        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_BUNKER);
+        CreativeTabContents.add(ModCreativeTabs.BLOCKS, DOOR_RED);
+
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, BOOK_GUIDE_BOOK);
+        CreativeTabContents.add(ModCreativeTabs.TEMPLATE, BOBMAZON);
+        CreativeTabContents.add(ModCreativeTabs.TEMPLATE, BOBMAZON_HIDDEN);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, BOOK_LEMEGETON);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, AMMO_BAG);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, AMMO_BAG_INFINITE);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CASING_BAG);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, PLASTIC_BAG);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CONTAINMENT_BOX);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, TOOLBOX);
     }
 
     // ==================== construction helpers ====================

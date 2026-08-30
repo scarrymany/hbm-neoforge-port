@@ -7,6 +7,7 @@ import com.hbm.handler.ability.IBaseAbility;
 import com.hbm.handler.ability.IToolAreaAbility;
 import com.hbm.handler.ability.IToolHarvestAbility;
 import com.hbm.handler.ability.ToolPreset;
+import com.hbm.items.ICustomItemModelRegister;
 import com.hbm.items.IItemControlReceiver;
 import com.hbm.items.IKeybindReceiver;
 import com.hbm.util.TagsUtil;
@@ -17,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -33,6 +35,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.IShearable;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
@@ -62,7 +65,7 @@ import java.util.List;
  *     explosion instead of CE's custom {@code ExplosionNT} pipeline - see that class's javadoc.</li>
  * </ul>
  */
-public class ItemToolAbility extends TieredItem implements IDepthRockTool, IItemControlReceiver, IKeybindReceiver {
+public class ItemToolAbility extends TieredItem implements IDepthRockTool, IItemControlReceiver, IKeybindReceiver, ICustomItemModelRegister {
 
     /** Mirrors CE's {@code EnumToolType} (PICKAXE/AXE/SHOVEL/MINER - CE never had a HOE variant here). */
     public enum ToolRole {
@@ -454,5 +457,23 @@ public class ItemToolAbility extends TieredItem implements IDepthRockTool, IItem
     public void handleKeybindClient(LocalPlayer player, ItemStack stack, HbmKeybinds.EnumKeybind keybind, boolean state) {
         // CE opens GUIScreenToolAbility here to customize presets; that screen isn't part of this
         // port yet (see class javadoc) - cycling via ABILITY_CYCLE above still fully works.
+    }
+
+    /**
+     * All of this class's ~40 instances (plus {@link ItemToolAbilityFueled}/{@link ItemToolAbilityPower}
+     * /{@link ItemChainsaw}, which inherit this override rather than repeating it) are handheld 3D
+     * tools, not flat 2D resource icons - {@code ModItemModelProvider}'s {@code basicItem(...)}
+     * default (single {@code item/generated} layer) would render them as a flat picture instead of
+     * the angled in-hand tool pose every vanilla tool uses. Parents to vanilla's {@code item/handheld}
+     * with a single {@code layer0} texture at this item's own registry-name path under {@code item/}
+     * - the same texture-path convention {@code basicItem(...)} itself would have used, just against
+     * the handheld parent instead of {@code item/generated} (confirmed real pattern: matches the Neo
+     * Edition reference's {@code ItemModelProvider.handheldItem(Item)} helper, which resolves to this
+     * exact {@code withExistingParent(...).texture("layer0", ...)} call).
+     */
+    @Override
+    public void registerItemModel(ItemModelProvider provider, ResourceLocation modelLocation) {
+        provider.withExistingParent(modelLocation.getPath(), provider.mcLoc("item/handheld"))
+                .texture("layer0", provider.modLoc("item/" + modelLocation.getPath()));
     }
 }
