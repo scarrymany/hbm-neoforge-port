@@ -1,9 +1,13 @@
 package com.hbm.blocks;
 
+import com.hbm.blocks.generic.BlockForgottenBrick;
+import com.hbm.blocks.generic.BlockGrate;
+import com.hbm.blocks.generic.BlockRotatablePillar;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
@@ -32,12 +36,30 @@ public final class ModBlocks {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
             DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MainRegistry.MODID);
 
+    /**
+     * Cross-block sibling references some {@code com.hbm.blocks.generic} classes need at runtime
+     * (identity checks against a specific registered instance, mirroring CE's own
+     * {@code ModBlocks.foo} field reads from inside another block's class body - see
+     * {@code BlockGrate}/{@code BlockRotatablePillar}/{@code BlockForgottenLock}'s own javadoc for
+     * each one's exact use). Populated by {@code GenericBlocks.registerAll()} during
+     * {@link #register}, before any block's {@code DeferredBlock#get()} is actually called (that
+     * only happens later, at gameplay time, once NeoForge's {@code RegisterEvent} has fired) - not
+     * {@code final} for that reason, the same as any other {@code DeferredRegister.register(...)}
+     * result stored for later cross-reference.
+     */
+    public static DeferredBlock<BlockForgottenBrick> BRICK_FORGOTTEN;
+    public static DeferredBlock<BlockGrate> STEEL_GRATE_WIDE;
+    public static DeferredBlock<BlockRotatablePillar> BLOCK_SCHRABIDIUM_CLUSTER;
+    public static DeferredBlock<BlockRotatablePillar> BLOCK_EUPHEMIUM_CLUSTER;
+
     private ModBlocks() {
     }
 
     public static void register(IEventBus modEventBus) {
         OreBlocks.registerAll();
         com.hbm.blocks.generic.GenericBlocks.registerAll();
+        MaterialBlockGenerator.registerAll();
+        com.hbm.blocks.gas.GasBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }

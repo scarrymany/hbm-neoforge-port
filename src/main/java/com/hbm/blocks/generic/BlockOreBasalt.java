@@ -14,10 +14,10 @@ import net.minecraft.world.level.block.Block;
  * belongs to has not been ported yet, so that ambient effect is skipped rather than faked; the
  * block's physical properties (hardness, resistance, sound) are otherwise faithful to CE.
  *
- * <p>CE's per-variant drop ({@link EnumBasaltOreType#getDrop()} /
- * {@link EnumBasaltOreType#getDropCount(int)}) is loot-table content in modern Minecraft (blocks no
- * longer have a Java-side {@code getDrops} hook); wire it into this block's loot table once the
- * datagen loot provider exists.
+ * <p>CE's per-variant drop ({@code EnumBasaltOreType.getDrop()}/{@code getDropCount(int)}, not
+ * reintroduced on the port's enum - see its own javadoc) is loot-table content in modern Minecraft
+ * (blocks no longer have a Java-side {@code getDrops} hook); wire it into this block's loot table
+ * once the datagen loot provider exists.
  */
 public class BlockOreBasalt extends Block {
 

@@ -1,8 +1,5 @@
 package com.hbm.blocks;
 
-import com.hbm.items.ModItems;
-import net.minecraft.world.item.Item;
-
 public class BlockEnums {
 
     public enum EnumStoneType {
@@ -135,6 +132,15 @@ public class BlockEnums {
         }
     }
 
+    /**
+     * {@code getDrop()}/{@code getDropCount(int)} companions (CE: {@code sulfur}/{@code fluorite}/
+     * {@code ingot_asbestos}/{@code gem_volcanic}/{@code powder_molysite}) are intentionally not
+     * reintroduced here: {@code ModItems} carries no plain per-element fields for this catalog
+     * (real registry homes are {@code PlateCrystalWasteItems}/{@code BilletPowderItems}/
+     * {@code IngotNuggetItems}, wired directly by {@code OreBlocks}'s own drop tables), and block
+     * drops are loot-table content in modern Minecraft regardless - there is no Java
+     * {@code getDrops} hook left to hang a per-enum-constant item mapping on.
+     */
     public enum EnumBasaltOreType {
         SULFUR,
         FLUORITE,
@@ -143,22 +149,16 @@ public class BlockEnums {
         MOLYSITE;
 
         public static final EnumBasaltOreType[] VALUES = values();
-
-        public Item getDrop() {
-            return switch (this) {
-                case SULFUR -> ModItems.sulfur;
-                case FLUORITE -> ModItems.fluorite;
-                case ASBESTOS -> ModItems.ingot_asbestos;
-                case GEM -> ModItems.gem_volcanic;
-                case MOLYSITE -> ModItems.powder_molysite;
-            };
-        }
-
-        public int getDropCount(int rand) {
-            return rand + 1;
-        }
     }
 
+    /**
+     * {@code getDrop()}/{@code getDropCount()} companions (CE: {@code cap_nuka}/{@code cap_quantum}/
+     * {@code cap_rad}/{@code cap_sparkle}/{@code cap_korl}/{@code cap_fritz}) are intentionally not
+     * reintroduced here: those fields are private to {@code items.food.FoodItems} (and CE's own
+     * {@code cap_fritz} was never actually constructed - see that class's javadoc), so there is no
+     * public per-element item to map to from this package; block drops are loot-table content in
+     * modern Minecraft regardless.
+     */
     public enum EnumBlockCapType {
         NUKA,
         QUANTUM,
@@ -168,21 +168,6 @@ public class BlockEnums {
         FRITZ;
 
         public static final EnumBlockCapType[] VALUES = values();
-
-        public Item getDrop() {
-            return switch (this) {
-                case NUKA -> ModItems.cap_nuka;
-                case QUANTUM -> ModItems.cap_quantum;
-                case RAD -> ModItems.cap_rad;
-                case SPARKLE -> ModItems.cap_sparkle;
-                case KORL -> ModItems.cap_korl;
-                case FRITZ -> ModItems.cap_fritz;
-            };
-        }
-
-        public int getDropCount() {
-            return 128;
-        }
     }
 
     public enum LightType {

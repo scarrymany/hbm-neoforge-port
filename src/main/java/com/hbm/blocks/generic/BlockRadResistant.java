@@ -15,4 +15,8 @@ public class BlockRadResistant extends BlockBase {
     public BlockRadResistant(Properties properties) {
         super(properties);
     }
+
+    public BlockRadResistant(Properties properties, boolean noSpawn) {
+        super(properties, noSpawn);
+    }
 }

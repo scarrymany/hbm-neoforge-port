@@ -1,13 +1,16 @@
 package com.hbm.blocks.generic;
 
+import com.hbm.blocks.ICustomBlockModelRegister;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -29,7 +32,7 @@ import java.util.function.Supplier;
  * this package, since every concrete stairs block needs a base material block this survey's scope
  * does not include.
  */
-public class BlockGenericStairs extends StairBlock {
+public class BlockGenericStairs extends StairBlock implements ICustomBlockModelRegister {
 
     private static final float BLAST_RESISTANCE_TOOLTIP_THRESHOLD = 50.0F;
 
@@ -49,5 +52,30 @@ public class BlockGenericStairs extends StairBlock {
         if (resistance > BLAST_RESISTANCE_TOOLTIP_THRESHOLD) {
             tooltip.add(Component.translatable("trait.blastres", resistance).withStyle(ChatFormatting.GOLD));
         }
+    }
+
+    /**
+     * {@code ModBlockStateProvider}'s cube-all default cannot express this block's real FACING/HALF/
+     * SHAPE blockstate at all (a plain cube-all model has none of those properties, let alone the
+     * straight/inner/outer corner geometry stairs need) - {@link BlockStateProvider#stairsBlock} is
+     * the confirmed real datagen helper that builds the full straight+inner+outer model trio and
+     * wires it to every FACING/HALF/SHAPE combination, from this block's own single registry-name
+     * texture (the base material's plain texture, per this class's javadoc), built via the exact
+     * {@code "block/" + registryName} convention {@code simpleCubeAllBlock(...)} itself would have
+     * used (through {@link BlockStateProvider#modLoc}, confirmed public and already used externally
+     * by this package's {@code WasteEarth}/{@code WasteLog}, rather than the provider's own
+     * {@code blockTexture(Block)} helper, which this port could not confirm is public rather than
+     * protected against the real 1.21.1 jar in this sandbox). The stair item's icon reuses the
+     * straight-stairs model exactly like vanilla's own stair items do (no separate flat icon),
+     * following the confirmed real {@code blockItem(...)} pattern in the Neo Edition reference's
+     * {@code NtmBlockStateProvider} (used right after its own {@code stairsBlock(...)} calls).
+     */
+    @Override
+    public void registerModel(BlockStateProvider provider, ResourceLocation modelLocation) {
+        String name = modelLocation.getPath();
+        ResourceLocation texture = provider.modLoc("block/" + name);
+
+        provider.stairsBlock(this, texture);
+        provider.simpleBlockItem(this, provider.models().getExistingFile(texture));
     }
 }

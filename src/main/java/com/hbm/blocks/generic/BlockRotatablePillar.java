@@ -1,12 +1,15 @@
 package com.hbm.blocks.generic;
 
+import com.hbm.blocks.ICustomBlockModelRegister;
 import com.hbm.blocks.ModBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 
 import java.util.List;
 
@@ -18,7 +21,7 @@ import java.util.List;
  * tooltip lines are preserved via direct sibling-field references, matching CE's own
  * {@code ModBlocks.block_schrabidium_cluster} identity check.
  */
-public class BlockRotatablePillar extends RotatedPillarBlock {
+public class BlockRotatablePillar extends RotatedPillarBlock implements ICustomBlockModelRegister {
 
     private static final float BLAST_RESISTANCE_TOOLTIP_THRESHOLD = 50.0F;
 
@@ -41,5 +44,27 @@ public class BlockRotatablePillar extends RotatedPillarBlock {
         if (resistance > BLAST_RESISTANCE_TOOLTIP_THRESHOLD) {
             tooltip.add(Component.translatable("trait.blastres", resistance).withStyle(ChatFormatting.GOLD));
         }
+    }
+
+    /**
+     * {@code ModBlockStateProvider}'s cube-all default would generate a single variant shared by
+     * every {@link net.minecraft.core.Direction.Axis} value, which is wrong for a real pillar (the
+     * side texture needs to rotate to face outward on the X/Z axes) - {@link BlockStateProvider#axisBlock}
+     * is the confirmed real datagen helper for exactly this AXIS-keyed vertical/horizontal model pair,
+     * built here from the block's own single registry-name texture (this class has no separate
+     * top/side texture pair - see CE's own plain pillar texture sets), matching the exact
+     * {@code "block/" + registryName} texture-path convention {@code simpleCubeAllBlock(...)} itself
+     * would have used (built directly via {@link BlockStateProvider#modLoc}, confirmed public and
+     * already used externally by this same package's {@code WasteEarth}/{@code WasteLog}, rather than
+     * via the provider's own {@code blockTexture(Block)} helper, which this port could not confirm is
+     * public rather than protected against the real 1.21.1 jar in this sandbox).
+     */
+    @Override
+    public void registerModel(BlockStateProvider provider, ResourceLocation modelLocation) {
+        String name = modelLocation.getPath();
+        ResourceLocation texture = provider.modLoc("block/" + name);
+
+        provider.axisBlock(this, texture, texture);
+        provider.simpleBlockItem(this, provider.models().getExistingFile(texture));
     }
 }
