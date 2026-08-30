@@ -1,5 +1,9 @@
 package com.hbm.items;
 
+import com.hbm.items.special.BedrockOreComponents;
+import com.hbm.items.special.BedrockOreItems;
+import com.hbm.items.tool.ToolDataComponents;
+import com.hbm.items.tool.ToolItems;
 import com.hbm.main.MainRegistry;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -28,6 +32,14 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MainRegistry.MODID);
 
     public static void register(IEventBus modEventBus) {
+        MaterialItemGenerator.registerAll();
+        PlateCrystalWasteItems.registerAll();
+        BilletPowderItems.registerAll();
+        IngotNuggetItems.registerAll();
+        BedrockOreItems.bootstrap();
+        BedrockOreComponents.register(modEventBus);
+        ToolItems.registerAll();
+        ToolDataComponents.register(modEventBus);
         ITEMS.register(modEventBus);
     }
 }

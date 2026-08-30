@@ -18,16 +18,19 @@ import com.hbm.hazard.type.HazardTypeHydroactive;
 import com.hbm.hazard.type.HazardTypeRadiation;
 import com.hbm.hazard.type.HazardTypeToxic;
 import com.hbm.hazard.type.IHazardType;
+import com.hbm.items.BilletPowderItems;
+import com.hbm.items.IngotNuggetItems;
+import com.hbm.items.PlateCrystalWasteItems;
 
 /**
  * Physics-derived level constants and the {@link IHazardType} singletons every {@code HazardData} entry is built
  * from, plus the transformer chain wiring.
  * <p>
- * {@link #registerItems()} and {@link #registerContaminatingDrops()} are intentionally empty. CE's ~460-line bulk
- * item-to-hazard binding table (and the specialized {@code registerRBMKRod}/{@code registerRTGPellet}/... helper
- * methods it uses) bind concrete items from the ~458-item CE catalog, which is Phase 1 content work, not part of
- * this registry-mechanism deliverable. Phase 1 should populate these two methods the same way CE's
- * {@code HazardRegistry} does, using the constants and {@link IHazardType} singletons declared here.
+ * {@link #registerItems()} and {@link #registerContaminatingDrops()} started out empty and are populated
+ * incrementally, one Phase 1 content area at a time, as each area's items land. CE's ~460-line bulk item-to-hazard
+ * binding table (and the specialized {@code registerRBMKRod}/{@code registerRTGPellet}/... helper methods it uses)
+ * binds concrete items from the ~458-item CE catalog; every area should append its own slice of that table here,
+ * using the constants and {@link IHazardType} singletons declared below, rather than replacing another area's calls.
  */
 @SuppressWarnings("unused") // constant table is consumed by Phase 1's bulk registration, not all of it by this file
 public class HazardRegistry {
@@ -168,6 +171,182 @@ public class HazardRegistry {
      * {@link IHazardType} singletons above.
      */
     public static void registerItems() {
+        // items_plate_crystal_waste area (docs/phase1/moditems_generative.md section 3,
+        // docs/phase1/hazard_bindings_plan.md Pattern A/D): waste_/crystal_/gem_ hazard bindings.
+        // Formulas ported verbatim from CE's HazardRegistry.registerOtherWasteContaminating/
+        // registerOtherWaste/registerRadSourceWaste helpers (CE HazardRegistry.java:613-639) - not
+        // reproduced as shared private helpers here to avoid colliding with another Phase 1 area's
+        // own same-named helper in this shared file; each call is written out in full instead.
+
+        // waste_* families with CONTAMINATING (registerOtherWasteContaminating, CE:272-280)
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_NATURAL_URANIUM.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 11.5F * 0.075F).addEntry(CONTAMINATING, 15));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_NATURAL_URANIUM_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 11.5F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 15));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_URANIUM.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 10F * 0.075F).addEntry(CONTAMINATING, 15));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_URANIUM_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 10F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 15));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_THORIUM.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 7.5F * 0.075F).addEntry(CONTAMINATING, 10));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_THORIUM_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 7.5F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 10));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_MOX.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 10F * 0.075F).addEntry(CONTAMINATING, 15));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_MOX_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 10F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 15));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLUTONIUM.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 12.5F * 0.075F).addEntry(CONTAMINATING, 15));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLUTONIUM_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 12.5F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 15));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_U233.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 10F * 0.075F).addEntry(CONTAMINATING, 15));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_U233_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 10F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 15));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_U235.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 11F * 0.075F).addEntry(CONTAMINATING, 15));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_U235_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 11F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 15));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_SCHRABIDIUM.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 15F * 0.075F).addEntry(CONTAMINATING, 40));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_SCHRABIDIUM_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 15F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 40));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_ZFB_MOX.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 5F * 0.075F).addEntry(CONTAMINATING, 10));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_ZFB_MOX_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * billet * 5F).addEntry(HOT, 5F).addEntry(CONTAMINATING, 10));
+
+        // waste_plate_* without CONTAMINATING (registerOtherWaste, CE:290-294)
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_U233.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 13F * 0.075F));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_U233_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 13F).addEntry(HOT, 5F));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_U235.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 10F * 0.075F));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_U235_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 10F).addEntry(HOT, 5F));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_MOX.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 16F * 0.075F));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_MOX_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 16F).addEntry(HOT, 5F));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_PU239.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 13.5F * 0.075F));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_PU239_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 13.5F).addEntry(HOT, 5F));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_SA326.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 10F * 0.075F));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_SA326_HOT.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 10F).addEntry(HOT, 5F));
+
+        // waste_plate_ra226be/pu238be: radioisotope-source waste, no 0.075x scaling on the cooled
+        // variant (registerRadSourceWaste, CE:295-296)
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_RA226BE.get(),
+                new HazardData().addEntry(RADIATION, pobe * nugget * 3));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_RA226BE_HOT.get(),
+                new HazardData().addEntry(RADIATION, pobe * nugget * 3).addEntry(HOT, 5F));
+
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_PU238BE.get(),
+                new HazardData().addEntry(RADIATION, pube * nugget * 1));
+        HazardSystem.register(PlateCrystalWasteItems.WASTE_PLATE_PU238BE_HOT.get(),
+                new HazardData().addEntry(RADIATION, pube * nugget * 1).addEntry(HOT, 5F));
+
+        // crystal_/gem_ direct bindings (CE HazardRegistry.java:502-503, 244)
+        HazardSystem.register(PlateCrystalWasteItems.CRYSTAL_PHOSPHORUS.get(),
+                new HazardData().addEntry(HOT, 2F * crystal));
+        HazardSystem.register(PlateCrystalWasteItems.CRYSTAL_TRIXITE.get(),
+                new HazardData().addEntry(RADIATION, trx * crystal));
+        HazardSystem.register(PlateCrystalWasteItems.GEM_RAD.get(),
+                new HazardData().addEntry(RADIATION, 25F));
+
+        // items_billet_powder area (docs/phase1/moditems_generative.md section 3,
+        // hazard_bindings_plan.md Pattern A/B): only the billet_/powder_ fields CE's own
+        // HazardRegistry.registerItems() actually binds (upstream hbm-ce HazardRegistry.java
+        // lines 225, 307-352, 203, 490-499) - the great majority of billet_/powder_ fields (plain
+        // metal billets like billet_uranium/billet_plutonium, most powders) carry no hazard data
+        // in CE at all; do not invent radiation for them.
+
+        // billet_* fuel-shape family (CE:307-352)
+        HazardSystem.register(BilletPowderItems.BILLET_URANIUM_FUEL.get(), new HazardData().addEntry(RADIATION, uf * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_UZH.get(), new HazardData().addEntry(RADIATION, uzh * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_PLUTONIUM_FUEL.get(), new HazardData().addEntry(RADIATION, puf * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_THORIUM_FUEL.get(), new HazardData().addEntry(RADIATION, thf * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_NEPTUNIUM_FUEL.get(), new HazardData().addEntry(RADIATION, npf * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_MOX_FUEL.get(), new HazardData().addEntry(RADIATION, mox * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_AMERICIUM_FUEL.get(), new HazardData().addEntry(RADIATION, amf * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_SCHRABIDIUM_FUEL.get(),
+                new HazardData().addEntry(RADIATION, saf * billet).addEntry(BLINDING, 5F * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_HES.get(), new HazardData().addEntry(RADIATION, saf * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_LES.get(), new HazardData().addEntry(RADIATION, saf * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_BALEFIRE_GOLD.get(), new HazardData().addEntry(RADIATION, au198 * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_FLASHLEAD.get(),
+                new HazardData().addEntry(RADIATION, pb209 * 1.25F * billet).addEntry(HOT, 7F));
+        HazardSystem.register(BilletPowderItems.BILLET_PO210BE.get(), new HazardData().addEntry(RADIATION, pobe * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_RA226BE.get(), new HazardData().addEntry(RADIATION, rabe * billet));
+        HazardSystem.register(BilletPowderItems.BILLET_PU238BE.get(), new HazardData().addEntry(RADIATION, pube * billet));
+
+        // billet_nuclear_waste (CE:225)
+        HazardSystem.register(BilletPowderItems.BILLET_NUCLEAR_WASTE.get(),
+                new HazardData().addEntry(RADIATION, wst * billet).addEntry(CONTAMINATING, wst * billet));
+
+        // powder_* direct bindings (CE:203, 490, 495, 499). powder_balefire's two CE calls
+        // (registerItems RADIATION 500F + registerContaminatingDrops CONTAMINATING bf * powder)
+        // are merged into one HazardData here since both target the same item and neither
+        // overrides - equivalent end state, one registration instead of two.
+        HazardSystem.register(BilletPowderItems.POWDER_BALEFIRE.get(),
+                new HazardData().addEntry(RADIATION, 500F).addEntry(CONTAMINATING, bf * powder));
+        HazardSystem.register(BilletPowderItems.POWDER_YELLOWCAKE.get(),
+                new HazardData().addEntry(RADIATION, yc * powder).addEntry(CONTAMINATING, yc * powder));
+        HazardSystem.register(BilletPowderItems.POWDER_CAESIUM.get(),
+                new HazardData().addEntry(HYDROACTIVE, 1F).addEntry(HOT, 3F));
+        HazardSystem.register(BilletPowderItems.POWDER_COLTAN_ORE.get(), new HazardData().addEntry(ASBESTOS, 3F));
+
+        // items_ingot_nugget area (docs/phase1/moditems_generative.md section 3,
+        // hazard_bindings_plan.md Pattern A/B): only the ingot_/nugget_ fields CE's own
+        // HazardRegistry.registerItems() actually binds (upstream hbm-ce HazardRegistry.java
+        // lines 306-346) - every other ingot_/nugget_ field (plain metal ingots like
+        // ingot_uranium/ingot_plutonium/nugget_polonium, and the ItemUnstable/ItemHot/
+        // ItemSchraranium/ItemFuel/food-backed fields) carries no hazard data in CE at all; do not
+        // invent radiation for them.
+        HazardSystem.register(IngotNuggetItems.NUGGET_URANIUM_FUEL.get(), new HazardData().addEntry(RADIATION, uf * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_URANIUM_FUEL.get(), new HazardData().addEntry(RADIATION, uf * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_PLUTONIUM_FUEL.get(), new HazardData().addEntry(RADIATION, puf * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_PLUTONIUM_FUEL.get(), new HazardData().addEntry(RADIATION, puf * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_THORIUM_FUEL.get(), new HazardData().addEntry(RADIATION, thf * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_THORIUM_FUEL.get(), new HazardData().addEntry(RADIATION, thf * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_NEPTUNIUM_FUEL.get(), new HazardData().addEntry(RADIATION, npf * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_NEPTUNIUM_FUEL.get(), new HazardData().addEntry(RADIATION, npf * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_MOX_FUEL.get(), new HazardData().addEntry(RADIATION, mox * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_MOX_FUEL.get(), new HazardData().addEntry(RADIATION, mox * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_AMERICIUM_FUEL.get(), new HazardData().addEntry(RADIATION, amf * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_AMERICIUM_FUEL.get(), new HazardData().addEntry(RADIATION, amf * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_SCHRABIDIUM_FUEL.get(),
+                new HazardData().addEntry(RADIATION, saf * nugget).addEntry(BLINDING, 5F * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_SCHRABIDIUM_FUEL.get(),
+                new HazardData().addEntry(RADIATION, saf * ingot).addEntry(BLINDING, 5F * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_HES.get(), new HazardData().addEntry(RADIATION, saf * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_HES.get(), new HazardData().addEntry(RADIATION, saf * ingot));
+
+        HazardSystem.register(IngotNuggetItems.NUGGET_LES.get(), new HazardData().addEntry(RADIATION, saf * nugget));
+        HazardSystem.register(IngotNuggetItems.INGOT_LES.get(), new HazardData().addEntry(RADIATION, saf * ingot));
     }
 
     /**

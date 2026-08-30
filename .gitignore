@@ -1,6 +1,9 @@
 # Reference-only upstream clones, not part of the port
 /upstream/
 
+# Local Claude Code session artifacts
+/.claude/
+
 # Gradle / build
 .gradle/
 build/

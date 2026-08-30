@@ -1,0 +1,26 @@
+This repository is a from-scratch port of "Hbm's Nuclear Tech - Community Edition"
+(https://github.com/Warfactory-Official/Hbm-s-Nuclear-Tech-CE, modid hbm, v2.6.0.0) from
+Minecraft 1.12.2/Forge to Minecraft 1.21.1/NeoForge. It is licensed under the GNU GPLv3 /
+LGPLv3 (see LICENSE and LICENSE.LESSER), matching the source project's license.
+
+Original credits (from the CE source, mcmod.info):
+HBMMods - creator
+Drillgon200 - original 1.12.2 port
+TheOriginalGolem - 1.12.2 bug fixing
+Alcater - Custom 1.12.2 version, updating and texturing
+Sten89, GB_Doge_9000 - bug testers
+Hoboy - textures and models
+Doctor17 - Russian translations
+grangerave, rodolphito
+mexikoedi - log spam fix
+Crowbar Collective - gluon gun sounds
+70000HP - MIRV and configs
+
+Authors (CE mcmod.info authorList): MrNorwood, TheSlize, Movblock, EOS, Alcater,
+Drillgon200, HBMMods/The Bobcat.
+
+Reference used during the port (registration/rendering patterns only, no content or logic
+copied from it): "HBMsNTM-NEO-EDITION" by ohiomannnn, https://github.com/ohiomannnn/HBMsNTM-NEO-EDITION
+
+This port does not include CE's "processor/" directory (All Rights Reserved, excluded from
+CE's own GPLv3/LGPLv3 licensing) and never copied any content from it.

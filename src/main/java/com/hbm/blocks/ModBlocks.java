@@ -1,6 +1,8 @@
 package com.hbm.blocks;
 
 import com.hbm.main.MainRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -20,10 +22,22 @@ public final class ModBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MainRegistry.MODID);
 
+    /**
+     * No {@code BlockEntityType} registry existed anywhere in the port before this pass - added
+     * here (rather than a new top-level class) since {@code ModBlocks} is already the shared,
+     * every-area-appends-to-it home for block-adjacent NeoForge registries. Any area registering a
+     * block entity should add its {@code BLOCK_ENTITY_TYPES.register(...)} calls the same way
+     * {@code BLOCKS.register(...)} calls already work.
+     */
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
+            DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MainRegistry.MODID);
+
     private ModBlocks() {
     }
 
     public static void register(IEventBus modEventBus) {
+        com.hbm.blocks.generic.GenericBlocks.registerAll();
         BLOCKS.register(modEventBus);
+        BLOCK_ENTITY_TYPES.register(modEventBus);
     }
 }
