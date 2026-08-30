@@ -12,7 +12,9 @@ Summary: lib/util, material system, fluid type registry, HE energy API + network
 hazard registry (+ per-tick hooks via `CommonEvents`), sound registry, config (TOML), packet
 dispatch framework, capability framework, base item/block registries (empty, ready for Phase 1),
 creative tabs (empty, `Items.BARRIER` icons), HBM API/interfaces, main registry/proxy/keybinds,
-damage types (registry keys + tags, no datagen provider wired yet).
+damage types (registry keys + tags, no datagen provider wired yet), client-only bootstrap class
+(`com.hbm.main.ClientModRegistry`, empty `FMLClientSetupEvent` handler, ready for the first area
+that needs client-only setup - see "Gap-fill: client bootstrap class" below).
 
 ## Known gaps intentionally deferred to later phases (per PORT_SPEC.md's own phase boundaries)
 
@@ -33,11 +35,6 @@ These are expected forward references, not bugs - the owning phase will resolve 
 - Damage types `GatherDataEvent`/datagen provider wiring (no `ModDataGenerators`-equivalent class
   exists yet in this port) - needs a `com.hbm.datagen`-style owner, likely early Phase 1 alongside
   the first datagen work for items/blocks.
-- Client-only bootstrap class mirroring Neo Edition's `NuclearTechModClient`
-  (`@Mod(dist=Dist.CLIENT)` + `FMLClientSetupEvent`) - needed once any area has client-only setup
-  (rendering, tooltip hook for `HazardSystem.addHazardInfo`, etc). Not created yet - open gap for
-  whichever area does client setup first (likely early Phase 5, or sooner if a Phase 1/2 area needs
-  it).
 
 ## Open decisions that need an explicit call before they compound
 
@@ -74,6 +71,27 @@ build is exactly the closure gap that Phase 1 (and later 2-4) are expected to cl
   every one of the 15 areas' scope even though it's explicitly named in PORT_SPEC.md's Phase 0 list
   ("HE energy capability + network graph"). Ported in a dedicated follow-up pass, generic signature
   verified compile-compatible with the already-written `PowerNetMK2`.
+
+## Gap-fill: client bootstrap class (2026-08-30)
+
+Closed the "no client-only bootstrap class" gap previously tracked here. Added
+`com.hbm.main.ClientModRegistry`: a second `@Mod(value = MainRegistry.MODID, dist =
+Dist.CLIENT)` class (NeoForge's supported pattern, confirmed against the Neo Edition
+reference's `com.hbm.main.NuclearTechModClient` - discovered by the same annotation scan
+as `MainRegistry`, no `neoforge.mods.toml` change needed), paired with
+`@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT)` and an empty
+`onClientSetup(FMLClientSetupEvent)` handler wrapped in `event.enqueueWork(...)`, with a
+comment marking it as the landing spot for the first area that needs client-only setup
+(item/block renderer registration, tooltip hooks, `RegisterColorHandlersEvent`, particle
+providers, etc).
+
+Checked whether `com.hbm.handler.HbmKeybinds` needed to be wired from this new class
+before assuming it did: it does not. It already self-registers its
+`RegisterKeyMappingsEvent`/input/tick handlers via its own
+`@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT)` annotation (same
+self-registering pattern the Neo Edition reference's own `HbmKeybinds` uses), so there was
+no dangling registration to wire up - `main_registry_keybinds.md`'s own integration notes
+already said as much. `ClientModRegistry` was left with no calls into `HbmKeybinds`.
 
 ## On "gradlew build green" as a per-phase gate
 
