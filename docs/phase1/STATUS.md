@@ -92,14 +92,18 @@ These are expected forward references, not regressions - the owning phase resolv
   `com.hbm.tileentity.IPersistentNBT`, neither of which exists - the Phase 2 multiblock framework's
   job. Confirmed by this session's static triage to be unchanged since Phase 0 and not referenced
   anywhere in Phase 1's own new code.
-- `com.hbm.items.machine.ItemBlueprints`/`ItemBlueprintFolder` import
-  `com.hbm.inventory.recipes.loader.GenericRecipe(s)`, which doesn't exist - a recipe/pool system
-  `docs/phase1/items_machine.md` already documented as an intentional forward reference, in the same
-  family as Phase 0's already-flagged `com.hbm.inventory.RecipesCommon` gap. This is a **new
-  instance of a known gap category**, not previously counted in Phase 0's ~100-error baseline
-  (those two item classes didn't exist yet when that baseline was taken) - flagging explicitly so
-  whichever pass ports the recipe/pool system knows it also unblocks `MachineItems.java`'s
-  compilation (which cascades to `ModItems.java`).
+- ~~`com.hbm.items.machine.ItemBlueprints`/`ItemBlueprintFolder` import
+  `com.hbm.inventory.recipes.loader.GenericRecipe(s)`, which doesn't exist~~ - **closed in Phase 2**
+  (`docs/phase2/items_tool_machine_coupling_and_recipe_system.md` Part B): `com.hbm.inventory.RecipesCommon`
+  (the `AStack`/`ComparableStack`/`NbtComparableStack`/`OreDictStack`/`MetaBlock` comparison-key
+  hierarchy - also unblocks `com.hbm.api.block.IToolable` and `com.hbm.hazard.HazardSystem`, both of
+  which already referenced it uncompiled) and a deliberately minimal
+  `com.hbm.inventory.recipes.loader.GenericRecipe(s)` compile shim (pool bookkeeping +
+  `getLocalizedName()` only - the full CE method-chaining machine-recipe loader is NOT ported, see
+  that class's own header) are both now in the tree. `ItemBlueprints`/`ItemBlueprintFolder` compile
+  against them. The real per-machine JSON `Recipe<?>` conversion PORT_SPEC.md's ground rule calls for
+  is separate follow-up work, scaffolded (not yet populated) in
+  `com.hbm.inventory.recipes.{HbmRecipes,HbmSimpleRecipe}`.
 - The 11 classes repeatedly referenced across this session's research as "needs a cross-cutting
   system that doesn't exist yet" remain correctly absent and are not half-referenced by any Phase 1
   code: `ContaminationUtil`, `ArmorUtil`, `HbmPotion`, `HbmLivingProps`, `PollutionHandler`,
