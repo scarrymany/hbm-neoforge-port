@@ -1,6 +1,7 @@
 package com.hbm.packet;
 
 import com.hbm.main.MainRegistry;
+import com.hbm.packet.toclient.BufPacket;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -49,7 +50,9 @@ public class HbmNetwork {
     public static void registerPackets(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
 
-        // Phase 0: no concrete packets yet. Later phases append playToClient/playToServer registrations here,
-        // one per packet, as each owning feature system is ported.
+        // Phase 2 (com.hbm.blockentity base framework): the generic ByteBuf block-entity sync payload used by
+        // LoadedBaseBlockEntity#networkPackNT/networkPackMK2. Every later phase appends its own
+        // playToClient/playToServer registrations here, one per packet, as each owning feature system is ported.
+        registrar.playToClient(BufPacket.TYPE, BufPacket.STREAM_CODEC, BufPacket::handleCommon);
     }
 }
