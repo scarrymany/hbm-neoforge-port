@@ -39,6 +39,18 @@ public class ItemRBMKPellet extends ItemBase {
         return getStage(stack) >= 5;
     }
 
+    /**
+     * CE: {@code ItemRBMKPellet.rectify(int meta)} (clamped {@code Math.abs(meta) % 10} over raw
+     * metadata). This port already flattens that 0-9 stage into {@link #getStage}/{@link #setStage}
+     * via a data component instead of metadata, so this overload is just an {@link ItemStack} alias
+     * for {@link #getStage} - added to fix a real, already-present compile break:
+     * {@code com.hbm.hazard.modifier.HazardModifierRBMKRadiation} (committed in an earlier Phase 1
+     * pass) calls {@code ItemRBMKPellet.rectify(stack)}, which never existed on this class.
+     */
+    public static int rectify(ItemStack stack) {
+        return getStage(stack);
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.literal(ChatFormatting.ITALIC + this.fullName));

@@ -5,6 +5,7 @@ import com.hbm.lib.DirPos;
 import com.hbm.main.MainRegistry;
 import it.unimi.dsi.fastutil.objects.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -195,12 +196,30 @@ public final class UniNodespace {
             this.provider = provider;
         }
 
+        /**
+         * {@code revCon}/{@code connectFrom} directions may be {@code null} - the port's equivalent of
+         * CE's {@code ForgeDirection.UNKNOWN} (offset (0,0,0), self-inverse opposite), used by
+         * {@code FluidPipeAnchor}'s wrench-linked, non-face-adjacent connections
+         * ({@code com.hbm.blockentity.network.PipelineBaseBlockEntity#createNode}). Vanilla
+         * {@link net.minecraft.core.Direction} has no such sentinel value, so {@code null} is treated
+         * as one here instead of forcing {@link DirPos} to carry a fake 7th direction: zero offset, and
+         * only matches another {@code null} (mirroring {@code UNKNOWN.getOpposite() == UNKNOWN}).
+         * Behaviorally identical to the pre-fix version for every non-null direction (the only case any
+         * caller before {@code FluidPipeAnchor} ever produced) - narrow addition, not a redesign.
+         */
         private static boolean checkConnection(GenNode<?> connectsTo, DirPos connectFrom, boolean skipSideCheck) {
+            Direction fromDir = connectFrom.getDir();
             for (DirPos revCon : connectsTo.connections) {// @formatter:off
-                if (revCon.getPos().getX() - revCon.getDir().getStepX() == connectFrom.getPos().getX() &&
-                        revCon.getPos().getY() - revCon.getDir().getStepY() == connectFrom.getPos().getY() &&
-                        revCon.getPos().getZ() - revCon.getDir().getStepZ() == connectFrom.getPos().getZ() &&
-                        (revCon.getDir() == connectFrom.getDir().getOpposite() || skipSideCheck)) {
+                Direction revDir = revCon.getDir();
+                int dx = revDir == null ? 0 : revDir.getStepX();
+                int dy = revDir == null ? 0 : revDir.getStepY();
+                int dz = revDir == null ? 0 : revDir.getStepZ();
+                boolean dirMatches = skipSideCheck
+                        || (revDir == null ? fromDir == null : revDir == (fromDir == null ? null : fromDir.getOpposite()));
+                if (revCon.getPos().getX() - dx == connectFrom.getPos().getX() &&
+                        revCon.getPos().getY() - dy == connectFrom.getPos().getY() &&
+                        revCon.getPos().getZ() - dz == connectFrom.getPos().getZ() &&
+                        dirMatches) {
                     return true;
                 }// @formatter:on
             }

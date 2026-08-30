@@ -68,5 +68,21 @@ public class ItemPWRFuel extends ItemBase {
             this.function = function;
             this.yield = yield;
         }
+
+        /**
+         * Narrow gap-fill for {@code com.hbm.blockentity.machine.PWRControllerBlockEntity} (Phase 2
+         * PWR package): CE's own {@code TileEntityPWRController.update()} calls
+         * {@code fuel.function.effonix(fluxPerRod)} directly - a legal same-behavior cross-package
+         * call there because CE's {@code Function} class is public. This port's
+         * {@link FuelReactivityFunction} was deliberately scoped package-private in Phase 1 (see its
+         * own javadoc) since no consumer outside {@code com.hbm.items.machine} existed yet; the PWR
+         * controller is now that consumer. Rather than widen {@link FuelReactivityFunction}/
+         * {@code effonix} to public (CE's own scope, more than this one call site needs), this single
+         * public forwarding method gives the controller exactly the one operation it requires, with
+         * {@link FuelReactivityFunction} itself staying package-private.
+         */
+        public double reactivity(double flux) {
+            return this.function.effonix(flux);
+        }
     }
 }

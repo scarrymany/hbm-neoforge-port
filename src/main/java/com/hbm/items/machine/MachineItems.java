@@ -45,6 +45,14 @@ public final class MachineItems {
     public static final Map<ItemPileRodMK2.EnumPileRod, DeferredItem<Item>> PILE_RODS_MK2 = new EnumMap<>(ItemPileRodMK2.EnumPileRod.class);
     public static final Map<ItemPWRFuel.EnumPWRFuel, DeferredItem<Item>> PWR_FUEL = new EnumMap<>(ItemPWRFuel.EnumPWRFuel.class);
     public static final Map<ItemWatzPellet.EnumWatzType, DeferredItem<Item>> WATZ_PELLET = new EnumMap<>(ItemWatzPellet.EnumWatzType.class);
+    /**
+     * Depleted counterpart to {@link #WATZ_PELLET}, exposed for the Phase 2 Watz reactor block
+     * entity ({@code docs/phase2/machine_fusion_watz.md}) to swap a spent pellet stack into once its
+     * yield reaches zero (CE's {@code ItemStack(ModItems.watz_pellet_depleted, 1, meta)} swap) - the
+     * depleted item was already registered here in Phase 1 but its {@code DeferredItem} reference was
+     * previously discarded since nothing consumed it yet.
+     */
+    public static final Map<ItemWatzPellet.EnumWatzType, DeferredItem<Item>> WATZ_PELLET_DEPLETED = new EnumMap<>(ItemWatzPellet.EnumWatzType.class);
     public static final Map<ItemBreedingRod.BreedingRodType, DeferredItem<Item>> BREEDING_ROD_SINGLE = new EnumMap<>(ItemBreedingRod.BreedingRodType.class);
     public static final Map<ItemBreedingRod.BreedingRodType, DeferredItem<Item>> BREEDING_ROD_DUAL = new EnumMap<>(ItemBreedingRod.BreedingRodType.class);
     public static final Map<ItemBreedingRod.BreedingRodType, DeferredItem<Item>> BREEDING_ROD_QUAD = new EnumMap<>(ItemBreedingRod.BreedingRodType.class);
@@ -575,8 +583,9 @@ public final class MachineItems {
         for (ItemWatzPellet.EnumWatzType type : ItemWatzPellet.EnumWatzType.VALUES) {
             String suffix = lower(type.name());
             DeferredItem<Item> fresh = reg("watz_pellet_" + suffix, () -> new ItemWatzPellet(type, false, props()));
-            reg("watz_pellet_depleted_" + suffix, () -> new ItemWatzPellet(type, true, props()));
+            DeferredItem<Item> depleted = reg("watz_pellet_depleted_" + suffix, () -> new ItemWatzPellet(type, true, props()));
             WATZ_PELLET.put(type, fresh);
+            WATZ_PELLET_DEPLETED.put(type, depleted);
             tab(ModCreativeTabs.CONTROL, fresh);
         }
     }
