@@ -2,7 +2,7 @@ package com.hbm.blocks;
 
 import com.hbm.handler.MultiblockHandlerXR;
 import com.hbm.interfaces.ICopiable;
-import com.hbm.tileentity.IPersistentNBT;
+import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.world.gen.nbt.INBTBlockTransformable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -438,7 +438,7 @@ public abstract class BlockDummyable extends BaseEntityBlock implements ICustomB
     }
 
     @Override
-    public BlockState transformState(BlockState state, Rotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         if (rotation == Rotation.NONE) return state;
 
         int meta = state.getValue(META);
