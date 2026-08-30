@@ -6,6 +6,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 /**
  * Client-only bootstrap mod class, mirroring the Neo Edition reference's
@@ -50,5 +51,23 @@ public class ClientModRegistry {
             // See NuclearTechModClient.onClientSetup in the Neo Edition reference for the
             // confirmed real-world shape once work lands here.
         });
+    }
+
+    /**
+     * Client-side {@link net.minecraft.world.inventory.MenuType}-to-{@code Screen} binding, the
+     * confirmed-real NeoForge counterpart to {@code com.hbm.inventory.container.ModMenuTypes}'
+     * server/common-safe {@code DeferredRegister} - see Neo Edition's real
+     * {@code CommonEvents.registerScreens} (cross-checked for API shape only) for the identical
+     * {@code event.register(SOME_MENU_TYPE.get(), SomeScreen::new)} pattern every future Phase 2
+     * machine Menu+Screen pair should add a line to here.
+     * <p>
+     * Empty for now, same reason {@link com.hbm.inventory.container.ModMenuTypes} has no
+     * {@code DeferredHolder} fields yet: no concrete Phase 2 machine Menu+Screen pair exists in this
+     * pass (see {@code docs/phase2/gui_framework.md}'s Deferred scope).
+     */
+    @SubscribeEvent
+    public static void registerScreens(RegisterMenuScreensEvent event) {
+        // Add one event.register(ModMenuTypes.SOME_MACHINE.get(), SomeMachineScreen::new) line here
+        // per concrete Phase 2 machine Menu+Screen pair, alongside its ModMenuTypes field.
     }
 }

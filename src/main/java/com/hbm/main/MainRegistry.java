@@ -6,7 +6,9 @@ import com.hbm.capability.ModCapabilities;
 import com.hbm.config.HbmConfig;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.hazard.HazardComponents;
+import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.recipes.HbmRecipes;
 import com.hbm.items.HbmDataComponents;
 import com.hbm.items.ModItems;
 import com.hbm.lib.HBMSoundHandler;
@@ -53,6 +55,8 @@ public class MainRegistry {
         ModBlocks.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         MaterialRegistry.register(modEventBus);
+        HbmRecipes.register(modEventBus);
+        ModMenuTypes.register(modEventBus);
 
         Fluids.init();
     }
