@@ -8,7 +8,7 @@ import com.hbm.hazard.modifier.IHazardModifier;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.ModDamageSource;
 import com.hbm.lib.ObjObjDoubleConsumer;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;

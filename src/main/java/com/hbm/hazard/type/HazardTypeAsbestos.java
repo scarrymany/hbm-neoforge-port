@@ -6,7 +6,7 @@ import com.hbm.handler.ArmorUtil;
 import com.hbm.hazard.modifier.IHazardModifier;
 import com.hbm.util.ArmorRegistry;
 import com.hbm.util.ArmorRegistry.HazardClass;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;

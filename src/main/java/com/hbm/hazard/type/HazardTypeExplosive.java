@@ -2,7 +2,7 @@ package com.hbm.hazard.type;
 
 import com.hbm.config.RadiationConfig;
 import com.hbm.hazard.modifier.IHazardModifier;
-import com.hbm.util.I18nUtil;
+import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
