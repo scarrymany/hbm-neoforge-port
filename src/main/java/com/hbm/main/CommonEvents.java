@@ -4,6 +4,13 @@ import com.hbm.blockentity.bomb.LaunchPadBaseBlockEntity;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardRegistry;
+import com.hbm.inventory.recipes.RefineryRecipes;
+import com.hbm.inventory.recipes.chem.CentrifugeRecipes;
+import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
+import com.hbm.inventory.recipes.chem.CyclotronRecipes;
+import com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes;
+import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes;
+import com.hbm.inventory.recipes.chem.SILEXRecipes;
 import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.saveddata.satellites.Satellite;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -46,6 +53,22 @@ public class CommonEvents {
             // Phase 3 (missile_launch_infra) - populates com.hbm.saveddata.satellites.Satellite's
             // fixed, order-sensitive registry (see that class's own javadoc on why order matters).
             Satellite.register();
+            // Phase 2 (oil_production_chain / machines_chemical_isotope) - moved here from
+            // OilChainBlocks.registerAll()/ChemIsotopeBlocks.registerAll(): each of these hand-coded
+            // recipe tables resolves DeferredItem.get() eagerly while building its ItemStack outputs
+            // (e.g. PlateCrystalWasteItems.CRYSTAL_SULFUR, IngotNuggetItems.NUGGET_U238), so calling
+            // them from a block registerAll() - which runs synchronously inside MainRegistry's
+            // constructor, strictly before any RegisterEvent fires - threw IllegalStateException at
+            // startup (same bug class as the sedna gun eager-field crash, see XFactory556mm's javadoc).
+            // Each keeps its own idempotent "registered" guard, so calling them here (well after every
+            // RegisterEvent has fired) is safe and still runs exactly once.
+            RefineryRecipes.registerRefinery();
+            CentrifugeRecipes.register();
+            GasCentrifugeRecipes.register();
+            SILEXRecipes.register();
+            CyclotronRecipes.register();
+            ChemPlantRecipes.register();
+            ElectrolyserFluidRecipes.register();
         });
     }
 }

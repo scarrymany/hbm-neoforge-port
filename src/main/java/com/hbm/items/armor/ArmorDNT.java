@@ -20,8 +20,8 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 /**
  * Ported from CE's {@code com.hbm.items.armor.ArmorDNT} (205 lines) - the "DNS" (Deep Null Suit)
@@ -114,7 +114,7 @@ public class ArmorDNT extends ArmorFSBPowered {
     }
 
     @Override
-    public void handleAttack(LivingAttackEvent event) {
+    public void handleAttack(LivingIncomingDamageEvent event) {
         LivingEntity entity = event.getEntity();
         if (entity instanceof Player player && ArmorFSB.hasFSBArmor(player)) {
             if (event.getSource().is(DamageTypeTags.IS_EXPLOSION)) return;

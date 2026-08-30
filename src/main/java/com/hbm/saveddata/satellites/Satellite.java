@@ -89,7 +89,7 @@ public abstract class Satellite {
         registerSatellite(SatelliteRadar.class, EnumSatType.RADAR, null);
         registerSatellite(SatelliteLaser.class, EnumSatType.DEATH_RAY, null);
         registerSatellite(SatelliteResonator.class, EnumSatType.XENIUM_RESONATOR, null);
-        registerSatellite(SatelliteRelay.class, null, null);
+        registerSatellite(SatelliteRelay.class, EnumSatType.RELAY, null);
         registerSatellite(SatelliteMiner.class, EnumSatType.MINER_ASTRO, null);
         registerSatellite(SatelliteLunarMiner.class, EnumSatType.MINER_LUNAR, null);
         registerSatellite(SatelliteHorizons.class, null, null);

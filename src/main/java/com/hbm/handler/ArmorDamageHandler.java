@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
@@ -38,18 +37,28 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
  *     <li>{@link LivingDamageEvent.Pre} - shield absorb (CE: {@code ModEventHandler#onEntityHurt}'s
  *     first block), armor-mod {@code ItemArmorMod#modDamage} iteration, {@link ArmorFSB#handleHurt},
  *     and {@link IDamageHandler} iteration, in CE's exact order.</li>
- *     <li>{@link LivingAttackEvent} (unchanged in NeoForge 1.21, confirmed) -
- *     {@link ArmorFSB#handleAttack} and {@link IAttackHandler} iteration.</li>
+ *     <li>{@link LivingIncomingDamageEvent} again (a second, separate listener method below) -
+ *     {@link ArmorFSB#handleAttack} and {@link IAttackHandler} iteration. CE's {@code LivingAttackEvent}
+ *     does <b>not</b> exist under that name anywhere in real NeoForge 1.21.1 - a prior pass here
+ *     incorrectly assumed it "survives unchanged"; confirmed by a source search of the real
+ *     {@code neoforged/NeoForge} repository turning up zero matches for {@code LivingAttackEvent} in
+ *     the whole org. {@code LivingIncomingDamageEvent} is its actual, confirmed-real successor - it
+ *     already fires early enough (before any damage-reduction math) to reproduce CE's
+ *     "cancel the attack outright" semantics, and is fully cancelable via {@code setCanceled(boolean)}
+ *     exactly like the old event.</li>
  * </ul>
  *
- * <p><b>Not independently verified against a compiler in this sandbox</b> (no NeoForge library jar
- * was reachable to decompile, and neither reference tree contains a real call site beyond an
- * empty-bodied stub): {@link LivingDamageEvent.Pre}'s exact accessor names
- * ({@code getNewDamage()}/{@code setNewDamage(float)}) are this port's best-confidence reading of
- * the real NeoForge 1.21.x {@code DamageContainer}-backed API (distinguishing "damage" naming on
- * the {@code Pre}/{@code Post} events from "amount" naming on the older-lineage
- * {@link LivingIncomingDamageEvent}/{@link LivingAttackEvent}), not a source- or bytecode-confirmed
- * fact. Flagged for a targeted compile-check follow-up.
+ * <p><b>Now independently confirmed against real NeoForge source</b> (via a targeted GitHub code
+ * search of {@code neoforged/NeoForge}, not decompilation, since this sandbox has no reachable
+ * NeoForge library jar): {@link LivingDamageEvent.Pre#getNewDamage()}/{@code #setNewDamage(float)}
+ * are real, exactly as used below - confirmed by
+ * {@code neoforged/NeoForge}'s own {@code LivingDamageEvent.java} (the {@code Pre} inner class
+ * delegates both to its {@code DamageContainer}) and {@code CommonHooks#onLivingDamagePre}, which
+ * fires {@code new LivingDamageEvent.Pre(entity, container)} and reads back {@code .getNewDamage()}
+ * exactly as this class does. {@link LivingIncomingDamageEvent#getOriginalAmount()}/
+ * {@code #getEntity()}/{@code #setCanceled(boolean)} are likewise confirmed real via the same search
+ * (and already exercised by Neo Edition's {@code DamageResistanceHandler.onEntityAttacked}, which
+ * this class's {@code onIncomingDamage}/{@code onAttack} methods below mirror the shape of).
  */
 @EventBusSubscriber(modid = MainRegistry.MODID)
 public final class ArmorDamageHandler {
@@ -118,7 +127,7 @@ public final class ArmorDamageHandler {
     }
 
     @SubscribeEvent
-    public static void onAttack(LivingAttackEvent event) {
+    public static void onAttack(LivingIncomingDamageEvent event) {
         if (!(event.getEntity() instanceof Player player)) return;
 
         ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);

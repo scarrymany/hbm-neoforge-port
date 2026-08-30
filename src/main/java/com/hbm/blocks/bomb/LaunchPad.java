@@ -69,7 +69,16 @@ public class LaunchPad extends BlockDummyable implements IBomb {
         if (!level.isClientSide()) {
             BlockPos corePos = findCore(level, pos);
             if (corePos != null && level.getBlockEntity(corePos) instanceof LaunchPadBlockEntity entity) {
-                return entity.launchFromDesignator();
+                // Smuggle the triggering entity through to finalizeLaunch()'s ModContext.DETONATOR_CONTEXT
+                // read, exactly like the sibling LaunchPadLarge/NukeBalefireBlock#explode already do -
+                // this was previously missing here, so a detonator-triggered launch through this (small)
+                // pad never attributed the resulting missile's thrower to whoever fired the detonator.
+                com.hbm.main.ModContext.DETONATOR_CONTEXT.set(detonator);
+                try {
+                    return entity.launchFromDesignator();
+                } finally {
+                    com.hbm.main.ModContext.DETONATOR_CONTEXT.remove();
+                }
             }
         }
         return BombReturnCode.UNDEFINED;

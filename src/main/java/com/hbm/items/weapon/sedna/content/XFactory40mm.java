@@ -38,9 +38,12 @@ import java.util.function.BiConsumer;
  * {@code gun_mk108}). See {@code docs/phase3/guns_and_ammo.md}'s {@code XFactory40mm} table;
  * cross-checked against a full read of CE's real {@code XFactory40mm.java}.
  * <p>
- * See {@link XFactory556mm}'s class javadoc for why every field here is a plain eager
- * {@code static final} and why {@code .setCasing(...)}/{@code .smoke(...)}/{@code .anim(...)}/
- * {@code .orchestra(...)}/{@code setDefaultAmmo(...)} are all omitted.
+ * See {@link XFactory556mm}'s class javadoc for why every ammo/{@code BulletConfig} field here is a
+ * plain eager {@code static final} and why {@code .setCasing(...)}/{@code .smoke(...)}/
+ * {@code .anim(...)}/{@code .orchestra(...)}/{@code setDefaultAmmo(...)} are all omitted, and why the
+ * 3 guns below are static METHODS rather than fields (deferring the {@code Receiver.sound(...).get()}
+ * SoundEvent {@code DeferredHolder} resolution until {@code RegisterEvent(ITEM)} time, via
+ * {@link GunLauncherItems}'s method-reference {@code Supplier}s).
  * <p>
  * <b>{@code g40_base} - collapsed from a clone-template into per-config repetition.</b> CE builds a
  * single {@code BulletConfig g40_base = new BulletConfig().setLife(200).setVel(2F).setGrav(0.035F)}
@@ -202,7 +205,8 @@ public final class XFactory40mm {
 
     // ==================== guns (3) ====================
 
-    public static final ItemGunBaseNT gun_flaregun = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+    public static ItemGunBaseNT gun_flaregun() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
             new GunConfig()
                     .dura(100).draw(7).inspect(39).crosshair(Crosshair.L_CIRCUMFLEX)
                     .rec(new Receiver(0)
@@ -212,9 +216,11 @@ public final class XFactory40mm {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_GL))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G26_FLARE x3
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_congolake = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+    public static ItemGunBaseNT gun_congolake() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
             new GunConfig()
                     .dura(400).draw(7).inspect(39).reloadSequential(true).reloadChangeType(true).crosshair(Crosshair.L_CIRCUMFLEX)
                     .rec(new Receiver(0)
@@ -224,9 +230,11 @@ public final class XFactory40mm {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_GL))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G40_HE x8
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_mk108 = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+    public static ItemGunBaseNT gun_mk108() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
             new GunConfig()
                     .dura(5_000).draw(20).inspect(65).crosshair(Crosshair.L_CIRCUMFLEX).hideCrosshair(false)
                     .rec(new Receiver(0)
@@ -236,5 +244,6 @@ public final class XFactory40mm {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_MK108))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G40_HE x50
-    );
+        );
+    }
 }

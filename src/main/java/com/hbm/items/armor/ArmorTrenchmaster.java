@@ -14,8 +14,8 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class ArmorTrenchmaster extends ArmorFSB {
     }
 
     @Override
-    public void handleAttack(LivingAttackEvent event) {
+    public void handleAttack(LivingIncomingDamageEvent event) {
         super.handleAttack(event);
         LivingEntity entity = event.getEntity();
 

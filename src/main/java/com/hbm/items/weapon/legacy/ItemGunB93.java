@@ -67,7 +67,7 @@ public class ItemGunB93 extends Item {
         if (power <= 0) return;
 
         int mode = power - 1;
-        LegacyChargeWeapons.fireBeam(entity, LegacyChargeWeapons.b93_beam, 16F + mode * 2F, 0F);
+        LegacyChargeWeapons.fireBeam(entity, LegacyChargeWeapons.b93Beam(mode), 16F + mode * 2F, 0F);
         stack.hurtAndBreak(1, entity, LivingEntity.getSlotForHand(InteractionHand.MAIN_HAND));
 
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.AMBIENT, 5.0F, 1.0F);

@@ -7,7 +7,6 @@ import com.hbm.blockentity.machine.oil.OilChainBlockEntities;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.inventory.container.machine.oil.OilChainMenus;
-import com.hbm.inventory.recipes.RefineryRecipes;
 import com.hbm.items.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -83,7 +82,13 @@ public final class OilChainBlocks {
 
         OilChainBlockEntities.registerAll();
         OilChainMenus.registerAll();
-        RefineryRecipes.registerRefinery();
+        // NOT called here: RefineryRecipes.registerRefinery(). registerAll() runs synchronously from
+        // ModBlocks.register(modEventBus), itself called from MainRegistry's constructor - strictly
+        // before any RegisterEvent fires - but registerRefinery() resolves DeferredItem.get() (e.g.
+        // PlateCrystalWasteItems.CRYSTAL_SULFUR) eagerly while building its ItemStack outputs, which
+        // would throw IllegalStateException at startup (same bug class as the sedna gun eager-field
+        // crash, see XFactory556mm's javadoc). Moved into CommonEvents#commonSetup's enqueueWork,
+        // which this port already uses for exactly this timing requirement - see CommonEvents.java.
     }
 
     private static <T extends Block> DeferredBlock<T> registerMachine(String name, Supplier<T> factory) {

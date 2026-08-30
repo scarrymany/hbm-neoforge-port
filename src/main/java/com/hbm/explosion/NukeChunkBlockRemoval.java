@@ -48,8 +48,11 @@ import java.util.Map;
  * ({@code LevelChunk#getSections()}, {@code Level#getMinSection()},
  * {@code LevelChunkSection#hasOnlyAir()}/{@code getBlockState}) is confirmed against this repo's
  * own Neo Edition reference. {@code LevelChunkSection#setBlockState(int,int,int,BlockState)},
- * {@code Heightmap#update}, {@code LevelLightEngine#checkBlock}, and {@code ChunkAccess#setUnsaved}
- * are well-established public Mojang-mapping knowledge but are <em>not</em> independently
+ * {@code Heightmap#update}, {@code LevelLightEngine#checkBlock}, {@code ChunkAccess#setUnsaved}, and
+ * {@code Level#removeBlockEntity(BlockPos)} (added during review to stop a stale block-entity leak
+ * whenever a direct section write silently vaporizes a chest/machine/etc. position without going
+ * through {@code LevelChunk#setBlockState}'s own block-entity bookkeeping - see the removal loop
+ * below) are well-established public Mojang-mapping knowledge but are <em>not</em> independently
  * confirmed by any file in this repo beyond the sibling package's identical assumption - this
  * sandbox cannot reach {@code maven.neoforged.net} to verify them directly. Flagged as the piece of
  * this class that needs a real-compiler check before being trusted at nuke-tier (thousands of
@@ -90,6 +93,16 @@ final class NukeChunkBlockRemoval {
 
             LevelChunkSection section = sections[sectionIndex];
             if (section == null || section.hasOnlyAir()) continue;
+
+            // The direct section write below bypasses Level#setBlock entirely, which is exactly
+            // the point (see class javadoc) - but that also means it bypasses LevelChunk#setBlockState's
+            // own block-entity bookkeeping. Any block entity still registered at this position must be
+            // torn down by hand first, or the chunk's block-entity map keeps a stale entry pointing at
+            // a now-air position (a ClassCastException/NPE landmine the next time that block entity
+            // ticks, and silent world-save corruption via setUnsaved(true) below).
+            if (chunk.getBlockEntity(pos) != null) {
+                level.removeBlockEntity(pos);
+            }
 
             section.setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, air);
 

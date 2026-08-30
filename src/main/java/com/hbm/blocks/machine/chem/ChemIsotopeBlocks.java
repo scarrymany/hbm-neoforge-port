@@ -5,12 +5,6 @@ import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.inventory.container.machine.chem.ChemIsotopeMenus;
-import com.hbm.inventory.recipes.chem.CentrifugeRecipes;
-import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
-import com.hbm.inventory.recipes.chem.CyclotronRecipes;
-import com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes;
-import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes;
-import com.hbm.inventory.recipes.chem.SILEXRecipes;
 import com.hbm.items.ModItems;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -29,8 +23,8 @@ import java.util.function.Supplier;
  * from {@code ModBlocks.register()} (see this task's wiring notes), no other shared file needs a
  * direct edit.
  * <p>
- * Also calls every recipe table's {@code register()} once (same precedent as
- * {@code OilChainBlocks} calling {@code RefineryRecipes.registerRefinery()}).
+ * Does NOT call this family's recipe tables' {@code register()} methods - see {@link #registerAll()}'s
+ * own inline comment for why that was moved to {@code CommonEvents#commonSetup} instead.
  * <p>
  * <b>Not ported this pass</b>: {@code TileEntityMachineChemicalFactory} (the 4-module Chemical
  * Factory) - the task's own machine list names "chemical plant" only; the Factory's extra coolant loop
@@ -65,12 +59,17 @@ public final class ChemIsotopeBlocks {
         ChemIsotopeBlockEntities.registerAll();
         ChemIsotopeMenus.registerAll();
 
-        CentrifugeRecipes.register();
-        GasCentrifugeRecipes.register();
-        SILEXRecipes.register();
-        CyclotronRecipes.register();
-        ChemPlantRecipes.register();
-        ElectrolyserFluidRecipes.register();
+        // NOT called here: CentrifugeRecipes/GasCentrifugeRecipes/SILEXRecipes/CyclotronRecipes/
+        // ChemPlantRecipes/ElectrolyserFluidRecipes.register(). registerAll() runs synchronously from
+        // ModBlocks.register(modEventBus), itself called from MainRegistry's constructor - i.e. during
+        // mod construction, strictly before any RegisterEvent fires. Several of those recipe tables'
+        // register() methods resolve DeferredItem.get() (e.g. IngotNuggetItems.NUGGET_U238,
+        // PlateCrystalWasteItems.CRYSTAL_FLUORITE) eagerly while building their ItemStack outputs -
+        // calling them from here would throw IllegalStateException at startup, same bug class as the
+        // sedna gun eager-field crash (see XFactory556mm's javadoc). Fixed by moving every one of this
+        // family's register() calls into CommonEvents#commonSetup's enqueueWork, which this port
+        // already uses for exactly this "must run after every relevant RegisterEvent has fired" timing
+        // requirement (see that method's own javadoc) - see CommonEvents.java.
     }
 
     private static <T extends net.minecraft.world.level.block.Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory) {

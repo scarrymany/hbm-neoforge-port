@@ -1,5 +1,7 @@
 package com.hbm.items.weapon.sedna.mods;
 
+import com.hbm.capability.HbmLivingAttachment;
+import com.hbm.capability.ModAttachments;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.items.weapon.sedna.GunConfig;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
@@ -17,14 +19,11 @@ import java.util.function.BiConsumer;
  * shield: faster draw, but firing burns the shooter.
  * <p>
  * CE's {@code GunConfig.FUN_ANIMNATIONS} branch (a shieldless-draw animation) is dropped - see
- * {@link WeaponModSawedOff}'s class javadoc for why. CE's fire-application also increments
- * {@code HbmLivingCapability}'s custom {@code fire} burn-timer field (a CE-specific hazard mechanic,
- * distinct from vanilla fire ticks) via {@code props.setFire(props.getFire() + 100)} - that
- * capability field does not exist on this port's {@code HbmLivingAttachment}/{@code HbmLivingProps}
- * (neither ports CE's {@code fire} field - see those classes' own javadocs, which cover CE's other
- * hazard fields but not this one). The real, load-bearing effect - the instant {@code DamageClass.FIRE}
- * hit - is still applied; only the follow-up burn-timer increment is stubbed pending that missing
- * capability field.
+ * {@link WeaponModSawedOff}'s class javadoc for why. CE's {@code props.setFire(props.getFire() + 100)}
+ * burn-timer increment IS wired below, via {@link HbmLivingAttachment#getFire()}/{@code setFire(int)}
+ * (that field does exist on this port's attachment - see {@code XFactory40mm}'s {@code LAMBDA_STANDARD_IGNITE}
+ * for the identical direct-attachment-access precedent), re-synced via {@code entity.setData(...)} per
+ * that class's documented mutation contract.
  */
 public class WeaponModPanzerschreckSawedOff extends WeaponModBase {
 
@@ -42,7 +41,9 @@ public class WeaponModPanzerschreckSawedOff extends WeaponModBase {
     public static final BiConsumer<ItemStack, LambdaContext> LAMBDA_FIRE = (stack, ctx) -> {
         Lego.LAMBDA_STANDARD_FIRE.accept(stack, ctx);
         if (ctx.entity != null) {
-            // TODO(capability): CE also does props.setFire(props.getFire() + 100) here - see class javadoc.
+            HbmLivingAttachment data = HbmLivingAttachment.getData(ctx.entity);
+            data.setFire(data.getFire() + 100);
+            ctx.entity.setData(ModAttachments.LIVING_ATTACHMENT, data);
             EntityDamageUtil.attackEntityFromNT(ctx.entity, BulletConfig.getDamage(ctx.entity, ctx.entity, DamageClass.FIRE), 4F, true, false, 0F, 0F, 0F);
         }
     };

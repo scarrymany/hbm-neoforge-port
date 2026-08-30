@@ -65,6 +65,10 @@ import java.util.Map;
  *     engine's own per-tick processing really does drain a {@code checkBlock}-queued position without
  *     an explicit "run now" call from here.</li>
  *     <li>{@code ChunkAccess#setUnsaved(boolean)} (the modern name for CE-era {@code markDirty()}).</li>
+ *     <li>{@code Level#removeBlockEntity(BlockPos)} (added during review to stop a stale block-entity
+ *     leak whenever a direct section write silently vaporizes a chest/machine/etc. position without
+ *     going through {@code LevelChunk#setBlockState}'s own block-entity bookkeeping - see the removal
+ *     loop below).</li>
  *     <li>{@code Level#getChunk(int, int)}'s exact declared return type (defensively cast to
  *     {@link LevelChunk} above rather than assumed).</li>
  *     <li>{@code ChunkPos#getMiddleBlockX()}/{@code getMiddleBlockZ()} (low-risk, standard, but still
@@ -106,6 +110,16 @@ final class ChunkBatchedBlockRemoval {
 
                 LevelChunkSection section = sections[sectionIndex];
                 if (section == null || section.hasOnlyAir()) continue;
+
+                // The direct section write below bypasses Level#setBlock entirely, which is exactly
+                // the point (see class javadoc) - but that also means it bypasses LevelChunk#setBlockState's
+                // own block-entity bookkeeping. Any block entity still registered at this position must be
+                // torn down by hand first, or the chunk's block-entity map keeps a stale entry pointing at
+                // a now-air position (a ClassCastException/NPE landmine the next time that block entity
+                // ticks, and silent world-save corruption via setUnsaved(true) below).
+                if (chunk.getBlockEntity(pos) != null) {
+                    level.removeBlockEntity(pos);
+                }
 
                 section.setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, air);
 

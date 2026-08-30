@@ -21,9 +21,12 @@ import java.util.function.BiConsumer;
  * {@code gun_bolter}. See {@code docs/phase3/guns_and_ammo.md}'s {@code XFactory75Bolt} table;
  * cross-checked against a full read of CE's real {@code XFactory75Bolt.java} (63 lines, read in full).
  * <p>
- * See {@link XFactory556mm}'s class javadoc for why every field here is a plain eager
- * {@code static final} and why {@code .smoke(...)}/{@code .anim(...)}/{@code .orchestra(...)}/
- * {@code setDefaultAmmo(...)} are omitted.
+ * See {@link XFactory556mm}'s class javadoc for why every ammo/{@code BulletConfig} field here is a
+ * plain eager {@code static final} and why {@code .smoke(...)}/{@code .anim(...)}/
+ * {@code .orchestra(...)}/{@code setDefaultAmmo(...)} are omitted, and why the gun below is a static
+ * METHOD rather than a field (deferring the {@code Receiver.sound(...).get()} SoundEvent
+ * {@code DeferredHolder} resolution until {@code RegisterEvent(ITEM)} time, via
+ * {@link GunLauncherItems}'s method-reference {@code Supplier}).
  * <p>
  * <b>{@code b75_inc}/{@code b75_exp} have no incendiary/explosive on-hit effect whatsoever</b>, despite
  * their names - confirmed by reading the source directly rather than trusting the naming convention
@@ -59,7 +62,8 @@ public final class XFactory75Bolt {
 
     // ==================== gun (1) ====================
 
-    public static final ItemGunBaseNT gun_bolter = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.SPECIAL,
+    public static ItemGunBaseNT gun_bolter() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.SPECIAL,
             new GunConfig()
                     .dura(3_000).draw(20).inspect(31).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -69,5 +73,6 @@ public final class XFactory75Bolt {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_BOLT))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): B75 x15
-    );
+        );
+    }
 }

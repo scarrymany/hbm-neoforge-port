@@ -37,9 +37,16 @@ import java.util.function.BiConsumer;
  * {@code docs/phase3/guns_and_ammo.md}'s {@code XFactory10ga} table; cross-checked against a full read
  * of CE's real {@code XFactory10ga.java}.
  * <p>
- * See {@link XFactory556mm}'s class javadoc for why every field here is a plain eager
- * {@code static final} and why {@code .setCasing(...)}/{@code .smoke(...)}/{@code .anim(...)}/
- * {@code .orchestra(...)}/{@code setDefaultAmmo(...)} are all omitted.
+ * See {@link XFactory556mm}'s class javadoc for why every ammo/{@code BulletConfig} field here is a
+ * plain eager {@code static final} and why {@code .setCasing(...)}/{@code .smoke(...)}/
+ * {@code .anim(...)}/{@code .orchestra(...)}/{@code setDefaultAmmo(...)} are all omitted.
+ * <p>
+ * <b>Guns are static METHODS, not fields</b> - see {@link XFactory556mm}'s javadoc on
+ * {@code gun_g3()} for why: constructing an {@code ItemGunBaseNT} here resolves a SoundEvent
+ * {@code DeferredHolder} via {@code Receiver.sound(...).get()}, which throws
+ * {@code IllegalStateException} if evaluated eagerly at class-load time (before
+ * {@code RegisterEvent(SOUND_EVENT)} has fired). {@link GunShotgunItems} wraps each of these in a
+ * method-reference {@code Supplier} for {@code DeferredRegister}.
  */
 public final class XFactory10ga {
 
@@ -142,7 +149,8 @@ public final class XFactory10ga {
 
     // ==================== guns (3) ====================
 
-    public static final ItemGunBaseNT gun_double_barrel = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.SPECIAL,
+    public static ItemGunBaseNT gun_double_barrel() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.SPECIAL,
             new GunConfig()
                     .dura(1_000).draw(10).inspect(39).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -152,9 +160,11 @@ public final class XFactory10ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_DOUBLE_BARREL))
                     .setupStandardConfiguration().ps(LAMBDA_DOUBLE_SECONDARY)
             // default ammo (not yet wired): G10 x6
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_double_barrel_sacred_dragon = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.B_SIDE,
+    public static ItemGunBaseNT gun_double_barrel_sacred_dragon() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.B_SIDE,
             new GunConfig()
                     .dura(6_000).draw(10).inspect(39).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -164,7 +174,8 @@ public final class XFactory10ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_DOUBLE_BARREL))
                     .setupStandardConfiguration().ps(LAMBDA_DOUBLE_SECONDARY)
             // default ammo (not yet wired): G10_DU x6
-    );
+        );
+    }
 
     /**
      * DEBUG-quality gun; CE never calls {@code .dura(...)} for this one either (0 durability, matching
@@ -172,7 +183,8 @@ public final class XFactory10ga {
      * {@link Lego#LAMBDA_NOWEAR_FIRE} (never accrues wear) exactly like {@code gun_autoshotgun_heretic}'s
      * 12ga-family debug siblings.
      */
-    public static final ItemGunBaseNT gun_autoshotgun_heretic = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.DEBUG,
+    public static ItemGunBaseNT gun_autoshotgun_heretic() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.DEBUG,
             new GunConfig()
                     .draw(20).inspect(65).reloadSequential(true).inspectCancel(false).crosshair(Crosshair.L_CIRCLE).hideCrosshair(false)
                     .rec(new Receiver(0)
@@ -182,5 +194,6 @@ public final class XFactory10ga {
                             .canFire(Lego.LAMBDA_STANDARD_CAN_FIRE).fire(Lego.LAMBDA_NOWEAR_FIRE).recoil(XFactory12ga.LAMBDA_RECOIL_SEXY))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G10 x50
-    );
+        );
+    }
 }

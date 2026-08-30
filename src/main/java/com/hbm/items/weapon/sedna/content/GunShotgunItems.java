@@ -3,8 +3,11 @@ package com.hbm.items.weapon.sedna.content;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ModItems;
+import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
+
+import java.util.function.Supplier;
 
 /**
  * Registered {@code Item}s for this batch of the Sedna gun roster
@@ -49,20 +52,20 @@ public final class GunShotgunItems {
     public static final DeferredItem<Item> G10_EXPLOSIVE = registerAmmo("g10_explosive", XFactory10ga.ITEM_G10_EXPLOSIVE);
 
     // ==================== 12ga guns (8) ====================
-    public static final DeferredItem<Item> GUN_MARESLEG = registerGun("gun_maresleg", XFactory12ga.gun_maresleg);
-    public static final DeferredItem<Item> GUN_MARESLEG_AKIMBO = registerGun("gun_maresleg_akimbo", XFactory12ga.gun_maresleg_akimbo);
-    public static final DeferredItem<Item> GUN_MARESLEG_BROKEN = registerGun("gun_maresleg_broken", XFactory12ga.gun_maresleg_broken);
-    public static final DeferredItem<Item> GUN_LIBERATOR = registerGun("gun_liberator", XFactory12ga.gun_liberator);
-    public static final DeferredItem<Item> GUN_SPAS12 = registerGun("gun_spas12", XFactory12ga.gun_spas12);
-    public static final DeferredItem<Item> GUN_AUTOSHOTGUN = registerGun("gun_autoshotgun", XFactory12ga.gun_autoshotgun);
-    public static final DeferredItem<Item> GUN_AUTOSHOTGUN_SHREDDER = registerGun("gun_autoshotgun_shredder", XFactory12ga.gun_autoshotgun_shredder);
-    public static final DeferredItem<Item> GUN_AUTOSHOTGUN_SEXY = registerGun("gun_autoshotgun_sexy", XFactory12ga.gun_autoshotgun_sexy);
+    public static final DeferredItem<Item> GUN_MARESLEG = registerGun("gun_maresleg", XFactory12ga::gun_maresleg);
+    public static final DeferredItem<Item> GUN_MARESLEG_AKIMBO = registerGun("gun_maresleg_akimbo", XFactory12ga::gun_maresleg_akimbo);
+    public static final DeferredItem<Item> GUN_MARESLEG_BROKEN = registerGun("gun_maresleg_broken", XFactory12ga::gun_maresleg_broken);
+    public static final DeferredItem<Item> GUN_LIBERATOR = registerGun("gun_liberator", XFactory12ga::gun_liberator);
+    public static final DeferredItem<Item> GUN_SPAS12 = registerGun("gun_spas12", XFactory12ga::gun_spas12);
+    public static final DeferredItem<Item> GUN_AUTOSHOTGUN = registerGun("gun_autoshotgun", XFactory12ga::gun_autoshotgun);
+    public static final DeferredItem<Item> GUN_AUTOSHOTGUN_SHREDDER = registerGun("gun_autoshotgun_shredder", XFactory12ga::gun_autoshotgun_shredder);
+    public static final DeferredItem<Item> GUN_AUTOSHOTGUN_SEXY = registerGun("gun_autoshotgun_sexy", XFactory12ga::gun_autoshotgun_sexy);
 
     // ==================== 10ga guns (3) ====================
-    public static final DeferredItem<Item> GUN_DOUBLE_BARREL = registerGun("gun_double_barrel", XFactory10ga.gun_double_barrel);
-    public static final DeferredItem<Item> GUN_DOUBLE_BARREL_SACRED_DRAGON = registerGun("gun_double_barrel_sacred_dragon", XFactory10ga.gun_double_barrel_sacred_dragon);
+    public static final DeferredItem<Item> GUN_DOUBLE_BARREL = registerGun("gun_double_barrel", XFactory10ga::gun_double_barrel);
+    public static final DeferredItem<Item> GUN_DOUBLE_BARREL_SACRED_DRAGON = registerGun("gun_double_barrel_sacred_dragon", XFactory10ga::gun_double_barrel_sacred_dragon);
     /** Debug-quality; its actual default ammo is G10 (10ga), not 12ga, despite the "autoshotgun" name - see XFactory10ga's class javadoc. */
-    public static final DeferredItem<Item> GUN_AUTOSHOTGUN_HERETIC = registerGun("gun_autoshotgun_heretic", XFactory10ga.gun_autoshotgun_heretic);
+    public static final DeferredItem<Item> GUN_AUTOSHOTGUN_HERETIC = registerGun("gun_autoshotgun_heretic", XFactory10ga::gun_autoshotgun_heretic);
 
     /** No-op beyond forcing this class (and the 2 XFactory* content classes it references) to load before {@code ModItems.ITEMS.register(modEventBus)}. */
     public static void registerAll() {
@@ -79,8 +82,15 @@ public final class GunShotgunItems {
         return ModItems.ITEMS.register(name, () -> instance);
     }
 
-    private static DeferredItem<Item> registerGun(String name, Item instance) {
-        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> instance);
+    /**
+     * Takes a {@link Supplier}, not an already-constructed {@code Item}: every gun in this batch is
+     * built via a static factory method (see e.g. {@link XFactory12ga#gun_maresleg()}), not an eager
+     * {@code static final} field, specifically so constructing it (which resolves a SoundEvent
+     * {@code DeferredHolder} via {@code Receiver.sound(...).get()}) is deferred until
+     * {@code RegisterEvent(ITEM)} actually fires, not evaluated at this class's own load time.
+     */
+    private static DeferredItem<Item> registerGun(String name, Supplier<? extends ItemGunBaseNT> factory) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, factory);
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }

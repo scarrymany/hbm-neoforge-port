@@ -24,8 +24,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.entity.living.LivingAttackEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -52,8 +52,8 @@ import java.util.Set;
  *     part-hiding) is built on.</li>
  *     <li>{@link #handleAttack}/{@link #handleHurt} - empty base hooks overridden by leaf classes,
  *     dispatched centrally by {@code com.hbm.handler.ArmorDamageHandler} from
- *     {@link LivingAttackEvent}/{@link LivingDamageEvent.Pre} respectively (the confirmed real
- *     1.21.1 replacements for CE's {@code LivingAttackEvent}/{@code LivingHurtEvent} - see
+ *     {@link LivingIncomingDamageEvent}/{@link LivingDamageEvent.Pre} respectively (the confirmed
+ *     real 1.21.1 replacements for CE's {@code LivingAttackEvent}/{@code LivingHurtEvent} - see
  *     {@code docs/phase3/armor_equippable_framework.md} Key design decision #2).</li>
  *     <li>{@link #handleTick}/{@link #handleJump}/{@link #handleFall} - static dispatch hooks for
  *     the full-suit potion effects, jump sound, and hard-landing knockback+fall sound. <b>Not</b>
@@ -209,11 +209,14 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
     }
 
     /**
-     * Dispatched by {@code com.hbm.handler.ArmorDamageHandler} from {@link LivingAttackEvent}
+     * Dispatched by {@code com.hbm.handler.ArmorDamageHandler} from {@link LivingIncomingDamageEvent}
      * (CE: {@code ArmorFSB#handleAttack(LivingAttackEvent)}, called from
-     * {@code ModEventHandler#onEntityAttacked}). No-op base; overridden by leaves.
+     * {@code ModEventHandler#onEntityAttacked}). No-op base; overridden by leaves. CE's
+     * {@code LivingAttackEvent} does not exist under that name in real NeoForge 1.21.1 (confirmed
+     * absent from the whole {@code neoforged/NeoForge} source tree) - {@code LivingIncomingDamageEvent}
+     * is its actual, confirmed-real successor (same "cancel before any damage math runs" semantics).
      */
-    public void handleAttack(LivingAttackEvent event) {
+    public void handleAttack(LivingIncomingDamageEvent event) {
     }
 
     /**

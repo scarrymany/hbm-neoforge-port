@@ -54,11 +54,15 @@ import java.util.function.BiConsumer;
  * {@code XFactory12ga} table; every stat/lambda below is cross-checked against a full read of CE's
  * real {@code XFactory12ga.java} (697 lines), not just the report's summarized table.
  * <p>
- * See {@link XFactory556mm}'s class javadoc for why every field here is a plain eager
- * {@code static final} and why {@code .setCasing(...)}/{@code .smoke(...)}/{@code .anim(...)}/
- * {@code .orchestra(...)}/{@code setDefaultAmmo(...)} are all omitted (same unlanded dependencies:
- * no shared casing-item family, no {@code BusAnimationSedna}/{@code Orchestras} default lambdas, no
- * {@code ItemGunBaseNT.defaultAmmo} field yet).
+ * See {@link XFactory556mm}'s class javadoc for why every ammo/{@code BulletConfig} field here is a
+ * plain eager {@code static final} and why {@code .setCasing(...)}/{@code .smoke(...)}/
+ * {@code .anim(...)}/{@code .orchestra(...)}/{@code setDefaultAmmo(...)} are all omitted (same
+ * unlanded dependencies: no shared casing-item family, no {@code BusAnimationSedna}/
+ * {@code Orchestras} default lambdas, no {@code ItemGunBaseNT.defaultAmmo} field yet). The 8 guns
+ * below are static METHODS rather than fields for the same reason: constructing them resolves a
+ * SoundEvent {@code DeferredHolder} via {@code Receiver.sound(...).get()}, which would throw
+ * {@code IllegalStateException} if evaluated at class-load time; {@link GunShotgunItems} wraps each
+ * in a method-reference {@code Supplier} for {@code DeferredRegister} instead.
  * <p>
  * <b>{@code makeShredderConfig}/{@code makeShredderSubmunition} - ported with 2 documented
  * simplifications, both matching precedent already set elsewhere in this package.</b> CE's real
@@ -379,7 +383,8 @@ public final class XFactory12ga {
 
     // ==================== guns (8) ====================
 
-    public static final ItemGunBaseNT gun_maresleg = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+    public static ItemGunBaseNT gun_maresleg() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
             new GunConfig()
                     .dura(600).draw(10).inspect(39).reloadSequential(true).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -389,9 +394,11 @@ public final class XFactory12ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_MARESLEG))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G12 x12
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_maresleg_akimbo = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.B_SIDE,
+    public static ItemGunBaseNT gun_maresleg_akimbo() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.B_SIDE,
             new GunConfig()
                     .dura(600).draw(5).inspect(39).reloadSequential(true).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -411,9 +418,11 @@ public final class XFactory12ga {
                     .ps(Lego.LAMBDA_STANDARD_CLICK_PRIMARY).pr(Lego.LAMBDA_STANDARD_RELOAD)
                     .decider(GunStateDecider.LAMBDA_STANDARD_DECIDER)
             // default ammo (not yet wired): G12 x24
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_maresleg_broken = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.LEGENDARY,
+    public static ItemGunBaseNT gun_maresleg_broken() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.LEGENDARY,
             new GunConfig()
                     .dura(0).draw(5).inspect(39).reloadSequential(true).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -423,9 +432,11 @@ public final class XFactory12ga {
                             .canFire(Lego.LAMBDA_STANDARD_CAN_FIRE).fire(Lego.LAMBDA_NOWEAR_FIRE).recoil(LAMBDA_RECOIL_MARESLEG))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G12_MAGNUM x24
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_liberator = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+    public static ItemGunBaseNT gun_liberator() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
             new GunConfig()
                     .dura(200).draw(20).inspect(21).reloadSequential(true).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -435,9 +446,11 @@ public final class XFactory12ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_LIBERATOR))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G12 x12
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_spas12 = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+    public static ItemGunBaseNT gun_spas12() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
             new GunConfig()
                     .dura(600).draw(20).inspect(39).reloadSequential(true).reloadChangeType(true).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -447,9 +460,11 @@ public final class XFactory12ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_MARESLEG))
                     .setupStandardConfiguration().ps(LAMBDA_SPAS_SECONDARY).pt(null)
             // default ammo (not yet wired): G12 x16
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_autoshotgun = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+    public static ItemGunBaseNT gun_autoshotgun() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
             new GunConfig()
                     .dura(2_000).draw(10).inspect(33).reloadSequential(true).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -459,9 +474,11 @@ public final class XFactory12ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_AUTOSHOTGUN))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G12 x20
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_autoshotgun_shredder = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.B_SIDE,
+    public static ItemGunBaseNT gun_autoshotgun_shredder() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.B_SIDE,
             new GunConfig()
                     .dura(2_000).draw(10).inspect(33).reloadSequential(true).crosshair(Crosshair.L_CIRCLE)
                     .rec(new Receiver(0)
@@ -471,9 +488,11 @@ public final class XFactory12ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_AUTOSHOTGUN))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G12 x20
-    );
+        );
+    }
 
-    public static final ItemGunBaseNT gun_autoshotgun_sexy = new ItemGunBaseNT(new Item.Properties(), WeaponQuality.LEGENDARY,
+    public static ItemGunBaseNT gun_autoshotgun_sexy() {
+        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.LEGENDARY,
             new GunConfig()
                     .dura(5_000).draw(20).inspect(65).reloadSequential(true).inspectCancel(false).crosshair(Crosshair.L_CIRCLE).hideCrosshair(false)
                     .rec(new Receiver(0)
@@ -483,5 +502,6 @@ public final class XFactory12ga {
                             .setupStandardFire().recoil(LAMBDA_RECOIL_SEXY))
                     .setupStandardConfiguration()
             // default ammo (not yet wired): G12_MAGNUM x50
-    );
+        );
+    }
 }

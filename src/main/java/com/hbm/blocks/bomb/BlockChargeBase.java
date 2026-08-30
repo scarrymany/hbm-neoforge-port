@@ -121,13 +121,21 @@ public abstract class BlockChargeBase extends BaseEntityBlock implements IBomb, 
         return level.getBlockState(support).isFaceSturdy(level, support, dir);
     }
 
-    /** CE: {@code neighborChanged} - support-loss removes the block quietly (no explosion, no drop). */
+    /**
+     * CE: {@code neighborChanged} - just {@code worldIn.setBlockToAir(pos)}, with no {@link #safe}
+     * guard around it (confirmed by reading the real CE source: only {@link #onScrew}'s DEFUSER
+     * branch sets {@code safe} around its own {@link #dismantle} call). Vanilla's block-removal path
+     * still runs {@link #onRemove} for the old block whenever a block actually changes, independent of
+     * the flags passed to the removal call - so, matching CE exactly, losing support here still lets
+     * {@link #onRemove}'s {@code !safe} check fire {@link #explode}: a charge detonates if the block
+     * it's mounted on disappears out from under it. A previous version of this method wrapped the
+     * removal in {@code safe = true/false}, which suppressed that explosion - a real behavioral
+     * deviation from CE, not a deliberate improvement, now corrected.
+     */
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
         if (!level.isClientSide() && !state.canSurvive(level, pos)) {
-            safe = true;
             level.removeBlock(pos, false);
-            safe = false;
         }
     }
 

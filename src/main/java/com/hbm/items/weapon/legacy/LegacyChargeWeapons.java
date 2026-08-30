@@ -1,14 +1,19 @@
 package com.hbm.items.weapon.legacy;
 
+import com.hbm.config.BombConfig;
+import com.hbm.entity.effect.EntityCloudFleija;
+import com.hbm.entity.effect.EntityNukeTorex;
+import com.hbm.entity.logic.EntityNukeExplosionMK3;
+import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
-import com.hbm.explosion.vanillant.ExplosionVNT;
-import com.hbm.explosion.vanillant.standard.EntityProcessorCrossSmooth;
-import com.hbm.explosion.vanillant.standard.ExplosionEffectWeapon;
-import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
+import com.hbm.explosion.ExplosionLarge;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -21,10 +26,34 @@ import net.minecraft.world.phys.Vec3;
  * bespoke {@code EntityType}s, both weapons reuse the already-ported, already-registered
  * {@link EntityBulletBaseMK4} (constructed directly, bypassing the Sedna {@code Receiver}/
  * {@code GunConfig} state machine entirely - these are hold-right-click bow-style items, not
- * {@code ItemGunBaseNT}s) with a dedicated {@link BulletConfig} whose {@code onImpact} reproduces
- * CE's "explode on impact" behavior via this port's real {@code ExplosionVNT} stack. Same visible
- * behavior (a projectile that flies out and explodes where it lands); no new entity/network
- * registration needed.
+ * {@code ItemGunBaseNT}s) with dedicated {@link BulletConfig}s whose {@code onImpact} reproduces
+ * CE's real explosion behavior via already-ported explosion entities/helpers.
+ * <p>
+ * <b>{@code gun_b92}'s explosion is a single fixed tier</b> - CE's real {@code EntityExplosiveBeam#explode()}
+ * always spawns the exact same fixed-radius antimatter-tier detonation regardless of how many charges
+ * were fired (charge count only controls how many beams are fired, each with increasing divergence -
+ * see {@link ItemGunB92#releaseUsing}). This is ported 1:1 via {@link EntityNukeExplosionMK3#statFacFleija}
+ * (destructionRange 10) - the exact same factory {@link ItemGunB92#selfDetonate} already uses for the
+ * gun's 11th-charge self-detonation, just at a smaller radius - plus a decorative
+ * {@link EntityCloudFleija} (this port's substitute for CE's {@code EntityCloudFleijaRainbow}, which
+ * does not exist here; see that class's own javadoc).
+ * <p>
+ * <b>{@code gun_b93}'s explosion genuinely escalates with charge level</b> - CE's real
+ * {@code EntityModBeam#explode()} branches on an int {@code mode} field (0-9, = charge power - 1)
+ * into 10 completely different explosion types, from a small vanilla-style blast at mode 0 up to a
+ * full {@code EntityNukeExplosionMK5} gadget-tier nuclear detonation at max charge (mode 9) - this is
+ * the gun's entire "legendary" identity, not a cosmetic detail, so it is ported as a real 10-tier
+ * escalation rather than the single flattened explosion an earlier draft of this file used.
+ * {@link EntityBulletBaseMK4} has no spare per-shot field to carry an arbitrary int like CE's bespoke
+ * {@code EntityModBeam.mode} (adding one would mean touching that shared, heavily-reused entity class
+ * outside this package's scope), so the 10 tiers are instead 10 distinct {@link BulletConfig}s - one
+ * per mode, each with its own {@code onImpact} - selected by {@link #b93Beam(int)} at fire time. CE's
+ * modes 4/5 ({@code EntityVortex}), 6/7 ({@code EntityRagingVortex}), and 8 ({@code EntityBlackHole})
+ * all need entity classes that do not exist anywhere in this port yet (grepped, confirmed absent) -
+ * those 5 tiers fall back to mode 3's real, already-portable tier ({@code EntityNukeExplosionMK3},
+ * destructionRange 20) rather than a silent no-op or a crash, preserving "the explosion keeps getting
+ * stronger with more charge" without inventing new gameplay. Mode 9 (CE's real final {@code else}
+ * branch, hit only at max charge) is a genuine gadget-tier nuke, exactly matching CE.
  */
 final class LegacyChargeWeapons {
 
@@ -33,10 +62,24 @@ final class LegacyChargeWeapons {
 
     static final BulletConfig b92_beam = new BulletConfig("b92_beam")
             .setupDamageClass(DamageClass.EXPLOSIVE).setVel(1.5F).setGrav(0).setLife(200)
-            .setOnImpact(LegacyChargeWeapons::explode);
-    static final BulletConfig b93_beam = new BulletConfig("b93_beam")
-            .setupDamageClass(DamageClass.EXPLOSIVE).setVel(1.5F).setGrav(0).setLife(200)
-            .setOnImpact(LegacyChargeWeapons::explode);
+            .setOnImpact(LegacyChargeWeapons::explodeB92);
+
+    /** 10 mode-tier configs for {@code gun_b93} - see class javadoc. Index == CE's {@code mode} (0-9). */
+    private static final BulletConfig[] B93_BEAMS = new BulletConfig[10];
+
+    static {
+        for (int i = 0; i < B93_BEAMS.length; i++) {
+            int mode = i;
+            B93_BEAMS[i] = new BulletConfig("b93_beam_" + mode)
+                    .setupDamageClass(DamageClass.EXPLOSIVE).setVel(1.5F).setGrav(0).setLife(200)
+                    .setOnImpact((bullet, hit) -> explodeB93(bullet, hit, mode));
+        }
+    }
+
+    /** The {@code gun_b93} config for a given charge {@code mode} (0-9), clamped defensively - see {@link ItemGunB93#releaseUsing}'s call site. */
+    static BulletConfig b93Beam(int mode) {
+        return B93_BEAMS[Math.max(0, Math.min(mode, B93_BEAMS.length - 1))];
+    }
 
     /** Spawns one charge-round with the given fixed damage (CE: {@code dmgMin}-{@code dmgMax} 16-28 for b92, mode-scaled for b93) and per-shot angular divergence. */
     static void fireBeam(LivingEntity shooter, BulletConfig config, float damage, float divergence) {
@@ -44,15 +87,55 @@ final class LegacyChargeWeapons {
         shooter.level().addFreshEntity(bullet);
     }
 
-    private static void explode(EntityBulletBaseMK4 bullet, HitResult hit) {
+    /** CE's {@code EntityExplosiveBeam#explode()} - see class javadoc. */
+    private static void explodeB92(EntityBulletBaseMK4 bullet, HitResult hit) {
         if (hit instanceof EntityHitResult ehr && bullet.tickCount < 3 && ehr.getEntity() == bullet.getThrower()) return;
         bullet.discard();
+
+        Level level = bullet.level();
+        if (level.isClientSide()) return;
         Vec3 loc = hit.getLocation();
-        ExplosionVNT vnt = new ExplosionVNT(bullet.level(), loc.x, loc.y, loc.z, 3F, bullet.getThrower());
-        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, bullet.damage));
-        vnt.setPlayerProcessor(new PlayerProcessorStandard());
-        vnt.setSFX(new ExplosionEffectWeapon(6, 2F, 1F));
-        vnt.explode();
+
+        level.playSound(null, loc.x, loc.y, loc.z, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F, level.random.nextFloat() * 0.1F + 0.9F);
+        level.addFreshEntity(EntityNukeExplosionMK3.statFacFleija(level, loc.x, loc.y, loc.z, 10));
+        level.addFreshEntity(EntityCloudFleija.create(level, loc.x, loc.y, loc.z, 100));
+    }
+
+    /** CE's {@code EntityModBeam#explode()}'s 10-tier {@code mode} branch - see class javadoc for the mode-by-mode mapping and the modes-4-8 fallback. */
+    private static void explodeB93(EntityBulletBaseMK4 bullet, HitResult hit, int mode) {
+        if (hit instanceof EntityHitResult ehr && bullet.tickCount < 3 && ehr.getEntity() == bullet.getThrower()) return;
+        bullet.discard();
+
+        Level level = bullet.level();
+        if (level.isClientSide()) return;
+        Vec3 loc = hit.getLocation();
+        LivingEntity thrower = bullet.getThrower();
+
+        switch (mode) {
+            case 0 -> ExplosionLarge.explode(level, thrower, loc.x, loc.y, loc.z, 5F, true, false, false);
+            case 1 -> ExplosionLarge.explodeFire(level, thrower, loc.x, loc.y, loc.z, 10F, true, false, false);
+            case 2 -> {
+                level.playSound(null, loc.x, loc.y, loc.z, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F, level.random.nextFloat() * 0.1F + 0.9F);
+                level.addFreshEntity(EntityNukeExplosionMK3.statFacFleija(level, loc.x, loc.y, loc.z, 10));
+                level.addFreshEntity(EntityCloudFleija.create(level, loc.x, loc.y, loc.z, 100));
+            }
+            // Modes 3-8: mode 3 is CE's real tier here (EntityNukeExplosionMK3, destructionRange 20);
+            // modes 4/5/6/7/8 fall back to this same tier - see class javadoc for why (EntityVortex/
+            // EntityRagingVortex/EntityBlackHole don't exist in this port yet).
+            case 3, 4, 5, 6, 7, 8 -> {
+                level.playSound(null, loc.x, loc.y, loc.z, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F, level.random.nextFloat() * 0.1F + 0.9F);
+                level.addFreshEntity(EntityNukeExplosionMK3.statFacFleija(level, loc.x, loc.y, loc.z, 20));
+                level.addFreshEntity(EntityCloudFleija.create(level, loc.x, loc.y, loc.z, 100));
+            }
+            // Mode 9 (max charge) and CE's own catch-all default: a real gadget-tier nuke.
+            default -> {
+                level.playSound(null, loc.x, loc.y, loc.z, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F, level.random.nextFloat() * 0.1F + 0.9F);
+                level.addFreshEntity(EntityNukeExplosionMK5.statFac(level, BombConfig.GADGET_RADIUS.get(), loc.x, loc.y, loc.z).setDetonator(thrower));
+                if (BombConfig.ENABLE_NUKE_CLOUDS.get()) {
+                    EntityNukeTorex.statFac(level, loc.x, loc.y, loc.z, BombConfig.GADGET_RADIUS.get());
+                }
+            }
+        }
     }
 
     static final Item.Properties LEGENDARY_PROPS = new Item.Properties().stacksTo(1);

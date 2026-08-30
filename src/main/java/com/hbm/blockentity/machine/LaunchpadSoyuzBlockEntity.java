@@ -111,34 +111,60 @@ public class LaunchpadSoyuzBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public void updateEntity() {
-        if (level == null || level.isClientSide) return;
+        if (level == null) return;
 
-        this.power = Library.chargeTEFromItems(inventory, 8, power, MAX_POWER);
+        if (!level.isClientSide) {
+            this.power = Library.chargeTEFromItems(inventory, 8, power, MAX_POWER);
 
-        if (!hasRocketLoaded()) {
-            boolean isMoving = false;
+            if (!hasRocketLoaded()) {
+                boolean isMoving = false;
+                for (int i = 0; i < this.positions.length; i++) {
+                    if (!this.finishedMoving(i)) {
+                        isMoving = true;
+                        break;
+                    }
+                }
+
+                // if all parts are currently idle, set the status back to absent and prepare new loading procedure
+                if (!isMoving) this.soyuzStatus = SoyuzStatus.ABSENT;
+
+                this.loadedType = -1;
+            } else {
+                this.loadedType = 0;
+            }
+
+            if (this.power >= CONSUMPTION) {
+                this.updateStates();
+                this.move();
+                this.power -= CONSUMPTION;
+            }
+
+            networkPackNT(300);
+        } else {
+            // Client-side interpolation of the synced positions array toward the values
+            // deserialize() last wrote into syncPositions, matching CE's own update()'s client
+            // branch - this was missing entirely (the method used to unconditionally bail out on
+            // the client), which meant the crane/strut/carriage animation never advanced on the
+            // client at all despite the server-side state machine progressing normally. CE's
+            // per-index turnProgress decrement (rather than once per call) is preserved exactly,
+            // quirky as it is - see LaunchPadLargeBlockEntity's sibling "sync" field for the more
+            // usual once-per-call shape of the same idea.
             for (int i = 0; i < this.positions.length; i++) {
-                if (!this.finishedMoving(i)) {
-                    isMoving = true;
-                    break;
+                this.prevPositions[i] = this.positions[i];
+
+                if (this.turnProgress > 0) {
+                    this.positions[i] = this.positions[i] + ((this.syncPositions[i] - this.positions[i]) / (float) this.turnProgress);
+                    --this.turnProgress;
+                } else {
+                    this.positions[i] = this.syncPositions[i];
                 }
             }
 
-            // if all parts are currently idle, set the status back to absent and prepare new loading procedure
-            if (!isMoving) this.soyuzStatus = SoyuzStatus.ABSENT;
-
-            this.loadedType = -1;
-        } else {
-            this.loadedType = 0;
+            // TODO(effectNT/particle networking, Phase 5): CE spawns 3 "tower" lift-plume particles
+            // here once positions[CARRIAGE] and positions[ROTOR] both reach 1F and loadedType >= 0
+            // (MainRegistry.proxy.effectNT) - not ported, this port's networked particle-effect
+            // infrastructure doesn't exist yet (see ExplosionLarge's identical VFX deferrals).
         }
-
-        if (this.power >= CONSUMPTION) {
-            this.updateStates();
-            this.move();
-            this.power -= CONSUMPTION;
-        }
-
-        networkPackNT(300);
     }
 
     public void updateStates() {

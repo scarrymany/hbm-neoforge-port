@@ -73,6 +73,7 @@ public class ModItems {
         com.hbm.items.weapon.grenade.GrenadeDataComponents.register(modEventBus);
         com.hbm.items.weapon.WeaponMeleeItems.registerAll();
         com.hbm.items.weapon.WeaponDataComponents.register(modEventBus);
+        com.hbm.items.tool.MultitoolPassiveItems.registerAll(); // added by melee-weapons review pass: wires the 8 ItemMultitoolPassive rungs that were built but never registered
         com.hbm.items.weapon.MissileItems.registerAll();
         com.hbm.items.weapon.MissileDataComponents.register(modEventBus);
         com.hbm.items.weapon.sedna.content.GunPistolItems.registerAll();
