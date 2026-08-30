@@ -1,7 +1,12 @@
 package com.hbm.items;
 
+import com.hbm.items.gear.GearItems;
+import com.hbm.items.machine.MachineDataComponents;
+import com.hbm.items.machine.MachineItems;
 import com.hbm.items.special.BedrockOreComponents;
 import com.hbm.items.special.BedrockOreItems;
+import com.hbm.items.special.SpecialItemComponents;
+import com.hbm.items.special.SpecialItems;
 import com.hbm.items.tool.ToolDataComponents;
 import com.hbm.items.tool.ToolItems;
 import com.hbm.main.MainRegistry;
@@ -40,6 +45,11 @@ public class ModItems {
         BedrockOreComponents.register(modEventBus);
         ToolItems.registerAll();
         ToolDataComponents.register(modEventBus);
+        GearItems.registerAll(modEventBus);
+        MachineItems.registerAll();
+        MachineDataComponents.register(modEventBus);
+        SpecialItems.registerAll();
+        SpecialItemComponents.register(modEventBus);
         ITEMS.register(modEventBus);
     }
 }

@@ -36,6 +36,7 @@ public final class ModBlocks {
     }
 
     public static void register(IEventBus modEventBus) {
+        OreBlocks.registerAll();
         com.hbm.blocks.generic.GenericBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
