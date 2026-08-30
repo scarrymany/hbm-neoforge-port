@@ -1,5 +1,7 @@
 package com.hbm.items;
 
+import com.hbm.items.food.FoodDataComponents;
+import com.hbm.items.food.FoodItems;
 import com.hbm.items.gear.GearItems;
 import com.hbm.items.machine.MachineDataComponents;
 import com.hbm.items.machine.MachineItems;
@@ -48,6 +50,8 @@ public class ModItems {
         GearItems.registerAll(modEventBus);
         MachineItems.registerAll();
         MachineDataComponents.register(modEventBus);
+        FoodItems.registerAll(modEventBus);
+        FoodDataComponents.register(modEventBus);
         SpecialItems.registerAll();
         SpecialItemComponents.register(modEventBus);
         ITEMS.register(modEventBus);
