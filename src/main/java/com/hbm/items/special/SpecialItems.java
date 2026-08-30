@@ -27,9 +27,9 @@ import java.util.function.Supplier;
  *     {@code ItemSimpleConsumable}, {@code ItemHot}, {@code ItemNuclearWaste} (base) - reusable
  *     building classes with no field of their own inside this package's CE scope; CE's hundreds of
  *     concrete instances of these classes live in other Phase 1 areas' own item families.</li>
- *     <li>{@code ItemDepletedFuel} - all 16 CE fields it backs were already registered as plain
- *     {@code Item} pairs by {@code com.hbm.items.PlateCrystalWasteItems} before this class existed;
- *     see this area's final report for the integration follow-up.</li>
+ *     <li>{@code ItemDepletedFuel} - all 16 CE fields it backs are registered by
+ *     {@code com.hbm.items.PlateCrystalWasteItems} (a different concurrent Phase 1 area's file),
+ *     using this class directly; not duplicated here to avoid double-registering those ids.</li>
  * </ul>
  */
 public final class SpecialItems {
@@ -336,6 +336,37 @@ public final class SpecialItems {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, SPAWN_UFO);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, SPAWN_DUCK);
     }
+
+    // ==================== ItemSoyuz (3 flattened SoyuzSkinType variants) ====================
+    // CE's single "missile_soyuz" field (ItemEnumMulti, 3 metadata skins) flattens into one registry
+    // id per skin, matching this file's other ItemEnumMulti ports (ItemSiegeCoin, ItemWasteLong).
+    // CE placed missile_soyuz under MainRegistry.missileTab with stacksTo(1); rarity is baked in per
+    // skin (see ItemSoyuz's javadoc) since getRarity has no per-instance override left in modern Item.
+
+    public static final DeferredItem<ItemSoyuz> MISSILE_SOYUZ_NORMAL = register("missile_soyuz_normal",
+            () -> new ItemSoyuz(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.COMMON),
+                    ItemSoyuz.SoyuzSkinType.NORMAL));
+    public static final DeferredItem<ItemSoyuz> MISSILE_SOYUZ_LUNAR = register("missile_soyuz_lunar",
+            () -> new ItemSoyuz(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.RARE),
+                    ItemSoyuz.SoyuzSkinType.LUNAR));
+    public static final DeferredItem<ItemSoyuz> MISSILE_SOYUZ_POST_WAR = register("missile_soyuz_post_war",
+            () -> new ItemSoyuz(new Item.Properties().stacksTo(1).rarity(net.minecraft.world.item.Rarity.EPIC),
+                    ItemSoyuz.SoyuzSkinType.POST_WAR));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.MISSILE, MISSILE_SOYUZ_NORMAL);
+        CreativeTabContents.add(ModCreativeTabs.MISSILE, MISSILE_SOYUZ_LUNAR);
+        CreativeTabContents.add(ModCreativeTabs.MISSILE, MISSILE_SOYUZ_POST_WAR);
+    }
+
+    // ==================== ItemTrain (2 flattened EnumTrainType variants) ====================
+    // CE's single "train" field (ItemEnumMulti, 2 metadata rail-car types) flattens into one registry
+    // id per type, same treatment as ItemSoyuz above. CE sets setCreativeTab(null) on "train" - hidden
+    // from every tab, same here.
+
+    public static final DeferredItem<ItemTrain> TRAIN_CARGO_TRAM = register("train_cargo_tram",
+            () -> new ItemTrain(new Item.Properties().stacksTo(1), ItemTrain.EnumTrainType.CARGO_TRAM));
+    public static final DeferredItem<ItemTrain> TRAIN_CARGO_TRAM_TRAILER = register("train_cargo_tram_trailer",
+            () -> new ItemTrain(new Item.Properties().stacksTo(1), ItemTrain.EnumTrainType.CARGO_TRAM_TRAILER));
 
     // ==================== helpers ====================
 

@@ -16,13 +16,12 @@ import java.util.List;
  * companion.
  * <p>
  * All 16 CE fields backed by this class ({@code waste_natural_uranium}, {@code waste_uranium}, ...,
- * {@code waste_plate_pu238be}) were already registered, independently, by
- * {@code com.hbm.items.PlateCrystalWasteItems} (a different concurrent Phase 1 area) as plain
- * {@link net.minecraft.world.item.Item} pairs before this class existed - see this area's final
- * report for the integration follow-up to point those registrations at this class instead. This
- * class is provided now as the faithful, ready-to-use behavior (cooling tooltip; CE's item-color
- * tint is a client-rendering registration deferred alongside every other Phase 1 area's dynamic-
- * model work, see docs/phase1/items_special.md finding 6).
+ * {@code waste_plate_pu238be}) are registered, as {@code <name>}/{@code <name>_hot} pairs, by
+ * {@code com.hbm.items.PlateCrystalWasteItems} (a different concurrent Phase 1 area's file), which
+ * constructs this class directly for each of the 32 flattened registrations. This class provides the
+ * faithful, ready-to-use behavior (cooling tooltip; CE's item-color tint is a client-rendering
+ * registration deferred alongside every other Phase 1 area's dynamic-model work, see
+ * docs/phase1/items_special.md finding 6).
  */
 public class ItemDepletedFuel extends ItemNuclearWaste {
 

@@ -2,6 +2,7 @@ package com.hbm.items;
 
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
+import com.hbm.items.special.ItemDepletedFuel;
 import com.hbm.items.special.ItemFuel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -86,50 +87,57 @@ public final class PlateCrystalWasteItems {
         return item;
     }
 
+    private static DeferredItem<Item> registerWaste(String name, boolean hot) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemDepletedFuel(new Item.Properties(), hot));
+        CreativeTabContents.add(ModCreativeTabs.PARTS, item);
+        return item;
+    }
+
     // ==================== waste_ (16 CE fields -> 32 flattened variants) ====================
     // CE's ItemDepletedFuel (com.hbm.items.special) is hasSubtypes(true) with exactly 2 metadata
     // variants: 0 = already cooled (lower radiation, no heat) and 1 = freshly generated, still
     // cooling ("Cool in a Spent Fuel Pool Drum" tooltip; HOT hazard applies). Flattened here as
-    // <name> (meta 0, cooled/default) and <name>_hot (meta 1) - the "_hot" suffix is a naming
-    // decision made for this port, not a CE id, since CE itself only ever had one id per pair.
-    // ItemNuclearWaste's custom drop entity (EntityItemWaste, infinite despawn timer) is not ported
-    // here - that is an entity-system concern, not an item-registration one; these register as
-    // plain Item meanwhile.
-    public static final DeferredItem<Item> WASTE_NATURAL_URANIUM = registerParts("waste_natural_uranium");
-    public static final DeferredItem<Item> WASTE_NATURAL_URANIUM_HOT = registerParts("waste_natural_uranium_hot");
-    public static final DeferredItem<Item> WASTE_URANIUM = registerParts("waste_uranium");
-    public static final DeferredItem<Item> WASTE_URANIUM_HOT = registerParts("waste_uranium_hot");
-    public static final DeferredItem<Item> WASTE_THORIUM = registerParts("waste_thorium");
-    public static final DeferredItem<Item> WASTE_THORIUM_HOT = registerParts("waste_thorium_hot");
-    public static final DeferredItem<Item> WASTE_MOX = registerParts("waste_mox");
-    public static final DeferredItem<Item> WASTE_MOX_HOT = registerParts("waste_mox_hot");
-    public static final DeferredItem<Item> WASTE_PLUTONIUM = registerParts("waste_plutonium");
-    public static final DeferredItem<Item> WASTE_PLUTONIUM_HOT = registerParts("waste_plutonium_hot");
-    public static final DeferredItem<Item> WASTE_U233 = registerParts("waste_u233");
-    public static final DeferredItem<Item> WASTE_U233_HOT = registerParts("waste_u233_hot");
-    public static final DeferredItem<Item> WASTE_U235 = registerParts("waste_u235");
-    public static final DeferredItem<Item> WASTE_U235_HOT = registerParts("waste_u235_hot");
-    public static final DeferredItem<Item> WASTE_SCHRABIDIUM = registerParts("waste_schrabidium");
-    public static final DeferredItem<Item> WASTE_SCHRABIDIUM_HOT = registerParts("waste_schrabidium_hot");
-    public static final DeferredItem<Item> WASTE_ZFB_MOX = registerParts("waste_zfb_mox");
-    public static final DeferredItem<Item> WASTE_ZFB_MOX_HOT = registerParts("waste_zfb_mox_hot");
+    // <name> (meta 0, cooled/default, hot=false) and <name>_hot (meta 1, hot=true) - the "_hot"
+    // suffix is a naming decision made for this port, not a CE id, since CE itself only ever had one
+    // id per pair. Both variants construct com.hbm.items.special.ItemDepletedFuel directly so the
+    // cooling tooltip is preserved; ItemNuclearWaste's custom drop entity (EntityItemWaste, infinite
+    // despawn timer) is not ported here - that remains an entity-system concern, not an
+    // item-registration one.
+    public static final DeferredItem<Item> WASTE_NATURAL_URANIUM = registerWaste("waste_natural_uranium", false);
+    public static final DeferredItem<Item> WASTE_NATURAL_URANIUM_HOT = registerWaste("waste_natural_uranium_hot", true);
+    public static final DeferredItem<Item> WASTE_URANIUM = registerWaste("waste_uranium", false);
+    public static final DeferredItem<Item> WASTE_URANIUM_HOT = registerWaste("waste_uranium_hot", true);
+    public static final DeferredItem<Item> WASTE_THORIUM = registerWaste("waste_thorium", false);
+    public static final DeferredItem<Item> WASTE_THORIUM_HOT = registerWaste("waste_thorium_hot", true);
+    public static final DeferredItem<Item> WASTE_MOX = registerWaste("waste_mox", false);
+    public static final DeferredItem<Item> WASTE_MOX_HOT = registerWaste("waste_mox_hot", true);
+    public static final DeferredItem<Item> WASTE_PLUTONIUM = registerWaste("waste_plutonium", false);
+    public static final DeferredItem<Item> WASTE_PLUTONIUM_HOT = registerWaste("waste_plutonium_hot", true);
+    public static final DeferredItem<Item> WASTE_U233 = registerWaste("waste_u233", false);
+    public static final DeferredItem<Item> WASTE_U233_HOT = registerWaste("waste_u233_hot", true);
+    public static final DeferredItem<Item> WASTE_U235 = registerWaste("waste_u235", false);
+    public static final DeferredItem<Item> WASTE_U235_HOT = registerWaste("waste_u235_hot", true);
+    public static final DeferredItem<Item> WASTE_SCHRABIDIUM = registerWaste("waste_schrabidium", false);
+    public static final DeferredItem<Item> WASTE_SCHRABIDIUM_HOT = registerWaste("waste_schrabidium_hot", true);
+    public static final DeferredItem<Item> WASTE_ZFB_MOX = registerWaste("waste_zfb_mox", false);
+    public static final DeferredItem<Item> WASTE_ZFB_MOX_HOT = registerWaste("waste_zfb_mox_hot", true);
 
     // waste_plate_* - 1:1 depleted-fuel companions of the excluded plate_fuel_* items (see class
     // doc). These 7 are still ItemDepletedFuel, not ItemPlateFuel, so they stay in scope here.
-    public static final DeferredItem<Item> WASTE_PLATE_U233 = registerParts("waste_plate_u233");
-    public static final DeferredItem<Item> WASTE_PLATE_U233_HOT = registerParts("waste_plate_u233_hot");
-    public static final DeferredItem<Item> WASTE_PLATE_U235 = registerParts("waste_plate_u235");
-    public static final DeferredItem<Item> WASTE_PLATE_U235_HOT = registerParts("waste_plate_u235_hot");
-    public static final DeferredItem<Item> WASTE_PLATE_MOX = registerParts("waste_plate_mox");
-    public static final DeferredItem<Item> WASTE_PLATE_MOX_HOT = registerParts("waste_plate_mox_hot");
-    public static final DeferredItem<Item> WASTE_PLATE_PU239 = registerParts("waste_plate_pu239");
-    public static final DeferredItem<Item> WASTE_PLATE_PU239_HOT = registerParts("waste_plate_pu239_hot");
-    public static final DeferredItem<Item> WASTE_PLATE_SA326 = registerParts("waste_plate_sa326");
-    public static final DeferredItem<Item> WASTE_PLATE_SA326_HOT = registerParts("waste_plate_sa326_hot");
-    public static final DeferredItem<Item> WASTE_PLATE_RA226BE = registerParts("waste_plate_ra226be");
-    public static final DeferredItem<Item> WASTE_PLATE_RA226BE_HOT = registerParts("waste_plate_ra226be_hot");
-    public static final DeferredItem<Item> WASTE_PLATE_PU238BE = registerParts("waste_plate_pu238be");
-    public static final DeferredItem<Item> WASTE_PLATE_PU238BE_HOT = registerParts("waste_plate_pu238be_hot");
+    public static final DeferredItem<Item> WASTE_PLATE_U233 = registerWaste("waste_plate_u233", false);
+    public static final DeferredItem<Item> WASTE_PLATE_U233_HOT = registerWaste("waste_plate_u233_hot", true);
+    public static final DeferredItem<Item> WASTE_PLATE_U235 = registerWaste("waste_plate_u235", false);
+    public static final DeferredItem<Item> WASTE_PLATE_U235_HOT = registerWaste("waste_plate_u235_hot", true);
+    public static final DeferredItem<Item> WASTE_PLATE_MOX = registerWaste("waste_plate_mox", false);
+    public static final DeferredItem<Item> WASTE_PLATE_MOX_HOT = registerWaste("waste_plate_mox_hot", true);
+    public static final DeferredItem<Item> WASTE_PLATE_PU239 = registerWaste("waste_plate_pu239", false);
+    public static final DeferredItem<Item> WASTE_PLATE_PU239_HOT = registerWaste("waste_plate_pu239_hot", true);
+    public static final DeferredItem<Item> WASTE_PLATE_SA326 = registerWaste("waste_plate_sa326", false);
+    public static final DeferredItem<Item> WASTE_PLATE_SA326_HOT = registerWaste("waste_plate_sa326_hot", true);
+    public static final DeferredItem<Item> WASTE_PLATE_RA226BE = registerWaste("waste_plate_ra226be", false);
+    public static final DeferredItem<Item> WASTE_PLATE_RA226BE_HOT = registerWaste("waste_plate_ra226be_hot", true);
+    public static final DeferredItem<Item> WASTE_PLATE_PU238BE = registerWaste("waste_plate_pu238be", false);
+    public static final DeferredItem<Item> WASTE_PLATE_PU238BE_HOT = registerWaste("waste_plate_pu238be_hot", true);
 
     // ==================== plate_ (28 fields: plain resources + armor-crafting components) ========
     // Plain metal/composite plates, faithful 1:1 with CE - no hazard bindings exist for this family

@@ -25,9 +25,20 @@ import java.util.List;
  * value baked in at registration, so every record is registered with {@code Rarity.RARE} directly
  * instead.
  * <p>
- * The four {@code JukeboxSong} datapack entries this item references
- * ({@code data/hbm/jukebox_song/*.json}) are authored alongside this class (see this area's final
- * report); the {@code SoundEvent} each one names is already ported ({@code HBMSoundHandler}).
+ * NOT YET DONE: the four {@code JukeboxSong} datapack entries this item's
+ * {@code Item.Properties#jukeboxPlayable} keys resolve to ({@code data/hbm/jukebox_song/lc.json},
+ * {@code ss.json}, {@code vc.json}, {@code glass.json}) do not exist on disk yet - without them,
+ * {@code JukeboxPlayable.tryInsertIntoJukebox} will fail its registry lookup and these items will not
+ * play in a jukebox at runtime, though they will still register and hold their tooltip/name/rarity
+ * correctly. The {@code SoundEvent} each entry would name is already ported
+ * ({@code HBMSoundHandler.lambdaCore}/{@code sectorSweep}/{@code vortalCombat}/{@code glass}, ids
+ * {@code hbm:music.recordlambdacore}/{@code music.recordsectorsweep}/{@code music.recordvortalcombat}/
+ * {@code music.transmission}), but no {@code .ogg} audio asset or {@code sounds.json} entry for any of
+ * them has landed in this port yet either (see {@code HBMSoundHandler}'s own javadoc) - authoring the
+ * {@code length_in_seconds}/{@code comparator_output} datapack fields now would mean inventing values
+ * for audio that cannot be verified or heard in this build. Left as a followup for whichever area
+ * lands the sound asset pipeline, at which point the real track lengths are knowable and the four
+ * JSON files can be authored correctly in the same pass.
  */
 public class ItemModRecord extends Item {
 
