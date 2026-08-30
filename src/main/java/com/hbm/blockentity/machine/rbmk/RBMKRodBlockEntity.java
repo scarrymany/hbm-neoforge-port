@@ -279,8 +279,8 @@ public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity implements IRBMKF
     @Override
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
-        this.fluxQuantity = buf.readDouble();
-        this.fluxFastRatio = buf.readDouble();
+        this.lastFluxQuantity = buf.readDouble();
+        this.lastFluxRatio = buf.readDouble();
         this.hasRod = buf.readBoolean();
         this.rodColor = buf.readInt();
     }

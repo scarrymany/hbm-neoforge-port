@@ -26,7 +26,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
  * {@link com.hbm.blockentity.MachineBaseBlockEntity#getEnergyStorageCapability}'s own gating
  * contract (a mismatched flag throws at first use, not at registration time).
  */
-@EventBusSubscriber(modid = MainRegistry.MODID)
+@EventBusSubscriber(modid = MainRegistry.MODID, bus = EventBusSubscriber.Bus.MOD)
 public final class PowerGenCapabilities {
 
     private PowerGenCapabilities() {

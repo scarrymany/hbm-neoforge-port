@@ -1,5 +1,6 @@
 package com.hbm.blockentity.machine.rbmk;
 
+import com.hbm.api.rbmk.RBMKControlMath;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.interfaces.ICopiable;
 import net.minecraft.core.BlockPos;
@@ -44,22 +45,8 @@ public class RBMKControlAutoBlockEntity extends RBMKControlBlockEntity implement
     @Override
     public void updateEntity() {
         if (!this.level.isClientSide) {
-            double fauxLevel;
-
-            double lowerBound = Math.min(this.heatLower, this.heatUpper);
-            double upperBound = Math.max(this.heatLower, this.heatUpper);
-
-            if (this.heat < lowerBound) {
-                fauxLevel = this.levelLower;
-            } else if (this.heat > upperBound) {
-                fauxLevel = this.levelUpper;
-            } else {
-                fauxLevel = switch (this.function) {
-                    case LINEAR -> (this.heat - this.heatLower) * ((this.levelUpper - this.levelLower) / (this.heatUpper - this.heatLower)) + this.levelLower;
-                    case QUAD_UP -> Math.pow((this.heat - this.heatLower) / (this.heatUpper - this.heatLower), 2) * (this.levelUpper - this.levelLower) + this.levelLower;
-                    case QUAD_DOWN -> Math.pow((this.heat - this.heatUpper) / (this.heatLower - this.heatUpper), 2) * (this.levelLower - this.levelUpper) + this.levelUpper;
-                };
-            }
+            double fauxLevel = RBMKControlMath.autoLevel(this.heat, this.heatLower, this.heatUpper,
+                    this.levelLower, this.levelUpper, RBMKControlMath.AutoFunction.valueOf(this.function.name()));
 
             this.targetLevel = Math.max(0D, Math.min(1D, fauxLevel * 0.01D));
         }

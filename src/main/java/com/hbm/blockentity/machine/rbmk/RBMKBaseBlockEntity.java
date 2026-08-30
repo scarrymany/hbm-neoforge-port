@@ -85,12 +85,19 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
         return 15;
     }
 
+    /**
+     * CE: only {@code TileEntityRBMKRod.update()} ever checks {@code heat > maxHeat()} and fires a
+     * meltdown (see {@link RBMKMeltdownTrigger}'s own javadoc) - every other column type (moderator,
+     * reflector, absorber, blank, control, boiler, outgasser, heater) inherits/calls this base update
+     * for heat diffusion only and never triggers a meltdown from its own accumulated heat in CE.
+     * {@link #checkMeltdown} is therefore deliberately NOT called here; it stays a {@code protected}
+     * method that only {@link RBMKRodBlockEntity#updateEntity()} calls, matching CE exactly.
+     */
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide || !(level instanceof ServerLevel serverLevel)) return;
 
         moveHeat();
-        checkMeltdown(serverLevel);
         networkPackNT(trackingRange());
     }
 

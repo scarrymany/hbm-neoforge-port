@@ -21,7 +21,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
  * {@code (be, side) -> be.getFluidHandlerCapability(side)} shape used for every
  * {@code MachineBaseBlockEntity} subclass elsewhere - same call shape, different receiver type.
  */
-@EventBusSubscriber(modid = MainRegistry.MODID)
+@EventBusSubscriber(modid = MainRegistry.MODID, bus = EventBusSubscriber.Bus.MOD)
 public final class PWRCapabilities {
 
     private PWRCapabilities() {

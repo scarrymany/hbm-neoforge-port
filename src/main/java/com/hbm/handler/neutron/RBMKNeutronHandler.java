@@ -5,7 +5,6 @@ import com.hbm.api.rbmk.IRBMKControlColumn;
 import com.hbm.api.rbmk.IRBMKFluxReceiver;
 import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.handler.neutron.NeutronNodeWorld.StreamWorld;
-import com.hbm.handler.radiation.ChunkRadiationManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -148,8 +147,10 @@ public final class RBMKNeutronHandler {
      * existing (confirmed by reading the real, current CE source rather than assuming the dials'
      * existence implies they're wired up - preserved exactly as CE's real, currently-live
      * behavior). CE's {@code Vec3NT#rotateAroundYDeg} helper is replaced with direct trigonometry
-     * below (not part of this package's scope to port); behaviorally equivalent - 8 evenly-spaced
-     * directions at a random starting angle.
+     * below (not part of this package's scope to port), matching CE's real
+     * {@code Vec3NT#rotateAroundYRad} clockwise rotation-sign convention exactly so the resulting
+     * 8-direction set is bit-for-bit identical to CE's under a fixed RNG seed, not merely a
+     * mirror-image set of the same 8 evenly-spaced directions.
      *
      * @param nodePos a caller-owned cache key for this ReaSim column (CE:
      *                {@code TileEntityRBMKRodReaSim#posReasimRod}, a lazily-allocated copy of the
@@ -170,17 +171,22 @@ public final class RBMKNeutronHandler {
         RBMKNeutronNode node = existing instanceof RBMKNeutronNode rn ? rn : makeNode(streamWorld, receiver);
         if (existing == null) streamWorld.addNode(node);
 
+        // CE's Vec3NT.rotateAroundYRad(a) is nx = x*cos(a) + z*sin(a); nz = -x*sin(a) + z*cos(a) -
+        // a clockwise rotation in the (x,z) plane. Both the initial-angle vector below (starting
+        // from CE's (1,0,0)) and the per-step rotation apply that exact formula so this matches
+        // CE's real, live TileEntityRBMKRodReaSim#spreadFlux direction set bit-for-bit under a
+        // fixed RNG seed, not just as a statistically-equivalent mirror image.
         double angle = Math.toRadians(random.nextInt(4) * 9D);
         double vx = Math.cos(angle);
-        double vz = Math.sin(angle);
+        double vz = -Math.sin(angle);
         double step = Math.toRadians(45D);
         double cosStep = Math.cos(step);
         double sinStep = Math.sin(step);
 
         for (int i = 0; i < 8; i++) {
             new RBMKNeutronStream(node, new Vec3(vx, 0, vz), flux * 0.75D, ratio);
-            double nvx = vx * cosStep - vz * sinStep;
-            double nvz = vx * sinStep + vz * cosStep;
+            double nvx = vx * cosStep + vz * sinStep;
+            double nvz = -vx * sinStep + vz * cosStep;
             vx = nvx;
             vz = nvz;
         }
@@ -446,9 +452,10 @@ public final class RBMKNeutronHandler {
 
                 IRBMKColumn columnEntry = targetNode.getColumn();
 
-                if (!rbmkTarget.hasLid()) {
-                    ChunkRadiationManager.proxy.incrementRad(level, targetPos, this.fluxQuantity * 0.05D);
-                }
+                // Phase 4 forward reference, not callable from this wave (com.hbm.handler.radiation
+                // does not exist in this port): CE's RBMKNeutronStream#runStreamInteraction calls
+                // ChunkRadiationManager.proxy.incrementRad(level, targetPos, this.fluxQuantity * 0.05D)
+                // here when !rbmkTarget.hasLid() - see RBMKRodBlockEntity's matching forward reference.
 
                 if (type == RBMKType.MODERATOR || columnEntry.isModerated()) {
                     moderatedCount++;
@@ -543,13 +550,19 @@ public final class RBMKNeutronHandler {
         }
 
         public void irradiateFromFlux(ServerLevel level, TickContext ctx, BlockPos pos) {
-            ChunkRadiationManager.proxy.incrementRad(level, pos,
-                    fluxQuantity * 0.05D * (1 - (double) getHits(level, ctx, pos) / ctx.columnHeight()));
+            // Phase 4 forward reference, not callable from this wave (com.hbm.handler.radiation
+            // does not exist in this port): CE's RBMKNeutronStream#irradiateFromFlux(BlockPos) calls
+            // ChunkRadiationManager.proxy.incrementRad(level, pos, fluxQuantity * 0.05D *
+            // (1 - (double) getHits(level, ctx, pos) / ctx.columnHeight())) here - see
+            // RBMKRodBlockEntity's matching forward reference.
         }
 
         public void irradiateFromFlux(ServerLevel level, TickContext ctx, BlockPos pos, int hits) {
-            ChunkRadiationManager.proxy.incrementRad(level, pos,
-                    fluxQuantity * 0.05D * (1 - (double) hits / ctx.columnHeight()));
+            // Phase 4 forward reference, not callable from this wave (com.hbm.handler.radiation
+            // does not exist in this port): CE's RBMKNeutronStream#irradiateFromFlux(BlockPos, int)
+            // calls ChunkRadiationManager.proxy.incrementRad(level, pos, fluxQuantity * 0.05D *
+            // (1 - (double) hits / ctx.columnHeight())) here - see RBMKRodBlockEntity's matching
+            // forward reference.
         }
 
         public void moderateStream(TickContext ctx) {
