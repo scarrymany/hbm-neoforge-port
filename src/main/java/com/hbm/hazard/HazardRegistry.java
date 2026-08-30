@@ -723,8 +723,8 @@ public class HazardRegistry {
         HazardSystem.trafos.add(new HazardTransformerRadiationNBT());
         HazardSystem.trafos.add(new HazardTransformerForgeFluid());
 
-        if (!(GeneralConfig.enableLBSM && GeneralConfig.enableLBSMSafeCrates)) HazardSystem.trafos.add(new HazardTransformerRadiationContainer());
-        if (!(GeneralConfig.enableLBSM && GeneralConfig.enableLBSMSafeMEDrives)) HazardSystem.trafos.add(new HazardTransformerRadiationME());
+        if (!(GeneralConfig.enableLBSM() && GeneralConfig.LBSM_SAFE_CRATES.get())) HazardSystem.trafos.add(new HazardTransformerRadiationContainer());
+        if (!(GeneralConfig.enableLBSM() && GeneralConfig.LBSM_SAFE_ME_DRIVES.get())) HazardSystem.trafos.add(new HazardTransformerRadiationME());
         // Keep the custom post transformer last
         HazardSystem.trafos.add(new HazardTransformerPostCustom());
     }

@@ -32,7 +32,7 @@ public class HazardTypeRadiation implements IHazardType {
         if (level > 0) {
             double rad = level / 20D;
 
-            if (GeneralConfig.enable528 && reacher) {
+            if (GeneralConfig.enable528() && reacher) {
                 rad = rad / 49D; // More realistic function for 528: x / distance^2
             } else if (reacher) {
                 rad = BobMathUtil.sqrt(rad); // Reworked radiation function: sqrt(x+1/(x+2)^2)-1/(x+2)

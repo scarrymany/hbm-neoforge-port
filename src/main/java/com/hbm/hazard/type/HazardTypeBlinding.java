@@ -24,7 +24,7 @@ public class HazardTypeBlinding implements IHazardType {
     @Override
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
 
-        if (RadiationConfig.disableBlinding) return;
+        if (RadiationConfig.DISABLE_BLINDING.get()) return;
 
         if (!ArmorRegistry.hasProtection(target, EquipmentSlot.HEAD, HazardClass.LIGHT)) {
             target.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, (int) level * hazardRate, 0));

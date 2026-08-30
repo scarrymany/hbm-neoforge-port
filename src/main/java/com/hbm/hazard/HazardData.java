@@ -34,7 +34,7 @@ public class HazardData {
     }
 
     public HazardData addEntry(final IHazardType hazard, final double level) {
-        if (hazard == HazardRegistry.CONTAMINATING && !RadiationConfig.enableContaminationOnGround) return this;
+        if (hazard == HazardRegistry.CONTAMINATING && !RadiationConfig.ENABLE_CONTAMINATION_ON_GROUND.get()) return this;
         return this.addEntry(hazard, level, false);
     }
 

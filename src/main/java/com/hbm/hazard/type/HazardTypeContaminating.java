@@ -36,7 +36,7 @@ public class HazardTypeContaminating implements IHazardType {
 
     @Override
     public void updateEntity(final ItemEntity item, final double level) {
-        if (!RadiationConfig.enableContaminationOnGround) return;
+        if (!RadiationConfig.ENABLE_CONTAMINATION_ON_GROUND.get()) return;
         if (item == null) return;
         final Level world = item.level();
         if (world == null || world.isClientSide()) return;
@@ -62,7 +62,7 @@ public class HazardTypeContaminating implements IHazardType {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void addHazardInformation(final Player player, final List<Component> list, final double level, final ItemStack stack, final List<IHazardModifier> modifiers) {
-        if (!RadiationConfig.enableContaminationOnGround) return;
+        if (!RadiationConfig.ENABLE_CONTAMINATION_ON_GROUND.get()) return;
         final int radius = computeRadius(level);
         if (radius > 1) {
             list.add(Component.literal("[" + I18nUtil.resolveKey("trait.contaminating") + "]").withStyle(ChatFormatting.DARK_GREEN));

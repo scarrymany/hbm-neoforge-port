@@ -28,6 +28,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  *   BrokenItem  : "itemID" + "itemMeta" (a wrapped Item registry name + damage value) -> hbm:wrapped_item, DataComponentType<ItemStack>
  *                 storing the full wrapped ItemStack directly (meta/damage-as-variant no longer exists post-flattening).
  *   ISatChip    : "freq" (int, stored directly in the stack's tag compound) -> hbm:sat_freq, DataComponentType<Integer>
+ *   ArmorUtil    : CE's FILTERK_KEY nested-NBT gas-mask-filter slot -> hbm:gas_mask_filter, DataComponentType<ItemStack>,
+ *                 same shape as WRAPPED_ITEM but kept as its own field per that class's javadoc (a different semantic:
+ *                 WRAPPED_ITEM is BrokenItem's wrapped-item-plus-meta concept, this is a live equipped filter stack).
+ *   ContaminationUtil : CE's NTM_NEUTRON_NBT_KEY ("ntmNeutron", a float stored directly in the stack's tag compound) ->
+ *                 hbm:neutron_activation, DataComponentType<Float>.
  */
 public final class HbmDataComponents {
 
@@ -44,6 +49,20 @@ public final class HbmDataComponents {
             DATA_COMPONENT_TYPES.register("sat_freq", () -> DataComponentType.<Integer>builder()
                     .persistent(Codec.INT)
                     .networkSynchronized(ByteBufCodecs.INT)
+                    .build());
+
+    /** {@code com.hbm.handler.ArmorUtil}'s installed gas-mask filter stack (CE: {@code FILTERK_KEY}). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemStack>> GAS_MASK_FILTER =
+            DATA_COMPONENT_TYPES.register("gas_mask_filter", () -> DataComponentType.<ItemStack>builder()
+                    .persistent(ItemStack.OPTIONAL_CODEC)
+                    .networkSynchronized(ItemStack.OPTIONAL_STREAM_CODEC)
+                    .build());
+
+    /** {@code com.hbm.util.ContaminationUtil}'s neutron-activation float (CE: {@code NTM_NEUTRON_NBT_KEY}). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> NEUTRON_ACTIVATION =
+            DATA_COMPONENT_TYPES.register("neutron_activation", () -> DataComponentType.<Float>builder()
+                    .persistent(Codec.FLOAT)
+                    .networkSynchronized(ByteBufCodecs.FLOAT)
                     .build());
 
     private HbmDataComponents() {}

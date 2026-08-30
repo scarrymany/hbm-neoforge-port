@@ -20,7 +20,7 @@ public class HazardTypeExplosive implements IHazardType {
     @Override
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
 
-        if (RadiationConfig.disableExplosive) return;
+        if (RadiationConfig.DISABLE_EXPLOSIVE.get()) return;
 
         if (target.isOnFire() && stack.getCount() > 0) {
             stack.setCount(0);
@@ -31,7 +31,7 @@ public class HazardTypeExplosive implements IHazardType {
     @Override
     public void updateEntity(final ItemEntity item, final double level) {
 
-        if (RadiationConfig.disableExplosive) return;
+        if (RadiationConfig.DISABLE_EXPLOSIVE.get()) return;
 
         if (item.isOnFire()) {
             item.discard();

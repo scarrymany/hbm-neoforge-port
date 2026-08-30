@@ -1,12 +1,12 @@
 package com.hbm.hazard.type;
 
 import com.hbm.config.BombConfig;
+import com.hbm.damage.ModDamageTypes;
 import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.hazard.HazardComponents;
 import com.hbm.hazard.modifier.IHazardModifier;
 import com.hbm.lib.HBMSoundHandler;
-import com.hbm.lib.ModDamageSource;
 import com.hbm.lib.ObjObjDoubleConsumer;
 import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
@@ -61,11 +61,11 @@ public class HazardTypeUnstable implements IHazardType {
                 stack.setCount(0);
                 world.addFreshEntity(EntityNukeExplosionMK5.statFac(world, radius, entity.getX(), entity.getY(), entity.getZ()).setDetonator(entity));
 
-                if (BombConfig.enableNukeClouds) {
+                if (BombConfig.ENABLE_NUKE_CLOUDS.get()) {
                     EntityNukeTorex.statFac(world, entity.getX(), entity.getY(), entity.getZ(), radius);
                 }
                 world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), HBMSoundHandler.oldExplosion, SoundSource.PLAYERS, 1.0F, 1.0F);
-                entity.hurt(ModDamageSource.nuclearBlast(entity.level()), 10000);
+                entity.hurt(entity.level().damageSources().source(ModDamageTypes.NUCLEAR_BLAST), 10000);
             }
         };
         this.onDrop = (itemEntity, level) -> {
@@ -78,11 +78,11 @@ public class HazardTypeUnstable implements IHazardType {
                 // the detonation runs without a credited detonator until the entity area supplies one.
                 world.addFreshEntity(EntityNukeExplosionMK5.statFac(world, radius, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ()).setDetonator(null));
 
-                if (BombConfig.enableNukeClouds) {
+                if (BombConfig.ENABLE_NUKE_CLOUDS.get()) {
                     EntityNukeTorex.statFac(world, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), radius);
                 }
                 world.playSound(null, itemEntity.getX(), itemEntity.getY(), itemEntity.getZ(), HBMSoundHandler.oldExplosion, SoundSource.PLAYERS, 1.0F, 1.0F);
-                itemEntity.hurt(ModDamageSource.nuclearBlast(world), 10000);
+                itemEntity.hurt(world.damageSources().source(ModDamageTypes.NUCLEAR_BLAST), 10000);
                 itemEntity.discard();
             }
         };

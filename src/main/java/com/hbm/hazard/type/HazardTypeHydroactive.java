@@ -22,7 +22,7 @@ public class HazardTypeHydroactive implements IHazardType {
     @Override
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
 
-        if (RadiationConfig.disableHydro) return;
+        if (RadiationConfig.DISABLE_HYDRO.get()) return;
 
         final Level world = target.level();
         final boolean playerIsWet = target.isInWaterOrRain()
@@ -37,7 +37,7 @@ public class HazardTypeHydroactive implements IHazardType {
     @Override
     public void updateEntity(final ItemEntity item, final double level) {
 
-        if (RadiationConfig.disableHydro) return;
+        if (RadiationConfig.DISABLE_HYDRO.get()) return;
 
         if (item.isInWaterOrRain()) {
             item.discard();

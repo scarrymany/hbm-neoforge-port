@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface IHazardType {
 
-    int hazardRate = RadiationConfig.hazardRate;
+    int hazardRate = RadiationConfig.HAZARD_RATE.get();
 
     /**
      * Does the thing. Called by {@link com.hbm.hazard.HazardEntry#applyHazard}.

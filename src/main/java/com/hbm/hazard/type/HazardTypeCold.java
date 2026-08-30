@@ -24,7 +24,7 @@ public class HazardTypeCold implements IHazardType {
     @Override
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
         final boolean reacher = HazardHelper.isHoldingReacher(target);
-        if (RadiationConfig.disableCold || reacher) return;
+        if (RadiationConfig.DISABLE_COLD.get() || reacher) return;
 
         if (target instanceof Player && ArmorUtil.checkForHazmat(target)) return;
 

@@ -24,7 +24,7 @@ public class HazardTypeAsbestos implements IHazardType {
     @Override
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
 
-        if (RadiationConfig.disableAsbestos) return;
+        if (RadiationConfig.DISABLE_ASBESTOS.get()) return;
 
         if (ArmorRegistry.hasProtection(target, EquipmentSlot.HEAD, HazardClass.PARTICLE_FINE))
             ArmorUtil.damageGasMaskFilter(target, (int) level * hazardRate);

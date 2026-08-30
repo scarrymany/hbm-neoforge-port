@@ -26,7 +26,7 @@ public class HazardTypeToxic implements IHazardType {
     @Override
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
 
-        if (RadiationConfig.disableToxic) return;
+        if (RadiationConfig.DISABLE_TOXIC.get()) return;
 
         final boolean reacher = HazardHelper.isHoldingReacher(target);
         boolean hasToxFilter = false;

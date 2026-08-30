@@ -53,7 +53,10 @@ public final class HbmLivingAttachment {
     );
 
     public static final int MAX_ASBESTOS = 60 * 60 * 20;
-    public static final int MAX_BLACKLUNG = 60 * 60 * 20;
+    // CE's HbmLivingProps.maxBlacklung = 2 * 60 * 60 * 20 (double maxAsbestos) - this was
+    // missing the 2x factor here (matched MAX_ASBESTOS exactly), a pre-existing constant bug
+    // fixed per the Phase 3 contamination/armor-util research report's Open questions section.
+    public static final int MAX_BLACKLUNG = 2 * 60 * 60 * 20;
     private static final double MAX_RADS = 2500D;
     private static final double MAX_DIGAMMA = 1000D;
 

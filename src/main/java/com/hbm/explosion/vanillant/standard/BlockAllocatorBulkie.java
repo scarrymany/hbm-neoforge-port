@@ -1,0 +1,99 @@
+package com.hbm.explosion.vanillant.standard;
+
+import com.hbm.explosion.vanillant.ExplosionVNT;
+import com.hbm.explosion.vanillant.interfaces.IBlockAllocator;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.HashSet;
+
+/**
+ * CE: {@code BlockAllocatorBulkie} - named for the "Bulkie" creature/weapon use site; unlike
+ * {@link BlockAllocatorStandard} this allocator has no power budget at all - each ray always walks
+ * out to exactly {@code explosion.size} blocks, stopping early only if it meets a block whose
+ * (default-state) explosion resistance exceeds {@code maximum}. CE checks resistance against each
+ * block's <em>default</em> state rather than the actual state present at that position (preserved
+ * here faithfully, quirk and all) and, like {@link BlockAllocatorStandard}, drops the vanished
+ * {@code canExplosionDestroyBlock} veto (see that class's javadoc).
+ */
+public class BlockAllocatorBulkie implements IBlockAllocator {
+
+    protected double maximum;
+    protected int resolution;
+
+    public BlockAllocatorBulkie(double maximum) {
+        this(maximum, 16);
+    }
+
+    public BlockAllocatorBulkie(double maximum, int resolution) {
+        this.resolution = resolution;
+        this.maximum = maximum;
+    }
+
+    @Override
+    public HashSet<BlockPos> allocate(ExplosionVNT explosion, Level level, double x, double y, double z, float size) {
+
+        HashSet<BlockPos> affectedBlocks = new HashSet<>();
+
+        for (int i = 0; i < this.resolution; ++i) {
+            for (int j = 0; j < this.resolution; ++j) {
+                for (int k = 0; k < this.resolution; ++k) {
+
+                    if (i == 0 || i == this.resolution - 1 || j == 0 || j == this.resolution - 1 || k == 0 || k == this.resolution - 1) {
+
+                        double d0 = ((float) i / ((float) this.resolution - 1.0F) * 2.0F - 1.0F);
+                        double d1 = ((float) j / ((float) this.resolution - 1.0F) * 2.0F - 1.0F);
+                        double d2 = ((float) k / ((float) this.resolution - 1.0F) * 2.0F - 1.0F);
+                        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
+
+                        d0 /= d3;
+                        d1 /= d3;
+                        d2 /= d3;
+
+                        double currentX = x;
+                        double currentY = y;
+                        double currentZ = z;
+
+                        double dist = 0;
+
+                        for (float stepSize = 0.3F; dist <= explosion.size; ) {
+
+                            double deltaX = currentX - x;
+                            double deltaY = currentY - y;
+                            double deltaZ = currentZ - z;
+                            dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+
+                            int blockX = Mth.floor(currentX);
+                            int blockY = Mth.floor(currentY);
+                            int blockZ = Mth.floor(currentZ);
+                            BlockPos pos = new BlockPos(blockX, blockY, blockZ);
+
+                            if (!level.isInWorldBounds(pos)) break;
+
+                            Block block = level.getBlockState(pos).getBlock();
+                            BlockState defaultState = block.defaultBlockState();
+
+                            if (!defaultState.isAir()) {
+                                float blockResistance = defaultState.getExplosionResistance(level, pos, explosion.compat);
+                                if (this.maximum < blockResistance) {
+                                    break;
+                                }
+                            }
+
+                            affectedBlocks.add(pos);
+
+                            currentX += d0 * (double) stepSize;
+                            currentY += d1 * (double) stepSize;
+                            currentZ += d2 * (double) stepSize;
+                        }
+                    }
+                }
+            }
+        }
+
+        return affectedBlocks;
+    }
+}

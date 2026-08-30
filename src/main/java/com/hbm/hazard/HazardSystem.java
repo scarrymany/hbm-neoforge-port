@@ -456,7 +456,7 @@ public class HazardSystem {
     }
 
     private static boolean onHazardTick(final LivingEntity entity) {
-        return entity.level().getGameTime() % Math.max(1, RadiationConfig.hazardRate) == 0;
+        return entity.level().getGameTime() % Math.max(1, RadiationConfig.HAZARD_RATE.get()) == 0;
     }
 
     private static TagKey<Item> itemTag(final String name) {

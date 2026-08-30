@@ -21,7 +21,7 @@ public class HazardTypeHot implements IHazardType {
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
 
         final boolean wetOrReacher = HazardHelper.isHoldingReacher(target) || target.isInWaterOrRain();
-        if (RadiationConfig.disableHot || wetOrReacher) return;
+        if (RadiationConfig.DISABLE_HOT.get() || wetOrReacher) return;
         if (target instanceof Player player && player.isCreative()) return;
         target.setRemainingFireTicks((int) Math.ceil(level) * hazardRate);
     }

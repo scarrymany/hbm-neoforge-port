@@ -54,7 +54,11 @@ public class ModDamageTypeTagsProvider extends DamageTypeTagsProvider {
                         ModDamageTypes.SUBATOMIC_2,
                         ModDamageTypes.SUBATOMIC_3,
                         ModDamageTypes.SUBATOMIC_4,
-                        ModDamageTypes.SUBATOMIC_5
+                        ModDamageTypes.SUBATOMIC_5,
+                        // gun-framework ballistics core (BulletConfig.getDamage): matches CE's own
+                        // BulletConfig.getDamage's `case PHYSICAL -> dmg.setProjectile();` - see
+                        // docs/phase3/gun_framework.md.
+                        ModDamageTypes.SEDNA_PHYSICAL
                 );
 
         this.tag(DamageTypeTags.BYPASSES_ARMOR)
@@ -204,7 +208,13 @@ public class ModDamageTypeTagsProvider extends DamageTypeTagsProvider {
                         ModDamageTypes.SEDNA_LASER,
                         ModDamageTypes.SEDNA_MICROWAVE,
                         ModDamageTypes.SEDNA_SUBATOMIC,
-                        ModDamageTypes.SEDNA_ELECTRIC
+                        ModDamageTypes.SEDNA_ELECTRIC,
+                        // gun-framework ballistics core: SEDNA_PLASMA is a new ModDamageTypes entry
+                        // this package adds (see this task's wiring snippet for ModDamageTypes.java) -
+                        // grouped into IS_ENERGY alongside the other three energy-weapon Sedna damage
+                        // classes for the same reason this tag already groups SEDNA_MICROWAVE in
+                        // beyond CE's own dmgClass switch statement (see docs/phase3/gun_framework.md).
+                        ModDamageTypes.SEDNA_PLASMA
                 );
     }
 }

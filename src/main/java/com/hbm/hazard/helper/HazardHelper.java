@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Player;
 public class HazardHelper {
 
     public static boolean isHoldingReacher(final LivingEntity target) {
-        if (target instanceof Player player && !GeneralConfig.enable528) {
+        if (target instanceof Player player && !GeneralConfig.enable528()) {
             return player.getMainHandItem().is(ModItems.reacher.get()) || player.getOffhandItem().is(ModItems.reacher.get());
         }
         return false;
