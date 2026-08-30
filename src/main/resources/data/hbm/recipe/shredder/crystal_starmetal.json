@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_starmetal" },
+  "output": { "id": "hbm:powder_dura_steel", "count": 6 },
+  "duration": 60
+}

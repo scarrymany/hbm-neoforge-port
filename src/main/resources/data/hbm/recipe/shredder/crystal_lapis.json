@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_lapis" },
+  "output": { "id": "hbm:powder_lapis", "count": 8 },
+  "duration": 60
+}

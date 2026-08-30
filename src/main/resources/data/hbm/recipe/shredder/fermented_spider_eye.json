@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:fermented_spider_eye" },
+  "output": { "id": "hbm:powder_poison", "count": 3 },
+  "duration": 60
+}

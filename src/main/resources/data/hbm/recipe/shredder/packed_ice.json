@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:packed_ice" },
+  "output": { "id": "hbm:powder_ice", "count": 1 },
+  "duration": 60
+}

@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_redstone" },
+  "output": { "id": "minecraft:redstone", "count": 8 },
+  "duration": 60
+}

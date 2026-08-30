@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:apple" },
+  "output": { "id": "minecraft:sugar", "count": 1 },
+  "duration": 60
+}

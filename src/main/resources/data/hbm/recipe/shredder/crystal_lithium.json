@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_lithium" },
+  "output": { "id": "hbm:powder_lithium", "count": 3 },
+  "duration": 60
+}

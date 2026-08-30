@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:glowstone" },
+  "output": { "id": "minecraft:glowstone_dust", "count": 4 },
+  "duration": 60
+}

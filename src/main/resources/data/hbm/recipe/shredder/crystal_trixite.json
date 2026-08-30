@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_trixite" },
+  "output": { "id": "hbm:powder_plutonium", "count": 6 },
+  "duration": 60
+}

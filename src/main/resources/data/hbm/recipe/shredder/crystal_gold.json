@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_gold" },
+  "output": { "id": "hbm:powder_gold", "count": 3 },
+  "duration": 60
+}

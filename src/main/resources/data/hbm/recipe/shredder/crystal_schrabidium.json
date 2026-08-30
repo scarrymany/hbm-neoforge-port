@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_schrabidium" },
+  "output": { "id": "hbm:powder_schrabidium", "count": 3 },
+  "duration": 60
+}

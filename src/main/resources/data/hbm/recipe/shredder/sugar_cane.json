@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:sugar_cane" },
+  "output": { "id": "minecraft:sugar", "count": 3 },
+  "duration": 60
+}

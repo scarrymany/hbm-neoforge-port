@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:sandstone" },
+  "output": { "id": "minecraft:sand", "count": 4 },
+  "duration": 60
+}

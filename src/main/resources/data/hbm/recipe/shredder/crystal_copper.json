@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_copper" },
+  "output": { "id": "hbm:powder_copper", "count": 3 },
+  "duration": 60
+}

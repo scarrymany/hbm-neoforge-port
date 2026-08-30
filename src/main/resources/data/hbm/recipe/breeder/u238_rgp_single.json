@@ -1,0 +1,6 @@
+{
+  "type": "hbm:breeder",
+  "input": { "item": "hbm:rod_u238" },
+  "output": { "id": "hbm:rod_rgp", "count": 1 },
+  "flux": 300
+}

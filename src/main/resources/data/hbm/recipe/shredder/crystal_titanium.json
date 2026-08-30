@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_titanium" },
+  "output": { "id": "hbm:powder_titanium", "count": 3 },
+  "duration": 60
+}

@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:tnt" },
+  "output": { "id": "minecraft:gunpowder", "count": 5 },
+  "duration": 60
+}

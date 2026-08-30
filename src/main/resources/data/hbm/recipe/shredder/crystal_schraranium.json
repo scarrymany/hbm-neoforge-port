@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_schraranium" },
+  "output": { "id": "hbm:nugget_schrabidium", "count": 3 },
+  "duration": 60
+}

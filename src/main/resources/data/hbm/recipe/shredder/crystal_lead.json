@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_lead" },
+  "output": { "id": "hbm:powder_lead", "count": 3 },
+  "duration": 60
+}

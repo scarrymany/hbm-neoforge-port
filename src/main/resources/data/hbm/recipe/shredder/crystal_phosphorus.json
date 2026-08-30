@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_phosphorus" },
+  "output": { "id": "hbm:powder_fire", "count": 8 },
+  "duration": 60
+}

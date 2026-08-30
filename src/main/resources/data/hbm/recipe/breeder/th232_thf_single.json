@@ -1,0 +1,6 @@
+{
+  "type": "hbm:breeder",
+  "input": { "item": "hbm:rod_th232" },
+  "output": { "id": "hbm:rod_thf", "count": 1 },
+  "flux": 500
+}

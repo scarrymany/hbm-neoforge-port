@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_thorium" },
+  "output": { "id": "hbm:powder_thorium", "count": 3 },
+  "duration": 60
+}

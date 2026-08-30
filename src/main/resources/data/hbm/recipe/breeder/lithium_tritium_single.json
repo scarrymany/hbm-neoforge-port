@@ -1,0 +1,6 @@
+{
+  "type": "hbm:breeder",
+  "input": { "item": "hbm:rod_lithium" },
+  "output": { "id": "hbm:rod_tritium", "count": 1 },
+  "flux": 200
+}

@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:anvil" },
+  "output": { "id": "hbm:powder_iron", "count": 31 },
+  "duration": 60
+}

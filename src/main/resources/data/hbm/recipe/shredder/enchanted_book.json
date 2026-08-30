@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:enchanted_book" },
+  "output": { "id": "hbm:powder_magic", "count": 1 },
+  "duration": 60
+}

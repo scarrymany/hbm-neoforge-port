@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_tungsten" },
+  "output": { "id": "hbm:powder_tungsten", "count": 3 },
+  "duration": 60
+}

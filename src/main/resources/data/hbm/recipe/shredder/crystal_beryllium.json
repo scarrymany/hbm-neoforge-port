@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_beryllium" },
+  "output": { "id": "hbm:powder_beryllium", "count": 3 },
+  "duration": 60
+}

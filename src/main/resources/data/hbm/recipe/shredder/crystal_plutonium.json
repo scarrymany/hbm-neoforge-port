@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crystal_plutonium" },
+  "output": { "id": "hbm:powder_plutonium", "count": 3 },
+  "duration": 60
+}

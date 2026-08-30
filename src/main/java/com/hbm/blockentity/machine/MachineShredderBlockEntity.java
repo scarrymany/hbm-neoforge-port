@@ -1,0 +1,279 @@
+package com.hbm.blockentity.machine;
+
+import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.blockentity.ITickableBE;
+import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.inventory.container.machine.MachineShredderMenu;
+import com.hbm.inventory.recipes.HbmSimpleRecipe;
+import com.hbm.inventory.recipes.ProcessingRecipes;
+import com.hbm.items.machine.ItemBlades;
+import com.hbm.lib.Library;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
+
+/**
+ * Ported from CE's {@code com.hbm.tileentity.machine.TileEntityMachineShredder} (335 lines, read in
+ * full) - see {@code docs/phase2/machines_shredder_assembler_crystallizer_mixer.md}'s per-machine
+ * detail for the full slot/power/recipe breakdown this class implements.
+ * <p>
+ * <b>Slots</b> (30 total, unchanged from CE): 0-8 input, 9-26 output (take-only via
+ * {@link #canExtractItem}), 27/28 left/right {@link ItemBlades}, 29 battery.
+ * <p>
+ * <b>Recipe lookup</b>: {@link ProcessingRecipes#SHREDDER_TYPE} ({@link HbmSimpleRecipe}, JSON-backed -
+ * see that class's own javadoc), replacing CE's hardcoded {@code ShredderRecipes} HashMap. One real
+ * deviation from CE, documented: CE's {@code getShredderResult} always returns <i>something</i> (a
+ * {@code ModItems.scrap} fallback on a miss) - this port has no equivalent generic "scrap" item
+ * registered yet (confirmed absent - only material-specific {@code scraps_<material>} items exist),
+ * so a no-match item here simply has no recipe ({@link #isItemValidForSlot} rejects it, matching how
+ * {@link com.hbm.inventory.recipes.CrystallizerRecipes} already has a real "no recipe" state) rather
+ * than silently producing a placeholder item. <b>TODO(items-followup)</b>: swap in a real fallback
+ * once a generic scrap item exists.
+ */
+public class MachineShredderBlockEntity extends MachineBaseBlockEntity
+        implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
+
+    public static final long MAX_POWER = 10_000L;
+    public static final int PROCESSING_SPEED = 60;
+
+    private static final int INPUT_START = 0;
+    private static final int INPUT_END = 8;
+    private static final int OUTPUT_START = 9;
+    private static final int OUTPUT_END = 26;
+    private static final int BLADE_LEFT = 27;
+    private static final int BLADE_RIGHT = 28;
+    private static final int BATTERY_SLOT = 29;
+
+    private static final int[] ALL_SLOTS = new int[30];
+
+    static {
+        for (int i = 0; i < ALL_SLOTS.length; i++) ALL_SLOTS[i] = i;
+    }
+
+    private long power;
+    private int progress;
+
+    public MachineShredderBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state, 30, false, true);
+    }
+
+    @Override
+    protected Component getDefaultName() {
+        return Component.translatable("container.machineShredder");
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        return ALL_SLOTS;
+    }
+
+    private Optional<HbmSimpleRecipe> recipeFor(ItemStack stack) {
+        if (level == null || stack.isEmpty()) return Optional.empty();
+        return level.getRecipeManager()
+                .getRecipeFor(ProcessingRecipes.SHREDDER_TYPE.get(), new SingleRecipeInput(stack), level)
+                .map(RecipeHolder::value);
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        if (slot >= INPUT_START && slot <= INPUT_END) {
+            return !(stack.getItem() instanceof ItemBlades) && recipeFor(stack).isPresent();
+        }
+        if (slot == BATTERY_SLOT) return Library.isBattery(stack);
+        return (slot == BLADE_LEFT || slot == BLADE_RIGHT) && stack.getItem() instanceof ItemBlades;
+    }
+
+    @Override
+    public boolean canInsertItem(int slot, ItemStack itemStack) {
+        if (slot != BLADE_LEFT && slot != BLADE_RIGHT && itemStack.getItem() instanceof ItemBlades) return false;
+        if (slot != BATTERY_SLOT && Library.isDischargeableBattery(itemStack)) return false;
+        return isItemValidForSlot(slot, itemStack);
+    }
+
+    @Override
+    public boolean canExtractItem(int slot, ItemStack itemStack, int amount) {
+        if (slot >= OUTPUT_START && slot <= OUTPUT_END) return true;
+        if (slot == BLADE_LEFT || slot == BLADE_RIGHT) {
+            return itemStack.getMaxDamage() > 0 && itemStack.getDamageValue() == itemStack.getMaxDamage();
+        }
+        return false;
+    }
+
+    public boolean hasPower() {
+        return power > 0;
+    }
+
+    public boolean isProcessing() {
+        return progress > 0;
+    }
+
+    public long getPower() {
+        return power;
+    }
+
+    public long getMaxPower() {
+        return MAX_POWER;
+    }
+
+    @Override
+    public void setPower(long i) {
+        power = i;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public int getProgressScaled(int scale) {
+        return (progress * scale) / PROCESSING_SPEED;
+    }
+
+    /** Gear wear tier of the given blade slot: 0 (no blade), 1 (fresh-to-half), 2 (half-to-worn), 3 (fully worn, needs replacing) - matches CE's {@code getGearLeft}/{@code getGearRight} exactly. */
+    private int gearOf(int bladeSlot) {
+        ItemStack blade = inventory.getStackInSlot(bladeSlot);
+        if (blade.isEmpty() || !(blade.getItem() instanceof ItemBlades)) return 0;
+        if (blade.getMaxDamage() == 0) return 1;
+        if (blade.getDamageValue() < blade.getMaxDamage() / 2) return 1;
+        if (blade.getDamageValue() != blade.getMaxDamage()) return 2;
+        return 3;
+    }
+
+    public boolean canProcess() {
+        int left = gearOf(BLADE_LEFT);
+        int right = gearOf(BLADE_RIGHT);
+        if (left <= 0 || left >= 3 || right <= 0 || right >= 3) return false;
+
+        for (int i = INPUT_START; i <= INPUT_END; i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (!stack.isEmpty() && hasSpace(stack)) return true;
+        }
+        return false;
+    }
+
+    public boolean hasSpace(ItemStack stack) {
+        Optional<HbmSimpleRecipe> recipe = recipeFor(stack);
+        if (recipe.isEmpty()) return false;
+        ItemStack result = recipe.get().getResultItem(level.registryAccess());
+        if (result.isEmpty()) return false;
+
+        int spaceLeft = 0;
+        for (int i = OUTPUT_START; i <= OUTPUT_END; i++) {
+            ItemStack slotStack = inventory.getStackInSlot(i);
+            if (slotStack.isEmpty()) {
+                spaceLeft += result.getMaxStackSize();
+            } else if (ItemStack.isSameItemSameComponents(slotStack, result)) {
+                spaceLeft += slotStack.getMaxStackSize() - slotStack.getCount();
+            }
+        }
+        return spaceLeft >= result.getCount();
+    }
+
+    public void processItem() {
+        for (int inSlot = INPUT_START; inSlot <= INPUT_END; inSlot++) {
+            ItemStack inp = inventory.getStackInSlot(inSlot);
+            if (inp.isEmpty() || !hasSpace(inp)) continue;
+
+            ItemStack outp = recipeFor(inp).orElseThrow().getResultItem(level.registryAccess()).copy();
+            int itemsLeft = outp.getCount();
+
+            for (int outSlot = OUTPUT_START; outSlot <= OUTPUT_END && itemsLeft > 0; outSlot++) {
+                ItemStack slotStack = inventory.getStackInSlot(outSlot);
+                if (!slotStack.isEmpty() && ItemStack.isSameItemSameComponents(slotStack, outp)) {
+                    int space = slotStack.getMaxStackSize() - slotStack.getCount();
+                    if (space > 0) {
+                        int amount = Math.min(itemsLeft, space);
+                        slotStack.grow(amount);
+                        itemsLeft -= amount;
+                    }
+                }
+            }
+            for (int outSlot = OUTPUT_START; outSlot <= OUTPUT_END && itemsLeft > 0; outSlot++) {
+                if (inventory.getStackInSlot(outSlot).isEmpty()) {
+                    int amount = Math.min(itemsLeft, outp.getMaxStackSize());
+                    ItemStack newStack = outp.copy();
+                    newStack.setCount(amount);
+                    inventory.setStackInSlot(outSlot, newStack);
+                    itemsLeft -= amount;
+                }
+            }
+
+            inp.shrink(1);
+            if (inp.isEmpty()) inventory.setStackInSlot(inSlot, ItemStack.EMPTY);
+        }
+    }
+
+    @Override
+    public void updateEntity() {
+        if (level == null || level.isClientSide) return;
+
+        if (hasPower() && canProcess()) {
+            progress++;
+            power -= 5;
+
+            if (progress == PROCESSING_SPEED) {
+                for (int bladeSlot = BLADE_LEFT; bladeSlot <= BLADE_RIGHT; bladeSlot++) {
+                    ItemStack blade = inventory.getStackInSlot(bladeSlot);
+                    if (blade.getMaxDamage() > 0) blade.setDamageValue(blade.getDamageValue() + 1);
+                }
+                progress = 0;
+                processItem();
+            }
+        } else {
+            progress = 0;
+        }
+
+        power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+
+        dataChanged();
+        networkPackMK2(15);
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tag.putLong("powerTime", power);
+        tag.putInt("progress", progress);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        power = tag.getLong("powerTime");
+        progress = tag.getInt("progress");
+    }
+
+    @Override
+    public void serialize(RegistryFriendlyByteBuf buf) {
+        super.serialize(buf);
+        buf.writeLong(power);
+        buf.writeInt(progress);
+    }
+
+    @Override
+    public void deserialize(RegistryFriendlyByteBuf buf) {
+        super.deserialize(buf);
+        power = buf.readLong();
+        progress = buf.readInt();
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new MachineShredderMenu(containerId, playerInventory, this);
+    }
+}
