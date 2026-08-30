@@ -10,7 +10,6 @@ import com.hbm.hazard.HazardSystem;
 import com.hbm.hazard.type.HazardTypeRadiation;
 import com.hbm.interfaces.IRadiationImmune;
 import com.hbm.items.HbmDataComponents;
-import com.hbm.items.ModItems;
 import com.hbm.lib.Library;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import com.hbm.util.i18n.I18nUtil;
@@ -555,11 +554,11 @@ public final class ContaminationUtil {
     private static boolean isExplosionExempt(Entity e) {
         if (e instanceof Ocelot) return true;
 
-        if (e instanceof Player player && ArmorUtil.checkArmor(player,
-                ModItems.euphemium_helmet.get(), ModItems.euphemium_plate.get(),
-                ModItems.euphemium_legs.get(), ModItems.euphemium_boots.get())) {
-            return true;
-        }
+        // TODO(armor-items content package): CE also exempts a full-set euphemium-armor wearer here
+        // (ArmorUtil.checkArmor(player, euphemium_helmet, euphemium_plate, euphemium_legs,
+        // euphemium_boots)) - ModItems has no euphemium_* fields yet (a nonexistent static field is a
+        // hard compile error, unlike a forward-referenced method call), so this branch is stubbed to
+        // false until the armor-items package registers those 4 fields.
 
         return e instanceof Player p && (p.isCreative() || p.isSpectator());
     }

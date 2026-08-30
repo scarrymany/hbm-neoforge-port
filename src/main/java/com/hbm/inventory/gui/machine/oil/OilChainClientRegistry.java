@@ -14,7 +14,10 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
  * {@code com.hbm.main.ClientModRegistry#registerScreens} directly, avoiding the same multi-agent
  * shared-file race).
  */
-@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT)
+// bus = Bus.MOD required: RegisterMenuScreensEvent implements IModBusEvent and only fires on the mod
+// bus - @EventBusSubscriber's bus() defaults to Bus.GAME and does not auto-detect IModBusEvent
+// (confirmed against real NeoForge 1.21.1 source and FancyModLoader's EventBusSubscriber javadoc).
+@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class OilChainClientRegistry {
 
     private OilChainClientRegistry() {

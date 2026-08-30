@@ -40,7 +40,10 @@ import java.util.concurrent.CompletableFuture;
  * 4.6): a fluid tag provider (Phase 0's fluid area), a sound definitions provider (Phase 0's sound
  * area) and a recipe provider (its own large content area).
  */
-@EventBusSubscriber(modid = MainRegistry.MODID)
+// bus = Bus.MOD required: GatherDataEvent implements IModBusEvent and only fires on the mod bus -
+// @EventBusSubscriber's bus() defaults to Bus.GAME and does not auto-detect IModBusEvent (confirmed
+// against real NeoForge 1.21.1 source and FancyModLoader's EventBusSubscriber javadoc).
+@EventBusSubscriber(modid = MainRegistry.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class ModDataGenerators {
 
     @SubscribeEvent

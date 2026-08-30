@@ -7,6 +7,12 @@ import com.hbm.capability.ModCapabilities;
 import com.hbm.config.HbmConfig;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.entity.ConveyorEntityTypes;
+import com.hbm.entity.GunEntityTypes;
+import com.hbm.entity.effect.EffectEntityTypes;
+import com.hbm.entity.item.TntPrimedEntityTypes;
+import com.hbm.entity.logic.NukeEntityTypes;
+import com.hbm.entity.projectile.FallingNukeEntityTypes;
+import com.hbm.entity.projectile.RubbleEntityTypes;
 import com.hbm.hazard.HazardComponents;
 import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.fluid.Fluids;
@@ -59,6 +65,12 @@ public class MainRegistry {
         HbmDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);
         ConveyorEntityTypes.register(modEventBus);
+        NukeEntityTypes.register(modEventBus);
+        EffectEntityTypes.register(modEventBus);
+        FallingNukeEntityTypes.register(modEventBus);
+        GunEntityTypes.register(modEventBus);
+        TntPrimedEntityTypes.register(modEventBus);
+        RubbleEntityTypes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         MaterialRegistry.register(modEventBus);
         HbmRecipes.register(modEventBus);
@@ -66,5 +78,7 @@ public class MainRegistry {
         com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.register(modEventBus);
 
         Fluids.init();
+        // Populates the data-driven Solinium block-swap table (defaults to empty/no-op otherwise).
+        com.hbm.explosion.ExplosionNukeGeneric.loadSoliniumFromFile();
     }
 }

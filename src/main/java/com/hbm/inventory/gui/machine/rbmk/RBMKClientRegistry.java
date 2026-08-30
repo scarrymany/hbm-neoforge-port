@@ -16,7 +16,10 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
  * without needing a line added anywhere else - confirmed real NeoForge behavior, already used
  * identically by {@code com.hbm.handler.HbmKeybinds} per {@code ClientModRegistry}'s own javadoc.
  */
-@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT)
+// bus = Bus.MOD required: RegisterMenuScreensEvent implements IModBusEvent and only fires on the mod
+// bus - @EventBusSubscriber's bus() defaults to Bus.GAME and does not auto-detect IModBusEvent
+// (confirmed against real NeoForge 1.21.1 source and FancyModLoader's EventBusSubscriber javadoc).
+@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class RBMKClientRegistry {
 
     private RBMKClientRegistry() {

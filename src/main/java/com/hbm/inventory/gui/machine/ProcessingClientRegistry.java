@@ -13,7 +13,10 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
  * for why this is a separate {@code @EventBusSubscriber} rather than an edit to
  * {@code ClientModRegistry#registerScreens} (same multi-area-in-one-wave race that class avoids).
  */
-@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT)
+// bus = Bus.MOD required: RegisterMenuScreensEvent implements IModBusEvent and only fires on the mod
+// bus - @EventBusSubscriber's bus() defaults to Bus.GAME and does not auto-detect IModBusEvent
+// (confirmed against real NeoForge 1.21.1 source and FancyModLoader's EventBusSubscriber javadoc).
+@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class ProcessingClientRegistry {
 
     private ProcessingClientRegistry() {

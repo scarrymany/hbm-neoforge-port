@@ -60,6 +60,7 @@ public class ModItems {
         com.hbm.items.machine.rbmk.RBMKRods.registerAll();
         com.hbm.items.tool.CouplingToolItems.registerAll();
         com.hbm.items.machine.CouplingMachineItems.registerAll();
+        com.hbm.items.armor.ArmorDataComponents.register(modEventBus);
         ITEMS.register(modEventBus);
     }
 }

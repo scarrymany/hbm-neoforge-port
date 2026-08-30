@@ -359,7 +359,11 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
     }
 
     public ArmorFSB addEffect(MobEffectInstance effect) {
-        if (!PotionConfig.DO_JUMP_BOOST.get() && effect.getEffect() == MobEffects.JUMP_BOOST) return this;
+        // MobEffects.JUMP is Mojang's real (legacy-internal-name) field for the Jump Boost effect -
+        // confirmed against this port's own already-established usage (items.food.ItemEnergy/
+        // ItemPill/FoodItems), not the display-name-shaped MobEffects.JUMP_BOOST, which does not
+        // exist under Mojang mappings.
+        if (!PotionConfig.DO_JUMP_BOOST.get() && effect.getEffect() == MobEffects.JUMP) return this;
         effects.add(effect);
         return this;
     }

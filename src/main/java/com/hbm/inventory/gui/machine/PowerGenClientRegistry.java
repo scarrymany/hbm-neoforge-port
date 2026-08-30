@@ -18,7 +18,10 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
  * this port) let every area register its own screens from its own file, with zero shared-file edits
  * and zero merge risk.
  */
-@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT)
+// bus = Bus.MOD required: RegisterMenuScreensEvent implements IModBusEvent and only fires on the mod
+// bus - @EventBusSubscriber's bus() defaults to Bus.GAME and does not auto-detect IModBusEvent
+// (confirmed against real NeoForge 1.21.1 source and FancyModLoader's EventBusSubscriber javadoc).
+@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public final class PowerGenClientRegistry {
 
     private PowerGenClientRegistry() {

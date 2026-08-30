@@ -2,6 +2,11 @@ package com.hbm.packet;
 
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.toclient.BufPacket;
+import com.hbm.packet.toclient.ExplosionEffectSyncPacket;
+import com.hbm.packet.toclient.ExplosionRemovalSyncPacket;
+import com.hbm.packet.toclient.GunAnimationPayload;
+import com.hbm.packet.toclient.NukeExplosionRemovalSyncPacket;
+import com.hbm.packet.toserver.ItemControlPacket;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -37,7 +42,10 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
  * }
  * </pre>
  */
-@EventBusSubscriber(modid = MainRegistry.MODID)
+// bus = Bus.MOD required: RegisterPayloadHandlersEvent implements IModBusEvent and only fires on the
+// mod bus - @EventBusSubscriber's bus() defaults to Bus.GAME and does not auto-detect IModBusEvent
+// (confirmed against real NeoForge 1.21.1 source and FancyModLoader's EventBusSubscriber javadoc).
+@EventBusSubscriber(modid = MainRegistry.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class HbmNetwork {
 
     /**
@@ -54,5 +62,21 @@ public class HbmNetwork {
         // LoadedBaseBlockEntity#networkPackNT/networkPackMK2. Every later phase appends its own
         // playToClient/playToServer registrations here, one per packet, as each owning feature system is ported.
         registrar.playToClient(BufPacket.TYPE, BufPacket.STREAM_CODEC, BufPacket::handleCommon);
+
+        // Phase 3 (explosion_vanillant_core): client-visible explosion removal/effect sync.
+        registrar.playToClient(ExplosionRemovalSyncPacket.TYPE, ExplosionRemovalSyncPacket.STREAM_CODEC, ExplosionRemovalSyncPacket::handleClient);
+        registrar.playToClient(ExplosionEffectSyncPacket.TYPE, ExplosionEffectSyncPacket.STREAM_CODEC, ExplosionEffectSyncPacket::handleClient);
+
+        // Phase 3 (nuke_explosion_entities): a distinct, separately-registered payload pair from the
+        // vanillant pair above - see NukeExplosionRemovalSyncPacket's javadoc for why.
+        registrar.playToClient(NukeExplosionRemovalSyncPacket.TYPE, NukeExplosionRemovalSyncPacket.STREAM_CODEC, NukeExplosionRemovalSyncPacket::handleClient);
+
+        // Phase 3 (weapon animation triggers, com.hbm.weapon.anim): S2C "start playing this animation
+        // now" hook. Stub client handler - see GunAnimationPayload's class javadoc.
+        registrar.playToClient(GunAnimationPayload.TYPE, GunAnimationPayload.STREAM_CODEC, GunAnimationPayload::handleCommon);
+
+        // Phase 3 (scattered_military_items / weapon_animation_hooks): generic C2S "apply this NBT to
+        // whatever the player is holding" control packet, dispatching to IItemControlReceiver.
+        registrar.playToServer(ItemControlPacket.TYPE, ItemControlPacket.STREAM_CODEC, ItemControlPacket::handleServer);
     }
 }

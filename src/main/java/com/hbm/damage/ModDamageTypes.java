@@ -111,6 +111,7 @@ public interface ModDamageTypes {
     ResourceKey<DamageType> SEDNA_FIRE = key("sedna_fire");
     ResourceKey<DamageType> SEDNA_EXPLOSION = key("sedna_explosion");
     ResourceKey<DamageType> SEDNA_ELECTRIC = key("sedna_electric");
+    ResourceKey<DamageType> SEDNA_PLASMA = key("sedna_plasma");
     ResourceKey<DamageType> SEDNA_LASER = key("sedna_laser");
     ResourceKey<DamageType> SEDNA_MICROWAVE = key("sedna_microwave");
     ResourceKey<DamageType> SEDNA_SUBATOMIC = key("sedna_subatomic");
@@ -187,6 +188,7 @@ public interface ModDamageTypes {
         context.register(SEDNA_FIRE, new DamageType("sednaFire", DEFAULT_EXHAUSTION));
         context.register(SEDNA_EXPLOSION, new DamageType("sednaExplosion", DEFAULT_EXHAUSTION));
         context.register(SEDNA_ELECTRIC, new DamageType("sednaElectric", DEFAULT_EXHAUSTION));
+        context.register(SEDNA_PLASMA, new DamageType("sednaPlasma", DEFAULT_EXHAUSTION));
         context.register(SEDNA_LASER, new DamageType("sednaLaser", DEFAULT_EXHAUSTION));
         context.register(SEDNA_MICROWAVE, new DamageType("sednaMicrowave", DEFAULT_EXHAUSTION));
         context.register(SEDNA_SUBATOMIC, new DamageType("sednaSubatomic", DEFAULT_EXHAUSTION));

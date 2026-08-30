@@ -39,8 +39,13 @@ import com.hbm.inventory.gui.FluidTankScreen;
  * layer assignment via {@code ItemBlockRenderTypes}, {@code ItemProperties.register}
  * calls, entity/block-entity renderer registration, etc).
  */
+// bus = Bus.MOD required: both FMLClientSetupEvent and RegisterMenuScreensEvent implement
+// IModBusEvent and only fire on the mod bus - @EventBusSubscriber's bus() defaults to Bus.GAME and
+// does not auto-detect IModBusEvent (confirmed against real NeoForge 1.21.1 source and
+// FancyModLoader's EventBusSubscriber javadoc). Without this, no Phase 2+ machine screen would ever
+// actually bind to its MenuType.
 @Mod(value = MainRegistry.MODID, dist = Dist.CLIENT)
-@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
 public class ClientModRegistry {
 
     public ClientModRegistry(ModContainer modContainer) {

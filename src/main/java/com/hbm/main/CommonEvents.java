@@ -1,17 +1,20 @@
 package com.hbm.main;
 
+import com.hbm.handler.ArmorUtil;
 import com.hbm.hazard.HazardRegistry;
-import com.hbm.hazard.HazardSystem;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
-@EventBusSubscriber(modid = MainRegistry.MODID)
+/**
+ * Mod-bus common setup. {@code bus = Bus.MOD} is required: {@link FMLCommonSetupEvent} implements
+ * {@code net.neoforged.fml.event.IModBusEvent} and only ever fires on the mod bus - confirmed against
+ * FancyModLoader's {@code EventBusSubscriber} javadoc, which states {@code bus()} defaults to
+ * {@code Bus.GAME} and does not auto-detect {@code IModBusEvent}. The game-bus per-entity tick
+ * dispatch that used to live in this class was split out to {@link CommonTickEvents} for exactly this
+ * reason - a single {@code @EventBusSubscriber} class can only subscribe to one bus.
+ */
+@EventBusSubscriber(modid = MainRegistry.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class CommonEvents {
 
     @SubscribeEvent
@@ -20,21 +23,10 @@ public class CommonEvents {
             HazardRegistry.registerTrafos();
             HazardRegistry.registerItems();
             HazardRegistry.registerContaminatingDrops();
+            // Flushes com.hbm.items.gear.ArmorFSB#setHazardClass's accumulated self-registrations
+            // into com.hbm.util.ArmorRegistry - confirmed real call-site timing via Neo Edition's
+            // own CommonEvents.commonSetup, which calls ArmorUtil.register() from this exact event.
+            ArmorUtil.register();
         });
-    }
-
-    @SubscribeEvent
-    public static void onLivingTick(EntityTickEvent.Pre event) {
-        Entity entity = event.getEntity();
-
-        if(entity instanceof Player player) {
-            HazardSystem.updatePlayerInventory(player);
-        }
-        if(entity instanceof ItemEntity itemEntity) {
-            HazardSystem.updateDroppedItem(itemEntity);
-        }
-        if(entity instanceof LivingEntity livingEntity) {
-            HazardSystem.updateLivingInventory(livingEntity);
-        }
     }
 }
