@@ -2,6 +2,8 @@ package com.hbm.items;
 
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
+import com.hbm.items.food.ItemLemon;
+import com.hbm.items.special.ItemFuel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -11,7 +13,6 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,27 +43,29 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * would duplicate that area's work.
  * <p>
  * {@code powder_lignite}, {@code powder_coal}, {@code powder_coal_tiny} and {@code powder_fire} keep
- * CE's {@code ItemFuel} furnace-burn-time behavior, and {@code powder_fertilizer} keeps CE's
- * {@code ItemFertilizer} area-bonemeal behavior, both faithfully - but as anonymous {@link Item}
- * subclasses built by {@link #registerFuelPowder(String, int)}/{@link #registerFertilizerPowder}
- * rather than named top-level classes: CE's {@code ItemFuel} is likewise claimed by
- * {@code items_special.md} ({@code com.hbm.items.special.ItemFuel}), and CE's
- * {@code ItemFertilizer} (CE package {@code com.hbm.items.tool}) is claimed by
+ * CE's {@code ItemFuel} furnace-burn-time behavior faithfully via the named
+ * {@link com.hbm.items.special.ItemFuel} class, constructed directly by
+ * {@link #registerFuelPowder(String, int)} - that class landed in a parallel {@code items_special.md}
+ * implementation wave, so no local anonymous subclass is needed for it any more.
+ * {@code powder_fertilizer} keeps CE's {@code ItemFertilizer} area-bonemeal behavior via a local
+ * anonymous {@link Item} subclass built by {@link #registerFertilizerPowder}, since CE's
+ * {@code ItemFertilizer} (CE package {@code com.hbm.items.tool}) - claimed by
  * {@code docs/phase1/items_tool.md} ("bonemeal-alternative for IGrowable crops, fires vanilla
- * BonemealEvent"). Once either area lands its canonical class, the five affected register calls
- * below can be pointed at it in place of the local anonymous subclass with no registry-id, hazard,
- * or creative-tab change - this file only avoids introducing a second, competing implementation of
- * either concept in the meantime. Behavior is unabridged either way: {@link #registerFuelPowder}
- * overrides {@link Item#getBurnTime(ItemStack, RecipeType)} exactly as CE's {@code ItemFuel} did
- * (minus its two per-item tooltip easter eggs, not gameplay behavior), and
- * {@link #registerFertilizerPowder} reproduces CE's 3x3x3 {@code ItemFertilizer.onItemUse} via the
- * confirmed 1.21 {@link BonemealableBlock}/{@link BonemealEvent} APIs (see that method's own
- * javadoc for the exact CE-to-1.21 API mapping).
+ * BonemealEvent") - has not landed as a named class as of this writing. Once that area lands its
+ * canonical class, {@link #registerFertilizerPowder} can be pointed at it in place of the local
+ * anonymous subclass with no registry-id, hazard, or creative-tab change - this file only avoids
+ * introducing a second, competing implementation of that concept in the meantime.
+ * {@link #registerFertilizerPowder}/{@link #fertilize} reproduce CE's 3x3x3
+ * {@code ItemFertilizer.onItemUse} via the confirmed 1.21 {@link BonemealableBlock}/
+ * {@link BonemealEvent} APIs, including CE's force-only-on-the-clicked-block chance gate (see
+ * {@link #fertilize}'s own javadoc for the exact CE-to-1.21 API mapping).
  * <p>
  * {@code powder_cement} was CE's one {@code ItemLemon} (basic food, nutrition 2 / saturation 0.5, no
- * special tooltip or effect for this particular item) - 1.21 expresses that as a plain {@code Item}
- * carrying a {@link FoodProperties} component rather than a separate food item class, so no
- * behavior class is needed for it either.
+ * special tooltip or effect for this particular item) - it is now constructed directly via the named
+ * {@link com.hbm.items.food.ItemLemon} class (see that class's own javadoc, which names
+ * {@code powder_cement} as one of its two intended consumers outside the food-consumables catalog),
+ * carrying a {@link FoodProperties} component built by {@link #registerCementPowder} rather than a
+ * separate 1.12-style food-item class.
  * <p>
  * {@code powder_ash} ({@code ItemEnumMulti<EnumAshType>}, 6 metadata variants: WOOD, COAL, MISC,
  * FLY, SOOT, FULLERENE) is deliberately NOT registered here - it is a metadata-driven-multi item
@@ -261,10 +264,10 @@ public final class BilletPowderItems {
     public static final DeferredItem<Item> POWDER_RA226 = registerPowder("powder_ra226");
 
     // CE's ItemLemon(2, 0.5F, false, "powder_cement"): plain food, no special tooltip/effect for
-    // this item in ItemLemon.java's this-== branches. 1.21 has no separate food-item class - food
-    // is a data component on a plain Item. CE's isWolfFood=false has no direct component
-    // equivalent (wolf food preference is a #minecraft:wolf_food item tag in 1.21); omitted rather
-    // than guessed at, since leaving a resource item off that tag is the tag's default state anyway.
+    // this item in ItemLemon.java's path-switch branches (see that class - powder_cement falls
+    // through its default case). CE's isWolfFood=false has no direct component equivalent (wolf
+    // food preference is a #minecraft:wolf_food item tag in 1.21); omitted rather than guessed at,
+    // since leaving a resource item off that tag is the tag's default state anyway.
     public static final DeferredItem<Item> POWDER_CEMENT = registerCementPowder();
 
     /** No-op beyond forcing this class to load before {@code ModItems.ITEMS.register(modEventBus)}. */
@@ -286,18 +289,11 @@ public final class BilletPowderItems {
     }
 
     /**
-     * CE's {@code ItemFuel}: a fixed furnace burn time, via the confirmed 1.21
-     * {@link Item#getBurnTime(ItemStack, RecipeType)} hook (see the Neo Edition reference's
-     * {@code com.hbm.items.FuelItem} for the same override). See the class javadoc for why this is
-     * an anonymous subclass rather than a named {@code ItemFuel} class.
+     * CE's {@code ItemFuel}: a fixed furnace burn time, now backed by the named
+     * {@link ItemFuel} class from {@code com.hbm.items.special} (see the class javadoc).
      */
     private static DeferredItem<Item> registerFuelPowder(String name, int burnTime) {
-        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new Item(new Item.Properties()) {
-            @Override
-            public int getBurnTime(ItemStack stack, RecipeType<?> recipeType) {
-                return burnTime;
-            }
-        });
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemFuel(new Item.Properties(), burnTime));
         CreativeTabContents.add(ModCreativeTabs.PARTS, item);
         return item;
     }
@@ -333,7 +329,8 @@ public final class BilletPowderItems {
                     for (int y = -1; y <= 1; y++) {
                         for (int z = -1; z <= 1; z++) {
                             BlockPos pos = center.offset(x, y, z);
-                            if (fertilize(level, player, stack, pos)) {
+                            boolean force = x == 0 && y == 0 && z == 0;
+                            if (fertilize(level, player, stack, pos, force)) {
                                 didSomething = true;
                                 level.levelEvent(2005, pos, 0);
                             }
@@ -352,7 +349,17 @@ public final class BilletPowderItems {
         return item;
     }
 
-    private static boolean fertilize(Level level, Player player, ItemStack stack, BlockPos pos) {
+    /**
+     * Applies bonemeal-equivalent growth to a single candidate block, matching CE's
+     * {@code ItemFertilizer.fertilize(..., force)}: CE only guaranteed growth on the exact clicked
+     * block ({@code force = true}); the other 26 positions in the 3x3x3 area still had to pass a
+     * random-chance roll to succeed. Here that roll is {@link BonemealableBlock#isBonemealSuccess}
+     * - checked for every position except the center ({@code force = true}), mirroring
+     * {@link com.hbm.blocks.generic.BlockNTMFlower}/{@link com.hbm.blocks.generic.BlockTallPlant}'s
+     * own {@code isValidBonemealTarget} + {@code isBonemealSuccess} + {@code performBonemeal} call
+     * shape.
+     */
+    private static boolean fertilize(Level level, Player player, ItemStack stack, BlockPos pos, boolean force) {
         if (!(level instanceof ServerLevel serverLevel)) {
             return false;
         }
@@ -370,13 +377,16 @@ public final class BilletPowderItems {
 
         RandomSource random = level.getRandom();
         BonemealableBlock growable = (BonemealableBlock) state.getBlock();
+        if (!force && !growable.isBonemealSuccess(level, random, pos, state)) {
+            return false;
+        }
         growable.performBonemeal(serverLevel, random, pos, state);
         return true;
     }
 
     private static DeferredItem<Item> registerCementPowder() {
         FoodProperties food = new FoodProperties.Builder().nutrition(2).saturationModifier(0.5F).build();
-        DeferredItem<Item> item = ModItems.ITEMS.register("powder_cement", () -> new Item(new Item.Properties().food(food)));
+        DeferredItem<Item> item = ModItems.ITEMS.register("powder_cement", () -> new ItemLemon(new Item.Properties().food(food)));
         CreativeTabContents.add(ModCreativeTabs.PARTS, item);
         return item;
     }

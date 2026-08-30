@@ -48,6 +48,7 @@ public final class MachineItems {
     public static final Map<ItemBreedingRod.BreedingRodType, DeferredItem<Item>> BREEDING_ROD_SINGLE = new EnumMap<>(ItemBreedingRod.BreedingRodType.class);
     public static final Map<ItemBreedingRod.BreedingRodType, DeferredItem<Item>> BREEDING_ROD_DUAL = new EnumMap<>(ItemBreedingRod.BreedingRodType.class);
     public static final Map<ItemBreedingRod.BreedingRodType, DeferredItem<Item>> BREEDING_ROD_QUAD = new EnumMap<>(ItemBreedingRod.BreedingRodType.class);
+    public static final Map<ItemPistons.EnumPistonType, DeferredItem<Item>> PISTONS = new EnumMap<>(ItemPistons.EnumPistonType.class);
 
     public static DeferredItem<Item> PLATE_FUEL_U233, PLATE_FUEL_U235, PLATE_FUEL_MOX, PLATE_FUEL_PU239, PLATE_FUEL_SA326, PLATE_FUEL_RA226BE, PLATE_FUEL_PU238BE;
     public static DeferredItem<Item> PELLET_RTG, PELLET_RTG_RADIUM, PELLET_RTG_WEAK, PELLET_RTG_STRONTIUM, PELLET_RTG_COBALT, PELLET_RTG_ACTINIUM,
@@ -72,6 +73,7 @@ public final class MachineItems {
         registerMold();
         registerPaCoils();
         registerPileRods();
+        registerPistons();
         registerPlateFuel();
         registerPwrFuel();
         registerRbmkPellets();
@@ -356,6 +358,17 @@ public final class MachineItems {
         for (ItemPileRodMK2.EnumPileRod type : ItemPileRodMK2.EnumPileRod.VALUES) {
             DeferredItem<Item> item = reg("pile_rod_mk2_" + lower(type.name()), () -> new ItemPileRodMK2(type, props()));
             PILE_RODS_MK2.put(type, item);
+            tab(ModCreativeTabs.CONTROL, item);
+        }
+    }
+
+    // ==================== ItemPistons ====================
+    // CE: single "piston_set" field (ItemEnumMulti), 4 metadata grades.
+
+    private static void registerPistons() {
+        for (ItemPistons.EnumPistonType type : ItemPistons.EnumPistonType.VALUES) {
+            DeferredItem<Item> item = reg("piston_set_" + lower(type.name()), () -> new ItemPistons(type, props().stacksTo(1)));
+            PISTONS.put(type, item);
             tab(ModCreativeTabs.CONTROL, item);
         }
     }

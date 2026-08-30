@@ -3,7 +3,9 @@ package com.hbm.items;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.food.ItemLemon;
+import com.hbm.items.special.ItemCustomLore;
 import com.hbm.items.special.ItemFuel;
+import com.hbm.items.special.ItemHot;
 import com.hbm.items.special.ItemSchraranium;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
@@ -44,21 +46,31 @@ import java.util.function.Supplier;
  *     evidence of real content.</li>
  * </ul>
  *
- * <p><b>Deferred behavior</b> (registered as plain items; see the ported classes' javadoc and this
- * area's final report for the full reasoning):
+ * <p><b>Deferred behavior</b> (registered as plain items; see the ported classes' javadoc and
+ * {@code docs/phase1/items_ingot_nugget_notes.md} for the full reasoning):
  * <ul>
- *     <li>{@code ItemHot}/{@code ItemHotDusted}'s heat-countdown mechanic ({@code ingot_chainsteel},
- *     {@code ingot_meteorite}, {@code ingot_meteorite_forged}, {@code ingot_steel_dusted_*}) needs a
- *     new {@code DataComponentType<Integer>} registered on the mod event bus from
- *     {@code MainRegistry}, which is outside this area's file-edit scope (only {@code ModItems},
- *     {@code ModBlocks} and {@code HazardRegistry.registerItems()} may be touched). The purely
- *     cosmetic baked-model heat-glow overlay is also not reproduced (1.12 vertex-color rendering
- *     hack with no 1.21 model-json equivalent, a resource-pack concern for a later phase).</li>
+ *     <li>{@code ItemHot}'s heat-countdown mechanic is ported for {@code ingot_chainsteel} (maxHeat
+ *     100), {@code ingot_meteorite} and {@code ingot_meteorite_forged} (maxHeat 200 each) - constants
+ *     confirmed against CE's {@code ModItems.java} lines 884-886 - now that
+ *     {@code SpecialItemComponents.HEAT} is registered on the mod event bus (see
+ *     {@code ModItems.register()}). {@code ItemHotDusted}'s parallel per-purity-level heat mechanic
+ *     ({@code ingot_steel_dusted_*}) is still deferred: no {@code ItemHotDusted} port exists yet, and
+ *     porting it would mean either 10 near-duplicate heat-tracking classes or a shared refactor of
+ *     {@code ItemHot} itself, which belongs to whichever area owns {@code com.hbm.items.special}, not
+ *     this file. The purely cosmetic baked-model heat-glow overlay is also not reproduced for any of
+ *     these (1.12 vertex-color rendering hack with no 1.21 model-json equivalent, a resource-pack
+ *     concern for a later phase).</li>
  *     <li>{@code ItemUnstable}'s nuclear-detonation timer ({@code ingot_u238m2*}, {@code nugget_u238m2},
  *     {@code ingot_electronium}) depends on CE's {@code EntityNukeExplosionMK5}/{@code EntityNukeTorex}/
  *     {@code ModDamageSource}, a nuke-explosion engine that belongs to a dedicated later phase (see
  *     the report's section 4, which explicitly carves nukes/missiles out of this area), not "items
  *     and simple blocks".</li>
+ *     <li>{@code ItemCustomLore}'s "polaroid ID 11" easter-egg branch (the {@code .desc.P11} lines on
+ *     {@code ingot_lanthanium}, {@code ingot_neptunium}, {@code ingot_tantalium} and
+ *     {@code nugget_tantalium}) is not reproduced: it depends on {@code MainRegistry.polaroidID}, an
+ *     unported mechanic. The port's {@code ItemCustomLore} (unlike CE's) only ever renders the plain
+ *     {@code .desc} line, which is exactly the fallback CE itself used whenever {@code polaroidID != 11}
+ *     - so these four items already show their non-Easter-egg CE tooltip faithfully.</li>
  * </ul>
  */
 public final class IngotNuggetItems {
@@ -76,9 +88,14 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_ALUMINIUM = registerIngot("ingot_aluminium");
     public static final DeferredItem<Item> INGOT_BERYLLIUM = registerIngot("ingot_beryllium");
     public static final DeferredItem<Item> INGOT_LEAD = registerIngot("ingot_lead");
-    public static final DeferredItem<Item> INGOT_ASBESTOS = registerIngot("ingot_asbestos");
+
+    // ItemCustomLore: real item.hbm.ingot_asbestos.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> INGOT_ASBESTOS = registerLoreIngot("ingot_asbestos");
+
     public static final DeferredItem<Item> INGOT_MAGNETIZED_TUNGSTEN = registerIngot("ingot_magnetized_tungsten");
-    public static final DeferredItem<Item> INGOT_COMBINE_STEEL = registerIngot("ingot_combine_steel");
+
+    // ItemCustomLore: real item.hbm.ingot_combine_steel.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> INGOT_COMBINE_STEEL = registerLoreIngot("ingot_combine_steel");
     public static final DeferredItem<Item> INGOT_DURA_STEEL = registerIngot("ingot_dura_steel");
     public static final DeferredItem<Item> INGOT_TECHNETIUM = registerIngot("ingot_technetium");
     public static final DeferredItem<Item> INGOT_TCALLOY = registerIngot("ingot_tcalloy");
@@ -95,7 +112,10 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_FERROURANIUM = registerIngot("ingot_ferrouranium");
     public static final DeferredItem<Item> INGOT_STARMETAL = registerIngot("ingot_starmetal");
     public static final DeferredItem<Item> INGOT_OSMIRIDIUM = registerIngot("ingot_osmiridium");
-    public static final DeferredItem<Item> INGOT_EUPHEMIUM = registerIngot("ingot_euphemium");
+
+    // ItemCustomLore: real item.hbm.ingot_euphemium.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> INGOT_EUPHEMIUM = registerLoreIngot("ingot_euphemium");
+
     public static final DeferredItem<Item> INGOT_DINEUTRONIUM = registerIngot("ingot_dineutronium");
     public static final DeferredItem<Item> INGOT_CADMIUM = registerIngot("ingot_cadmium");
     public static final DeferredItem<Item> INGOT_BISMUTH = registerIngot("ingot_bismuth");
@@ -148,7 +168,9 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_LES = registerIngot("ingot_les");
     public static final DeferredItem<Item> INGOT_SCHRABIDIUM_FUEL = registerIngot("ingot_schrabidium_fuel");
     public static final DeferredItem<Item> INGOT_HES = registerIngot("ingot_hes");
-    public static final DeferredItem<Item> INGOT_NEPTUNIUM = registerIngot("ingot_neptunium");
+    // ItemCustomLore: real item.hbm.ingot_neptunium.desc flavor text in CE's lang file (plus a
+    // .desc.P11 easter-egg line, deferred - see class javadoc).
+    public static final DeferredItem<Item> INGOT_NEPTUNIUM = registerLoreIngot("ingot_neptunium");
     public static final DeferredItem<Item> INGOT_TENNESSINE = registerIngot("ingot_tennessine");
     public static final DeferredItem<Item> INGOT_POLONIUM = registerIngot("ingot_polonium");
     public static final DeferredItem<Item> INGOT_PHOSPHORUS = registerIngot("ingot_phosphorus");
@@ -157,7 +179,8 @@ public final class IngotNuggetItems {
     // ItemFuel: furnace burn time only, no per-item tooltip branch applies to this area's fields.
     public static final DeferredItem<Item> INGOT_GRAPHITE = register("ingot_graphite", () -> new ItemFuel(new Item.Properties(), FUEL_BURN_TIME));
 
-    public static final DeferredItem<Item> INGOT_FIBERGLASS = registerIngot("ingot_fiberglass");
+    // ItemCustomLore: real item.hbm.ingot_fiberglass.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> INGOT_FIBERGLASS = registerLoreIngot("ingot_fiberglass");
 
     // ItemFoodBase in CE, but ingot_smore has no per-item onFoodEaten/tooltip branch, so a plain
     // Item with food properties is fully faithful without needing a dedicated class.
@@ -169,8 +192,13 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_BROMINE = registerIngot("ingot_bromine");
     public static final DeferredItem<Item> INGOT_CAESIUM = registerIngot("ingot_caesium");
     public static final DeferredItem<Item> INGOT_CERIUM = registerIngot("ingot_cerium");
-    public static final DeferredItem<Item> INGOT_LANTHANIUM = registerIngot("ingot_lanthanium");
-    public static final DeferredItem<Item> INGOT_TANTALIUM = registerIngot("ingot_tantalium");
+    // ItemCustomLore: real item.hbm.ingot_lanthanium.desc flavor text in CE's lang file (plus a
+    // .desc.P11 easter-egg line, deferred - see class javadoc).
+    public static final DeferredItem<Item> INGOT_LANTHANIUM = registerLoreIngot("ingot_lanthanium");
+
+    // ItemCustomLore: real item.hbm.ingot_tantalium.desc flavor text in CE's lang file (plus a
+    // .desc.P11 easter-egg line, deferred - see class javadoc).
+    public static final DeferredItem<Item> INGOT_TANTALIUM = registerLoreIngot("ingot_tantalium");
     public static final DeferredItem<Item> INGOT_ASTATINE = registerIngot("ingot_astatine");
     public static final DeferredItem<Item> INGOT_FIREBRICK = registerIngot("ingot_firebrick");
     public static final DeferredItem<Item> INGOT_COBALT = registerIngot("ingot_cobalt");
@@ -182,7 +210,9 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_PB209 = registerIngot("ingot_pb209");
     public static final DeferredItem<Item> INGOT_RA226 = registerIngot("ingot_ra226");
 
-    public static final DeferredItem<Item> INGOT_GH336 = register("ingot_gh336", () -> new Item(new Item.Properties().rarity(Rarity.EPIC)));
+    // ItemCustomLore: real item.hbm.ingot_gh336.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> INGOT_GH336 =
+            register("ingot_gh336", () -> new ItemCustomLore(new Item.Properties().rarity(Rarity.EPIC)));
 
     // ItemUnstable, decay/explosion timer deferred (see class javadoc). No confirmed use of damage
     // 1-3 anywhere in CE for this field, unlike ingot_u238m2 - kept as a single item.
@@ -199,10 +229,15 @@ public final class IngotNuggetItems {
     // Confirmed still-referenced by AnvilRecipes/SmeltingRecipes across all 10 purity levels.
     public static final List<DeferredItem<Item>> INGOT_STEEL_DUSTED = registerIngotSeries("ingot_steel_dusted", STEEL_DUSTED_VARIANT_COUNT);
 
-    // ItemHot, heat mechanic deferred (see class javadoc).
-    public static final DeferredItem<Item> INGOT_CHAINSTEEL = registerIngot("ingot_chainsteel");
-    public static final DeferredItem<Item> INGOT_METEORITE = registerIngot("ingot_meteorite");
-    public static final DeferredItem<Item> INGOT_METEORITE_FORGED = registerIngot("ingot_meteorite_forged");
+    // ItemHot, heat-glow behavior ported. maxHeat constants confirmed against CE's ModItems.java
+    // lines 884-886 (new ItemHot(100, "ingot_chainsteel") / new ItemHot(200, "ingot_meteorite") /
+    // new ItemHot(200, "ingot_meteorite_forged")).
+    public static final DeferredItem<Item> INGOT_CHAINSTEEL =
+            register("ingot_chainsteel", () -> new ItemHot(new Item.Properties(), 100));
+    public static final DeferredItem<Item> INGOT_METEORITE =
+            register("ingot_meteorite", () -> new ItemHot(new Item.Properties(), 200));
+    public static final DeferredItem<Item> INGOT_METEORITE_FORGED =
+            register("ingot_meteorite_forged", () -> new ItemHot(new Item.Properties(), 200));
 
     // ===== scattered ingot_ entries (CE ModItems.java ~L1005, L1136-1137) =====
 
@@ -245,7 +280,8 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> NUGGET_POLONIUM = registerNugget("nugget_polonium");
     public static final DeferredItem<Item> NUGGET_THORIUM_FUEL = registerNugget("nugget_thorium_fuel");
     public static final DeferredItem<Item> NUGGET_URANIUM_FUEL = registerNugget("nugget_uranium_fuel");
-    public static final DeferredItem<Item> NUGGET_MOX_FUEL = registerNugget("nugget_mox_fuel");
+    // ItemCustomLore: real item.hbm.nugget_mox_fuel.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> NUGGET_MOX_FUEL = registerLoreNugget("nugget_mox_fuel");
     public static final DeferredItem<Item> NUGGET_PLUTONIUM_FUEL = registerNugget("nugget_plutonium_fuel");
     public static final DeferredItem<Item> NUGGET_NEPTUNIUM_FUEL = registerNugget("nugget_neptunium_fuel");
     public static final DeferredItem<Item> NUGGET_AMERICIUM_FUEL = registerNugget("nugget_americium_fuel");
@@ -258,12 +294,17 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> NUGGET_BISMUTH = registerNugget("nugget_bismuth");
     public static final DeferredItem<Item> NUGGET_ARSENIC = registerNugget("nugget_arsenic");
     public static final DeferredItem<Item> NUGGET_ZIRCONIUM = registerNugget("nugget_zirconium");
-    public static final DeferredItem<Item> NUGGET_TANTALIUM = registerNugget("nugget_tantalium");
+    // ItemCustomLore: real item.hbm.nugget_tantalium.desc flavor text in CE's lang file (plus a
+    // .desc.P11 easter-egg line, deferred - see class javadoc).
+    public static final DeferredItem<Item> NUGGET_TANTALIUM = registerLoreNugget("nugget_tantalium");
     public static final DeferredItem<Item> NUGGET_DESH = registerNugget("nugget_desh");
     public static final DeferredItem<Item> NUGGET_OSMIRIDIUM = registerNugget("nugget_osmiridium");
     public static final DeferredItem<Item> NUGGET_SCHRABIDIUM = registerNugget("nugget_schrabidium");
     public static final DeferredItem<Item> NUGGET_SOLINIUM = registerNugget("nugget_solinium");
-    public static final DeferredItem<Item> NUGGET_EUPHEMIUM = registerNugget("nugget_euphemium");
+
+    // ItemCustomLore: real item.hbm.nugget_euphemium.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> NUGGET_EUPHEMIUM = registerLoreNugget("nugget_euphemium");
+
     public static final DeferredItem<Item> NUGGET_DINEUTRONIUM = registerNugget("nugget_dineutronium");
     public static final DeferredItem<Item> NUGGET_NIOBIUM = registerNugget("nugget_niobium");
     public static final DeferredItem<Item> NUGGET_SILICON = registerNugget("nugget_silicon");
@@ -273,7 +314,8 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> NUGGET_STRONTIUM = registerNugget("nugget_strontium");
     public static final DeferredItem<Item> NUGGET_SR90 = registerNugget("nugget_sr90");
     public static final DeferredItem<Item> NUGGET_PB209 = registerNugget("nugget_pb209");
-    public static final DeferredItem<Item> NUGGET_GH336 = registerNugget("nugget_gh336");
+    // ItemCustomLore: real item.hbm.nugget_gh336.desc flavor text in CE's lang file.
+    public static final DeferredItem<Item> NUGGET_GH336 = registerLoreNugget("nugget_gh336");
     public static final DeferredItem<Item> NUGGET_AU198 = registerNugget("nugget_au198");
     public static final DeferredItem<Item> NUGGET_RA226 = registerNugget("nugget_ra226");
     public static final DeferredItem<Item> NUGGET_REIIUM = registerNugget("nugget_reiium");
@@ -309,6 +351,24 @@ public final class IngotNuggetItems {
 
     private static DeferredItem<Item> registerNugget(String name) {
         return register(name, () -> new Item(new Item.Properties()));
+    }
+
+    /**
+     * Same as {@link #registerIngot(String)}, but backed by {@link ItemCustomLore} for the ingot
+     * fields that carry a real {@code item.hbm.<name>.desc} flavor-text lang entry in CE (see class
+     * javadoc) - a plain {@link Item} would silently drop that tooltip line.
+     */
+    private static DeferredItem<Item> registerLoreIngot(String name) {
+        return register(name, () -> new ItemCustomLore(new Item.Properties()));
+    }
+
+    /**
+     * Same as {@link #registerNugget(String)}, but backed by {@link ItemCustomLore} for the nugget
+     * fields that carry a real {@code item.hbm.<name>.desc} flavor-text lang entry in CE (see class
+     * javadoc) - a plain {@link Item} would silently drop that tooltip line.
+     */
+    private static DeferredItem<Item> registerLoreNugget(String name) {
+        return register(name, () -> new ItemCustomLore(new Item.Properties()));
     }
 
     private static List<DeferredItem<Item>> registerIngotSeries(String baseName, int count) {

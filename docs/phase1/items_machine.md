@@ -84,7 +84,7 @@ Result: **43 port-now, 9 defer-to-Phase-2, 1 not-actually-an-item**.
 
 | Class | Note |
 |---|---|
-| ItemDrive | Not an `Item` subclass at all - just a bare static nested enum `EnumDriveType` (13 values: FLASH_EMPTY, DISK_EMPTY, ... KLAUS) with no fields, no registration call, and no other members. It exists purely as a shared enum namespace for whatever real item class (elsewhere, likely `items.special`) implements the actual satellite/data-drive item. Porting the enum itself is trivial and has no Phase 2 coupling - just don't count it as a 43rd/44th standalone item; find and check its real consumer when that package is triaged. |
+| ItemDrive | Not an `Item` subclass at all - just a bare static nested enum `EnumDriveType` (11 values: FLASH_EMPTY, DISK_EMPTY, FLASH_BROKEN, DISK_BROKEN, FLASH_FLIGHTSIM, FLASH_PARTICLESIM, DISK_FLIGHTDATA, DISK_FLIGHTDATA_PROCESSED, DISK_ORBITDATA, DISK_ORBITDATA_PROCESSED, KLAUS) with no fields, no registration call, and no other members. It exists purely as a shared enum namespace for whatever real item class (elsewhere, likely `items.special`) implements the actual satellite/data-drive item. Porting the enum itself is trivial and has no Phase 2 coupling - just don't count it as a 43rd/44th standalone item; find and check its real consumer when that package is triaged. |
 
 ## Cross-cutting design flags (apply the "no metadata after flattening" rule with judgment, not blindly)
 
