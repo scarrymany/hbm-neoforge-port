@@ -90,7 +90,7 @@ public class HbmKeybinds {
 
     /**
      * Preserved exactly from CE: member set and order matter, since {@link Enum#ordinal()} is the wire
-     * format used by {@link KeybindPacket} and by {@link #clientKeysPressed}.
+     * format used by {@link com.hbm.packet.toserver.KeybindPacket} and by {@link #clientKeysPressed}.
      */
     public enum EnumKeybind {
         JETPACK,

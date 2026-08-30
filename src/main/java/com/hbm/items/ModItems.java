@@ -61,6 +61,20 @@ public class ModItems {
         com.hbm.items.tool.CouplingToolItems.registerAll();
         com.hbm.items.machine.CouplingMachineItems.registerAll();
         com.hbm.items.armor.ArmorDataComponents.register(modEventBus);
+        com.hbm.items.armor.PoweredArmorItems.registerAll(modEventBus);
+        com.hbm.items.gear.SpecialArmorItems.registerAll(modEventBus);
+        com.hbm.items.gear.JetpackItems.registerAll(modEventBus);
+        com.hbm.items.bomb.NukeCasingItems.registerAll();
+        com.hbm.items.tool.DetonatorItems.registerAll();
+        com.hbm.items.tool.MilitaryC2Items.registerAll();
+        com.hbm.items.special.ScatteredMilitaryItems.registerAll();
+        com.hbm.items.weapon.sedna.GunDataComponents.register(modEventBus);
+        com.hbm.items.weapon.grenade.GrenadeItems.registerAll();
+        com.hbm.items.weapon.grenade.GrenadeDataComponents.register(modEventBus);
+        com.hbm.items.weapon.WeaponMeleeItems.registerAll();
+        com.hbm.items.weapon.WeaponDataComponents.register(modEventBus);
+        com.hbm.items.weapon.MissileItems.registerAll();
+        com.hbm.items.weapon.MissileDataComponents.register(modEventBus);
         ITEMS.register(modEventBus);
     }
 }

@@ -5,6 +5,8 @@ import com.hbm.inventory.fluid.Fluids;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
@@ -65,6 +67,53 @@ public class ItemCell extends Item {
 
     public static ItemStack getFullCell(Item cellItem, FluidType fluid) {
         return getFullCell(cellItem, fluid, 1);
+    }
+
+    /**
+     * CE's {@code ItemCell.hasEmptyCell(EntityPlayer)}/{@code consumeEmptyCell(EntityPlayer)}
+     * (confirmed present in CE, absent from this port's {@link ItemCell} until this addition - see
+     * {@code docs/phase3/scattered_military_items.md}'s "Key design/API decisions": a
+     * player-inventory scan over the existing {@link #isEmptyCell(ItemStack)} primitive, added here
+     * so future items needing "does the player have a spare cell" share one implementation rather
+     * than each duplicating the scan). Scans main inventory, armor and offhand, in that order -
+     * matching CE's real {@code InventoryPlayer#getSizeInventory()} flat-index scan order (main
+     * slots before armor/offhand).
+     */
+    public static boolean hasEmptyCell(Player player) {
+        Inventory inv = player.getInventory();
+        for (ItemStack stack : inv.items) {
+            if (isEmptyCell(stack)) return true;
+        }
+        for (ItemStack stack : inv.armor) {
+            if (isEmptyCell(stack)) return true;
+        }
+        for (ItemStack stack : inv.offhand) {
+            if (isEmptyCell(stack)) return true;
+        }
+        return false;
+    }
+
+    /** See {@link #hasEmptyCell(Player)}. Shrinks the first empty cell found by one; no-op if none exist. */
+    public static void consumeEmptyCell(Player player) {
+        Inventory inv = player.getInventory();
+        for (ItemStack stack : inv.items) {
+            if (isEmptyCell(stack)) {
+                stack.shrink(1);
+                return;
+            }
+        }
+        for (ItemStack stack : inv.armor) {
+            if (isEmptyCell(stack)) {
+                stack.shrink(1);
+                return;
+            }
+        }
+        for (ItemStack stack : inv.offhand) {
+            if (isEmptyCell(stack)) {
+                stack.shrink(1);
+                return;
+            }
+        }
     }
 
     @Override

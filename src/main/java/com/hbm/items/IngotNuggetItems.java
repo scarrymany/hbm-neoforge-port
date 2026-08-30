@@ -60,11 +60,13 @@ import java.util.function.Supplier;
  *     this file. The purely cosmetic baked-model heat-glow overlay is also not reproduced for any of
  *     these (1.12 vertex-color rendering hack with no 1.21 model-json equivalent, a resource-pack
  *     concern for a later phase).</li>
- *     <li>{@code ItemUnstable}'s nuclear-detonation timer ({@code ingot_u238m2*}, {@code nugget_u238m2},
- *     {@code ingot_electronium}) depends on CE's {@code EntityNukeExplosionMK5}/{@code EntityNukeTorex}/
- *     {@code ModDamageSource}, a nuke-explosion engine that belongs to a dedicated later phase (see
- *     the report's section 4, which explicitly carves nukes/missiles out of this area), not "items
- *     and simple blocks".</li>
+ *     <li>{@code ItemUnstable}'s nuclear-detonation timer ({@code ingot_u238m2}, {@code nugget_u238m2},
+ *     {@code ingot_electronium} - not the inert {@code _elements}/{@code _arsenic}/{@code _vault}
+ *     reskins) no longer needs a bespoke {@code Item} subclass here: Phase 3's
+ *     {@code docs/phase3/scattered_military_items.md} wires it via the already-real
+ *     {@code com.hbm.hazard.type.HazardTypeUnstable} parametric hazard strategy instead (see
+ *     {@code com.hbm.hazard.HazardRegistry#registerItems()}'s own binding block) - these three
+ *     fields stay plain {@link Item}s here; the decay/detonation behavior is bound externally.</li>
  *     <li>{@code ItemCustomLore}'s "polaroid ID 11" easter-egg branch (the {@code .desc.P11} lines on
  *     {@code ingot_lanthanium}, {@code ingot_neptunium}, {@code ingot_tantalium} and
  *     {@code nugget_tantalium}) is not reproduced: it depends on {@code MainRegistry.polaroidID}, an
@@ -138,8 +140,8 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_U235 = registerIngot("ingot_u235");
     public static final DeferredItem<Item> INGOT_U238 = registerIngot("ingot_u238");
 
-    // ItemUnstable, decay/explosion timer deferred (see class javadoc). Damage 1-3 flattened per
-    // confirmed MagicRecipes/ItemMS usage.
+    // ItemUnstable, decay/explosion timer bound via HazardRegistry (see class javadoc). Damage 1-3
+    // flattened per confirmed MagicRecipes/ItemMS usage.
     public static final DeferredItem<Item> INGOT_U238M2 = registerIngot("ingot_u238m2");
     public static final DeferredItem<Item> INGOT_U238M2_ELEMENTS = registerIngot("ingot_u238m2_elements");
     public static final DeferredItem<Item> INGOT_U238M2_ARSENIC = registerIngot("ingot_u238m2_arsenic");
@@ -222,8 +224,8 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_GH336 =
             register("ingot_gh336", () -> new ItemCustomLore(new Item.Properties().rarity(Rarity.EPIC)));
 
-    // ItemUnstable, decay/explosion timer deferred (see class javadoc). No confirmed use of damage
-    // 1-3 anywhere in CE for this field, unlike ingot_u238m2 - kept as a single item.
+    // ItemUnstable, decay/explosion timer bound via HazardRegistry (see class javadoc). No confirmed
+    // use of damage 1-3 anywhere in CE for this field, unlike ingot_u238m2 - kept as a single item.
     public static final DeferredItem<Item> INGOT_ELECTRONIUM = registerIngot("ingot_electronium");
 
     public static final DeferredItem<Item> INGOT_REIIUM = registerIngot("ingot_reiium");
@@ -269,8 +271,8 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> NUGGET_U235 = registerNugget("nugget_u235");
     public static final DeferredItem<Item> NUGGET_U238 = registerNugget("nugget_u238");
 
-    // ItemUnstable, decay/explosion timer deferred (see class javadoc). No confirmed use of damage
-    // 1-3 anywhere in CE for this field - kept as a single item, unlike ingot_u238m2.
+    // ItemUnstable, decay/explosion timer bound via HazardRegistry (see class javadoc). No confirmed
+    // use of damage 1-3 anywhere in CE for this field - kept as a single item, unlike ingot_u238m2.
     public static final DeferredItem<Item> NUGGET_U238M2 = registerNugget("nugget_u238m2");
 
     public static final DeferredItem<Item> NUGGET_PLUTONIUM = registerNugget("nugget_plutonium");

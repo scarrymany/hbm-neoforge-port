@@ -6,10 +6,12 @@ import com.hbm.config.CompatibilityConfig;
 import com.hbm.config.GeneralConfig;
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.handler.ArmorUtil;
+import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardSystem;
 import com.hbm.hazard.type.HazardTypeRadiation;
 import com.hbm.interfaces.IRadiationImmune;
 import com.hbm.items.HbmDataComponents;
+import com.hbm.items.gear.ArmorEuphemium;
 import com.hbm.lib.Library;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import com.hbm.util.i18n.I18nUtil;
@@ -71,11 +73,7 @@ public final class ContaminationUtil {
     public static double calculateRadiationMod(LivingEntity entity) {
         double koeff = 10.0D;
 
-        // TODO(HazmatRegistry): CE adds HazmatRegistry.getResistance(entity) to the exponent here
-        // (the per-armor-piece radiation-resistance coefficient table). That class doesn't exist
-        // in this port yet (see Deferred scope) - stub as 0, matching CE's own null-safety
-        // fallback idiom (ArmorUtil.isFaradayArmor's HazmatRegistry.getCladding stub does the same).
-        double hazmatResistance = 0D;
+        double hazmatResistance = HazmatRegistry.getResistance(entity);
 
         return Math.pow(koeff, -(getConfigEntityRadResistance(entity) + hazmatResistance));
     }
@@ -90,8 +88,7 @@ public final class ContaminationUtil {
         double rads = 0D;
         double env = getPlayerRads(player);
         double res = (1.0D - rawRadMod) * 100.0D;
-        // TODO(HazmatRegistry): see calculateRadiationMod's javadoc - stubbed as 0.
-        double resKoeff = 0D;
+        double resKoeff = HazmatRegistry.getResistance(player) * 100.0D;
         double rec = env * rawRadMod;
 
         String eRadS = formatMagnitude(eRad, 3);
@@ -554,11 +551,7 @@ public final class ContaminationUtil {
     private static boolean isExplosionExempt(Entity e) {
         if (e instanceof Ocelot) return true;
 
-        // TODO(armor-items content package): CE also exempts a full-set euphemium-armor wearer here
-        // (ArmorUtil.checkArmor(player, euphemium_helmet, euphemium_plate, euphemium_legs,
-        // euphemium_boots)) - ModItems has no euphemium_* fields yet (a nonexistent static field is a
-        // hard compile error, unlike a forward-referenced method call), so this branch is stubbed to
-        // false until the armor-items package registers those 4 fields.
+        if (e instanceof LivingEntity living && ArmorEuphemium.isFullSetWorn(living)) return true;
 
         return e instanceof Player p && (p.isCreative() || p.isSpectator());
     }

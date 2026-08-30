@@ -1,6 +1,7 @@
 package com.hbm.main;
 
 import com.hbm.handler.ArmorUtil;
+import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardRegistry;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,6 +28,11 @@ public class CommonEvents {
             // into com.hbm.util.ArmorRegistry - confirmed real call-site timing via Neo Edition's
             // own CommonEvents.commonSetup, which calls ArmorUtil.register() from this exact event.
             ArmorUtil.register();
+            // CE: FMLPreInitializationEvent-time HazmatRegistry.registerHazmats() call. This port
+            // splits out just the initDefault() half (registerHazmats()'s Gson config-file
+            // persistence is not ported - see HazmatRegistry's own javadoc); currently a no-op
+            // beyond flushing HazmatRegistry.external, since nothing populates that list yet.
+            HazmatRegistry.initDefault();
         });
     }
 }

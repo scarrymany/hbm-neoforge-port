@@ -1,8 +1,12 @@
 package com.hbm.handler;
 
 import com.hbm.items.armor.ItemArmorMod;
+import com.hbm.main.MainRegistry;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -37,6 +41,46 @@ public final class ArmorModHandler {
     public static final int battery = 8;
 
     public static final int MOD_SLOTS = 9;
+
+    /**
+     * Ported from CE's {@code ArmorModHandler.fixedUUIDs} - a per-<b>slot</b> (not per-item) fixed
+     * identity every "always-on Armor modifier" attribute uses, so wearing several pieces that each
+     * contribute one of these (CE: {@code ArmorDesh}/{@code ArmorDiesel}/{@code ArmorLiquidator})
+     * stack additively across slots without colliding within a slot. 1.21's
+     * {@code AttributeModifier} keys on {@link ResourceLocation} rather than CE's raw {@link
+     * java.util.UUID}, but the role is identical: one fixed id per {@link EquipmentSlot}, shared by
+     * whichever concrete item currently occupies it.
+     */
+    private static final ResourceLocation ARMOR_MODIFIER_HEAD =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "armor_modifier_head");
+    private static final ResourceLocation ARMOR_MODIFIER_CHEST =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "armor_modifier_chest");
+    private static final ResourceLocation ARMOR_MODIFIER_LEGS =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "armor_modifier_legs");
+    private static final ResourceLocation ARMOR_MODIFIER_FEET =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "armor_modifier_feet");
+
+    public static ResourceLocation getArmorSlotModifierId(EquipmentSlot slot) {
+        return switch (slot) {
+            case HEAD -> ARMOR_MODIFIER_HEAD;
+            case CHEST -> ARMOR_MODIFIER_CHEST;
+            case LEGS -> ARMOR_MODIFIER_LEGS;
+            case FEET -> ARMOR_MODIFIER_FEET;
+            default -> throw new IllegalArgumentException("Not an armor slot: " + slot);
+        };
+    }
+
+    /** The single-slot {@link EquipmentSlotGroup} matching one armor {@link EquipmentSlot}, for
+     * building a static {@code ItemAttributeModifiers} component scoped to just that slot. */
+    public static EquipmentSlotGroup getArmorSlotGroup(EquipmentSlot slot) {
+        return switch (slot) {
+            case HEAD -> EquipmentSlotGroup.HEAD;
+            case CHEST -> EquipmentSlotGroup.CHEST;
+            case LEGS -> EquipmentSlotGroup.LEGS;
+            case FEET -> EquipmentSlotGroup.FEET;
+            default -> throw new IllegalArgumentException("Not an armor slot: " + slot);
+        };
+    }
 
     /**
      * Checks if a mod can be applied to an armor piece. Needs to be used to prevent people from

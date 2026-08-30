@@ -2,6 +2,7 @@ package com.hbm.handler;
 
 import com.hbm.api.item.IGasMask;
 import com.hbm.items.HbmDataComponents;
+import com.hbm.items.gear.SpecialArmorItems;
 import com.hbm.lib.Library;
 import com.hbm.util.ArmorRegistry;
 import com.hbm.util.ArmorRegistry.HazardClass;
@@ -31,15 +32,16 @@ import java.util.Locale;
  * {@code hazard.type.HazardTypeCold}/{@code HazardTypeToxic}/{@code FT_Toxin}
  * ({@link #checkForHazmat}).
  *
- * <p><b>Forward references (expected, per this area's research report), stubbed to compile
- * today:</b> every {@code checkFor*} method that CE keys off a concrete armor set (hazmat, fau/dns
- * "digamma", asbestos, euphemium, liquidator, rpa, hazmat_paa, jackt/jackt2) references {@code
- * ModItems} fields that are not registered anywhere in this port yet - those armor pieces belong
- * to a separate, not-yet-scheduled Phase 3 "armor items" work package. Referencing a nonexistent
- * static field is a hard compile error, not a soft forward reference the way an unresolved runtime
- * lookup would be, so each such method is stubbed to CE's own "no match" return value ({@code
- * false}) with an inline TODO naming exactly which {@code ModItems} fields it needs, rather than
- * left referencing fields that don't exist. Every other method in this class (the gas-mask-filter
+ * <p><b>Forward references, partially resolved by {@code docs/phase3/armor_special_sets.md}'s
+ * {@code com.hbm.items.gear.SpecialArmorItems}:</b> {@link #checkForAsbestos} is now fully wired
+ * (all 4 {@code asbestos_*} items exist); {@link #checkForHazmatOnly}/{@link #checkForHaz2}/
+ * {@link #checkForHazmat} are wired for the hazmat/hazmat_paa/euphemium/schrabidium sets that
+ * package registers, with a per-branch TODO naming the still-missing {@code liquidator}/
+ * {@code rpa}/{@code fau}/{@code dns} sets. {@link #checkForFiend}/{@link #checkForFiend2}
+ * ({@code jackt}/{@code jackt2}) and {@link #checkForDigamma} ({@code fau}/{@code dns}) remain
+ * fully stubbed to CE's own "no match" return value ({@code false}) - those armor pieces belong to
+ * a separate, not-yet-scheduled Phase 3 "armor items" work package, and referencing a nonexistent
+ * static field would be a hard compile error. Every other method in this class (the gas-mask-filter
  * helpers, {@link #checkForFaraday}, {@link #checkArmorNull}, {@link #damageSuit}, {@link
  * #resetFlightTime}, {@link #checkArmor}, {@link #checkArmorPiece}) has no such dependency and is
  * ported in full.
@@ -73,17 +75,35 @@ public final class ArmorUtil {
      * real call-site timing Neo Edition's own {@code CommonEvents.commonSetup} uses.
      */
     public static void register() {
+        // CE's real concrete-item block (docs/phase3/armor_special_sets.md-scoped items only - see
+        // that package's structured report for the full ~20-call table). The gas_mask_filter*/
+        // mask_rag/mask_piss/goggles/ashglasses/attachment_mask/liquidator_helmet entries and the
+        // GregTech "registerIfExists" compat hook are still forward references: none of those items
+        // exist in this port yet (a wider "armor items"/attachments scope than this package), and
+        // GregTech compat is out of this NeoForge port's scope entirely.
+        ArmorRegistry.registerHazard(SpecialArmorItems.GAS_MASK.get(), HazardClass.SAND, HazardClass.LIGHT);
+        ArmorRegistry.registerHazard(SpecialArmorItems.GAS_MASK_M65.get(), HazardClass.SAND);
+
+        ArmorRegistry.registerHazard(SpecialArmorItems.ASBESTOS_HELMET.get(), HazardClass.SAND, HazardClass.LIGHT);
+        ArmorRegistry.registerHazard(SpecialArmorItems.HAZMAT_HELMET.get(), HazardClass.SAND);
+        ArmorRegistry.registerHazard(SpecialArmorItems.HAZMAT_HELMET_RED.get(), HazardClass.SAND);
+        ArmorRegistry.registerHazard(SpecialArmorItems.HAZMAT_HELMET_GREY.get(), HazardClass.SAND);
+        ArmorRegistry.registerHazard(SpecialArmorItems.HAZMAT_PAA_HELMET.get(), HazardClass.LIGHT, HazardClass.SAND);
+        // TODO(liquidator armor not yet ported): CE also registers liquidator_helmet here
+        // (HazardClass.LIGHT, HazardClass.SAND) - a wider "armor items" scope than this package.
+        ArmorRegistry.registerHazard(SpecialArmorItems.SCHRABIDIUM_HELMET.get(), FULL_PACKAGE);
+        ArmorRegistry.registerHazard(SpecialArmorItems.EUPHEMIUM_HELMET.get(), FULL_PACKAGE);
+
         for (Tuple.Pair<Item, HazardClass[]> pair : external) {
             ArmorRegistry.registerHazard(pair.getKey(), pair.getValue());
         }
 
-        // TODO: CE also hard-codes ~20 ArmorRegistry.registerHazard(...) calls here for concrete
-        // gas-mask-filter/hazmat/schrabidium/euphemium items (e.g. ModItems.gas_mask_filter,
-        // ModItems.hazmat_helmet, ModItems.schrabidium_helmet) plus a "registerIfExists" GregTech
-        // compat hook for 3 cross-mod armor pieces. None of those items exist in this port yet
-        // (see class javadoc's "Forward references" note) and GregTech compat is out of this
-        // NeoForge port's scope entirely - port the concrete-item block once the "armor items"
-        // work package lands.
+        // TODO(wider "armor items"/attachments scope): CE also registers gas_mask_filter/
+        // gas_mask_filter_mono/gas_mask_filter_combo/gas_mask_filter_rag/gas_mask_filter_piss
+        // (ItemFilter items), mask_rag/mask_piss (ArmorModel-based items), goggles/ashglasses
+        // (ArmorModel-based), attachment_mask, and a GregTech "registerIfExists" compat hook (3
+        // cross-mod hazmat helmets) here - none of those items exist in this port yet, and GregTech
+        // compat is out of this NeoForge port's scope entirely.
     }
 
     public static boolean checkForFaraday(Player player) {
@@ -110,12 +130,10 @@ public final class ArmorUtil {
             if (name.contains(metal)) return true;
         }
 
-        // TODO(HazmatRegistry): CE also checks HazmatRegistry.getCladding(item) > 0 here (the
-        // per-armor-piece cladding coefficient table). That class doesn't exist in this port yet
-        // (see this area's research report's Deferred scope) - stub as 0, matching CE's own
-        // `f != null ? f : 0` null-safety idiom (a true no-behavior-change stub, not a guess).
-        int cladding = 0;
-        return cladding > 0;
+        // HazmatRegistry (com.hbm.handler.HazmatRegistry) now exists - getCladding itself is still a
+        // documented stub pending ItemModCladding (see that method's own javadoc), so this remains
+        // behavior-identical to the previous inline stub, just centralized into the real engine.
+        return HazmatRegistry.getCladding(item) > 0;
     }
 
     public static boolean checkArmorNull(LivingEntity entity, EquipmentSlot slot) {
@@ -161,33 +179,69 @@ public final class ArmorUtil {
         return false;
     }
 
-    // TODO(hazmat_paa/liquidator/euphemium/rpa/fau/dns armor sets not yet ported - see class
-    // javadoc's "Forward references" note and docs/phase3/armor_equippable_framework.md's
-    // Phase-3-safe-scope table for the owning "armor items" work package). Stubbed to false
-    // (CE's own default when none of these sets are worn) rather than referencing nonexistent
-    // ModItems fields, which is a hard compile error.
+    /**
+     * {@code docs/phase3/armor_special_sets.md}-scoped sets ({@code hazmat_paa}, {@code euphemium})
+     * are wired for real; {@code liquidator}/{@code rpa}/{@code fau}/{@code dns} are a wider "armor
+     * items" scope than this package and remain a documented forward reference.
+     */
     public static boolean checkForHaz2(LivingEntity entity) {
+        if (checkArmor(entity, SpecialArmorItems.HAZMAT_PAA_HELMET.get(), SpecialArmorItems.HAZMAT_PAA_PLATE.get(),
+                SpecialArmorItems.HAZMAT_PAA_LEGS.get(), SpecialArmorItems.HAZMAT_PAA_BOOTS.get())) return true;
+        if (checkArmor(entity, SpecialArmorItems.EUPHEMIUM_HELMET.get(), SpecialArmorItems.EUPHEMIUM_PLATE.get(),
+                SpecialArmorItems.EUPHEMIUM_LEGS.get(), SpecialArmorItems.EUPHEMIUM_BOOTS.get())) return true;
+
+        // TODO(liquidator/rpa/fau/dns armor sets not yet ported - a wider "armor items" scope than
+        // this package).
         return false;
     }
 
-    // TODO(hazmat/hazmat_red/hazmat_grey/hazmat_paa/liquidator armor sets not yet ported - same
-    // blocker as checkForHaz2 above).
+    /**
+     * {@code docs/phase3/armor_special_sets.md}-scoped hazmat sets (base/red/grey/paa) are wired
+     * for real; {@code liquidator} is a wider "armor items" scope than this package.
+     */
     public static boolean checkForHazmatOnly(LivingEntity entity) {
+        if (checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET.get(), SpecialArmorItems.HAZMAT_PLATE.get(),
+                SpecialArmorItems.HAZMAT_LEGS.get(), SpecialArmorItems.HAZMAT_BOOTS.get())) return true;
+        if (checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_RED.get(), SpecialArmorItems.HAZMAT_PLATE_RED.get(),
+                SpecialArmorItems.HAZMAT_LEGS_RED.get(), SpecialArmorItems.HAZMAT_BOOTS_RED.get())) return true;
+        if (checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_GREY.get(), SpecialArmorItems.HAZMAT_PLATE_GREY.get(),
+                SpecialArmorItems.HAZMAT_LEGS_GREY.get(), SpecialArmorItems.HAZMAT_BOOTS_GREY.get())) return true;
+        if (checkArmor(entity, SpecialArmorItems.HAZMAT_PAA_HELMET.get(), SpecialArmorItems.HAZMAT_PAA_PLATE.get(),
+                SpecialArmorItems.HAZMAT_PAA_LEGS.get(), SpecialArmorItems.HAZMAT_PAA_BOOTS.get())) return true;
+
+        // TODO(liquidator armor not yet ported - a wider "armor items" scope than this package).
         return false;
     }
 
-    // TODO(hazmat/hazmat_red/hazmat_grey/schrabidium armor sets not yet ported - same blocker as
-    // checkForHaz2 above; checkForHaz2 itself is likewise stubbed).
+    /**
+     * {@code docs/phase3/armor_special_sets.md}-scoped hazmat/schrabidium sets are wired for real;
+     * {@link #checkForHaz2} covers its own scope. {@code HbmPotion.mutation} is a separate,
+     * not-yet-ported {@code MobEffect}-registration area (see {@code ContaminationUtil}'s own
+     * identical TODO for the same effect).
+     */
     @Deprecated
     public static boolean checkForHazmat(LivingEntity entity) {
+        if (checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET.get(), SpecialArmorItems.HAZMAT_PLATE.get(),
+                SpecialArmorItems.HAZMAT_LEGS.get(), SpecialArmorItems.HAZMAT_BOOTS.get())
+                || checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_RED.get(), SpecialArmorItems.HAZMAT_PLATE_RED.get(),
+                        SpecialArmorItems.HAZMAT_LEGS_RED.get(), SpecialArmorItems.HAZMAT_BOOTS_RED.get())
+                || checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_GREY.get(), SpecialArmorItems.HAZMAT_PLATE_GREY.get(),
+                        SpecialArmorItems.HAZMAT_LEGS_GREY.get(), SpecialArmorItems.HAZMAT_BOOTS_GREY.get())
+                || checkArmor(entity, SpecialArmorItems.SCHRABIDIUM_HELMET.get(), SpecialArmorItems.SCHRABIDIUM_PLATE.get(),
+                        SpecialArmorItems.SCHRABIDIUM_LEGS.get(), SpecialArmorItems.SCHRABIDIUM_BOOTS.get())
+                || checkForHaz2(entity)) {
+            return true;
+        }
+
         // TODO(HbmPotion): CE also returns true for player.isPotionActive(HbmPotion.mutation)
         // here; HbmPotion doesn't exist in this port yet (see Deferred scope).
         return false;
     }
 
-    // TODO(asbestos_helmet/plate/legs/boots not yet ported - same blocker as checkForHaz2 above).
+    /** Fully wireable: all 4 {@code asbestos_*} items are registered by this package. */
     public static boolean checkForAsbestos(LivingEntity entity) {
-        return false;
+        return checkArmor(entity, SpecialArmorItems.ASBESTOS_HELMET.get(), SpecialArmorItems.ASBESTOS_PLATE.get(),
+                SpecialArmorItems.ASBESTOS_LEGS.get(), SpecialArmorItems.ASBESTOS_BOOTS.get());
     }
 
     public static boolean checkArmor(LivingEntity entity, Item helm, Item chest, Item leg, Item shoe) {

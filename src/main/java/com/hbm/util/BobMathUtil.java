@@ -2,14 +2,19 @@ package com.hbm.util;
 
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Locale;
+
 /**
  * Partial port of CE's {@code com.hbm.util.BobMathUtil} - a large grab-bag math-helper class.
- * Only the two pure functions the gun-framework ballistics core actually calls are ported here
+ * Only the pure functions the gun-framework packages actually call are ported here
  * ({@link #getCrossAngle}, used by {@code BulletConfig}'s standard ricochet lambda to test a
  * glancing-blow angle; {@link #interp}, used by {@code EntityBulletBaseMK4}'s lockon-homing turn-rate
- * ramp). Whichever future package needs another CE {@code BobMathUtil} member should add it here
- * rather than re-deriving it elsewhere - this is a per-package partial port, not a claim that the
- * rest of CE's {@code BobMathUtil} doesn't exist/isn't needed.
+ * ramp; {@link #min(int, int, int)}/{@link #getShortNumber}/{@link #getBlink}, added by the held-
+ * weapon state-machine package for {@code MagazineSingleTypeBase}'s reload-amount clamping,
+ * {@code MagazineEnergy}'s HUD text, and {@code ItemGunBaseNT}'s SECRET/DEBUG tooltip blink
+ * respectively). Whichever future package needs another CE {@code BobMathUtil} member should add it
+ * here rather than re-deriving it elsewhere - this is a per-package partial port, not a claim that
+ * the rest of CE's {@code BobMathUtil} doesn't exist/isn't needed.
  */
 public class BobMathUtil {
 
@@ -34,5 +39,24 @@ public class BobMathUtil {
     /** Linear interpolation between x and y at fraction `interp` (0 = x, 1 = y). */
     public static double interp(double x, double y, float interp) {
         return x + (y - x) * interp;
+    }
+
+    /** Smallest of three ints - CE's own overload used by {@code MagazineSingleTypeBase.standardReload}'s reload-amount clamp. */
+    public static int min(int a, int b, int c) {
+        return Math.min(a, Math.min(b, c));
+    }
+
+    /** Abbreviated large-number formatting (1.5k/2.3M/...), matching CE's own helper used by ammo/energy HUD text. */
+    public static String getShortNumber(long number) {
+        if (number < 1000) return String.valueOf(number);
+        if (number < 1_000_000) return String.format(Locale.US, "%.2fk", number / 1000.0);
+        if (number < 1_000_000_000) return String.format(Locale.US, "%.2fM", number / 1_000_000.0);
+        if (number < 1_000_000_000_000L) return String.format(Locale.US, "%.2fG", number / 1_000_000_000.0);
+        return String.format(Locale.US, "%.2fT", number / 1_000_000_000_000.0);
+    }
+
+    /** Half-second on/off blink, used by CE's SECRET/DEBUG weapon-quality tooltip flash. */
+    public static boolean getBlink() {
+        return (System.currentTimeMillis() / 500L) % 2 == 0;
     }
 }

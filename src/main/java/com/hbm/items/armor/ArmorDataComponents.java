@@ -28,6 +28,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  *     {@code docs/phase3/fsb_armor_and_jetpacks.md} Key design decision ("a naming call, not a new
  *     design") - {@code ArmorFSBFueled}'s fuel gate is a wholly different field from any jetpack's
  *     fuel amount even though both are plain {@code int} mB counters.</li>
+ *     <li>{@link #JETPACK_GLIDER_TANK} - {@link JetpackTankState}, replaces {@code JetpackGlider}'s
+ *     raw {@code "fuelTank"} NBT-compound field ({@code FluidTankNTM#writeToNBT}/{@code #readFromNBT}).
+ *     See that record's own javadoc for why this is its own narrow component rather than a shared
+ *     "item fluid tank" shape.</li>
  * </ul>
  */
 public final class ArmorDataComponents {
@@ -54,6 +58,13 @@ public final class ArmorDataComponents {
             DATA_COMPONENT_TYPES.register("armor_fuel", () -> DataComponentType.<Integer>builder()
                     .persistent(Codec.INT)
                     .networkSynchronized(ByteBufCodecs.INT)
+                    .build());
+
+    /** {@code JetpackGlider}'s {@code FluidTankNTM}-in-NBT (CE key {@code "fuelTank"}) - see {@link JetpackTankState}. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<JetpackTankState>> JETPACK_GLIDER_TANK =
+            DATA_COMPONENT_TYPES.register("jetpack_glider_tank", () -> DataComponentType.<JetpackTankState>builder()
+                    .persistent(JetpackTankState.CODEC)
+                    .networkSynchronized(JetpackTankState.STREAM_CODEC)
                     .build());
 
     private ArmorDataComponents() {

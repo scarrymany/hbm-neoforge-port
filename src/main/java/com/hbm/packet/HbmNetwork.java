@@ -7,6 +7,8 @@ import com.hbm.packet.toclient.ExplosionRemovalSyncPacket;
 import com.hbm.packet.toclient.GunAnimationPayload;
 import com.hbm.packet.toclient.NukeExplosionRemovalSyncPacket;
 import com.hbm.packet.toserver.ItemControlPacket;
+import com.hbm.packet.toserver.KeybindPacket;
+import com.hbm.packet.toserver.TurretControlPacket;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -78,5 +80,13 @@ public class HbmNetwork {
         // Phase 3 (scattered_military_items / weapon_animation_hooks): generic C2S "apply this NBT to
         // whatever the player is holding" control packet, dispatching to IItemControlReceiver.
         registrar.playToServer(ItemControlPacket.TYPE, ItemControlPacket.STREAM_CODEC, ItemControlPacket::handleServer);
+
+        // Phase 3 (gun_framework_core): C2S keybind press/release sync, dispatching to IKeybindReceiver.
+        // Fixes a pre-existing gap - HbmKeybindInputEvents/HbmKeybinds already sent/expected this packet
+        // shape but com.hbm.packet.KeybindPacket never existed anywhere in the tree before Phase 3.
+        registrar.playToServer(KeybindPacket.TYPE, KeybindPacket.STREAM_CODEC, KeybindPacket::handleServer);
+
+        // Phase 3 (turret_system): C2S mob-filter/whitelist mutation for the bare-Screen mob-filter GUI (no backing Menu).
+        registrar.playToServer(TurretControlPacket.TYPE, TurretControlPacket.STREAM_CODEC, TurretControlPacket::handleServer);
     }
 }

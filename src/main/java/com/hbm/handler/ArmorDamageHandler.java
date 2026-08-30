@@ -4,6 +4,7 @@ import com.hbm.capability.HbmPlayerAttachment;
 import com.hbm.items.armor.IAttackHandler;
 import com.hbm.items.armor.IDamageHandler;
 import com.hbm.items.armor.ItemArmorMod;
+import com.hbm.items.gear.ArmorEuphemium;
 import com.hbm.items.gear.ArmorFSB;
 import com.hbm.main.MainRegistry;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -29,10 +30,11 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
  * <ul>
  *     <li>{@link LivingIncomingDamageEvent} - the earliest, fully-cancelable point in the pipeline;
  *     the correct replacement for {@code ISpecialArmor}'s "override the entire damage pipeline"
- *     role. No concrete full-immunity set ({@code ArmorAsbestos}/{@code ArmorEuphemium}/
- *     {@code ArmorSchrabidium}-equivalent) exists in this port yet - those are a later Phase 3
- *     content package's job - so this listener currently has nothing to cancel; it exists now so
- *     that package's dispatch point is already in place.</li>
+ *     role. Dispatches to {@link ArmorEuphemium#isFullSetWorn} (the only one of CE's 3
+ *     {@code ISpecialArmor} full-immunity sets that is still live - {@code ArmorAsbestos}/
+ *     {@code ArmorSchrabidium} are dead code in current CE, migrated onto plain {@code ArmorFSB}
+ *     with no damage-absorption mechanism at all - see {@code docs/phase3/armor_special_sets.md}
+ *     Headline finding #1).</li>
  *     <li>{@link LivingDamageEvent.Pre} - shield absorb (CE: {@code ModEventHandler#onEntityHurt}'s
  *     first block), armor-mod {@code ItemArmorMod#modDamage} iteration, {@link ArmorFSB#handleHurt},
  *     and {@link IDamageHandler} iteration, in CE's exact order.</li>
@@ -57,13 +59,16 @@ public final class ArmorDamageHandler {
 
     @SubscribeEvent
     public static void onIncomingDamage(LivingIncomingDamageEvent event) {
-        // Forward reference: CE's 3 ISpecialArmor full-immunity pieces (ArmorAsbestos/
-        // ArmorEuphemium/ArmorSchrabidium) belong to a later Phase 3 content package (see
-        // docs/phase3/armor_equippable_framework.md's Phase-3-safe-scope table). Once ported,
-        // their full-cancel checks (event.setCanceled(true), mirroring CE's
-        // ArmorUtil.checkArmor(...) + event.setCanceled(true) shape) belong here, at the earliest
-        // possible point in the damage pipeline - not on LivingDamageEvent.Pre below, which fires
-        // after vanilla's own defense-point math.
+        // ArmorEuphemium (com.hbm.items.gear.SpecialArmorItems): CE's ArmorEuphemium#getProperties
+        // full-set-gated, EntityPlayer-only unconditional damage immunity - see that class's javadoc.
+        // Asbestos/Schrabidium's own ISpecialArmor immunity is NOT reproduced here: real, current CE
+        // no longer builds those 2 sets from ISpecialArmor-implementing leaf classes at all (both are
+        // dead code, migrated onto plain ArmorFSB with zero damage-absorption mechanism - see
+        // docs/phase3/armor_special_sets.md Headline finding #1 and SpecialArmorItems' own javadoc),
+        // so there is nothing left to cancel for either set.
+        if (ArmorEuphemium.isFullSetWorn(event.getEntity())) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent

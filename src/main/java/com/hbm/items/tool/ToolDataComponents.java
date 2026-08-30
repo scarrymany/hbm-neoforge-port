@@ -2,12 +2,15 @@ package com.hbm.items.tool;
 
 import com.hbm.main.MainRegistry;
 import com.mojang.serialization.Codec;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.List;
 
 /**
  * Data components backing ItemStack state CE stored as raw NBT on tool items in this package:
@@ -53,6 +56,38 @@ public final class ToolDataComponents {
             DATA_COMPONENT_TYPES.register("coltan_z", () -> DataComponentType.<Integer>builder()
                     .persistent(Codec.INT)
                     .networkSynchronized(ByteBufCodecs.INT)
+                    .build());
+
+    /**
+     * {@link ItemDetonator}'s stored target position (CE NBT keys "x"/"y"/"z" on the detonator
+     * stack itself). Vanilla {@link BlockPos} ships its own {@code Codec}/{@code StreamCodec}
+     * ({@link BlockPos#CODEC}/{@link BlockPos#STREAM_CODEC}), so no custom codec is needed here.
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockPos>> DETONATOR_POS =
+            DATA_COMPONENT_TYPES.register("detonator_pos", () -> DataComponentType.<BlockPos>builder()
+                    .persistent(BlockPos.CODEC)
+                    .networkSynchronized(BlockPos.STREAM_CODEC)
+                    .build());
+
+    /**
+     * {@link ItemMultiDetonator}'s stored target position list (CE NBT keys "xValues"/"yValues"/
+     * "zValues" - three parallel {@code int[]} arrays on the detonator stack, collapsed here into
+     * one ordered {@code List<BlockPos>}).
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<BlockPos>>> MULTI_DETONATOR_POS =
+            DATA_COMPONENT_TYPES.register("multi_detonator_pos", () -> DataComponentType.<List<BlockPos>>builder()
+                    .persistent(BlockPos.CODEC.listOf())
+                    .networkSynchronized(BlockPos.STREAM_CODEC.apply(ByteBufCodecs.list()))
+                    .build());
+
+    /**
+     * {@link ItemRTTYPager}'s stored channel name (CE NBT key {@code "chan"} - a plain string, no
+     * special codec needed).
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> PAGER_CHANNEL =
+            DATA_COMPONENT_TYPES.register("pager_channel", () -> DataComponentType.<String>builder()
+                    .persistent(Codec.STRING)
+                    .networkSynchronized(ByteBufCodecs.STRING_UTF8)
                     .build());
 
     private ToolDataComponents() {

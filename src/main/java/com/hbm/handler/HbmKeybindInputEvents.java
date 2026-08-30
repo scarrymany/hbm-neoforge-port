@@ -4,7 +4,7 @@ import com.hbm.handler.HbmKeybinds.EnumKeybind;
 import com.hbm.inventory.gui.CalculatorScreen;
 import com.hbm.items.IKeybindReceiver;
 import com.hbm.main.MainRegistry;
-import com.hbm.packet.KeybindPacket;
+import com.hbm.packet.toserver.KeybindPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;

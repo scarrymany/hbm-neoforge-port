@@ -22,11 +22,10 @@ import javax.annotation.Nullable;
  * assigned anywhere in the class (confirmed by reading it in full) - genuinely dead state, dropped
  * rather than carried forward.
  * <p>
- * <b>Blocking dependency (documented forward reference, not this pass's to fix)</b>: {@code
- * com.hbm.blocks.bomb.NukeCustom} - the class whose static {@code explodeCustom(...)} this entity
- * calls on landing - does not exist anywhere in this port yet (confirmed; {@code com.hbm.blocks.bomb}
- * has zero files). That call site is a documented {@code TODO} below; everything else (falling
- * physics, rotation animation, ground-contact detection, thrower tracking) is fully ported.
+ * Ground-contact detonation now calls {@link com.hbm.blocks.bomb.NukeCustomBlock#explodeCustom}
+ * directly - that class landed as part of the nuke-casing bomb-blocks package
+ * ({@code docs/phase3/bomb_blocks_and_detonators.md} §B), closing what was previously a documented
+ * forward-reference gap here.
  */
 public class EntityFallingNuke extends Entity {
 
@@ -80,12 +79,8 @@ public class EntityFallingNuke extends Entity {
 
         if (!level().getBlockState(BlockPos.containing(getX(), getY(), getZ())).isAir()) {
             if (!level().isClientSide()) {
-                // TODO(com.hbm.blocks.bomb.NukeCustom, docs/phase3/bomb_blocks_and_detonators.md
-                // §B): CE calls NukeCustom.explodeCustom(world, thrower, posX, posY, posZ, tnt,
-                // nuke, hydro, bale, dirty, schrab, sol, euph) here on ground contact. That class
-                // doesn't exist in this port yet - the entity still discards itself on landing
-                // (preserving "the falling bomb goes away when it hits the ground") but currently
-                // detonates nothing until NukeCustom lands.
+                com.hbm.blocks.bomb.NukeCustomBlock.explodeCustom(level(), thrower, getX(), getY(), getZ(),
+                        tnt, nuke, hydro, bale, dirty, schrab, sol, euph);
                 this.discard();
             }
         }

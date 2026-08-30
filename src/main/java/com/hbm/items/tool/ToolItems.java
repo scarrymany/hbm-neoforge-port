@@ -326,6 +326,11 @@ public final class ToolItems {
     public static final DeferredItem<Item> CONTAINMENT_BOX = ModItems.ITEMS.register("containment_box", () -> new ItemLeadBox(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> TOOLBOX = ModItems.ITEMS.register("toolbox", () -> new ItemToolBox(new Item.Properties().stacksTo(1)));
 
+    // ==================== Phase 3 (turret_system) ====================
+
+    /** See {@code com.hbm.items.tool.ItemTurretMobFilter}'s own javadoc. */
+    public static final DeferredItem<Item> TURRET_MOB_FILTER = ModItems.ITEMS.register("turret_mob_filter", () -> new ItemTurretMobFilter(new Item.Properties().stacksTo(1)));
+
     /** No-op beyond forcing this class to load before {@code ModItems.ITEMS.register(modEventBus)}. */
     public static void registerAll() {
     }
@@ -369,6 +374,8 @@ public final class ToolItems {
         CreativeTabContents.add(ModCreativeTabs.WEAPON, BALEFIRE_AND_STEEL);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CRATE_CALLER);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, MYSTERYSHOVEL);
+
+        CreativeTabContents.add(ModCreativeTabs.WEAPON, TURRET_MOB_FILTER);
 
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, BOOK_GUIDE_BOOK);
         CreativeTabContents.add(ModCreativeTabs.TEMPLATE, BOBMAZON);

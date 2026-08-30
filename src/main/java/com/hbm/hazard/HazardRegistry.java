@@ -22,6 +22,7 @@ import com.hbm.hazard.type.HazardTypeHot;
 import com.hbm.hazard.type.HazardTypeHydroactive;
 import com.hbm.hazard.type.HazardTypeRadiation;
 import com.hbm.hazard.type.HazardTypeToxic;
+import com.hbm.hazard.type.HazardTypeUnstable;
 import com.hbm.hazard.type.IHazardType;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.MaterialShapes;
@@ -621,6 +622,26 @@ public class HazardRegistry {
         registerRBMKPellet("rbmk_pellet_zfb_pu241", pu239 * billet * 0.1F, wst * billet * 7.5F);
         registerRBMKPellet("rbmk_pellet_zfb_am_mix", pu241 * billet * 0.1F, wst * billet * 10F);
         registerRBMKPellet("rbmk_pellet_drx", bf * billet, bf * billet * 100F, true, 0F, 1F / 24F);
+
+        // docs/phase3/scattered_military_items.md: CE's ItemUnstable pocket-nuke decay/detonation
+        // timer, generalized here via the already-real HazardTypeUnstable parametric strategy
+        // (com.hbm.hazard.type.HazardTypeUnstable, confirmed already built and already wired to the
+        // per-stack HazardComponents.UNSTABLE_DECAY_TIMER component, but not yet bound to any item)
+        // rather than a bespoke ItemUnstable Item subclass - the "level" argument to addEntry is the
+        // explosion radius, the HazardTypeUnstable constructor argument is the decay-tick timer.
+        // Exact (radius, timer) pairs confirmed against CE's real ModItems.java `new
+        // ItemUnstable(radius, timer, name)` call sites (only 3 exist in all of CE): ingot_u238m2
+        // (350, 200), ingot_electronium (30, 6000), nugget_u238m2 (60, 2000). The inert
+        // ELEMENTS/ARSENIC/VAULT reskins (ingot_u238m2_elements/_arsenic/_vault) are deliberately not
+        // bound here - CE's own ItemUnstable short-circuits all behavior for those metas, and
+        // post-flattening they are already separate plain-Item registry entries with no ticking
+        // behavior of their own (see IngotNuggetItems).
+        HazardSystem.register(IngotNuggetItems.INGOT_U238M2.get(),
+                new HazardData().addEntry(new HazardTypeUnstable(200), 350));
+        HazardSystem.register(IngotNuggetItems.INGOT_ELECTRONIUM.get(),
+                new HazardData().addEntry(new HazardTypeUnstable(6000), 30));
+        HazardSystem.register(IngotNuggetItems.NUGGET_U238M2.get(),
+                new HazardData().addEntry(new HazardTypeUnstable(2000), 60));
     }
 
     // ==================== items_machine hazard-wiring helpers (CE Pattern E, ported near-verbatim; Item
