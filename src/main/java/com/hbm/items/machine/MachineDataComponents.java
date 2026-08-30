@@ -64,6 +64,22 @@ public final class MachineDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> RBMK_PELLET_STAGE =
             register("rbmk_pellet_stage", Codec.INT, ByteBufCodecs.INT);
 
+    /** ItemRBMKRod total potential inFlux yield remaining (CE NBT key "yield"). Absent = brand new (falls back to the rod type's max yield - see {@code ItemRBMKRod#getYield}). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> RBMK_ROD_YIELD =
+            register("rbmk_rod_yield", Codec.DOUBLE, ByteBufCodecs.DOUBLE);
+
+    /** ItemRBMKRod xenon poison level, 0-100 (CE NBT key "xenon"). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> RBMK_ROD_XENON =
+            register("rbmk_rod_xenon", Codec.DOUBLE, ByteBufCodecs.DOUBLE);
+
+    /** ItemRBMKRod core (fission-zone) heat in degrees C (CE NBT key "core"). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> RBMK_ROD_CORE_HEAT =
+            register("rbmk_rod_core_heat", Codec.DOUBLE, ByteBufCodecs.DOUBLE);
+
+    /** ItemRBMKRod hull (outer cladding) heat in degrees C (CE NBT key "hull"). */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> RBMK_ROD_HULL_HEAT =
+            register("rbmk_rod_hull_heat", Codec.DOUBLE, ByteBufCodecs.DOUBLE);
+
     /** ItemLens damage counter (CE NBT key "damage"). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> LENS_DAMAGE =
             register("lens_damage", Codec.LONG, ByteBufCodecs.VAR_LONG);
