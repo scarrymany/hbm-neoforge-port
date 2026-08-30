@@ -18,6 +18,13 @@ public final class BombBlockEntities {
     public static Supplier<BlockEntityType<ChargeBlockEntity>> CHARGE;
     public static Supplier<BlockEntityType<LandmineBlockEntity>> LANDMINE;
 
+    /** Phase 3 ({@code missile_launch_infra}): small pad, {@link LaunchPadBlockEntity}. */
+    public static Supplier<BlockEntityType<LaunchPadBlockEntity>> LAUNCH_PAD;
+    /** Phase 3 ({@code missile_launch_infra}): large erector pad, {@link LaunchPadLargeBlockEntity}. */
+    public static Supplier<BlockEntityType<LaunchPadLargeBlockEntity>> LAUNCH_PAD_LARGE;
+    /** Phase 3 ({@code missile_launch_infra}): standalone rusted pad, {@link LaunchPadRustedBlockEntity} - not a {@link LaunchPadBaseBlockEntity} subclass, per the research report's explicit warning. */
+    public static Supplier<BlockEntityType<LaunchPadRustedBlockEntity>> LAUNCH_PAD_RUSTED;
+
     private BombBlockEntities() {
     }
 
@@ -30,6 +37,21 @@ public final class BombBlockEntities {
         LANDMINE = ModBlocks.BLOCK_ENTITY_TYPES.register("landmine", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new LandmineBlockEntity(LANDMINE.get(), pos, state),
                 BombBlocks.MINE_AP.get(), BombBlocks.MINE_HE.get(), BombBlocks.MINE_SHRAP.get(), BombBlocks.MINE_FAT.get(), BombBlocks.MINE_NAVAL.get()
+        ).build(null));
+
+        LAUNCH_PAD = ModBlocks.BLOCK_ENTITY_TYPES.register("launch_pad", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new LaunchPadBlockEntity(LAUNCH_PAD.get(), pos, state),
+                BombBlocks.LAUNCH_PAD.get()
+        ).build(null));
+
+        LAUNCH_PAD_LARGE = ModBlocks.BLOCK_ENTITY_TYPES.register("launch_pad_large", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new LaunchPadLargeBlockEntity(LAUNCH_PAD_LARGE.get(), pos, state),
+                BombBlocks.LAUNCH_PAD_LARGE.get()
+        ).build(null));
+
+        LAUNCH_PAD_RUSTED = ModBlocks.BLOCK_ENTITY_TYPES.register("launch_pad_rusted", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new LaunchPadRustedBlockEntity(LAUNCH_PAD_RUSTED.get(), pos, state),
+                BombBlocks.LAUNCH_PAD_RUSTED.get()
         ).build(null));
     }
 }

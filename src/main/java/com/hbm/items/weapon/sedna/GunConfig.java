@@ -2,6 +2,7 @@ package com.hbm.items.weapon.sedna;
 
 import com.hbm.items.weapon.sedna.factory.GunStateDecider;
 import com.hbm.items.weapon.sedna.factory.Lego;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.render.misc.RenderScreenOverlay;
 import net.minecraft.world.item.ItemStack;
 
@@ -13,9 +14,11 @@ import java.util.function.BiConsumer;
  * receivers array, durability, draw/inspect durations, crosshair choice, and the click/decider lambda
  * slots. See {@code docs/phase3/gun_framework.md}'s Package B table, read in full.
  * <p>
- * Every getter here is a raw pass-through to the {@code _DNA} field (see {@link ItemGunBaseNT}'s
- * class javadoc for why - CE's {@code XWeaponModManager.eval(...)} wrapper is Package C, not ported
- * yet, and is documented as a pure pass-through when a stack has no mod NBT).
+ * <b>Every getter routes through {@link XWeaponModManager#eval}</b> (Package C, now landed) before
+ * returning the raw {@code _DNA} field - i.e. every single config value on every gun is
+ * mod-overridable, matching CE's own {@code GunConfig} 1:1. {@code XWeaponModManager.eval} is a pure
+ * pass-through when the stack carries no installed-mod list for this config index, so an unmodified
+ * gun behaves exactly as it did before this wiring landed.
  * <p>
  * Not ported from CE's own field set (see {@code docs/phase3/gun_framework.md}'s Deferred scope):
  * {@code animations_DNA}/{@code getAnims}/{@code anim(...)} (needs
@@ -24,9 +27,44 @@ import java.util.function.BiConsumer;
  * {@code getHUDComponents}/{@code hud(...)} (needs {@code com.hbm.items.weapon.sedna.hud.IHUDComponent},
  * unported Phase 5 HUD-widget package). Both were purely client-rendering config slots in CE (their
  * own field comments in CE say as much - {@code smokeHandler_DNA} is commented "Handles smoke
- * clientside" right next to them) with no bearing on the fire/reload state machine itself.
+ * clientside" right next to them) with no bearing on the fire/reload state machine itself. Because
+ * neither field/getter exists here, any weapon mod whose CE {@code eval()} body branches on
+ * {@code GunConfig.FUN_ANIMNATIONS}/{@code O_HUDCOMPONENTS} (bayonet/sawed-off/speedloader mods'
+ * custom animation overrides) simply never has that branch reached in this port - documented per-mod
+ * where it matters, not a silent gap.
  */
 public class GunConfig {
+
+    /* MOD-EVAL KEYS - string identity, not value, is what {@link XWeaponModManager#eval} matches on;
+     * every key here mirrors CE's own {@code GunConfig} constant name 1:1 so a mod's {@code eval()}
+     * body ported from CE needs no key renaming. */
+    public static final String O_RECEIVERS = "O_RECEIVERS";
+    public static final String F_DURABILITY = "F_DURABILITY";
+    public static final String I_DRAWDURATION = "I_DRAWDURATION";
+    public static final String I_INSPECTDURATION = "I_INSPECTDURATION";
+    public static final String I_INSPECTCANCEL = "I_INSPECTCANCEL";
+    public static final String O_CROSSHAIR = "O_CROSSHAIR";
+    public static final String B_HIDECROSSHAIR = "B_HIDECROSSHAIR";
+    public static final String B_THERMALSIGHTS = "B_THERMALSIGHTS";
+    public static final String B_RELOADREQUIRESTYPECHANGE = "B_RELOADREQUIRESTYPECHANGE";
+    public static final String B_RELOADANIMATIONSEQUENTIAL = "B_RELOADANIMATIONSEQUENTIAL";
+    /** CE also has {@code O_SCOPETEXTURE} here (a {@code ResourceLocation} field/getter) - not ported: this class has no {@code scopeTexture_DNA} field (Phase 5 rendering, see class javadoc), but the key string is still exposed so a scope mod's {@code eval()} can match on it (the branch is simply never read by anything yet). */
+    public static final String O_SCOPETEXTURE = "O_SCOPETEXTURE";
+    public static final String CON_SMOKE = "CON_SMOKE";
+    public static final String CON_ORCHESTRA = "CON_ORCHESTRA";
+    public static final String CON_ONPRESSPRIMARY = "CON_ONPRESSPRIMARY";
+    public static final String CON_ONPRESSSECONDARY = "CON_ONPRESSSECONDARY";
+    public static final String CON_ONPRESSTERTIARY = "CON_ONPRESSTERTIARY";
+    public static final String CON_ONPRESSRELOAD = "CON_ONPRESSRELOAD";
+    public static final String CON_ONRELEASEPRIMARY = "CON_ONRELEASEPRIMARY";
+    public static final String CON_ONRELEASESECONDARY = "CON_ONRELEASESECONDARY";
+    public static final String CON_ONRELEASETERTIARY = "CON_ONRELEASETERTIARY";
+    public static final String CON_ONRELEASERELOAD = "CON_ONRELEASERELOAD";
+    public static final String CON_DECIDER = "CON_DECIDER";
+    /** Key string only - see class javadoc, no {@code animations_DNA} field/getter exists to route through it yet. */
+    public static final String FUN_ANIMNATIONS = "FUN_ANIMNATIONS";
+    /** Key string only - see class javadoc, no {@code hudComponents_DNA} field/getter exists to route through it yet. */
+    public static final String O_HUDCOMPONENTS = "O_HUDCOMPONENTS";
 
     /* FIELDS */
 
@@ -58,43 +96,43 @@ public class GunConfig {
     /** The engine for the state machine that determines the gun's overall behavior. */
     protected BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> decider_DNA;
 
-    /* GETTERS - raw pass-throughs, see class javadoc */
+    /* GETTERS - every value routes through XWeaponModManager.eval, see class javadoc */
 
-    public Receiver[] getReceivers(ItemStack stack) { return receivers_DNA; }
-    public float getDurability(ItemStack stack) { return durability_DNA; }
-    public int getDrawDuration(ItemStack stack) { return drawDuration_DNA; }
-    public int getInspectDuration(ItemStack stack) { return inspectDuration_DNA; }
-    public boolean getInspectCancel(ItemStack stack) { return inspectCancel_DNA; }
+    public Receiver[] getReceivers(ItemStack stack) { return XWeaponModManager.eval(receivers_DNA, stack, O_RECEIVERS, this, this.index); }
+    public float getDurability(ItemStack stack) { return XWeaponModManager.eval(durability_DNA, stack, F_DURABILITY, this, this.index); }
+    public int getDrawDuration(ItemStack stack) { return XWeaponModManager.eval(drawDuration_DNA, stack, I_DRAWDURATION, this, this.index); }
+    public int getInspectDuration(ItemStack stack) { return XWeaponModManager.eval(inspectDuration_DNA, stack, I_INSPECTDURATION, this, this.index); }
+    public boolean getInspectCancel(ItemStack stack) { return XWeaponModManager.eval(inspectCancel_DNA, stack, I_INSPECTCANCEL, this, this.index); }
     @Nullable
-    public RenderScreenOverlay.Crosshair getCrosshair(ItemStack stack) { return crosshair_DNA; }
-    public boolean getHideCrosshair(ItemStack stack) { return hideCrosshair_DNA; }
-    public boolean hasThermalSights(ItemStack stack) { return thermalSights_DNA; }
-    public boolean getReloadChangesType(ItemStack stack) { return reloadRequiresTypeChange_DNA; }
-    public boolean getReloadAnimSequential(ItemStack stack) { return reloadAnimationsSequential_DNA; }
+    public RenderScreenOverlay.Crosshair getCrosshair(ItemStack stack) { return XWeaponModManager.eval(crosshair_DNA, stack, O_CROSSHAIR, this, this.index); }
+    public boolean getHideCrosshair(ItemStack stack) { return XWeaponModManager.eval(hideCrosshair_DNA, stack, B_HIDECROSSHAIR, this, this.index); }
+    public boolean hasThermalSights(ItemStack stack) { return XWeaponModManager.eval(thermalSights_DNA, stack, B_THERMALSIGHTS, this, this.index); }
+    public boolean getReloadChangesType(ItemStack stack) { return XWeaponModManager.eval(reloadRequiresTypeChange_DNA, stack, B_RELOADREQUIRESTYPECHANGE, this, this.index); }
+    public boolean getReloadAnimSequential(ItemStack stack) { return XWeaponModManager.eval(reloadAnimationsSequential_DNA, stack, B_RELOADANIMATIONSEQUENTIAL, this, this.index); }
     @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getSmokeHandler(ItemStack stack) { return smokeHandler_DNA; }
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getSmokeHandler(ItemStack stack) { return XWeaponModManager.eval(smokeHandler_DNA, stack, CON_SMOKE, this, this.index); }
     @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getOrchestra(ItemStack stack) { return orchestra_DNA; }
-
-    @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressPrimary(ItemStack stack) { return onPressPrimary_DNA; }
-    @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressSecondary(ItemStack stack) { return onPressSecondary_DNA; }
-    @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressTertiary(ItemStack stack) { return onPressTertiary_DNA; }
-    @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressReload(ItemStack stack) { return onPressReload_DNA; }
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getOrchestra(ItemStack stack) { return XWeaponModManager.eval(orchestra_DNA, stack, CON_ORCHESTRA, this, this.index); }
 
     @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleasePrimary(ItemStack stack) { return onReleasePrimary_DNA; }
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressPrimary(ItemStack stack) { return XWeaponModManager.eval(onPressPrimary_DNA, stack, CON_ONPRESSPRIMARY, this, this.index); }
     @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleaseSecondary(ItemStack stack) { return onReleaseSecondary_DNA; }
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressSecondary(ItemStack stack) { return XWeaponModManager.eval(onPressSecondary_DNA, stack, CON_ONPRESSSECONDARY, this, this.index); }
     @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleaseTertiary(ItemStack stack) { return onReleaseTertiary_DNA; }
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressTertiary(ItemStack stack) { return XWeaponModManager.eval(onPressTertiary_DNA, stack, CON_ONPRESSTERTIARY, this, this.index); }
     @Nullable
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleaseReload(ItemStack stack) { return onReleaseReload_DNA; }
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getPressReload(ItemStack stack) { return XWeaponModManager.eval(onPressReload_DNA, stack, CON_ONPRESSRELOAD, this, this.index); }
 
-    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getDecider(ItemStack stack) { return decider_DNA; }
+    @Nullable
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleasePrimary(ItemStack stack) { return XWeaponModManager.eval(onReleasePrimary_DNA, stack, CON_ONRELEASEPRIMARY, this, this.index); }
+    @Nullable
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleaseSecondary(ItemStack stack) { return XWeaponModManager.eval(onReleaseSecondary_DNA, stack, CON_ONRELEASESECONDARY, this, this.index); }
+    @Nullable
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleaseTertiary(ItemStack stack) { return XWeaponModManager.eval(onReleaseTertiary_DNA, stack, CON_ONRELEASETERTIARY, this, this.index); }
+    @Nullable
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleaseReload(ItemStack stack) { return XWeaponModManager.eval(onReleaseReload_DNA, stack, CON_ONRELEASERELOAD, this, this.index); }
+
+    public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getDecider(ItemStack stack) { return XWeaponModManager.eval(decider_DNA, stack, CON_DECIDER, this, this.index); }
 
     /* SETTERS - fluent builder, field-for-field port of CE's own */
 

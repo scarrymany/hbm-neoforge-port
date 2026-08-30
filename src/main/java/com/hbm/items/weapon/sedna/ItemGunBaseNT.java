@@ -7,6 +7,7 @@ import com.hbm.items.IEquipReceiver;
 import com.hbm.items.IKeybindReceiver;
 import com.hbm.items.weapon.sedna.mags.IMagazine;
 import com.hbm.items.weapon.sedna.mags.MagazineInfinite;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.toclient.GunAnimationPayload;
 import com.hbm.sound.AudioWrapper;
@@ -54,19 +55,18 @@ import java.util.function.Function;
  * overload required by {@link IKeybindReceiver} is a thin wrapper around this one, supplying the
  * player's own inventory - it is not the "real" implementation.
  * <p>
- * <b>Every {@code GunConfig}/{@code Receiver} getter is a raw pass-through here</b> (see
- * {@link #getConfig}) rather than routing through CE's {@code XWeaponModManager.eval(...)}, because
- * that weapon-attachment eval layer is a separate, not-yet-ported package (Package C per the research
- * report's work-split) - {@code XWeaponModManager.eval} is documented as a no-op pass-through when a
- * stack carries no mod NBT, so every gun's default (unmodded) loadout behaves identically either way.
- * Wiring these getters through the real eval layer once Package C lands is a mechanical follow-up,
- * not a behavior change.
+ * <b>{@code GunConfig}/{@code Receiver} getters route through {@link XWeaponModManager#eval}</b> (see
+ * {@link #getConfig} - {@code getConfig} itself is still a raw array index, but every value read off
+ * the returned {@code GunConfig}/its {@code Receiver}s is mod-overridable). Package C (the weapon-mod
+ * eval chain + concrete {@code WeaponMod*} effect classes + the attachment items themselves) has
+ * landed - {@link XWeaponModManager#getUpgradeItems} now backs this class's own tooltip loop below.
  * <p>
  * <b>Deliberately not ported from CE</b> (see the research report's Package C/D "Not part of this
  * package" lists for why each belongs elsewhere): {@code defaultAmmo}/{@code setDefaultAmmo} (needs
  * {@code GunFactory.EnumAmmo} + {@code ModItems.ammo_standard}, Package D content); the
- * {@code GUIWeaponTable}-aware tooltip branch and {@code XWeaponModManager.getUpgradeItems} (Package
- * C); {@code onBlockStartBreak}/{@code onLeftClickEntity} (CE's own overrides both unconditionally
+ * {@code GUIWeaponTable}-aware "this gun accepts:" tooltip branch (a dedicated weapon-table block/menu
+ * this port doesn't have yet - see {@code WeaponModItems}'s own javadoc); {@code onBlockStartBreak}/
+ * {@code onLeftClickEntity} (CE's own overrides both unconditionally
  * return {@code true}, i.e. "don't change vanilla's default behavior" - 1.21.1 already behaves that
  * way with no override present, so omitting them changes nothing observable); the smoke-node/
  * orchestra *default* lambda bodies (client-rendering feed data with zero gameplay effect - the
@@ -121,8 +121,9 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipRecei
     public final WeaponQuality quality;
 
     /**
-     * See this class's javadoc: a raw pass-through, not {@code XWeaponModManager.eval(...)} - that
-     * layer doesn't exist in this port yet (Package C).
+     * A raw array index - {@code GunConfig} instances themselves are never swapped out by a weapon
+     * mod (only the values read off one, via {@link XWeaponModManager#eval}, are - see this class's
+     * javadoc).
      */
     public GunConfig getConfig(ItemStack stack, int index) {
         return configs_DNA[index];
@@ -216,8 +217,9 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipRecei
                 tooltip.add(Component.translatable("desc.gun.condition", dura));
             }
 
-            // CE also lists installed weapon-mod upgrade items here (XWeaponModManager.getUpgradeItems)
-            // - Package C, not ported yet (see this class's javadoc).
+            for (ItemStack upgrade : XWeaponModManager.getUpgradeItems(stack, i)) {
+                tooltip.add(upgrade.getHoverName().copy().withStyle(ChatFormatting.YELLOW));
+            }
         }
 
         switch (this.quality) {
@@ -231,8 +233,9 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipRecei
         }
 
         // CE also shows a "this gun accepts:" list of recognizedMods while a GUIWeaponTable screen is
-        // open (Minecraft.getMinecraft().currentScreen instanceof GUIWeaponTable) - that screen is
-        // Package C content, not ported yet.
+        // open (Minecraft.getMinecraft().currentScreen instanceof GUIWeaponTable) - that screen (a
+        // dedicated weapon-table block/menu) is not ported yet, see WeaponModItems's own javadoc;
+        // recognizedMods itself is populated correctly by XWeaponModManager.init() already.
     }
 
     @Override

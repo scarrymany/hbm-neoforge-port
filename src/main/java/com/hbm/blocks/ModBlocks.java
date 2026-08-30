@@ -76,6 +76,7 @@ public final class ModBlocks {
         com.hbm.blocks.bomb.BombBlocks.registerAll();
         com.hbm.blocks.bomb.NukeCasingBlocks.registerAll();
         com.hbm.blocks.turret.TurretBlocks.registerAll();
+        com.hbm.blocks.machine.LaunchInfraBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }

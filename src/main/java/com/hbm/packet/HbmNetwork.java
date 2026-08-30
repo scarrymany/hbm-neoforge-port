@@ -6,8 +6,10 @@ import com.hbm.packet.toclient.ExplosionEffectSyncPacket;
 import com.hbm.packet.toclient.ExplosionRemovalSyncPacket;
 import com.hbm.packet.toclient.GunAnimationPayload;
 import com.hbm.packet.toclient.NukeExplosionRemovalSyncPacket;
+import com.hbm.packet.toclient.SatPanelPayload;
 import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
+import com.hbm.packet.toserver.SatPanelActionPayload;
 import com.hbm.packet.toserver.TurretControlPacket;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -88,5 +90,9 @@ public class HbmNetwork {
 
         // Phase 3 (turret_system): C2S mob-filter/whitelist mutation for the bare-Screen mob-filter GUI (no backing Menu).
         registrar.playToServer(TurretControlPacket.TYPE, TurretControlPacket.STREAM_CODEC, TurretControlPacket::handleServer);
+
+        // Phase 3 (missile_launch_infra): S2C live satellite-panel stream + C2S panel control round trip.
+        registrar.playToClient(SatPanelPayload.TYPE, SatPanelPayload.STREAM_CODEC, SatPanelPayload::handleClient);
+        registrar.playToServer(SatPanelActionPayload.TYPE, SatPanelActionPayload.STREAM_CODEC, SatPanelActionPayload::handleServer);
     }
 }

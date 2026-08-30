@@ -30,9 +30,12 @@ import java.util.function.Supplier;
  * recipe-plumbing work beyond this task), the detonator/defuser items themselves ({@code ItemDetonator}/
  * {@code ItemMultiDetonator}/{@code ItemLaserDetonator}/{@code ItemDefuser}, Section C - a separate
  * work package; {@link Landmine}'s defuser check resolves those two items by registry id rather than
- * a compile-time reference, see that class's javadoc), and the six launch-pad/missile multiblocks
- * plus the five non-{@code IBomb} world-hazard block families explicitly named out of scope by the
- * research report's Deferred scope section.
+ * a compile-time reference, see that class's javadoc), and the five non-{@code IBomb} world-hazard
+ * block families explicitly named out of scope by the research report's Deferred scope section.
+ * {@link LaunchPad}/{@link LaunchPadLarge}/{@link LaunchPadRusted} (the three launch-pad
+ * multiblocks) were added by the later {@code missile_launch_infra} work package - see that
+ * package's own {@code docs/phase3/missile_launch_infra.md} report, not this class's original
+ * {@code bomb_blocks_and_detonators} scope.
  */
 public final class BombBlocks {
 
@@ -77,6 +80,14 @@ public final class BombBlocks {
     public static DeferredBlock<BombThermo> THERM_ENDO;
     public static DeferredBlock<BombThermo> THERM_EXO;
 
+    /** Phase 3 ({@code missile_launch_infra}): the three launch-pad multiblocks. */
+    public static DeferredBlock<LaunchPad> LAUNCH_PAD;
+    public static DeferredBlock<LaunchPadLarge> LAUNCH_PAD_LARGE;
+    public static DeferredBlock<LaunchPadRusted> LAUNCH_PAD_RUSTED;
+
+    private static final BlockBehaviour.Properties LAUNCH_PAD_PROPS =
+            BlockBehaviour.Properties.of().strength(5.0F, 6000F).sound(SoundType.METAL);
+
     private BombBlocks() {
     }
 
@@ -110,6 +121,10 @@ public final class BombBlocks {
         EMP_BOMB = registerBlock("emp_bomb", () -> new BombFloat(BOMB_PROPS));
         THERM_ENDO = registerBlock("therm_endo", () -> new BombThermo(BOMB_PROPS));
         THERM_EXO = registerBlock("therm_exo", () -> new BombThermo(BOMB_PROPS));
+
+        LAUNCH_PAD = registerBlock("launch_pad", () -> new LaunchPad(LAUNCH_PAD_PROPS));
+        LAUNCH_PAD_LARGE = registerBlock("launch_pad_large", () -> new LaunchPadLarge(LAUNCH_PAD_PROPS));
+        LAUNCH_PAD_RUSTED = registerBlock("launch_pad_rusted", () -> new LaunchPadRusted(LAUNCH_PAD_PROPS));
 
         BombBlockEntities.registerAll();
     }

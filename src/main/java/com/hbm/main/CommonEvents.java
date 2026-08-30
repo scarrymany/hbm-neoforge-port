@@ -1,8 +1,11 @@
 package com.hbm.main;
 
+import com.hbm.blockentity.bomb.LaunchPadBaseBlockEntity;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardRegistry;
+import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
+import com.hbm.saveddata.satellites.Satellite;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -33,6 +36,16 @@ public class CommonEvents {
             // persistence is not ported - see HazmatRegistry's own javadoc); currently a no-op
             // beyond flushing HazmatRegistry.external, since nothing populates that list yet.
             HazmatRegistry.initDefault();
+            // Package C (weapon-mod eval chain) - must run after every Item/BulletConfig in
+            // com.hbm.items.weapon.sedna.** has registered (RegisterEvent has already fully fired by
+            // the time enqueueWork's Runnable executes), see XWeaponModManager's own class javadoc.
+            XWeaponModManager.init();
+            // Phase 3 (missile_launch_infra) - must run after every MissileItems/MissileEntityTypes
+            // DeferredHolder has registered, matching XWeaponModManager's own timing reasoning above.
+            LaunchPadBaseBlockEntity.registerLaunchables();
+            // Phase 3 (missile_launch_infra) - populates com.hbm.saveddata.satellites.Satellite's
+            // fixed, order-sensitive registry (see that class's own javadoc on why order matters).
+            Satellite.register();
         });
     }
 }

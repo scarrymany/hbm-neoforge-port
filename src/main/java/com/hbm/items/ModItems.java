@@ -75,6 +75,17 @@ public class ModItems {
         com.hbm.items.weapon.WeaponDataComponents.register(modEventBus);
         com.hbm.items.weapon.MissileItems.registerAll();
         com.hbm.items.weapon.MissileDataComponents.register(modEventBus);
+        com.hbm.items.weapon.sedna.content.GunPistolItems.registerAll();
+        com.hbm.items.weapon.sedna.content.GunRifleItems.registerAll();
+        com.hbm.items.weapon.sedna.content.GunShotgunItems.registerAll();
+        com.hbm.items.weapon.sedna.content.GunLauncherItems.registerAll();
+        com.hbm.items.weapon.sedna.content.GunEnergyItems.registerAll();
+        com.hbm.items.weapon.sedna.content.GunHeavyItems.registerAll();
+        com.hbm.items.weapon.legacy.LegacyWeaponItems.registerAll();
+        com.hbm.items.weapon.legacy.LegacyWeaponDataComponents.register(modEventBus);
+        com.hbm.items.weapon.sedna.mods.WeaponModItems.registerAll();
+        com.hbm.items.weapon.sedna.mods.WeaponModDataComponents.register(modEventBus);
+        com.hbm.items.tool.LaunchInfraItems.registerAll();
         ITEMS.register(modEventBus);
     }
 }

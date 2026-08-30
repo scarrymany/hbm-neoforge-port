@@ -51,6 +51,14 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<FluidTankMenu>> FLUID_TANK =
             reg("machine_fluidtank_basic", FluidTankMenu::fromNetwork);
 
+    /** Phase 3 ({@code missile_launch_infra}): shared by both the small and large launch pad, matching CE's own {@code TileEntityLaunchPadBase.provideContainer}. */
+    public static final DeferredHolder<MenuType<?>, MenuType<LaunchPadMenu>> LAUNCH_PAD =
+            reg("launch_pad", LaunchPadMenu::fromNetwork);
+    public static final DeferredHolder<MenuType<?>, MenuType<LaunchPadRustedMenu>> LAUNCH_PAD_RUSTED =
+            reg("launch_pad_rusted", LaunchPadRustedMenu::fromNetwork);
+    public static final DeferredHolder<MenuType<?>, MenuType<LaunchpadSoyuzMenu>> LAUNCHPAD_SOYUZ =
+            reg("launchpad_soyuz", LaunchpadSoyuzMenu::fromNetwork);
+
     private ModMenuTypes() {
     }
 
