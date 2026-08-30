@@ -8,6 +8,7 @@ import com.hbm.inventory.fluid.trait.FluidTraitSimple.*;
 import com.hbm.main.MainRegistry;
 import com.hbm.render.misc.EnumSymbol;
 import com.hbm.uninos.INetworkProvider;
+import com.mojang.serialization.Codec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -45,6 +46,15 @@ public class FluidType {
     public boolean renderWithTint = false;
 
     public static final int ROOM_TEMPERATURE = 20;
+
+    /**
+     * Registry-name-keyed (this fluid catalog's own {@link #getName()}, i.e. {@link Fluids#fromName}),
+     * not id-keyed - matches {@link Fluids#writeType}/{@link Fluids#readType}'s own name-first,
+     * numeric-id-fallback save convention, since ids shift when fluids are added/removed but names
+     * don't. {@link com.hbm.inventory.fluid.FluidStack#STREAM_CODEC} composes this fluid catalog's
+     * id instead for its short-lived network wire format, where that risk doesn't apply.
+     */
+    public static final Codec<FluidType> CODEC = Codec.STRING.xmap(Fluids::fromName, FluidType::getName);
 
     // v v v this entire system is a pain in the ass to work with. i'd much rather define state transitions and heat values manually.
     /** How hot this fluid is. Simple enough. */
