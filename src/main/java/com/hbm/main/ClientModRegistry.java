@@ -8,6 +8,11 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
+import com.hbm.inventory.container.ModMenuTypes;
+import com.hbm.inventory.gui.BatteryScreen;
+import com.hbm.inventory.gui.CrateScreen;
+import com.hbm.inventory.gui.FluidTankScreen;
+
 /**
  * Client-only bootstrap mod class, mirroring the Neo Edition reference's
  * {@code com.hbm.main.NuclearTechModClient}. A second {@code @Mod} class with the same
@@ -59,15 +64,15 @@ public class ClientModRegistry {
      * server/common-safe {@code DeferredRegister} - see Neo Edition's real
      * {@code CommonEvents.registerScreens} (cross-checked for API shape only) for the identical
      * {@code event.register(SOME_MENU_TYPE.get(), SomeScreen::new)} pattern every future Phase 2
-     * machine Menu+Screen pair should add a line to here.
-     * <p>
-     * Empty for now, same reason {@link com.hbm.inventory.container.ModMenuTypes} has no
-     * {@code DeferredHolder} fields yet: no concrete Phase 2 machine Menu+Screen pair exists in this
-     * pass (see {@code docs/phase2/gui_framework.md}'s Deferred scope).
+     * machine Menu+Screen pair should add a line to here - the storage-machines package below is the
+     * first concrete set (see {@code docs/phase2/machines_storage.md}).
      */
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        // Add one event.register(ModMenuTypes.SOME_MACHINE.get(), SomeMachineScreen::new) line here
-        // per concrete Phase 2 machine Menu+Screen pair, alongside its ModMenuTypes field.
+        // Phase 2 storage-machines package (see docs/phase2/machines_storage.md) - first concrete
+        // entries following this method's own original template comment.
+        event.register(ModMenuTypes.CRATE.get(), CrateScreen::new);
+        event.register(ModMenuTypes.BATTERY.get(), BatteryScreen::new);
+        event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
     }
 }

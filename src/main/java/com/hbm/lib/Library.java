@@ -1,10 +1,20 @@
 package com.hbm.lib;
 
+import com.hbm.api.energymk2.IBatteryItem;
+import com.hbm.api.fluidmk2.IFluidConnectorBlockMK2;
+import com.hbm.api.fluidmk2.IFluidConnectorMK2;
+import com.hbm.inventory.fluid.FluidType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -37,6 +47,30 @@ import java.util.TreeMap;
  * method (Neo Edition's confirmed-real {@code InfoScreen.drawElectricityInfo} calls the equivalent
  * {@code BobMathUtil.getShortNumber}), so it belongs on this shared class rather than duplicated per
  * machine once a second caller needs it.
+ * <p>
+ * Phase 2's fluid-duct package adds {@link #canConnectFluid}, ported from CE's {@code Library:973-997}
+ * (read in full) for {@code com.hbm.blockentity.network.PipeBaseBlockEntity}'s connection-mask cache
+ * and the {@code IBlockFluidDuct} type-propagation flood fill - the per-neighbor adjacency test both
+ * mechanisms share, translating {@code IBlockAccess}/{@code ForgeDirection} to {@code BlockGetter}/
+ * {@code Direction} the same way every other {@code lib}/{@code api} class in this port already does.
+ * <p>
+ * Phase 2's storage-machines package (mass crates/batteries/capacitors) adds the six
+ * battery/item-charging helpers CE's own {@code Library} carries at lines 282-387 (read in full):
+ * {@link #chargeTEFromItems}, {@link #chargeItemsFromTE}, {@link #chargeBatteryIfValid},
+ * {@link #dischargeBatteryIfValid}, {@link #isBattery}, {@link #isChargeableBattery},
+ * {@link #isDischargeableBattery}, {@link #isEmptyBattery}, {@link #isFullBattery} - the exact gap
+ * {@code docs/phase2/machines_storage.md}'s "Open questions / risks" section flagged as expected for
+ * this pass to close. <b>One deliberate scope narrowing</b>: CE's versions of these methods have a
+ * second branch reading a stack's Forge-Energy ({@code IEnergyStorage}) capability as a fallback when
+ * the stack isn't an {@link IBatteryItem} (a same-item HE&lt;-&gt;FE bridge, gated behind
+ * {@code GeneralConfig.conversionRateHeToRF}). That branch is dropped here, matching the precedent
+ * already set by this port's {@link com.hbm.api.energymk2.IEnergyProviderMK2} javadoc (its own
+ * neighbour-FE-bridge is "intentionally deferred to a later phase behind a config flag") - every
+ * battery item this port has (Phase 1's {@code ItemBattery}/{@code ItemBatteryPack}/
+ * {@code ItemBatterySC}/{@code ItemBatteryCreative}) is an {@link IBatteryItem}, so the FE branch has
+ * no in-repo caller yet and would be dead, unverifiable code (no FE-capability item exists in this
+ * port to test it against). Re-add it alongside that same deferred FE-bridge work, not independently
+ * here.
  * <p>
  * The remaining ~2500 lines of {@code Library} must be triaged method-by-method against the areas
  * that call them (energy/fluid, capability, blocks/items, entity, tileentity) once those areas exist,
@@ -142,5 +176,134 @@ public final class Library {
         }
 
         return negative ? "-" + result : result;
+    }
+
+    /**
+     * Charges a machine's HE pool from a battery item sitting in one of its inventory slots (the
+     * TE-side half of a charge/discharge slot pair - e.g. {@code MachineBaseBlockEntity} subclasses'
+     * "insert a battery to top yourself up" slot). Ported from CE's {@code Library.chargeTEFromItems}
+     * (see this class's javadoc for the one dropped branch: no Forge-Energy fallback).
+     */
+    public static long chargeTEFromItems(IItemHandlerModifiable inventory, int index, long power, long maxPower) {
+        ItemStack stack = inventory.getStackInSlot(index);
+        long powerNeeded = maxPower - power;
+        if (powerNeeded <= 0) return power;
+        long heExtracted = dischargeBatteryIfValid(stack, powerNeeded, false);
+        return power + heExtracted;
+    }
+
+    /**
+     * Charges a battery item sitting in a machine's inventory slot from the machine's own HE pool -
+     * the mirror image of {@link #chargeTEFromItems}. Ported from CE's {@code Library.chargeItemsFromTE}.
+     */
+    public static long chargeItemsFromTE(IItemHandlerModifiable inventory, int index, long power, long maxPower) {
+        ItemStack stackToCharge = inventory.getStackInSlot(index);
+        if (stackToCharge.isEmpty() || power <= 0) {
+            return power;
+        }
+        long heCharged = chargeBatteryIfValid(stackToCharge, power, false);
+        return power - heCharged;
+    }
+
+    /**
+     * Charges {@code stack} (an {@link IBatteryItem}) by up to {@code chargeAmountHE}, respecting
+     * both the item's remaining headroom and its own {@link IBatteryItem#getChargeRate} unless
+     * {@code instant} is set. Ported from CE's {@code Library.chargeBatteryIfValid} (Forge-Energy
+     * branch dropped - see this class's javadoc).
+     *
+     * @return the actual amount charged, in HE.
+     * @throws IllegalArgumentException if {@code chargeAmountHE <= 0}.
+     */
+    public static long chargeBatteryIfValid(@NotNull ItemStack stack, long chargeAmountHE, boolean instant) {
+        if (stack.isEmpty()) return 0;
+        if (chargeAmountHE <= 0) throw new IllegalArgumentException("chargeAmountHE must be > 0");
+        if (!(stack.getItem() instanceof IBatteryItem battery)) return 0;
+        long max = Math.max(0L, battery.getMaxCharge(stack));
+        long cur = Math.max(0L, Math.min(max, battery.getCharge(stack)));
+        long room = Math.max(0L, max - cur);
+        long rate = Math.max(0L, battery.getChargeRate(stack));
+        long req = instant ? chargeAmountHE : Math.min(chargeAmountHE, rate);
+        long added = Math.min(req, room);
+        if (added > 0) battery.chargeBattery(stack, added);
+        return added;
+    }
+
+    /**
+     * Discharges {@code stack} (an {@link IBatteryItem}) by up to {@code dischargeAmountHE},
+     * respecting both its current charge and its own {@link IBatteryItem#getDischargeRate} unless
+     * {@code instant} is set. Ported from CE's {@code Library.dischargeBatteryIfValid} (Forge-Energy
+     * branch dropped - see this class's javadoc).
+     *
+     * @return the actual amount discharged, in HE.
+     * @throws IllegalArgumentException if {@code dischargeAmountHE <= 0}.
+     */
+    public static long dischargeBatteryIfValid(@NotNull ItemStack stack, long dischargeAmountHE, boolean instant) {
+        if (stack.isEmpty()) return 0;
+        if (dischargeAmountHE <= 0) throw new IllegalArgumentException("dischargeAmountHE must be > 0");
+        if (!(stack.getItem() instanceof IBatteryItem battery)) return 0;
+        long cur = Math.max(0L, battery.getCharge(stack));
+        long rate = Math.max(0L, battery.getDischargeRate(stack));
+        long req = instant ? dischargeAmountHE : Math.min(dischargeAmountHE, rate);
+        long take = Math.min(req, cur);
+        if (take > 0) battery.dischargeBattery(stack, take);
+        return take;
+    }
+
+    /** @return true if {@code stack} is an {@link IBatteryItem}. Ported from CE's {@code Library.isBattery}. */
+    public static boolean isBattery(@NotNull ItemStack stack) {
+        return !stack.isEmpty() && stack.getItem() instanceof IBatteryItem;
+    }
+
+    /** Ported from CE's {@code Library.isDischargeableBattery}. */
+    public static boolean isDischargeableBattery(@NotNull ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (!(stack.getItem() instanceof IBatteryItem battery)) return false;
+        return battery.getCharge(stack) > 0 && battery.getDischargeRate(stack) > 0;
+    }
+
+    /** Ported from CE's {@code Library.isChargeableBattery}. */
+    public static boolean isChargeableBattery(@NotNull ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (!(stack.getItem() instanceof IBatteryItem battery)) return false;
+        return battery.getMaxCharge(stack) > battery.getCharge(stack) && battery.getChargeRate(stack) > 0;
+    }
+
+    /** Ported from CE's {@code Library.isEmptyBattery}. */
+    public static boolean isEmptyBattery(@NotNull ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (!(stack.getItem() instanceof IBatteryItem battery)) return false;
+        return battery.getCharge(stack) <= 0;
+    }
+
+    /** Ported from CE's {@code Library.isFullBattery}. */
+    public static boolean isFullBattery(@NotNull ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (!(stack.getItem() instanceof IBatteryItem battery)) return false;
+        return battery.getCharge(stack) >= battery.getMaxCharge(stack);
+    }
+
+    /**
+     * Whether the block/block-entity at {@code pos} accepts a fluid-duct connection of {@code type}
+     * from the given side. {@code dir} is the duct's own connecting side (the direction pointing
+     * <em>from</em> the duct <em>into</em> {@code pos}) - flipped to the neighbor's own incoming side
+     * ({@code dir.getOpposite()}) before either check runs, exactly like CE's own
+     * {@code Library.canConnectFluid}. Checks the block-level {@link IFluidConnectorBlockMK2} first
+     * (a fixed machine port with no per-side block-entity state), then the block-entity-level
+     * {@link IFluidConnectorMK2} (every duct/pipe and every {@code IFluidStandardReceiverMK2}/
+     * {@code IFluidStandardSenderMK2} machine) - CE checks both because a block can implement one, the
+     * other, or (rarely) neither.
+     */
+    public static boolean canConnectFluid(BlockGetter level, BlockPos pos, Direction dir, FluidType type) {
+        if (pos.getY() < level.getMinBuildHeight() || pos.getY() >= level.getMaxBuildHeight()) return false;
+
+        Direction incoming = dir.getOpposite();
+
+        if (level.getBlockState(pos).getBlock() instanceof IFluidConnectorBlockMK2 blockCon
+                && blockCon.canConnect(type, level, pos, incoming)) {
+            return true;
+        }
+
+        BlockEntity be = level.getBlockEntity(pos);
+        return be instanceof IFluidConnectorMK2 tileCon && tileCon.canConnect(type, incoming);
     }
 }

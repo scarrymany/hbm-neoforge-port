@@ -16,17 +16,16 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * per concrete piece of content as later work adds it" convention (see {@code ModBlocks}'s own
  * javadoc for the precedent this follows).
  *
- * <p>Deliberately empty of actual {@link DeferredHolder} fields for now, same as {@code ModBlocks}
- * was in Phase 0: no concrete Phase 2 machine {@link MenuBase}/{@code Screen} pair exists yet (this
- * package is the shared-base prerequisite those pairs will build on, per
- * {@code docs/phase2/gui_framework.md}'s Deferred scope). Once a machine's {@link MenuBase} subclass
- * exists, register it here through {@link #reg(String, IContainerFactory)}, e.g.:
+ * <p>{@link #CRATE}/{@link #BATTERY}/{@link #FLUID_TANK} are this registry's first concrete entries
+ * (Phase 2's storage-machines package - see {@code docs/phase2/machines_storage.md}), added following
+ * exactly the pattern this class's own javadoc originally sketched. Once a machine's {@link MenuBase}
+ * subclass exists, register it here through {@link #reg(String, IContainerFactory)}, e.g.:
  * <pre>{@code
  * public static final DeferredHolder<MenuType<?>, MenuType<MachineFooMenu>> MACHINE_FOO =
  *         reg("machine_foo", MachineFooMenu::new);
  * }</pre>
  * then add the matching {@code event.register(ModMenuTypes.MACHINE_FOO.get(), MachineFooScreen::new)}
- * line to {@link com.hbm.main.ClientModRegistry#registerScreens}.
+ * line to {@link com.hbm.main.ClientModRegistry#registerScreens} (already done below for these three).
  *
  * <h2>Confirmed real NeoForge 1.21.1 API - not invented</h2>
  * Both the {@link DeferredRegister}/{@link #reg} shape and the
@@ -44,6 +43,13 @@ public final class ModMenuTypes {
 
     public static final DeferredRegister<MenuType<?>> MENU_TYPES =
             DeferredRegister.create(Registries.MENU, MainRegistry.MODID);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<CrateMenu>> CRATE =
+            reg("crate", CrateMenu::fromNetwork);
+    public static final DeferredHolder<MenuType<?>, MenuType<BatteryMenu>> BATTERY =
+            reg("machine_battery", BatteryMenu::fromNetwork);
+    public static final DeferredHolder<MenuType<?>, MenuType<FluidTankMenu>> FLUID_TANK =
+            reg("machine_fluidtank_basic", FluidTankMenu::fromNetwork);
 
     private ModMenuTypes() {
     }
