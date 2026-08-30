@@ -60,6 +60,19 @@ public final class ModBlocks {
         com.hbm.blocks.generic.GenericBlocks.registerAll();
         MaterialBlockGenerator.registerAll();
         com.hbm.blocks.gas.GasBlocks.registerAll();
+        com.hbm.blocks.machine.PowerGenBlocks.registerAll();
+        com.hbm.blocks.machine.StorageMachineBlocks.registerAll();
+        com.hbm.blockentity.machine.StorageBlockEntities.registerAll();
+        com.hbm.blocks.network.energy.EnergyNetworkBlocks.registerAll();
+        com.hbm.blocks.network.FluidDuctBlocks.registerAll();
+        com.hbm.blockentity.network.FluidDuctBlockEntities.registerAll();
+        com.hbm.blocks.network.ConveyorBlocks.registerAll();
+        com.hbm.blocks.machine.OilChainBlocks.registerAll();
+        com.hbm.blocks.machine.ProcessingBlocks.registerAll();
+        com.hbm.blocks.machine.chem.ChemIsotopeBlocks.registerAll();
+        com.hbm.blocks.machine.PWRBlocks.registerAll();
+        com.hbm.blocks.machine.fusion.FusionBlocks.registerAll();
+        com.hbm.blocks.machine.rbmk.RBMKBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }

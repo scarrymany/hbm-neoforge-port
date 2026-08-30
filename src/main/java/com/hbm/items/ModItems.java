@@ -54,6 +54,12 @@ public class ModItems {
         FoodDataComponents.register(modEventBus);
         SpecialItems.registerAll();
         SpecialItemComponents.register(modEventBus);
+        com.hbm.items.tool.NetworkToolItems.registerAll();
+        com.hbm.items.machine.IcfPressItems.registerAll();
+        com.hbm.items.machine.rbmk.RBMKItems.registerAll();
+        com.hbm.items.machine.rbmk.RBMKRods.registerAll();
+        com.hbm.items.tool.CouplingToolItems.registerAll();
+        com.hbm.items.machine.CouplingMachineItems.registerAll();
         ITEMS.register(modEventBus);
     }
 }

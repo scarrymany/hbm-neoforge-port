@@ -43,6 +43,7 @@ public final class HbmConfig {
 
         ModConfigSpec.Builder serverBuilder = new ModConfigSpec.Builder();
         ServerConfig.init(serverBuilder);
+        RBMKConfig.init(serverBuilder);
         SERVER_SPEC = serverBuilder.build();
 
         ModConfigSpec.Builder clientBuilder = new ModConfigSpec.Builder();

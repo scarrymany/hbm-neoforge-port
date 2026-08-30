@@ -1,10 +1,12 @@
 package com.hbm.main;
 
+import com.hbm.blockentity.machine.StorageBlockEntities;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.capability.ModAttachments;
 import com.hbm.capability.ModCapabilities;
 import com.hbm.config.HbmConfig;
 import com.hbm.creativetabs.ModCreativeTabs;
+import com.hbm.entity.ConveyorEntityTypes;
 import com.hbm.hazard.HazardComponents;
 import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.fluid.Fluids;
@@ -50,13 +52,18 @@ public class MainRegistry {
         HazardComponents.register(modEventBus);
         ModAttachments.register(modEventBus);
         modEventBus.addListener(ModCapabilities::register);
+        // Block-entity capability counterpart to the item-capability listener above - see
+        // StorageBlockEntities' own javadoc (Phase 2 storage-machines package).
+        modEventBus.addListener(StorageBlockEntities::registerCapabilities);
         ModItems.register(modEventBus);
         HbmDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);
+        ConveyorEntityTypes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         MaterialRegistry.register(modEventBus);
         HbmRecipes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.register(modEventBus);
 
         Fluids.init();
     }
