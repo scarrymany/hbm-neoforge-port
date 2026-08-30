@@ -30,6 +30,11 @@ public class ItemWatzPellet extends ItemBase {
         return this.type;
     }
 
+    /** Whether this is the depleted (spent, inert) registered variant rather than the fresh one - see class javadoc. */
+    public boolean isDepleted() {
+        return this.depleted;
+    }
+
     public static double getYield(ItemStack stack) {
         if (!(stack.getItem() instanceof ItemWatzPellet pellet)) return 0D;
         return stack.getOrDefault(MachineDataComponents.WATZ_YIELD.get(), pellet.type.yield);
@@ -42,6 +47,27 @@ public class ItemWatzPellet extends ItemBase {
     public static double getEnrichment(ItemStack stack) {
         if (!(stack.getItem() instanceof ItemWatzPellet pellet)) return 0D;
         return getYield(stack) / pellet.type.yield;
+    }
+
+    /**
+     * Narrow Phase 2 addition (fusion/Watz reactor package - {@code docs/phase2/machine_fusion_watz.md}):
+     * {@link FuelReactivityFunction} and its {@code effonix} method are package-private on purpose
+     * (see that class's own javadoc), so the Watz reactor block entity - living in
+     * {@code com.hbm.blockentity.machine.fusion}, outside this package - cannot call
+     * {@code type.burnFunc.effonix(...)} directly. These two static helpers are the accessor CE's
+     * {@code TileEntityWatz.updateReaction} inlined itself (same package there); they expose only the
+     * resulting {@code double}, never the {@link FuelReactivityFunction} type itself, keeping that
+     * class's outside-this-package-scope contract intact.
+     */
+    public static double computeBurn(ItemStack stack, double heat, double inputFlux) {
+        if (!(stack.getItem() instanceof ItemWatzPellet pellet) || pellet.type.burnFunc == null) return 0D;
+        double div = pellet.type.heatDiv != null ? pellet.type.heatDiv.effonix(heat) : 1D;
+        return pellet.type.burnFunc.effonix(inputFlux) / div;
+    }
+
+    public static double computeAbsorb(ItemStack stack, double baseFluxPlusLast) {
+        if (!(stack.getItem() instanceof ItemWatzPellet pellet) || pellet.type.absorbFunc == null) return 0D;
+        return pellet.type.absorbFunc.effonix(baseFluxPlusLast);
     }
 
     @Override
@@ -86,31 +112,40 @@ public class ItemWatzPellet extends ItemBase {
     }
 
     public enum EnumWatzType {
-        SCHRABIDIUM(2_000, 20D, new FuelReactivityFunction.Linear(1.5D), new FuelReactivityFunction.SqrtFalling(10D), null),
-        HES(1_750, 20D, new FuelReactivityFunction.Linear(1.25D), new FuelReactivityFunction.SqrtFalling(15D), null),
-        MES(1_500, 15D, new FuelReactivityFunction.Linear(1.15D), new FuelReactivityFunction.SqrtFalling(15D), null),
-        LES(1_250, 15D, new FuelReactivityFunction.Linear(1D), new FuelReactivityFunction.SqrtFalling(20D), null),
-        HEN(0, 10D, new FuelReactivityFunction.Sqrt(100), new FuelReactivityFunction.SqrtFalling(10D), null),
-        MEU(0, 10D, new FuelReactivityFunction.Sqrt(75), new FuelReactivityFunction.SqrtFalling(10D), null),
-        MEP(0, 15D, new FuelReactivityFunction.Sqrt(150), new FuelReactivityFunction.SqrtFalling(10D), null),
-        LEAD(0, 0, null, null, new FuelReactivityFunction.Sqrt(10)),
-        BORON(0, 0, null, null, new FuelReactivityFunction.Linear(10)),
-        DU(0, 0, null, null, new FuelReactivityFunction.Quadratic(1D, 1D).withDiv(100)),
-        NQD(2_000, 20, new FuelReactivityFunction.Linear(2D), new FuelReactivityFunction.Sqrt(1D / 25D).withOff(25D * 25D), null),
-        NQR(2_500, 30, new FuelReactivityFunction.Linear(1.5D), new FuelReactivityFunction.Sqrt(1D / 25D).withOff(25D * 25D), null);
+        SCHRABIDIUM(2_000, 20D, 0.01D, new FuelReactivityFunction.Linear(1.5D), new FuelReactivityFunction.SqrtFalling(10D), null),
+        HES(1_750, 20D, 0.005D, new FuelReactivityFunction.Linear(1.25D), new FuelReactivityFunction.SqrtFalling(15D), null),
+        MES(1_500, 15D, 0.0025D, new FuelReactivityFunction.Linear(1.15D), new FuelReactivityFunction.SqrtFalling(15D), null),
+        LES(1_250, 15D, 0.00125D, new FuelReactivityFunction.Linear(1D), new FuelReactivityFunction.SqrtFalling(20D), null),
+        HEN(0, 10D, 0.0005D, new FuelReactivityFunction.Sqrt(100), new FuelReactivityFunction.SqrtFalling(10D), null),
+        MEU(0, 10D, 0.0005D, new FuelReactivityFunction.Sqrt(75), new FuelReactivityFunction.SqrtFalling(10D), null),
+        MEP(0, 15D, 0.0005D, new FuelReactivityFunction.Sqrt(150), new FuelReactivityFunction.SqrtFalling(10D), null),
+        LEAD(0, 0, 0.0025D, null, null, new FuelReactivityFunction.Sqrt(10)),
+        BORON(0, 0, 0.0025D, null, null, new FuelReactivityFunction.Linear(10)),
+        DU(0, 0, 0.0025D, null, null, new FuelReactivityFunction.Quadratic(1D, 1D).withDiv(100)),
+        NQD(2_000, 20, 0.01D, new FuelReactivityFunction.Linear(2D), new FuelReactivityFunction.Sqrt(1D / 25D).withOff(25D * 25D), null),
+        NQR(2_500, 30, 0.01D, new FuelReactivityFunction.Linear(1.5D), new FuelReactivityFunction.Sqrt(1D / 25D).withOff(25D * 25D), null);
 
         public static final EnumWatzType[] VALUES = values();
 
         public final double passive;
         public final double heatEmission;
+        /**
+         * How much {@code WATZ} mud fluid is produced per reaction flux (CE's {@code mudContent},
+         * halved in CE's own constructor - kept here for the same reason: Phase 2 addition, see
+         * {@link #computeBurn}/{@link #computeAbsorb}'s javadoc for why this field was missing from
+         * the Phase 1 port (CE's math-only item state) and is added narrowly now that a real reactor
+         * block entity needs it).
+         */
+        public final double mudContent;
         public final FuelReactivityFunction burnFunc;
         public final FuelReactivityFunction heatDiv;
         public final FuelReactivityFunction absorbFunc;
         public final double yield = 500_000_000;
 
-        EnumWatzType(double passive, double heatEmission, FuelReactivityFunction burnFunc, FuelReactivityFunction heatDiv, FuelReactivityFunction absorbFunc) {
+        EnumWatzType(double passive, double heatEmission, double mudContent, FuelReactivityFunction burnFunc, FuelReactivityFunction heatDiv, FuelReactivityFunction absorbFunc) {
             this.passive = passive;
             this.heatEmission = heatEmission;
+            this.mudContent = mudContent / 2D;
             this.burnFunc = burnFunc;
             this.heatDiv = heatDiv;
             this.absorbFunc = absorbFunc;
