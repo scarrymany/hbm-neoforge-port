@@ -12,12 +12,20 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Standalone superheated-steam export pipe stub, not an RBMK grid column. Ported from CE's
  * {@code RBMKOutlet} block class.
  */
 public class RBMKOutletBlock extends BaseEntityBlock {
+
+    public static final MapCodec<RBMKOutletBlock> CODEC = simpleCodec(RBMKOutletBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public RBMKOutletBlock(Properties properties) {
         super(properties);

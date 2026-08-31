@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.CableDetector} - a redstone-driven twin of
@@ -24,6 +26,13 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
  * from {@link #neighborChanged} rather than a player right-click.
  */
 public class CableDetectorBlock extends BaseEntityBlock {
+
+    public static final MapCodec<CableDetectorBlock> CODEC = simpleCodec(CableDetectorBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final BooleanProperty STATE = CableSwitchBlock.STATE;
 

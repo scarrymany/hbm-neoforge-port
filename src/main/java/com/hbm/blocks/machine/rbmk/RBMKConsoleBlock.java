@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * RBMK reactor console - a plain single block (not {@link RBMKBaseBlock}/{@code BlockDummyable}, see
@@ -24,6 +25,13 @@ import org.jetbrains.annotations.Nullable;
  * another 1x1xN column). Ported from CE's {@code RBMKConsole} block class.
  */
 public class RBMKConsoleBlock extends BaseEntityBlock {
+
+    public static final MapCodec<RBMKConsoleBlock> CODEC = simpleCodec(RBMKConsoleBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public RBMKConsoleBlock(Properties properties) {
         super(properties);

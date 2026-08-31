@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code MachineICFController} (regname {@code icf_controller}): a single-block
@@ -25,6 +26,13 @@ import org.jetbrains.annotations.Nullable;
  * the capacitor/turbocharger sub-multiblock simplification this makes versus CE.
  */
 public class IcfControllerBlock extends BaseEntityBlock {
+
+    public static final MapCodec<IcfControllerBlock> CODEC = simpleCodec(IcfControllerBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     /** Reuses {@link HorizontalDirectionalBlock}'s own static property rather than declaring a duplicate. */
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;

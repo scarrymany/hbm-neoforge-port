@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Mechanical fuel-rod feeder, meant to be placed directly above a fuel rod channel - not an RBMK
@@ -24,6 +25,13 @@ import org.jetbrains.annotations.Nullable;
  * {@code rbmk_autoloader} matching the tile entity/research report naming, not CE's block-class name).
  */
 public class RBMKAutoloaderBlock extends BaseEntityBlock {
+
+    public static final MapCodec<RBMKAutoloaderBlock> CODEC = simpleCodec(RBMKAutoloaderBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public RBMKAutoloaderBlock(Properties properties) {
         super(properties);

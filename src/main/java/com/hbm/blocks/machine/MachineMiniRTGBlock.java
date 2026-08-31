@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code MachineMiniRTG} - one CE class backs two distinct registry blocks
@@ -24,6 +25,13 @@ import org.jetbrains.annotations.Nullable;
  * {@link com.hbm.blockentity.machine.PowerGenBlockEntities}'s factory lambda.
  */
 public class MachineMiniRTGBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachineMiniRTGBlock> CODEC = simpleCodec(p -> new MachineMiniRTGBlock(p, false));
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     private final boolean polonium;
 

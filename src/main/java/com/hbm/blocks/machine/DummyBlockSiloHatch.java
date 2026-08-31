@@ -32,6 +32,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.machine.DummyBlockSiloHatch} (209 lines, read in full) -
@@ -43,6 +44,13 @@ import org.jetbrains.annotations.Nullable;
  * identical javadoc note.
  */
 public class DummyBlockSiloHatch extends BaseEntityBlock implements IDummy, IBomb, IRadResistantBlock {
+
+    public static final MapCodec<DummyBlockSiloHatch> CODEC = simpleCodec(DummyBlockSiloHatch::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public DummyBlockSiloHatch(Properties properties) {
         super(properties);

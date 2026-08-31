@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Shared casing shell for the 9 concrete {@code Nuke*Block}s + {@code NukeCustomBlock}, ported from
@@ -49,6 +50,13 @@ import org.jetbrains.annotations.Nullable;
  * {@link NukeCasingBlockEntity}, so both shapes drop their inventory through this one override.
  */
 public abstract class NukeCasingBlockBase extends BaseEntityBlock implements IBomb {
+
+    public static final MapCodec<NukeCasingBlockBase> CODEC = simpleCodec(p -> { throw new UnsupportedOperationException("NukeCasingBlockBase is code-registered, not data-driven"); });
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 

@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code TurretSentry} - unlike every other concrete turret this one is a plain
@@ -28,6 +29,13 @@ import org.jetbrains.annotations.Nullable;
  * partial stacks; a cosmetic-only difference, not a functional one.
  */
 public class TurretSentryBlock extends BaseEntityBlock {
+
+    public static final MapCodec<TurretSentryBlock> CODEC = simpleCodec(TurretSentryBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public TurretSentryBlock(Properties properties) {
         super(properties);

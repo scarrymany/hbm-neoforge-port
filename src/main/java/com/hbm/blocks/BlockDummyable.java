@@ -46,6 +46,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code BlockDummyable}: the shared base for every multiblock's non-core "dummy"
@@ -71,6 +72,13 @@ import java.util.List;
  * rendering area needs to rebuild that preview on the modern pipeline.
  */
 public abstract class BlockDummyable extends BaseEntityBlock implements ICustomBlockHighlight, ICopiable, INBTBlockTransformable {
+
+    public static final MapCodec<BlockDummyable> CODEC = simpleCodec(p -> { throw new UnsupportedOperationException("BlockDummyable is code-registered, not data-driven"); });
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     /// BLOCK METADATA ///
     // 0-5   dummy rotation  (for dummy neighbor / core-search checks)

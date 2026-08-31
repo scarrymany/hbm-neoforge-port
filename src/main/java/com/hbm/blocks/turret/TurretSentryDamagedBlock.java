@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code TurretSentryDamaged} - a ruins/loot "damaged" variant, single block
@@ -23,6 +24,13 @@ import org.jetbrains.annotations.Nullable;
  * {@code BlockItem}, applied where this block is registered).
  */
 public class TurretSentryDamagedBlock extends BaseEntityBlock {
+
+    public static final MapCodec<TurretSentryDamagedBlock> CODEC = simpleCodec(TurretSentryDamagedBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public TurretSentryDamagedBlock(Properties properties) {
         super(properties);

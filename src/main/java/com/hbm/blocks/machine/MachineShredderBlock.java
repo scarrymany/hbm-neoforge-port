@@ -15,9 +15,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /** Ported from CE's {@code MachineShredder} (regname {@code machine_shredder}): single-block, not dummyable. */
 public class MachineShredderBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachineShredderBlock> CODEC = simpleCodec(MachineShredderBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public MachineShredderBlock(Properties properties) {
         super(properties);

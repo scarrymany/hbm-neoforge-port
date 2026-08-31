@@ -24,6 +24,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.PowerCableBox} (read in full): a boxier
@@ -43,6 +45,13 @@ import java.util.Map;
  * out of this network-graph pass's scope.
  */
 public class PowerCableBoxBlock extends BaseEntityBlock {
+
+    public static final MapCodec<PowerCableBoxBlock> CODEC = simpleCodec(PowerCableBoxBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final IntegerProperty THICKNESS = IntegerProperty.create("thickness", 0, 4);
 

@@ -141,7 +141,7 @@ public final class MachineItems {
                 () -> new ItemBattery(10000000, 0, 1000, Rarity.UNCOMMON, true, props())));
         registerPlainBattery("memory", Long.MAX_VALUE / 100L, 100000000000000L, 100000000000000L, null);
 
-        tab(ModCreativeTabs.CONTROL, reg("battery_creative", ItemBatteryCreative::new));
+        tab(ModCreativeTabs.CONTROL, reg("battery_creative", () -> new ItemBatteryCreative(props())));
 
         for (ItemBatteryPack.EnumBatteryPack type : ItemBatteryPack.EnumBatteryPack.VALUES) {
             tab(ModCreativeTabs.CONTROL, reg(lower(type.name()) + "_pack", () -> new ItemBatteryPack(type, props().stacksTo(1))));
@@ -271,7 +271,7 @@ public final class MachineItems {
         tab(ModCreativeTabs.CONTROL, reg("fluid_tank_lead_v2", () -> new ItemFluidTankV2(1000, props())));
         tab(ModCreativeTabs.CONTROL, reg("fluid_barrel_v2", () -> new ItemFluidTankV2(16000, props())));
 
-        reg("fluid_icon", ItemFluidIcon::new); // CE: setCreativeTab(null), pure GUI helper, never shown in creative
+        reg("fluid_icon", () -> new ItemFluidIcon(props())); // CE: setCreativeTab(null), pure GUI helper, never shown in creative
     }
 
     // ==================== ItemGear ====================
@@ -285,7 +285,7 @@ public final class MachineItems {
     // ==================== ItemICFPellet ====================
 
     private static void registerIcfPellet() {
-        tab(ModCreativeTabs.CONTROL, reg("icf_pellet", ItemICFPellet::new));
+        tab(ModCreativeTabs.CONTROL, reg("icf_pellet", () -> new ItemICFPellet(props())));
     }
 
     // ==================== ItemLens ====================
@@ -344,7 +344,7 @@ public final class MachineItems {
     // ==================== ItemMold ====================
 
     private static void registerMold() {
-        tab(ModCreativeTabs.TEMPLATE, reg("mold", ItemMold::new));
+        tab(ModCreativeTabs.TEMPLATE, reg("mold", () -> new ItemMold(props())));
     }
 
     // ==================== ItemPACoil ====================

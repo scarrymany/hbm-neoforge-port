@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.hbm.blockentity.bomb.BombBlockEntities;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.bomb.LaunchPad} (98 lines, read in full) - the small,

@@ -39,6 +39,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code BlockCrashedBomb} (174 lines, read in full) - dud/salvage nuke wreckage.
@@ -64,6 +65,13 @@ import org.jetbrains.annotations.Nullable;
  * {@code ball_tnt} stack.
  */
 public class CrashedBombBlock extends BaseEntityBlock implements IBomb {
+
+    public static final MapCodec<CrashedBombBlock> CODEC = simpleCodec(p -> new CrashedBombBlock(p, EnumDudType.BALEFIRE));
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     private final EnumDudType dudType;
 

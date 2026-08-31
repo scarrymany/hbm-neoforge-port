@@ -15,9 +15,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /** Ported from CE's {@code MachineICFPress} (regname {@code machine_icf_press}): single-block, not dummyable. */
 public class IcfPressBlock extends BaseEntityBlock {
+
+    public static final MapCodec<IcfPressBlock> CODEC = simpleCodec(IcfPressBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public IcfPressBlock(Properties properties) {
         super(properties);

@@ -15,12 +15,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code MachineRTG} (regname {@code machine_rtg_grey}): a single-block
  * {@code BlockContainer} in CE, kept single-block here too (not dummyable).
  */
 public class MachineRTGBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachineRTGBlock> CODEC = simpleCodec(MachineRTGBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public MachineRTGBlock(Properties properties) {
         super(properties);
