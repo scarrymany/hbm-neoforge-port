@@ -25,6 +25,11 @@ This slice landed code, not another research dump. Gaps below are still open.
   1-in-3 replace still missing (`ExplosionThermo` / `BlockTaint` / toxic fluid not ported).
 - `red_wire_coated` — CE `WireCoated` (full-cube `TileEntityCableBaseNT`).
 - `ItemPoolsLegacy` remaps CE `block_*` → port autogen `*_block` (`block_tungsten` → `tungsten_block`).
+- `ItemPoolsComponent` / `ItemPoolsSingle` / `ItemPoolsRedRoom` / `ItemPoolsPile` /
+  `ItemPoolsVendingMachine` — CE pool-name strings verbatim (SHA `e5ed5ec` / `a23316ca` /
+  `293649fc` / `4c61be97` / `565968ad`). Wired from `CommonEvents` FMLCommonSetup.
+  Meta remaps: circuits, stamp_book PRINTING1–8, deco_computer IBM_300PL, blueprint_folder
+  base/discover/secret. Grenade-shell / `item_secret` / material-meta bolt-shell skipped.
 
 ## Not this slice (still Phase 8)
 
@@ -32,8 +37,6 @@ This slice landed code, not another research dump. Gaps below are still open.
   transliterate `setBlockState` walls. See `docs/phase4/worldgen_structures_bunkers_stations.md`.
 - Modern `.nbt` structures: vertibird / crashed_vertibird / radio_house / meteor_dungeon jigsaw.
   Assets live under CE `assets/hbm/structures/`; need `StructureType` + `structure_set` + block-id remap.
-- `ItemPoolsComponent` / `ItemPoolsSingle` / `ItemPoolsRedRoom` / `ItemPoolsPile` /
-  `ItemPoolsVendingMachine` — modern `.nbt` wand-loot strings.
 - `EntityLootSubProvider` — still absent. Existing mobs already drop via `dropCustomDeathLoot`
   (creeper variants, Mask Man, crabs, RAD Beast). Adding datapack tables on top would double drops.
   Convert Java drops → loot tables when Phase 9 lands more entities.
@@ -44,9 +47,12 @@ This slice landed code, not another research dump. Gaps below are still open.
 
 ## Verification (this follow-up)
 
-- `./gradlew compileJava` / `./gradlew build` — green. Jar `build/libs/hbm-0.0.1.jar` **5,979,328** bytes (after runData resources).
-- `./gradlew runData` — **SUCCESS** (2984 files written). Generated tree committed under `src/generated/resources/`.
-- `./gradlew runServer` — **FAIL after RegisterEvent**. Dist `Screen`/`Model` classrefs in common items were moved behind `ClientScreens` / `ArmorHatClient`. Next brick: `ModConfigSpec$ValueSpec.test` NPE (`ImmutableList.contains(null)`) while writing default configs. `runClient` skipped (no display).
+- `./gradlew compileJava` — green after config + Dist packet fixes.
+- `./gradlew runData` — **SUCCESS** (previous slice; 2984 files). Generated tree committed.
+- `./gradlew runServer` — **SUCCESS.** Dedicated-server `"Done (0.592s)!"` on `d7418d2`.
+  Fixed this turn: `defineInList` `List.of().contains(null)` NPE (`f387aee`); `@OnlyIn`
+  `handleClient` DistCleaner NSME (`d7418d2` → `ClientPackets`). Non-fatal: 3 creeper variants
+  missing `RegisterSpawnPlacementsEvent` (gold/phosgene/volatile). `runClient` skipped (no display).
 
 ## Explicitly not Phase 8
 
