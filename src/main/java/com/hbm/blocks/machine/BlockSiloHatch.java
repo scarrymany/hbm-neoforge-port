@@ -3,6 +3,7 @@ package com.hbm.blocks.machine;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.LaunchInfraBlockEntities;
 import com.hbm.blockentity.machine.SiloHatchBlockEntity;
+import com.hbm.handler.radiation.RadiationSystemNT;
 import com.hbm.interfaces.IBomb;
 import com.hbm.interfaces.IDoor;
 import com.hbm.interfaces.IMultiBlock;
@@ -156,5 +157,21 @@ public class BlockSiloHatch extends BaseEntityBlock implements IBomb, IMultiBloc
             return door.getState() == IDoor.DoorState.CLOSED;
         }
         return true;
+    }
+
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        if (!level.isClientSide() && !state.is(oldState.getBlock())) {
+            RadiationSystemNT.markSectionForRebuild(level, pos);
+        }
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!level.isClientSide() && !state.is(newState.getBlock())) {
+            RadiationSystemNT.markSectionForRebuild(level, pos);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 }

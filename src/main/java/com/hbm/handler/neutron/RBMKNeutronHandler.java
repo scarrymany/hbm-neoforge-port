@@ -5,6 +5,7 @@ import com.hbm.api.rbmk.IRBMKControlColumn;
 import com.hbm.api.rbmk.IRBMKFluxReceiver;
 import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.handler.neutron.NeutronNodeWorld.StreamWorld;
+import com.hbm.handler.radiation.ChunkRadiationManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -452,10 +453,11 @@ public final class RBMKNeutronHandler {
 
                 IRBMKColumn columnEntry = targetNode.getColumn();
 
-                // Phase 4 forward reference, not callable from this wave (com.hbm.handler.radiation
-                // does not exist in this port): CE's RBMKNeutronStream#runStreamInteraction calls
-                // ChunkRadiationManager.proxy.incrementRad(level, targetPos, this.fluxQuantity * 0.05D)
-                // here when !rbmkTarget.hasLid() - see RBMKRodBlockEntity's matching forward reference.
+                // CE: RBMKNeutronStream#runStreamInteraction irradiates the surrounding chunk when
+                // the target column's lid is off.
+                if (!rbmkTarget.hasLid()) {
+                    ChunkRadiationManager.proxy.incrementRad(level, targetPos, this.fluxQuantity * 0.05D);
+                }
 
                 if (type == RBMKType.MODERATOR || columnEntry.isModerated()) {
                     moderatedCount++;
@@ -550,19 +552,13 @@ public final class RBMKNeutronHandler {
         }
 
         public void irradiateFromFlux(ServerLevel level, TickContext ctx, BlockPos pos) {
-            // Phase 4 forward reference, not callable from this wave (com.hbm.handler.radiation
-            // does not exist in this port): CE's RBMKNeutronStream#irradiateFromFlux(BlockPos) calls
-            // ChunkRadiationManager.proxy.incrementRad(level, pos, fluxQuantity * 0.05D *
-            // (1 - (double) getHits(level, ctx, pos) / ctx.columnHeight())) here - see
-            // RBMKRodBlockEntity's matching forward reference.
+            ChunkRadiationManager.proxy.incrementRad(level, pos,
+                    fluxQuantity * 0.05D * (1 - (double) getHits(level, ctx, pos) / ctx.columnHeight()));
         }
 
         public void irradiateFromFlux(ServerLevel level, TickContext ctx, BlockPos pos, int hits) {
-            // Phase 4 forward reference, not callable from this wave (com.hbm.handler.radiation
-            // does not exist in this port): CE's RBMKNeutronStream#irradiateFromFlux(BlockPos, int)
-            // calls ChunkRadiationManager.proxy.incrementRad(level, pos, fluxQuantity * 0.05D *
-            // (1 - (double) hits / ctx.columnHeight())) here - see RBMKRodBlockEntity's matching
-            // forward reference.
+            ChunkRadiationManager.proxy.incrementRad(level, pos,
+                    fluxQuantity * 0.05D * (1 - (double) hits / ctx.columnHeight()));
         }
 
         public void moderateStream(TickContext ctx) {

@@ -3,14 +3,18 @@ package com.hbm.items.gear;
 import com.hbm.config.PotionConfig;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.items.armor.IArmorDisableModel;
+import com.hbm.items.tool.ToolItems;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.util.ArmorRegistry;
 import com.hbm.util.ArmorRegistry.HazardClass;
+import com.hbm.util.ContaminationUtil;
 import com.hbm.util.Tuple;
 import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -74,11 +78,11 @@ import java.util.Set;
  *     the value to register.</li>
  * </ul>
  *
- * <p><b>Deferred to Phase 4</b> (documented TODO, not silently dropped): {@link #onArmorTick}'s
- * geiger-tick sound cue needs {@code ContaminationUtil.getActualPlayerRads} and
- * {@code ChunkRadiationManager.proxy.getRadiation} (world/radiation simulation, not yet ported -
- * see {@code docs/phase3/fsb_armor_and_jetpacks.md} Deferred scope). Nothing else in this class
- * depends on Phase 4.
+ * <p>{@link #onArmorTick}'s geiger-tick sound cue (Phase 4) is now wired against
+ * {@link ContaminationUtil#getActualPlayerRads} - it only ever needed Phase 3's own
+ * {@code HbmLivingProps}-tracked accumulated-dose value, not the chunk-radiation simulation itself
+ * (unlike {@code ItemGeigerCounter}'s ambient click, this cue was never blocked on
+ * {@code ChunkRadiationManager}).
  *
  * <p><b>Simplified relative to CE</b> (documented, not silently dropped): {@code handleTick}'s
  * footstep-sound cadence (CE's {@code steppy} helper, keyed off 1.12-only
@@ -304,12 +308,50 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
     protected void onArmorTick(Level level, Player player, ItemStack stack) {
         if (this.getType() != Type.CHESTPLATE) return;
         if (!hasFSBArmor(player) || !this.geigerSound) return;
+        if (carriesGeigerOrDosimeter(player)) return;
+        if (level.getGameTime() % 5 != 0) return;
 
-        // TODO(Phase 4 - ChunkRadiationManager/ContaminationUtil): CE's geiger-tick sound cue
-        // (ContaminationUtil.getActualPlayerRads(entity) feeding a HBMSoundHandler.geigerSounds[]
-        // pick, gated on the player not already carrying a geiger counter/dosimeter) needs the
-        // not-yet-ported radiation simulation. See docs/phase3/armor_equippable_framework.md
-        // Deferred scope #3 / docs/phase3/fsb_armor_and_jetpacks.md Deferred scope.
+        double rads = ContaminationUtil.getActualPlayerRads(player);
+        if (rads <= 1e-5) return;
+
+        List<Integer> tiers = new ArrayList<>();
+        if (rads < 1) tiers.add(0);
+        if (rads < 5) tiers.add(0);
+        if (rads < 10) tiers.add(1);
+        if (rads > 5 && rads < 15) tiers.add(2);
+        if (rads > 10 && rads < 20) tiers.add(3);
+        if (rads > 15 && rads < 25) tiers.add(4);
+        if (rads > 20 && rads < 30) tiers.add(5);
+        if (rads > 25) tiers.add(6);
+
+        int tier = tiers.get(level.getRandom().nextInt(tiers.size()));
+        if (tier > 0) {
+            SoundEvent[] geigerSounds = HBMSoundHandler.geigerSounds();
+            level.playSound(null, player.getX(), player.getY(), player.getZ(), geigerSounds[tier - 1], SoundSource.PLAYERS, 1.0F, 1.0F);
+        }
+    }
+
+    /**
+     * CE: {@code InventoryUtil.hasItem(entity, ModItems.geiger_counter) ||
+     * InventoryUtil.hasItem(entity, ModItems.dosimeter)} - skip the armor's own geiger cue while the
+     * player is already carrying either detector item (which plays its own ambient click), checking
+     * main inventory, armor, and offhand exactly as CE's {@code InventoryUtil.hasItem} does. No
+     * standalone {@code InventoryUtil} class exists in this port (a separate, much larger CE utility
+     * class not carried over wholesale) - reimplemented locally as the one method this call site needs.
+     */
+    private static boolean carriesGeigerOrDosimeter(Player player) {
+        Item geiger = ToolItems.GEIGER_COUNTER.get();
+        Item dosimeter = ToolItems.DOSIMETER.get();
+        for (ItemStack stack : player.getInventory().items) {
+            if (stack.getItem() == geiger || stack.getItem() == dosimeter) return true;
+        }
+        for (ItemStack stack : player.getInventory().armor) {
+            if (stack.getItem() == geiger || stack.getItem() == dosimeter) return true;
+        }
+        for (ItemStack stack : player.getInventory().offhand) {
+            if (stack.getItem() == geiger || stack.getItem() == dosimeter) return true;
+        }
+        return false;
     }
 
     public boolean isArmorEnabled(ItemStack stack) {

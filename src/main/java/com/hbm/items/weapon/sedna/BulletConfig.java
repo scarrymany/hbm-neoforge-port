@@ -102,6 +102,14 @@ public class BulletConfig implements Cloneable {
             case MICROWAVE -> ModDamageTypes.SEDNA_MICROWAVE;
             case SUBATOMIC -> ModDamageTypes.SEDNA_SUBATOMIC;
             case OTHER -> ModDamageTypes.SEDNA_OTHER;
+            // Legacy pre-Sedna mob ballistics retarget (docs/phase4/entities_legacy_bullet_system.md):
+            // these 3 map directly onto already-registered ModDamageTypes keys matching CE's own
+            // ModDamageSource.causeBulletDamage/causeTauDamage/causeDisplacementDamage singletons, not
+            // the generic SEDNA_* categories above - the legacy system's damage-type selection was never
+            // generic to begin with. Used by LegacyMobBulletConfigs (GunNPCFactory retarget, chopper/tau).
+            case REVOLVER_BULLET -> ModDamageTypes.REVOLVER_BULLET;
+            case TAU -> ModDamageTypes.TAU;
+            case CHOPPER_BULLET -> ModDamageTypes.CHOPPER_BULLET;
         };
     }
 
@@ -275,6 +283,18 @@ public class BulletConfig implements Cloneable {
 
     public DamageClass dmgClass = DamageClass.PHYSICAL;
 
+    // ============================================================================================
+    // Flat damage-range roll - additive support for docs/phase4/entities_legacy_bullet_system.md's
+    // GunNPCFactory retarget. CE's legacy BulletConfiguration always rolled its own dmgMin/dmgMax at
+    // hit time (`rand.nextFloat()*(dmgMax-dmgMin)+dmgMin`) rather than taking an externally-supplied
+    // `baseDamage` the way every other Sedna-native constructor here does (gun/turret configs have no
+    // dmgMin/dmgMax at all - see `damageMult` above). Unused (both stay 0) by any config that only ever
+    // spawns via the existing baseDamage-taking constructors; only
+    // EntityBulletBaseMK4's mob/boss "aim at a target" constructor reads these, via #rollDamage.
+    // ============================================================================================
+    public float dmgMin = 0F;
+    public float dmgMax = 0F;
+
     public float ricochetAngle = 5F;
     public int maxRicochetCount = 2;
     /** Whether damage dealt to an entity is subtracted from the projectile's remaining damage on penetration. */
@@ -353,6 +373,17 @@ public class BulletConfig implements Cloneable {
         return this.casingItem;
     }
 
+    /**
+     * Rolls a flat damage value from {@link #dmgMin}/{@link #dmgMax}, matching CE legacy
+     * {@code BulletConfiguration}'s own hit-time roll formula
+     * ({@code rand.nextFloat()*(dmgMax-dmgMin)+dmgMin}) exactly. Returns {@link #dmgMin} unrolled
+     * (no randomness) when {@code dmgMax <= dmgMin}, which covers both misconfiguration and the
+     * common flat-damage case (e.g. a config with {@code dmgMin == dmgMax}).
+     */
+    public float rollDamage(net.minecraft.util.RandomSource random) {
+        return dmgMax > dmgMin ? dmgMin + random.nextFloat() * (dmgMax - dmgMin) : dmgMin;
+    }
+
     // ============================================================================================
     // Fluent builder setters - all pure, all return `this`. Field-for-field port of CE's own builder.
     // ============================================================================================
@@ -378,6 +409,7 @@ public class BulletConfig implements Cloneable {
     public BulletConfig setKnockback(float knockbackMult) { this.knockbackMult = knockbackMult; return this; }
     public BulletConfig setHeadshot(float headshotMult) { this.headshotMult = headshotMult; return this; }
     public BulletConfig setupDamageClass(DamageClass clazz) { this.dmgClass = clazz; return this; }
+    public BulletConfig setDamageRange(float dmgMin, float dmgMax) { this.dmgMin = dmgMin; this.dmgMax = dmgMax; return this; }
     public BulletConfig setRicochetAngle(float angle) { this.ricochetAngle = angle; return this; }
     public BulletConfig setRicochetCount(int count) { this.maxRicochetCount = count; return this; }
     public BulletConfig setDamageFalloffByPen(boolean falloff) { this.damageFalloffByPen = falloff; return this; }

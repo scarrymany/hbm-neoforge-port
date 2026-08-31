@@ -13,6 +13,7 @@ import com.hbm.explosion.vanillant.standard.BlockProcessorStandard;
 import com.hbm.explosion.vanillant.standard.EntityProcessorCrossSmooth;
 import com.hbm.explosion.vanillant.standard.ExplosionEffectWeapon;
 import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
+import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.items.weapon.sedna.GunConfig;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
@@ -57,10 +58,11 @@ import java.util.function.BiConsumer;
  *     "set the entity on fire" half of the same lambda <b>is</b> ported (via
  *     {@link HbmLivingAttachment}, which is real and already carries CE's exact {@code fire}/
  *     {@code getFire}/{@code setFire} field).</li>
- *     <li>{@code com.hbm.handler.radiation.ChunkRadiationManager}/{@code com.hbm.saveddata.satellites
- *     .SatelliteDetector} (the nuke rounds' {@code incrementRad}/satellite-ping calls) - confirmed not
- *     ported anywhere in this tree, matching {@code GrenadeFillingActions}'s identical documented gap
- *     for the same two classes.</li>
+ *     <li>{@code com.hbm.saveddata.satellites.SatelliteDetector} (the nuke rounds' satellite-ping
+ *     calls) - confirmed not ported anywhere in this tree, matching {@code GrenadeFillingActions}'s
+ *     identical documented gap for the same class. {@code ChunkRadiationManager}'s own
+ *     {@code incrementRad} half of these same CE call sites (Phase 4) is wired below, via the local
+ *     {@code incrementRad} helper.</li>
  *     <li>{@code EntityProcessorCrossSmooth#setDamageClass(DamageClass)} does not exist on this port's
  *     {@code EntityProcessorCrossSmooth} - same confirmed gap {@code GrenadeFillingActions} already
  *     documented; every {@code ExplosionVNT} blast below falls back to the processor's own plain
@@ -267,8 +269,9 @@ public final class XFactoryEnergy {
     }
 
     // ==================== gun_fatman nuke-round impact lambdas ====================
-    // incrementRad/SatelliteDetector calls are dropped (documented forward reference, see class
-    // javadoc) - every explosion/nuke-entity call itself is real.
+    // SatelliteDetector calls are still dropped (com.hbm.saveddata.satellites.SatelliteDetector is a
+    // separate, not-yet-ported system - documented forward reference, see class javadoc); incrementRad
+    // is now wired against Phase 4's real com.hbm.handler.radiation.ChunkRadiationManager.
 
     private static void nukeStandard(EntityBulletBaseMK4 bullet, HitResult hit) {
         if (skipSelfHit(bullet, hit)) return;
@@ -278,6 +281,7 @@ public final class XFactoryEnergy {
         vnt.setEntityProcessor(new EntityProcessorCrossSmooth(2, bullet.damage).withRangeMod(1.5F));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
+        incrementRad(bullet.level(), loc.x, loc.y, loc.z, 1F);
         spawnMush(bullet, loc);
     }
 
@@ -291,6 +295,7 @@ public final class XFactoryEnergy {
         vnt.setEntityProcessor(new EntityProcessorCrossSmooth(2, bullet.damage).withRangeMod(1.5F));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
+        incrementRad(bullet.level(), loc.x, loc.y, loc.z, 1.5F);
         spawnMush(bullet, loc);
     }
 
@@ -312,6 +317,7 @@ public final class XFactoryEnergy {
         vnt.setEntityProcessor(new EntityProcessorCrossSmooth(2, bullet.damage).withRangeMod(1.5F));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
+        incrementRad(bullet.level(), loc.x, loc.y, loc.z, 1.5F);
         bullet.level().playSound(null, loc.x, loc.y + 0.5, loc.z, HBMSoundHandler.mukeExplosion.get(), net.minecraft.sounds.SoundSource.HOSTILE, 15.0F, 1.0F);
         // TODO(phase5-particles): CE broadcasts an AuxParticlePacketNT "Muke" burst here - client VFX.
     }
@@ -324,7 +330,25 @@ public final class XFactoryEnergy {
         vnt.setEntityProcessor(new EntityProcessorCrossSmooth(2, bullet.damage).withRangeMod(1.5F));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
+        incrementRad(bullet.level(), loc.x, loc.y, loc.z, 0.25F);
         EntityNukeTorex.statFac(bullet.level(), loc.x, loc.y + 0.5, loc.z, 0.25F);
+    }
+
+    /**
+     * CE: {@code XFactoryCatapult.incrementRad(World, double, double, double, float)} - a 5x5
+     * chunk-cross ambient-radiation bump around a nuke round's impact point, one
+     * {@code ChunkRadiationManager.proxy.incrementRad} call per chunk in the (Manhattan-distance &lt; 4)
+     * diamond, falling off as {@code 50/(|i|+|j|+1)} scaled by {@code mult}.
+     */
+    private static void incrementRad(Level level, double x, double y, double z, float mult) {
+        for (int i = -2; i <= 2; i++) {
+            for (int j = -2; j <= 2; j++) {
+                if (Math.abs(i) + Math.abs(j) < 4) {
+                    BlockPos pos = BlockPos.containing(x + i * 16, y, z + j * 16);
+                    ChunkRadiationManager.proxy.incrementRad(level, pos, (50F / (Math.abs(i) + Math.abs(j) + 1)) * mult);
+                }
+            }
+        }
     }
 
     private static void nukeHive(EntityBulletBaseMK4 bullet, HitResult hit) {

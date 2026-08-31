@@ -1,6 +1,7 @@
 package com.hbm.explosion.vanillant.standard;
 
 import com.hbm.explosion.vanillant.ExplosionVNT;
+import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 
@@ -11,19 +12,30 @@ import net.minecraft.world.entity.Entity;
  * <p>
  * CE's real {@code attackEntity} routes through {@code com.hbm.items.weapon.sedna.BulletConfig},
  * {@code com.hbm.util.EntityDamageUtil.attackEntityFromNT} (piercing-aware damage bypassing part of
- * the vanilla armor model), {@code com.hbm.items.weapon.sedna.factory.ConfettiUtil}, and
- * {@code com.hbm.util.DamageResistanceHandler.DamageClass} - none of which exist in this port yet
- * (the Sedna weapon system and its damage-resistance/piercing model are a separate Phase 3 "guns"
- * package, not created this wave; confirmed via Neo Edition's own parallel port assuming the same
- * not-yet-built classes). {@link #calculateDamage} needs none of them and is ported exactly; the
- * piercing/confetti pieces of {@link #attackEntity} are left as a documented forward-reference,
- * falling back to plain vanilla damage in the meantime rather than inventing a piercing model.
+ * the vanilla armor model), and {@code com.hbm.items.weapon.sedna.factory.ConfettiUtil} - none of
+ * which are wired into {@link #attackEntity} below yet (the Sedna weapon system's own guns/turrets
+ * build their explosive impacts directly on {@code ExplosionVNT} instead, per
+ * {@code docs/phase3/gun_framework.md}; this class's own piercing/confetti layer was never needed by
+ * any consumer built so far). {@code com.hbm.util.DamageResistanceHandler.DamageClass} <b>does</b> now
+ * exist (shipped alongside the Sedna weapon system) and is exposed via {@link #setDamageClass} for a
+ * future consumer to select - see that method's own javadoc. {@link #calculateDamage} needs none of
+ * the above and is ported exactly; the piercing/confetti/damage-class pieces of {@link #attackEntity}
+ * remain a documented forward-reference, falling back to plain vanilla explosion damage in the
+ * meantime rather than inventing a piercing model.
  */
 public class EntityProcessorCrossSmooth extends EntityProcessorCross {
 
     protected float fixedDamage;
     protected float pierceDT = 0;
     protected float pierceDR = 0;
+    /**
+     * CE default for this processor's own damage-source selection ({@code DamageClass.EXPLOSIVE}) -
+     * not yet consumed by {@link #attackEntity} below (see that method's own forward-reference note),
+     * but exposed now via {@link #setDamageClass} so {@code EntityOrbitalLaser}
+     * (docs/phase3/satellites_followup_and_loot_pools.md's forward reference) has a real, non-default
+     * damage class to select (e.g. {@code DamageClass.LASER}) once it's built.
+     */
+    protected DamageClass dmgClass = DamageClass.EXPLOSIVE;
 
     public EntityProcessorCrossSmooth(double nodeDist, float fixedDamage) {
         super(nodeDist);
@@ -34,6 +46,11 @@ public class EntityProcessorCrossSmooth extends EntityProcessorCross {
     public EntityProcessorCrossSmooth setupPiercing(float pierceDT, float pierceDR) {
         this.pierceDT = pierceDT;
         this.pierceDR = pierceDR;
+        return this;
+    }
+
+    public EntityProcessorCrossSmooth setDamageClass(DamageClass dmgClass) {
+        this.dmgClass = dmgClass;
         return this;
     }
 

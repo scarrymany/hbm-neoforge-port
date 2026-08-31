@@ -1,5 +1,6 @@
 package com.hbm.blocks.generic;
 
+import com.hbm.handler.radiation.RadiationSystemNT;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -15,9 +16,8 @@ import java.util.function.Supplier;
  * {@link Supplier} (set once by the registration hub after both {@code DeferredBlock}s exist),
  * avoiding a circular static-initialization dependency between the two instances.
  * <p>
- * {@code RadiationSystemNT.markSectionForRebuild} calls are dropped: that system does not exist yet
- * (Phase 2). {@link com.hbm.interfaces.IRadResistantBlock} is implemented as a no-op marker per that
- * interface's own contract, matching the block's real shielding behavior once Phase 2 lands.
+ * {@code RadiationSystemNT.markSectionForRebuild} calls (Phase 4) are now wired in {@link #onPlace}/
+ * {@link #onRemove}, per {@link com.hbm.interfaces.IRadResistantBlock}'s own contract.
  */
 public class ReinforcedLamp extends Block implements com.hbm.interfaces.IRadResistantBlock {
 
@@ -37,12 +37,23 @@ public class ReinforcedLamp extends Block implements com.hbm.interfaces.IRadResi
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         if (!level.isClientSide) {
+            if (!state.is(oldState.getBlock())) {
+                RadiationSystemNT.markSectionForRebuild(level, pos);
+            }
             if (this.isOn && !level.hasNeighborSignal(pos)) {
                 level.scheduleTick(pos, this, 4);
             } else if (!this.isOn && level.hasNeighborSignal(pos) && companion != null) {
                 level.setBlock(pos, companion.get().defaultBlockState(), 2);
             }
         }
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (!level.isClientSide && !state.is(newState.getBlock())) {
+            RadiationSystemNT.markSectionForRebuild(level, pos);
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override

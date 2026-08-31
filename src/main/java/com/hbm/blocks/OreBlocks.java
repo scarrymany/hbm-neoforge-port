@@ -3,6 +3,7 @@ package com.hbm.blocks;
 import com.hbm.blocks.generic.BlockCluster;
 import com.hbm.blocks.generic.BlockDepthOre;
 import com.hbm.blocks.generic.BlockNTMOre;
+import com.hbm.blocks.generic.BlockNetherCoal;
 import com.hbm.blocks.generic.BlockOutgas;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -128,6 +129,13 @@ public final class OreBlocks {
     }
 
     private static void registerGneissOres() {
+        // Stratum substrate the (separate) ore-veins content package's SchistStratum-equivalent
+        // world-gen paints in before any of the ore veins below get planted into it - see
+        // docs/phase4/ore_veins_and_bedrock_ores.md Group C's "Blocking gap" note. CE:
+        // new BlockBase(Material.ROCK, "stone_gneiss").setHardness(1.5F).setResistance(10.0F) - the
+        // exact GNEISS_HARDNESS this class already anticipated (see the field's own declaration above).
+        registerBlock("stone_gneiss", () -> new BlockBase(oreProps(GNEISS_HARDNESS, STD_RESISTANCE, 0)), ModCreativeTabs.RESOURCE);
+
         ore("ore_gneiss_iron", 1, GNEISS_HARDNESS, STD_RESISTANCE, null);
         ore("ore_gneiss_gold", 2, GNEISS_HARDNESS, STD_RESISTANCE, null);
         ore("ore_gneiss_copper", 1, GNEISS_HARDNESS, STD_RESISTANCE, null);
@@ -152,6 +160,14 @@ public final class OreBlocks {
         ore("ore_nether_schrabidium", 3, SCHRABIDIUM_HARDNESS, SCHRABIDIUM_RESISTANCE, null);
         outgas("ore_nether_uranium", NETHER_HARDNESS, STD_RESISTANCE);
         outgas("ore_nether_uranium_scorched", NETHER_HARDNESS, STD_RESISTANCE);
+
+        // CE: new BlockNetherCoal(false, 5, true, "ore_nether_coal").setLightLevel(10F / 15F)
+        // .setHardness(0.4F).setResistance(10.0F) - no harvest-level call, so no tool requirement
+        // (harvestLevel 0). See BlockNetherCoal's own javadoc for what the 3 leading CE constructor
+        // params actually configure and what is/isn't ported.
+        registerBlock("ore_nether_coal",
+                () -> new BlockNetherCoal(oreProps(NETHER_HARDNESS, STD_RESISTANCE, 0).lightLevel(state -> 10)),
+                ModCreativeTabs.RESOURCE);
     }
 
     private static void registerUraniumOres() {

@@ -5,6 +5,7 @@ import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.entity.projectile.EntityRubble;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.potion.HbmPotionEffects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -47,8 +48,9 @@ import java.util.Random;
  * would go: {@code onUpdate}'s advancement grants ({@code ArmorUtil.checkForFiend}/
  * {@code AdvancementManager}, neither ported - see {@code docs/phase3/melee_weapons.md}'s Deferred
  * scope) - CE's {@code onUpdate} hook itself has no other content, so no stub method is added here
- * purely to hold a TODO comment - and {@code lead_gavel}'s {@code HbmPotion.lead} effect (unported
- * potion registry).
+ * purely to hold a TODO comment. {@code lead_gavel}'s {@code HbmPotion.lead} on-hit grant (15x20
+ * ticks, amplifier 4) is wired against {@code com.hbm.potion.HbmPotionEffects} - see
+ * {@link #hurtEnemy}.
  */
 public class WeaponSpecial extends SwordItem {
 
@@ -120,8 +122,9 @@ public class WeaponSpecial extends SwordItem {
                     level.playSound(null, target.getX(), target.getY(), target.getZ(), HBMSoundHandler.whack.get(), SoundSource.PLAYERS, 3.0F, 1.0F);
             case "lead_gavel" -> {
                 level.playSound(null, target.getX(), target.getY(), target.getZ(), HBMSoundHandler.whack.get(), SoundSource.PLAYERS, 3.0F, 1.0F);
-                // Deferred: CE also applies HbmPotion.lead for 15s at amplifier 4 (unported potion
-                // registry, upstream hbm-ce WeaponSpecial.java:159).
+                if (!level.isClientSide()) {
+                    target.addEffect(new MobEffectInstance(HbmPotionEffects.LEAD, 15 * 20, 4));
+                }
             }
             case "diamond_gavel" -> {
                 target.setHealth(target.getHealth() - target.getMaxHealth() / 3);

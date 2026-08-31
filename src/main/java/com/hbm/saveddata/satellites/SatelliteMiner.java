@@ -13,11 +13,17 @@ import java.util.Map;
  * arrives passively via {@link #getCargo()}, consumed by whatever the "asteroid miner" delivery
  * mechanism is (not itself in this package's scope).
  * <p>
- * <b>Documented gap</b>: CE's {@code CARGO} map stores a {@code WeightedRandomObject[]} loot table
- * key resolved through {@code com.hbm.itempool.ItemPoolsSatellite}, a loot-pool registry this port
- * has not ported (confirmed absent by grep). Since CE's own field is already just a {@code String}
- * pool identifier (not resolved loot itself), this class preserves that exact shape - the string key
- * is real and stable, only the downstream pool-lookup system is the forward reference.
+ * <b>Pool-key convention (settled, not a gap anymore)</b>: CE's {@code CARGO} map stores a plain
+ * {@code String} pool identifier resolved through {@code com.hbm.itempool.ItemPoolsSatellite}'s
+ * {@code POOL_SAT_MINER}/{@code POOL_SAT_LUNAR} constants ({@code "POOL_SAT_MINER"}/
+ * {@code "POOL_SAT_LUNAR"} in CE). This class deliberately keys its own {@code CARGO} map with
+ * {@code "sat_miner"} instead (see {@link #registerCargo}) - per
+ * {@code docs/phase4/satellites_followup_and_loot_pools.md}'s Headline finding #5 and Open
+ * questions, whoever writes {@code ItemPoolsSatellite} against this port's now-real
+ * {@code com.hbm.itempool.ItemPool} framework must define its pool-name constant with the value
+ * {@code "sat_miner"} (not a verbatim transcription of CE's own constant value) so the two already-
+ * committed lookup keys here continue to match. {@link #getCargo()}'s return value is a pool-name
+ * {@code String} for {@code ItemPool.getPool(String)}, not resolved loot itself.
  */
 public class SatelliteMiner extends Satellite {
 

@@ -5,6 +5,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
 import com.hbm.blocks.machine.BlockSiloHatch;
 import com.hbm.blocks.machine.LaunchInfraBlocks;
+import com.hbm.handler.radiation.RadiationSystemNT;
 import com.hbm.interfaces.IAnimatedDoor;
 import com.hbm.lib.HBMSoundHandler;
 import net.neoforged.api.distmarker.Dist;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Ported from CE's {@code com.hbm.tileentity.machine.TileEntitySiloHatch} (256 lines, read in full)
@@ -37,9 +40,9 @@ import javax.annotation.Nullable;
  * "play the hydraulics sound only on a stationary-to-moving transition" behavior exactly via
  * {@link IAnimatedDoor#clientAnimStart}.
  * <p>
- * <b>Not ported</b>: {@code RadiationSystemNT.markSectionsForRebuild} calls - that whole radiation
- * simulation system is not ported anywhere in this tree yet (confirmed absent by grep), matching
- * {@link com.hbm.interfaces.IRadResistantBlock}'s own documented gap.
+ * {@code RadiationSystemNT.markSectionsForRebuild} calls (Phase 4) are wired in
+ * {@link #markHatchAreaForRebuild}, called from both {@link #toggle} and the door-close branch of
+ * {@link #updateEntity}, matching CE's own two call sites.
  */
 public class SiloHatchBlockEntity extends LoadedBaseBlockEntity implements ITickableBE, IAnimatedDoor, ILockable {
 
@@ -93,8 +96,7 @@ public class SiloHatchBlockEntity extends LoadedBaseBlockEntity implements ITick
                 }
                 if (timer > 100) {
                     state = DoorState.CLOSED;
-                    // TODO(radiation-system): CE marks the occupied radiation sections for rebuild
-                    // here (RadiationSystemNT.markSectionsForRebuild) - not ported yet, see class javadoc.
+                    markHatchAreaForRebuild();
                 }
             } else if (state == DoorState.OPENING) {
                 if (timer == 70) {
@@ -148,6 +150,28 @@ public class SiloHatchBlockEntity extends LoadedBaseBlockEntity implements ITick
         }
 
         return true;
+    }
+
+    /**
+     * CE: {@code TileEntitySiloHatch}'s {@code RadiationSystemNT.markSectionsForRebuild} call on
+     * every door toggle/close - the hatch's own position plus the 3x3 dummy-ring 3 blocks in front of
+     * it (the same area {@link #placeDummy}/{@link #removeDummy} occupy) all change their effective
+     * {@link com.hbm.interfaces.IRadResistantBlock} mask as the door opens/closes.
+     */
+    private void markHatchAreaForRebuild() {
+        if (level == null || level.isClientSide) return;
+
+        List<BlockPos> area = new ArrayList<>(10);
+        area.add(worldPosition);
+        if (facing != null) {
+            BlockPos mid = worldPosition.relative(facing, 3);
+            for (int i = -1; i <= 1; i++) {
+                for (int j = -1; j <= 1; j++) {
+                    area.add(mid.offset(i, 0, j));
+                }
+            }
+        }
+        RadiationSystemNT.markSectionsForRebuild(level, area);
     }
 
     public void removeDummy(BlockPos target) {
@@ -227,8 +251,7 @@ public class SiloHatchBlockEntity extends LoadedBaseBlockEntity implements ITick
         } else if (state == DoorState.OPEN) {
             state = DoorState.CLOSING;
         }
-        // TODO(radiation-system): CE marks occupied radiation sections for rebuild on every toggle -
-        // not ported yet, see class javadoc.
+        markHatchAreaForRebuild();
     }
 
     @Override

@@ -107,9 +107,9 @@ public final class WeaponMeleeItems {
      */
     private static final Tier MESE_GAVEL_TIER = new SimpleTier(BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 0, 50.0F, 0.0F, 200, () -> Ingredient.EMPTY);
 
-    /** CE also adds {@code IWeaponAbility.PHOSPHORUS, 0} here - not ported yet (needs the unbuilt {@code HbmPotion} registry, see {@link IWeaponAbility}'s own javadoc). */
     public static final DeferredItem<Item> MESE_GAVEL = ModItems.ITEMS.register("mese_gavel", () ->
             new ItemSwordAbility(250F, 1.5, MESE_GAVEL_TIER, new Item.Properties())
+                    .addAbility(IWeaponAbility.PHOSPHORUS, 0)
                     .addAbility(IWeaponAbility.RADIATION, 2)
                     .addAbility(IWeaponAbility.STUN, 3)
                     .addAbility(IWeaponAbility.VAMPIRE, 4)

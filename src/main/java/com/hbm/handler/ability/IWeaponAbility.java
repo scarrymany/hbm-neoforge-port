@@ -1,5 +1,6 @@
 package com.hbm.handler.ability;
 
+import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ContaminationUtil;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
@@ -27,13 +28,13 @@ import net.minecraft.world.level.Level;
  * {@code com.hbm.handler.ability.IWeaponAbility}.
  * <p>
  * Portable now (this package's task): {@link #NONE}, {@link #RADIATION} (via the already-ported
- * {@link ContaminationUtil}), {@link #VAMPIRE}, {@link #STUN}, {@link #FIRE}, {@link #BEHEADER}.
+ * {@link ContaminationUtil}), {@link #VAMPIRE}, {@link #STUN}, {@link #PHOSPHORUS} (via
+ * {@code com.hbm.potion.HbmPotionEffects}, the Phase 4 {@code MobEffect} registry), {@link #FIRE},
+ * {@link #BEHEADER}.
  * <p>
  * Deliberately <b>not</b> ported yet, per the task's own deferral list - each needs a system that
  * genuinely does not exist anywhere in this port:
  * <ul>
- *     <li>{@code PHOSPHORUS} - CE applies {@code HbmPotion.phosphorus}; this port has no
- *     {@code HbmPotion} registry (a separate, not-yet-ported {@code MobEffect} registration area).</li>
  *     <li>{@code CHAINSAW} - CE's on-kill "shred into nitra + XP orbs" payoff spawns
  *     {@code ModItems.nitra_small} (not yet a registered item in this port) and a
  *     {@code HbmEffectNT.VanillaBurst_BlockDust} particle burst (the CE generic effect-dispatch
@@ -41,11 +42,11 @@ import net.minecraft.world.level.Level;
  *     <li>{@code BOBBLE} - CE's on-kill drop is {@code ModBlocks.bobblehead} with
  *     {@code BlockBobble.BobbleType}, neither of which exists in this port yet.</li>
  * </ul>
- * Whoever first ports {@code HbmPotion.phosphorus}, {@code nitra_small}, or
- * {@code ModBlocks.bobblehead} should add the matching singleton here and into {@link #abilities},
- * following CE's {@code IWeaponAbility} exactly - the on-hit dispatch machinery
- * ({@link AvailableAbilities#getWeaponAbilities()}, {@code ItemSwordAbility#hurtEnemy}) already
- * supports an arbitrary number of these with no further changes needed.
+ * Whoever first ports {@code nitra_small} or {@code ModBlocks.bobblehead} should add the matching
+ * singleton here and into {@link #abilities}, following CE's {@code IWeaponAbility} exactly - the
+ * on-hit dispatch machinery ({@link AvailableAbilities#getWeaponAbilities()},
+ * {@code ItemSwordAbility#hurtEnemy}) already supports an arbitrary number of these with no further
+ * changes needed.
  */
 public interface IWeaponAbility extends IBaseAbility {
 
@@ -180,6 +181,44 @@ public interface IWeaponAbility extends IBaseAbility {
         }
     };
 
+    /**
+     * CE: {@code IWeaponAbility.PHOSPHORUS} - grants the victim
+     * {@code com.hbm.potion.HbmPotionEffects#PHOSPHORUS} (amplifier 4) for a 60/90-tick-by-level
+     * duration. Applied by e.g. {@code mese_gavel}.
+     */
+    IWeaponAbility PHOSPHORUS = new IWeaponAbility() {
+        private final int[] durationAtLevel = {60, 90};
+
+        @Override
+        public String getName() {
+            return "weapon.ability.phosphorus";
+        }
+
+        @Override
+        public int levels() {
+            return durationAtLevel.length;
+        }
+
+        @Override
+        public String getExtension(int level) {
+            return " (" + durationAtLevel[level] + ")";
+        }
+
+        @Override
+        public int sortOrder() {
+            return SORT_ORDER_BASE + 4;
+        }
+
+        @Override
+        public void onHit(int level, Level level_, Player player, Entity victim, Item tool) {
+            int duration = durationAtLevel[level];
+
+            if (victim instanceof LivingEntity living) {
+                living.addEffect(new MobEffectInstance(HbmPotionEffects.PHOSPHORUS, duration * 20, 4));
+            }
+        }
+    };
+
     /** CE: {@code IWeaponAbility.FIRE} - sets the victim on fire. */
     IWeaponAbility FIRE = new IWeaponAbility() {
         private final int[] durationAtLevel = {5, 10};
@@ -265,7 +304,7 @@ public interface IWeaponAbility extends IBaseAbility {
         }
     };
 
-    IWeaponAbility[] abilities = { NONE, RADIATION, VAMPIRE, STUN, FIRE, BEHEADER };
+    IWeaponAbility[] abilities = { NONE, RADIATION, VAMPIRE, STUN, PHOSPHORUS, FIRE, BEHEADER };
 
     static IWeaponAbility getByName(String name) {
         for (IWeaponAbility ability : abilities) {

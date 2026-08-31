@@ -7,12 +7,14 @@ import com.hbm.config.GeneralConfig;
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
+import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.hazard.HazardSystem;
 import com.hbm.hazard.type.HazardTypeRadiation;
 import com.hbm.interfaces.IRadiationImmune;
 import com.hbm.items.HbmDataComponents;
 import com.hbm.items.gear.ArmorEuphemium;
 import com.hbm.lib.Library;
+import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
@@ -60,10 +62,8 @@ public final class ContaminationUtil {
     /**
      * Calculates how much radiation can be applied to this entity by way of resistance.
      *
-     * <p>TODO(HbmPotion): CE returns {@code 0D} immediately when
-     * {@code entity.isPotionActive(HbmPotion.mutation)}; {@code HbmPotion} doesn't exist in this
-     * port yet (a separate {@code MobEffect}-registration area, see this area's research report's
-     * Deferred scope) - the mutation-immunity short-circuit is dropped until that lands.
+     * <p>CE returns {@code 0D} immediately when {@code entity.isPotionActive(HbmPotion.mutation)};
+     * this port's {@link com.hbm.potion.HbmPotionEffects#MUTATION} equivalent.
      *
      * <p>CE also reads a per-entity {@code "hbmradmultiplier"} scratch float off the entity's own
      * synced data ({@code EntityLivingBase#getEntityData()}) here as an extra multiplier; nothing
@@ -71,6 +71,8 @@ public final class ContaminationUtil {
      * that branch is a dead no-op in practice and is not reproduced.
      */
     public static double calculateRadiationMod(LivingEntity entity) {
+        if (entity.hasEffect(HbmPotionEffects.MUTATION)) return 0D;
+
         double koeff = 10.0D;
 
         double hazmatResistance = HazmatRegistry.getResistance(entity);
@@ -81,11 +83,9 @@ public final class ContaminationUtil {
     public static void printGeigerData(Player player) {
         double rawRadMod = calculateRadiationMod(player);
         double eRad = HbmLivingProps.getRadiation(player);
-        // TODO(ChunkRadiationManager, Phase 4): CE reads ambient chunk radiation here via
-        // ChunkRadiationManager.proxy.getRadiation(world, pos); that class is Phase 4 world/
-        // simulation scope and doesn't exist in this port yet (see Deferred scope, matching how
-        // RBMKNeutronHandler already handles the same forward reference). Stubbed to 0.
-        double rads = 0D;
+        // CE: ChunkRadiationManager.proxy.getRadiation(player.world, player.getPosition()) - ambient
+        // chunk radiation at the player's own position (Phase 4, com.hbm.handler.radiation).
+        double rads = ChunkRadiationManager.proxy.getRadiation(player.level(), player.blockPosition());
         double env = getPlayerRads(player);
         double res = (1.0D - rawRadMod) * 100.0D;
         double resKoeff = HazmatRegistry.getResistance(player) * 100.0D;
@@ -356,8 +356,9 @@ public final class ContaminationUtil {
      * custom-mob checks as a documented forward reference for whichever phase ports them.
      */
     public static boolean isRadImmune(Entity e) {
-        // TODO(HbmPotion): CE also returns true for LivingEntity#isPotionActive(HbmPotion.mutation)
-        // here; HbmPotion doesn't exist in this port yet (see Deferred scope).
+        if (e instanceof LivingEntity living && living.hasEffect(HbmPotionEffects.MUTATION)) {
+            return true;
+        }
 
         if (e instanceof Zombie || e instanceof Skeleton || e instanceof MushroomCow
                 || e instanceof Ocelot || e instanceof IRadiationImmune
@@ -428,8 +429,7 @@ public final class ContaminationUtil {
         if (entity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
         if (e instanceof Player && e.tickCount < 200) return;
 
-        // TODO(HbmPotion): CE returns early here if entity.isPotionActive(HbmPotion.stability);
-        // HbmPotion doesn't exist in this port yet (see Deferred scope).
+        if (entity.hasEffect(HbmPotionEffects.STABILITY)) return;
 
         if (!(entity instanceof Player digammaPlayer && ArmorUtil.checkForDigamma(digammaPlayer))) {
             HbmLivingProps.incrementDigamma(entity, f);

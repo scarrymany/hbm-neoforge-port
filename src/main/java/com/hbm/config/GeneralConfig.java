@@ -359,10 +359,10 @@ public class GeneralConfig {
                 .comment("Keeps the RBMK dial for ReaSim boilers on, preventing use of non-ReaSim boiler columns and forcing the use of steam in-/outlets. [CE: X528_forceReasimBoilers]")
                 .define("forceReasimBoilers", true);
         X528_ENABLE_COLTAN_DEPOSIT = builder
-                .comment("Enables the coltan deposit. A large amount of coltan will spawn around a single random location in the world. [CE: X528_enableColtanDepsoit]")
+                .comment("Enables the coltan deposit. A large amount of coltan will spawn around a single random location in the world. Gates the rich coltan deposit in docs/phase4/ore_veins_and_bedrock_ores.md Group B. [CE field: enable528ColtanDeposit, toml key: X528_enableColtanDepsoit]")
                 .define("enableColtanDeposit", true);
         X528_ENABLE_COLTAN_SPAWNING = builder
-                .comment("Enables coltan ore as a random spawn in the world. Unlike the deposit option, coltan will not just spawn in one central location. [CE: X528_enableColtanSpawning]")
+                .comment("Enables coltan ore as a random spawn in the world. Unlike the deposit option, coltan will not just spawn in one central location. Gates the ordinary ore_coltan vein in docs/phase4/ore_veins_and_bedrock_ores.md Group A. [CE field: enable528ColtanSpawn, toml key: X528_enableColtanSpawning]")
                 .define("enableColtanSpawning", false);
         X528_ENABLE_BOSNIA_SIMULATOR = builder
                 .comment("Enables anti tank mines spawning all over the world. [CE: X528_enableBosniaSimulator]")
@@ -380,7 +380,7 @@ public class GeneralConfig {
                 .comment("Requires most large machines to have a proper foundation, or else they tilt and break. [CE: X528_enable528MachineGravity]")
                 .define("enableMachineGravity", true);
         X528_ORE_COLTAN_FREQUENCY = builder
-                .comment("How many coltan ore veins are to be expected in a chunk. Only applies if random coltan spawning is enabled. [CE: X528_oreColtanFrequency]")
+                .comment("How many coltan ore veins are to be expected in a chunk. Only applies if random coltan spawning is enabled. [CE field: coltanRate, toml key: X528_oreColtanFrequency]")
                 .defineInRange("oreColtanFrequency", 2, 0, Integer.MAX_VALUE);
 
         builder.pop();

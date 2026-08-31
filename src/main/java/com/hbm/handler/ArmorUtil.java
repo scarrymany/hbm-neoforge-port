@@ -4,6 +4,7 @@ import com.hbm.api.item.IGasMask;
 import com.hbm.items.HbmDataComponents;
 import com.hbm.items.gear.SpecialArmorItems;
 import com.hbm.lib.Library;
+import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ArmorRegistry;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import com.hbm.util.Tuple;
@@ -38,10 +39,12 @@ import java.util.Locale;
  * {@link #checkForHazmat} are wired for the hazmat/hazmat_paa/euphemium/schrabidium sets that
  * package registers, with a per-branch TODO naming the still-missing {@code liquidator}/
  * {@code rpa}/{@code fau}/{@code dns} sets. {@link #checkForFiend}/{@link #checkForFiend2}
- * ({@code jackt}/{@code jackt2}) and {@link #checkForDigamma} ({@code fau}/{@code dns}) remain
- * fully stubbed to CE's own "no match" return value ({@code false}) - those armor pieces belong to
- * a separate, not-yet-scheduled Phase 3 "armor items" work package, and referencing a nonexistent
- * static field would be a hard compile error. Every other method in this class (the gas-mask-filter
+ * ({@code jackt}/{@code jackt2}) remain fully stubbed to CE's own "no match" return value
+ * ({@code false}) - those armor pieces belong to a separate, not-yet-scheduled Phase 3 "armor items"
+ * work package, and referencing a nonexistent static field would be a hard compile error.
+ * {@link #checkForDigamma} ({@code fau}/{@code dns}) is the same story for its own armor-set
+ * branch, but now falls back to {@code com.hbm.potion.HbmPotionEffects#STABILITY} instead of a bare
+ * {@code false}, per CE's own {@code HbmPotion.stability} fallback. Every other method in this class (the gas-mask-filter
  * helpers, {@link #checkForFaraday}, {@link #checkArmorNull}, {@link #damageSuit}, {@link
  * #resetFlightTime}, {@link #checkArmor}, {@link #checkArmorPiece}) has no such dependency and is
  * ported in full.
@@ -215,9 +218,8 @@ public final class ArmorUtil {
 
     /**
      * {@code docs/phase3/armor_special_sets.md}-scoped hazmat/schrabidium sets are wired for real;
-     * {@link #checkForHaz2} covers its own scope. {@code HbmPotion.mutation} is a separate,
-     * not-yet-ported {@code MobEffect}-registration area (see {@code ContaminationUtil}'s own
-     * identical TODO for the same effect).
+     * {@link #checkForHaz2} covers its own scope; the {@code com.hbm.potion.HbmPotionEffects#MUTATION}
+     * fallback matches {@code ContaminationUtil}'s identical fallback for the same effect.
      */
     @Deprecated
     public static boolean checkForHazmat(LivingEntity entity) {
@@ -233,9 +235,7 @@ public final class ArmorUtil {
             return true;
         }
 
-        // TODO(HbmPotion): CE also returns true for player.isPotionActive(HbmPotion.mutation)
-        // here; HbmPotion doesn't exist in this port yet (see Deferred scope).
-        return false;
+        return entity.hasEffect(HbmPotionEffects.MUTATION);
     }
 
     /** Fully wireable: all 4 {@code asbestos_*} items are registered by this package. */
@@ -321,9 +321,7 @@ public final class ArmorUtil {
     // TODO(fau/dns "digamma"/"deep null suit" armor sets not yet ported - same blocker as
     // checkForHaz2 above).
     public static boolean checkForDigamma(Player player) {
-        // TODO(HbmPotion): CE also returns true for player.isPotionActive(HbmPotion.stability)
-        // here; HbmPotion doesn't exist in this port yet (see Deferred scope).
-        return false;
+        return player.hasEffect(HbmPotionEffects.STABILITY);
     }
 
     /**

@@ -4,6 +4,7 @@ import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.machine.CrateBlockEntity;
 import com.hbm.blockentity.machine.CrateBlockEntity.CrateType;
 import com.hbm.blockentity.machine.StorageBlockEntities;
+import com.hbm.handler.radiation.RadiationSystemNT;
 import com.hbm.interfaces.IRadResistantBlock;
 import com.hbm.inventory.container.CrateMenu;
 import net.minecraft.core.BlockPos;
@@ -40,9 +41,9 @@ import org.jetbrains.annotations.Nullable;
  * {@code BlockStorageCrateRadResistant} (a distinct subclass in CE whose only difference is a
  * radiation-shielding tooltip line and a {@code RadiationSystemNT.markSectionForRebuild} hook on
  * place/break - folded into this single class as a per-{@link CrateType} flag rather than a second
- * subclass, since the actual radiation-system hook is a documented no-op here: no radiation system
- * has landed for any Phase 2 package yet, matching this port's identical precedent on
- * {@code BlockRadResistantPillar}/{@code BlockNTMGlass} per {@code docs/phase1/blocks_generic.md}).
+ * subclass). The {@code markSectionForRebuild} hook itself is wired (Phase 4) in {@link #setPlacedBy}/
+ * {@link #onRemove}, called unconditionally for every grade (not just tungsten) since a non-resistant
+ * crate replacing a resistant one, or vice versa, still changes the section's resistant-block mask.
  * {@link CrateType#TUNGSTEN}'s laser-heating mechanic ({@code ILaserable}, CE's
  * {@code TileEntityCrateTungsten}) is a separate, documented follow-up - see
  * {@code docs/phase2/machines_storage.md}'s "Open questions" - this class ships the plain-crate shell.
@@ -104,12 +105,16 @@ public class CrateBlock extends BaseEntityBlock implements IRadResistantBlock {
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
         IPersistentNBT.restoreData(level, pos, stack);
+        if (!level.isClientSide) {
+            RadiationSystemNT.markSectionForRebuild(level, pos);
+        }
     }
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!level.isClientSide && !state.is(newState.getBlock())) {
             IPersistentNBT.breakBlock(level, pos, state);
+            RadiationSystemNT.markSectionForRebuild(level, pos);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }

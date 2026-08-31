@@ -1,13 +1,16 @@
 package com.hbm.config;
 
+import com.hbm.potion.HbmPotionEffects;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+
 /**
  * Port of CE's {@code VersatileConfig}: derived-logic helpers that combine values from other
  * config classes rather than holding config values of their own.
  * <p>
- * Not ported: {@code applyPotionSickness(EntityLivingBase, int)} and
- * {@code hasPotionSickness(EntityLivingBase)}. Both depend on {@code com.hbm.potion.HbmPotion},
- * which is out of this area's scope and not ported yet. Whoever ports the potion system should
- * add these back, reading {@link PotionConfig#potionSicknessMode()} for the mode check CE did via
+ * {@code applyPotionSickness(EntityLivingBase, int)}/{@code hasPotionSickness(EntityLivingBase)}
+ * are restored here against {@code com.hbm.potion.HbmPotionEffects#POTIONSICKNESS}, reading
+ * {@link PotionConfig#potionSicknessMode()} for the mode check CE did via
  * {@code PotionConfig.potionSickness}.
  */
 public class VersatileConfig {
@@ -20,6 +23,27 @@ public class VersatileConfig {
     /** Mirrors CE's {@code VersatileConfig.getSchrabOreChance()}. */
     public static int getSchrabOreChance() {
         return GeneralConfig.enableLBSM() ? 20 : 250;
+    }
+
+    /**
+     * Mirrors CE's {@code VersatileConfig.applyPotionSickness(EntityLivingBase, int)}: a no-op when
+     * {@link PotionConfig.SicknessMode#OFF}, a {@code x12} duration multiplier under
+     * {@link PotionConfig.SicknessMode#TERRARIA}, otherwise grants
+     * {@code com.hbm.potion.HbmPotionEffects#POTIONSICKNESS} for {@code duration*20} ticks at
+     * amplifier 0.
+     */
+    public static void applyPotionSickness(LivingEntity entity, int duration) {
+        PotionConfig.SicknessMode mode = PotionConfig.potionSicknessMode();
+        if (mode == PotionConfig.SicknessMode.OFF) return;
+
+        if (mode == PotionConfig.SicknessMode.TERRARIA) duration *= 12;
+
+        entity.addEffect(new MobEffectInstance(HbmPotionEffects.POTIONSICKNESS, duration * 20, 0));
+    }
+
+    /** Mirrors CE's {@code VersatileConfig.hasPotionSickness(EntityLivingBase)}. */
+    public static boolean hasPotionSickness(LivingEntity entity) {
+        return entity.hasEffect(HbmPotionEffects.POTIONSICKNESS);
     }
 
     /** Mirrors CE's {@code VersatileConfig.rtgDecay()}. */

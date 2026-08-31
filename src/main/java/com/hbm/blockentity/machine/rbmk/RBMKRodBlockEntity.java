@@ -7,6 +7,7 @@ import com.hbm.blocks.machine.rbmk.RBMKBaseBlock;
 import com.hbm.blocks.machine.rbmk.RBMKRodBlock;
 import com.hbm.handler.neutron.NeutronStream;
 import com.hbm.handler.neutron.RBMKNeutronHandler;
+import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.items.machine.ItemRBMKRod;
 import com.hbm.items.machine.rbmk.RBMKRods;
 import net.minecraft.core.BlockPos;
@@ -25,8 +26,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * classes, not a forward-referenced guess).
  * <p>
  * <b>Not ported</b>: OpenComputers, satellite-scan, and redstone-over-radio integration (see prior
- * revision's note - left for a follow-up pass). {@code ChunkRadiationManager} un-lidded irradiation is
- * a Phase 4 forward reference, left commented out.
+ * revision's note - left for a follow-up pass). {@code ChunkRadiationManager} un-lidded irradiation
+ * (Phase 4) is now wired in {@link #updateEntity}.
  */
 public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity implements IRBMKFluxReceiver, IRBMKLoadable {
 
@@ -109,10 +110,12 @@ public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity implements IRBMKF
             inventory.setStackInSlot(0, stack);
             hasRod = true;
 
-            // Phase 4 forward reference, not callable from this wave (com.hbm.handler.radiation
-            // does not exist in this port): CE's TileEntityRBMKRod.update() calls
-            // ChunkRadiationManager.proxy.incrementRad(world, pos, (float)(fluxQuantity * 0.05F),
-            // (float)(fluxQuantity * 10F)) here when !hasLid().
+            // CE: TileEntityRBMKRod.update() irradiates the surrounding chunk when the rod's lid is
+            // off (un-lidded fuel rods leak radiation into the room around them).
+            if (!hasLid()) {
+                ChunkRadiationManager.proxy.incrementRad(serverLevel, worldPosition,
+                        fluxQuantity * 0.05D, fluxQuantity * 10D);
+            }
 
             moveHeat();
             boolean overheated = this.heat > this.maxHeat();

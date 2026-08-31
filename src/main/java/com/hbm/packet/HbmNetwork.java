@@ -6,6 +6,7 @@ import com.hbm.packet.toclient.ExplosionEffectSyncPacket;
 import com.hbm.packet.toclient.ExplosionRemovalSyncPacket;
 import com.hbm.packet.toclient.GunAnimationPayload;
 import com.hbm.packet.toclient.NukeExplosionRemovalSyncPacket;
+import com.hbm.packet.toclient.RadFogPayload;
 import com.hbm.packet.toclient.SatPanelPayload;
 import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
@@ -94,5 +95,8 @@ public class HbmNetwork {
         // Phase 3 (missile_launch_infra): S2C live satellite-panel stream + C2S panel control round trip.
         registrar.playToClient(SatPanelPayload.TYPE, SatPanelPayload.STREAM_CODEC, SatPanelPayload::handleClient);
         registrar.playToServer(SatPanelActionPayload.TYPE, SatPanelActionPayload.STREAM_CODEC, SatPanelActionPayload::handleServer);
+
+        // Phase 4 (chunk_radiation_system): S2C decorative "radiation fog" particle cue.
+        registrar.playToClient(RadFogPayload.TYPE, RadFogPayload.STREAM_CODEC, RadFogPayload::handleClient);
     }
 }

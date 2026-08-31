@@ -1,5 +1,9 @@
 package com.hbm.saveddata.satellites;
 
+import com.hbm.handler.pollution.PollutionHandler;
+import com.hbm.handler.pollution.PollutionHandler.PollutionData;
+import com.hbm.handler.pollution.PollutionHandler.PollutionType;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
@@ -13,11 +17,10 @@ import java.util.Locale;
  * Ported from CE's {@code com.hbm.saveddata.satellites.SatelliteMapper} (read in full) - a
  * {@code SAT_PANEL} satellite with a map/chunk-loaded overlay and three text commands.
  * <p>
- * {@code CMD_GETSMOG} is a documented forward-reference stub: CE's {@code PollutionHandler} (the
- * pollution/smog simulation) is not ported anywhere in this tree yet (confirmed by grep - only
- * {@code ItemPollutionDetector} references it, itself presumably carrying the same forward
- * reference). This command replies with an empty {@link #tx} until that system lands, rather than
- * throwing or fabricating a value.
+ * {@code CMD_GETSMOG} now reads the real {@link PollutionHandler} (Phase 4's
+ * {@code com.hbm.handler.pollution} package) exactly like CE: soot at {@code (targetX, 255, targetZ)},
+ * rounded up. CE leaves {@link #tx} untouched (not reset) when there is no pollution data at that
+ * cell yet - replicated exactly below, not "fixed" into an empty-string reset.
  */
 public class SatelliteMapper extends Satellite {
 
@@ -52,9 +55,11 @@ public class SatelliteMapper extends Satellite {
         }
 
         if (cmd[0].equals(CMD_GETSMOG)) {
-            // TODO(pollution-system): com.hbm.handler.pollution.PollutionHandler is not ported yet -
-            // this command is a no-op stub until that simulation lands (see class javadoc).
-            this.tx = "";
+            PollutionData data = PollutionHandler.getPollutionData(level, new BlockPos(targetX, 255, targetZ));
+            if (data != null) {
+                float soot = data.pollution[PollutionType.SOOT.ordinal()];
+                this.tx = "" + (int) Math.ceil(soot);
+            }
             return;
         }
 

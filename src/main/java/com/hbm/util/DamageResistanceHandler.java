@@ -16,7 +16,14 @@ package com.hbm.util;
  *     (confirmed by reading CE's {@code DamageResistanceHandler.java} directly - kept whole,
  *     including {@code PLASMA}, unlike the Neo Edition reference's own trimmed 8-value copy, since
  *     {@code PLASMA} is a real, distinct value CE's own resistance-table switch statement still
- *     branches on elsewhere in the mod).</li>
+ *     branches on elsewhere in the mod), plus 3 additional entries
+ *     ({@code REVOLVER_BULLET}/{@code TAU}/{@code CHOPPER_BULLET}) added by
+ *     {@code docs/phase4/entities_legacy_bullet_system.md}'s retarget of CE's pre-Sedna
+ *     {@code GunNPCFactory}/{@code EntityBullet} mob ammo onto this framework - these 3 resolve
+ *     directly to already-registered {@link com.hbm.damage.ModDamageTypes} keys (CE's own
+ *     {@code ModDamageSource.causeBulletDamage}/{@code causeTauDamage}/{@code causeDisplacementDamage})
+ *     rather than the generic {@code SEDNA_*} categories the original 9 values map to, since the legacy
+ *     system's own damage-type selection was never generic to begin with.</li>
  *     <li>The {@code setup(pierceDT, pierce)}/{@code reset()} static-state contract
  *     {@code EntityDamageUtil.attackEntityFromNT} threads {@code BulletConfig}'s
  *     {@code armorThresholdNegation}/{@code armorPiercingPercent} fields through, preserved
@@ -48,6 +55,9 @@ public class DamageResistanceHandler {
     }
 
     public enum DamageClass {
-        PHYSICAL, FIRE, EXPLOSIVE, ELECTRIC, PLASMA, LASER, MICROWAVE, SUBATOMIC, OTHER
+        PHYSICAL, FIRE, EXPLOSIVE, ELECTRIC, PLASMA, LASER, MICROWAVE, SUBATOMIC, OTHER,
+        // Legacy pre-Sedna mob ballistics content (see class javadoc) - not part of CE's original
+        // 9-value enum, added purely for the retargeted GunNPCFactory/EntityBullet mob ammo.
+        REVOLVER_BULLET, TAU, CHOPPER_BULLET
     }
 }

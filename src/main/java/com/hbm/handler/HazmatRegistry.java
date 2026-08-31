@@ -1,5 +1,6 @@
 package com.hbm.handler;
 
+import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ShadyUtil;
 import com.hbm.util.Tuple;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -117,17 +118,18 @@ public final class HazmatRegistry {
 
     /**
      * CE: {@code HazmatRegistry#getResistance(EntityLivingBase)} - sums {@link #getResistance(ItemStack)}
-     * across all 4 worn armor slots, plus a hardcoded {@code ShadyUtil.Pu_238} UUID bonus.
-     *
-     * <p>TODO(HbmPotion): CE also adds {@code 0.2F} when {@code player.isPotionActive(HbmPotion.radx)};
-     * {@code HbmPotion} doesn't exist in this port yet (see this area's research report's Deferred
-     * scope) - dropped until that lands.
+     * across all 4 worn armor slots, plus a hardcoded {@code ShadyUtil.Pu_238} UUID bonus and a flat
+     * {@code 0.2F} bonus while {@code com.hbm.potion.HbmPotionEffects#RADX} is active.
      */
     public static float getResistance(LivingEntity entity) {
         float res = 0.0F;
 
         if (entity.getUUID().equals(ShadyUtil.Pu_238)) {
             res += 0.4F;
+        }
+
+        if (entity.hasEffect(HbmPotionEffects.RADX)) {
+            res += 0.2F;
         }
 
         if (entity instanceof Player player) {

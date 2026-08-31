@@ -1,5 +1,6 @@
 package com.hbm.blocks.generic;
 
+import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.BlockEnums;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
@@ -59,6 +60,8 @@ public final class GenericBlocks {
         PlantBlocks.registerAll();
         GenericCrateBlocks.registerAll();
         GenericDecoBlocks.registerAll();
+        BedrockOreBlocks.registerAll();
+        WastelandVirusBlocks.registerAll();
 
         registerStructural();
         registerDoorsLaddersGlass();
@@ -458,6 +461,13 @@ public final class GenericBlocks {
         registerBlock("brick_concrete_mossy", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(15.0F, 160.0F).sound(SoundType.STONE)),
                 ModCreativeTabs.BLOCKS);
         registerBlock("reinforced_brick", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(15.0F, 300.0F).sound(SoundType.STONE)),
+                ModCreativeTabs.BLOCKS);
+        // CE: new BlockBase(Material.ROCK, "reinforced_sand").setHardness(15.0F).setResistance(40.0F)
+        // - the fifth member of ExplosionChaos.explode's indestructible-block list (see
+        // docs/phase4/entities_vortex_gravity_wells.md Table B); its four siblings
+        // (reinforced_glass/reinforced_lamp_on/reinforced_lamp_off above, reinforced_brick just above)
+        // were already registered here.
+        registerBlock("reinforced_sand", () -> new BlockBase(BlockBehaviour.Properties.of().strength(15.0F, 40.0F).sound(SoundType.STONE)),
                 ModCreativeTabs.BLOCKS);
         registerBlock("brick_compound", () -> new BlockRadResistant(BlockBehaviour.Properties.of().strength(15.0F, 400.0F).sound(SoundType.STONE)),
                 ModCreativeTabs.BLOCKS);

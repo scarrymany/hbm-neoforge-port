@@ -22,6 +22,7 @@ import com.hbm.inventory.recipes.HbmRecipes;
 import com.hbm.items.HbmDataComponents;
 import com.hbm.items.ModItems;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.potion.HbmPotionEffects;
 import com.hbm.sound.ModSounds;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -57,6 +58,7 @@ public class MainRegistry {
 
         HBMSoundHandler.register(modEventBus);
         ModSounds.register(modEventBus);
+        HbmPotionEffects.register(modEventBus);
         HazardComponents.register(modEventBus);
         ModAttachments.register(modEventBus);
         modEventBus.addListener(ModCapabilities::register);

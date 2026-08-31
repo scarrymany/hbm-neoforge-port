@@ -13,9 +13,11 @@ import com.hbm.explosion.vanillant.standard.EntityProcessorCrossSmooth;
 import com.hbm.explosion.vanillant.standard.ExplosionEffectTiny;
 import com.hbm.explosion.vanillant.standard.ExplosionEffectWeapon;
 import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
+import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,11 +54,11 @@ import java.util.List;
  *     mapping {@code docs/phase3/gun_framework.md} already flagged as missing a
  *     {@code SEDNA_PLASMA}-family entry) - EMP/PLASMA fall back to the processor's own plain
  *     explosion-damage source until that lands.</li>
- *     <li>{@code com.hbm.handler.radiation.ChunkRadiationManager} (NUCLEAR/NUCLEAR_DEMO's
- *     {@code incrementRad}) and {@code com.hbm.saveddata.satellites.SatelliteDetector} (their
- *     {@code spawnMush}'s satellite ping) - confirmed not ported anywhere in this tree (Phase 4
- *     world-sim/missile-infra scope, per {@code docs/phase3/explosion_engine.md}'s identical finding
- *     for {@code EntityFalloutRain}).</li>
+ *     <li>{@code com.hbm.saveddata.satellites.SatelliteDetector} ({@code spawnMush}'s satellite ping) -
+ *     confirmed not ported anywhere in this tree (missile-infra scope, per
+ *     {@code docs/phase3/explosion_engine.md}'s identical finding for {@code EntityFalloutRain}).
+ *     {@code com.hbm.handler.radiation.ChunkRadiationManager} (NUCLEAR/NUCLEAR_DEMO's
+ *     {@code incrementRad}) is now real (Phase 4) and wired below.</li>
  * </ul>
  * Every other call below (the {@code ExplosionVNT} blasts themselves, the CLUSTER/CLUSTER_HEAVY/LASER/
  * FRAG_SLEEVE submunitions, SCHRAB's Fleija spawn) is a real, fully-wired port - none of Phase 3's own
@@ -219,8 +221,21 @@ public final class GrenadeFillingActions {
         spawnMush(grenade);
     }
 
+    /**
+     * CE: {@code XFactoryCatapult.incrementRad(World, double, double, double, float)} - the same
+     * 5x5 chunk-cross ambient-radiation bump {@link com.hbm.items.weapon.sedna.content.XFactoryEnergy}
+     * uses for its own nuke rounds, applied here to NUCLEAR/NUCLEAR_DEMO grenade fillings.
+     */
     private static void incrementRad(Level level, double x, double y, double z, float mult) {
-        // forward reference: com.hbm.handler.radiation.ChunkRadiationManager - see class javadoc. No-op.
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        for (int i = -2; i <= 2; i++) {
+            for (int j = -2; j <= 2; j++) {
+                if (Math.abs(i) + Math.abs(j) < 4) {
+                    pos.set((int) Math.floor(x + i * 16), (int) Math.floor(y), (int) Math.floor(z + j * 16));
+                    ChunkRadiationManager.proxy.incrementRad(level, pos, (50F / (Math.abs(i) + Math.abs(j) + 1)) * mult);
+                }
+            }
+        }
     }
 
     private static void spawnMush(EntityGrenadeUniversal grenade) {

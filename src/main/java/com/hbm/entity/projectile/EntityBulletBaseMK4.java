@@ -24,11 +24,13 @@ import javax.annotation.Nullable;
 
 /**
  * Port of CE's {@code com.hbm.entity.projectile.EntityBulletBaseMK4} (288 lines) - the concrete
- * "physical bullet" entity: 4 constructors (submunition, standard gun-fired, turret-fired by raw
- * yaw/pitch, and the bare no-arg used for deserialization/{@code EntityType} construction), a
- * lockon-homing branch, and the fixed {@code onImpact} dispatch order the gun-framework report calls
- * out explicitly: {@code config.onImpact}, then - only if the bullet is still alive - the
- * type-appropriate {@code config.onRicochet}/{@code config.onEntityHit}.
+ * "physical bullet" entity: originally 4 constructors (submunition, standard gun-fired, turret-fired
+ * by raw yaw/pitch, and the bare no-arg used for deserialization/{@code EntityType} construction), plus
+ * a 5th purely-additive "aim at a target" constructor added by
+ * {@code docs/phase4/entities_legacy_bullet_system.md}'s pre-Sedna mob ballistics retarget (see that
+ * constructor's own javadoc); a lockon-homing branch; and the fixed {@code onImpact} dispatch order the
+ * gun-framework report calls out explicitly: {@code config.onImpact}, then - only if the bullet is
+ * still alive - the type-appropriate {@code config.onRicochet}/{@code config.onEntityHit}.
  */
 public class EntityBulletBaseMK4 extends EntityThrowableInterp implements IEntityWithComplexSpawn {
 
@@ -139,6 +141,61 @@ public class EntityBulletBaseMK4 extends EntityThrowableInterp implements IEntit
 
     public EntityBulletBaseMK4(Level level, BulletConfig config, float baseDamage, float gunSpread, float yaw, float pitch) {
         this(GunEntityTypes.BULLET_MK4.get(), level, config, baseDamage, gunSpread, yaw, pitch);
+    }
+
+    /**
+     * For mob/boss AI firing at a specific target - the CE-faithful equivalent of legacy
+     * {@code com.hbm.entity.projectile.EntityBulletBase}'s own
+     * {@code (World, int, EntityLivingBase shooter, EntityLivingBase target, float motion, float
+     * deviation)} mob-firing constructor, relocated here per
+     * {@code docs/phase4/entities_legacy_bullet_system.md}'s Headline finding #5 / Key design
+     * decisions (retarget the 8 live {@code GunNPCFactory} ammo definitions onto this class rather
+     * than porting a second, parallel ballistics entity). Computes the same ~10-line aim-at-target
+     * {@code atan2} trig CE's constructor does (this port's coordinate/angle conventions are
+     * otherwise identical to CE's - see {@link #shoot}/{@link #alignRotationWithMotion}), then rolls
+     * {@link #damage} from {@code config}'s {@link BulletConfig#dmgMin}/{@link BulletConfig#dmgMax}
+     * (see that pair's own javadoc for why this constructor, uniquely among this class's 4
+     * constructors, has no externally-supplied {@code baseDamage} parameter - CE's own equivalent
+     * constructor doesn't take one either, since the legacy system always rolled its own flat damage
+     * range instead of scaling a caller-supplied base).
+     * <p>
+     * <b>Purely additive</b> - does not alter any existing constructor's signature or behavior; the 3
+     * gun/turret-firing constructors above and {@code TileEntityTurretBaseNT}'s own use of this class
+     * are untouched.
+     */
+    protected EntityBulletBaseMK4(EntityType<? extends EntityBulletBaseMK4> type, Level level, BulletConfig config, LivingEntity shooter, LivingEntity target, float motion, float deviation) {
+        this(type, level);
+
+        this.setOwner(shooter);
+        this.setBulletConfig(config);
+        this.damage = config.rollDamage(this.random);
+
+        double eyeY = shooter.getY() + shooter.getEyeHeight() - 0.10000000149011612D;
+        double d0 = target.getX() - shooter.getX();
+        double d1 = target.getBoundingBox().minY + target.getBbHeight() / 3.0F - eyeY;
+        double d2 = target.getZ() - shooter.getZ();
+        double d3 = Math.sqrt(d0 * d0 + d2 * d2);
+
+        if (d3 >= 1.0E-7D) {
+            float yaw = (float) (Math.atan2(d2, d0) * 180.0D / Math.PI) - 90.0F;
+            float pitch = (float) (-(Math.atan2(d1, d3) * 180.0D / Math.PI));
+            double d4 = d0 / d3;
+            double d5 = d2 / d3;
+            this.moveTo(shooter.getX() + d4, eyeY, shooter.getZ() + d5, yaw, pitch);
+            this.setPos(this.position());
+            this.shoot(d0, d1, d2, motion, deviation);
+            alignRotationWithMotion();
+        } else {
+            // CE's own constructor leaves position/motion untouched in this (practically unreachable -
+            // shooter and target at the exact same X/Z) degenerate case; match that here rather than
+            // inventing a fallback aim direction it never had.
+            this.moveTo(shooter.getX(), eyeY, shooter.getZ(), shooter.getYRot(), shooter.getXRot());
+            this.setPos(this.position());
+        }
+    }
+
+    public EntityBulletBaseMK4(Level level, BulletConfig config, LivingEntity shooter, LivingEntity target, float motion, float deviation) {
+        this(GunEntityTypes.BULLET_MK4.get(), level, config, shooter, target, motion, deviation);
     }
 
     @Override

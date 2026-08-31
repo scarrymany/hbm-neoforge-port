@@ -6,6 +6,7 @@ import com.hbm.items.ModItems;
 import com.hbm.items.gear.ArmorFSB;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.MaterialRegistry;
+import com.hbm.potion.HbmPotionEffects;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -351,7 +352,7 @@ public final class PoweredArmorItems {
     }
 
     // ==================== BJ (4) + BJJetpack (1) - ArmorFSBPowered(10000000,10000,1000,100) ====================
-    // CE ModItems.java:647-663. HbmPotion.radx effect dropped (HbmPotion not ported - see Deferred scope).
+    // CE ModItems.java:647-663.
 
     public static final DeferredItem<Item> BJ_HELMET = register("bj_helmet", () ->
             bjEffects(new ArmorBJ(MaterialRegistry.aMatBJ, ArmorItem.Type.HELMET, poweredProps(), 10000000, 10000, 1000, 100)));
@@ -369,7 +370,7 @@ public final class PoweredArmorItems {
                 .addEffect(effect(MobEffects.MOVEMENT_SPEED, 30, 1))
                 .addEffect(effect(MobEffects.JUMP, 30, 0))
                 .addEffect(effect(MobEffects.SATURATION, 30, 0))
-                // TODO(HbmPotion not yet ported): CE also adds HbmPotion.radx here - see Deferred scope.
+                .addEffect(effect(HbmPotionEffects.RADX, 30, 0))
                 .setStep(HBMSoundHandler.metalStep.get()).setJump(HBMSoundHandler.ironJump.get()).setFall(HBMSoundHandler.ironLand.get())
                 .setRadResist(1D);
         return armor;

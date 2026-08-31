@@ -38,10 +38,12 @@ import java.util.function.Supplier;
  * never had - see those classes' javadocs).
  * <p>
  * {@link ItemEnergy}, {@link ItemPill}, and {@link ItemCanteen} are registered fully working per the
- * research report's sequencing recommendation, with every branch that would call into the unported
- * {@code HbmPotion}/{@code HbmLivingProps}/{@code ContaminationUtil}/
- * {@code VersatileConfig.applyPotionSickness} facade left as an explicit TODO on that item class
- * rather than silently dropped or stubbed to a no-op without comment.
+ * research report's sequencing recommendation. {@link ItemPill}'s {@code HbmPotion}/
+ * {@code VersatileConfig.applyPotionSickness} branches are now wired against
+ * {@code com.hbm.potion.HbmPotionEffects} (see that class's own javadoc); every remaining branch
+ * that would call into the still-unported {@code HbmLivingProps}/{@code ContaminationUtil} facade is
+ * left as an explicit TODO on that item class rather than silently dropped or stubbed to a no-op
+ * without comment.
  */
 public final class FoodItems {
 
@@ -278,20 +280,16 @@ public final class FoodItems {
                         .build()),
                 true, false)));
 
-        // apple_lead: low/mid tiers use CE's unported HbmPotion.lead effect (docs/phase1/
-        // items_food_gear.md finding #2) - registered with no effect for now, TODO'd below rather than
-        // silently dropped. High tier is lethal instead (500 damage via the already-ported
-        // ModDamageTypes.LEAD), implemented directly in ItemAppleSchrabidium#finishUsingItem.
-        // TODO(HbmPotion follow-up): apple_lead_low should additionally apply HbmPotion.lead
-        // (15*20 ticks, amp 2) here once that effect is ported.
+        // apple_lead: low/mid tiers grant com.hbm.potion.HbmPotionEffects.LEAD (CE's real numbers,
+        // upstream hbm-ce ItemAppleSchrabidium#onFoodEaten: 15*20 ticks amp 2 / 60*20 ticks amp 4).
+        // High tier is lethal instead (500 damage via the already-ported ModDamageTypes.LEAD),
+        // implemented directly in ItemAppleSchrabidium#finishUsingItem.
         tab(reg("apple_lead_low", () -> new ItemAppleSchrabidium(
                 new Item.Properties().rarity(Rarity.UNCOMMON).food(foodBuilder(5, 0F).alwaysEdible().build()),
-                false, false)));
-        // TODO(HbmPotion follow-up): apple_lead_mid should additionally apply HbmPotion.lead
-        // (60*20 ticks, amp 4) here once that effect is ported.
+                false, false, 15 * 20, 2)));
         tab(reg("apple_lead_mid", () -> new ItemAppleSchrabidium(
                 new Item.Properties().rarity(Rarity.RARE).food(foodBuilder(5, 0F).alwaysEdible().build()),
-                false, false)));
+                false, false, 60 * 20, 4)));
         tab(reg("apple_lead_high", () -> new ItemAppleSchrabidium(
                 new Item.Properties().rarity(Rarity.EPIC).food(foodBuilder(5, 0F).alwaysEdible().build()),
                 true, true)));

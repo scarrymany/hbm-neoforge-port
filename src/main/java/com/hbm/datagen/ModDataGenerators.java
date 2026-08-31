@@ -8,6 +8,7 @@ import com.hbm.damage.datagen.ModDamageTypeTagsProvider;
 import com.hbm.items.datagen.ModItemModelProvider;
 import com.hbm.items.datagen.ModItemTagProvider;
 import com.hbm.main.MainRegistry;
+import com.hbm.world.biome.ModCraterBiomes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
@@ -55,6 +56,7 @@ public class ModDataGenerators {
 
         RegistrySetBuilder registrySetBuilder = new RegistrySetBuilder();
         registrySetBuilder.add(Registries.DAMAGE_TYPE, ModDamageTypes::bootstrap);
+        registrySetBuilder.add(Registries.BIOME, ModCraterBiomes::bootstrap);
         DatapackBuiltinEntriesProvider datapackProvider =
                 new DatapackBuiltinEntriesProvider(output, lookup, registrySetBuilder, Set.of(MainRegistry.MODID));
         generator.addProvider(event.includeServer(), datapackProvider);

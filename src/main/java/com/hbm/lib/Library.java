@@ -306,4 +306,79 @@ public final class Library {
         BlockEntity be = level.getBlockEntity(pos);
         return be instanceof IFluidConnectorMK2 tileCon && tileCon.canConnect(type, incoming);
     }
+
+    /**
+     * Phase 4's {@code com.hbm.handler.radiation.RadiationSystemNT} bit-packing helpers, net-new to
+     * this port (CE's own equivalents live scattered across CE's much larger 2500-line {@code Library}
+     * god-class this port does not carry over wholesale - see class javadoc). Confirmed absent from
+     * this file before this pass (zero matches for any of these names).
+     * <p>
+     * A <b>section key</b> packs one 16x16x16 subchunk section's owning chunk X/Z plus its subchunk Y
+     * index into a single {@code long}: X in bits 0-23, Z in bits 24-47 (both signed 24-bit fields,
+     * plenty of headroom past the vanilla +-30,000,000 block world border), subchunk Y (bias +128) in
+     * bits 48-55. A <b>chunk key</b> is the same encoding with the Y field zeroed
+     * ({@link #sectionToChunkLong}), so it groups every section of one chunk column under one map key.
+     * A <b>local index</b> packs a block's position within its own section into one {@code int} in
+     * {@code 0..4095} ({@code (y<<8)|(z<<4)|x} ordering).
+     * <p>
+     * This is a self-consistent internal format for this port's own runtime bookkeeping only - it is
+     * <em>not</em> required to bit-match CE's 1.12.2 on-disk encoding (chunk/NBT formats are already
+     * completely incompatible across that version gap for unrelated reasons), only to round-trip
+     * correctly within this port.
+     */
+    public static long sectionToLong(int sectionX, int sectionZ, int sectionY) {
+        return (((long) sectionX) & 0xFFFFFFL)
+                | ((((long) sectionZ) & 0xFFFFFFL) << 24)
+                | ((((long) (sectionY + 128)) & 0xFFL) << 48);
+    }
+
+    /** Replaces just the subchunk-Y field of an existing section key, keeping its chunk X/Z intact. */
+    public static long setSectionY(long sectionKey, int sectionY) {
+        long cleared = sectionKey & ~(0xFFL << 48);
+        return cleared | ((((long) (sectionY + 128)) & 0xFFL) << 48);
+    }
+
+    public static int getSectionX(long sectionKey) {
+        return (int) ((sectionKey << 40) >> 40);
+    }
+
+    public static int getSectionZ(long sectionKey) {
+        return (int) ((sectionKey << 16) >> 40);
+    }
+
+    public static int getSectionY(long sectionKey) {
+        return (int) (((sectionKey >>> 48) & 0xFFL) - 128);
+    }
+
+    /** Section key for the subchunk section containing {@code pos}. */
+    public static long blockPosToSectionLong(BlockPos pos) {
+        return sectionToLong(pos.getX() >> 4, pos.getZ() >> 4, pos.getY() >> 4);
+    }
+
+    /** The owning chunk's key (section key with the subchunk-Y field zeroed out). */
+    public static long sectionToChunkLong(long sectionKey) {
+        return sectionKey & 0xFFFFFFFFFFFFL;
+    }
+
+    /** Packs {@code pos}'s position within its own 16x16x16 section into {@code 0..4095}. */
+    public static int blockPosToLocal(BlockPos pos) {
+        return ((pos.getY() & 15) << 8) | ((pos.getZ() & 15) << 4) | (pos.getX() & 15);
+    }
+
+    public static int getLocalX(int local) {
+        return local & 15;
+    }
+
+    public static int getLocalZ(int local) {
+        return (local >> 4) & 15;
+    }
+
+    public static int getLocalY(int local) {
+        return (local >> 8) & 15;
+    }
+
+    /** Full-precision world-block-position key; delegates to Mojang's own {@link BlockPos#asLong()}. */
+    public static long blockPosToLong(BlockPos pos) {
+        return pos.asLong();
+    }
 }

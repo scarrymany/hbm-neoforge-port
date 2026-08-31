@@ -1,6 +1,8 @@
 package com.hbm.items.food;
 
+import com.hbm.config.VersatileConfig;
 import com.hbm.damage.ModDamageTypes;
+import com.hbm.potion.HbmPotionEffects;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,13 +23,17 @@ import java.util.List;
  * same technique as {@link ItemEnergy}/the existing {@link ItemLemon}.
  * <p>
  * <b>Not ported (see docs/phase1/items_food_gear.md finding #2 - flagged per-branch below, not
- * silently dropped):</b> CE calls {@code VersatileConfig.applyPotionSickness(player, 5)} before every
- * branch, and most branches also read/write {@code HbmLivingProps}' asbestos/black-lung/radiation/
- * digamma state or apply an {@code HbmPotion} effect (`radx`, `death`, `stability`, and removing
- * `HbmPotion.radiation`). None of {@code HbmPotion}/{@code HbmLivingProps}/{@code VersatileConfig
- * .applyPotionSickness} exist in this port yet, so those specific calls are TODO'd next to the
- * vanilla-only pieces of each branch, which are ported directly. {@code plan_c} and {@code chocolate}'s
- * self-damage branches use the already-ported {@link ModDamageTypes#EUTHANIZED_SELF}/
+ * silently dropped):</b> most branches also read/write {@code HbmLivingProps}' asbestos/black-lung/
+ * radiation/digamma state, which does not exist in this port yet - those specific calls are TODO'd
+ * next to the vanilla-only/potion pieces of each branch, which are ported directly. Every
+ * {@code HbmPotion}-equivalent branch ({@code pill_iodine}'s radiation removal, {@code pill_red}'s
+ * {@code death} grant, {@code radx}'s {@code radx} grant, {@code pill_herbal}'s
+ * {@code potionsickness} grant, {@code five_htp}'s {@code stability} grant, and the
+ * {@code VersatileConfig.applyPotionSickness(player, 5)} call CE makes before every branch) is now
+ * wired against {@code com.hbm.potion.HbmPotionEffects} - except {@code pill_herbal}'s milk-curative
+ * immunity, which docs/phase4/hbm_potion_system.md's own Open questions section flags as having no
+ * confirmed 1.21.1 equivalent (see that branch's own TODO below). {@code plan_c} and
+ * {@code chocolate}'s self-damage branches use the already-ported {@link ModDamageTypes#EUTHANIZED_SELF}/
  * {@link ModDamageTypes#EUTHANIZED_SELF_2}/{@link ModDamageTypes#OVERDOSE} damage types in place of
  * CE's unported {@code com.hbm.lib.ModDamageSource} singletons of (almost) the same name.
  */
@@ -44,8 +50,7 @@ public class ItemPill extends Item {
             return result;
         }
 
-        // TODO(VersatileConfig follow-up, docs/phase1/items_food_gear.md finding #2): CE calls
-        // VersatileConfig.applyPotionSickness(player, 5) here before every branch below - not ported.
+        VersatileConfig.applyPotionSickness(player, 5);
 
         String path = BuiltInRegistries.ITEM.getKey(this).getPath();
         switch (path) {
@@ -58,7 +63,7 @@ public class ItemPill extends Item {
                 player.removeEffect(MobEffects.POISON);
                 player.removeEffect(MobEffects.WEAKNESS);
                 player.removeEffect(MobEffects.WITHER);
-                // TODO(HbmPotion follow-up): CE also removes HbmPotion.radiation here - unported effect.
+                player.removeEffect(HbmPotionEffects.RADIATION);
             }
             case "plan_c" -> {
                 // CE: 10x attackEntityFrom(random ModDamageSource.euthanizedSelf/euthanizedSelf2, 1000) -
@@ -69,12 +74,8 @@ public class ItemPill extends Item {
                     player.hurt(level.damageSources().source(type), 1000F);
                 }
             }
-            case "pill_red" -> {
-                // TODO(HbmPotion follow-up): CE applies HbmPotion.death (60*60*20 ticks, amp 0) here - unported.
-            }
-            case "radx" -> {
-                // TODO(HbmPotion follow-up): CE applies HbmPotion.radx (3*60*20 ticks, amp 3) here - unported.
-            }
+            case "pill_red" -> player.addEffect(new MobEffectInstance(HbmPotionEffects.DEATH, 60 * 60 * 20, 0));
+            case "radx" -> player.addEffect(new MobEffectInstance(HbmPotionEffects.RADX, 3 * 60 * 20, 3));
             case "siox" -> {
                 // TODO(HbmLivingProps follow-up): CE zeroes asbestos and caps black lung to 1/5 max here -
                 // HbmLivingProps doesn't exist in this port yet.
@@ -86,8 +87,13 @@ public class ItemPill extends Item {
                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 10 * 60 * 20, 2));
                 player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 10 * 60 * 20, 2));
                 player.addEffect(new MobEffectInstance(MobEffects.POISON, 5 * 20, 2));
-                // TODO(HbmPotion follow-up): CE also applies a 10-minute, curative-item-immune
-                // HbmPotion.potionsickness here - unported effect.
+                // TODO(curative-item override, docs/phase4/hbm_potion_system.md Open questions):
+                // CE makes this specific potionsickness grant immune to milk curing via a
+                // per-instance PotionEffect#setCurativeItems(emptyList) override. Modern MobEffect
+                // curability is EffectCure-based and class-level (MobEffect#fillEffectCures), with
+                // no confirmed 1.21.1 equivalent for a per-application override - granted below as
+                // an ordinary (milk-curable) potionsickness instance until that's confirmed.
+                player.addEffect(new MobEffectInstance(HbmPotionEffects.POTIONSICKNESS, 10 * 60 * 20, 0));
             }
             case "xanax" -> {
                 // TODO(HbmLivingProps follow-up): CE reduces digamma by 0.5 (floored at 0) here - digamma
@@ -106,8 +112,8 @@ public class ItemPill extends Item {
                 player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 0));
             }
             case "five_htp" -> {
-                // TODO(HbmLivingProps/HbmPotion follow-up): CE zeroes digamma and applies a 10-minute
-                // HbmPotion.stability here - neither exists in this port yet.
+                // TODO(HbmLivingProps follow-up): CE also zeroes digamma here - unported.
+                player.addEffect(new MobEffectInstance(HbmPotionEffects.STABILITY, 10 * 60 * 20, 0));
             }
             default -> {
             }

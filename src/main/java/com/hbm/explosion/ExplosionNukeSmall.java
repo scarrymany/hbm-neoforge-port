@@ -2,6 +2,7 @@ package com.hbm.explosion;
 
 import com.hbm.config.BombConfig;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
+import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
@@ -16,11 +17,11 @@ import net.minecraft.world.level.Level;
  * AuxParticlePacketNT}/{@code HbmEffectNT}, Phase 5) and the {@code params.miniNuke && !params.safe}
  * branch's {@code ExplosionNT} mini-explosion (that older, non-vanillant explosion class was out of
  * this pass's read set per {@code docs/phase3/explosion_engine.md} - a real, separately-scoped
- * forward reference, not guessed at) and the mini-nuke chunk-radiation increment ({@code
- * ChunkRadiationManager}, Phase 4 world/simulation). {@link #dealDamage}'s AoE (via {@link
- * ExplosionNukeGeneric#dealDamage}) and the non-mini-nuke path's real {@link EntityNukeExplosionMK5}
- * spawn are both fully ported and functional - the two presets actually flagged {@code miniNuke =
- * false} ({@link #PARAMS_HIGH}) already skip the stubbed branch entirely.
+ * forward reference, not guessed at). {@link #dealDamage}'s AoE (via {@link
+ * ExplosionNukeGeneric#dealDamage}), the non-mini-nuke path's real {@link EntityNukeExplosionMK5}
+ * spawn, and the mini-nuke chunk-radiation increment ({@code ChunkRadiationManager}, Phase 4) are all
+ * fully ported and functional - the two presets actually flagged {@code miniNuke = false}
+ * ({@link #PARAMS_HIGH}) already skip both stubbed/radiation branches entirely.
  */
 public final class ExplosionNukeSmall {
 
@@ -51,9 +52,19 @@ public final class ExplosionNukeSmall {
         }
 
         if (params.miniNuke) {
-            // TODO(ChunkRadiationManager, Phase 4): CE increments ambient chunk radiation in a 5x5
-            // chunk cross around the epicenter here, scaled by params.radiationLevel; that world/
-            // simulation system doesn't exist in this port yet.
+            // CE: 5x5 chunk-cross ambient-radiation bump around the epicenter, falling off with
+            // Manhattan distance, scaled by params.radiationLevel/3.
+            float radMod = params.radiationLevel / 3F;
+            BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+            for (int i = -2; i <= 2; i++) {
+                for (int j = -2; j <= 2; j++) {
+                    if (Math.abs(i) + Math.abs(j) < 4) {
+                        mutablePos.set((int) Math.floor(posX + i * 16), (int) Math.floor(posY), (int) Math.floor(posZ + j * 16));
+                        ChunkRadiationManager.proxy.incrementRad(level, mutablePos,
+                                (50F / (Math.abs(i) + Math.abs(j) + 1)) * radMod);
+                    }
+                }
+            }
         }
     }
 
