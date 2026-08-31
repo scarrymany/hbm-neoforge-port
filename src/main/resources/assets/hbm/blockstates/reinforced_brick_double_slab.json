@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/reinforced_brick"
+    },
+    "type=top": {
+      "model": "hbm:block/reinforced_brick"
+    }
+  }
+}

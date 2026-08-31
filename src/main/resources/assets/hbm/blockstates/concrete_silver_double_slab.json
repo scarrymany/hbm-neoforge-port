@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/concrete_silver"
+    },
+    "type=top": {
+      "model": "hbm:block/concrete_silver"
+    }
+  }
+}

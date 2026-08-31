@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "hbm:block/geysir_stone",
+    "up": "hbm:block/geysir_stone",
+    "down": "block/stone",
+    "east": "block/stone",
+    "west": "block/stone",
+    "north": "block/stone",
+    "south": "block/stone"
+  }
+}

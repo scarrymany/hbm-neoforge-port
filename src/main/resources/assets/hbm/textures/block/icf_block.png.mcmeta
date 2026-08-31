@@ -1,0 +1,15 @@
+{
+	"ctm": {
+		"ctm_version": 1,
+		"type": "ctm",
+		"textures": [
+			"hbm:blocks/icf_block_ct"
+		],
+        "extra": {
+            "connect_to": [
+                { "block": "hbm:icf_block" },
+                { "block": "hbm:icf_controller" }
+            ]
+        }
+	}
+}

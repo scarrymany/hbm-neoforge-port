@@ -1,0 +1,11 @@
+{
+  "parent": "hbm:block/capacitor",
+  "textures": {
+    "top": "hbm:block/capacitor_gold_top",
+    "side": "hbm:block/capacitor_gold_side",
+    "bottom": "hbm:block/capacitor_gold_bottom",
+    "inner_top": "hbm:block/capacitor_gold_inner_top",
+    "inner_side": "hbm:block/capacitor_gold_inner_side",
+    "particle": "hbm:block/capacitor_gold_inner_side"
+  }
+}

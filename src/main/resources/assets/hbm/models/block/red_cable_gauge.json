@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "hbm:block/concrete_tile",
+    "front": "hbm:block/red_cable_gauge_front",
+    "side": "hbm:block/concrete_tile"
+  }
+}

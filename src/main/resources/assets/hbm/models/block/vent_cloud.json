@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "hbm:block/vent_blank",
+    "top": "hbm:block/vent_blank",
+    "side": "hbm:block/vent_cloud"
+  }
+}

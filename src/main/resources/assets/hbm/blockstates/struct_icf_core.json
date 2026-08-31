@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/struct_icf_core"
+    },
+    "facing=south": {
+      "model": "hbm:block/struct_icf_core",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/struct_icf_core",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/struct_icf_core",
+      "y": 90
+    }
+  }
+}

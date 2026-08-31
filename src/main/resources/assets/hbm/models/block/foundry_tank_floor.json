@@ -1,0 +1,29 @@
+{
+  "textures": {
+    "bottom": "hbm:block/foundry_tank_bottom",
+    "particle": "hbm:block/foundry_tank_bottom"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#bottom"
+        },
+        "down": {
+          "texture": "#bottom",
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

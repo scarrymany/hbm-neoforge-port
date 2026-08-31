@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/ngtv"
+    },
+    "facing=south": {
+      "model": "hbm:block/ngtv",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/ngtv",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/ngtv",
+      "y": 90
+    }
+  }
+}

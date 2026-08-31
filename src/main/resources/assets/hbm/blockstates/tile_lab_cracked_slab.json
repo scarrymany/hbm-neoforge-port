@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/half_slab_tile_lab_cracked"
+    },
+    "type=top": {
+      "model": "hbm:block/upper_slab_tile_lab_cracked"
+    }
+  }
+}

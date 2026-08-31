@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/wood_barrier"
+    },
+    "facing=south": {
+      "model": "hbm:block/wood_barrier"
+    },
+    "facing=west": {
+      "model": "hbm:block/wood_barrier"
+    },
+    "facing=east": {
+      "model": "hbm:block/wood_barrier"
+    }
+  }
+}

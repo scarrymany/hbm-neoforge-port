@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/machine_electric_furnace_on"
+    },
+    "facing=south": {
+      "model": "hbm:block/machine_electric_furnace_on",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/machine_electric_furnace_on",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/machine_electric_furnace_on",
+      "y": 90
+    }
+  }
+}

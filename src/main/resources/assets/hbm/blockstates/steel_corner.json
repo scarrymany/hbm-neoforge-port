@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/steel_corner"
+    },
+    "facing=south": {
+      "model": "hbm:block/steel_corner",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/steel_corner",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/steel_corner",
+      "y": 90
+    }
+  }
+}

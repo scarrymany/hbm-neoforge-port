@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "tooled=false": {
+      "model": "hbm:block/watz_casing"
+    },
+    "tooled=true": {
+      "model": "hbm:block/watz_casing_tooled"
+    }
+  }
+}

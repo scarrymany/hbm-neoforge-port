@@ -40,6 +40,8 @@ public class ModBlockStateProvider extends BlockStateProvider {
             try {
                 if (block instanceof ICustomBlockModelRegister custom) {
                     custom.registerModel(this, loc);
+                } else if (hasExistingBlockstate(loc)) {
+                    // Phase 10 CE-converted blockstates — don't emit cube-all that shadows them.
                 } else if (hasBlockTexture(loc)) {
                     this.simpleCubeAllBlock(block);
                 }
@@ -51,6 +53,10 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     private boolean hasBlockTexture(ResourceLocation loc) {
         return files.exists(loc, PackType.CLIENT_RESOURCES, ".png", "textures/block");
+    }
+
+    private boolean hasExistingBlockstate(ResourceLocation loc) {
+        return files.exists(loc, PackType.CLIENT_RESOURCES, ".json", "blockstates");
     }
 
     /** Creates the block with its {@code BlockItem}, both using the same cube-all model. */

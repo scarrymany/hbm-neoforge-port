@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "hbm:block/contamination/grass_tall/waste_grass_tall_0"
+  },
+  "ambientocclusion": false
+}

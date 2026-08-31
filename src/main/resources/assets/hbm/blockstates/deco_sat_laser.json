@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/deco_sat_laser"
+    },
+    "facing=south": {
+      "model": "hbm:block/deco_sat_laser",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/deco_sat_laser",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/deco_sat_laser",
+      "y": 90
+    }
+  }
+}

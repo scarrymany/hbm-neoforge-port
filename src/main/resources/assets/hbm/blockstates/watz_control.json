@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "activated=true": {
+      "model": "hbm:block/watz_control"
+    },
+    "activated=false": {
+      "model": "hbm:block/watz_control"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {
+    "bottom": "hbm:block/concrete_red",
+    "top": "hbm:block/concrete_red",
+    "side": "hbm:block/concrete_red"
+  }
+}

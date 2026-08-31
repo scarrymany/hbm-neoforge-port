@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "hbm:block/deco_emitter"
+    },
+    "facing=up": {
+      "model": "hbm:block/deco_emitter"
+    },
+    "facing=north": {
+      "model": "hbm:block/deco_emitter"
+    },
+    "facing=south": {
+      "model": "hbm:block/deco_emitter"
+    },
+    "facing=west": {
+      "model": "hbm:block/deco_emitter"
+    },
+    "facing=east": {
+      "model": "hbm:block/deco_emitter"
+    }
+  }
+}

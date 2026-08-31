@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/reinforced_stone"
+    },
+    "type=top": {
+      "model": "hbm:block/reinforced_stone"
+    }
+  }
+}

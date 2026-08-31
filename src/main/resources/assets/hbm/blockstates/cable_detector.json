@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "state=true": {
+      "model": "hbm:block/cable_detector_on"
+    },
+    "state=false": {
+      "model": "hbm:block/cable_detector_off"
+    }
+  }
+}

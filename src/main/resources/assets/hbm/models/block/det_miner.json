@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "hbm:block/det_miner_top",
+    "side": "hbm:block/det_miner_side"
+  }
+}

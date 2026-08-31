@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/tile_lab"
+    },
+    "type=top": {
+      "model": "hbm:block/tile_lab"
+    }
+  }
+}

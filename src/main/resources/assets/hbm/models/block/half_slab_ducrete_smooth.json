@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "hbm:block/ducrete_smooth",
+    "top": "hbm:block/ducrete_smooth",
+    "side": "hbm:block/ducrete_smooth"
+  }
+}

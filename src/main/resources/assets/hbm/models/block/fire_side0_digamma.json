@@ -1,0 +1,7 @@
+{
+  "parent": "hbm:block/fire_side",
+  "textures": {
+    "particle": "hbm:block/fire_digamma",
+    "fire": "hbm:block/fire_digamma"
+  }
+}

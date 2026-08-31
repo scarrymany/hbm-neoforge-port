@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "hbm:block/reactor_element_top",
+    "side": "hbm:block/reactor_element_side"
+  }
+}

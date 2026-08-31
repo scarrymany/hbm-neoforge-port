@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "extracts=false": {
+      "model": "hbm:block/fluid_duct_mk2"
+    },
+    "extracts=true": {
+      "model": "hbm:block/fluid_duct_mk2"
+    }
+  }
+}

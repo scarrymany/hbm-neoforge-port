@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/brick_obsidian"
+    },
+    "type=top": {
+      "model": "hbm:block/brick_obsidian"
+    }
+  }
+}

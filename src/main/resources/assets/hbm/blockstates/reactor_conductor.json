@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "activated=true": {
+      "model": "hbm:block/reactor_conductor"
+    },
+    "activated=false": {
+      "model": "hbm:block/reactor_conductor"
+    }
+  }
+}

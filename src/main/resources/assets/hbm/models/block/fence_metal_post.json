@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/fence_post",
+  "textures": {
+    "texture": "hbm:block/fence_metal_post",
+    "particle": "hbm:block/fence_metal_post"
+  }
+}

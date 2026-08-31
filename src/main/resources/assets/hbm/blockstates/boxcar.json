@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/boxcar"
+    },
+    "facing=south": {
+      "model": "hbm:block/boxcar"
+    },
+    "facing=west": {
+      "model": "hbm:block/boxcar"
+    },
+    "facing=east": {
+      "model": "hbm:block/boxcar"
+    }
+  }
+}

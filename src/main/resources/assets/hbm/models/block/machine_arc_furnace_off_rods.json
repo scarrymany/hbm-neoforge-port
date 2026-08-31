@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "hbm:block/machine_arc_furnace_side",
+    "down": "hbm:block/machine_arc_furnace_bottom",
+    "up": "hbm:block/machine_arc_furnace_top_rods",
+    "north": "hbm:block/machine_arc_furnace_front_off",
+    "east": "hbm:block/machine_arc_furnace_side",
+    "south": "hbm:block/machine_arc_furnace_side",
+    "west": "hbm:block/machine_arc_furnace_side"
+  }
+}

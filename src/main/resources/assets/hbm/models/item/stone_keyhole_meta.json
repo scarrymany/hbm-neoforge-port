@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "hbm:block/brick_red",
+    "side": "hbm:block/stone_keyhole_meta"
+  }
+}

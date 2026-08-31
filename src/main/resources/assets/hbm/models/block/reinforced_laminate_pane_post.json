@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/glass_pane_post",
+  "textures": {
+    "pane": "hbm:block/reinforced_laminate_pane",
+    "edge": "hbm:block/reinforced_laminate_pane_edge"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/half_slab_reinforced_sand"
+    },
+    "type=top": {
+      "model": "hbm:block/upper_slab_reinforced_sand"
+    }
+  }
+}

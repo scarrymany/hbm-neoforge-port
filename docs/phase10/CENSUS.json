@@ -1,0 +1,131 @@
+{
+  "ce_root": "/workspace/upstream/hbm-ce/src/main/resources/assets/hbm",
+  "dst_root": "/workspace/src/main/resources/assets/hbm",
+  "copied": {
+    "ogg": 549,
+    "mbb": 1,
+    "frag": 51,
+    "vert": 48,
+    "png": 2,
+    "geo": 1,
+    "obj": 634,
+    "mtl": 57,
+    "hmf": 3,
+    "texture": 7159,
+    "nbt": 76,
+    "blockstate": 932,
+    "model_json": 4084,
+    "bak": 1,
+    "dae": 9,
+    "sounds.json": 1
+  },
+  "skipped": {
+    "skip_advancements": 65,
+    "skip_disks": 2,
+    "skip_lang": 9,
+    "skip_manual": 223,
+    "skip_optifine": 1,
+    "other_json": 12
+  },
+  "port_before": {
+    ".mbb": 1,
+    ".json": 12,
+    ".png": 2,
+    "png": 2,
+    "ogg_all": 0,
+    "json": 12,
+    "obj": 0,
+    "mcmeta": 0
+  },
+  "port_after": {
+    ".json": 5029,
+    ".obj": 634,
+    ".mtl": 57,
+    ".hmf": 3,
+    ".mbb": 1,
+    ".png": 6967,
+    ".ogg": 548,
+    "ogg": 548,
+    ".frag": 51,
+    ".vert": 48,
+    ".geo": 1,
+    ".nbt": 76,
+    ".bak": 1,
+    ".dae": 9,
+    ".mcmeta": 190,
+    "tex_block": 2026,
+    "tex_gui": 493,
+    "tex_entity": 83,
+    "tex_armor": 133,
+    "tex_item": 3214,
+    "tex_models": 1079,
+    "tex_particle": 37,
+    ".ini": 3,
+    ".txt": 1,
+    ".mp3": 1,
+    "png": 6967,
+    "ogg_all": 548,
+    "json": 5029,
+    "obj": 634,
+    "mcmeta": 190
+  },
+  "sounds": {
+    "ce_keys": 392,
+    "out_keys": 392,
+    "mapped_to_handler": 379,
+    "keys_not_in_handler": 13,
+    "handler_ids": 379,
+    "mismatch_sample": [
+      [
+        "block.dieselOperate",
+        "block.diesel_operate"
+      ],
+      [
+        "block.vaultScrape",
+        "block.vault_scrape"
+      ],
+      [
+        "block.vaultThud",
+        "block.vault_thud"
+      ],
+      [
+        "block.missileAssembly",
+        "block.missile_assembly"
+      ],
+      [
+        "weapon.osiprAltFire",
+        "weapon.osipr_alt_fire"
+      ],
+      [
+        "weapon.fire.vstar",
+        "weapon.fire.vstar"
+      ],
+      [
+        "weapon.reload.closeClick",
+        "weapon.reload.close_click"
+      ],
+      [
+        "weapon.reload.insertGrenade",
+        "weapon.reload.insert_grenade"
+      ],
+      [
+        "weapon.reload.insertLarge",
+        "weapon.reload.insert_large"
+      ],
+      [
+        "fm.clap",
+        "fm.clap"
+      ],
+      [
+        "fm.mug",
+        "fm.mug"
+      ],
+      [
+        "fm.sample",
+        "fm.sample"
+      ]
+    ],
+    "handler_missing_from_json": [],
+    "handler_missing_count": 0
+  }
+}

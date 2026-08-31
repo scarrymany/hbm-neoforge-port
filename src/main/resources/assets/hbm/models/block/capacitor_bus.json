@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "hbm:block/capacitor_bus_out",
+    "side": "hbm:block/capacitor_bus_side",
+    "bottom": "hbm:block/capacitor_bus_side"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "ambientocclusion": false,
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "hbm:block/grate_wide_top",
+    "end": "hbm:block/grate_wide_top",
+    "side": "hbm:block/grate_side"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        4,
+        0
+      ],
+      "to": [
+        16,
+        6,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#end"
+        },
+        "up": {
+          "texture": "#end"
+        },
+        "north": {
+          "texture": "#side",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#side",
+          "cullface": "east"
+        }
+      }
+    }
+  ]
+}

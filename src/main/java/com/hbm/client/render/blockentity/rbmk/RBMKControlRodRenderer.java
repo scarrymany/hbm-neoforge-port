@@ -53,7 +53,7 @@ import net.minecraft.world.level.Level;
  *
  * <h2>Assets not yet present</h2>
  * {@code models/rbmk/rbmk_rods.obj} (CE: {@code ResourceManager.rbmk_rods_vbo}) and the 7
- * {@code textures/blocks/rbmk/rbmk_control*.png} textures below do not exist in
+ * {@code textures/block/rbmk/rbmk_control*.png} textures below do not exist in
  * {@code src/main/resources} yet - see
  * {@code docs/phase5/reactor_and_explosion_visual_effects.md}'s "Texture/model assets" Deferred-
  * scope entry. This renderer activates the moment they land: {@link HbmObjModel#get} is only ever
@@ -80,7 +80,7 @@ public final class RBMKControlRodRenderer implements BlockEntityRenderer<RBMKCon
     private static final ResourceLocation TEX_AUTO = texture("rbmk_control_auto");
 
     private static ResourceLocation texture(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/blocks/rbmk/" + name + ".png");
+        return ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/block/rbmk/" + name + ".png");
     }
 
     // Lazily populated, see class javadoc's "Assets not yet present" section.

@@ -1,3 +1,8 @@
 * text=auto eol=lf
 *.png binary
 *.jar binary
+*.ogg binary
+*.obj binary
+*.mtl binary
+*.dae binary
+*.nbt binary

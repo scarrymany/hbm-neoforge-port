@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/cable_diode"
+    },
+    "facing=south": {
+      "model": "hbm:block/cable_diode"
+    },
+    "facing=west": {
+      "model": "hbm:block/cable_diode"
+    },
+    "facing=east": {
+      "model": "hbm:block/cable_diode"
+    },
+    "facing=up": {
+      "model": "hbm:block/cable_diode"
+    },
+    "facing=down": {
+      "model": "hbm:block/cable_diode"
+    }
+  }
+}

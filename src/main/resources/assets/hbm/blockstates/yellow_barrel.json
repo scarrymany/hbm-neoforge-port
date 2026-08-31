@@ -1,0 +1,12 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {},
+    "model": "hbm:block/barrel_yellow.obj"
+  },
+  "variants": {
+    "": [
+      {}
+    ]
+  }
+}

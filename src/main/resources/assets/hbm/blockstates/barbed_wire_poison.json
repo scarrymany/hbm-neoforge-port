@@ -1,0 +1,27 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {},
+    "model": "hbm:block/barbed_wire_poison.obj"
+  },
+  "variants": {
+    "facing=north": [
+      {}
+    ],
+    "facing=south": [
+      {
+        "y": 180
+      }
+    ],
+    "facing=west": [
+      {
+        "y": 270
+      }
+    ],
+    "facing=east": [
+      {
+        "y": 90
+      }
+    ]
+  }
+}

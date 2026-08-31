@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/glass_pane_side",
+  "textures": {
+    "pane": "hbm:block/reinforced_glass_pane",
+    "edge": "hbm:block/reinforced_glass_pane_edge"
+  }
+}

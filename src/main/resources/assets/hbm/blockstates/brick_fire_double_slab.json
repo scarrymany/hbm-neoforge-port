@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/brick_fire"
+    },
+    "type=top": {
+      "model": "hbm:block/brick_fire"
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "rot=0": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=1": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=2": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=3": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=4": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=5": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=6": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=7": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=8": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=9": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=10": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=11": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=12": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=13": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=14": {
+      "model": "hbm:block/bobblehead"
+    },
+    "rot=15": {
+      "model": "hbm:block/bobblehead"
+    }
+  }
+}

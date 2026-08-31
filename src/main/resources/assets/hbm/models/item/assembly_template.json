@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "hbm:item/assembly_template"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "hbm:secret": 1
+      },
+      "model": "hbm:item/assembly_template_secret"
+    }
+  ]
+}

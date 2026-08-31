@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/launch_table"
+    },
+    "facing=south": {
+      "model": "hbm:block/launch_table",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/launch_table",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/launch_table",
+      "y": 90
+    }
+  }
+}

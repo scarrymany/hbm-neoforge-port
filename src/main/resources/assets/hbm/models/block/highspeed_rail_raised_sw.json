@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/rail_raised_sw",
+  "textures": {
+    "rail": "hbm:block/rail_highspeed"
+  }
+}

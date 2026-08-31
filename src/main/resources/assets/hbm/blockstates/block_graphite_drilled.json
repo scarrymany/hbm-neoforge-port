@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "hbm:block/block_graphite_drilled"
+    },
+    "axis=z": {
+      "model": "hbm:block/block_graphite_drilled",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "hbm:block/block_graphite_drilled",
+      "x": 90,
+      "y": 90
+    },
+    "axis=none": {
+      "model": "hbm:block/block_graphite_drilled"
+    }
+  }
+}

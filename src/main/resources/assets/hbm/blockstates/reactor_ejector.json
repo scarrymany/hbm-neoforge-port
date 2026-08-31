@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/reactor_ejector"
+    },
+    "facing=south": {
+      "model": "hbm:block/reactor_ejector",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/reactor_ejector",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/reactor_ejector",
+      "y": 90
+    }
+  }
+}

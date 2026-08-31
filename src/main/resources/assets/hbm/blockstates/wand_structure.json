@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "meta=0": {
+      "model": "hbm:block/wand_structure"
+    },
+    "meta=1": {
+      "model": "hbm:block/wand_structure_load"
+    }
+  }
+}

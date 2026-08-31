@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "meta=0": {
+      "model": "hbm:block/platemetal_base"
+    },
+    "meta=1": {
+      "model": "hbm:block/platemetal_black"
+    },
+    "meta=2": {
+      "model": "hbm:block/platemetal_white"
+    },
+    "meta=3": {
+      "model": "hbm:block/platemetal_red"
+    },
+    "meta=4": {
+      "model": "hbm:block/platemetal_green"
+    },
+    "meta=5": {
+      "model": "hbm:block/platemetal_light_gray"
+    },
+    "meta=6": {
+      "model": "hbm:block/platemetal_blue"
+    },
+    "meta=7": {
+      "model": "hbm:block/platemetal_purple"
+    },
+    "meta=8": {
+      "model": "hbm:block/platemetal_cyan"
+    },
+    "meta=9": {
+      "model": "hbm:block/platemetal_pink"
+    },
+    "meta=10": {
+      "model": "hbm:block/platemetal_lime"
+    },
+    "meta=11": {
+      "model": "hbm:block/platemetal_yellow"
+    },
+    "meta=12": {
+      "model": "hbm:block/platemetal_light_blue"
+    },
+    "meta=13": {
+      "model": "hbm:block/platemetal_magenta"
+    },
+    "meta=14": {
+      "model": "hbm:block/platemetal_orange"
+    }
+  }
+}

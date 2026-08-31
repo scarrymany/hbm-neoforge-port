@@ -1,0 +1,29 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "hbm:block/machine_difurnace_on"
+  },
+  "variants": {
+    "facing": {
+      "north": {},
+      "south": {
+        "y": 180
+      },
+      "west": {
+        "y": 270
+      },
+      "east": {
+        "y": 90
+      }
+    },
+    "ext": {
+      "true": {
+        "textures": {
+          "front": "hbm:block/difurnace_front_on_tall",
+          "side": "hbm:block/difurnace_side_tall"
+        }
+      },
+      "false": {}
+    }
+  }
+}

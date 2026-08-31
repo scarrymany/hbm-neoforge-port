@@ -1,0 +1,13 @@
+{
+  "forge_marker": 1,
+  "variants": {
+    "": [
+      {
+        "model": "neoforge:fluid",
+        "custom": {
+          "fluid": "mud_fluid"
+        }
+      }
+    ]
+  }
+}

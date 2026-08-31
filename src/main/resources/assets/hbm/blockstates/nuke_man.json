@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "facing=2": {
+      "model": "hbm:block/nuke_man"
+    },
+    "facing=3": {
+      "model": "hbm:block/nuke_man"
+    },
+    "facing=4": {
+      "model": "hbm:block/nuke_man"
+    },
+    "facing=5": {
+      "model": "hbm:block/nuke_man"
+    }
+  }
+}

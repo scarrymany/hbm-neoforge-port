@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/brick_concrete_mossy"
+    },
+    "type=top": {
+      "model": "hbm:block/brick_concrete_mossy"
+    }
+  }
+}

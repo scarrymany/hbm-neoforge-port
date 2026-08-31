@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "check_decay=false,decayable=false,variant=oak": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=false,decayable=true,variant=oak": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=false,variant=oak": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=true,variant=oak": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=false,decayable=false,variant=spruce": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=false,decayable=true,variant=spruce": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=false,variant=spruce": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=true,variant=spruce": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=false,decayable=false,variant=birch": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=false,decayable=true,variant=birch": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=false,variant=birch": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=true,variant=birch": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=false,decayable=false,variant=jungle": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=false,decayable=true,variant=jungle": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=false,variant=jungle": {
+      "model": "hbm:block/waste_leaves"
+    },
+    "check_decay=true,decayable=true,variant=jungle": {
+      "model": "hbm:block/waste_leaves"
+    }
+  }
+}

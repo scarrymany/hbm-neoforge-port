@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/reactor_inserter"
+    },
+    "facing=south": {
+      "model": "hbm:block/reactor_inserter",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/reactor_inserter",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/reactor_inserter",
+      "y": 90
+    }
+  }
+}

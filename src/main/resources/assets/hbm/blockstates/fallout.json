@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "": {
+      "model": "hbm:block/ash"
+    },
+    "meta=0": {
+      "model": "hbm:block/ash"
+    },
+    "meta=1": {
+      "model": "hbm:block/ash"
+    },
+    "meta=2": {
+      "model": "hbm:block/ash"
+    },
+    "meta=3": {
+      "model": "hbm:block/ash"
+    },
+    "meta=4": {
+      "model": "hbm:block/ash"
+    },
+    "meta=5": {
+      "model": "hbm:block/ash"
+    },
+    "meta=6": {
+      "model": "hbm:block/ash"
+    }
+  }
+}

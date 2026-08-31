@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "hbm:block/machine_coal_side",
+    "front": "hbm:block/machine_coal_front_off",
+    "side": "hbm:block/machine_coal_side"
+  }
+}

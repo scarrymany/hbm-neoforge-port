@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "activated=true": {
+      "model": "hbm:block/reactor_element_nonuke"
+    },
+    "activated=false": {
+      "model": "hbm:block/reactor_element_nuke"
+    }
+  }
+}

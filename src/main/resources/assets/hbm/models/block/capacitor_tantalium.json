@@ -1,0 +1,11 @@
+{
+  "parent": "hbm:block/capacitor",
+  "textures": {
+    "top": "hbm:block/capacitor_tantalium_top",
+    "side": "hbm:block/capacitor_tantalium_side",
+    "bottom": "hbm:block/capacitor_tantalium_bottom",
+    "inner_top": "hbm:block/capacitor_tantalium_inner_top",
+    "inner_side": "hbm:block/capacitor_tantalium_inner_side",
+    "particle": "hbm:block/capacitor_tantalium_inner_side"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/ducrete"
+    },
+    "type=top": {
+      "model": "hbm:block/ducrete"
+    }
+  }
+}

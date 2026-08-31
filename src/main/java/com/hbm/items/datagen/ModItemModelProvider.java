@@ -39,6 +39,8 @@ public class ModItemModelProvider extends ItemModelProvider {
             try {
                 if (item instanceof ICustomItemModelRegister custom) {
                     custom.registerItemModel(this, loc);
+                } else if (hasExistingItemModel(loc)) {
+                    // Phase 10 CE-converted models/item — don't emit a cube that shadows them.
                 } else if (hasItemTexture(loc)) {
                     this.basicItem(item);
                 }
@@ -50,5 +52,9 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     private boolean hasItemTexture(ResourceLocation loc) {
         return files.exists(loc, PackType.CLIENT_RESOURCES, ".png", "textures/item");
+    }
+
+    private boolean hasExistingItemModel(ResourceLocation loc) {
+        return files.exists(loc, PackType.CLIENT_RESOURCES, ".json", "models/item");
     }
 }

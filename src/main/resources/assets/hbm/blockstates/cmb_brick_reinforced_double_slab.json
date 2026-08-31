@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "hbm:block/cmb_brick_reinforced"
+    },
+    "type=top": {
+      "model": "hbm:block/cmb_brick_reinforced"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "hbm:block/crane_router_red",
+    "up": "hbm:block/crane_router_orange",
+    "north": "hbm:block/crane_router_yellow",
+    "south": "hbm:block/crane_router_green",
+    "west": "hbm:block/crane_router_blue",
+    "east": "hbm:block/crane_router_cyan",
+    "particle": "hbm:block/crane_in"
+  }
+}

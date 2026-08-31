@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "part=ground": {
+      "model": "hbm:block/vine_phosphor_ground"
+    },
+    "part=middle": {
+      "model": "hbm:block/vine_phosphor_middle"
+    },
+    "part=hang": {
+      "model": "hbm:block/vine_phosphor_hang"
+    }
+  }
+}

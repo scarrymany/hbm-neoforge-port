@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "hbm:block/mush_block_inside",
+    "bottom": "hbm:block/mush_block_inside",
+    "side": "hbm:block/mush_block_stem"
+  }
+}

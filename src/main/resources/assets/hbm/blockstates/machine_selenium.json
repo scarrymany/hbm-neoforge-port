@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "hbm:block/machine_selenium"
+    },
+    "facing=south": {
+      "model": "hbm:block/machine_selenium",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/machine_selenium",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/machine_selenium",
+      "y": 90
+    }
+  }
+}

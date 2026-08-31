@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=top": {
+      "model": "hbm:block/pink_planks"
+    },
+    "type=bottom": {
+      "model": "hbm:block/pink_planks"
+    }
+  }
+}

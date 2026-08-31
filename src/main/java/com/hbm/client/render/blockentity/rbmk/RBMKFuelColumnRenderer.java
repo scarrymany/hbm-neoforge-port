@@ -49,7 +49,7 @@ import org.joml.Matrix4f;
  *
  * <h2>Assets not yet present</h2>
  * {@code models/rbmk/rbmk_element_rods.obj} (CE: {@code ResourceManager.rbmk_element_rods_vbo})
- * and {@code textures/blocks/rbmk/rbmk_element_fuel.png} do not exist in
+ * and {@code textures/block/rbmk/rbmk_element_fuel.png} do not exist in
  * {@code src/main/resources} yet - see this task's own notes. This renderer activates the moment
  * they land, same lazy-{@link HbmObjModel#get} pattern as {@link RBMKControlRodRenderer}.
  */
@@ -58,7 +58,7 @@ public final class RBMKFuelColumnRenderer implements BlockEntityRenderer<RBMKRod
     private static final ResourceLocation MODEL =
             ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "models/rbmk/rbmk_element_rods.obj");
     private static final ResourceLocation TEX_FUEL =
-            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/blocks/rbmk/rbmk_element_fuel.png");
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/block/rbmk/rbmk_element_fuel.png");
 
     // CE: RenderRBMKLid.render's renderCherenkovEffect(0.4F, 0.9F, 1.0F, 0.1F, offset) call - the
     // Cherenkov-blue additive glow tint, unchanged.

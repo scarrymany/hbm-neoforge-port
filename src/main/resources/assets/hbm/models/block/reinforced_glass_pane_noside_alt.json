@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/glass_pane_noside_alt",
+  "textures": {
+    "pane": "hbm:block/reinforced_glass_pane"
+  }
+}

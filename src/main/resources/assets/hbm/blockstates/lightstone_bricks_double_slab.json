@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "variant=default": {
+      "model": "hbm:block/lightstone_bricks_double_slab"
+    },
+    "type=bottom": {
+      "model": "hbm:block/lightstone_bricks_double_slab"
+    },
+    "type=top": {
+      "model": "hbm:block/lightstone_bricks_double_slab"
+    }
+  }
+}

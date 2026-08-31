@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "hbm:block/contamination/sellafield_1/sellafield_1_4"
+  }
+}
