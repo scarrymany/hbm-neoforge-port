@@ -11,6 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.List;
@@ -110,7 +111,7 @@ public final class JeiUtil {
     }
 
     /** See this class's own javadoc "vanillaRecipes" bullet for the full timing-risk writeup. */
-    public static <T extends Recipe<?>> List<T> vanillaRecipes(RecipeType<T> type) {
+    public static <I extends RecipeInput, T extends Recipe<I>> List<T> vanillaRecipes(RecipeType<T> type) {
         var level = Minecraft.getInstance().level;
         if (level == null) return List.of();
         return level.getRecipeManager().getAllRecipesFor(type).stream().map(RecipeHolder::value).toList();

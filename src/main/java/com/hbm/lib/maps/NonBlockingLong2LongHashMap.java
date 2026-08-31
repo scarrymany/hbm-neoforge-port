@@ -404,6 +404,44 @@ public class NonBlockingLong2LongHashMap extends AbstractLong2LongMap implements
     }
 
     @Override
+    public Long compute(Long key, BiFunction<? super Long, ? super Long, ? extends Long> remappingFunction) {
+        if (key == null || remappingFunction == null) throw new NullPointerException();
+        Long old = get(key);
+        Long next = remappingFunction.apply(key, old);
+        if (next == null) {
+            if (old != null) remove(key);
+            return null;
+        }
+        put(key, next);
+        return next;
+    }
+
+    @Override
+    public Long computeIfAbsent(Long key, java.util.function.Function<? super Long, ? extends Long> mappingFunction) {
+        if (key == null || mappingFunction == null) throw new NullPointerException();
+        Long old = get(key);
+        if (old != null) return old;
+        Long next = mappingFunction.apply(key);
+        if (next == null) return null;
+        Long raced = putIfAbsent(key, next);
+        return raced != null ? raced : next;
+    }
+
+    @Override
+    public Long computeIfPresent(Long key, BiFunction<? super Long, ? super Long, ? extends Long> remappingFunction) {
+        if (key == null || remappingFunction == null) throw new NullPointerException();
+        Long old = get(key);
+        if (old == null) return null;
+        Long next = remappingFunction.apply(key, old);
+        if (next == null) {
+            remove(key);
+            return null;
+        }
+        put(key, next);
+        return next;
+    }
+
+    @Override
     public Long merge(Long key, Long value, BiFunction<? super Long, ? super Long, ? extends Long> remappingFunction) {
         if (key == null || value == null || remappingFunction == null) throw new NullPointerException();
         Long old = get(key);
