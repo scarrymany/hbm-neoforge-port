@@ -1,5 +1,6 @@
 package com.hbm.entity.grenade;
 
+import com.hbm.entity.effect.EntityMist;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,16 +22,10 @@ import javax.annotation.Nullable;
  * {@code ItemDisperser} family's throw entity. Reuses {@link EntityGrenadeBase}'s shared
  * throw-launch physics and immediate-on-impact detonation exactly as CE does.
  * <p>
- * <b>Blocking dependency, stubbed (not silently dropped):</b> {@code explode()}'s actual payload is
- * CE's {@code com.hbm.entity.effect.EntityMist} (a 368-line area-effect-cloud entity with ~10
- * {@code FluidTrait}-driven per-entity effect branches - boil/freeze/corrosive/poison/radiation/
- * pheromone/etc.) - confirmed not ported anywhere in this tree (grepped: no {@code EntityMist} class
- * exists under {@code src/}). This is a substantial standalone payload entity in its own right, not a
- * small forward-reference call; porting it is out of this package's scope (it is not named among the
- * "already-ported from Phase 0" dependencies this task was scoped against, unlike
- * {@code com.hbm.inventory.fluid.FluidType} itself, which is real and used below). {@link #explode()}
- * carries the real fluid/type bookkeeping and self-destructs, matching CE's control flow, but the
- * mist entity spawn itself is a documented forward reference.
+ * <b>{@code EntityMist} payload - wired for real</b> (Phase 4,
+ * {@code docs/phase4/entities_orbital_and_beam_payloads.md}): {@link #explode()} spawns CE's real
+ * payload, a {@link EntityMist} sized {@code 10x5}, {@code 80}-tick duration, typed by
+ * {@link #getFluid()} - matching CE's own {@code explode()} exactly (read in full).
  */
 public class EntityDisperserCanister extends EntityGrenadeBase {
 
@@ -78,9 +73,7 @@ public class EntityDisperserCanister extends EntityGrenadeBase {
     @Override
     public void explode() {
         if (!this.level().isClientSide()) {
-            // forward reference: com.hbm.entity.effect.EntityMist (10x5 area, 80-tick duration, typed
-            // by this.getFluid()) - see class javadoc. No area-effect payload is spawned until that
-            // entity is ported.
+            EntityMist.spawn(this.level(), this.getX(), this.getY(), this.getZ(), getFluid(), 10F, 5F, 80);
             this.discard();
         }
     }

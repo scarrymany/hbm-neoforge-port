@@ -1,7 +1,7 @@
 package com.hbm.saveddata.satellites;
 
 import com.hbm.api.redstoneoverradio.IRORInteractive;
-import com.hbm.main.MainRegistry;
+import com.hbm.entity.logic.EntityOrbitalLaser;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -16,10 +16,9 @@ import java.util.Locale;
  * Ported from CE's {@code com.hbm.saveddata.satellites.SatellitePrecisionLaser} (read in full) - a
  * {@code SAT_COORD} entity-tracking laser satellite ("Orbital Tattoo Remover").
  * <p>
- * <b>Blocked, documented</b>: {@code com.hbm.entity.logic.EntityOrbitalLaser} (the payload entity)
- * is not ported anywhere in this tree - same forward reference as {@link SatelliteLaser}'s
- * {@code EntityDeathBlast}. {@link #deathBlast} manages cooldown bookkeeping and logs rather than
- * spawning anything; the entity-tracking/dispatch protocol itself is fully real.
+ * {@link #deathBlast} spawns and detonates the real {@link EntityOrbitalLaser} payload, per
+ * {@code docs/phase4/satellites_followup_and_loot_pools.md} - the entity-tracking/dispatch protocol
+ * itself was already real before that package landed.
  */
 public class SatellitePrecisionLaser extends Satellite {
 
@@ -125,9 +124,10 @@ public class SatellitePrecisionLaser extends Satellite {
 
         lastShot = level.getGameTime();
 
-        // TODO(missile-launch-infra): com.hbm.entity.logic.EntityOrbitalLaser is not ported yet -
-        // see class javadoc. Once it lands, spawn+explode it here at (x, y, z).
-        MainRegistry.logger.info("[Satellite] Precision-laser fire command received at {} / {} / {}, but EntityOrbitalLaser is not yet ported - no-op.", x, y, z);
+        EntityOrbitalLaser blast = new EntityOrbitalLaser(level);
+        blast.setPos(x, y, z);
+        blast.explode();
+        level.addFreshEntity(blast);
     }
 
     @Override

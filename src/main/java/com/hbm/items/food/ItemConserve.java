@@ -1,5 +1,6 @@
 package com.hbm.items.food;
 
+import com.hbm.entity.effect.EntityVortex;
 import com.hbm.items.special.ItemSimpleConsumable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -18,11 +19,14 @@ import net.minecraft.world.level.Level;
  * comment on that constant.
  * <p>
  * CE gives every can a {@code can_key} on eating (self-contained, ported directly below).
- * {@link FoodType#BHOLE} additionally spawns an {@code EntityVortex} and {@link FoodType#FIST} deals 2
- * magic damage to the eater - both are TODO'd per docs/phase1/items_food_gear.md's explicit guidance
- * (the vortex entity doesn't exist in this port yet; the magic-damage branch is deferred alongside it
- * rather than singled out for early implementation). {@link FoodType#RECURSION} self-duplicates 90% of
- * the time, which is fully self-contained and ported directly.
+ * {@link FoodType#BHOLE} spawns an {@link EntityVortex} at the eater's position, per
+ * docs/phase1/items_food_gear.md's original TODO and docs/phase4/entities_vortex_gravity_wells.md's
+ * follow-up (this is CE's own only real call site for {@code EntityVortex#setShrinkRate} - see that
+ * method's own javadoc for why the call is made for parity despite having zero gameplay effect in real
+ * CE). {@link FoodType#FIST} deals 2 magic damage to the eater - still TODO'd per docs/phase1/
+ * items_food_gear.md's explicit guidance, out of this package's scope (unrelated to gravity wells).
+ * {@link FoodType#RECURSION} self-duplicates 90% of the time, which is fully self-contained and ported
+ * directly.
  */
 public class ItemConserve extends Item {
 
@@ -92,9 +96,13 @@ public class ItemConserve extends Item {
         if (!level.isClientSide()) {
             switch (type) {
                 case BHOLE -> {
-                    // TODO(entities follow-up, docs/phase1/items_food_gear.md): CE spawns an
-                    // EntityVortex (0.5 size, 0.01 shrink rate, no-break) at the eater's position here -
-                    // EntityVortex doesn't exist in this port yet (a Phase 2 entity).
+                    // CE: new EntityVortex(world, 0.5F).setShrinkRate(0.01F).noBreak(), spawned at the
+                    // eater's position. setShrinkRate(0.01F) is called for parity even though
+                    // EntityVortex#tick() never reads it (a real, documented CE bug - see that
+                    // method's own javadoc).
+                    EntityVortex vortex = (EntityVortex) new EntityVortex(level, 0.5F).setShrinkRate(0.01F).noBreak();
+                    vortex.setPos(entity.getX(), entity.getY(), entity.getZ());
+                    level.addFreshEntity(vortex);
                 }
                 case FIST -> {
                     // TODO(follow-up, docs/phase1/items_food_gear.md): CE deals 2 magic damage to the

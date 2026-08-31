@@ -2,6 +2,7 @@ package com.hbm.blocks;
 
 import com.hbm.blocks.generic.BlockCluster;
 import com.hbm.blocks.generic.BlockDepthOre;
+import com.hbm.blocks.generic.BlockHazard;
 import com.hbm.blocks.generic.BlockNTMOre;
 import com.hbm.blocks.generic.BlockNetherCoal;
 import com.hbm.blocks.generic.BlockOutgas;
@@ -63,11 +64,17 @@ import java.util.function.Supplier;
  * ({@code BlockMeteorOre}, a {@code BlockEnumMeta<EnumMeteorType>} 5-variant metadata-multi block the
  * research report did not flag as a flattening case and this pass did not have a confirmed drop
  * mapping for), {@code ore_sellafield_*}/{@code BlockSellafieldOre} (needs its own random-variant/
- * shade rendering solution per the report's section 5, independent of this registration pass),
- * {@code block_meteor_molten} (a stateful tick-driven molten-to-cobble transition block, not a
- * resource-drop block), and {@code ore_oil_empty}/{@code ore_oil_sand} (companion decorative states
- * of the oil ore that are plain {@code BlockBase}/{@code BlockFallingBase}, not part of the
- * {@code BlockNTMOre} family).
+ * shade rendering solution per the report's section 5, independent of this registration pass), and
+ * {@code ore_oil_empty}/{@code ore_oil_sand} (companion decorative states of the oil ore that are
+ * plain {@code BlockBase}/{@code BlockFallingBase}, not part of the {@code BlockNTMOre} family).
+ * {@code block_meteor_molten} - CE's stateful tick-driven molten-to-cobble transition block, needed
+ * as one of the meteor world-gen hull-shell blocks per
+ * docs/phase4/worldgen_oil_and_meteor_dungeons.md Part 2a - <b>is</b> registered here now
+ * ({@code registerMeteorOres()} below) as a plain {@link BlockHazard} instance, matching this port's
+ * already-established simplification for every other {@code BlockHazard}-family block - the
+ * identity-gated {@code updateTick}/{@code onPlayerDestroy} molten-to-cobble/molten-to-lava
+ * transitions CE's 1.12 {@code BlockHazard} performs for this one block are not reproduced (a
+ * cosmetic tick concern unrelated to world-gen shape placement, out of this pass).
  */
 public final class OreBlocks {
 
@@ -187,6 +194,16 @@ public final class OreBlocks {
         ore("block_meteor_cobble", 2, 0, METEOR_HARDNESS, METEOR_RESISTANCE, meteoriteFragment);
         ore("block_meteor_broken", 1, 0, METEOR_HARDNESS, METEOR_RESISTANCE, meteoriteFragment);
         ore("block_meteor_treasure", 3, METEOR_HARDNESS, METEOR_RESISTANCE, null);
+
+        // CE: new BlockHazard(Material.ROCK, "block_meteor_molten").setTickRandomly(true)
+        // .setLightLevel(0.75F).setHardness(15.0F).setResistance(360.0F) - no setHarvestLevel call
+        // unlike its siblings above, so harvestLevel 0 (breakable by hand) is CE-faithful, not an
+        // omission. Needed by docs/phase4/worldgen_oil_and_meteor_dungeons.md Part 2a's
+        // MeteoriteGenerator hull-shell placement (hull type 0/3) - see this class's own javadoc for
+        // what CE tick behavior is/isn't preserved.
+        registerBlock("block_meteor_molten",
+                () -> new BlockHazard(oreProps(METEOR_HARDNESS, METEOR_RESISTANCE, 0).lightLevel(state -> 11)),
+                ModCreativeTabs.RESOURCE);
     }
 
     private static void registerClusters() {

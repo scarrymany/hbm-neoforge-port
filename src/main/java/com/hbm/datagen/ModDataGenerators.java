@@ -5,10 +5,14 @@ import com.hbm.blocks.datagen.ModBlockStateProvider;
 import com.hbm.blocks.datagen.ModBlockTagProvider;
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.damage.datagen.ModDamageTypeTagsProvider;
+import com.hbm.entity.mob.CreeperVariantBiomeModifiers;
 import com.hbm.items.datagen.ModItemModelProvider;
 import com.hbm.items.datagen.ModItemTagProvider;
 import com.hbm.main.MainRegistry;
 import com.hbm.world.biome.ModCraterBiomes;
+import com.hbm.world.gen.OilMeteorBiomeModifiers;
+import com.hbm.world.gen.OilMeteorConfiguredFeatures;
+import com.hbm.world.gen.OilMeteorPlacedFeatures;
 import com.hbm.world.gen.OreBiomeModifiers;
 import com.hbm.world.gen.OreConfiguredFeatures;
 import com.hbm.world.gen.OrePlacedFeatures;
@@ -68,6 +72,18 @@ public class ModDataGenerators {
         registrySetBuilder.add(Registries.CONFIGURED_FEATURE, OreConfiguredFeatures::bootstrap);
         registrySetBuilder.add(Registries.PLACED_FEATURE, OrePlacedFeatures::bootstrap);
         registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, OreBiomeModifiers::bootstrap);
+        // Phase 4 oil-deposit + ambient meteorite world-gen
+        // (docs/phase4/worldgen_oil_and_meteor_dungeons.md Part 1 + Part 2a) - same three-stage
+        // pipeline, its own Feature instances registered separately via
+        // OilMeteorWorldGenFeatures.register(modEventBus).
+        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, OilMeteorConfiguredFeatures::bootstrap);
+        registrySetBuilder.add(Registries.PLACED_FEATURE, OilMeteorPlacedFeatures::bootstrap);
+        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, OilMeteorBiomeModifiers::bootstrap);
+        // Phase 4 (entities_creeper_variants) - natural biome spawning for the Gold/Volatile/Phosgene
+        // creeper variants (CE's EntityMappings.writeSpawns()). Same BiomeModifier pipeline as the two
+        // groups above; EntityType DeferredHolders are registered separately via
+        // CreeperVariantEntityTypes.register(modEventBus), like any other DeferredRegister.
+        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, CreeperVariantBiomeModifiers::bootstrap);
         DatapackBuiltinEntriesProvider datapackProvider =
                 new DatapackBuiltinEntriesProvider(output, lookup, registrySetBuilder, Set.of(MainRegistry.MODID));
         generator.addProvider(event.includeServer(), datapackProvider);

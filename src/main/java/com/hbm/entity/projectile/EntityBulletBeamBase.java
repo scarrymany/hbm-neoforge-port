@@ -11,6 +11,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -22,6 +24,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,15 +38,19 @@ import java.util.Optional;
  * {@link EntityThrowableNT} uses for bullets. {@link #tick()} only exists to expire the entity after
  * {@code config.expires} ticks (its tracer-render lifetime) - no gravity, no flight loop.
  * <p>
- * <b>{@code EntityCoin} special case - stubbed, not ported.</b> CE's {@code performHitscan} has a
- * "coin flip" branch: any {@code EntityCoin} (a themed target/currency entity) along the beam's path
- * always blocks non-coin hits behind it and triggers its own nearest-entity fan-out (spawning a
- * second beam from the coin's position toward whatever's nearest). {@code com.hbm.entity.item.
- * EntityCoin} does not exist in this port yet - out of this ballistics-core package's scope per
- * {@code docs/phase3/gun_framework.md}'s Deferred scope. Skipped gracefully: with no
- * {@code EntityCoin} instances ever present, this branch would never match anything in CE either, so
- * omitting it changes nothing observable until that entity lands - see the TODO in
- * {@link #performHitscan()}.
+ * <b>{@code EntityCoin} "coin flip" special case</b> - ported per
+ * {@code docs/phase4/entities_orbital_and_beam_payloads.md}'s Key design decisions, now that
+ * {@link EntityCoin} is real. Preserves CE's exact (non-obvious) priority: <i>any</i>
+ * {@link EntityCoin} the beam segment intersects always wins over a normal entity hit, regardless of
+ * which is actually closer along the segment - CE's own {@code performHitscan} computes the closest
+ * ordinary entity hit first, then unconditionally overwrites/bypasses it the moment any coin is
+ * found (the coin-flip branch never compares its own hit distance against the ordinary sweep's
+ * {@code nearest}). Penetrating beams are the one asymmetric exception: their per-entity
+ * {@code onImpact} calls happen inline during the sweep, gated on {@code dist < closestCoin}, so an
+ * entity strictly closer than the coin still gets hit before the flip triggers - matching CE 1:1
+ * (see {@link #performHitscan()}). The relay beam is credited to the <i>coin's</i> thrower, falling
+ * back to this beam's own thrower only if the coin has none - not the original shooter - per the
+ * report's flagged subtle-attribution behavior.
  */
 public class EntityBulletBeamBase extends Entity implements IEntityWithComplexSpawn {
 
@@ -179,15 +186,36 @@ public class EntityBulletBeamBase extends Entity implements IEntityWithComplexSp
 
         if (!level.isClientSide && doesImpactEntities()) {
 
-            // TODO(entity-item-coin): CE's performHitscan also special-cases EntityCoin here - see
-            // this class's javadoc for why it is skipped gracefully rather than ported.
-
             Entity hitEntity = null;
             double nearest = 0.0D;
             Vec3 nearestHitPos = null;
 
             AABB region = getBoundingBox().expandTowards(headingX, headingY, headingZ).inflate(1.0D, 1.0D, 1.0D);
-            for (Entity value : level.getEntities(this, region, e -> true)) {
+            List<Entity> candidates = level.getEntities(this, region, e -> true);
+
+            // Coin-flip special case, scanned first (matches CE's own pass order): the nearest
+            // EntityCoin the beam segment intersects, if any.
+            double closestCoin = 0.0D;
+            Vec3 coinHitPos = null;
+            EntityCoin hitCoin = null;
+
+            for (Entity entity : candidates) {
+                if (entity instanceof EntityCoin coin) {
+                    double hitbox = 0.3D;
+                    AABB aabb = coin.getBoundingBox().inflate(hitbox, hitbox, hitbox);
+                    Optional<Vec3> clip = aabb.clip(pos, clippedNextPos);
+                    if (clip.isPresent()) {
+                        double dist = pos.distanceTo(clip.get());
+                        if (closestCoin == 0.0D || dist < closestCoin) {
+                            closestCoin = dist;
+                            hitCoin = coin;
+                            coinHitPos = clip.get();
+                        }
+                    }
+                }
+            }
+
+            for (Entity value : candidates) {
                 if (value == thrower || !value.isPickable()) continue;
 
                 double hitbox = 0.3D;
@@ -199,9 +227,13 @@ public class EntityBulletBeamBase extends Entity implements IEntityWithComplexSp
 
                     // if penetration is enabled, run impact for all intersecting entities, in
                     // whatever order getEntities() returns them - NOT distance-sorted, matching
-                    // EntityThrowableNT's own penetrating branch exactly.
+                    // EntityThrowableNT's own penetrating branch exactly. A coin still blocks
+                    // anything behind it even in penetrating mode - matches CE's own
+                    // `hitCoin == null || dist < closestCoin` gate exactly.
                     if (doesPenetrate()) {
-                        onImpact(new EntityHitResult(value, clip.get()));
+                        if (hitCoin == null || dist < closestCoin) {
+                            onImpact(new EntityHitResult(value, clip.get()));
+                        }
                     } else if (dist < nearest || nearest == 0.0D) {
                         hitEntity = value;
                         nearest = dist;
@@ -214,6 +246,13 @@ public class EntityBulletBeamBase extends Entity implements IEntityWithComplexSp
             if (!doesPenetrate() && hitEntity != null) {
                 mop = new EntityHitResult(hitEntity, nearestHitPos);
             }
+
+            // The coin flip always wins over a normal hit once found - matches CE exactly (see class
+            // javadoc): the beam relays from the coin's position rather than resolving `mop` at all.
+            if (hitCoin != null) {
+                resolveCoinFlip(level, pos, hitCoin, coinHitPos);
+                return;
+            }
         }
 
         if (mop != null) {
@@ -225,6 +264,91 @@ public class EntityBulletBeamBase extends Entity implements IEntityWithComplexSp
         } else {
             this.beamLength = clippedNextPos.subtract(pos).length();
         }
+    }
+
+    /**
+     * CE's "coin flip" fan-out: destroy the struck coin, find whatever's nearest to it by CE's fixed
+     * priority order (another coin &gt; player &gt; hostile mob &gt; any other living entity), and
+     * relay a second beam from the coin's position at 1.25x this beam's damage - credited to the
+     * <i>coin's</i> thrower (falling back to this beam's own thrower only if the coin has none), not
+     * the original shooter. See class javadoc for the exact CE call this reproduces
+     * ({@code performHitscan}, read in full) and {@code docs/phase4/
+     * entities_orbital_and_beam_payloads.md}'s Open questions for why the attribution rule matters.
+     * <p>
+     * CE's own explosion-flash particle-packet broadcast at the coin's position is client-only VFX,
+     * deferred to Phase 5 per this class's javadoc/the report's Deferred scope - not reproduced here.
+     */
+    private void resolveCoinFlip(Level level, Vec3 pos, EntityCoin hitCoin, Vec3 coinHitPos) {
+
+        this.beamLength = coinHitPos.subtract(pos).length();
+
+        double range = 50D;
+        AABB scanBox = new AABB(coinHitPos.x, coinHitPos.y, coinHitPos.z, coinHitPos.x, coinHitPos.y, coinHitPos.z).inflate(range);
+        List<Entity> targets = level.getEntities((Entity) null, scanBox, e -> true);
+
+        hitCoin.discard();
+
+        Entity nearestCoin = null;
+        Entity nearestPlayer = null;
+        Entity nearestMob = null;
+        Entity nearestOther = null;
+        double coinDist = 0.0D;
+        double playerDist = 0.0D;
+        double mobDist = 0.0D;
+        double otherDist = 0.0D;
+
+        // Ternary-of-shame priority selection, matching CE's own single-pass classification loop
+        // (its own comment: "well i mean we could just use a single var for all variants... however i
+        // can't be assed").
+        for (Entity entity : targets) {
+            if (entity == this.getThrower() || entity == hitCoin) continue;
+
+            double dist = entity.distanceTo(hitCoin);
+            if (dist > range) continue;
+
+            if (entity instanceof EntityCoin) {
+                if (coinDist == 0.0D || dist < coinDist) {
+                    coinDist = dist;
+                    nearestCoin = entity;
+                }
+            } else if (entity instanceof Player) {
+                if (playerDist == 0.0D || dist < playerDist) {
+                    playerDist = dist;
+                    nearestPlayer = entity;
+                }
+            } else if (entity instanceof Enemy) {
+                if (mobDist == 0.0D || dist < mobDist) {
+                    mobDist = dist;
+                    nearestMob = entity;
+                }
+            } else if (entity instanceof LivingEntity) {
+                if (otherDist == 0.0D || dist < otherDist) {
+                    otherDist = dist;
+                    nearestOther = entity;
+                }
+            }
+        }
+
+        Entity target = nearestCoin != null ? nearestCoin
+                : nearestPlayer != null ? nearestPlayer
+                : nearestMob != null ? nearestMob
+                : nearestOther;
+
+        LivingEntity credited = hitCoin.getThrower() != null ? hitCoin.getThrower() : this.thrower;
+
+        EntityBulletBeamBase newBeam = new EntityBulletBeamBase(level, this.config, this.damage * 1.25F);
+        newBeam.thrower = credited;
+        newBeam.setPos(coinHitPos.x, coinHitPos.y, coinHitPos.z);
+
+        if (target != null) {
+            Vec3 delta = new Vec3(target.getX() - newBeam.getX(), (target.getY() + target.getBbHeight() / 2D) - newBeam.getY(), target.getZ() - newBeam.getZ());
+            newBeam.setRotationsFromVector(delta);
+        } else {
+            newBeam.setRotationsFromVector(new Vec3(this.random.nextGaussian() * 0.5D, -1D, this.random.nextGaussian() * 0.5D));
+        }
+
+        newBeam.performHitscanExternal(250D);
+        level.addFreshEntity(newBeam);
     }
 
     protected void onImpact(HitResult mop) {

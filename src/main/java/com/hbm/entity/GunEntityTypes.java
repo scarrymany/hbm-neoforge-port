@@ -3,6 +3,7 @@ package com.hbm.entity;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.entity.projectile.EntityBulletBaseMK4CL;
 import com.hbm.entity.projectile.EntityBulletBeamBase;
+import com.hbm.entity.projectile.EntityCoin;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -33,6 +34,13 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * Neo Edition has no {@code BULLET_MK4CL} entry of its own (it never ported the chunk-loading
  * variant) - registered here from CE's {@code @AutoRegister} directly, same shape as
  * {@code BULLET_MK4} it extends.
+ * <p>
+ * {@link EntityCoin} (Phase 4, {@code docs/phase4/entities_orbital_and_beam_payloads.md}) joins this
+ * family per that report's Key design decisions ("gun-adjacent... either extending GunEntityTypes or
+ * standing up a small new registry are both valid" - resolved here in favor of this file, since the
+ * coin-flip relay mechanic lives in {@link EntityBulletBeamBase}, this exact class). CE's
+ * {@code @AutoRegister(name = "entity_coin", trackingRange = 1000)}; not fire-immune (CE never sets
+ * that flag for this entity, unlike the bullets/beam above).
  */
 public final class GunEntityTypes {
 
@@ -42,6 +50,7 @@ public final class GunEntityTypes {
     public static DeferredHolder<EntityType<?>, EntityType<EntityBulletBaseMK4>> BULLET_MK4;
     public static DeferredHolder<EntityType<?>, EntityType<EntityBulletBaseMK4CL>> BULLET_MK4CL;
     public static DeferredHolder<EntityType<?>, EntityType<EntityBulletBeamBase>> BULLET_BEAM;
+    public static DeferredHolder<EntityType<?>, EntityType<EntityCoin>> COIN;
 
     private GunEntityTypes() {
     }
@@ -70,6 +79,13 @@ public final class GunEntityTypes {
                         .sized(0.5F, 0.5F)
                         .setTrackingRange(256)
                         .build("entity_beam_mk4"));
+
+        COIN = ENTITY_TYPES.register("entity_coin", () ->
+                EntityType.Builder.<EntityCoin>of(EntityCoin::new, MobCategory.MISC)
+                        .noSummon()
+                        .sized(1F, 0.5F)
+                        .setTrackingRange(1000)
+                        .build("entity_coin"));
 
         ENTITY_TYPES.register(modEventBus);
     }

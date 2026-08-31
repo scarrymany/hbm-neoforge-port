@@ -1,11 +1,12 @@
 package com.hbm.saveddata.satellites;
 
-import com.hbm.main.MainRegistry;
+import com.hbm.entity.logic.EntityDeathBlast;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.Locale;
 
@@ -14,15 +15,10 @@ import java.util.Locale;
  * representative {@code SAT_PANEL} satellite: a 5-minute cooldown gate around spawning a
  * death-blast payload at a clicked/commanded coordinate.
  * <p>
- * <b>Blocked, documented</b>: {@code com.hbm.entity.logic.EntityDeathBlast} (the actual payload
- * entity) is not ported anywhere in this tree (confirmed by grep of {@code com.hbm.entity.logic} -
- * that package holds {@code EntityBalefire}/{@code EntityExplosionChunkloading}/
- * {@code EntityNukeExplosionMK3}/{@code EntityNukeExplosionMK5}/{@code IChunkLoader}/
- * {@code NukeEntityTypes}, no death-blast entity), per this package's task brief which explicitly
- * flags this dependency and says to stub it. {@link #deathBlast} therefore only manages the
- * cooldown/dirty-flag bookkeeping and logs a warning instead of spawning anything - the addressing/
- * dispatch protocol (registration, {@code onClick}/{@code onCommandImpl} dual entry point,
- * cooldown NBT round-trip) is fully real and ready for the entity to be wired in once it lands.
+ * {@link #deathBlast} spawns the real {@link EntityDeathBlast} payload, per
+ * {@code docs/phase4/satellites_followup_and_loot_pools.md} - the addressing/dispatch protocol
+ * (registration, {@code onClick}/{@code onCommandImpl} dual entry point, cooldown NBT round-trip)
+ * was already real before that package landed.
  */
 public class SatelliteLaser extends Satellite {
 
@@ -83,15 +79,17 @@ public class SatelliteLaser extends Satellite {
     }
 
     public void deathBlast(Level level, int x, int z, ServerPlayer detonator) {
-        if (!(level instanceof ServerLevel) || lastOp + CHARGE_TIME >= level.getGameTime()) return;
+        if (!(level instanceof ServerLevel serverLevel) || lastOp + CHARGE_TIME >= level.getGameTime()) return;
 
         lastOp = level.getGameTime();
         this.markDirty();
 
-        // TODO(missile-launch-infra): com.hbm.entity.logic.EntityDeathBlast is not ported yet - see
-        // class javadoc. Once it lands, spawn it here at (x, level.getHeight(...), z) with
-        // detonator threaded through exactly like CE's own EntityDeathBlast#detonator field.
-        MainRegistry.logger.info("[Satellite] Death-ray fire command received at {} / {}, but EntityDeathBlast is not yet ported - no-op.", x, z);
+        int y = serverLevel.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+
+        EntityDeathBlast blast = new EntityDeathBlast(level);
+        blast.setPos(x, y, z);
+        blast.detonator = detonator;
+        level.addFreshEntity(blast);
     }
 
     @Override

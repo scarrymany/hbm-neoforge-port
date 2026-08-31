@@ -350,10 +350,14 @@ public final class ContaminationUtil {
 
     /**
      * CE's hardcoded {@code immuneEntities} class array mixed vanilla mobs with two HBM-custom
-     * ones ({@code EntityCreeperNuclear}, {@code EntityQuackos}) that don't exist in this port
-     * yet - ported with the vanilla classes plus the {@link IRadiationImmune} extensibility-point
-     * interface (Phase 0's whole reason to define it rather than hardcode a list), leaving the two
-     * custom-mob checks as a documented forward reference for whichever phase ports them.
+     * ones ({@code EntityCreeperNuclear}, {@code EntityQuackos}) - ported with the vanilla classes
+     * plus the {@link IRadiationImmune} extensibility-point interface (Phase 0's whole reason to
+     * define it rather than hardcode a list). {@code EntityCreeperNuclear} (Phase 4,
+     * {@code docs/phase4/entities_creeper_variants.md}) now {@code implements IRadiationImmune}
+     * directly - a deliberate, behavior-preserving departure from CE's own hardcoded-array shape,
+     * recommended by that area's research report - so the {@code instanceof IRadiationImmune} check
+     * below already covers it with no further change needed here. {@code EntityQuackos} does not
+     * exist in this port yet; whichever phase ports it should give it the same treatment.
      */
     public static boolean isRadImmune(Entity e) {
         if (e instanceof LivingEntity living && living.hasEffect(HbmPotionEffects.MUTATION)) {
@@ -366,8 +370,8 @@ public final class ContaminationUtil {
             return true;
         }
 
-        // TODO(EntityCreeperNuclear/EntityQuackos): CE's immuneEntities array also lists these two
-        // HBM-custom mobs; neither exists in this port yet.
+        // TODO(EntityQuackos): CE's immuneEntities array also lists this HBM-custom mob; it doesn't
+        // exist in this port yet.
 
         return checkConfigEntityImmunity(e);
     }

@@ -37,6 +37,17 @@ public class EntityNukeTorex extends Entity implements IConstantRenderer {
     private static final EntityDataAccessor<Byte> TYPE = SynchedEntityData.defineId(EntityNukeTorex.class, EntityDataSerializers.BYTE);
 
     public int maxAge = 1000;
+    /**
+     * CE's {@code ticksExisted}, tracked manually rather than relying on vanilla's
+     * {@link Entity#tickCount} - see this fix's note on {@link #tick()}: this class's own
+     * {@code tick()} never calls {@code super.tick()}/{@code baseTick()} (matching CE's own
+     * onEntityUpdate() fully overriding the base class), and {@code tickCount} is only ever
+     * incremented from inside {@code baseTick()}, so relying on it here left the despawn check below
+     * permanently false - the same manual-counter pattern this file's sibling
+     * {@code EntityCloudFleija}/{@code EntityCloudSolinium}/{@code EntityEMPBlast} already use, for
+     * the same reason.
+     */
+    private int age;
 
     public EntityNukeTorex(EntityType<? extends EntityNukeTorex> entityType, Level level) {
         super(entityType, level);
@@ -73,8 +84,11 @@ public class EntityNukeTorex extends Entity implements IConstantRenderer {
         // ~500 lines, all inside `if (world.isRemote)`) lives here. Zero gameplay effect; see class
         // javadoc. Not ported in this pass.
 
-        if (!level().isClientSide() && this.tickCount > maxAge) {
-            this.discard();
+        if (!level().isClientSide()) {
+            if (this.age > maxAge) {
+                this.discard();
+            }
+            this.age++;
         }
     }
 

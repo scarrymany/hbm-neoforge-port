@@ -1,6 +1,12 @@
 package com.hbm.main;
 
 import com.hbm.blockentity.bomb.LaunchPadBaseBlockEntity;
+import com.hbm.entity.mob.CreeperVariantEntityTypes;
+import com.hbm.entity.mob.EntityCreeperGold;
+import com.hbm.entity.mob.EntityCreeperNuclear;
+import com.hbm.entity.mob.EntityCreeperPhosgene;
+import com.hbm.entity.mob.EntityCreeperTainted;
+import com.hbm.entity.mob.EntityCreeperVolatile;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardRegistry;
@@ -11,11 +17,13 @@ import com.hbm.inventory.recipes.chem.CyclotronRecipes;
 import com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes;
 import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes;
 import com.hbm.inventory.recipes.chem.SILEXRecipes;
+import com.hbm.itempool.ItemPoolsSatellite;
 import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.saveddata.satellites.Satellite;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 
 /**
  * Mod-bus common setup. {@code bus = Bus.MOD} is required: {@link FMLCommonSetupEvent} implements
@@ -76,6 +84,29 @@ public class CommonEvents {
             // MainRegistry's constructor (unlike ExplosionNukeGeneric.loadSoliniumFromFile(), whose
             // solinium.cfg table resolves block ids lazily by name at actual use time instead).
             com.hbm.config.FalloutConfigJSON.initialize();
+            // Phase 4 (satellites_followup_and_loot_pools) - com.hbm.itempool.ItemPoolsSatellite#init()
+            // eagerly resolves several DeferredItem.get() calls (e.g. BilletPowderItems.POWDER_IRON)
+            // while building its weighted pool entries, same reasoning as the recipe tables above -
+            // must run after every item RegisterEvent has fired, not from a static field initializer.
+            ItemPoolsSatellite.init();
         });
+    }
+
+    /**
+     * Phase 4 (entities_creeper_variants) - {@link EntityAttributeCreationEvent} for this port's
+     * first {@code MobCategory.MONSTER} entities. Confirmed real call shape via Neo Edition's own
+     * compiling {@code CommonEvents.onEntityAttributeCreation}
+     * ({@code event.put(NtmEntityTypes.CREEPER_NUCLEAR.get(), CreeperNuclear.createAttributes().build())}).
+     * Safe to call {@code .get()} on each {@code CreeperVariantEntityTypes} holder directly here:
+     * {@link EntityAttributeCreationEvent}, like {@code FMLCommonSetupEvent} above, always fires
+     * after every registry's {@code RegisterEvent} has completed.
+     */
+    @SubscribeEvent
+    public static void onEntityAttributeCreation(EntityAttributeCreationEvent event) {
+        event.put(CreeperVariantEntityTypes.CREEPER_GOLD.get(), EntityCreeperGold.createAttributes().build());
+        event.put(CreeperVariantEntityTypes.CREEPER_VOLATILE.get(), EntityCreeperVolatile.createAttributes().build());
+        event.put(CreeperVariantEntityTypes.CREEPER_PHOSGENE.get(), EntityCreeperPhosgene.createAttributes().build());
+        event.put(CreeperVariantEntityTypes.CREEPER_TAINTED.get(), EntityCreeperTainted.createAttributes().build());
+        event.put(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), EntityCreeperNuclear.createAttributes().build());
     }
 }

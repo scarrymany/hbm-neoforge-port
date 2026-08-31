@@ -1,6 +1,7 @@
 package com.hbm.saveddata.satellites;
 
-import com.hbm.main.MainRegistry;
+import com.hbm.entity.projectile.EntityTom;
+import com.hbm.main.AdvancementManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -13,15 +14,13 @@ import java.util.Locale;
  * Ported from CE's {@code com.hbm.saveddata.satellites.SatelliteHorizons} (107 lines, read in
  * full) - the "gerald"/{@code sat_gerald} one-shot easter-egg satellite ({@code SAT_COORD}).
  * <p>
- * <b>Blocked, documented</b>: {@code com.hbm.entity.projectile.EntityTom} (the payload entity this
- * satellite spawns) is not ported anywhere in this tree (confirmed absent from
- * {@code com.hbm.entity.projectile}'s real file list - see this port's own
- * {@code EntityBulletBaseMK4}/{@code EntityThrowableInterp}/etc, no {@code EntityTom}). {@code
- * AdvancementManager} (CE's achievement hooks) is likewise not ported. {@link #theHorizons} manages
- * the "already used" one-shot flag and dirty-marking (the part of CE's behavior that's pure data,
- * not entity spawning) and logs rather than spawning anything - the addressing/dispatch protocol
- * itself (registration, {@code onCommandImpl}/{@code onCoordAction} dual entry point, NBT
- * round-trip) is fully real.
+ * {@link #onOrbit}/{@link #theHorizons} spawn the real {@link EntityTom} payload and grant the real
+ * {@link AdvancementManager#horizonsStart}/{@link AdvancementManager#horizonsEnd} advancements, per
+ * {@code docs/phase4/satellites_followup_and_loot_pools.md} - both dependencies were already real
+ * (the foundation wave's own {@code AdvancementManager}, this package's own {@code EntityTom})
+ * before this class's forward references were wired in. The addressing/dispatch protocol itself
+ * (registration, {@code onCommandImpl}/{@code onCoordAction} dual entry point, NBT round-trip) was
+ * already real before either landed.
  */
 public class SatelliteHorizons extends Satellite {
 
@@ -50,7 +49,11 @@ public class SatelliteHorizons extends Satellite {
 
     @Override
     public void onOrbit(Level level, double x, double y, double z) {
-        // TODO(advancements): com.hbm.main.AdvancementManager is not ported - CE grants horizonsStart here.
+        if (level instanceof ServerLevel serverLevel) {
+            for (ServerPlayer p : serverLevel.players()) {
+                AdvancementManager.grantAchievement(p, AdvancementManager.horizonsStart);
+            }
+        }
     }
 
     @Override
@@ -93,10 +96,20 @@ public class SatelliteHorizons extends Satellite {
         used = true;
         this.markDirty();
 
-        // TODO(missile-launch-infra): com.hbm.entity.projectile.EntityTom is not ported yet - see
-        // class javadoc. Once it lands, spawn it here at (x, 600, z) and force-load its chunk.
         serverLevel.getChunkSource().getChunk(x >> 4, z >> 4, true);
-        MainRegistry.logger.info("[Satellite] Horizons fire command received at {} / {}, but EntityTom is not yet ported - no-op.", x, z);
+
+        EntityTom tom = new EntityTom(level);
+        tom.setPos(x + 0.5, 600, z + 0.5);
+        level.addFreshEntity(tom);
+
+        for (ServerPlayer p : serverLevel.players()) {
+            AdvancementManager.grantAchievement(p, AdvancementManager.horizonsEnd);
+        }
+
+        // CE: "not necessary but JUST to make sure" - a server-wide flavor-text broadcast, kept
+        // faithfully rather than dropped as cosmetic (it's a one-line real API call, not a forward
+        // reference).
+        serverLevel.getServer().getPlayerList().broadcastSystemMessage(Component.translatable("chat.gerald.detonated"), false);
     }
 
     @Override
