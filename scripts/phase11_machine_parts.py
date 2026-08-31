@@ -717,7 +717,7 @@ def write_assembler(known: set[str]) -> tuple[int, int, dict[str, int]]:
                 skip += 1
                 continue
             payload["output_fluids"] = fluids
-        slug = r["name"].replace("ass.", "")
+        slug = r["name"].replace("ass.", "").lower()
         path = out_dir / f"{slug}.json"
         path.write_text(json.dumps(payload, indent=2) + "\n")
         ok += 1

@@ -2,7 +2,7 @@
 
 - Census: `docs/phase11/PARITY_REPORT.md` — **60.5% weighted / 79.1% unweighted**. Not ≥90%.
 - Machine recipes **227 → 394 (13.4% → 23.2%)**. Blocks **649 → 665 (55.5% → 56.9%)**.
-- This session: chemplant dump, assembler fluids + expensive/part_generic flatten, centrifuge/SILEX leftovers, radar family, door casings.
+- This session: chemplant dump, assembler fluids + expensive/part_generic flatten, centrifuge/SILEX leftovers, radar family, door casings. CamelCase assembler JSON lowercased (1.21 pack paths).
 - Leftover CE `@AutoRegister` entities: **none missing**. `docs/phase9/ENTITY_CENSUS.md`.
-- `compileJava` 0. `build` / `runServer` — see end of this file after boot.
+- `compileJava` 0, `build` SUCCESS, jar **66311278**, `runServer` **Done (5.014s)** wiped world, 2359 recipes.
 - No GitHub Release. `master` untouched.
