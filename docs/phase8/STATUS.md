@@ -34,6 +34,8 @@ This slice landed code, not another research dump. Gaps below are still open.
 - Remaining ~500 missing block ids (PARITY_REPORT 642 / ~1165). Next high-value: `red_barrel` /
   `yellow_barrel` / `block_tungsten` / `red_wire_coated` (pool + machine refs).
 - CE `GeneralConfig.enableDungeons` gate — not ported; Antenna uses only the per-dim 1-in-N roll.
+- Crater biome `EnumProxy` grass tint — `ModCraterBiomes` needs `META-INF/enumextensions.json`;
+  bootstrap uses `GrassColorModifier.NONE` so runData can emit biome JSON.
 
 ## Explicitly not Phase 8
 

@@ -81,14 +81,16 @@ public final class ModCraterBiomes {
         HolderGetter<PlacedFeature> placed = context.lookup(Registries.PLACED_FEATURE);
         HolderGetter<ConfiguredWorldCarver<?>> carvers = context.lookup(Registries.CONFIGURED_CARVER);
 
+        // EnumProxy.getValue() needs META-INF/enumextensions.json (not shipped). Vanilla NONE
+        // until that file lands; CE noise-tinted grass is visual-only.
         context.register(CRATER, baseBuilder(placed, carvers)
-                .specialEffects(effects(0x525A52, CRATER_GRASS_MOD.getValue()))
+                .specialEffects(effects(0x525A52, GrassColorModifier.NONE))
                 .build());
         context.register(CRATER_INNER, baseBuilder(placed, carvers)
-                .specialEffects(effects(0x424A42, CRATER_INNER_GRASS_MOD.getValue()))
+                .specialEffects(effects(0x424A42, GrassColorModifier.NONE))
                 .build());
         context.register(CRATER_OUTER, baseBuilder(placed, carvers)
-                .specialEffects(effects(0x6B9189, CRATER_OUTER_GRASS_MOD.getValue()))
+                .specialEffects(effects(0x6B9189, GrassColorModifier.NONE))
                 .build());
     }
 
