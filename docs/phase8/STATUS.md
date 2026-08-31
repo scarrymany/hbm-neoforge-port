@@ -59,7 +59,7 @@ Do **not** start Phase 9/10/11 — non-machine gap is smaller but not honestly s
 ## Verification (this follow-up)
 
 - `./gradlew compileJava` — **0 errors** (pre-existing deprecation warnings).
-- `./gradlew build` — **SUCCESS.** Jar `build/libs/hbm-0.0.1.jar` **6,466,946** bytes
+- `./gradlew build` — **SUCCESS.** Jar `build/libs/hbm-0.0.1.jar` **6,501,956** bytes
   (was 6,428,399; CE schematics + generated loot/lang/worldgen).
 - `./gradlew runData` — **SUCCESS.** 3245 generated files (was 3138; +107:
   56 block loot/lang/models, bunker/radio configured+placed, biome-modifier update).
