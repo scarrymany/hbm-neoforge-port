@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:gem_volcanic" },
+  "output": { "id": "hbm:gem_rad", "count": 1 }
+}

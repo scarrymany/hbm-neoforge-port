@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:ingot_dura_steel" },
+  "output": { "id": "hbm:ingot_tcalloy", "count": 1 }
+}

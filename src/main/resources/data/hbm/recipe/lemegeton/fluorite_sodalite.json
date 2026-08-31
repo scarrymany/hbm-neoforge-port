@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:crystal_fluorite" },
+  "output": { "id": "hbm:gem_sodalite", "count": 1 }
+}

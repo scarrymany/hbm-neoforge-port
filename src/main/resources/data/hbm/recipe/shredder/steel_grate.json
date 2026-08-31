@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:steel_grate" },
+  "output": { "id": "hbm:powder_steel_tiny", "count": 3 },
+  "duration": 60
+}

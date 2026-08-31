@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "tag": "minecraft:logs" },
+  "output": { "id": "hbm:powder_sawdust", "count": 4 },
+  "duration": 60
+}

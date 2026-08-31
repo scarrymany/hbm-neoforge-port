@@ -95,10 +95,13 @@ public class ChemPlantCategory implements IRecipeCategory<ChemPlantRecipe> {
             }
         }
 
-        if (recipe.outputFluid != null) {
-            builder.addOutputSlot(80, 54)
-                    .setOutputSlotBackground()
-                    .addItemStack(JeiUtil.fluidIcon(recipe.outputFluid));
+        if (recipe.outputFluids != null) {
+            for (int i = 0; i < Math.min(recipe.outputFluids.length, 2); i++) {
+                if (recipe.outputFluids[i] == null) continue;
+                builder.addOutputSlot(80 + i * 18, 54)
+                        .setOutputSlotBackground()
+                        .addItemStack(JeiUtil.fluidIcon(recipe.outputFluids[i]));
+            }
         }
     }
 

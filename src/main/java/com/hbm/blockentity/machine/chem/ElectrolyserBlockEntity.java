@@ -47,6 +47,19 @@ import java.util.Map;
  * downstream"). {@link com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes} therefore has no
  * {@code ElectrolyserMetalRecipes} sibling in this pass either.
  * <p>
+ * <b>Correction (Phase 7 mrec-12-electrolysermetal-misc pass):</b> {@code com.hbm.util.CrucibleUtil}
+ * has since landed in this port (the concurrent Phase 7 Crucible-machine pass), so the foundry/casting
+ * target named above now exists. That resolves one of {@code ElectrolyserMetalRecipes}'s blockers, but
+ * not all of them - two of CE's 18 explicit crystal recipes still need unregistered {@code sulfur}/
+ * {@code chunk_ore} items, and CE's bedrock-ore loop (18 more recipes) still needs
+ * {@code ItemBedrockOreNew.toFluid}/{@code .extract}-equivalent helpers this port's bedrock-ore item
+ * classes don't have. More importantly, <b>this TE still has no ore/crystal-mode branch at all</b> - no
+ * item input slot, no dual-GUI toggle, no pour-out tick logic - porting that is real machine-behavior
+ * work (new menu/screen state, a molten-material accumulator, a downward {@code CrucibleUtil} pour call)
+ * beyond a recipe-data porting task's scope; left for a future pass. See
+ * {@code src/main/java/com/hbm/inventory/recipes/chem/ElectrolyserFluidRecipes.java}'s javadoc for the
+ * same note.
+ * <p>
  * {@link #tankIn} is fixed to CE's own constructor default, {@link Fluids#WATER} (CE's
  * {@code IItemFluidIdentifier}-based tank retyping is not ported, same reasoning as
  * {@code GasCentrifugeBlockEntity}'s tank - a receiving tank must already carry the feed fluid's type

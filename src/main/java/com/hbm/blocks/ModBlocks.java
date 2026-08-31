@@ -69,6 +69,7 @@ public final class ModBlocks {
         com.hbm.blocks.network.ConveyorBlocks.registerAll();
         com.hbm.blocks.machine.OilChainBlocks.registerAll();
         com.hbm.blocks.machine.ProcessingBlocks.registerAll();
+        com.hbm.blocks.machine.CrucibleBlocks.registerAll();
         com.hbm.blocks.machine.chem.ChemIsotopeBlocks.registerAll();
         com.hbm.blocks.machine.PWRBlocks.registerAll();
         com.hbm.blocks.machine.fusion.FusionBlocks.registerAll();

@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -2239,9 +2240,9 @@ public class ModRecipeProvider extends RecipeProvider {
         TagKey<Item> weaponsteelShell = MaterialShapes.SHELL.commonTag(Mats.MAT_WEAPONSTEEL);
         Item ingotPolymer = item("ingot_polymer");
         Item ingotBakelite = item("ingot_bakelite");
-        Ingredient anyPlasticGrip = Ingredient.of(
+        Ingredient anyPlasticGrip = anyTag(
                 MaterialShapes.GRIP.commonTag(Mats.MAT_POLYMER), MaterialShapes.GRIP.commonTag(Mats.MAT_BAKELITE));
-        Ingredient anyPlasticStock = Ingredient.of(
+        Ingredient anyPlasticStock = anyTag(
                 MaterialShapes.STOCK.commonTag(Mats.MAT_POLYMER), MaterialShapes.STOCK.commonTag(Mats.MAT_BAKELITE));
         Ingredient anyPlasticIngot = Ingredient.of(ingotPolymer, ingotBakelite);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("gun_star_f"))
@@ -2360,8 +2361,8 @@ public class ModRecipeProvider extends RecipeProvider {
         TagKey<Item> cdalloyLightBarrel = MaterialShapes.LIGHTBARREL.commonTag(Mats.MAT_CDALLOY);
         TagKey<Item> tcalloyLightReceiver = MaterialShapes.LIGHTRECEIVER.commonTag(Mats.MAT_TCALLOY);
         TagKey<Item> cdalloyLightReceiver = MaterialShapes.LIGHTRECEIVER.commonTag(Mats.MAT_CDALLOY);
-        Ingredient anyResistantAlloyLightBarrel = Ingredient.of(tcalloyLightBarrel, cdalloyLightBarrel);
-        Ingredient anyResistantAlloyLightReceiver = Ingredient.of(tcalloyLightReceiver, cdalloyLightReceiver);
+        Ingredient anyResistantAlloyLightBarrel = anyTag(tcalloyLightBarrel, cdalloyLightBarrel);
+        Ingredient anyResistantAlloyLightReceiver = anyTag(tcalloyLightReceiver, cdalloyLightReceiver);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("gun_lag"))
                 .pattern("BRM").pattern("  G")
                 .define('B', anyResistantAlloyLightBarrel).define('R', anyResistantAlloyLightReceiver)
@@ -2371,7 +2372,7 @@ public class ModRecipeProvider extends RecipeProvider {
         Item crystalRedstone = item("crystal_redstone");
         TagKey<Item> bigmtLightReceiver = MaterialShapes.LIGHTRECEIVER.commonTag(Mats.MAT_SATURN);
         Item ingotPvc = item("ingot_pvc");
-        Ingredient anyHardplasticGrip = Ingredient.of(
+        Ingredient anyHardplasticGrip = anyTag(
                 MaterialShapes.GRIP.commonTag(Mats.MAT_HARDPLASTIC), MaterialShapes.GRIP.commonTag(Mats.MAT_PVC));
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("gun_laser_pistol"))
                 .pattern("CRM").pattern("GG ")
@@ -2707,6 +2708,23 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     /**
+     * REVIEW FIX (r2-crafting-recipes): builds an {@link Ingredient} matching any item in any of the
+     * given tags. Vanilla's own {@code Ingredient.of(TagKey<Item>)} only accepts a single tag (and
+     * {@code Ingredient.of(ItemLike...)} does not apply either - {@link TagKey} does not implement
+     * {@code ItemLike}), so the 5 "any resistant-alloy/plastic shape" call sites below that used to
+     * pass 2 {@code TagKey<Item>} arguments directly to {@code Ingredient.of(...)} had no matching
+     * overload and would not compile. This is the same construction vanilla's own single-tag
+     * {@code Ingredient.of(TagKey)} uses internally - confirmed real via this repo's local NeoForge
+     * source checkout ({@code Ingredient.java.patch}, the unpatched vanilla body of that method is
+     * literally {@code return fromValues(Stream.of(new Ingredient.TagValue(tag)));}) - generalized
+     * here to N tags via {@link Ingredient#fromValues(java.util.stream.Stream)}.
+     */
+    @SafeVarargs
+    private static Ingredient anyTag(TagKey<Item>... tags) {
+        return Ingredient.fromValues(Arrays.stream(tags).map(Ingredient.TagValue::new));
+    }
+
+    /**
      * Resolve-by-id lookup against the already-populated {@link BuiltInRegistries#ITEM} registry,
      * mirroring the pattern already proven safe in this codebase by
      * {@code com.hbm.items.datagen.ModItemTagProvider} - {@code GatherDataEvent} (which drives this
@@ -2747,7 +2765,7 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     // ================================================================================================
-    // Part 8: dynamic crafting-table handlers - docs/phase7/crafting_dynamic_handlers.md
+    // Part 10: dynamic crafting-table handlers - docs/phase7/crafting_dynamic_handlers.md
     // ================================================================================================
     // CE's com.hbm.crafting.handlers.* family (see this class's own "Explicitly not attempted"
     // javadoc paragraph, now updated). Every real matching/assembling logic lives in the Java

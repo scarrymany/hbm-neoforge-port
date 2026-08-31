@@ -1,0 +1,7 @@
+{
+  "type": "hbm:blast_furnace_nt",
+  "input_a": { "ingredient": { "item": "hbm:powder_copper" } },
+  "input_b": { "ingredient": { "tag": "c:ingots/redstone" } },
+  "output": { "id": "hbm:ingot_red_copper", "count": 2 },
+  "duration": 400
+}

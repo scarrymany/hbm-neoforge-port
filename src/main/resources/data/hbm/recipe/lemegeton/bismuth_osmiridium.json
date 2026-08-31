@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:ingot_bismuth" },
+  "output": { "id": "hbm:ingot_osmiridium", "count": 1 }
+}

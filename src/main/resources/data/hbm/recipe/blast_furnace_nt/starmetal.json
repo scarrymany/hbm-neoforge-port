@@ -1,0 +1,7 @@
+{
+  "type": "hbm:blast_furnace_nt",
+  "input_a": { "ingredient": { "item": "hbm:ingot_saturnite" } },
+  "input_b": { "ingredient": { "item": "hbm:ingot_meteorite" } },
+  "output": { "id": "hbm:ingot_starmetal", "count": 1 },
+  "duration": 600
+}

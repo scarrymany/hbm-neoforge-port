@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "tag": "minecraft:sand" },
+  "output": { "id": "hbm:ingot_fiberglass", "count": 1 }
+}

@@ -9,6 +9,7 @@ import com.hbm.packet.toclient.HbmEffectPacket;
 import com.hbm.packet.toclient.NukeExplosionRemovalSyncPacket;
 import com.hbm.packet.toclient.RadFogPayload;
 import com.hbm.packet.toclient.SatPanelPayload;
+import com.hbm.packet.toserver.CrucibleControlPacket;
 import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
 import com.hbm.packet.toserver.LaunchPadRustedControlPacket;
@@ -108,5 +109,8 @@ public class HbmNetwork {
         // Phase 5 (gui_screens_survey_weapons_storage_special): C2S control packet for the rusted
         // launch pad's bare-Screen GUI.
         registrar.playToServer(LaunchPadRustedControlPacket.TYPE, LaunchPadRustedControlPacket.STREAM_CODEC, LaunchPadRustedControlPacket::handleServer);
+
+        // Phase 7 (crucible-core): C2S control packet for the Crucible's recipe-cycle click zone.
+        registrar.playToServer(CrucibleControlPacket.TYPE, CrucibleControlPacket.STREAM_CODEC, CrucibleControlPacket::handleServer);
     }
 }

@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:light_gray_wool" },
+  "output": { "id": "minecraft:string", "count": 4 },
+  "duration": 60
+}

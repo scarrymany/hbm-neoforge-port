@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "tag": "c:coals" },
+  "output": { "id": "hbm:ingot_graphite", "count": 1 }
+}

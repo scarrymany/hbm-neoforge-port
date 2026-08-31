@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:light_blue_terracotta" },
+  "output": { "id": "minecraft:clay_ball", "count": 4 },
+  "duration": 60
+}

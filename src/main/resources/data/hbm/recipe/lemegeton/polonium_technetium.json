@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:ingot_polonium" },
+  "output": { "id": "hbm:ingot_technetium", "count": 1 }
+}

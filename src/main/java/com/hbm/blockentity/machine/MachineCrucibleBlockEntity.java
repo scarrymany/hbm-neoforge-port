@@ -182,15 +182,18 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
         if (level.getBlockEntity(worldPosition.below()) instanceof IHeatSource source) {
             int diff = source.getHeatStored() - heat;
 
-            if (diff != 0) {
-                diff = Math.min(diff, MAX_HEAT - heat);
+            // CE: returns here (no passive decay this tick) when the source already matches the
+            // crucible's own heat exactly - a real behavior difference from simply falling through
+            // to the decay line below, confirmed against TileEntityCrucible#tryPullHeat.
+            if (diff == 0) return;
 
-                if (diff > 0) {
-                    diff = (int) Math.ceil(diff * DIFFUSION);
-                    source.useUpHeat(diff);
-                    heat = Math.min(heat + diff, MAX_HEAT);
-                    return;
-                }
+            diff = Math.min(diff, MAX_HEAT - heat);
+
+            if (diff > 0) {
+                diff = (int) Math.ceil(diff * DIFFUSION);
+                source.useUpHeat(diff);
+                heat = Math.min(heat + diff, MAX_HEAT);
+                return;
             }
         }
 
@@ -207,20 +210,25 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
             ItemStack stack = itemEntity.getItem();
             if (!isItemSmeltable(stack)) continue;
 
+            // CE: the inner loop only breaks on the count==1 branch - a stack with count > 1 keeps
+            // distributing one item per empty slot across the whole 3x3 in a single tick instead of
+            // stopping after the first slot (confirmed against TileEntityCrucible#update's "collect
+            // items" block, where only the setDead()+break path actually breaks).
             for (int slot = INPUT_START; slot <= INPUT_END; slot++) {
                 if (!inventory.getStackInSlot(slot).isEmpty()) continue;
 
                 if (stack.getCount() == 1) {
                     inventory.setStackInSlot(slot, stack.copy());
                     itemEntity.discard();
+                    setChanged();
+                    break;
                 } else {
                     ItemStack single = stack.copy();
                     single.setCount(1);
                     inventory.setStackInSlot(slot, single);
                     stack.shrink(1);
+                    setChanged();
                 }
-                setChanged();
-                break;
             }
         }
     }

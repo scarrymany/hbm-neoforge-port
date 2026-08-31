@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:ingot_combine_steel" },
+  "output": { "id": "hbm:ingot_dineutronium", "count": 1 }
+}

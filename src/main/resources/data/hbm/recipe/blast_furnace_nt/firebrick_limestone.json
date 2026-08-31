@@ -1,0 +1,7 @@
+{
+  "type": "hbm:blast_furnace_nt",
+  "input_a": { "ingredient": { "item": "hbm:powder_limestone" } },
+  "input_b": { "ingredient": { "item": "minecraft:clay_ball" }, "count": 6 },
+  "output": { "id": "hbm:ingot_firebrick", "count": 8 },
+  "duration": 800
+}

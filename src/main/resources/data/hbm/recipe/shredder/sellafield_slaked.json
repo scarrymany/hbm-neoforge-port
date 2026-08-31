@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:sellafield_slaked" },
+  "output": { "id": "minecraft:gravel", "count": 1 },
+  "duration": 60
+}

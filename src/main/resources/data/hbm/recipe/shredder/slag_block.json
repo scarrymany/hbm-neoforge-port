@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:slag_block" },
+  "output": { "id": "hbm:powder_cement", "count": 4 },
+  "duration": 60
+}

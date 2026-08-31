@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "minecraft:copper_ingot" },
+  "output": { "id": "hbm:ingot_red_copper", "count": 1 }
+}

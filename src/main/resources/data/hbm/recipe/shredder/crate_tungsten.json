@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:crate_tungsten" },
+  "output": { "id": "hbm:powder_tungsten", "count": 36 },
+  "duration": 60
+}

@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:fragment_cerium" },
+  "output": { "id": "hbm:powder_cerium_tiny", "count": 1 },
+  "duration": 60
+}

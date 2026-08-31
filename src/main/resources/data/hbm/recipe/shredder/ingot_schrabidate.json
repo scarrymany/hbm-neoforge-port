@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:ingot_schrabidate" },
+  "output": { "id": "hbm:powder_schrabidate", "count": 1 },
+  "duration": 60
+}

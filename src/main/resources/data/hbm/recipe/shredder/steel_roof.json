@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:steel_roof" },
+  "output": { "id": "hbm:powder_steel_tiny", "count": 9 },
+  "duration": 60
+}

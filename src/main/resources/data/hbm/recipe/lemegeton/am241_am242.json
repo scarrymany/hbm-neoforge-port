@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:ingot_am241" },
+  "output": { "id": "hbm:ingot_am242", "count": 1 }
+}

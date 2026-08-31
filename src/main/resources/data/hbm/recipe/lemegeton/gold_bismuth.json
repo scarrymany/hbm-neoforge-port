@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "minecraft:gold_ingot" },
+  "output": { "id": "hbm:ingot_bismuth", "count": 1 }
+}

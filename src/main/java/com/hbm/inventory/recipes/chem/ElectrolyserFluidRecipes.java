@@ -26,10 +26,20 @@ import java.util.Map;
  * {@code ALUMINA}'s second byproduct {@code fluorite} (CE's bare item, distinct from the already-ported
  * {@code crystal_fluorite}, not registered yet either).
  * <p>
- * The ore/crystal electrolysis half ({@code ElectrolyserMetalRecipes}) is not ported this pass - see
- * {@code com.hbm.blockentity.machine.chem.ElectrolyserBlockEntity}'s javadoc: it requires
- * {@code com.hbm.util.CrucibleUtil}'s foundry/casting system, not ported anywhere in this port yet, a
- * real Phase 2/4 boundary dependency flagged by the research doc itself.
+ * The ore/crystal electrolysis half ({@code ElectrolyserMetalRecipes}) is still not ported as of this
+ * pass - see {@code com.hbm.blockentity.machine.chem.ElectrolyserBlockEntity}'s javadoc for the current
+ * status. <b>Correction (Phase 7 mrec-12-electrolysermetal-misc pass):</b> {@code com.hbm.util.CrucibleUtil}
+ * (the foundry/casting system this half pours into) has since landed in this port, in the concurrent
+ * Phase 7 Crucible-machine pass ({@code com.hbm.util.CrucibleUtil}, {@code MachineCrucibleBlockEntity}) -
+ * that specific blocker named above is resolved. What remains blocked: two of the 18 explicit CE crystal
+ * recipes need bare {@code sulfur} and {@code chunk_ore} (meta {@code CRYOLITE}) items neither registered
+ * in this port yet; CE's 6-member bedrock-ore loop (18 more recipes) needs
+ * {@code ItemBedrockOreNew.toFluid}/{@code .extract}-equivalent helper methods this port's
+ * {@code BedrockOreType}/{@code BedrockOreOutput} classes don't have yet; and, more fundamentally,
+ * {@code ElectrolyserBlockEntity} itself has no ore/crystal-mode branch wired in at all yet (no item
+ * input slot, no dual-mode GUI toggle, no pour-out tick logic calling {@code CrucibleUtil.pourFullStack})
+ * - a machine-behavior task in its own right, now unblocked at the infrastructure layer but not attempted
+ * in this pass (out of scope for a recipe-data porting task; see that block entity's own javadoc).
  */
 public final class ElectrolyserFluidRecipes {
 

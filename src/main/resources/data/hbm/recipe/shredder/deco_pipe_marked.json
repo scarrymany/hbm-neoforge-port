@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:deco_pipe_marked" },
+  "output": { "id": "hbm:powder_steel", "count": 1 },
+  "duration": 60
+}

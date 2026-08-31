@@ -146,11 +146,18 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < recipe.outputItems.length && i < 3; i++) {
             if (!inventory.insertItem(ITEM_OUT_START + i, recipe.outputItems[i], true).isEmpty()) return false;
         }
-        if (recipe.outputFluid != null) {
+        // Independently reserved per fluid so a 2-output recipe (e.g. chem.cccentrifuge) can't have
+        // both outputs silently claim the same tank slot - see ChemPlantRecipe's own javadoc on the
+        // outputFluid -> outputFluids widening.
+        boolean[] reserved = new boolean[outputTanks.length];
+        for (FluidStack out : recipe.outputFluids) {
             boolean placed = false;
-            for (FluidTankNTM tank : outputTanks) {
-                if ((tank.getTankType() == recipe.outputFluid.type || tank.getTankType() == Fluids.NONE)
-                        && tank.getFill() + recipe.outputFluid.fill <= tank.getMaxFill()) {
+            for (int i = 0; i < outputTanks.length; i++) {
+                if (reserved[i]) continue;
+                FluidTankNTM tank = outputTanks[i];
+                if ((tank.getTankType() == out.type || tank.getTankType() == Fluids.NONE)
+                        && tank.getFill() + out.fill <= tank.getMaxFill()) {
+                    reserved[i] = true;
                     placed = true;
                     break;
                 }
@@ -171,11 +178,15 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < recipe.outputItems.length && i < 3; i++) {
             inventory.insertItem(ITEM_OUT_START + i, recipe.outputItems[i].copy(), false);
         }
-        if (recipe.outputFluid != null) {
-            for (FluidTankNTM tank : outputTanks) {
-                if (tank.getTankType() == recipe.outputFluid.type || tank.getTankType() == Fluids.NONE) {
-                    tank.setTankType(recipe.outputFluid.type);
-                    tank.setFill(tank.getFill() + recipe.outputFluid.fill);
+        boolean[] reserved = new boolean[outputTanks.length];
+        for (FluidStack out : recipe.outputFluids) {
+            for (int i = 0; i < outputTanks.length; i++) {
+                if (reserved[i]) continue;
+                FluidTankNTM tank = outputTanks[i];
+                if (tank.getTankType() == out.type || tank.getTankType() == Fluids.NONE) {
+                    tank.setTankType(out.type);
+                    tank.setFill(tank.getFill() + out.fill);
+                    reserved[i] = true;
                     break;
                 }
             }

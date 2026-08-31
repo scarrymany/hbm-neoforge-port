@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:block_bakelite" },
+  "output": { "id": "hbm:powder_bakelite", "count": 9 },
+  "duration": 60
+}

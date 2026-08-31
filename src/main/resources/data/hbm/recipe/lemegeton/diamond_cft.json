@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "minecraft:diamond" },
+  "output": { "id": "hbm:ingot_cft", "count": 1 }
+}

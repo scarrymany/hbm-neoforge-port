@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:fragment_niobium" },
+  "output": { "id": "hbm:powder_niobium_tiny", "count": 1 },
+  "duration": 60
+}

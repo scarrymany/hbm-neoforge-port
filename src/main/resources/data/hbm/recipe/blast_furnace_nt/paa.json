@@ -1,0 +1,7 @@
+{
+  "type": "hbm:blast_furnace_nt",
+  "input_a": { "ingredient": { "item": "minecraft:gold_ingot" } },
+  "input_b": { "ingredient": { "item": "hbm:plate_mixed" } },
+  "output": { "id": "hbm:plate_paa", "count": 1 },
+  "duration": 600
+}

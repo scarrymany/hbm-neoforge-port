@@ -6,10 +6,14 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.items.special.BedrockOreGrade;
+import com.hbm.items.special.BedrockOreItems;
+import com.hbm.items.special.BedrockOreType;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.Tuple;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -17,6 +21,8 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static com.hbm.items.special.BedrockOreGrade.*;
 
 /**
  * Ported from CE's {@code com.hbm.inventory.recipes.CrystallizerRecipes} (385 lines, read in full) -
@@ -72,6 +78,29 @@ public final class CrystallizerRecipes {
      */
     private static Block hbmBlock(String path) {
         return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+    }
+
+    /** Item-registry counterpart to {@link #hbmBlock(String)} - same lazy-safety rationale, used
+     * below to resolve {@code chemical_dye_*} (registered per-color by {@code MachineItems}, which
+     * exposes no public {@code EnumChemDye -> DeferredItem} map to reference directly) and
+     * {@code ingot_schraranium} (a {@code register(...)} call in {@code IngotNuggetItems}, not one of
+     * that class's {@code registerIngot(...)}-family helpers, so no uniformly-named field lookup is
+     * needed - this is simply the same cross-package-reference idiom already established by
+     * {@code RockMillRecipes#resolveItem}/{@code ChemPlantRecipes} for the identical situation). */
+    private static Item hbmItem(String path) {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+    }
+
+    /** {@code ItemBedrockOreNew.make(grade, type)} equivalent for a recipe *input* - CE's dense
+     * (type, grade) cross product is this port's {@link BedrockOreItems#get}, see that class's own
+     * javadoc for the 6x26=156 flattening rationale. */
+    private static ComparableStack bIn(BedrockOreType type, BedrockOreGrade grade) {
+        return new ComparableStack(BedrockOreItems.get(type, grade).get());
+    }
+
+    /** Same lookup as {@link #bIn}, wrapped as an output {@link ItemStack} instead. */
+    private static ItemStack bOut(BedrockOreType type, BedrockOreGrade grade) {
+        return new ItemStack(BedrockOreItems.get(type, grade).get());
     }
 
     /**
@@ -146,6 +175,180 @@ public final class CrystallizerRecipes {
         // registerRecipe(new ComparableStack(ModItems.powder_desh_ready), new CrystallizerRecipe(ModItems.ingot_desh, baseTime));
         register(new ComparableStack(BilletPowderItems.POWDER_DESH_READY.get()), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
                 new CrystallizerRecipe(new ItemStack(IngotNuggetItems.INGOT_DESH.get()), baseTime, 0F));
+
+        // ==================== mrec-10-crystallizer-misc additions ====================
+        // Ported per docs/phase7/mrec_10_crystallizer_misc.md's "ready to port now" catalog (CE
+        // CrystallizerRecipes.java, upstream/hbm-ce, lines 56-219 read in full). CE origin cited per
+        // entry/group below; entries the report marked blocked (missing item/block) are NOT ported -
+        // see that file's stillBlocked-equivalent notes and this task's own final report.
+        final int mixingTime = 20;
+
+        // ---- ore -> crystal, remaining flat entries (CE registerDefaults(), the COAL/U/S/KNO/AL/F/
+        // BE/SA326/oreRareEarth/oreCinnabar/ore_nether_fire/ore_tikite/SRN call sites) ----
+        // registerRecipe(COAL.ore(), new CrystallizerRecipe(ModItems.crystal_coal, baseTime).prod(0.05F));
+        register(new ComparableStack(Blocks.COAL_ORE), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_COAL.get()), baseTime, 0.05F));
+        // registerRecipe(U.ore(), new CrystallizerRecipe(ModItems.crystal_uranium, baseTime).prod(0.05F), sulfur);
+        // NOTE: this port's ore_uranium is a BlockOutgas (radioactive-gas variant of BlockNTMOre), but
+        // it is still the real registered block under that id - CE's U.ore() resolves to the same block.
+        register(new ComparableStack(hbmBlock("ore_uranium")), Fluids.SULFURIC_ACID, 500,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_URANIUM.get()), baseTime, 0.05F));
+        // registerRecipe(S.ore(), new CrystallizerRecipe(ModItems.crystal_sulfur, baseTime).prod(0.05F));
+        register(new ComparableStack(hbmBlock("ore_sulfur")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_SULFUR.get()), baseTime, 0.05F));
+        // registerRecipe(KNO.ore(), new CrystallizerRecipe(ModItems.crystal_niter, baseTime).prod(0.05F));
+        register(new ComparableStack(hbmBlock("ore_niter")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_NITER.get()), baseTime, 0.05F));
+        // registerRecipe(AL.ore(), new CrystallizerRecipe(ModItems.crystal_aluminium, baseTime).prod(0.05F));
+        register(new ComparableStack(hbmBlock("ore_aluminium")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_ALUMINIUM.get()), baseTime, 0.05F));
+        // registerRecipe(F.ore(), new CrystallizerRecipe(ModItems.crystal_fluorite, baseTime).prod(0.05F));
+        register(new ComparableStack(hbmBlock("ore_fluorite")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get()), baseTime, 0.05F));
+        // registerRecipe(BE.ore(), new CrystallizerRecipe(ModItems.crystal_beryllium, baseTime).prod(0.05F));
+        register(new ComparableStack(hbmBlock("ore_beryllium")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_BERYLLIUM.get()), baseTime, 0.05F));
+        // registerRecipe(SA326.ore(), new CrystallizerRecipe(ModItems.crystal_schrabidium, baseTime).prod(0.05F), sulfur);
+        register(new ComparableStack(hbmBlock("ore_schrabidium")), Fluids.SULFURIC_ACID, 500,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_SCHRABIDIUM.get()), baseTime, 0.05F));
+        // registerRecipe("oreRareEarth", new CrystallizerRecipe(ModItems.crystal_rare, baseTime).prod(0.05F), sulfur);
+        // ore-dict key substituted with the concrete block it names in this port (no ore-dict system
+        // here - see class javadoc), matching the already-established substitution pattern.
+        register(new ComparableStack(hbmBlock("ore_rare")), Fluids.SULFURIC_ACID, 500,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_RARE.get()), baseTime, 0.05F));
+        // registerRecipe("oreCinnabar", new CrystallizerRecipe(ModItems.crystal_cinnabar, baseTime).prod(0.05F));
+        register(new ComparableStack(hbmBlock("ore_cinnabar")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_CINNABAR.get()), baseTime, 0.05F));
+        // registerRecipe(new ComparableStack(ModBlocks.ore_nether_fire), new CrystallizerRecipe(ModItems.crystal_phosphorus, baseTime).prod(0.05F));
+        register(new ComparableStack(hbmBlock("ore_nether_fire")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_PHOSPHORUS.get()), baseTime, 0.05F));
+        // registerRecipe(new ComparableStack(ModBlocks.ore_tikite), new CrystallizerRecipe(ModItems.crystal_trixite, baseTime).prod(0.05F), sulfur);
+        register(new ComparableStack(hbmBlock("ore_tikite")), Fluids.SULFURIC_ACID, 500,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_TRIXITE.get()), baseTime, 0.05F));
+        // registerRecipe(SRN.ingot(), new CrystallizerRecipe(ModItems.crystal_schraranium, baseTime).prod(0.05F));
+        // ingot_schraranium is IngotNuggetItems.INGOT_SCHRARANIUM (a bespoke register(...) call, not
+        // one of that class's registerIngot(...) helpers - still a real, confirmed item).
+        register(new ComparableStack(IngotNuggetItems.INGOT_SCHRARANIUM.get()), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_SCHRARANIUM.get()), baseTime, 0.05F));
+
+        // ---- misc item/utility transmutations (CE registerDefaults(), the KEY_SAND/SI/BORAX/DYE-15/
+        // BONE/powder_meteorite/powder_impure_osmiridium/KEY_SAND-to-clay call sites) ----
+        // registerRecipe(KEY_SAND, new CrystallizerRecipe(ModItems.ingot_fiberglass, utilityTime).prod(0.15F));
+        // KEY_SAND is CE's ore-dict "sand" key, substituted with vanilla sand directly (see class javadoc).
+        register(new ComparableStack(Blocks.SAND), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(IngotNuggetItems.INGOT_FIBERGLASS.get()), utilityTime, 0.15F));
+        // registerRecipe(SI.ingot(), new CrystallizerRecipe(new ItemStack(Items.QUARTZ, 2), utilityTime).prod(0.1F), new FluidStack(Fluids.OXYGEN, 250));
+        register(new ComparableStack(IngotNuggetItems.INGOT_SILICON.get()), Fluids.OXYGEN, 250,
+                new CrystallizerRecipe(new ItemStack(Items.QUARTZ, 2), utilityTime, 0.1F));
+        // registerRecipe(BORAX.dust(), new CrystallizerRecipe(new ItemStack(ModItems.powder_boron_tiny, 3), baseTime).prod(0.25F), sulfur);
+        register(new ComparableStack(BilletPowderItems.POWDER_BORAX.get()), Fluids.SULFURIC_ACID, 500,
+                new CrystallizerRecipe(new ItemStack(BilletPowderItems.POWDER_BORON_TINY.get(), 3), baseTime, 0.25F));
+        // registerRecipe(new ComparableStack(Items.DYE, 1, 15), new CrystallizerRecipe(new ItemStack(Items.SLIME_BALL, 4), mixingTime), new FluidStack(Fluids.SULFURIC_ACID, 250));
+        // 1.21: dye color 15 (white) is its own item, Items.WHITE_DYE.
+        register(new ComparableStack(Items.WHITE_DYE), Fluids.SULFURIC_ACID, 250,
+                new CrystallizerRecipe(new ItemStack(Items.SLIME_BALL, 4), mixingTime, 0F));
+        // registerRecipe(new ComparableStack(Items.BONE), new CrystallizerRecipe(new ItemStack(Items.SLIME_BALL, 16), mixingTime), new FluidStack(Fluids.SULFURIC_ACID, 1_000));
+        register(new ComparableStack(Items.BONE), Fluids.SULFURIC_ACID, 1_000,
+                new CrystallizerRecipe(new ItemStack(Items.SLIME_BALL, 16), mixingTime, 0F));
+        // registerRecipe(new ComparableStack(ModItems.powder_meteorite), new CrystallizerRecipe(ModItems.fragment_meteorite, utilityTime));
+        register(new ComparableStack(BilletPowderItems.POWDER_METEORITE.get()), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.FRAGMENT_METEORITE.get()), utilityTime, 0F));
+        // registerRecipe(new ComparableStack(ModItems.powder_impure_osmiridium), new CrystallizerRecipe(ModItems.crystal_osmiridium, baseTime), new FluidStack(Fluids.SCHRABIDIC, 1_000));
+        register(new ComparableStack(BilletPowderItems.POWDER_IMPURE_OSMIRIDIUM.get()), Fluids.SCHRABIDIC, 1_000,
+                new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_OSMIRIDIUM.get()), baseTime, 0F));
+        // registerRecipe(KEY_SAND, new CrystallizerRecipe(Blocks.CLAY, 20), new FluidStack(Fluids.COLLOID, 1_000));
+        register(new ComparableStack(Blocks.SAND), Fluids.COLLOID, 1_000,
+                new CrystallizerRecipe(new ItemStack(Blocks.CLAY), mixingTime, 0F));
+
+        // registerRecipe(new ComparableStack(ModBlocks.stone_gneiss), new CrystallizerRecipe(ModItems.powder_lithium, utilityTime).prod(0.25F));
+        // CORRECTION vs. this task's own research report (docs/phase7/mrec_10_crystallizer_misc.md
+        // marked this "Blocked"): stone_gneiss IS a real registered block in this port
+        // (com.hbm.blocks.OreBlocks#registerBlock("stone_gneiss", ...), confirmed by direct read and
+        // by RockMillRecipes' own already-working resolveItem("stone_gneiss") reference) - ready.
+        register(new ComparableStack(hbmBlock("stone_gneiss")), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
+                new CrystallizerRecipe(new ItemStack(BilletPowderItems.POWDER_LITHIUM.get()), utilityTime, 0.25F));
+
+        // registerRecipe(CD.dust(), new CrystallizerRecipe(new ItemStack(ModItems.ingot_rubber, 16), utilityTime), new FluidStack(Fluids.FISHOIL, 4_000));
+        register(new ComparableStack(BilletPowderItems.POWDER_CADMIUM.get()), Fluids.FISHOIL, 4_000,
+                new CrystallizerRecipe(new ItemStack(IngotNuggetItems.INGOT_RUBBER.get(), 16), utilityTime, 0F));
+
+        // ---- dye loop (CE lines 178-186): 6 dust materials x 3 reagent fluids -> chemical_dye colors ----
+        // chemical_dye_* items are registered per-color by MachineItems#registerChemicalDye (no public
+        // EnumChemDye -> DeferredItem map exposed), resolved here the same way hbmItem resolves any
+        // other cross-package registry id.
+        for (FluidType dyeReagent : new FluidType[]{Fluids.WOODOIL, Fluids.FISHOIL, Fluids.LIGHTOIL}) {
+            register(new ComparableStack(BilletPowderItems.POWDER_COAL.get()), dyeReagent, 100,
+                    new CrystallizerRecipe(new ItemStack(hbmItem("chemical_dye_black"), 4), mixingTime, 0.15F));
+            register(new ComparableStack(BilletPowderItems.POWDER_TITANIUM.get()), dyeReagent, 100,
+                    new CrystallizerRecipe(new ItemStack(hbmItem("chemical_dye_white"), 4), mixingTime, 0.15F));
+            register(new ComparableStack(BilletPowderItems.POWDER_IRON.get()), dyeReagent, 100,
+                    new CrystallizerRecipe(new ItemStack(hbmItem("chemical_dye_red"), 4), mixingTime, 0.15F));
+            register(new ComparableStack(BilletPowderItems.POWDER_TUNGSTEN.get()), dyeReagent, 100,
+                    new CrystallizerRecipe(new ItemStack(hbmItem("chemical_dye_yellow"), 4), mixingTime, 0.15F));
+            register(new ComparableStack(BilletPowderItems.POWDER_COPPER.get()), dyeReagent, 100,
+                    new CrystallizerRecipe(new ItemStack(hbmItem("chemical_dye_green"), 4), mixingTime, 0.15F));
+            register(new ComparableStack(BilletPowderItems.POWDER_COBALT.get()), dyeReagent, 100,
+                    new CrystallizerRecipe(new ItemStack(hbmItem("chemical_dye_blue"), 4), mixingTime, 0.15F));
+        }
+
+        // ---- bedrock-ore washing/roasting/centrifuging chain (CE lines 122-176) ----
+        // Verbatim transcription of CE's nested loop: ItemBedrockOreNew.make(grade, type) ->
+        // BedrockOreItems.get(type, grade).get() is the only substitution (see bIn/bOut above). 37
+        // recipes per BedrockOreType x 6 types = 222 runtime recipes - by far the largest sub-pattern
+        // in this class; see docs/phase7/mrec_10_crystallizer_misc.md for the full derivation.
+        final int bedrock = 200;
+        final int washing = 100;
+        for (BedrockOreType type : BedrockOreType.VALUES) {
+            register(bIn(type, BASE), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, BASE_WASHED), washing, 0F));
+            register(bIn(type, BASE_ROASTED), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, BASE_WASHED), washing, 0F));
+
+            register(bIn(type, PRIMARY), Fluids.SULFURIC_ACID, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SULFURIC), bedrock, 0F));
+            register(bIn(type, PRIMARY_ROASTED), Fluids.SULFURIC_ACID, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SULFURIC), bedrock, 0F));
+
+            register(bIn(type, PRIMARY), Fluids.SOLVENT, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SOLVENT), bedrock, 0F));
+            register(bIn(type, PRIMARY_ROASTED), Fluids.SOLVENT, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SOLVENT), bedrock, 0F));
+            register(bIn(type, PRIMARY_NOSULFURIC), Fluids.SOLVENT, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SOLVENT), bedrock, 0F));
+
+            register(bIn(type, PRIMARY), Fluids.RADIOSOLVENT, 250, new CrystallizerRecipe(bOut(type, PRIMARY_RAD), bedrock, 0F));
+            register(bIn(type, PRIMARY_ROASTED), Fluids.RADIOSOLVENT, 250, new CrystallizerRecipe(bOut(type, PRIMARY_RAD), bedrock, 0F));
+            register(bIn(type, PRIMARY_NOSULFURIC), Fluids.RADIOSOLVENT, 250, new CrystallizerRecipe(bOut(type, PRIMARY_RAD), bedrock, 0F));
+            register(bIn(type, PRIMARY_NOSOLVENT), Fluids.RADIOSOLVENT, 250, new CrystallizerRecipe(bOut(type, PRIMARY_RAD), bedrock, 0F));
+
+            final int sulf = 4;
+            register(bIn(type, SULFURIC_BYPRODUCT), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, SULFURIC_WASHED), washing, sulf, 0F));
+            register(bIn(type, SULFURIC_ROASTED), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, SULFURIC_WASHED), washing, sulf, 0F));
+            register(bIn(type, SULFURIC_ARC), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, SULFURIC_WASHED), washing, sulf, 0F));
+
+            final int solv = 4;
+            register(bIn(type, SOLVENT_BYPRODUCT), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, SOLVENT_WASHED), washing, solv, 0F));
+            register(bIn(type, SOLVENT_ROASTED), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, SOLVENT_WASHED), washing, solv, 0F));
+            register(bIn(type, SOLVENT_ARC), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, SOLVENT_WASHED), washing, solv, 0F));
+
+            final int rad = 4;
+            register(bIn(type, RAD_BYPRODUCT), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, RAD_WASHED), washing, rad, 0F));
+            register(bIn(type, RAD_ROASTED), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, RAD_WASHED), washing, rad, 0F));
+            register(bIn(type, RAD_ARC), Fluids.WATER, 250, new CrystallizerRecipe(bOut(type, RAD_WASHED), washing, rad, 0F));
+
+            register(bIn(type, PRIMARY), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+            register(bIn(type, PRIMARY_ROASTED), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+            register(bIn(type, PRIMARY_SULFURIC), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+            register(bIn(type, PRIMARY_NOSULFURIC), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+            register(bIn(type, PRIMARY_SOLVENT), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+            register(bIn(type, PRIMARY_NOSOLVENT), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+            register(bIn(type, PRIMARY_RAD), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+            register(bIn(type, PRIMARY_NORAD), Fluids.HYDROGEN, 250, new CrystallizerRecipe(bOut(type, PRIMARY_FIRST), bedrock, 0F));
+
+            register(bIn(type, PRIMARY), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+            register(bIn(type, PRIMARY_ROASTED), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+            register(bIn(type, PRIMARY_SULFURIC), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+            register(bIn(type, PRIMARY_NOSULFURIC), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+            register(bIn(type, PRIMARY_SOLVENT), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+            register(bIn(type, PRIMARY_NOSOLVENT), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+            register(bIn(type, PRIMARY_RAD), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+            register(bIn(type, PRIMARY_NORAD), Fluids.CHLORINE, 250, new CrystallizerRecipe(bOut(type, PRIMARY_SECOND), bedrock, 0F));
+
+            register(bIn(type, CRUMBS), Fluids.SLOP, 1000, new CrystallizerRecipe(bOut(type, BASE), bedrock, 64, 0F));
+        }
     }
 
     private static void register(ComparableStack input, FluidType acidType, int acidAmount, CrystallizerRecipe recipe) {

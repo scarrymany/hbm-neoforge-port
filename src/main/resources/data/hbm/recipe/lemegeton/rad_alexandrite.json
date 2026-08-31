@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:gem_rad" },
+  "output": { "id": "hbm:gem_alexandrite", "count": 1 }
+}

@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "minecraft:quartz_stairs" },
+  "output": { "id": "hbm:powder_quartz", "count": 3 },
+  "duration": 60
+}

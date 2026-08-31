@@ -110,8 +110,9 @@ public final class ProgressionChainGameTests {
 
     /**
      * Scenario 1 step 3: chem plant runs {@code chem.ethanol} (10x {@code minecraft:sugar} -> 1000mB
-     * ethanol, {@code duration: 100} ticks - {@code inventory/recipes/chem/ChemPlantRecipes.java:66
-     * -70}, the only fluid-input-free recipe in this port's chem plant table). Battery slot
+     * ethanol, {@code duration: 100} ticks - {@code inventory/recipes/chem/ChemPlantRecipes.java:164
+     * -168} (line numbers shifted by the {@code mrec-08-chemplant-misc} pass's 47-entry extension;
+     * still the only fluid-input-free item-only recipe in this port's chem plant table). Battery slot
      * confirmed {@code ChemPlantBlockEntity.java:55} ({@code BATTERY_SLOT = 6}).
      */
     // TODO(gametest, fc7-gametest-emptytemplate): removed `@EmptyTemplate(value = {5, 5, 5})` -

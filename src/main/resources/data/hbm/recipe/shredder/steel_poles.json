@@ -1,0 +1,6 @@
+{
+  "type": "hbm:shredder",
+  "input": { "item": "hbm:steel_poles" },
+  "output": { "id": "hbm:powder_steel_tiny", "count": 2 },
+  "duration": 60
+}

@@ -1,0 +1,5 @@
+{
+  "type": "hbm:lemegeton",
+  "input": { "item": "hbm:gem_sodalite" },
+  "output": { "id": "hbm:gem_volcanic", "count": 1 }
+}
