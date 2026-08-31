@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * CE {@code LiquefactionRecipes.java:32-69}. {@code RECIPES.put} so the census hits.
- * Skipped: {@code KEY_*_TAR} ({@code oil_tar} unregistered), lignite gem, {@code glyphid_gland_empty},
- * {@code plant_flower} metas, {@code PB.block} (block_lead not registered), food→SALIENT dynamic.
+ * CE {@code LiquefactionRecipes.java:32-69}. Each insert is a live {@code RECIPES.put} for the census.
+ * Skipped: {@code KEY_*_TAR} ({@code oil_tar}), lignite gem, {@code glyphid_gland_empty},
+ * {@code plant_flower} metas, {@code PB.block}, food→SALIENT dynamic.
  */
 public final class LiquefactionRecipes {
 
@@ -36,48 +36,43 @@ public final class LiquefactionRecipes {
         registered = true;
 
         // :33-34
-        put(Items.COAL, new FluidStack(Fluids.COALOIL, 250));
-        put(BilletPowderItems.POWDER_COAL.get(), new FluidStack(Fluids.COALOIL, 250));
-        // :36 lignite dust only
-        put(BilletPowderItems.POWDER_LIGNITE.get(), new FluidStack(Fluids.COALOIL, 150));
-        // :40 KEY_LOG
-        put(Items.OAK_LOG, new FluidStack(Fluids.MUG, 100));
+        RECIPES.put(new ComparableStack(Items.COAL), new FluidStack(Fluids.COALOIL, 250));
+        RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_COAL.get()), new FluidStack(Fluids.COALOIL, 250));
+        // :36
+        RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_LIGNITE.get()), new FluidStack(Fluids.COALOIL, 150));
+        // :40
+        RECIPES.put(new ComparableStack(Items.OAK_LOG), new FluidStack(Fluids.MUG, 100));
         // :41-43
-        put(BilletPowderItems.POWDER_SODIUM.get(), new FluidStack(Fluids.SODIUM, 100));
-        put(IngotNuggetItems.INGOT_LEAD.get(), new FluidStack(Fluids.LEAD, 100));
-        put(BilletPowderItems.POWDER_LEAD.get(), new FluidStack(Fluids.LEAD, 100));
+        RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_SODIUM.get()), new FluidStack(Fluids.SODIUM, 100));
+        RECIPES.put(new ComparableStack(IngotNuggetItems.INGOT_LEAD.get()), new FluidStack(Fluids.LEAD, 100));
+        RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_LEAD.get()), new FluidStack(Fluids.LEAD, 100));
         // :46-54
-        put(Blocks.NETHERRACK.asItem(), new FluidStack(Fluids.LAVA, 250));
-        put(Blocks.COBBLESTONE.asItem(), new FluidStack(Fluids.LAVA, 250));
-        put(Blocks.STONE.asItem(), new FluidStack(Fluids.LAVA, 250));
-        put(Blocks.OBSIDIAN.asItem(), new FluidStack(Fluids.LAVA, 500));
-        put(Items.SNOWBALL, new FluidStack(Fluids.WATER, 125));
-        put(Blocks.SNOW_BLOCK.asItem(), new FluidStack(Fluids.WATER, 500));
-        put(Blocks.ICE.asItem(), new FluidStack(Fluids.WATER, 1_000));
-        put(Blocks.PACKED_ICE.asItem(), new FluidStack(Fluids.WATER, 1_000));
-        put(Items.ENDER_PEARL, new FluidStack(Fluids.ENDERJUICE, 100));
+        RECIPES.put(new ComparableStack(Blocks.NETHERRACK.asItem()), new FluidStack(Fluids.LAVA, 250));
+        RECIPES.put(new ComparableStack(Blocks.COBBLESTONE.asItem()), new FluidStack(Fluids.LAVA, 250));
+        RECIPES.put(new ComparableStack(Blocks.STONE.asItem()), new FluidStack(Fluids.LAVA, 250));
+        RECIPES.put(new ComparableStack(Blocks.OBSIDIAN.asItem()), new FluidStack(Fluids.LAVA, 500));
+        RECIPES.put(new ComparableStack(Items.SNOWBALL), new FluidStack(Fluids.WATER, 125));
+        RECIPES.put(new ComparableStack(Blocks.SNOW_BLOCK.asItem()), new FluidStack(Fluids.WATER, 500));
+        RECIPES.put(new ComparableStack(Blocks.ICE.asItem()), new FluidStack(Fluids.WATER, 1_000));
+        RECIPES.put(new ComparableStack(Blocks.PACKED_ICE.asItem()), new FluidStack(Fluids.WATER, 1_000));
+        RECIPES.put(new ComparableStack(Items.ENDER_PEARL), new FluidStack(Fluids.ENDERJUICE, 100));
         // :55
-        put(item("ore_oil_sand"), new FluidStack(Fluids.BITUMEN, 100));
+        RECIPES.put(new ComparableStack(item("ore_oil_sand")), new FluidStack(Fluids.BITUMEN, 100));
         // :57-58
-        put(Items.SUGAR, new FluidStack(Fluids.ETHANOL, 100));
-        put(Items.MELON_SLICE, new FluidStack(Fluids.ETHANOL, 100));
+        RECIPES.put(new ComparableStack(Items.SUGAR), new FluidStack(Fluids.ETHANOL, 100));
+        RECIPES.put(new ComparableStack(Items.MELON_SLICE), new FluidStack(Fluids.ETHANOL, 100));
         // :61
-        put(Phase11ProcessItems.BIOMASS.get(), new FluidStack(Fluids.BIOGAS, 125));
-        // :63 fish wildcard → cod
-        put(Items.COD, new FluidStack(Fluids.FISHOIL, 100));
-        put(Items.SALMON, new FluidStack(Fluids.FISHOIL, 100));
-        // :64 sunflower
-        put(Blocks.SUNFLOWER.asItem(), new FluidStack(Fluids.SUNFLOWEROIL, 100));
+        RECIPES.put(new ComparableStack(Phase11ProcessItems.BIOMASS.get()), new FluidStack(Fluids.BIOGAS, 125));
+        // :63
+        RECIPES.put(new ComparableStack(Items.COD), new FluidStack(Fluids.FISHOIL, 100));
+        RECIPES.put(new ComparableStack(Items.SALMON), new FluidStack(Fluids.FISHOIL, 100));
+        // :64
+        RECIPES.put(new ComparableStack(Blocks.SUNFLOWER.asItem()), new FluidStack(Fluids.SUNFLOWEROIL, 100));
         // :66-69
-        put(Items.WHEAT_SEEDS, new FluidStack(Fluids.SEEDSLURRY, 50));
-        put(Blocks.SHORT_GRASS.asItem(), new FluidStack(Fluids.SEEDSLURRY, 100));
-        put(Blocks.FERN.asItem(), new FluidStack(Fluids.SEEDSLURRY, 100));
-        put(Blocks.VINE.asItem(), new FluidStack(Fluids.SEEDSLURRY, 100));
-    }
-
-    private static void put(Item item, FluidStack out) {
-        if (item == null || item == Items.AIR) return;
-        RECIPES.put(new ComparableStack(item), out);
+        RECIPES.put(new ComparableStack(Items.WHEAT_SEEDS), new FluidStack(Fluids.SEEDSLURRY, 50));
+        RECIPES.put(new ComparableStack(Blocks.SHORT_GRASS.asItem()), new FluidStack(Fluids.SEEDSLURRY, 100));
+        RECIPES.put(new ComparableStack(Blocks.FERN.asItem()), new FluidStack(Fluids.SEEDSLURRY, 100));
+        RECIPES.put(new ComparableStack(Blocks.VINE.asItem()), new FluidStack(Fluids.SEEDSLURRY, 100));
     }
 
     private static Item item(String id) {

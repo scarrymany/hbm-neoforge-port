@@ -1,20 +1,20 @@
 {
-  "weighted_pct": 60.5,
-  "unweighted_pct": 79.1,
-  "ce_sum": 7453,
-  "port_sum": 4508,
+  "weighted_pct": 61.5,
+  "unweighted_pct": 79.8,
+  "ce_sum": 7511,
+  "port_sum": 4623,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 1830,
-      "pct": 98.2
+      "port": 1854,
+      "pct": 99.5
     },
     {
       "cat": "blocks",
       "ce": 1169,
-      "port": 665,
-      "pct": 56.9
+      "port": 667,
+      "pct": 57.1
     },
     {
       "cat": "fluids",
@@ -42,9 +42,9 @@
     },
     {
       "cat": "machine_recipes",
-      "ce": 1695,
-      "port": 394,
-      "pct": 23.2
+      "ce": 1753,
+      "port": 483,
+      "pct": 27.6
     },
     {
       "cat": "advancements",
@@ -59,14 +59,14 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 1830,
+      "port": 1854,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
       "ce": 1169,
       "ce_fields": 1169,
       "ce_string_ctors": 290,
-      "port": 665,
+      "port": 667,
       "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
     },
     "fluids": {
@@ -122,7 +122,7 @@
       }
     },
     "machine_recipes": {
-      "ce_regex_plus_packloop": 1695,
+      "ce_regex_plus_packloop": 1753,
       "ce_by_class": {
         "AmmoPressRecipes": 1,
         "AnnihilatorRecipes": 17,
@@ -153,6 +153,7 @@
         "MixerRecipes": 3,
         "NuclearTransmutationRecipes": 4,
         "OutgasserRecipes": 22,
+        "PUREXRecipes": 58,
         "ParticleAcceleratorRecipes": 1,
         "PlasmaForgeRecipes": 1,
         "PrecAssRecipes": 6,
@@ -170,24 +171,26 @@
         "SuperComputerRecipes": 14,
         "WasteDrumRecipes": 20
       },
-      "port_json": 247,
+      "port_json": 254,
       "port_java": {
         "AmmoPressRecipes": 7,
         "CrucibleRecipes": 14,
         "CrystallizerRecipes": 1,
         "HeatRecipes": 2,
+        "LiquefactionRecipes": 27,
         "MagicRecipes": 3,
         "MixerRecipes": 1,
+        "PUREXRecipes": 51,
         "PyroOvenRecipes": 10,
         "CentrifugeRecipes": 29,
-        "ChemPlantRecipes": 53,
+        "ChemPlantRecipes": 57,
         "CyclotronRecipes": 1,
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 19
       },
-      "port": 394,
+      "port": 483,
       "by_type": {
-        "hbm:assembler": 125,
+        "hbm:assembler": 132,
         "hbm:breeder": 30,
         "hbm:container_upgrade_crate_desh": 1,
         "hbm:container_upgrade_crate_tungsten": 1,
@@ -203,10 +206,10 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 1830,
-      "reachable_via_recipe_or_loot": 766,
-      "pct": 41.9
+      "port_items": 1854,
+      "reachable_via_recipe_or_loot": 768,
+      "pct": 41.4
     }
   },
-  "recipe_json_total": 1069
+  "recipe_json_total": 1076
 }
