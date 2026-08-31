@@ -33,9 +33,10 @@ public class AvailableAbilities {
             MainRegistry.logger.warn("Ability {} already had level {}, overwriting with level {}", ability.getName(), abilities.get(ability), level);
         }
 
-        if (ability.isAllowed()) {
-            abilities.put(ability, level);
-        }
+        // Always register. isAllowed() reads ToolConfig, which NeoForge has not loaded yet
+        // during RegisterEvent (item ctor). Runtime use already gates via
+        // ItemToolAbility / IBaseAbility.isAllowed() after configs are loaded.
+        abilities.put(ability, level);
 
         return this;
     }
@@ -98,6 +99,7 @@ public class AvailableAbilities {
     /** Appends the ability tooltip block (and controls hint) to an item's hover text. */
     public void appendHoverText(java.util.List<Component> list) {
         var toolAbilities = abilities.entrySet().stream()
+                .filter(entry -> entry.getKey().isAllowed())
                 .filter(entry -> (entry.getKey() instanceof IToolAreaAbility && entry.getKey() != IToolAreaAbility.NONE)
                         || (entry.getKey() instanceof IToolHarvestAbility && entry.getKey() != IToolHarvestAbility.NONE))
                 .sorted(Comparator.comparing((Map.Entry<IBaseAbility, Integer> e) -> e.getKey()).thenComparing(Map.Entry::getValue))
@@ -117,6 +119,7 @@ public class AvailableAbilities {
         }
 
         var weaponAbilities = abilities.entrySet().stream()
+                .filter(entry -> entry.getKey().isAllowed())
                 .filter(entry -> entry.getKey() instanceof IWeaponAbility && entry.getKey() != IWeaponAbility.NONE)
                 .sorted(Comparator.comparing((Map.Entry<IBaseAbility, Integer> e) -> e.getKey()).thenComparing(Map.Entry::getValue))
                 .toList();
