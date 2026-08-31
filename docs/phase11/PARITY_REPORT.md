@@ -8,7 +8,9 @@ as current.
 Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_parity_census.py`
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg` + Mats autogen + plant/glyph/
 bedrock loops; **not** lang keys). Recipe JSON counted from `src/main/resources` + `src/generated`.
-`./gradlew` verification is recorded in the PR after this file lands.
+Verified this session: `compileJava` 0 errors, `./gradlew build` SUCCESS, jar
+`hbm-0.0.1.jar` **66,263,090** B (~63.20 MB), `./gradlew runServer` **Done (5.098s)**
+on a wiped world. `hbm:oil_bubble` still logs `setBlock in a far chunk` (no deadlock).
 
 ## Top line
 
