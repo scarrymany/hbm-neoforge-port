@@ -81,6 +81,13 @@ import javax.annotation.Nullable;
  * <b>{@link EntityChopperMine} proximity mines</b>: read in full from CE (145 lines, small and
  * self-contained per this task's own instruction) and ported alongside this class - see that class's
  * own javadoc.
+ * <p>
+ * <b>Review-pass fix - no chopper-on-chopper friendly fire</b>: CE's own {@code Library.
+ * getClosestEntityForChopper} explicitly excludes {@code instanceof EntityHunterChopper} (never target
+ * another chopper) and any player with {@code capabilities.disableDamage} (creative <em>and</em>
+ * spectator in vanilla 1.12) - {@link #retarget()} previously only excluded itself and creative players,
+ * matching {@link EntityUFO}'s identical, separately-fixed gap. Fixed to exclude other choppers and
+ * spectators too.
  */
 public class EntityHunterChopper extends FlyingMob implements Enemy, IRadiationImmune {
 
@@ -267,8 +274,13 @@ public class EntityHunterChopper extends FlyingMob implements Enemy, IRadiationI
         double bestDistSq = -1D;
 
         for (LivingEntity e : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius))) {
-            if (e == this || !e.isAlive()) continue;
-            if (e instanceof Player p && p.isCreative()) continue;
+            // CE: getClosestEntityForChopper explicitly excludes `instanceof EntityHunterChopper` (never
+            // target another chopper) and any player with capabilities.disableDamage set (creative AND
+            // spectator in vanilla 1.12) - both preserved here; the port previously only excluded itself
+            // and creative players, letting multiple choppers snipe each other and letting spectators be
+            // "targeted" (harmlessly, but not CE-accurate).
+            if (e == this || e instanceof EntityHunterChopper || !e.isAlive()) continue;
+            if (e instanceof Player p && (p.isCreative() || p.isSpectator())) continue;
 
             double effectiveRadius = e.isShiftKeyDown() ? radius * 0.8D : radius;
             double distSq = e.distanceToSqr(this);

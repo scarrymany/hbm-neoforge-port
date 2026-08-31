@@ -79,11 +79,18 @@ import java.util.EnumSet;
  * <p>
  * <b>Passive area radiation pulse</b> ({@link #tick()}): {@code ContaminationUtil.radiate(level, x, y,
  * z, 32, 500)} every server tick, confirmed real signature (already-real Phase 0/3 API). Also
- * reproduces CE's water-punishment ({@code isInWater() -> hurt(drown, 1)}), the periodic randomized
- * hover-offset ({@code heightOffsetUpdateTime}), and the anti-gravity float-toward-target-above logic
- * (raw {@code deltaMovement.y} nudge) - all read from CE's real {@code onLivingUpdate} verbatim. CE's
- * client-only particle flavor (town-aura/flame/lava puffs) is Phase 5 "Client & UX" VFX, not reproduced
- * here, matching this port's established convention for every other boss/elite mob ported so far.
+ * reproduces CE's water-punishment ({@code isWet() -> hurt(drown, 1)} - review-pass fix: CE's real
+ * {@code isWet()} is water-OR-rain, mapped to {@link #isInWaterRainOrBubble()} per {@link EntityCyberCrab}'s
+ * own identical mapping in this same package, not the narrower {@code isInWater()} this file previously
+ * used), the periodic randomized hover-offset ({@code heightOffsetUpdateTime}), and the anti-gravity
+ * float-toward-target-above logic (raw {@code deltaMovement.y} nudge) - all read from CE's real
+ * {@code onLivingUpdate} verbatim. CE's client-only particle flavor (town-aura/flame/lava puffs) is
+ * Phase 5 "Client & UX" VFX, not reproduced here, matching this port's established convention for every
+ * other boss/elite mob ported so far.
+ * <p>
+ * <b>Review-pass fix</b>: CE's constructor sets {@code experienceValue = 30}; this port's constructor
+ * never set {@link #xpReward} (unlike {@link EntityUFO}/{@link EntityHunterChopper} in this same
+ * package, which do), leaving it at {@link net.minecraft.world.entity.Mob}'s own default of 0 - fixed.
  * <p>
  * <b>{@code getUnfortunateSoul()}/{@code TARGET_ID}</b> (CE's synced current-target int, used only by
  * render code to draw a beam/highlight) is not reproduced - purely a client-rendering hook with zero
@@ -109,6 +116,9 @@ public class EntityRADBeast extends Monster implements IRadiationImmune {
         this.noCulling = true;
         // CE: this.isImmuneToFire = true - handled at EntityType registration (.fireImmune()) instead,
         // see RadBeastEntityTypes.
+        // CE: this.experienceValue = 30 - was missing here (Monster's own xpReward default is 0, unlike
+        // e.g. EntityUFO/EntityHunterChopper in this same package, which do set this.xpReward).
+        this.xpReward = 30;
     }
 
     /** CE: {@code applyEntityAttributes} - 120 HP / 16 attack damage base, plus
@@ -187,7 +197,9 @@ public class EntityRADBeast extends Monster implements IRadiationImmune {
 
         if (this.level().isClientSide) return;
 
-        if (this.isInWater()) {
+        // CE: isWet() (water OR rain), not the narrower isInWater() - see EntityCyberCrab's own
+        // identical CE-isWet() -> isInWaterRainOrBubble() mapping in this same package.
+        if (this.isInWaterRainOrBubble()) {
             this.hurt(this.damageSources().drown(), 1.0F);
         }
 
@@ -233,7 +245,8 @@ public class EntityRADBeast extends Monster implements IRadiationImmune {
         }
 
         int count = this.random.nextInt(3) + 1;
-        boolean wet = this.isInWater();
+        // CE: dropLoot's own isWet() check (water OR rain) - same mapping as tick()'s drown-punishment above.
+        boolean wet = this.isInWaterRainOrBubble();
         for (int i = 0; i < count; i++) {
             int r = this.random.nextInt(3);
             if (r == 0) {

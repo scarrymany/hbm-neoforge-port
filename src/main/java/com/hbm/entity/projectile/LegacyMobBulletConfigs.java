@@ -198,9 +198,15 @@ public final class LegacyMobBulletConfigs {
     // favor of Sedna's own non-penetrating "discard on block hit" handling, zero observable change.
     // ============================================================================================
 
-    /** CE: {@code new EntityBullet(world, this, 3.0F, 35, 45, false, "chopper", MAIN_HAND)} - Hunter Chopper's plain minigun-style bullet. Not tau, not critical (chopper explicitly excludes itself from the critical/no-drag flag). */
+    /** CE: {@code new EntityBullet(world, this, 3.0F, 35, 45, false, "chopper", MAIN_HAND)} - Hunter Chopper's plain minigun-style bullet. Not tau, not critical (chopper explicitly excludes itself from the critical/no-drag flag).
+     *  <p>Review-pass fix: the {@code (35, 45)} constructor args are that overload's {@code dmgMin}/
+     *  {@code dmgMax} params, but CE's real {@code EntityBullet(World, EntityLivingBase, float, int, int,
+     *  boolean, String, EnumHand)} constructor never reads them anywhere in its body (confirmed by a full
+     *  read - dead parameters) - the actual damage comes from the call site's very next line,
+     *  {@code entityarrow.setDamage(3 + rand.nextInt(5))}, i.e. a flat 3-7, not 35-45 (a ~6-10x
+     *  overtuned hit was previously baked in here). Corrected to match the real applied damage. */
     public static final BulletConfig CHOPPER_BULLET = new BulletConfig("legacy_chopper_bullet")
-            .setVel(3.0F).setSpread(0F).setLife(100).setDamageRange(35F, 45F)
+            .setVel(3.0F).setSpread(0F).setLife(100).setDamageRange(3F, 7F)
             .setHeadshot(1.0F).setupDamageClass(DamageClass.CHOPPER_BULLET)
             .setDoesPenetrate(false).setOnRicochet(DISCARD_ON_BLOCK_HIT);
 

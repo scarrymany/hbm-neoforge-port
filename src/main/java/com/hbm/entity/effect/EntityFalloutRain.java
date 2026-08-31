@@ -303,12 +303,12 @@ public class EntityFalloutRain extends EntityExplosionChunkloading {
     }
 
     /**
-     * Server-side biome reassignment for the crater-biome system - the actual ambient-radiation
-     * consequence of standing in one lives in the not-yet-ported {@code EntityEffectHandler} (out of
-     * this package's scope, see the research report's Deferred scope); this only paints the biome
-     * data itself. Writes every 4-block ("quart") vertical biome cell in the column, matching modern
-     * Minecraft's 3D biome storage (CE's 1.12 chunk format only ever needed one biome byte per
-     * column).
+     * Server-side biome reassignment for the crater-biome system - this only paints the biome data
+     * itself; the actual ambient-radiation consequence of standing in one is a separate concern,
+     * handled by {@code com.hbm.handler.EntityEffectHandler#handleCraterRadiation} (landed later in
+     * this same content wave - out of this package's own scope, but no longer a forward reference).
+     * Writes every 4-block ("quart") vertical biome cell in the column, matching modern Minecraft's
+     * 3D biome storage (CE's 1.12 chunk format only ever needed one biome byte per column).
      */
     private void paintBiome(Level level, int x, int z, double distPercent, int scale) {
         if (!biomeChange || !(level instanceof ServerLevel serverLevel)) return;

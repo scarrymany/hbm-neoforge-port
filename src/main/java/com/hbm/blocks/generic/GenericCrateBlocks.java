@@ -67,7 +67,40 @@ public final class GenericCrateBlocks {
         return CRATE_SUPPLY;
     }
 
+    /**
+     * Public accessors for the plain {@code crate}/{@code crate_weapon}/{@code crate_metal}/
+     * {@code crate_lead}/{@code crate_red} blocks registered by {@link #registerCrates()}, added
+     * during the Phase 4 review pass so {@code com.hbm.items.tool.ItemCrateCaller} (previously
+     * stubbed pending exactly this - see its own javadoc) can finally place them. Lazy accessor
+     * methods, not static field initializers, per this port's established DeferredBlock-forward-
+     * reference rule.
+     */
+    public static DeferredBlock<BlockCrate> crateStandard() {
+        return CRATE_STANDARD;
+    }
+
+    public static DeferredBlock<BlockCrate> crateWeapon() {
+        return CRATE_WEAPON;
+    }
+
+    public static DeferredBlock<BlockCrate> crateMetal() {
+        return CRATE_METAL;
+    }
+
+    public static DeferredBlock<BlockCrate> crateLead() {
+        return CRATE_LEAD;
+    }
+
+    public static DeferredBlock<BlockCrate> crateRed() {
+        return CRATE_RED;
+    }
+
     private static DeferredBlock<BlockSupplyCrate> CRATE_SUPPLY;
+    private static DeferredBlock<BlockCrate> CRATE_STANDARD;
+    private static DeferredBlock<BlockCrate> CRATE_WEAPON;
+    private static DeferredBlock<BlockCrate> CRATE_METAL;
+    private static DeferredBlock<BlockCrate> CRATE_LEAD;
+    private static DeferredBlock<BlockCrate> CRATE_RED;
 
     private GenericCrateBlocks() {
     }
@@ -85,12 +118,12 @@ public final class GenericCrateBlocks {
     }
 
     private static void registerCrates() {
-        registerBlock("crate", () -> new BlockCrate(crateProps(SoundType.WOOD), BlockCrate.Type.STANDARD), ModCreativeTabs.CONSUMABLE);
-        registerBlock("crate_weapon", () -> new BlockCrate(crateProps(SoundType.WOOD), BlockCrate.Type.WEAPON), ModCreativeTabs.CONSUMABLE);
-        registerBlock("crate_lead", () -> new BlockCrate(crateProps(SoundType.METAL), BlockCrate.Type.LEAD), ModCreativeTabs.CONSUMABLE);
-        registerBlock("crate_metal", () -> new BlockCrate(crateProps(SoundType.METAL), BlockCrate.Type.METAL), ModCreativeTabs.CONSUMABLE);
+        CRATE_STANDARD = registerBlock("crate", () -> new BlockCrate(crateProps(SoundType.WOOD), BlockCrate.Type.STANDARD), ModCreativeTabs.CONSUMABLE);
+        CRATE_WEAPON = registerBlock("crate_weapon", () -> new BlockCrate(crateProps(SoundType.WOOD), BlockCrate.Type.WEAPON), ModCreativeTabs.CONSUMABLE);
+        CRATE_LEAD = registerBlock("crate_lead", () -> new BlockCrate(crateProps(SoundType.METAL), BlockCrate.Type.LEAD), ModCreativeTabs.CONSUMABLE);
+        CRATE_METAL = registerBlock("crate_metal", () -> new BlockCrate(crateProps(SoundType.METAL), BlockCrate.Type.METAL), ModCreativeTabs.CONSUMABLE);
         // CE registers crate_red with setCreativeTab(null).
-        registerBlock("crate_red", () -> new BlockCrate(crateProps(SoundType.METAL), BlockCrate.Type.RED), null);
+        CRATE_RED = registerBlock("crate_red", () -> new BlockCrate(crateProps(SoundType.METAL), BlockCrate.Type.RED), null);
 
         registerBlock("crate_can", () -> new BlockCanCrate(BlockBehaviour.Properties.of().strength(SMALL_CRATE_HARDNESS, SMALL_CRATE_RESISTANCE).sound(SoundType.WOOD)),
                 ModCreativeTabs.CONSUMABLE);

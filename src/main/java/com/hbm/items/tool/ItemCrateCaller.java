@@ -1,27 +1,45 @@
 package com.hbm.items.tool;
 
+import com.hbm.blocks.generic.BlockCrate;
+import com.hbm.blocks.generic.GenericCrateBlocks;
+import com.hbm.lib.HBMSoundHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.registries.DeferredBlock;
 
 /**
  * Novelty "call in a loot crate" item: randomly drops one of several crate blocks near the player.
- * Ported from CE's {@code com.hbm.items.tool.ItemCrateCaller}.
+ * Ported from CE's {@code com.hbm.items.tool.ItemCrateCaller} (101 lines, read in full).
  *
- * <p><b>Stubbed pending an accessible crate block registration.</b> CE's {@code onItemRightClick}
- * places one of {@code ModBlocks.crate}/{@code crate_weapon}/{@code crate_metal}/{@code crate_lead}/
- * {@code crate_red} at a random nearby ground position. Block <em>classes</em> for this family
- * already exist in this port ({@code com.hbm.blocks.generic.BlockCrate} via
- * {@code GenericCrateBlocks}), but as of this writing {@code GenericCrateBlocks.registerAll()} is
- * never called from {@code ModBlocks.register()} (so no crate block is actually registered at
- * runtime) and the class exposes no public field/accessor for the registered
- * {@code DeferredBlock<BlockCrate>} instances even once it is wired up - see this area's final
- * report for the cross-area follow-up. Per the port plan's "stub with a documented TODO rather than
- * blocking" rule, the item itself is registered now (durability-based charge count preserved) and
- * its place-crate behavior is deferred until a crate block is reachable from this package.
+ * <p><b>Review-pass fix.</b> This class used to be stubbed out ("Block classes for this family
+ * already exist... but {@code GenericCrateBlocks.registerAll()} is never called from
+ * {@code ModBlocks.register()}") - that gap has since been closed by an earlier phase (it <em>is</em>
+ * wired, transitively, via {@code GenericBlocks.registerAll()} - confirmed by a fresh read of
+ * {@code ModBlocks.register()}), and {@link GenericCrateBlocks} now exposes lazy accessors for every
+ * plain crate variant CE places here (added alongside this fix, matching the {@code crateSupply()}
+ * accessor {@code EntityParachuteCrate} already uses). The stale stub is replaced with CE's real
+ * behavior below.
+ * <p>
+ * CE's {@code stack.damageItem(1, player)} runs unconditionally before the {@code !world.isRemote}
+ * check; mirrored here with the {@code ItemStack.hurtAndBreak(int, LivingEntity, EquipmentSlot)}
+ * convenience overload already in live use at this exact call shape elsewhere in this port (e.g.
+ * {@code ItemMeteorRemote}) - it resolves the entity's level internally and only applies durability
+ * loss server-side, so calling it from both logical sides (as {@code Item#use} naturally is) does not
+ * double-damage the stack. CE's weighted cascade ({@code i<350} weapon, {@code i<100} metal,
+ * {@code i<50} lead, {@code i==0} red, else standard - later checks override earlier ones since none
+ * {@code break}/{@code return}) and its "only place at y=255 if air" placement rule are reproduced
+ * exactly. No {@code data/hbm/lang}/{@code chat.callsp} translation key has been ported anywhere in
+ * this port yet (CE's own {@code TextComponentTranslation("chat.callsp")}), so - matching
+ * {@code ItemMeteorRemote}'s own already-established fallback for the identical gap - the client
+ * message is a literal {@link Component} instead of a translation key lookup.
  */
 public class ItemCrateCaller extends Item {
 
@@ -32,11 +50,32 @@ public class ItemCrateCaller extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        // TODO(cross-area follow-up): once GenericCrateBlocks exposes a registered crate block
-        // accessor, port CE's behavior here - damage this stack by 1, pick one of
-        // crate/crate_weapon/crate_metal/crate_lead/crate_red with CE's weighted odds
-        // (350/1000 weapon, 100/1000 metal, 50/1000 lead, 1/1000 red, else standard), and place it
-        // at y=255 within +-15 blocks of the player if that position is air.
-        return InteractionResultHolder.pass(stack);
+        stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
+
+        int x = player.getRandom().nextInt(31) - 15;
+        int z = player.getRandom().nextInt(31) - 15;
+
+        DeferredBlock<BlockCrate> crate = GenericCrateBlocks.crateStandard();
+
+        int i = player.getRandom().nextInt(1000);
+        if (i < 350) crate = GenericCrateBlocks.crateWeapon();
+        if (i < 100) crate = GenericCrateBlocks.crateMetal();
+        if (i < 50) crate = GenericCrateBlocks.crateLead();
+        if (i == 0) crate = GenericCrateBlocks.crateRed();
+
+        if (!level.isClientSide()) {
+            BlockPos pos = new BlockPos(player.getBlockX() + x, 255, player.getBlockZ() + z);
+            if (level.getBlockState(pos).isAir()) {
+                level.setBlockAndUpdate(pos, crate.get().defaultBlockState());
+            }
+        } else {
+            player.displayClientMessage(Component.literal("The supply plane has heard your call!"), false);
+        }
+
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), HBMSoundHandler.techBleep.get(),
+                SoundSource.PLAYERS, 1.0F, 1.0F);
+
+        player.swing(hand);
+        return InteractionResultHolder.success(stack);
     }
 }

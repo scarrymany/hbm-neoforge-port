@@ -88,6 +88,13 @@ import java.util.List;
  * carries no {@code eggColors}, unlike every other entity in this file's sibling classes; this port's
  * registry (see {@code Phase4BossEntityTypes2}) faithfully omits a spawn egg for this one entity to
  * match - the only spawn path is {@code ItemChopper}'s {@code spawn_ufo} variant, per design.
+ * <p>
+ * <b>Review-pass fix - no UFO-on-UFO friendly fire</b>: CE's own {@code canAttackClass(Class)} excludes
+ * {@code entityClass == this.getClass()} from both target scanning and the abduction beam's damage pass
+ * (so multiple UFOs never snipe or beam each other) - this was missing from {@link #scanTargets()}/
+ * {@link #updateBeam()} (which only excluded {@code this} itself, not other {@code EntityUFO} instances),
+ * unlike this same package's {@link EntityCyberCrab#TARGET_EXCLUSION}, which already excludes its own
+ * family correctly. Fixed to match CE and that established sibling convention.
  */
 public class EntityUFO extends FlyingMob implements Enemy, IRadiationImmune {
 
@@ -207,7 +214,10 @@ public class EntityUFO extends FlyingMob implements Enemy, IRadiationImmune {
         this.target = null;
 
         for (LivingEntity e : this.level().getEntitiesOfClass(LivingEntity.class, box)) {
-            if (e == this || !e.isAlive()) continue;
+            // CE: canAttackClass(entityClass) excludes entityClass == this.getClass() (i.e. never target
+            // another EntityUFO) alongside the bullet-class exclusion already implied by scanning only
+            // LivingEntity here - preserved so multiple UFOs don't snipe/beam each other.
+            if (e == this || e instanceof EntityUFO || !e.isAlive()) continue;
 
             if (e instanceof Player player) {
                 if (player.isCreative() || player.isSpectator()) continue;
@@ -299,7 +309,9 @@ public class EntityUFO extends FlyingMob implements Enemy, IRadiationImmune {
                 DamageSource source = level.damageSources().source(ModDamageTypes.COMBINE_BALL, this);
 
                 for (Entity e : level.getEntitiesOfClass(Entity.class, column)) {
-                    if (e == this) continue;
+                    // CE: canAttackClass(e.getClass()) excludes this exact class (another EntityUFO)
+                    // from the beam's damage/ignite/contaminate pass too - see scanTargets()'s identical note.
+                    if (e == this || e instanceof EntityUFO) continue;
                     e.hurt(source, 1000F);
                     e.igniteForSeconds(5);
                     if (e instanceof LivingEntity living) {

@@ -2,6 +2,7 @@ package com.hbm.capability;
 
 import com.hbm.config.RadiationConfig;
 import com.hbm.damage.ModDamageTypes;
+import com.hbm.main.AdvancementManager;
 import com.hbm.main.MainRegistry;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -128,11 +129,13 @@ public final class HbmLivingProps {
      * {@code digamma >= 10} (or once max health has been scaled down to nothing), matching CE 1:1.
      *
      * <p>CE's soul-sand particle burst on instadeath ({@code AuxParticlePacketNT} via
-     * {@code PacketThreading}) and its three digamma-exposure advancement grants
-     * ({@code AdvancementManager.digammaSee/Feel/Know}) are cosmetic/meta polish that depend on
-     * pre-1.21 particle-packet plumbing and an {@code AdvancementManager} this port doesn't have
-     * yet respectively - dropped rather than stubbed, since neither affects the actual hazard
-     * logic this facade is responsible for.
+     * {@code PacketThreading}) is cosmetic polish that depends on pre-1.21 particle-packet plumbing
+     * this port doesn't have yet - dropped rather than stubbed, since it doesn't affect the actual
+     * hazard logic this facade is responsible for. CE's three digamma-exposure advancement grants
+     * ({@link AdvancementManager#digammaSee}/{@link AdvancementManager#digammaFeel}/
+     * {@link AdvancementManager#digammaKnow}, re-reading the just-stored value at thresholds
+     * {@code >0}/{@code >=2}/{@code >=10}) <b>are</b> wired below - {@code AdvancementManager} landed
+     * later in this same Phase 4 wave, after this method was first written.
      */
     public static void setDigamma(LivingEntity entity, double digamma) {
         HbmLivingAttachment props = HbmLivingAttachment.getData(entity);
@@ -157,6 +160,20 @@ public final class HbmLivingProps {
             entity.setAbsorptionAmount(0F);
             entity.hurt(entity.damageSources().source(ModDamageTypes.DIGAMMA), 5_000_000F);
             entity.setHealth(0F);
+        }
+
+        // CE: HbmLivingProps#setDigamma's own trailing `if (entity instanceof EntityPlayer)` block -
+        // re-reads the just-stored value and grants 3 tiered advancements. Was dropped by the Phase 3
+        // foundation wave with the documented reason "an AdvancementManager this port doesn't have
+        // yet" (see this method's own javadoc) - com.hbm.main.AdvancementManager landed in this same
+        // Phase 4 wave with digammaSee/digammaFeel/digammaKnow already declared and loaded but never
+        // granted from anywhere; wired here now that the dependency is real.
+        if (entity instanceof ServerPlayer serverPlayer) {
+            double di = HbmLivingAttachment.getData(entity).getDigamma();
+
+            if (di > 0D) AdvancementManager.grantAchievement(serverPlayer, AdvancementManager.digammaSee);
+            if (di >= 2D) AdvancementManager.grantAchievement(serverPlayer, AdvancementManager.digammaFeel);
+            if (di >= 10D) AdvancementManager.grantAchievement(serverPlayer, AdvancementManager.digammaKnow);
         }
     }
 

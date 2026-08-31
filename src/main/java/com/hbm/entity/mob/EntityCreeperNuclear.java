@@ -123,8 +123,19 @@ public class EntityCreeperNuclear extends Creeper implements IRadiationImmune {
         return super.hurt(source, amount);
     }
 
+    /**
+     * {@code Creeper#explodeCreeper()} is {@code private} in real 1.21.1 - not a legal override point
+     * (see {@link CreeperVariantSupport}'s class javadoc). The explosion-interception check must run
+     * <em>before</em> {@code super.tick()} (calling this directly and returning instead of delegating,
+     * on the tick vanilla's own private countdown would have fired) - the contamination-aura/regen tick
+     * merges into the same override rather than a second {@code tick()} method.
+     */
     @Override
     public void tick() {
+        if (!this.level().isClientSide() && this.isAlive() && CreeperVariantSupport.isAboutToExplode(this)) {
+            explodeCreeper();
+            return;
+        }
         super.tick();
 
         if (!this.level().isClientSide) {
@@ -150,9 +161,13 @@ public class EntityCreeperNuclear extends Creeper implements IRadiationImmune {
         this.readAdditionalSaveData(tag);
     }
 
-    @Override
     protected void explodeCreeper() {
         if (this.level().isClientSide) return;
+
+        // Matches vanilla's own private explodeCreeper()'s `this.dead = true;` placement (before any
+        // blast that could otherwise hurt this entity again mid-explosion) - also what makes this
+        // class's own hurt() `if (this.dead) return false;` guard (see class javadoc) actually live.
+        this.dead = true;
 
         Level level = this.level();
         boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);

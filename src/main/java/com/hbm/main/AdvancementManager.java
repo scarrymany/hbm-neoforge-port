@@ -11,7 +11,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
-import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Ported from CE's {@code com.hbm.main.AdvancementManager} (a flat list of ~65
@@ -56,6 +56,22 @@ import java.util.Objects;
  * convention (CE's own {@code enableAdvancements} field is itself a load-time cache of a Forge config
  * value — the live {@code .get()} call is this port's already-chosen equivalent, not a new design
  * decision; e.g. {@code ContaminationUtil.java}, {@code LoadedBaseBlockEntity.java}).
+ *
+ * <p><b>Fixed crash-on-startup (review pass):</b> {@link GeneralConfig#ENABLE_ADVANCEMENTS} defaults
+ * to {@code true}, so {@link #init} runs on every default-config server start - but zero
+ * {@code data/hbm/advancement/*.json} datapack files exist anywhere in this port yet (confirmed by
+ * repo-wide search; CE's own real advancement JSON tree under
+ * {@code assets/hbm/advancements/*.json} - 1.12's still-client-resource-adjacent location for the
+ * then-new JSON advancement system - has not been ported/relocated to 1.21's
+ * {@code data/<namespace>/advancement/} datapack path by any wave yet). {@link #load} previously threw
+ * via {@code Objects.requireNonNull} the moment {@link #init} hit the first ({@code achsacrifice})
+ * lookup, which - since {@link ServerAdvancementManager#get} returns {@code null} for literally every
+ * one of the ~65 ids with no backing JSON - crashed {@link #onServerStarting} (and therefore server
+ * startup) unconditionally out of the box. {@link #load} now logs a warning and stores {@code null}
+ * instead of throwing (fields are {@code @Nullable} accordingly), and {@link #grantAchievement}/
+ * {@link #hasAdvancement} both no-op/return {@code false} on a {@code null} advancement rather than
+ * their own previous {@code Objects.requireNonNull} throw - this class degrades to a safe no-op
+ * everywhere until the real advancement JSON tree is ported, instead of taking the server down.
  */
 @EventBusSubscriber(modid = MainRegistry.MODID)
 public final class AdvancementManager {
@@ -137,13 +153,23 @@ public final class AdvancementManager {
     public static AdvancementHolder root;
 
     /**
-     * Resolves an already-loaded advancement by its {@code hbm:<path>} id, failing loudly if the
-     * datapack json for it is missing. Mirrors CE's own {@code load(adv, path)} helper exactly,
-     * including the "missing advancement is a hard error, not a silent null" behavior.
+     * Resolves an already-loaded advancement by its {@code hbm:<path>} id. CE's own {@code load(adv,
+     * path)} helper fails loudly ({@code Objects.requireNonNull}) on a missing datapack json, and this
+     * method used to mirror that exactly - but with zero {@code data/hbm/advancement/*.json} files
+     * shipped anywhere in this port yet (see this class's own javadoc), that made every single one of
+     * {@link #init}'s ~65 lookups a guaranteed {@link NullPointerException} on any default-config
+     * server start. Logs a warning and returns {@code null} instead now - every field below is
+     * therefore {@code @Nullable} in practice until the real advancement JSON tree is ported, and
+     * {@link #grantAchievement}/{@link #hasAdvancement} both tolerate that.
      */
+    @Nullable
     private static AdvancementHolder load(ServerAdvancementManager advancements, String path) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path);
-        return Objects.requireNonNull(advancements.get(id), "Missing advancement: " + id);
+        AdvancementHolder advancement = advancements.get(id);
+        if (advancement == null) {
+            MainRegistry.logger.warn("Missing advancement (not yet ported to a data/hbm/advancement json): {}", id);
+        }
+        return advancement;
     }
 
     @SubscribeEvent
@@ -240,10 +266,14 @@ public final class AdvancementManager {
      * {@code grantAchievement(EntityPlayerMP, Advancement)} exactly, modulo the
      * {@code getRemaningCriteria()} → {@code getRemainingCriteria()} and
      * {@code grantCriterion} → {@code award} renames documented on the class javadoc.
+     * <p>
+     * A {@code null} {@code advancement} (see {@link #load}'s own javadoc: real today for every one
+     * of this class's ~65 fields, since no backing json exists yet) is a silent no-op rather than the
+     * {@code Objects.requireNonNull} throw this method used to have - every boss-death/satellite-orbit
+     * call site can unconditionally call this without first null-checking the field itself.
      */
-    public static void grantAchievement(ServerPlayer player, AdvancementHolder advancement) {
-        if (!GeneralConfig.ENABLE_ADVANCEMENTS.get()) return;
-        Objects.requireNonNull(advancement, "Failed to grant null advancement! This should never happen.");
+    public static void grantAchievement(ServerPlayer player, @Nullable AdvancementHolder advancement) {
+        if (!GeneralConfig.ENABLE_ADVANCEMENTS.get() || advancement == null) return;
         PlayerAdvancements playerAdvancements = player.getAdvancements();
         for (String criterion : playerAdvancements.getOrStartProgress(advancement).getRemainingCriteria()) {
             playerAdvancements.award(advancement, criterion);
@@ -252,9 +282,11 @@ public final class AdvancementManager {
 
     /**
      * @apiNote Call sites shall test with {@link GeneralConfig#ENABLE_ADVANCEMENTS} first.
+     * A {@code null} {@code advancement} (see {@link #load}'s own javadoc) returns {@code false}
+     * rather than throwing, matching {@link #grantAchievement}'s own null-tolerance.
      */
-    public static boolean hasAdvancement(ServerPlayer player, AdvancementHolder advancement) {
-        Objects.requireNonNull(advancement, "Failed to test null advancement! This should never happen.");
+    public static boolean hasAdvancement(ServerPlayer player, @Nullable AdvancementHolder advancement) {
+        if (advancement == null) return false;
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 }

@@ -1,6 +1,8 @@
 package com.hbm.entity.mob;
 
 import com.hbm.damage.tags.ModDamageTypeTags;
+import com.hbm.entity.effect.EntityMist;
+import com.hbm.inventory.fluid.Fluids;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,10 +32,11 @@ import net.minecraft.world.level.Level;
  * <p>
  * <b>Explosion</b> ({@link #explodeCreeper()}): CE's is the simplest of the 5 -
  * {@code world.createExplosion(this, x, y+height/2, z, 2F, false)} (plain, portable now) plus spawning
- * an {@code EntityMist} (type {@code Fluids.PHOSGENE}, 10x5 area, 150-tick duration). {@code EntityMist}
- * does not exist in this port yet (confirmed absent from {@code src/} as of this task -
- * {@code docs/phase3/grenades.md} owns it, per the research report's Deferred scope #1) - the mist
- * spawn is a documented one-line forward reference, not reproduced.
+ * an {@code EntityMist} (type {@code Fluids.PHOSGENE}, 10x5 area, 150-tick duration).
+ * {@link EntityMist} landed mid-task (a different content-wave package) and is now wired here for
+ * real via its own documented {@link EntityMist#spawn} factory - not a forward reference any more
+ * (a stale prior version of this javadoc/comment claimed it was still missing; corrected during the
+ * Phase 4 meteor/creeper review pass).
  * <p>
  * <b>Drops</b>: CE has no drop overrides at all - it inherits vanilla {@link Creeper}'s own loot table
  * (plain gunpowder, including the skeleton-arrow-&gt;music-disc mechanic, unmodified). Since this is a
@@ -67,17 +70,40 @@ public class EntityCreeperPhosgene extends Creeper {
         return super.hurt(source, amount);
     }
 
+    /**
+     * {@code Creeper#explodeCreeper()} is {@code private} in real 1.21.1 - not a legal override point
+     * (see {@link CreeperVariantSupport}'s class javadoc). {@link #tick()} below intercepts one tick
+     * ahead of vanilla's own private countdown and calls this directly instead.
+     */
     @Override
+    public void tick() {
+        if (!this.level().isClientSide() && this.isAlive() && CreeperVariantSupport.isAboutToExplode(this)) {
+            explodeCreeper();
+            return;
+        }
+        super.tick();
+    }
+
     protected void explodeCreeper() {
         if (this.level().isClientSide) return;
 
-        this.level().explode(this, this.getX(), this.getY() + this.getBbHeight() / 2, this.getZ(),
-                2F, false, Level.ExplosionInteraction.TNT);
+        // Matches vanilla's own private explodeCreeper()'s `this.dead = true;` placement (before any
+        // blast that could otherwise hurt this entity again mid-explosion) - see CreeperVariantSupport.
+        this.dead = true;
 
-        // CE also spawns an EntityMist (Fluids.PHOSGENE, 10x5 area, 150-tick duration) here -
-        // com.hbm.entity.effect.EntityMist does not exist in this port yet (docs/phase3/grenades.md
-        // owns it; docs/phase4/entities_creeper_variants.md Deferred scope #1). One-line forward
-        // reference once it lands, not reproduced here.
+        // CE: world.createExplosion(this, x, y+height/2, z, 2F, false) - the trailing `false` is the
+        // 1.12.2 "isSmoking" flag, which is what actually gates block destruction (isSmoking=false ->
+        // Explosion#clearAffectedBlockPositions(), no block damage at all) - unconditional, not gated
+        // on mobGriefing at all (unlike EntityCreeperTainted). NONE is the correct 1.21.1 interaction
+        // for that, not TNT (which would always destroy blocks, contradicting CE's real behavior).
+        this.level().explode(this, this.getX(), this.getY() + this.getBbHeight() / 2, this.getZ(),
+                2F, false, Level.ExplosionInteraction.NONE);
+
+        // CE: new EntityMist(world).setType(Fluids.PHOSGENE).setPosition(posX, posY, posZ)
+        // .setArea(10, 5).setDuration(150), world.spawnEntity(mist). EntityMist has since landed
+        // (com.hbm.entity.effect.EntityMist, registered as EffectEntityTypes.MIST) - wired for real
+        // via its own documented factory method rather than left as a forward reference.
+        EntityMist.spawn(this.level(), this.getX(), this.getY(), this.getZ(), Fluids.PHOSGENE, 10F, 5F, 150);
 
         this.discard();
     }

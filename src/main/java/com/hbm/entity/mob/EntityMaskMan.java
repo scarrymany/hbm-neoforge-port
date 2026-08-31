@@ -151,10 +151,15 @@ public class EntityMaskMan extends Monster implements IRadiationImmune {
 
             // CE: onUpdate's one-time 50%-health self-detonation phase trigger - see class javadoc
             // "CE bug found and fixed" for why prevHealth is initialized to max health at construction.
+            // CE: world.createExplosion(this, posX, posY + 4, posZ, 2.5F, true) - the trailing `true`
+            // is isFlaming (causes fire); the 7-arg Level#explode overload with an explicit `true` is
+            // this port's established translation for a CE explosion that sets fire (see e.g.
+            // EntityMissileTier0/1/2/3, ExplosionLarge) - the 6-arg overload used here previously never
+            // ignites anything (see EntityMeteor's own javadoc: "the 6-arg, no-fire-flag overload").
             float half = maxHealth / 2F;
             if (this.prevHealth >= half && this.getHealth() < half) {
                 this.prevHealth = this.getHealth();
-                this.level().explode(this, this.getX(), this.getY() + 4D, this.getZ(), 2.5F, Level.ExplosionInteraction.MOB);
+                this.level().explode(this, this.getX(), this.getY() + 4D, this.getZ(), 2.5F, true, Level.ExplosionInteraction.MOB);
             }
         }
     }

@@ -80,7 +80,11 @@ public class OilBubbleFeature extends Feature<NoneFeatureConfiguration> {
 
         int radius = MIN_RADIUS + random.nextInt(RADIUS_VARIATION);
         spawnOil(level, origin.getX(), origin.getY(), origin.getZ(), radius, oreOil);
-        OilSpot.generateOilSpot(level, origin.getX(), origin.getZ(), SPOT_WIDTH, SPOT_COUNT, false);
+        // OilSpot.generateOilSpot takes a real Level, not WorldGenLevel (WorldGenLevel is a plain
+        // LevelAccessor, not a Level subtype - its actual runtime implementation during chunk
+        // generation is WorldGenRegion, which is not a Level at all) - route through the same
+        // WorldGenLevel#getLevel() conversion OreShapeUtil.dimension/seed already use.
+        OilSpot.generateOilSpot(OreShapeUtil.serverLevel(level), origin.getX(), origin.getZ(), SPOT_WIDTH, SPOT_COUNT, false);
         placeOilSpillPuddle(level, origin.getX(), origin.getZ());
         return true;
     }

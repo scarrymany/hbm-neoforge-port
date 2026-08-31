@@ -69,9 +69,26 @@ public class EntityCreeperGold extends Creeper implements IRadiationImmune {
                 .add(Attributes.MOVEMENT_SPEED, 0.25D);
     }
 
+    /**
+     * {@code Creeper#explodeCreeper()} is {@code private} in real 1.21.1 - not a legal override point
+     * (see {@link CreeperVariantSupport}'s class javadoc). {@link #tick()} below intercepts one tick
+     * ahead of vanilla's own private countdown and calls this directly instead.
+     */
     @Override
+    public void tick() {
+        if (!this.level().isClientSide() && this.isAlive() && CreeperVariantSupport.isAboutToExplode(this)) {
+            explodeCreeper();
+            return;
+        }
+        super.tick();
+    }
+
     protected void explodeCreeper() {
         if (this.level().isClientSide) return;
+
+        // Matches vanilla's own private explodeCreeper()'s `this.dead = true;` placement (before any
+        // blast that could otherwise hurt this entity again mid-explosion) - see CreeperVariantSupport.
+        this.dead = true;
 
         ExplosionVNT vnt = new ExplosionVNT(this.level(), this.getX(), this.getY(), this.getZ(),
                 this.isPowered() ? 14 : 7, this);

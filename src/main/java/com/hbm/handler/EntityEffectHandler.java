@@ -1,6 +1,7 @@
 package com.hbm.handler;
 
 import com.hbm.capability.HbmLivingProps;
+import com.hbm.config.GeneralConfig;
 import com.hbm.config.RadiationConfig;
 import com.hbm.config.WorldConfig;
 import com.hbm.damage.ModDamageTypes;
@@ -59,6 +60,21 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
  * temperature, dashing, plinking, the full 200-2,500,000 rad sickness-effect ladder beyond the mutation
  * thresholds) is out of this package's scope per this task's own brief - not reproduced here, and not
  * claimed as done.
+ * <p>
+ * <b>Review pass finding (not fixed here)</b>: CE's real {@code handleRadiationEffect} table actually has
+ * a <em>6th</em> branch this file's own scope list above omits - {@code eRad >= 800 && entity instanceof
+ * EntityHorse -> EntityZombieHorse} (copying growing age/temper/saddled/tamed/owner, then
+ * {@code makeMad()}). Not ported: CE's {@code temper}/{@code makeMad()} enrage-on-zombification have no
+ * confirmed 1.21.1 {@code AbstractHorse}/{@code ZombieHorse} equivalent this review could verify without a
+ * compiled jar, and guessing the modern saddle-equipment API wrong risks a real compile break in a sandbox
+ * that cannot run Gradle - left as a documented gap rather than an unverified guess (see this task's own
+ * remainingConcerns).
+ * <p>
+ * <b>Review pass fix</b>: {@link #handleMutationCascade} was missing CE's own top-level
+ * {@code !GeneralConfig.enableRads -> return} gate ({@code [CE: 1.16_enableRadiation]}, this port's
+ * {@link GeneralConfig#ENABLE_RADIATION}) - added, since without it the whole cascade kept mutating
+ * entities even with radiation disabled server-wide (this file's own {@code handleCraterRadiation} and
+ * {@code handlePollution} correctly gate on their own config flags already; this one branch didn't).
  * <p>
  * <b>Dispatch pattern</b>: a separate self-subscribing {@code @EventBusSubscriber} class on the same
  * {@link EntityTickEvent.Pre} event type {@code com.hbm.main.CommonTickEvents} already listens on -
@@ -131,6 +147,10 @@ public final class EntityEffectHandler {
     // ==================== radiation-mutation cascade (CE handleRadiationEffect, lines 233-285) =======
 
     private static void handleMutationCascade(LivingEntity entity, ServerLevel level) {
+        // CE: handleRadiationEffect's own top-level gate - `if (!GeneralConfig.enableRads ...) return;`
+        // ([CE: 1.16_enableRadiation], this port's GeneralConfig.ENABLE_RADIATION) - was missing here,
+        // meaning the whole mutation cascade would still fire even with radiation disabled server-wide.
+        if (!GeneralConfig.ENABLE_RADIATION.get()) return;
         if (!entity.isAlive()) return;
         if (entity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
 

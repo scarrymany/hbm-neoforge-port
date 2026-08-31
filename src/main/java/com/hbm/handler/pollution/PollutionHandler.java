@@ -274,23 +274,32 @@ public class PollutionHandler {
      * 1.21.1 equivalent, so this replicates its membership with confirmed-real vanilla tags/block
      * constants instead of inventing a new custom tag (Neo Edition's own port invents
      * {@code NtmTags.Blocks.PLANTS} for this - not reused here per this survey's explicit
-     * direction). Membership (leaves, saplings, crops, flowers, short/tall grass, ferns, dead bush,
-     * vines) mirrors the conventional 1.12-era {@code Material.PLANTS}/{@code Material.LEAVES}
-     * family; every tag/constant below is independently confirmed real in this exact target
-     * Minecraft version via Neo Edition's own {@code NtmBlockTagProvider} (which builds its
-     * {@code PLANTS} tag from this identical vanilla membership list).
+     * direction).
+     * <p>
+     * <b>Fixed CE-behavior mismatch (review pass):</b> the previous version of this method also
+     * matched {@code Blocks.VINE}/{@code Blocks.DEAD_BUSH}/{@code Blocks.TALL_GRASS} (the modern
+     * double-tall grass)/{@code Blocks.LARGE_FERN}, plus the full {@code BlockTags.FLOWERS} tag
+     * (which nests {@code #minecraft:tall_flowers} - sunflower/lilac/rose_bush/peony - and several
+     * newer, CE-unrelated blocks like {@code chorus_flower}/{@code mangrove_propagule}). Directly
+     * checking real 1.12.2 MCP source ({@code BlockVine}/{@code BlockDeadBush}/
+     * {@code BlockDoublePlant} - which backs vanilla's tall grass, large fern, <i>and</i> the tall
+     * flowers - all construct with {@code super(Material.vine)}, not {@code Material.plants}) shows
+     * CE's real {@code Material.LEAVES}/{@code Material.PLANTS} check never matches any of them;
+     * only the plain single-block {@code Blocks.TALLGRASS} (short grass + fern, matched by CE's own
+     * explicit {@code b == Blocks.TALLGRASS} identity check) is whitelisted outside the leaves/plants
+     * material pair. Narrowed to {@link BlockTags#SMALL_FLOWERS} (single-block flowers only,
+     * confirmed real in this exact 1.21.1 build) and the 2 real {@code Blocks.TALLGRASS} successors
+     * ({@link Blocks#SHORT_GRASS}/{@link Blocks#FERN}) to match CE exactly - vines/dead bush/double
+     * plants (sunflower, lilac, rose bush, peony, large fern, double tallgrass) are no longer
+     * destroyed by heavy pollution, matching real CE.
      */
     private static boolean isPollutionSweepTarget(BlockState state) {
         return state.is(BlockTags.LEAVES)
                 || state.is(BlockTags.SAPLINGS)
                 || state.is(BlockTags.CROPS)
-                || state.is(BlockTags.FLOWERS)
+                || state.is(BlockTags.SMALL_FLOWERS)
                 || state.is(Blocks.SHORT_GRASS)
-                || state.is(Blocks.FERN)
-                || state.is(Blocks.TALL_GRASS)
-                || state.is(Blocks.LARGE_FERN)
-                || state.is(Blocks.DEAD_BUSH)
-                || state.is(Blocks.VINE);
+                || state.is(Blocks.FERN);
     }
 
     ////////////////////////////////

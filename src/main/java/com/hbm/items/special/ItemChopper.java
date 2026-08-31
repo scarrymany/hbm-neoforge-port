@@ -68,6 +68,14 @@ public class ItemChopper extends Item {
             LivingEntity spawned = switch (this.mob) {
                 case WORM -> {
                     EntityBOTPrimeHead head = new EntityBOTPrimeHead(WormEntityTypes.BOTPRIME_HEAD.get(), level);
+                    // Bug fix: spawnBody() reads the head's *current* position (via blockPosition())
+                    // to place all 74 EntityBOTPrimeBody segments, then re-centers the head on that
+                    // same block - it must run AFTER the head is positioned, matching
+                    // BlockBallsSpawner's call order (setPos, then spawnBody()). Calling it here before
+                    // the common post-switch spawned.setPos(...) below would spawn all 74 body segments
+                    // at the head's default construction position (not spawnPos), stranding the entire
+                    // body chain away from the head the moment it gets repositioned.
+                    head.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
                     head.spawnBody();
                     yield head;
                 }

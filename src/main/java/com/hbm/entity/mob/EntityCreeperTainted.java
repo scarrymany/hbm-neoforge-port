@@ -62,20 +62,40 @@ public class EntityCreeperTainted extends Creeper implements IRadiationImmune {
                 .add(Attributes.MOVEMENT_SPEED, 0.35D);
     }
 
+    /**
+     * {@code Creeper#explodeCreeper()} is {@code private} in real 1.21.1 - not a legal override point
+     * (see {@link CreeperVariantSupport}'s class javadoc). The explosion-interception check must run
+     * <em>before</em> {@code super.tick()} (calling this directly and returning instead of delegating,
+     * on the tick vanilla's own private countdown would have fired) - the regen tick merges into the
+     * same override rather than a second {@code tick()} method.
+     */
     @Override
     public void tick() {
+        if (!this.level().isClientSide() && this.isAlive() && CreeperVariantSupport.isAboutToExplode(this)) {
+            explodeCreeper();
+            return;
+        }
         super.tick();
         if (!this.level().isClientSide && this.isAlive() && this.getHealth() < this.getMaxHealth() && this.tickCount % 10 == 0) {
             this.heal(1.0F);
         }
     }
 
-    @Override
     protected void explodeCreeper() {
         if (this.level().isClientSide) return;
 
+        // Matches vanilla's own private explodeCreeper()'s `this.dead = true;` placement (before any
+        // blast that could otherwise hurt this entity again mid-explosion) - see CreeperVariantSupport.
+        this.dead = true;
+
         boolean mobGriefing = this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
-        this.level().explode(this, this.getX(), this.getY(), this.getZ(), 5.0F, false, Level.ExplosionInteraction.TNT);
+        // CE: world.newExplosion(this, x, y, z, 5.0F, false, griefing) - the "isSmoking" arg (here
+        // `griefing`) is what actually gates block destruction in 1.12.2's Explosion (isSmoking=false
+        // -> clearAffectedBlockPositions(), no block damage at all). Ported explosion interaction must
+        // key off the same mobGriefing read, not be hardcoded on - matching vanilla Creeper's own
+        // explodeCreeper() TNT/NONE-by-griefing pattern.
+        this.level().explode(this, this.getX(), this.getY(), this.getZ(), 5.0F, false,
+                mobGriefing ? Level.ExplosionInteraction.TNT : Level.ExplosionInteraction.NONE);
 
         if (mobGriefing) {
             // CE's taint-terrain-conversion sweep (255 samples/15^3 cube at taintage 5-7 when powered,

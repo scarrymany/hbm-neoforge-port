@@ -21,9 +21,10 @@ import net.neoforged.fml.common.asm.enumextension.EnumProxy;
  * in full) - 3 cosmetic-only {@link Biome} entries ({@code crater}/{@code crater_inner}/
  * {@code crater_outer}) with no unique mob spawns or world-gen features of their own, per
  * docs/phase4/worldgen_oil_and_meteor_dungeons.md Part 3: "does not need any placement/world-gen
- * logic of its own - it is only ever assigned dynamically" (by the not-yet-ported
- * {@code EntityFalloutRain.getBiomeChange()}, a later Phase 4 package's job; see that report's
- * Deferred scope). This class only registers the 3 biomes - no placement logic is added here.
+ * logic of its own - it is only ever assigned dynamically" (by
+ * {@code EntityFalloutRain.getBiomeChangeKey()}/{@code paintBiome()}, and consumed by
+ * {@code com.hbm.handler.EntityEffectHandler#handleCraterRadiation} - both landed later in this same
+ * Phase 4 content wave). This class only registers the 3 biomes - no placement logic is added here.
  * <p>
  * Bootstrap shape ({@code BootstrapContext<Biome>}, the {@code HolderGetter} lookups needed for an
  * empty {@link BiomeGenerationSettings}, {@code EnumProxy}-injected custom

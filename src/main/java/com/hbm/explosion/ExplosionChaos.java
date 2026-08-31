@@ -178,7 +178,15 @@ public final class ExplosionChaos {
         });
     }
 
+    /**
+     * CE's real {@code spawnExplosion} <b>does</b> gate on {@code isWarDim} (verified directly against
+     * {@code upstream/hbm-ce/.../ExplosionChaos.java} lines 98-101) - docs/phase4/
+     * entities_vortex_gravity_wells.md's own Table B mismarks this method as ungated ("No"), and an
+     * earlier pass here followed that mismarked table rather than the real CE source. Corrected to match
+     * CE, not the report.
+     */
     public static void spawnExplosion(Level level, Entity detonator, int x, int y, int z, int bound) {
+        if (!isWarDim(level)) return;
         RandomSource random = level.getRandom();
         for (int i = 0; i < 25; i++) {
             blast(level, detonator, x + random.nextInt(bound), y + random.nextInt(bound), z + random.nextInt(bound));
