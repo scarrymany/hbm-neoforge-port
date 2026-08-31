@@ -90,7 +90,13 @@ def port_item_ids() -> set[str]:
         "battery_sodium_pack", "battery_schrabidium_pack", "battery_quantum_pack",
         "capacitor_copper_pack", "capacitor_gold_pack", "capacitor_niobium_pack",
         "capacitor_tantalum_pack", "capacitor_bismuth_pack", "capacitor_spark_pack",
+        "pellet_charged", "biomass", "biomass_compressed",
+        "fuel_additive_antiknock", "fuel_additive_deicer",
+        "nuclear_waste_tiny", "nuclear_waste_vitrified",
     }
+    for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
+              "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):
+        extra.add(f"pwr_fuel_depleted_{t}")
     return set(items) | extra
 
 
@@ -253,6 +259,7 @@ def ce_machine_recipe_counts() -> dict[str, int]:
         text = read(p)
         n = 0
         n += len(re.findall(r'this\.register\(\s*new\s+GenericRecipe', text))
+        n += len(re.findall(r'this\.register\(\s*\(PUREXRecipe\)', text))
         n += len(re.findall(r'recipes\.put\(', text))
         n += len(re.findall(r'RECIPES\.add\(', text))
         n += len(re.findall(r'registerDefaults', text)) and 0

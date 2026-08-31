@@ -49,6 +49,7 @@ public class ModItems {
         ToolDataComponents.register(modEventBus);
         GearItems.registerAll(modEventBus);
         MachineItems.registerAll();
+        com.hbm.items.machine.Phase11ProcessItems.registerAll();
         MachineDataComponents.register(modEventBus);
         FoodItems.registerAll(modEventBus);
         FoodDataComponents.register(modEventBus);

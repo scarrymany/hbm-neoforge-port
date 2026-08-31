@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:rubber_pipe"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_purex",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_dura_steel"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_titanium"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:drillbit_hss",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

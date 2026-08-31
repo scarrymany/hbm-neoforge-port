@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_combine_steel"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:powder_spark_mix"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:pellet_charged"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_chip_quantum"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:capacitor_spark_pack",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100000,
+  "input_fluids": [
+    {
+      "type": "PERFLUOROMETHYL_COLD",
+      "fill": 8000
+    }
+  ],
+  "output_fluids": [
+    {
+      "type": "PERFLUOROMETHYL",
+      "fill": 8000
+    }
+  ]
+}

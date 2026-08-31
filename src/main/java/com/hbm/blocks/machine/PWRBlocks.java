@@ -85,6 +85,7 @@ public final class PWRBlocks {
         com.hbm.blockentity.machine.PWRBlockEntities.registerAll();
         PWRMenus.registerAll();
         PWRHotFuelItems.registerAll();
+        com.hbm.items.machine.PWRDepletedFuelItems.registerAll();
         BreederRecipes.bootstrap();
     }
 

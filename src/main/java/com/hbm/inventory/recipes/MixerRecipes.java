@@ -62,12 +62,10 @@ import java.util.Map;
  * {@code POWDER_DIAMOND} substitution (see that class's {@code POWDER_DIAMOND} entry), a discrepancy
  * from the research report's suggested {@code Items.DIAMOND} substitution.
  * <p>
- * <b>Still blocked</b> (9 keys, unregistered item families, matching the research report):
- * {@code COLLOID} ({@code ModItems.dust}, a generic undifferentiated-dust item), {@code IONGEL}/
- * {@code SCHRABIDIC} ({@code pellet_charged}), {@code FULLERENE}/{@code LYE} ({@code powder_ash}
- * family), {@code PETROIL_LEADED}/{@code GASOLINE_LEADED}/{@code COALGAS_LEADED}
- * ({@code fuel_additive}), {@code BITUMEN} ({@code oil_tar}/{@code EnumTarType}, same gap
- * {@code RefineryRecipes} already documents). <b>Correction to the research report</b>: CE's
+ * <b>Still blocked</b>: {@code COLLOID} ({@code ModItems.dust}), {@code FULLERENE}/{@code LYE}
+ * ({@code powder_ash}), {@code BITUMEN} ({@code oil_tar}/{@code EnumTarType}).
+ * Landed this pass: {@code IONGEL}/{@code SCHRABIDIC} ({@code pellet_charged}),
+ * {@code PETROIL_LEADED}/{@code GASOLINE_LEADED}/{@code COALGAS_LEADED} ({@code fuel_additive_antiknock}). <b>Correction to the research report</b>: CE's
  * {@code ALUMINA} key has a real 2-recipe pair, but only the first ({@code F.dust()} -&gt;
  * {@code CRYSTAL_FLUORITE}) is portable - the report claimed CE's second recipe's
  * {@code chunk_ore}/{@code EnumChunkType.CRYOLITE} item is "registered", but only the bare
@@ -255,6 +253,25 @@ public final class MixerRecipes {
                 .setStack1(new FluidStack(Fluids.PETROLEUM, 1_000))
                 .setStack2(new FluidStack(Fluids.UNSATURATEDS, 500))
                 .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get())));
+
+        // CE MixerRecipes.java:48 / :62 / :83-85 — unblocked by pellet_charged / fuel_additive flatten
+        register(Fluids.IONGEL, new MixerRecipe(1_000, 50)
+                .setStack1(new FluidStack(Fluids.WATER, 1_000))
+                .setStack2(new FluidStack(Fluids.HYDROGEN, 200))
+                .setSolid(new ComparableStack(hbmItem("pellet_charged"))));
+        register(Fluids.SCHRABIDIC, new MixerRecipe(16_000, 100)
+                .setStack1(new FluidStack(Fluids.SAS3, 8_000))
+                .setStack2(new FluidStack(Fluids.PEROXIDE, 6_000))
+                .setSolid(new ComparableStack(hbmItem("pellet_charged"))));
+        register(Fluids.PETROIL_LEADED, new MixerRecipe(12_000, 40)
+                .setStack1(new FluidStack(Fluids.PETROIL, 10_000))
+                .setSolid(new ComparableStack(hbmItem("fuel_additive_antiknock"))));
+        register(Fluids.GASOLINE_LEADED, new MixerRecipe(12_000, 40)
+                .setStack1(new FluidStack(Fluids.GASOLINE, 10_000))
+                .setSolid(new ComparableStack(hbmItem("fuel_additive_antiknock"))));
+        register(Fluids.COALGAS_LEADED, new MixerRecipe(12_000, 40)
+                .setStack1(new FluidStack(Fluids.COALGAS, 10_000))
+                .setSolid(new ComparableStack(hbmItem("fuel_additive_antiknock"))));
     }
 
     /**

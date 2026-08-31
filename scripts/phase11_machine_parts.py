@@ -173,6 +173,13 @@ ITEM_MAP = {
     "ModBlocks.sliding_blast_door": "sliding_blast_door",
     "ModBlocks.machine_radar": "machine_radar",
     "ModBlocks.machine_radar_large": "machine_radar_large",
+    "ModBlocks.machine_purex": "machine_purex",
+    "ModBlocks.machine_liquefactor": "machine_liquefactor",
+    "ModItems.pellet_charged": "pellet_charged",
+    "ModItems.biomass": "biomass",
+    "ModItems.biomass_compressed": "biomass_compressed",
+    "ModItems.nuclear_waste_tiny": "nuclear_waste_tiny",
+    "ModItems.nuclear_waste_vitrified": "nuclear_waste_vitrified",
     "ModBlocks.machine_fracking_tower": "machine_fracking_tower",
     "ModBlocks.machine_well": "machine_well",
     "ModBlocks.machine_pumpjack": "machine_pumpjack",
@@ -267,7 +274,23 @@ def known_ids() -> set[str]:
         "capacitor_copper_pack", "capacitor_gold_pack", "capacitor_niobium_pack",
         "capacitor_tantalum_pack", "capacitor_bismuth_pack", "capacitor_spark_pack",
     }
-    return items | blocks | extra | packs | set(PARTS) | set(EXPENSIVE) | set(PART_GENERIC) | {f"circuit_{c}" for c in CIRCUITS}
+    computed = {
+        "pellet_charged", "biomass", "biomass_compressed",
+        "fuel_additive_antiknock", "fuel_additive_deicer",
+        "nuclear_waste_tiny", "nuclear_waste_vitrified",
+        "machine_purex", "machine_liquefactor",
+    }
+    for d in ("steel", "steel_diamond", "hss", "hss_diamond", "desh", "desh_diamond",
+              "tcalloy", "tcalloy_diamond", "ferro", "ferro_diamond"):
+        computed.add(f"drillbit_{d}")
+    for p in ("steel", "dura", "desh", "starmetal"):
+        computed.add(f"piston_set_{p}")
+    for r in ("uranium", "pu239", "plutonium", "source", "boron", "lithium", "detector"):
+        computed.add(f"pile_rod_{r}")
+    for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
+              "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):
+        computed.add(f"pwr_fuel_depleted_{t}")
+    return items | blocks | extra | packs | computed | set(PARTS) | set(EXPENSIVE) | set(PART_GENERIC) | {f"circuit_{c}" for c in CIRCUITS}
 
 
 def write_models() -> None:
@@ -365,6 +388,32 @@ def patch_lang() -> None:
             "block.hbm.sliding_blast_door": "Sliding Blast Door",
             "block.hbm.machine_radar": "Radar",
             "block.hbm.machine_radar_large": "Large Radar",
+            "block.hbm.machine_purex": "PUREX Reprocessing Plant",
+            "block.hbm.machine_liquefactor": "Liquefaction Machine",
+            "container.machinePUREX": "PUREX Reprocessing Plant",
+            "container.machineLiquefactor": "Liquefaction Machine",
+            "item.hbm.pellet_charged": "Charged Pellet",
+            "item.hbm.biomass": "Biomass",
+            "item.hbm.biomass_compressed": "Compressed Biomass",
+            "item.hbm.fuel_additive_antiknock": "Tetraethyllead Antiknock Agent",
+            "item.hbm.fuel_additive_deicer": "Deicer",
+            "item.hbm.nuclear_waste_tiny": "Tiny Pile of Nuclear Waste",
+            "item.hbm.nuclear_waste_vitrified": "Vitrified Nuclear Waste",
+            "item.hbm.pwr_fuel_depleted_meu": "Depleted PWR Fuel (MEU)",
+            "item.hbm.pwr_fuel_depleted_heu233": "Depleted PWR Fuel (HEU-233)",
+            "item.hbm.pwr_fuel_depleted_heu235": "Depleted PWR Fuel (HEU-235)",
+            "item.hbm.pwr_fuel_depleted_men": "Depleted PWR Fuel (MEN)",
+            "item.hbm.pwr_fuel_depleted_hen237": "Depleted PWR Fuel (HEN-237)",
+            "item.hbm.pwr_fuel_depleted_mox": "Depleted PWR Fuel (MOX)",
+            "item.hbm.pwr_fuel_depleted_mep": "Depleted PWR Fuel (MEP)",
+            "item.hbm.pwr_fuel_depleted_hep239": "Depleted PWR Fuel (HEP-239)",
+            "item.hbm.pwr_fuel_depleted_hep241": "Depleted PWR Fuel (HEP-241)",
+            "item.hbm.pwr_fuel_depleted_mea": "Depleted PWR Fuel (MEA)",
+            "item.hbm.pwr_fuel_depleted_hea242": "Depleted PWR Fuel (HEA-242)",
+            "item.hbm.pwr_fuel_depleted_hes326": "Depleted PWR Fuel (HES-326)",
+            "item.hbm.pwr_fuel_depleted_hes327": "Depleted PWR Fuel (HES-327)",
+            "item.hbm.pwr_fuel_depleted_bfb_am_mix": "Depleted PWR Fuel (BFB Am-Mix)",
+            "item.hbm.pwr_fuel_depleted_bfb_pu241": "Depleted PWR Fuel (BFB Pu-241)",
         }
         for k, v in aliases.items():
             if k not in data:

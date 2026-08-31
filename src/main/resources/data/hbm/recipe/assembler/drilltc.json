@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 20
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_desh"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:drillbit_tcalloy",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

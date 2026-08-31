@@ -45,6 +45,8 @@ import com.hbm.entity.mob.WormEntityTypes;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardRegistry;
+import com.hbm.inventory.recipes.LiquefactionRecipes;
+import com.hbm.inventory.recipes.PUREXRecipes;
 import com.hbm.inventory.recipes.RefineryRecipes;
 import com.hbm.inventory.recipes.chem.CentrifugeRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
@@ -116,6 +118,8 @@ public class CommonEvents {
             CyclotronRecipes.register();
             ChemPlantRecipes.register();
             ElectrolyserFluidRecipes.register();
+            PUREXRecipes.register();
+            LiquefactionRecipes.register();
             // Phase 4 (fallout_rain_and_effects) - com.hbm.config.FalloutConfigJSON#initDefault()
             // eagerly resolves several DeferredBlock.get() calls (e.g. WastelandVirusBlocks.SELLAFIELD)
             // while building its default block-transform table, so - same reasoning as the recipe

@@ -27,14 +27,12 @@ import java.util.List;
  * Recipe data for the Chemical Plant, ported from CE {@code ChemicalPlantRecipes.java}.
  * Numbers cited per call site. Blocked recipes (unregistered items) are listed in the header, not invented.
  * <p>
- * Skipped vs CE: biomes/explosives/additives that need unregistered items —
- * {@code chem.biogas} (:85 biomass), {@code chem.tarsand} (:102 ore_oil_sand+ANY_TAR),
- * {@code chem.tel}/ {@code chem.deicer} (:107/:112 fuel_additive), {@code chem.meatprocessing}
- * (:235 glyphid meat), {@code chem.biosolidfuel}/ {@code chem.biooilsolidfuel} (:246/:250 biomass_compressed),
- * {@code chem.schrabidic} (:282 pellet_charged), {@code chem.coltancleaning}/ {@code chem.coltancrystal}
- * (:293/:304 generic {@code dust}), {@code chem.cordite}/ {@code chem.rocketfuel}/ {@code chem.dynamite}/
- * {@code chem.tnt}/ {@code chem.tatb}/ {@code chem.napalm} (unregistered explosives / canister_napalm),
- * {@code chem.batteryquantum} (:176 pellet_charged), {@code chem.uf6} (:361 sulfur item).
+ * Landed this pass: {@code chem.biogas} (:85), {@code chem.deicer} (:112), {@code chem.schrabidic}
+ * (:282), {@code chem.batteryquantum} (:176). Still skipped: {@code chem.tarsand} (:102 ANY_TAR),
+ * {@code chem.tel} (:107 ANY_TAR+oil_tar), {@code chem.meatprocessing} (:235 glyphid meat),
+ * {@code chem.biosolidfuel}/ {@code chem.biooilsolidfuel} (:246/:250 {@code solid_fuel}),
+ * {@code chem.coltancleaning}/ {@code chem.coltancrystal} (:293/:304 generic {@code dust}),
+ * explosives / {@code canister_napalm}, {@code chem.uf6} (:361 sulfur item).
  */
 public final class ChemPlantRecipes {
 
@@ -112,6 +110,13 @@ public final class ChemPlantRecipes {
                 new ItemStack[0],
                 new FluidStack(Fluids.ETHANOL, 1_000)));
 
+        // :85
+        RECIPES.add(new ChemPlantRecipe("chem.biogas", 60, 100,
+                new AStack[]{new ComparableStack(item("biomass"), 16)},
+                new FluidStack[]{new FluidStack(Fluids.AIR, 4_000)},
+                new ItemStack[0],
+                new FluidStack(Fluids.BIOGAS, 2_000)));
+
         // :90
         RECIPES.add(new ChemPlantRecipe("chem.biofuel", 60, 100,
                 new AStack[0],
@@ -132,6 +137,13 @@ public final class ChemPlantRecipes {
                 new FluidStack[]{new FluidStack(Fluids.NAPHTHA, 1_000)},
                 new ItemStack[0],
                 new FluidStack(Fluids.GASOLINE, 800)));
+
+        // :112
+        RECIPES.add(new ChemPlantRecipe("chem.deicer", 40, 100,
+                new AStack[0],
+                new FluidStack[]{new FluidStack(Fluids.GAS, 100), new FluidStack(Fluids.HYDROGEN, 50)},
+                new ItemStack[]{new ItemStack(item("fuel_additive_deicer"))},
+                (FluidStack) null));
 
         // :117
         RECIPES.add(new ChemPlantRecipe("chem.cobble", 20, 100,
@@ -223,6 +235,13 @@ public final class ChemPlantRecipes {
                 new FluidStack[]{new FluidStack(Fluids.HELIUM4, 8_000)},
                 new ItemStack[]{new ItemStack(item("battery_schrabidium_pack"))},
                 (FluidStack) null));
+
+        // :176
+        RECIPES.add(new ChemPlantRecipe("chem.batteryquantum", 100, 100_000,
+                new AStack[]{new ComparableStack(item("bscco_dense_wire"), 24), new ComparableStack(item("pellet_charged"), 32), new ComparableStack(item("ingot_cft"), 16)},
+                new FluidStack[]{new FluidStack(Fluids.PERFLUOROMETHYL_COLD, 8_000)},
+                new ItemStack[]{new ItemStack(item("battery_quantum_pack"))},
+                new FluidStack(Fluids.PERFLUOROMETHYL, 8_000)));
 
         // :185 desh (non-LBSM: LIGHTOIL + MERCURY)
         RECIPES.add(new ChemPlantRecipe("chem.desh", 100, 100,
@@ -340,6 +359,13 @@ public final class ChemPlantRecipes {
                 new FluidStack[]{new FluidStack(Fluids.AIR, 8_000), new FluidStack(Fluids.WATER, 2_000)},
                 new ItemStack[0],
                 new FluidStack(Fluids.NITRIC_ACID, 1_000)));
+
+        // :282
+        RECIPES.add(new ChemPlantRecipe("chem.schrabidic", 60, 5_000,
+                new AStack[]{new ComparableStack(item("pellet_charged"))},
+                new FluidStack[]{new FluidStack(Fluids.SAS3, 2_000), new FluidStack(Fluids.PEROXIDE, 2_000)},
+                new ItemStack[0],
+                new FluidStack(Fluids.SCHRABIDIC, 2_000)));
 
         // :287
         RECIPES.add(new ChemPlantRecipe("chem.schrabidate", 150, 5_000,

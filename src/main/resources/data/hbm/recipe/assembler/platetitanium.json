@@ -1,0 +1,17 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_titanium"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:plate_titanium",
+    "count": 1
+  },
+  "duration": 60,
+  "power": 100
+}
