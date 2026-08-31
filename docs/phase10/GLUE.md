@@ -49,7 +49,7 @@ Static files: `src/main/resources/assets/hbm/lang/{en_us,ru_ru,uk_ua}.json`.
 
 - `./gradlew compileJava` — 0 errors
 - `./gradlew build` — SUCCESS
-- jar `hbm-0.0.1.jar` **66,011,309** bytes (**62.95 MB**)
-- `./gradlew runServer` — **Done (5.777s)** on wiped world. OilSpot still logs
+- jar `hbm-0.0.1.jar` **66,225,207** bytes (**63.16 MB**)
+- `./gradlew runServer` — **Done (5.842s)** on wiped world. OilSpot still logs
   `setBlock in a far chunk` for `hbm:oil_bubble` (worldgen thread) but does **not**
   deadlock; spawn 2% → 51% → Done.
