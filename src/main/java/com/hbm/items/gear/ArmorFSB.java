@@ -247,6 +247,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
         ArmorFSB chestplate = (ArmorFSB) plate.getItem();
 
         for (MobEffectInstance effect : chestplate.effects) {
+            if (!PotionConfig.DO_JUMP_BOOST.get() && effect.getEffect() == MobEffects.JUMP) continue;
             // Norwood (CE comment): no particles while the effect is armor-granted.
             player.addEffect(new MobEffectInstance(effect.getEffect(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), false));
         }
@@ -431,7 +432,8 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
         // confirmed against this port's own already-established usage (items.food.ItemEnergy/
         // ItemPill/FoodItems), not the display-name-shaped MobEffects.JUMP_BOOST, which does not
         // exist under Mojang mappings.
-        if (!PotionConfig.DO_JUMP_BOOST.get() && effect.getEffect() == MobEffects.JUMP) return this;
+        // Always store. PotionConfig is not loaded during RegisterEvent (item ctor).
+        // Jump-boost gate is applied in handleTick / tooltip after configs load.
         effects.add(effect);
         return this;
     }
@@ -488,6 +490,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
         if (!effects.isEmpty()) {
             List<String> names = new ArrayList<>();
             for (MobEffectInstance effect : effects) {
+                if (!PotionConfig.DO_JUMP_BOOST.get() && effect.getEffect() == MobEffects.JUMP) continue;
                 names.add(Component.translatable(effect.getEffect().value().getDescriptionId()).getString());
             }
             toAdd.add(Component.literal(String.join(", ", names)).withStyle(ChatFormatting.AQUA));

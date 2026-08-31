@@ -1,6 +1,5 @@
 package com.hbm.items.weapon;
 
-import com.hbm.config.BombConfig;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ModItems;
@@ -215,7 +214,8 @@ public final class MissileItems {
         MP_WARHEAD_15_THERMO = part("mp_warhead_15_thermo", () ->
                 new ItemMissile(new Item.Properties()).makeWarhead(WarheadType.TX, 250F, 6.5F, PartSize.SIZE_15).setHealth(25F).setRarity(Rarity.RARE));
         MP_WARHEAD_15_MIRV = part("mp_warhead_15_mirv", () ->
-                new ItemMissile(new Item.Properties()).makeWarhead(WarheadType.MIRV, (float) BombConfig.MIRV_RADIUS.get(), 7.0F, PartSize.SIZE_15)
+                // 70F = CE BombConfig.mirvRadius default. Live blast uses EntityMIRV + MIRV_RADIUS.get().
+                new ItemMissile(new Item.Properties()).makeWarhead(WarheadType.MIRV, 70F, 7.0F, PartSize.SIZE_15)
                         .setRarity(Rarity.LEGENDARY).setAuthor("Seven").setHealth(20F).setWittyText("I wanna know, have you ever seen the rain?"));
         MP_WARHEAD_15_BOXCAR = part("mp_warhead_15_boxcar", () ->
                 new ItemMissile(new Item.Properties()).makeWarhead(WarheadType.TX, 500F, 7.5F, PartSize.SIZE_15).setWittyText("?!?!").setHealth(35F).setRarity(Rarity.LEGENDARY));
