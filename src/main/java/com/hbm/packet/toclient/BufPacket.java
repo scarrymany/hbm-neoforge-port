@@ -1,19 +1,13 @@
 package com.hbm.packet.toclient;
 
 import com.hbm.blockentity.IBufPacketReceiver;
+import com.hbm.client.ClientPackets;
 import com.hbm.main.MainRegistry;
-import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
@@ -57,30 +51,7 @@ public record BufPacket(BlockPos pos, byte[] data) implements CustomPacketPayloa
     };
 
     public static void handleCommon(BufPacket packet, IPayloadContext context) {
-        handleClient(packet, context);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static void handleClient(BufPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            Level level = Minecraft.getInstance().level;
-            if (level == null) return;
-
-            BlockEntity be = level.getBlockEntity(packet.pos);
-            if (!(be instanceof IBufPacketReceiver receiver)) return;
-
-            RegistryFriendlyByteBuf buf =
-                    new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(packet.data), level.registryAccess(), ConnectionType.OTHER);
-            try {
-                receiver.deserialize(buf);
-            } catch (Exception e) {
-                MainRegistry.logger.warn("A ByteBuf sync packet failed to deserialize (buffer underflow - more data was" +
-                        " read than the packet actually contained). Block: {}", be.getBlockState().getBlock());
-                MainRegistry.logger.warn(e.getMessage(), e);
-            } finally {
-                buf.release();
-            }
-        });
+        ClientPackets.buf(packet, context);
     }
 
     @Override

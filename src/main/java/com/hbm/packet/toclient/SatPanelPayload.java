@@ -1,9 +1,8 @@
 package com.hbm.packet.toclient;
 
-import com.hbm.inventory.gui.SatPanelClientState;
+import com.hbm.client.ClientPackets;
 import com.hbm.main.MainRegistry;
 import com.hbm.saveddata.satellites.Satellite;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -11,8 +10,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
@@ -104,13 +101,7 @@ public record SatPanelPayload(int freq, String satType, float colorR, float colo
     }
 
     public static void handleClient(SatPanelPayload packet, IPayloadContext context) {
-        context.enqueueWork(() -> handleClientSync(packet));
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    private static void handleClientSync(SatPanelPayload packet) {
-        if (Minecraft.getInstance().player == null) return;
-        SatPanelClientState.LATEST = packet;
+        ClientPackets.satPanel(packet, context);
     }
 
     @Override

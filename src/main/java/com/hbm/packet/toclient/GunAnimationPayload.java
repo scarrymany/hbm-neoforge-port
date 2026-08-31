@@ -1,14 +1,9 @@
 package com.hbm.packet.toclient;
 
-import com.hbm.client.render.item.weapon.GunAnimationClientState;
-import com.hbm.items.weapon.sedna.GunConfig;
+import com.hbm.client.ClientPackets;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.main.MainRegistry;
-import com.hbm.weapon.anim.GunAnimationType;
 import com.hbm.weapon.anim.HbmAnimationType;
-import com.hbm.render.anim.sedna.BusAnimationSedna;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -17,12 +12,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
@@ -143,101 +135,7 @@ public record GunAnimationPayload(short animationType, byte hand, int receiverIn
     }
 
     public static void handleCommon(GunAnimationPayload packet, IPayloadContext context) {
-        handleClient(packet, context);
-    }
-
-    /**
-     * Filled in by Phase 5 ({@code c6-weapon-gun-rendering}) - see class javadoc. Mirrors CE's own
-     * {@code GunAnimationPacketSedna.Handler.handleSedna} for the two responsibilities this port's
-     * split design keeps client-side:
-     * <ol>
-     *   <li>On {@link GunAnimationType#CYCLE}, stamp {@link ItemGunBaseNT#lastShot}/
-     *       {@link ItemGunBaseNT#shotRand} (read by every concrete gun renderer's muzzle-flash
-     *       helper) - CE: {@code gun.lastShot[gunIndex] = System.currentTimeMillis(); gun.shotRand =
-     *       player.world.rand.nextDouble();}. <b>Not ported</b>: CE's handler also invokes the
-     *       receiver's {@code onRecoil} callback here
-     *       ({@code Receiver.getRecoil(stack).accept(stack, new LambdaContext(...))}) for a
-     *       client-only camera view-punch effect. This port's {@code ItemGunBaseNT.LambdaContext}'s
-     *       4th constructor argument is named/documented as {@code configIndex} (not CE's
-     *       {@code receiverIndex}) throughout the rest of this port's already-committed gun
-     *       framework (every other call site passes a config index there, never a receiver index) -
-     *       since this payload's own {@link #receiverIndex()} field is itself always {@code 0} today
-     *       (no call site populates it with anything else, confirmed by grep), invoking a
-     *       receiver-keyed client-only recoil callback here would either be a no-op (index 0 only)
-     *       or require guessing at a {@code LambdaContext} semantic this class did not itself
-     *       define. Deliberately deferred rather than guessed at - a future pass wiring real
-     *       {@code recoil(...)} lambdas for concrete guns should add this call once the
-     *       receiver-vs-config index question is resolved.</li>
-     *   <li>Look up the gun's registered animation for this trigger
-     *       ({@link GunConfig#getAnims(ItemStack)}, added by this same Phase 5 task - see that
-     *       class's own javadoc) and, if one exists, stamp
-     *       {@link GunAnimationClientState#hotbar}{@code [slot][gunIndex]} with a fresh
-     *       {@code Animation(key, System.currentTimeMillis(), animation, type, holdLastFrame)} -
-     *       CE: {@code HbmAnimationsSedna.hotbar[slot][gunIndex] = new Animation(...)}. The
-     *       {@code RELOAD_EMPTY -> RELOAD} fallback CE performs here does not apply (this port's
-     *       {@link GunAnimationType} never sends the deprecated {@code RELOAD_EMPTY} value at all -
-     *       see that enum's own javadoc); the {@code ALT_CYCLE -> CYCLE} / {@code CYCLE_EMPTY ->
-     *       CYCLE} fallback is ported (this port's vocabulary also lacks {@code CYCLE_EMPTY}, so
-     *       only the {@code ALT_CYCLE} half applies).</li>
-     * </ol>
-     * Tool animations ({@link com.hbm.weapon.anim.ToolAnimationType}) are intentionally left
-     * unhandled - no CE gun/tool in the roster this task ported drives {@code BusAnimationSedna}
-     * playback off a {@code ToolAnimationType} trigger (CE's melee tools that do animate,
-     * e.g. the chainsaw, use the Collada {@code animloader} system instead, explicitly out of this
-     * task's scope) - the debug log line the Phase 3 stub had is kept for that branch so a future
-     * tool-rendering task has a visible signal rather than a silent no-op.
-     */
-    @OnlyIn(Dist.CLIENT)
-    public static void handleClient(GunAnimationPayload packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            LocalPlayer player = mc.player;
-            if (player == null) return;
-
-            ItemStack stack = player.getMainHandItem();
-            if (stack.isEmpty()) return;
-
-            if (!(stack.getItem() instanceof ItemGunBaseNT gun)) {
-                MainRegistry.logger.debug(
-                        "Received GunAnimationPayload for a non-ItemGunBaseNT held item ({}) - tool " +
-                                "animation playback is out of c6-weapon-gun-rendering's scope, ignoring.",
-                        stack.getItem());
-                return;
-            }
-
-            int gunIndex = packet.gunIndex();
-            if (gunIndex < 0 || gunIndex >= GunAnimationClientState.hotbar[0].length) return;
-            if (gunIndex >= gun.getConfigCount()) return;
-
-            int slot = player.getInventory().selected;
-            if (slot < 0 || slot > 8) slot = Math.abs(slot) % 9;
-
-            GunAnimationType[] values = GunAnimationType.values();
-            int ordinal = packet.animationType();
-            if (ordinal < 0 || ordinal >= values.length) return;
-            GunAnimationType type = values[ordinal];
-
-            if (type == GunAnimationType.CYCLE) {
-                if (gunIndex < gun.lastShot.length) gun.lastShot[gunIndex] = System.currentTimeMillis();
-                gun.shotRand = player.level().random.nextDouble();
-            }
-
-            GunConfig config = gun.getConfig(stack, gunIndex);
-            BiFunction<ItemStack, HbmAnimationType, BusAnimationSedna> anims = config.getAnims(stack);
-            if (anims == null) return;
-
-            BusAnimationSedna animation = anims.apply(stack, type);
-            if (animation == null && type == GunAnimationType.ALT_CYCLE) {
-                animation = anims.apply(stack, GunAnimationType.CYCLE);
-            }
-
-            if (animation != null) {
-                boolean isReloadAnimation = type == GunAnimationType.RELOAD || type == GunAnimationType.RELOAD_CYCLE;
-                GunAnimationClientState.hotbar[slot][gunIndex] = new GunAnimationClientState.Animation(
-                        stack.getItem().getDescriptionId(), System.currentTimeMillis(), animation, type,
-                        isReloadAnimation && config.getReloadAnimSequential(stack));
-            }
-        });
+        ClientPackets.gunAnimation(packet, context);
     }
 
     @Override

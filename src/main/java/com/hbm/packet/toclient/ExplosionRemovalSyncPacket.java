@@ -1,16 +1,12 @@
 package com.hbm.packet.toclient;
 
+import com.hbm.client.ClientPackets;
 import com.hbm.main.MainRegistry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
@@ -60,18 +56,9 @@ public record ExplosionRemovalSyncPacket(List<BlockPos> positions) implements Cu
         }
     };
 
-    @OnlyIn(Dist.CLIENT)
+    /** Kept on both dists so {@code HbmNetwork} method-ref survives DistCleaner. Body is client-only. */
     public static void handleClient(ExplosionRemovalSyncPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            Level level = Minecraft.getInstance().level;
-            if (level == null) return;
-
-            for (BlockPos pos : packet.positions) {
-                // flag 3 (neighbors + client render) is fine client-side: this is a small, purely
-                // local render-sync operation, not the server-side batched write itself.
-                level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-            }
-        });
+        ClientPackets.explosionRemoval(packet, context);
     }
 
     @Override

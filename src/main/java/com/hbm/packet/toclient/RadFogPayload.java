@@ -1,15 +1,11 @@
 package com.hbm.packet.toclient;
 
+import com.hbm.client.ClientPackets;
 import com.hbm.main.MainRegistry;
-import com.hbm.particle.ModParticleTypes;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
@@ -56,18 +52,8 @@ public record RadFogPayload(double x, double y, double z) implements CustomPacke
         }
     };
 
-    @OnlyIn(Dist.CLIENT)
     public static void handleClient(RadFogPayload packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            Level level = Minecraft.getInstance().level;
-            if (level == null) return;
-
-            // CE: HbmEffectNT.RadFog spawns exactly one ParticleRadiationFog at the broadcast point
-            // (HbmEffectNT.java:141-148) - that single instance's own 25-quad static offset cluster
-            // (see RadiationFogParticle's class javadoc) is what produces the sprawling haze look, not
-            // a manual multi-spawn burst at this call site.
-            level.addParticle(ModParticleTypes.RADIATION_FOG.get(), packet.x, packet.y, packet.z, 0.0D, 0.0D, 0.0D);
-        });
+        ClientPackets.radFog(packet, context);
     }
 
     @Override
