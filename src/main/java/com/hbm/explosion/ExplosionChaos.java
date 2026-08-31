@@ -167,6 +167,17 @@ public final class ExplosionChaos {
                 || b == ours("reinforced_lamp_on") || b == ours("reinforced_lamp_off");
     }
 
+    /** CE's real indestructible test here is narrower than {@link #explode}'s - only bedrock-hardness (&gt;2,000,000 resistance) blocks at or below {@code y=0} survive; the same resistance value above {@code y=0} still gets cleared, presumably to guarantee a bottomless pit rather than leaving a bedrock floor at the old 1.12 world-height floor. */
+    public static void explodeZOMG(Level level, int x, int y, int z, int bombStartStrength) {
+        if (!isWarDim(level)) return;
+        forEachBlockInSphere(level, x, y, z, bombStartStrength, pos -> {
+            Block b = level.getBlockState(pos).getBlock();
+            if (!(b.getExplosionResistance() > 2_000_000 && pos.getY() <= 0)) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+            }
+        });
+    }
+
     public static void spawnExplosion(Level level, Entity detonator, int x, int y, int z, int bound) {
         RandomSource random = level.getRandom();
         for (int i = 0; i < 25; i++) {

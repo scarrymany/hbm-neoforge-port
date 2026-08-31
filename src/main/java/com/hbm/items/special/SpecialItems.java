@@ -323,18 +323,72 @@ public final class SpecialItems {
     // ==================== ItemChopper (4 instances) ====================
 
     public static final DeferredItem<ItemChopper> SPAWN_CHOPPER =
-            register("chopper", () -> new ItemChopper(new Item.Properties().stacksTo(1), false));
+            register("chopper", () -> new ItemChopper(new Item.Properties().stacksTo(1), ItemChopper.SpawnMob.CHOPPER));
     public static final DeferredItem<ItemChopper> SPAWN_WORM =
-            register("spawn_worm", () -> new ItemChopper(new Item.Properties().stacksTo(1), true));
+            register("spawn_worm", () -> new ItemChopper(new Item.Properties().stacksTo(1), ItemChopper.SpawnMob.WORM));
     public static final DeferredItem<ItemChopper> SPAWN_UFO =
-            register("spawn_ufo", () -> new ItemChopper(new Item.Properties().stacksTo(1), false));
+            register("spawn_ufo", () -> new ItemChopper(new Item.Properties().stacksTo(1), ItemChopper.SpawnMob.UFO));
     public static final DeferredItem<ItemChopper> SPAWN_DUCK =
-            register("spawn_duck", () -> new ItemChopper(new Item.Properties().stacksTo(16), false));
+            register("spawn_duck", () -> new ItemChopper(new Item.Properties().stacksTo(16), ItemChopper.SpawnMob.DUCK));
     static {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, SPAWN_CHOPPER);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, SPAWN_WORM);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, SPAWN_UFO);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, SPAWN_DUCK);
+    }
+
+    // ==================== BOTPrime worm boss loot/key (docs/phase4/entities_bosses.md) ==========
+    // coin_worm: a plain ItemCustomLore trophy, same pattern as the already-ported ItemSiegeCoin
+    // instances above. mech_key: CE's worm-spawner key (BlockBallsSpawner's single consumable), a
+    // plain crafted item - CE's own recipe (main/CraftingManager.java:792) needs ModItems.coin_maskman
+    // (MaskMan's own trophy - a different, not-yet-ported boss per this same report's own scope split)
+    // and a bare "key" item that does not exist in this port; substituted below with a recipe built
+    // entirely from items already registered in this port (see data/hbm/recipe/mech_key.json) - a
+    // deliberate simplification, not a missing dependency, per this package's own task brief ("this is
+    // not the recipe system's focus").
+
+    public static final DeferredItem<ItemCustomLore> COIN_WORM =
+            register("coin_worm", () -> new ItemCustomLore(new Item.Properties().rarity(net.minecraft.world.item.Rarity.RARE)));
+    public static final DeferredItem<Item> MECH_KEY =
+            register("mech_key", () -> new Item(new Item.Properties().stacksTo(1)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_WORM);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, MECH_KEY);
+    }
+
+    // ==================== MaskMan boss loot (docs/phase4/entities_bosses.md) ====================
+    // coin_maskman: CE ModItems.java:1419, ItemCustomLore, UNCOMMON, consumableTab - same pattern as
+    // coin_worm/the ItemSiegeCoin family above.
+    // gas_mask_filter_combo: CE ModItems.java:181, `new ItemFilter("gas_mask_filter_combo", 24000)
+    // .setMaxStackSize(1).setCreativeTab(MainRegistry.consumableTab)`. Ported here as a minimal plain
+    // Item (durability only) purely so EntityMaskMan's death loot can pre-install a real filter stack
+    // via the already-real ArmorUtil.installGasMaskFilter. CE's full ItemFilter mechanic (player
+    // right-click swap onto a worn IGasMask helmet, with an ArmorModHandler mod-slot cross-check) is a
+    // wider "armor items/attachments" scope already flagged as a deferred TODO in ArmorUtil.java
+    // (register(), ~lines 104-109) and is NOT reproduced here - this item is otherwise inert.
+
+    public static final DeferredItem<ItemCustomLore> COIN_MASKMAN =
+            register("coin_maskman", () -> new ItemCustomLore(new Item.Properties().rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER_COMBO =
+            register("gas_mask_filter_combo", () -> new Item(new Item.Properties().stacksTo(1).durability(24000)));
+    public static final DeferredItem<com.hbm.items.armor.ItemModV1> V1 =
+            register("v1", () -> new com.hbm.items.armor.ItemModV1(new Item.Properties().stacksTo(1)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_MASKMAN);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_COMBO);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, V1);
+    }
+
+    // ==================== RAD Beast leader loot (docs/phase4/entities_bosses.md RAD Beast section /
+    // entities_creeper_variants.md / pollution_system.md's EntityEffectHandler cross-references) ======
+    // coin_radiation: CE ModItems.java:1421, `new ItemCustomLore("coin_radiation").setRarity(UNCOMMON)
+    // .setCreativeTab(MainRegistry.consumableTab)` - same pattern as coin_worm/coin_maskman above; held
+    // in the off-hand-equivalent (mainhand) slot and dropped only by EntityRADBeast's "leader" variant.
+
+    public static final DeferredItem<ItemCustomLore> COIN_RADIATION =
+            register("coin_radiation", () -> new ItemCustomLore(new Item.Properties().rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_RADIATION);
     }
 
     // ==================== ItemSoyuz (3 flattened SoyuzSkinType variants) ====================
@@ -367,6 +421,41 @@ public final class SpecialItems {
             () -> new ItemTrain(new Item.Properties().stacksTo(1), ItemTrain.EnumTrainType.CARGO_TRAM));
     public static final DeferredItem<ItemTrain> TRAIN_CARGO_TRAM_TRAILER = register("train_cargo_tram_trailer",
             () -> new ItemTrain(new Item.Properties().stacksTo(1), ItemTrain.EnumTrainType.CARGO_TRAM_TRAILER));
+
+    // ==================== UFO boss loot (docs/phase4/entities_bosses.md UFO row) ==================
+    // coin_ufo: same ItemCustomLore trophy pattern as coin_worm/coin_maskman/coin_radiation above.
+
+    public static final DeferredItem<ItemCustomLore> COIN_UFO =
+            register("coin_ufo", () -> new ItemCustomLore(new Item.Properties().rarity(net.minecraft.world.item.Rarity.RARE)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_UFO);
+    }
+
+    // ==================== Hunter Chopper wreckage loot (docs/phase4/entities_bosses.md Hunter
+    // Chopper row) ============================================================================
+    // 6 plain flavor items with no gameplay use beyond being a drop - CE's own ModItems.java entries
+    // are bare `new ItemBase(name)` calls under partsTab; ported here as plain Items under the PARTS
+    // tab, matching this file's own established `registerParts` helper for exactly this shape.
+    // combine_scrap/wire_fine (also named in EntityHunterChopper's own loot table) are NOT registered
+    // here - neither exists anywhere in this port yet (a Phase 1/2 generic-materials gap, not owned by
+    // this boss/mob package) and registering a shared generic material from this file risks a
+    // duplicate-id collision with whichever concurrent sibling package does own it.
+
+    public static final DeferredItem<Item> CHOPPER_HEAD = registerParts("chopper_head", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CHOPPER_TORSO = registerParts("chopper_torso", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CHOPPER_WING = registerParts("chopper_wing", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CHOPPER_TAIL = registerParts("chopper_tail", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CHOPPER_GUN = registerParts("chopper_gun", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> CHOPPER_BLADES = registerParts("chopper_blades", () -> new Item(new Item.Properties()));
+
+    // ==================== ItemPeas (docs/phase4/entities_bosses.md Quackos row) ===================
+    // EntityQuackos's sole removal path - see com.hbm.items.tool.ItemPeas's own javadoc.
+
+    public static final DeferredItem<com.hbm.items.tool.ItemPeas> PEAS =
+            register("peas", () -> new com.hbm.items.tool.ItemPeas(new Item.Properties().stacksTo(64)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, PEAS);
+    }
 
     // ==================== helpers ====================
 

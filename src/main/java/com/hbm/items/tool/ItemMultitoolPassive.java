@@ -1,5 +1,6 @@
 package com.hbm.items.tool;
 
+import com.hbm.explosion.ExplosionChaos;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -58,18 +59,19 @@ import java.util.function.Supplier;
  * <ul>
  *     <li>{@link Rung#MINER}/{@link Rung#BEAM} - need {@code EntityMinerBeam}/{@code EntityLaserBeam}
  *     (unported projectile entities).</li>
- *     <li>{@link Rung#MEGA} - needs {@code ExplosionChaos.levelDown} (unported) gated behind
- *     {@code CompatibilityConfig.isWarDim}, itself a *deliberately* not-ported 1.12-dimension-ID
- *     concept with no 1.21 {@code ResourceKey<Level>} equivalent decided yet (see that class's own
- *     javadoc). Per the report's own explicitly-sanctioned resolution, this rung's right-click is a
- *     permanent no-op until a replacement dimension gate is designed - an explicit decision, not an
- *     accidental "works everywhere now."</li>
  *     <li>{@link Rung#JOULE} - needs {@code Library.getBlockPosInPath} (confirmed absent from this
  *     port's {@code com.hbm.lib.Library}), a 9-ray raycast-fan utility; {@code EntityRubble} itself
  *     (the other half of this rung) is already ported.</li>
  *     <li>{@link Rung#DECON} - needs the specific {@code ModBlocks.waste_*} wasteland block set
  *     (unported world-gen content).</li>
  * </ul>
+ * <p>
+ * {@link Rung#MEGA} is now wired ({@link ExplosionChaos#levelDown}, per
+ * docs/phase4/entities_vortex_gravity_wells.md's Open questions) - an earlier draft of this class
+ * treated it as blocked on a {@code CompatibilityConfig.isWarDim} replacement gate, but CE's real
+ * {@code levelDown} carries no {@code isWarDim} gate of its own (see {@code ExplosionChaos}'s own
+ * class javadoc for the per-method gate table), so the real blocker was only
+ * {@code ExplosionChaos.levelDown} not existing yet.
  */
 public class ItemMultitoolPassive extends Item {
 
@@ -193,8 +195,15 @@ public class ItemMultitoolPassive extends Item {
         }
 
         if (rung == Rung.MEGA) {
-            // Permanent no-op until a war-dimension replacement gate is designed - see class javadoc.
-            return InteractionResult.PASS;
+            // CE: ExplosionChaos.levelDown(world, pos.getX(), pos.getY(), pos.getZ(), 2), returning
+            // SUCCESS. Now wired per docs/phase4/entities_vortex_gravity_wells.md's Open questions -
+            // levelDown carries no isWarDim gate of its own in CE, so this rung's real blocker was
+            // only "ExplosionChaos.levelDown doesn't exist yet" (see class javadoc, corrected from an
+            // earlier "permanent no-op pending a war-dimension gate" note that overstated the blocker).
+            if (!level.isClientSide()) {
+                ExplosionChaos.levelDown(level, pos.getX(), pos.getY(), pos.getZ(), 2);
+            }
+            return InteractionResult.SUCCESS;
         }
 
         // JOULE (Library.getBlockPosInPath missing) and DECON (ModBlocks.waste_* missing) - see class javadoc.

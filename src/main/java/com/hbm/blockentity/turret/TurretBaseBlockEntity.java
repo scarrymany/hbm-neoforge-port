@@ -651,13 +651,21 @@ public abstract class TurretBaseBlockEntity extends MachineBaseBlockEntity
         }
 
         if (targetMachines) {
-            if (e instanceof com.hbm.api.entity.IRadarDetectableNT detectable && !detectable.canBeSeenBy(this)) return false;
+            // Phase 4 (entities_vehicles_aircraft/entities_bosses): closes this method's own
+            // long-standing TODO now that EntityMissileBaseNT/EntityMissileCustom and EntityBomber are
+            // real. Also fixes a real dangling-conditional bug found while closing it: the old
+            // `instanceof IRadarDetectableNT detectable && !detectable.canBeSeenBy(this)) return false`
+            // guard only ever short-circuited the "not visible" case and had no matching `return true`
+            // for the "visible" case, so a visible IRadarDetectableNT entity (e.g. any missile, whose
+            // own canBeSeenBy is an unconditional `true`) fell through every remaining branch and was
+            // never actually targetable - this now completes that check.
             if (e instanceof AbstractMinecart) return true;
-            // TODO(phase3/phase4-missiles): CE also targets EntityMissileBaseNT/EntityMissileCustom
-            // (only while descending) and EntityBomber here - none of those entity classes exist in
-            // this port yet (missile/aircraft system deferred, see docs/phase3/turret_system.md
-            // Deferred #2/#7). IRadarDetectableNT has no implementers yet either, so that branch is a
-            // correct no-op for now, same as the report's own Deferred #7 notes.
+            // CE: missiles are only turret-targetable while descending (a turret-side carve-out,
+            // checked before the generic IRadarDetectableNT branch below since EntityMissileBaseNT's
+            // own canBeSeenBy is an unconditional `true` and would otherwise shadow this gate).
+            if (e instanceof com.hbm.entity.missile.EntityMissileBaseNT missile) return missile.getDeltaMovement().y < 0;
+            if (e instanceof com.hbm.entity.logic.EntityBomber) return true;
+            if (e instanceof com.hbm.api.entity.IRadarDetectableNT detectable) return detectable.canBeSeenBy(this);
         }
 
         if (targetPlayers) {

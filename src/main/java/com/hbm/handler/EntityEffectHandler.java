@@ -1,0 +1,243 @@
+package com.hbm.handler;
+
+import com.hbm.capability.HbmLivingProps;
+import com.hbm.config.RadiationConfig;
+import com.hbm.config.WorldConfig;
+import com.hbm.damage.ModDamageTypes;
+import com.hbm.entity.mob.CreeperVariantEntityTypes;
+import com.hbm.entity.mob.EntityCreeperNuclear;
+import com.hbm.entity.mob.EntityDuck;
+import com.hbm.entity.mob.EntityQuackos;
+import com.hbm.entity.mob.EntityRADBeast;
+import com.hbm.entity.mob.Phase4BossEntityTypes2;
+import com.hbm.entity.mob.RadBeastEntityTypes;
+import com.hbm.handler.pollution.PollutionHandler;
+import com.hbm.handler.pollution.PollutionHandler.PollutionType;
+import com.hbm.main.MainRegistry;
+import com.hbm.potion.HbmPotionEffects;
+import com.hbm.util.ArmorRegistry;
+import com.hbm.util.ArmorRegistry.HazardClass;
+import com.hbm.util.ContaminationUtil;
+import com.hbm.util.ContaminationUtil.ContaminationType;
+import com.hbm.util.ContaminationUtil.HazardType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.MushroomCow;
+import net.minecraft.world.entity.monster.Blaze;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.biome.Biome;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
+
+/**
+ * Real, self-subscribing port of a narrow slice of CE's 759-line {@code com.hbm.handler.EntityEffectHandler}
+ * - see this task's own brief and the 3 research reports it names ({@code entities_bosses.md}'s RAD Beast
+ * section, {@code entities_creeper_variants.md}'s Headline finding #2, {@code pollution_system.md}'s
+ * {@code handlePollution} reference). Deliberately implements <b>only</b>:
+ * <ol>
+ *     <li>the radiation-mutation cascade table (Creeper/Cow/Villager/Blaze/Duck), from CE's real
+ *     {@code handleRadiationEffect} (lines 233-285 of the CE file, read in full);</li>
+ *     <li>the crater-biome ambient-radiation tick, from CE's real {@code onUpdate} (lines 81-94, read
+ *     in full);</li>
+ *     <li>{@code handlePollution}'s two ambient-exposure branches (lines 572-607, read in full);</li>
+ *     <li>the lead-poisoning-on-ore-break hook, from CE's real {@code ModEventHandler.blockBreak}
+ *     (lines 1294-1307, read in full).</li>
+ * </ol>
+ * Every other branch of the real file (contamination-effect ticking, digamma, lung disease, oil,
+ * temperature, dashing, plinking, the full 200-2,500,000 rad sickness-effect ladder beyond the mutation
+ * thresholds) is out of this package's scope per this task's own brief - not reproduced here, and not
+ * claimed as done.
+ * <p>
+ * <b>Dispatch pattern</b>: a separate self-subscribing {@code @EventBusSubscriber} class on the same
+ * {@link EntityTickEvent.Pre} event type {@code com.hbm.main.CommonTickEvents} already listens on -
+ * "sitting alongside" it rather than editing that shared file or duplicating its dispatch loop.
+ * NeoForge permits any number of independent subscribers to the same event type.
+ * <p>
+ * <b>Creeper -&gt; {@link EntityCreeperNuclear} at real CE's actual, broader condition</b>: CE's check is
+ * literally {@code entity instanceof EntityCreeper} (vanilla's own base class) - since every one of this
+ * port's 4 creeper variants ({@code EntityCreeperGold}/{@code Volatile}/{@code Phosgene}/{@code Tainted})
+ * also extends {@link Creeper}, CE's real condition is broader than "vanilla Creeper" as this task's own
+ * plain-language brief describes it. In practice this only matters for the 2 non-rad-immune variants
+ * (Volatile/Phosgene) - Gold/Tainted/Nuclear are all {@code IRadiationImmune} and therefore never
+ * accumulate real radiation via {@link ContaminationUtil#contaminate} in the first place. Preserved
+ * faithfully (broader {@code instanceof Creeper} check) rather than narrowed to the task brief's own
+ * summary, per this task's "CE is sole source of behavior" ground rule - with one added, harmless,
+ * behavior-preserving guard (excluding {@link EntityCreeperNuclear} itself) to avoid a pointless
+ * remutate-self edge case CE's own code technically doesn't special-case either (but which never fires
+ * in practice, since Nuclear Creepers are themselves immune).
+ * <p>
+ * <b>Duck -&gt; {@link com.hbm.entity.mob.EntityQuackos} (&gt;=200 rad)</b>: implemented - the
+ * boss-ufo-chopper-crabs sibling package landed {@code EntityDuck}/{@code EntityQuackos} (and their
+ * {@code Phase4BossEntityTypes2} registry) while this package was in progress; re-checked at the end of
+ * this implementation pass and wired for real, matching every other branch's {@link #mutate} shape.
+ */
+@EventBusSubscriber(modid = MainRegistry.MODID)
+public final class EntityEffectHandler {
+
+    private EntityEffectHandler() {
+    }
+
+    @SubscribeEvent
+    public static void onLivingTick(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity entity)) return;
+        if (!(entity.level() instanceof ServerLevel level)) return;
+
+        handleCraterRadiation(entity, level);
+        handleMutationCascade(entity, level);
+        handlePollution(entity, level);
+    }
+
+    // ==================== crater-biome ambient radiation (CE onUpdate, lines 81-94) ====================
+
+    /**
+     * CE never gates this specific tick on {@code WorldConfig.enableCraterBiomes} (confirmed by a full
+     * read of the real snippet) - that flag only gates whether {@code EntityFalloutRain} ever *paints* a
+     * crater biome in the first place, not whether standing in one already-painted still radiates. Not
+     * reproducing an extra gate CE's own code doesn't have here.
+     */
+    private static void handleCraterRadiation(LivingEntity entity, ServerLevel level) {
+        ResourceKey<Biome> biome = level.getBiome(entity.blockPosition()).unwrapKey().orElse(null);
+
+        double radiation;
+        if (biome == com.hbm.world.biome.ModCraterBiomes.CRATER_OUTER) {
+            radiation = WorldConfig.CRATER_BIOME_OUTER_RAD.get();
+        } else if (biome == com.hbm.world.biome.ModCraterBiomes.CRATER) {
+            radiation = WorldConfig.CRATER_BIOME_RAD.get();
+        } else if (biome == com.hbm.world.biome.ModCraterBiomes.CRATER_INNER) {
+            radiation = WorldConfig.CRATER_BIOME_INNER_RAD.get();
+        } else {
+            radiation = 0D;
+        }
+
+        if (radiation <= 0D) return;
+        if (entity.isInWater()) radiation *= WorldConfig.CRATER_BIOME_WATER_MULT.get();
+        if (radiation > 0D) {
+            ContaminationUtil.contaminate(entity, HazardType.RADIATION, ContaminationType.CREATIVE, radiation / 20D);
+        }
+    }
+
+    // ==================== radiation-mutation cascade (CE handleRadiationEffect, lines 233-285) =======
+
+    private static void handleMutationCascade(LivingEntity entity, ServerLevel level) {
+        if (!entity.isAlive()) return;
+        if (entity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
+
+        double eRad = HbmLivingProps.getRadiation(entity);
+        if (eRad < 50D) return;
+
+        // See class javadoc: CE's real condition is `instanceof EntityCreeper` (broader than "vanilla
+        // Creeper"), guarded here against remutating an already-Nuclear creeper (a harmless no-op in
+        // real CE too, since Nuclear Creepers are radiation-immune and never reach this threshold).
+        if (entity instanceof Creeper creeper && !(creeper instanceof EntityCreeperNuclear) && eRad >= 200D) {
+            if (level.random.nextInt(3) == 0) {
+                EntityCreeperNuclear mutated = new EntityCreeperNuclear(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), level);
+                mutate(creeper, mutated, level);
+            } else {
+                entity.hurt(entity.damageSources().source(ModDamageTypes.RADIATION), 100F);
+            }
+            return;
+        }
+
+        if (entity instanceof Cow cow && !(cow instanceof MushroomCow) && eRad >= 50D) {
+            MushroomCow mooshroom = new MushroomCow(EntityType.MOOSHROOM, level);
+            mutate(cow, mooshroom, level);
+            return;
+        }
+
+        if (entity instanceof Villager villager && eRad >= 500D) {
+            ZombieVillager zombie = new ZombieVillager(EntityType.ZOMBIE_VILLAGER, level);
+            zombie.setVillagerData(villager.getVillagerData());
+            zombie.setBaby(villager.isBaby());
+            mutate(villager, zombie, level);
+            return;
+        }
+
+        if (entity instanceof Blaze && eRad >= 700D) {
+            EntityRADBeast beast = new EntityRADBeast(RadBeastEntityTypes.RAD_BEAST.get(), level);
+            mutate(entity, beast, level);
+            return;
+        }
+
+        if (entity instanceof EntityDuck duck && !(duck instanceof EntityQuackos) && eRad >= 200D) {
+            EntityQuackos quacc = new EntityQuackos(Phase4BossEntityTypes2.QUACKOS.get(), level);
+            mutate(duck, quacc, level);
+        }
+    }
+
+    private static void mutate(LivingEntity original, LivingEntity replacement, ServerLevel level) {
+        replacement.moveTo(original.getX(), original.getY(), original.getZ(), original.getYRot(), original.getXRot());
+        if (original.isAlive() && level.addFreshEntity(replacement)) {
+            original.discard();
+        }
+    }
+
+    // ==================== ambient pollution exposure (CE handlePollution, lines 572-607) ==============
+
+    private static void handlePollution(LivingEntity entity, ServerLevel level) {
+        if (!RadiationConfig.ENABLE_POLLUTION.get()) return;
+        if (entity.tickCount % 60 != 0) return;
+
+        BlockPos pos = BlockPos.containing(entity.getX(), entity.getY() + entity.getEyeHeight(), entity.getZ());
+
+        if (RadiationConfig.ENABLE_POISON.get()
+                && !ArmorRegistry.hasProtection(entity, EquipmentSlot.HEAD, HazardClass.GAS_BLISTERING)) {
+            float poison = PollutionHandler.getPollution(level, pos, PollutionType.POISON);
+            if (poison > 10F) {
+                if (poison < 25F) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 0));
+                } else if (poison < 50F) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 1));
+                } else {
+                    entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 2));
+                }
+            }
+        }
+
+        if (RadiationConfig.ENABLE_LEAD_POISONING.get()
+                && !ArmorRegistry.hasProtection(entity, EquipmentSlot.HEAD, HazardClass.PARTICLE_FINE)) {
+            float metal = PollutionHandler.getPollution(level, pos, PollutionType.HEAVYMETAL);
+            if (metal > 25F) {
+                // CE: <50 -> amplifier 0, >=50 -> amplifier 2 in BOTH remaining branches (a real,
+                // confirmed-by-full-read CE quirk - amplifier 1 is never actually reached for lead from
+                // ambient exposure) - preserved exactly, not "fixed" into a 0/1/2 ladder.
+                int amplifier = metal < 50F ? 0 : 2;
+                entity.addEffect(new MobEffectInstance(HbmPotionEffects.LEAD, 100, amplifier));
+            }
+        }
+    }
+
+    // ==================== lead-poisoning-on-ore-break (CE ModEventHandler#blockBreak, 1294-1307) ======
+
+    @SubscribeEvent
+    public static void onBlockBreak(BlockEvent.BreakEvent event) {
+        if (event.isCanceled()) return;
+
+        Player player = event.getPlayer();
+        if (player == null || player.level().isClientSide) return;
+
+        if (!RadiationConfig.ENABLE_POLLUTION.get() || !RadiationConfig.ENABLE_LEAD_FROM_BLOCKS.get()) return;
+        if (ArmorRegistry.hasProtection(player, EquipmentSlot.HEAD, HazardClass.PARTICLE_FINE)) return;
+
+        float metal = PollutionHandler.getPollution(player.level(), event.getPos(), PollutionType.HEAVYMETAL);
+        if (metal < 5F) return;
+
+        int amplifier;
+        if (metal < 10F) amplifier = 0;
+        else if (metal < 25F) amplifier = 1;
+        else amplifier = 2;
+
+        player.addEffect(new MobEffectInstance(HbmPotionEffects.LEAD, 100, amplifier));
+    }
+}

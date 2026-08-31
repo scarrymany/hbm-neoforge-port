@@ -8,13 +8,27 @@ import com.hbm.config.HbmConfig;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.entity.ConveyorEntityTypes;
 import com.hbm.entity.GunEntityTypes;
+import com.hbm.entity.cart.CartEntityTypes;
 import com.hbm.entity.effect.EffectEntityTypes;
+import com.hbm.entity.effect.GravityWellEntityTypes;
 import com.hbm.entity.grenade.GrenadeEntityTypes;
+import com.hbm.entity.item.DroneEntityTypes;
+import com.hbm.entity.item.ParachuteCrateEntityTypes;
 import com.hbm.entity.item.TntPrimedEntityTypes;
 import com.hbm.entity.logic.NukeEntityTypes;
+import com.hbm.entity.logic.PlaneEntityTypes;
+import com.hbm.entity.logic.SatellitePayloadEntityTypes;
 import com.hbm.entity.missile.MissileEntityTypes;
+import com.hbm.entity.mob.CreeperVariantEntityTypes;
+import com.hbm.entity.mob.MaskmanEntityTypes;
+import com.hbm.entity.mob.Phase4BossEntityTypes2;
+import com.hbm.entity.mob.RadBeastEntityTypes;
+import com.hbm.entity.mob.WormEntityTypes;
+import com.hbm.entity.projectile.ChopperMineEntityTypes;
 import com.hbm.entity.projectile.FallingNukeEntityTypes;
+import com.hbm.entity.projectile.MeteorEntityTypes;
 import com.hbm.entity.projectile.RubbleEntityTypes;
+import com.hbm.entity.train.TrainEntityTypes;
 import com.hbm.hazard.HazardComponents;
 import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.fluid.Fluids;
@@ -24,6 +38,8 @@ import com.hbm.items.ModItems;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.potion.HbmPotionEffects;
 import com.hbm.sound.ModSounds;
+import com.hbm.world.gen.OilMeteorWorldGenFeatures;
+import com.hbm.world.gen.OreWorldGenFeatures;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -65,6 +81,9 @@ public class MainRegistry {
         // Block-entity capability counterpart to the item-capability listener above - see
         // StorageBlockEntities' own javadoc (Phase 2 storage-machines package).
         modEventBus.addListener(StorageBlockEntities::registerCapabilities);
+        // Phase 4 (entities_creeper_variants): must run before ModItems.register(modEventBus) below -
+        // this registry also adds this package's spawn-egg items into ModItems.ITEMS.
+        CreeperVariantEntityTypes.register(modEventBus);
         ModItems.register(modEventBus);
         HbmDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);
@@ -77,6 +96,22 @@ public class MainRegistry {
         RubbleEntityTypes.register(modEventBus);
         GrenadeEntityTypes.register(modEventBus);
         MissileEntityTypes.register(modEventBus);
+        // Phase 4 (World & simulation) entity/feature families.
+        WormEntityTypes.register(modEventBus);
+        MaskmanEntityTypes.register(modEventBus);
+        Phase4BossEntityTypes2.register(modEventBus);
+        RadBeastEntityTypes.register(modEventBus);
+        ChopperMineEntityTypes.register(modEventBus);
+        GravityWellEntityTypes.register(modEventBus);
+        SatellitePayloadEntityTypes.register(modEventBus);
+        MeteorEntityTypes.register(modEventBus);
+        TrainEntityTypes.register(modEventBus);
+        PlaneEntityTypes.register(modEventBus);
+        ParachuteCrateEntityTypes.register(modEventBus);
+        CartEntityTypes.register(modEventBus);
+        DroneEntityTypes.register(modEventBus);
+        OreWorldGenFeatures.register(modEventBus);
+        OilMeteorWorldGenFeatures.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         MaterialRegistry.register(modEventBus);
         HbmRecipes.register(modEventBus);

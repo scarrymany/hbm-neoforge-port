@@ -54,14 +54,14 @@ import java.util.function.BiConsumer;
  * configs below instead of introducing an extra, never-fired {@code "g40_base"} registry entry.
  * Observably identical; only the code shape differs.
  * <p>
- * <b>{@code EntityFireLingering}/{@code EntityC130} - genuinely missing dependencies, not invented
- * here.</b> {@code g40_inc}/{@code g40_phosphorus}'s lingering-fire area spawn and
- * {@code g26_flare_supply}/{@code _weapon}'s C130 airdrop-crate spawn both need entity classes that do
- * not exist anywhere in this port yet (grepped, confirmed absent - {@code com.hbm.entity.effect.
- * EntityFireLingering}, {@code com.hbm.entity.logic.EntityC130}). Both are documented forward-reference
- * TODOs inline: the shell's {@code standardExplode} splash damage still fires correctly, only the
- * lingering-DoT-fire-area and airdrop-crate spawns are stubbed pending those entities landing
- * (a different Phase 3/4 sub-area's scope per this task's brief).
+ * <b>{@code EntityFireLingering} - still a genuinely missing dependency; {@code EntityC130} is now
+ * real and wired up.</b> {@code g40_inc}/{@code g40_phosphorus}'s lingering-fire area spawn still needs
+ * {@code com.hbm.entity.effect.EntityFireLingering}, which does not exist anywhere in this port yet
+ * (a different Phase 3/4 sub-area's scope, documented forward-reference TODO inline - the shell's
+ * {@code standardExplode} splash damage still fires correctly regardless). {@code g26_flare_supply}/
+ * {@code _weapon}'s C130 airdrop-crate spawn, previously the other half of this same TODO, is now
+ * wired to the real {@code com.hbm.entity.logic.EntityC130} (Phase 4, {@code
+ * entities_vehicles_aircraft}/{@code entities_orbital_and_beam_payloads}) via {@link #spawnPlane}.
  */
 public final class XFactory40mm {
 
@@ -178,12 +178,41 @@ public final class XFactory40mm {
 
     public static final BulletConfig g26_flare = new BulletConfig("g26_flare").setItem(ITEM_G26_FLARE)
             .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE);
-    /** CE's onUpdate spawns an EntityC130 supply-drop plane at tick 40 - EntityC130 doesn't exist in this port yet, see class javadoc; left with no onUpdate so the round still fires/consumes correctly. */
+    /** Phase 4 (entities_vehicles_aircraft/entities_orbital_and_beam_payloads): closes this class's own
+     *  previously-documented forward reference now that {@code EntityC130} is real - see {@link
+     *  #spawnPlane}. */
     public static final BulletConfig g26_flare_supply = new BulletConfig("g26_flare_supply").setItem(ITEM_G26_FLARE_SUPPLY)
-            .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE);
-    /** Same TODO as {@link #g26_flare_supply} (weapons-payload variant). */
+            .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE)
+            .setOnUpdate(entity -> spawnPlane(entity, com.hbm.entity.logic.EntityC130.C130PayloadType.SUPPLIES));
+    /** Same as {@link #g26_flare_supply} (weapons-payload variant). */
     public static final BulletConfig g26_flare_weapon = new BulletConfig("g26_flare_weapon").setItem(ITEM_G26_FLARE_WEAPON)
-            .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE);
+            .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE)
+            .setOnUpdate(entity -> spawnPlane(entity, com.hbm.entity.logic.EntityC130.C130PayloadType.WEAPONS));
+
+    /**
+     * CE: {@code spawnPlane(Entity, C130PayloadType)} - at tick 40, calls in an {@code EntityC130}
+     * supply-drop plane targeting the flare's current ground position (top-of-world height at this
+     * x/z). Spawned via plain {@code level.addFreshEntity(...)}, matching {@code EntityC130}'s own
+     * established chunk-loading/spawn-plumbing substitution (see that class's javadoc) - CE's {@code
+     * WorldUtil.loadAndSpawnEntityInWorld}/{@code TrackerUtil.setTrackingRange} are dropped entirely.
+     */
+    private static void spawnPlane(Entity entity, com.hbm.entity.logic.EntityC130.C130PayloadType payload) {
+        if (entity.level().isClientSide() || entity.tickCount != 40) return;
+        if (!(entity instanceof EntityBulletBaseMK4 bullet)) return;
+
+        net.minecraft.world.level.Level level = bullet.level();
+        int x = (int) Math.floor(bullet.getX());
+        int z = (int) Math.floor(bullet.getZ());
+        int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, x, z);
+
+        if (bullet.getThrower() != null) {
+            level.playSound(null, bullet.getThrower().blockPosition(), HBMSoundHandler.techBleep.get(), net.minecraft.sounds.SoundSource.PLAYERS, 1.0F, 1.0F);
+        }
+
+        com.hbm.entity.logic.EntityC130 c130 = new com.hbm.entity.logic.EntityC130(level);
+        c130.fac(level, x, y, z, payload);
+        level.addFreshEntity(c130);
+    }
 
     public static final BulletConfig g40_he = new BulletConfig("g40_he").setItem(ITEM_G40_HE)
             .setLife(200).setVel(2F).setGrav(0.035D).setOnImpact(LAMBDA_STANDARD_EXPLODE);

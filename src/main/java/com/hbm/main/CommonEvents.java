@@ -7,6 +7,20 @@ import com.hbm.entity.mob.EntityCreeperNuclear;
 import com.hbm.entity.mob.EntityCreeperPhosgene;
 import com.hbm.entity.mob.EntityCreeperTainted;
 import com.hbm.entity.mob.EntityCreeperVolatile;
+import com.hbm.entity.mob.EntityBOTPrimeBody;
+import com.hbm.entity.mob.EntityBOTPrimeHead;
+import com.hbm.entity.mob.EntityCyberCrab;
+import com.hbm.entity.mob.EntityDuck;
+import com.hbm.entity.mob.EntityHunterChopper;
+import com.hbm.entity.mob.EntityMaskMan;
+import com.hbm.entity.mob.EntityTaintCrab;
+import com.hbm.entity.mob.EntityTeslaCrab;
+import com.hbm.entity.mob.EntityUFO;
+import com.hbm.entity.mob.EntityRADBeast;
+import com.hbm.entity.mob.MaskmanEntityTypes;
+import com.hbm.entity.mob.Phase4BossEntityTypes2;
+import com.hbm.entity.mob.RadBeastEntityTypes;
+import com.hbm.entity.mob.WormEntityTypes;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardRegistry;
@@ -89,6 +103,10 @@ public class CommonEvents {
             // while building its weighted pool entries, same reasoning as the recipe tables above -
             // must run after every item RegisterEvent has fired, not from a static field initializer.
             ItemPoolsSatellite.init();
+            // Phase 4 (entities_vehicles_aircraft / entities_orbital_and_beam_payloads) -
+            // com.hbm.itempool.ItemPoolsC130#init() has the exact same DeferredItem.get()-during-
+            // pool-construction timing requirement as ItemPoolsSatellite#init() above.
+            com.hbm.itempool.ItemPoolsC130.init();
         });
     }
 
@@ -108,5 +126,30 @@ public class CommonEvents {
         event.put(CreeperVariantEntityTypes.CREEPER_PHOSGENE.get(), EntityCreeperPhosgene.createAttributes().build());
         event.put(CreeperVariantEntityTypes.CREEPER_TAINTED.get(), EntityCreeperTainted.createAttributes().build());
         event.put(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), EntityCreeperNuclear.createAttributes().build());
+
+        // Phase 4 (entities_bosses - BOTPrime worm boss). Same "safe to .get() here" reasoning as the
+        // creeper variants above.
+        event.put(WormEntityTypes.BOTPRIME_HEAD.get(), EntityBOTPrimeHead.createAttributes().build());
+        event.put(WormEntityTypes.BOTPRIME_BODY.get(), EntityBOTPrimeBody.createAttributes().build());
+
+        // Phase 4 (entities_bosses - MaskMan). Same "safe to .get() here" reasoning as above.
+        event.put(MaskmanEntityTypes.MASK_MAN.get(), EntityMaskMan.createAttributes().build());
+
+        // Phase 4 (entities_bosses / entities_vehicles_aircraft - UFO boss, Hunter Chopper, the Cyber
+        // Crab family, EntityDuck/EntityQuackos). Same "safe to .get() here" reasoning as above.
+        event.put(Phase4BossEntityTypes2.UFO.get(), EntityUFO.createAttributes().build());
+        event.put(Phase4BossEntityTypes2.HUNTER_CHOPPER.get(), EntityHunterChopper.createAttributes().build());
+        event.put(Phase4BossEntityTypes2.CYBER_CRAB.get(), EntityCyberCrab.createAttributes().build());
+        event.put(Phase4BossEntityTypes2.TAINT_CRAB.get(), EntityTaintCrab.createAttributes().build());
+        event.put(Phase4BossEntityTypes2.TESLA_CRAB.get(), EntityTeslaCrab.createAttributes().build());
+        event.put(Phase4BossEntityTypes2.DUCK.get(), EntityDuck.createAttributes().build());
+        // EntityQuackos has no createAttributes() override of its own - it inherits EntityDuck's
+        // attribute set verbatim (CE's own EntityQuackos never overrides applyEntityAttributes either;
+        // its invulnerability comes from getIsInvulnerable()/setHealth, not from a different max health).
+        event.put(Phase4BossEntityTypes2.QUACKOS.get(), EntityDuck.createAttributes().build());
+
+        // Phase 4 (entities_bosses - RAD Beast, boss-adjacent elite). Same "safe to .get() here"
+        // reasoning as above.
+        event.put(RadBeastEntityTypes.RAD_BEAST.get(), EntityRADBeast.createAttributes().build());
     }
 }

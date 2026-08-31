@@ -87,6 +87,9 @@ public class ModItems {
         com.hbm.items.weapon.sedna.mods.WeaponModItems.registerAll();
         com.hbm.items.weapon.sedna.mods.WeaponModDataComponents.register(modEventBus);
         com.hbm.items.tool.LaunchInfraItems.registerAll();
+        com.hbm.items.armor.ModCharmItems.registerAll();
+        com.hbm.items.tool.MeteorToolItems.registerAll();
+        com.hbm.items.tool.CartItems.registerAll();
         ITEMS.register(modEventBus);
     }
 }

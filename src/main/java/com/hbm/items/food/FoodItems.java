@@ -184,9 +184,13 @@ public final class FoodItems {
     // See ItemLemon's own javadoc: ingot_semtex/powder_cement/bio_wafer are registered by other Phase
     // 1 areas (PARTS tab material resources) and are NOT repeated here.
 
+    /** Named (unlike most of this catalog) so Phase 4's {@code com.hbm.itempool.ItemPoolsC130} can
+     *  reference it directly - see that class's own javadoc. */
+    public static DeferredItem<Item> DEFINITELYFOOD;
+
     private static void registerLemonCatalog() {
         tab(reg("lemon", () -> new ItemLemon(food(3, 5F))));
-        tab(reg("definitelyfood", () -> new ItemLemon(food(3, 0.5F))));
+        tab(DEFINITELYFOOD = reg("definitelyfood", () -> new ItemLemon(food(3, 0.5F))));
         tab(reg("med_ipecac", () -> new ItemLemon(new Item.Properties().food(foodBuilder(0, 0F)
                 .effect(() -> new MobEffectInstance(MobEffects.HUNGER, 50, 49), 1.0F).build()))));
         tab(reg("med_ptsd", () -> new ItemLemon(new Item.Properties().food(foodBuilder(0, 0F)
@@ -351,6 +355,10 @@ public final class FoodItems {
     // by direct source inspection: exactly 10 "new ItemPill(...)" call sites exist in CE's
     // ModItems.java) ====================
 
+    /** Named (unlike most of this catalog) so Phase 4's {@code com.hbm.itempool.ItemPoolsC130} can
+     *  reference it directly - see that class's own javadoc. */
+    public static DeferredItem<Item> PILL_IODINE;
+
     private static void registerPill() {
         tab(reg("radx", () -> new ItemPill(pillProps())));
         tab(reg("siox", () -> new ItemPill(pillProps())));
@@ -358,7 +366,7 @@ public final class FoodItems {
         tab(reg("xanax", () -> new ItemPill(pillProps())));
         tab(reg("fmn", () -> new ItemPill(pillProps())));
         tab(reg("five_htp", () -> new ItemPill(pillProps())));
-        tab(reg("pill_iodine", () -> new ItemPill(pillProps())));
+        tab(PILL_IODINE = reg("pill_iodine", () -> new ItemPill(pillProps())));
         tab(reg("plan_c", () -> new ItemPill(pillProps())));
         tab(reg("pill_red", () -> new ItemPill(pillProps())));
         tab(reg("chocolate", () -> new ItemPill(pillProps())));

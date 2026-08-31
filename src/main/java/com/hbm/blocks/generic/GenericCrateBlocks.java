@@ -55,6 +55,20 @@ public final class GenericCrateBlocks {
     public static Supplier<BlockEntityType<BlockSupplyCrate.SupplyCrateBlockEntity>> SUPPLY_CRATE_ENTITY_TYPE;
     public static Supplier<BlockEntityType<BlockSkeletonHolder.SkeletonHolderBlockEntity>> SKELETON_HOLDER_ENTITY_TYPE;
 
+    /**
+     * Public accessor for the registered {@code crate_supply} block, added by the Phase 4
+     * (entities_vehicles_aircraft) package so {@code EntityParachuteCrate} can place it on landing -
+     * previously only a local variable inside {@link #registerLootContainers()} (see
+     * {@code com.hbm.items.tool.ItemCrateCaller}'s javadoc, which flagged this exact gap for the
+     * crate family in general). A lazy accessor method, not a static field initializer, per this
+     * port's established DeferredBlock-forward-reference rule.
+     */
+    public static DeferredBlock<BlockSupplyCrate> crateSupply() {
+        return CRATE_SUPPLY;
+    }
+
+    private static DeferredBlock<BlockSupplyCrate> CRATE_SUPPLY;
+
     private GenericCrateBlocks() {
     }
 
@@ -97,6 +111,7 @@ public final class GenericCrateBlocks {
         DeferredBlock<BlockSupplyCrate> supplyCrateBlock = registerBlock("crate_supply",
                 () -> new BlockSupplyCrate(BlockBehaviour.Properties.of().strength(SMALL_CRATE_HARDNESS, SMALL_CRATE_RESISTANCE).sound(SoundType.WOOD)),
                 ModCreativeTabs.MISSILE);
+        CRATE_SUPPLY = supplyCrateBlock;
         SUPPLY_CRATE_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("crate_supply",
                 () -> BlockEntityType.Builder.of(BlockSupplyCrate.SupplyCrateBlockEntity::new, supplyCrateBlock.get()).build(null));
 

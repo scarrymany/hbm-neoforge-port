@@ -2,12 +2,14 @@ package com.hbm.entity.missile;
 
 import com.hbm.blocks.bomb.BombBlocks;
 import com.hbm.config.BombConfig;
+import com.hbm.entity.effect.EntityBlackHole;
 import com.hbm.entity.effect.EntityCloudFleija;
 import com.hbm.entity.effect.EntityEMPBlast;
 import com.hbm.entity.logic.EntityNukeExplosionMK3;
 import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.explosion.ExplosionNukeSmall;
 import com.hbm.items.BilletPowderItems;
+import com.hbm.items.special.ScatteredMilitaryItems;
 import com.hbm.items.weapon.MissileItems;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -26,10 +28,12 @@ import java.util.List;
  * <p>
  * Several concrete debris/rare-drop items this file's CE original references
  * ({@code ModItems.wire_fine}/{@code shell}/{@code ducttape}, {@code ModItems.ammo_standard} +
- * {@code GunFactory.EnumAmmo.NUKE_HIGH}, {@code ModItems.black_hole}, {@code ModBlocks.taint}/{@code
- * sellafield_slaked}) are not registered anywhere in this port yet - each such call site is a
- * documented TODO below, the real explosion/damage effect is kept wherever its own target already
- * exists.
+ * {@code GunFactory.EnumAmmo.NUKE_HIGH}, {@code ModBlocks.taint}/{@code sellafield_slaked}) are not
+ * registered anywhere in this port yet - each such call site is a documented TODO below, the real
+ * explosion/damage effect is kept wherever its own target already exists.
+ * {@link EntityMissileBHole}'s {@code EntityBlackHole} spawn/{@code ModItems.black_hole} debris drop
+ * are now wired, per docs/phase4/entities_vortex_gravity_wells.md - both dependencies (the entity
+ * family, and Phase 3's {@code ScatteredMilitaryItems.BLACK_HOLE}) now exist in this port.
  */
 public abstract class EntityMissileTier0 extends EntityMissileBaseNT {
 
@@ -129,16 +133,25 @@ public abstract class EntityMissileTier0 extends EntityMissileBaseNT {
             super(type, level);
         }
 
-        /** TODO({@code EntityBlackHole}, not yet ported): CE spawns a scaled black-hole entity here. */
+        /**
+         * CE: {@code world.createExplosion(this, x, y, z, 1.5F, true)} then spawns an
+         * {@code EntityBlackHole(world, 1.5F)} at the same position - now wired, per
+         * docs/phase4/entities_vortex_gravity_wells.md.
+         */
         @Override
         public void onMissileImpact(HitResult mop) {
             level().explode(this, getX(), getY(), getZ(), 1.5F, true, Level.ExplosionInteraction.TNT);
+
+            if (!level().isClientSide()) {
+                EntityBlackHole blackHole = new EntityBlackHole(level(), 1.5F);
+                blackHole.setPos(getX(), getY(), getZ());
+                level().addFreshEntity(blackHole);
+            }
         }
 
         @Override
         public ItemStack getDebrisRareDrop() {
-            // TODO(ModItems.black_hole, not yet registered in this port).
-            return null;
+            return new ItemStack(ScatteredMilitaryItems.BLACK_HOLE.get());
         }
 
         @Override

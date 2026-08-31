@@ -59,6 +59,22 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<LaunchpadSoyuzMenu>> LAUNCHPAD_SOYUZ =
             reg("launchpad_soyuz", LaunchpadSoyuzMenu::fromNetwork);
 
+    /** Phase 4 ({@code entities_vehicles_aircraft} - rail/train package): the two entity-backed cargo
+     * menus, opened via {@link EntityMenuBase} rather than {@link MenuBase} since their inventory
+     * owner is an {@code Entity}, not a {@code MachineBaseBlockEntity} - see that class's javadoc. */
+    public static final DeferredHolder<MenuType<?>, MenuType<TrainCargoTramMenu>> TRAIN_CARGO_TRAM =
+            reg("entity_ntm_cargo_tram", TrainCargoTramMenu::fromNetwork);
+    public static final DeferredHolder<MenuType<?>, MenuType<TrainCargoTramTrailerMenu>> TRAIN_CARGO_TRAM_TRAILER =
+            reg("entity_ntm_cargo_tram_trailer", TrainCargoTramTrailerMenu::fromNetwork);
+
+    /** Phase 4 ({@code entities_vehicles_aircraft} - minecart package): the two entity-backed cargo
+     * menus for {@code com.hbm.entity.cart}, same {@link EntityMenuBase} shape as the rail/train pair
+     * above. */
+    public static final DeferredHolder<MenuType<?>, MenuType<MinecartCrateMenu>> CART_CRATE =
+            reg("entity_ntm_cart_crate", MinecartCrateMenu::fromNetwork);
+    public static final DeferredHolder<MenuType<?>, MenuType<MinecartDestroyerMenu>> CART_DESTROYER =
+            reg("entity_ntm_cart_destroyer", MinecartDestroyerMenu::fromNetwork);
+
     private ModMenuTypes() {
     }
 

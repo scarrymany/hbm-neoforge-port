@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MIM",
+    "ITI",
+    "MIM"
+  ],
+  "key": {
+    "M": { "item": "hbm:ingot_meteorite_forged" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "T": { "item": "minecraft:tripwire_hook" }
+  },
+  "result": {
+    "id": "hbm:mech_key",
+    "count": 1
+  }
+}

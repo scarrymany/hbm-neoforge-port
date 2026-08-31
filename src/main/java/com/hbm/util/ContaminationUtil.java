@@ -5,6 +5,7 @@ import com.hbm.capability.HbmLivingProps;
 import com.hbm.config.CompatibilityConfig;
 import com.hbm.config.GeneralConfig;
 import com.hbm.damage.ModDamageTypes;
+import com.hbm.entity.mob.EntityQuackos;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.handler.radiation.ChunkRadiationManager;
@@ -356,8 +357,11 @@ public final class ContaminationUtil {
      * {@code docs/phase4/entities_creeper_variants.md}) now {@code implements IRadiationImmune}
      * directly - a deliberate, behavior-preserving departure from CE's own hardcoded-array shape,
      * recommended by that area's research report - so the {@code instanceof IRadiationImmune} check
-     * below already covers it with no further change needed here. {@code EntityQuackos} does not
-     * exist in this port yet; whichever phase ports it should give it the same treatment.
+     * below already covers it with no further change needed here. {@link EntityQuackos} (Phase 4,
+     * {@code docs/phase4/entities_bosses.md}) is now real too - added below as an explicit
+     * {@code instanceof} check (matching CE's own hardcoded-array treatment for this one mob, not the
+     * {@link IRadiationImmune} interface {@code EntityCreeperNuclear} uses, since CE itself never gave
+     * {@code EntityQuackos} that marker interface either).
      */
     public static boolean isRadImmune(Entity e) {
         if (e instanceof LivingEntity living && living.hasEffect(HbmPotionEffects.MUTATION)) {
@@ -366,12 +370,10 @@ public final class ContaminationUtil {
 
         if (e instanceof Zombie || e instanceof Skeleton || e instanceof MushroomCow
                 || e instanceof Ocelot || e instanceof IRadiationImmune
-                || e instanceof ZombieHorse || e instanceof SkeletonHorse || e instanceof ArmorStand) {
+                || e instanceof ZombieHorse || e instanceof SkeletonHorse || e instanceof ArmorStand
+                || e instanceof EntityQuackos) {
             return true;
         }
-
-        // TODO(EntityQuackos): CE's immuneEntities array also lists this HBM-custom mob; it doesn't
-        // exist in this port yet.
 
         return checkConfigEntityImmunity(e);
     }
@@ -428,7 +430,7 @@ public final class ContaminationUtil {
         if (!(e instanceof LivingEntity entity)) return;
 
         if (e instanceof Ocelot) return;
-        // TODO(EntityQuackos): CE also exempts this HBM-custom mob; doesn't exist in this port yet.
+        if (e instanceof EntityQuackos) return;
 
         if (entity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
         if (e instanceof Player && e.tickCount < 200) return;

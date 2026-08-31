@@ -1,8 +1,11 @@
 package com.hbm.items.weapon.legacy;
 
 import com.hbm.config.BombConfig;
+import com.hbm.entity.effect.EntityBlackHole;
 import com.hbm.entity.effect.EntityCloudFleija;
 import com.hbm.entity.effect.EntityNukeTorex;
+import com.hbm.entity.effect.EntityRagingVortex;
+import com.hbm.entity.effect.EntityVortex;
 import com.hbm.entity.logic.EntityNukeExplosionMK3;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
@@ -48,12 +51,12 @@ import net.minecraft.world.phys.Vec3;
  * {@code EntityModBeam.mode} (adding one would mean touching that shared, heavily-reused entity class
  * outside this package's scope), so the 10 tiers are instead 10 distinct {@link BulletConfig}s - one
  * per mode, each with its own {@code onImpact} - selected by {@link #b93Beam(int)} at fire time. CE's
- * modes 4/5 ({@code EntityVortex}), 6/7 ({@code EntityRagingVortex}), and 8 ({@code EntityBlackHole})
- * all need entity classes that do not exist anywhere in this port yet (grepped, confirmed absent) -
- * those 5 tiers fall back to mode 3's real, already-portable tier ({@code EntityNukeExplosionMK3},
- * destructionRange 20) rather than a silent no-op or a crash, preserving "the explosion keeps getting
- * stronger with more charge" without inventing new gameplay. Mode 9 (CE's real final {@code else}
- * branch, hit only at max charge) is a genuine gadget-tier nuke, exactly matching CE.
+ * modes 4/5 ({@link EntityVortex}, sizes 1F/2.5F), 6/7 ({@link EntityRagingVortex}, sizes 2.5F/5F), and
+ * 8 ({@link EntityBlackHole}, size 2F) are now wired directly per
+ * docs/phase4/entities_vortex_gravity_wells.md's Headline finding 5 (that report's own exact
+ * mode-by-mode parameters, read from real CE {@code EntityModBeam#explode()} source), now that this
+ * port has that entity family. Mode 9 (CE's real final {@code else} branch, hit only at max charge) is
+ * a genuine gadget-tier nuke, exactly matching CE.
  */
 final class LegacyChargeWeapons {
 
@@ -101,7 +104,7 @@ final class LegacyChargeWeapons {
         level.addFreshEntity(EntityCloudFleija.create(level, loc.x, loc.y, loc.z, 100));
     }
 
-    /** CE's {@code EntityModBeam#explode()}'s 10-tier {@code mode} branch - see class javadoc for the mode-by-mode mapping and the modes-4-8 fallback. */
+    /** CE's {@code EntityModBeam#explode()}'s 10-tier {@code mode} branch - see class javadoc for the mode-by-mode mapping. */
     private static void explodeB93(EntityBulletBaseMK4 bullet, HitResult hit, int mode) {
         if (hit instanceof EntityHitResult ehr && bullet.tickCount < 3 && ehr.getEntity() == bullet.getThrower()) return;
         bullet.discard();
@@ -119,14 +122,19 @@ final class LegacyChargeWeapons {
                 level.addFreshEntity(EntityNukeExplosionMK3.statFacFleija(level, loc.x, loc.y, loc.z, 10));
                 level.addFreshEntity(EntityCloudFleija.create(level, loc.x, loc.y, loc.z, 100));
             }
-            // Modes 3-8: mode 3 is CE's real tier here (EntityNukeExplosionMK3, destructionRange 20);
-            // modes 4/5/6/7/8 fall back to this same tier - see class javadoc for why (EntityVortex/
-            // EntityRagingVortex/EntityBlackHole don't exist in this port yet).
-            case 3, 4, 5, 6, 7, 8 -> {
+            case 3 -> {
                 level.playSound(null, loc.x, loc.y, loc.z, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F, level.random.nextFloat() * 0.1F + 0.9F);
                 level.addFreshEntity(EntityNukeExplosionMK3.statFacFleija(level, loc.x, loc.y, loc.z, 20));
                 level.addFreshEntity(EntityCloudFleija.create(level, loc.x, loc.y, loc.z, 100));
             }
+            // Modes 4-8: CE's real EntityModBeam#explode() spawns the gravity-well entity itself at
+            // the beam's impact position, with the same explosion-sound cue as every other mode but
+            // no accompanying cloud - see class javadoc for the size-per-mode table.
+            case 4 -> spawnGravityWell(level, new EntityVortex(level, 1F), loc);
+            case 5 -> spawnGravityWell(level, new EntityVortex(level, 2.5F), loc);
+            case 6 -> spawnGravityWell(level, new EntityRagingVortex(level, 2.5F), loc);
+            case 7 -> spawnGravityWell(level, new EntityRagingVortex(level, 5F), loc);
+            case 8 -> spawnGravityWell(level, new EntityBlackHole(level, 2F), loc);
             // Mode 9 (max charge) and CE's own catch-all default: a real gadget-tier nuke.
             default -> {
                 level.playSound(null, loc.x, loc.y, loc.z, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F, level.random.nextFloat() * 0.1F + 0.9F);
@@ -136,6 +144,13 @@ final class LegacyChargeWeapons {
                 }
             }
         }
+    }
+
+    /** CE's real per-mode {@code EntityVortex}/{@code EntityRagingVortex}/{@code EntityBlackHole} spawn (modes 4-8) - see {@link #explodeB93}. */
+    private static void spawnGravityWell(Level level, EntityBlackHole well, Vec3 loc) {
+        level.playSound(null, loc.x, loc.y, loc.z, SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F, level.random.nextFloat() * 0.1F + 0.9F);
+        well.setPos(loc.x, loc.y, loc.z);
+        level.addFreshEntity(well);
     }
 
     static final Item.Properties LEGENDARY_PROPS = new Item.Properties().stacksTo(1);
