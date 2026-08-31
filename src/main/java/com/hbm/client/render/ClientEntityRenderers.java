@@ -8,6 +8,7 @@ import com.hbm.entity.cart.CartEntityTypes;
 import com.hbm.entity.effect.EffectEntityTypes;
 import com.hbm.entity.effect.GravityWellEntityTypes;
 import com.hbm.entity.grenade.GrenadeEntityTypes;
+import com.hbm.entity.item.BoatEntityTypes;
 import com.hbm.entity.item.DroneEntityTypes;
 import com.hbm.entity.item.ParachuteCrateEntityTypes;
 import com.hbm.entity.item.TntPrimedEntityTypes;
@@ -16,6 +17,8 @@ import com.hbm.entity.logic.PlaneEntityTypes;
 import com.hbm.entity.logic.SatellitePayloadEntityTypes;
 import com.hbm.entity.missile.MissileEntityTypes;
 import com.hbm.entity.mob.CreeperVariantEntityTypes;
+import com.hbm.entity.mob.Phase9MobEntityTypes;
+import com.hbm.entity.mob.glyphid.GlyphidEntityTypes;
 import com.hbm.entity.mob.MaskmanEntityTypes;
 import com.hbm.entity.mob.Phase4BossEntityTypes2;
 import com.hbm.entity.mob.RadBeastEntityTypes;
@@ -255,6 +258,26 @@ public final class ClientEntityRenderers {
         EntityRenderers.register(CreeperVariantEntityTypes.CREEPER_PHOSGENE.get(), FallbackEntityRenderer::new);
         EntityRenderers.register(CreeperVariantEntityTypes.CREEPER_TAINTED.get(), FallbackEntityRenderer::new);
         EntityRenderers.register(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.GLOWING_ONE.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.GHOST.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.FBI.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.FBI_DRONE.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.UNDEAD_SOLDIER.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.PIGEON.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.PLASTIC_BAG.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.PARASITE_MAGGOT.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.BLOCK_SPIDER.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9MobEntityTypes.DUMMY.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.GLYPHID.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.BOMBARDIER.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.BLASTER.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.BRAWLER.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.BEHEMOTH.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.BRENDA.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.DIGGER.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.NUCLEAR.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(GlyphidEntityTypes.SCOUT.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(BoatEntityTypes.BOAT_RUBBER.get(), FallbackEntityRenderer::new);
     }
 
     /**

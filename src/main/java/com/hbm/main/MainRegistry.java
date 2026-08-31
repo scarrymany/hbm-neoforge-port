@@ -12,6 +12,7 @@ import com.hbm.entity.cart.CartEntityTypes;
 import com.hbm.entity.effect.EffectEntityTypes;
 import com.hbm.entity.effect.GravityWellEntityTypes;
 import com.hbm.entity.grenade.GrenadeEntityTypes;
+import com.hbm.entity.item.BoatEntityTypes;
 import com.hbm.entity.item.DroneEntityTypes;
 import com.hbm.entity.item.ParachuteCrateEntityTypes;
 import com.hbm.entity.item.TntPrimedEntityTypes;
@@ -20,6 +21,8 @@ import com.hbm.entity.logic.PlaneEntityTypes;
 import com.hbm.entity.logic.SatellitePayloadEntityTypes;
 import com.hbm.entity.missile.MissileEntityTypes;
 import com.hbm.entity.mob.CreeperVariantEntityTypes;
+import com.hbm.entity.mob.Phase9MobEntityTypes;
+import com.hbm.entity.mob.glyphid.GlyphidEntityTypes;
 import com.hbm.entity.mob.MaskmanEntityTypes;
 import com.hbm.entity.mob.Phase4BossEntityTypes2;
 import com.hbm.entity.mob.RadBeastEntityTypes;
@@ -84,6 +87,10 @@ public class MainRegistry {
         // Phase 4 (entities_creeper_variants): must run before ModItems.register(modEventBus) below -
         // this registry also adds this package's spawn-egg items into ModItems.ITEMS.
         CreeperVariantEntityTypes.register(modEventBus);
+        // Phase 9 remaining mobs/glyphids: spawn eggs land on ModItems.ITEMS — must precede ITEMS.register.
+        Phase9MobEntityTypes.register(modEventBus);
+        GlyphidEntityTypes.register(modEventBus);
+        BoatEntityTypes.register(modEventBus);
         ModItems.register(modEventBus);
         HbmDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);

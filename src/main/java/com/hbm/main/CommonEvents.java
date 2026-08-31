@@ -20,6 +20,27 @@ import com.hbm.entity.mob.EntityRADBeast;
 import com.hbm.entity.mob.MaskmanEntityTypes;
 import com.hbm.entity.mob.Phase4BossEntityTypes2;
 import com.hbm.entity.mob.RadBeastEntityTypes;
+import com.hbm.entity.mob.Phase9MobEntityTypes;
+import com.hbm.entity.mob.EntityGlowingOne;
+import com.hbm.entity.mob.EntityGhost;
+import com.hbm.entity.mob.EntityFBI;
+import com.hbm.entity.mob.EntityFBIDrone;
+import com.hbm.entity.mob.EntityUndeadSoldier;
+import com.hbm.entity.mob.EntityPigeon;
+import com.hbm.entity.mob.EntityPlasticBag;
+import com.hbm.entity.mob.EntityParasiteMaggot;
+import com.hbm.entity.mob.EntityBlockSpider;
+import com.hbm.entity.mob.EntityDummy;
+import com.hbm.entity.mob.glyphid.GlyphidEntityTypes;
+import com.hbm.entity.mob.glyphid.EntityGlyphid;
+import com.hbm.entity.mob.glyphid.EntityGlyphidBehemoth;
+import com.hbm.entity.mob.glyphid.EntityGlyphidBlaster;
+import com.hbm.entity.mob.glyphid.EntityGlyphidBombardier;
+import com.hbm.entity.mob.glyphid.EntityGlyphidBrawler;
+import com.hbm.entity.mob.glyphid.EntityGlyphidBrenda;
+import com.hbm.entity.mob.glyphid.EntityGlyphidDigger;
+import com.hbm.entity.mob.glyphid.EntityGlyphidNuclear;
+import com.hbm.entity.mob.glyphid.EntityGlyphidScout;
 import com.hbm.entity.mob.WormEntityTypes;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
@@ -162,6 +183,27 @@ public class CommonEvents {
         // Phase 4 (entities_bosses - RAD Beast, boss-adjacent elite). Same "safe to .get() here"
         // reasoning as above.
         event.put(RadBeastEntityTypes.RAD_BEAST.get(), EntityRADBeast.createAttributes().build());
+
+        // Phase 9 remaining CE mobs / glyphids.
+        event.put(Phase9MobEntityTypes.GLOWING_ONE.get(), EntityGlowingOne.createAttributes().build());
+        event.put(Phase9MobEntityTypes.GHOST.get(), EntityGhost.createAttributes().build());
+        event.put(Phase9MobEntityTypes.FBI.get(), EntityFBI.createAttributes().build());
+        event.put(Phase9MobEntityTypes.FBI_DRONE.get(), EntityFBIDrone.createAttributes().build());
+        event.put(Phase9MobEntityTypes.UNDEAD_SOLDIER.get(), EntityUndeadSoldier.createAttributes().build());
+        event.put(Phase9MobEntityTypes.PIGEON.get(), EntityPigeon.createAttributes().build());
+        event.put(Phase9MobEntityTypes.PLASTIC_BAG.get(), EntityPlasticBag.createAttributes().build());
+        event.put(Phase9MobEntityTypes.PARASITE_MAGGOT.get(), EntityParasiteMaggot.createAttributes().build());
+        event.put(Phase9MobEntityTypes.BLOCK_SPIDER.get(), EntityBlockSpider.createAttributes().build());
+        event.put(Phase9MobEntityTypes.DUMMY.get(), EntityDummy.createAttributes().build());
+        event.put(GlyphidEntityTypes.GLYPHID.get(), EntityGlyphid.createAttributes().build());
+        event.put(GlyphidEntityTypes.BOMBARDIER.get(), EntityGlyphidBombardier.createAttributes().build());
+        event.put(GlyphidEntityTypes.BLASTER.get(), EntityGlyphidBlaster.createAttributes().build());
+        event.put(GlyphidEntityTypes.BRAWLER.get(), EntityGlyphidBrawler.createAttributes().build());
+        event.put(GlyphidEntityTypes.BEHEMOTH.get(), EntityGlyphidBehemoth.createAttributes().build());
+        event.put(GlyphidEntityTypes.BRENDA.get(), EntityGlyphidBrenda.createAttributes().build());
+        event.put(GlyphidEntityTypes.DIGGER.get(), EntityGlyphidDigger.createAttributes().build());
+        event.put(GlyphidEntityTypes.NUCLEAR.get(), EntityGlyphidNuclear.createAttributes().build());
+        event.put(GlyphidEntityTypes.SCOUT.get(), EntityGlyphidScout.createAttributes().build());
     }
 
     /**
@@ -176,6 +218,27 @@ public class CommonEvents {
         registerCreeper(event, CreeperVariantEntityTypes.CREEPER_PHOSGENE.get());
         registerCreeper(event, CreeperVariantEntityTypes.CREEPER_TAINTED.get());
         registerCreeper(event, CreeperVariantEntityTypes.CREEPER_NUCLEAR.get());
+        event.register(Phase9MobEntityTypes.GLOWING_ONE.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.OR);
+        event.register(Phase9MobEntityTypes.FBI.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.OR);
+        event.register(Phase9MobEntityTypes.UNDEAD_SOLDIER.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, EntityUndeadSoldier::checkUndeadSpawn,
+                RegisterSpawnPlacementsEvent.Operation.OR);
+        event.register(Phase9MobEntityTypes.PARASITE_MAGGOT.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.OR);
+        registerCreeper(event, GlyphidEntityTypes.GLYPHID.get());
+        registerCreeper(event, GlyphidEntityTypes.BOMBARDIER.get());
+        registerCreeper(event, GlyphidEntityTypes.BLASTER.get());
+        registerCreeper(event, GlyphidEntityTypes.BRAWLER.get());
+        registerCreeper(event, GlyphidEntityTypes.BEHEMOTH.get());
+        registerCreeper(event, GlyphidEntityTypes.BRENDA.get());
+        registerCreeper(event, GlyphidEntityTypes.DIGGER.get());
+        registerCreeper(event, GlyphidEntityTypes.NUCLEAR.get());
+        registerCreeper(event, GlyphidEntityTypes.SCOUT.get());
     }
 
     private static void registerCreeper(RegisterSpawnPlacementsEvent event, net.minecraft.world.entity.EntityType<? extends Monster> type) {
