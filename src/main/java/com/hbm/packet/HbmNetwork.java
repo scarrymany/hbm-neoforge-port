@@ -5,11 +5,13 @@ import com.hbm.packet.toclient.BufPacket;
 import com.hbm.packet.toclient.ExplosionEffectSyncPacket;
 import com.hbm.packet.toclient.ExplosionRemovalSyncPacket;
 import com.hbm.packet.toclient.GunAnimationPayload;
+import com.hbm.packet.toclient.HbmEffectPacket;
 import com.hbm.packet.toclient.NukeExplosionRemovalSyncPacket;
 import com.hbm.packet.toclient.RadFogPayload;
 import com.hbm.packet.toclient.SatPanelPayload;
 import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
+import com.hbm.packet.toserver.LaunchPadRustedControlPacket;
 import com.hbm.packet.toserver.SatPanelActionPayload;
 import com.hbm.packet.toserver.TurretControlPacket;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -98,5 +100,13 @@ public class HbmNetwork {
 
         // Phase 4 (chunk_radiation_system): S2C decorative "radiation fog" particle cue.
         registrar.playToClient(RadFogPayload.TYPE, RadFogPayload.STREAM_CODEC, RadFogPayload::handleClient);
+
+        // Phase 5 (particle_engine_and_generic_vfx): generic S2C "spawn this HbmEffect at (x,y,z)"
+        // broadcast, replacing CE's AuxParticlePacketNT/HbmEffectNT dispatch.
+        registrar.playToClient(HbmEffectPacket.TYPE, HbmEffectPacket.STREAM_CODEC, HbmEffectPacket::handleClient);
+
+        // Phase 5 (gui_screens_survey_weapons_storage_special): C2S control packet for the rusted
+        // launch pad's bare-Screen GUI.
+        registrar.playToServer(LaunchPadRustedControlPacket.TYPE, LaunchPadRustedControlPacket.STREAM_CODEC, LaunchPadRustedControlPacket::handleServer);
     }
 }

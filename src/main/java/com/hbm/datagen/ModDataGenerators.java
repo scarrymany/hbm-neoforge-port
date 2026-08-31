@@ -46,8 +46,11 @@ import java.util.concurrent.CompletableFuture;
  * <p>This class only imports and wires other providers - it never needs to change as Phase 1's
  * item/block count grows, only the individual provider classes do. Slots deliberately left out
  * because they are out of this area's scope (see {@code docs/phase1/datagen_framework.md} section
- * 4.6): a fluid tag provider (Phase 0's fluid area), a sound definitions provider (Phase 0's sound
- * area) and a recipe provider (its own large content area).
+ * 4.6): a fluid tag provider (Phase 0's fluid area) and a sound definitions provider (Phase 0's
+ * sound area). The recipe-provider slot that section flagged as "its own large content area" is
+ * filled as of task c16-recipe-datagen by {@link ModRecipeProvider} - see that class's own javadoc
+ * for exactly how much of CE's ~1,900+ vanilla-crafting-recipe corpus it covers (a first,
+ * explicitly-scoped slice, not the whole corpus).
  */
 // bus = Bus.MOD required: GatherDataEvent implements IModBusEvent and only fires on the mod bus -
 // @EventBusSubscriber's bus() defaults to Bus.GAME and does not auto-detect IModBusEvent (confirmed
@@ -103,5 +106,10 @@ public class ModDataGenerators {
         generator.addProvider(event.includeServer(),
                 (DataProvider.Factory<LootTableProvider>) lootOutput ->
                         new LootTableProvider(lootOutput, Collections.emptySet(), List.of(blockLootSubProvider), lookup));
+
+        // c16-recipe-datagen: highest-value slice of CE's vanilla-crafting-table recipe corpus
+        // (ToolRecipes/ArmorRecipes/MineralRecipes) - see ModRecipeProvider's own class javadoc for
+        // exactly what is and is not covered.
+        generator.addProvider(event.includeServer(), new ModRecipeProvider(output, lookup));
     }
 }

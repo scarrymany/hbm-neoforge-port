@@ -1,0 +1,22 @@
+{
+  "parent": "hbm:bossworm",
+  "display": {
+    "icon": {
+      "id": "hbm:sat_gerald"
+    },
+    "title": {
+      "translate": "achievement.horizonsStart"
+    },
+    "description": {
+      "translate": "achievement.horizonsStart.desc"
+    }
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

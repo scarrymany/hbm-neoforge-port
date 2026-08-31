@@ -1,6 +1,8 @@
 package com.hbm.main;
 
 import com.hbm.handler.HbmKeybinds.EnumKeybind;
+import com.hbm.particle.HbmEffect;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -19,5 +21,16 @@ public class ServerProxy {
 
     public Player me() {
         return null;
+    }
+
+    /**
+     * CE: {@code ServerProxy.effectNT(HbmEffectNT, x, y, z, NBTTagCompound)} - a no-op on the
+     * dedicated-server/common side ({@code upstream/hbm-ce/.../main/ServerProxy.java:41,43-44}); the
+     * server only ever broadcasts {@link com.hbm.packet.toclient.HbmEffectPacket} via
+     * {@link HbmEffect#sendPacket}, it never runs a handler itself. See {@link ClientProxy}'s override
+     * for the real client-side dispatch - {@code docs/phase5/particle_engine_and_generic_vfx.md}'s
+     * "Recommended architecture" point 2.
+     */
+    public void effectNT(HbmEffect effect, double x, double y, double z, CompoundTag data) {
     }
 }

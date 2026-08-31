@@ -167,6 +167,19 @@ public final class CrystallizerRecipes {
         return RECIPES.get(new Tuple.Pair<>(comp, acidType));
     }
 
+    /**
+     * Full-collection accessor added for {@code c11-jei-recipe-categories}
+     * ({@code docs/phase5/jei_integration.md}'s "Safe to build now" #4 - {@link #RECIPES} was
+     * previously point-lookup-only via {@link #getOutput}) so a JEI category can enumerate every
+     * registered recipe. Returns an unmodifiable view over the live, lazily-populated map - callers
+     * must not assume the returned map is non-empty before {@link #registerDefaults()} has run at
+     * least once (this method runs it itself, same as {@link #getOutput}).
+     */
+    public static Map<Tuple.Pair<ComparableStack, FluidType>, CrystallizerRecipe> getAllRecipes() {
+        registerDefaults();
+        return java.util.Collections.unmodifiableMap(RECIPES);
+    }
+
     public static class CrystallizerRecipe {
         public final ItemStack output;
         public final int duration;

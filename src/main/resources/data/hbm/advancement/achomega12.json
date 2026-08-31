@@ -1,0 +1,23 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:particle_digamma"
+    },
+    "title": {
+      "translate": "hbm.achievement.omega12"
+    },
+    "description": {
+      "translate": "hbm.achievement.omega12.desc"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 5000
+  }
+}

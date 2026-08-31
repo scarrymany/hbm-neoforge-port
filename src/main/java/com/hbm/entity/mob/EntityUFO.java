@@ -11,6 +11,9 @@ import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.AdvancementManager;
 import com.hbm.util.ContaminationUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -101,6 +104,24 @@ public class EntityUFO extends FlyingMob implements Enemy, IRadiationImmune {
     private final ServerBossEvent bossEvent =
             new ServerBossEvent(this.getDisplayName(), BossEvent.BossBarColor.RED, BossEvent.BossBarOverlay.PROGRESS);
 
+    /**
+     * Not a CE port on its own, but a small, necessary correctness fix - {@link #beam} below was a
+     * plain server-only field with no synced/client-visible copy, confirmed a real gap by {@code
+     * docs/phase5/boss_and_vehicle_entity_renderers.md} Headline finding #5 ("{@code EntityUFO.beam}
+     * ... a small, easy, but genuinely non-optional server-side follow-up this report surfaces for
+     * whoever implements the UFO renderer"). {@link #customServerAiStep()} (and therefore {@link
+     * #updateBeam()}, which mutates {@link #beam}) only ever runs server-side (vanilla {@code Mob}
+     * contract - the "Server" in the method name is load-bearing, not decorative), so a client-side
+     * tracked copy of this entity would otherwise see {@link #beam} permanently {@code false} - the
+     * exact bug the research report flagged. CE's real field is a synced {@code
+     * DataParameter<Boolean> BEAM}; ported here as a real {@link SynchedEntityData} accessor
+     * (matching {@code EntityPlaneBase.DATA_HEALTH}'s already-established pattern in this same
+     * package tree) rather than merely exposing the unsynced field via a getter, which would have
+     * silently reproduced CE's exact bug instead of fixing it.
+     */
+    private static final EntityDataAccessor<Boolean> DATA_BEAM =
+            SynchedEntityData.defineId(EntityUFO.class, EntityDataSerializers.BOOLEAN);
+
     private int courseChangeCooldown;
     private int scanCooldown;
     private int hurtCooldown;
@@ -113,10 +134,22 @@ public class EntityUFO extends FlyingMob implements Enemy, IRadiationImmune {
     private Entity target;
     private final List<Entity> secondaries = new ArrayList<>();
 
+    /** See {@link #DATA_BEAM}'s javadoc - the accessor {@link com.hbm.client.render.entity.mob.UfoRenderer} reads every frame. */
+    public boolean getBeam() {
+        return this.level().isClientSide() ? this.entityData.get(DATA_BEAM) : this.beam;
+    }
+
     public EntityUFO(EntityType<? extends EntityUFO> type, Level level) {
         super(type, level);
         this.setNoGravity(true);
         this.xpReward = 500;
+    }
+
+    /** See {@link #DATA_BEAM}'s javadoc - not a CE port, a correctness fix for the abduction-beam visual. */
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_BEAM, false);
     }
 
     /** CE: {@code applyEntityAttributes} - {@code MAX_HEALTH = 20000}. */
@@ -276,7 +309,10 @@ public class EntityUFO extends FlyingMob implements Enemy, IRadiationImmune {
     private void updateBeam() {
         Level level = this.level();
 
-        if (this.beamTimer <= 0 && this.beam) this.beam = false;
+        if (this.beamTimer <= 0 && this.beam) {
+            this.beam = false;
+            this.entityData.set(DATA_BEAM, false);
+        }
 
         if (this.target != null) {
             double dist = Math.abs(this.target.getX() - this.getX()) + Math.abs(this.target.getZ() - this.getZ());
@@ -289,6 +325,7 @@ public class EntityUFO extends FlyingMob implements Enemy, IRadiationImmune {
             if (!this.beam) {
                 level.playSound(null, this.getX(), this.getY(), this.getZ(), HBMSoundHandler.ufoBeam.get(), SoundSource.HOSTILE, 10.0F, 1.0F);
                 this.beam = true;
+                this.entityData.set(DATA_BEAM, true);
             }
 
             int ix = (int) Math.floor(this.getX());

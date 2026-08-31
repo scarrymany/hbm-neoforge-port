@@ -23,9 +23,11 @@ import com.hbm.items.weapon.sedna.mags.MagazineBelt;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
 import com.hbm.items.weapon.sedna.mags.MagazineSingleReload;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -216,8 +218,24 @@ public final class XFactoryEnergy {
             living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 9));
             living.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 60, 9));
         }
-        // TODO(phase5-particles): CE also broadcasts an AuxParticlePacketNT PlasmaBlast burst + an
-        // extra ufoBlast/firework-blast sound pair here - pure client VFX, out of this package's scope.
+
+        // CE (upstream/hbm-ce/.../factory/XFactoryEnergy.java:79-93): an extra sound pair plus a
+        // 3-shot PlasmaBlast fan (pitch -60/0/60, shared random yaw, blue r=0.5,g=0.5,b=1.0, scale=2,
+        // radius 100) on top of the standard beam-hit blast above.
+        beam.level().playSound(null, loc.x, loc.y, loc.z, HBMSoundHandler.ufoBlast.get(), net.minecraft.sounds.SoundSource.PLAYERS, 5.0F, 0.9F + beam.level().getRandom().nextFloat() * 0.2F);
+        beam.level().playSound(null, loc.x, loc.y, loc.z, net.minecraft.sounds.SoundEvents.FIREWORK_ROCKET_BLAST, net.minecraft.sounds.SoundSource.PLAYERS, 5.0F, 0.5F);
+
+        float sharedYaw = beam.level().getRandom().nextFloat() * 180F;
+        for (int i = 0; i < 3; i++) {
+            CompoundTag data = new CompoundTag();
+            data.putFloat("r", 0.5F);
+            data.putFloat("g", 0.5F);
+            data.putFloat("b", 1.0F);
+            data.putFloat("pitch", -60F + 60F * i);
+            data.putFloat("yaw", sharedYaw);
+            data.putFloat("scale", 2F);
+            HbmEffect.sendPacket(beam.level(), HbmEffect.PLASMA_BLAST, loc.x, loc.y, loc.z, 100, data);
+        }
     }
 
     /** Port of CE's {@code LAMBDA_LIGHTNING_SPLIT} - the same hit, then a fan-out of short sub-beams toward every nearby living entity. */
@@ -319,7 +337,7 @@ public final class XFactoryEnergy {
         vnt.explode();
         incrementRad(bullet.level(), loc.x, loc.y, loc.z, 1.5F);
         bullet.level().playSound(null, loc.x, loc.y + 0.5, loc.z, HBMSoundHandler.mukeExplosion.get(), net.minecraft.sounds.SoundSource.HOSTILE, 15.0F, 1.0F);
-        // TODO(phase5-particles): CE broadcasts an AuxParticlePacketNT "Muke" burst here - client VFX.
+        HbmEffect.sendPacket(bullet.level(), HbmEffect.MUKE, loc.x, loc.y + 0.5, loc.z, 250, null);
     }
 
     private static void nukeTinyTot(EntityBulletBaseMK4 bullet, HitResult hit) {

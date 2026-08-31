@@ -1,0 +1,28 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:achievement_icon_gofish"
+    },
+    "title": {
+      "translate": "achievement.gofish"
+    },
+    "description": {
+      "translate": "achievement.gofish.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

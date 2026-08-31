@@ -25,15 +25,20 @@ import net.minecraft.world.entity.player.Inventory;
  */
 public class TrainCargoTramScreen extends GuiInfoContainer<TrainCargoTramMenu> {
 
+    // CE's real asset lives under textures/gui/vehicles/, not .../train/ - see
+    // docs/phase5/gui_screens_survey_weapons_storage_special.md Headline finding 2 (verified by
+    // grepping upstream/hbm-ce's real resource tree; this port's own folder name never existed there).
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/train/gui_cargo_tram.png");
+            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/vehicles/gui_cargo_tram.png");
 
     public TrainCargoTramScreen(TrainCargoTramMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         // CE: 4x7 cargo grid (rows end at y=90) + one battery slot at (152,72), player inventory rows
         // starting at y=122, hotbar at y=180 - see TrainCargoTramMenu's own slot layout.
+        // ySize is CE's real 204, not 206 - see the survey's Headline finding 5 (verified against
+        // TrainCargoTram's own inner GUI class field).
         this.imageWidth = 176;
-        this.imageHeight = 206;
+        this.imageHeight = 204;
     }
 
     @Override

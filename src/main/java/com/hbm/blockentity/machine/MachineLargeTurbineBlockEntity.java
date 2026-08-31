@@ -11,6 +11,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.container.machine.MachineLargeTurbineMenu;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,6 +19,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -130,6 +132,17 @@ public class MachineLargeTurbineBlockEntity extends MachineBaseBlockEntity
         if (power > MAX_POWER) power = MAX_POWER;
 
         rotor = (rotor + (shouldTurn ? 6F : 0F)) % 360F;
+
+        // CE: TileEntityMachineLargeTurbine's client-side fan-acceleration branch drives a continuous
+        // AudioWrapper loop (HBMSoundHandler.turbofanOperate, 10-tick keepAlive) with volume/pitch
+        // ramped by fanAcceleration while shouldTurn. No looped-block-audio bridge or client-side fan
+        // easing ported yet (this class's rotor already moves in one server-side step, unlike CE's
+        // split client/server model - see class javadoc's "Scope trims" note); substituted with a
+        // periodic broadcast every 10 ticks while turning, at a fixed representative pitch/volume
+        // rather than CE's live ramp.
+        if (shouldTurn && level.getGameTime() % 10 == 0) {
+            level.playSound(null, worldPosition, HBMSoundHandler.turbofanOperate.get(), SoundSource.BLOCKS, 0.4F, 1.0F);
+        }
 
         dataChanged();
         networkPackMK2(50);

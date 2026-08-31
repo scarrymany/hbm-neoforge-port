@@ -1,0 +1,35 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:achievement_icon_questionmark"
+    },
+    "title": {
+      "translate": "achievement.c20_5"
+    },
+    "description": {
+      "translate": "achievement.c20_5.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crafting_hbm_canned_conserve_5": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:canned_jizz"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "crafting_hbm_canned_conserve_5"
+    ]
+  ]
+}

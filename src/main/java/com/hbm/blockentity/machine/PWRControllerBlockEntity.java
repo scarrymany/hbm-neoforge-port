@@ -18,6 +18,7 @@ import com.hbm.items.machine.ItemPWRFuel;
 import com.hbm.items.machine.ItemPWRFuel.EnumPWRFuel;
 import com.hbm.items.machine.PWRHotFuelItems;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.util.EnumUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,6 +26,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -295,6 +297,15 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
 
                 this.flux = newFlux;
                 if (tanks[0].getFill() > 0) this.flux *= multiplier;
+
+                // CE: TileEntityPWRController.createAudioLoop() - continuous AudioWrapper loop
+                // (HBMSoundHandler.reactorLoop, 10-tick keepAlive) while the reactor core is
+                // generating flux. No looped-block-audio bridge ported yet (see
+                // ChemPlantBlockEntity's identical note); substituted with a periodic broadcast
+                // every 20 ticks while flux is positive.
+                if (this.flux > 0 && level.getGameTime() % 20 == 0) {
+                    level.playSound(null, worldPosition, HBMSoundHandler.reactorLoop.get(), SoundSource.BLOCKS, 1F, 1.0F);
+                }
 
                 if (this.coreHeat > this.coreHeatCapacity) meltDown();
             } else {

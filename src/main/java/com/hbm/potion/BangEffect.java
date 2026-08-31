@@ -2,7 +2,7 @@ package com.hbm.potion;
 
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.explosion.ExplosionLarge;
-import com.hbm.sound.ModSounds;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
@@ -53,7 +53,7 @@ public class BangEffect extends MobEffect {
         }
 
         level.playSound(null, entity.getX(), entity.getY(), entity.getZ(),
-                ModSounds.LASER_BANG.get(), SoundSource.AMBIENT, 100.0F, 1.0F);
+                HBMSoundHandler.laserBang.get(), SoundSource.AMBIENT, 100.0F, 1.0F);
         ExplosionLarge.spawnParticles(level, entity.getX(), entity.getY(), entity.getZ(), 10);
 
         return true;

@@ -2,9 +2,12 @@ package com.hbm.items.weapon;
 
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.MainRegistry;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -44,10 +47,9 @@ import java.util.List;
  * <p>
  * Not ported (documented, not silently dropped):
  * <ul>
- *     <li>The on-kill-while-charged "blender" particle burst ({@code HbmEffectNT.VanillaBurst_BlockDust})
- *     - purely cosmetic VFX riding CE's unported generic effect-dispatch table (see
- *     {@code docs/phase3/weapon_animation_hooks.md}); the discharge-on-hit gameplay itself still
- *     works without it.</li>
+ *     <li>The on-kill-while-charged "blender" particle burst
+ *     ({@link com.hbm.particle.HbmEffect#VANILLA_BURST_BLOCK_DUST}) is now wired in {@link #hurtEnemy},
+ *     matching CE's own count/motion/block values 1:1.</li>
  *     <li>The {@code doSpecialClick} client-only alternate-attack toggle and its first-person
  *     lightning-particle GUI feedback ({@code updateClient}, {@code ParticleCrucibleLightning}) -
  *     Phase 5 rendering scope; this port's crucible always follows CE's "not doSpecialClick"
@@ -114,7 +116,20 @@ public class ItemCrucible extends ItemSwordCutter {
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
         discharge(stack);
-        // CE's on-kill "blender" particle burst (HbmEffectNT-based) is deferred - see class javadoc.
+
+        // CE: on-kill-while-charged "blender" burst (upstream/hbm-ce/.../ItemCrucible.java:132-144) -
+        // gated on the charge count STILL remaining after discharge() and the victim now being dead.
+        if (getCharges(stack) > 0 && !target.isAlive() && target.level() instanceof ServerLevel serverLevel) {
+            int count = Math.min((int) Math.ceil(target.getMaxHealth() / 3D), 250);
+
+            CompoundTag data = new CompoundTag();
+            data.putInt("count", count * 4);
+            data.putDouble("motion", 0.1D);
+            data.putString("block", "minecraft:redstone_block");
+            HbmEffect.sendPacket(serverLevel, HbmEffect.VANILLA_BURST_BLOCK_DUST,
+                    target.getX(), target.getY() + target.getBbHeight() * 0.5, target.getZ(), 50, data);
+        }
+
         return super.hurtEnemy(stack, target, attacker);
     }
 

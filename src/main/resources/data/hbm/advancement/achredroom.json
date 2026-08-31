@@ -1,0 +1,28 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:key_red"
+    },
+    "title": {
+      "translate": "achievement.redroom"
+    },
+    "description": {
+      "translate": "achievement.redroom.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

@@ -10,6 +10,7 @@ import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.explosion.ExplosionSolinium;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.MainRegistry;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,9 +44,10 @@ import java.util.UUID;
  * explosion_engine.md}'s "Fallout trigger hook") is now wired - see {@code
  * docs/phase4/fallout_rain_and_effects.md}. The anti-nuke
  * "jammer" mechanic ({@link #isJammed}/{@link #statFacFleija}) is ported with its actual gameplay
- * check intact but its particle-burst VFX ({@link #createParticle}) reduced to sound-only (the
- * packet-based particle broadcast it used, {@code AuxParticlePacketNT}, doesn't exist in this port -
- * Phase 5 scope).
+ * check intact; its particle-burst VFX ({@link #createParticle}) now also broadcasts the real
+ * {@code PlasmaBlast} {@link HbmEffect} (matching CE's own r/g/b/scale=7.5 values 1:1,
+ * {@code upstream/hbm-ce/.../EntityNukeExplosionMK3.java:250-258,331-336}) - see
+ * {@code docs/phase5/particle_engine_and_generic_vfx.md} for the dispatch mechanism this now uses.
  */
 public class EntityNukeExplosionMK3 extends EntityExplosionChunkloading {
 
@@ -246,9 +248,13 @@ public class EntityNukeExplosionMK3 extends EntityExplosionChunkloading {
 
     private static void createParticle(Level level, ResourceKey<Level> dim, double x, double y, double z, float r, float g, float b) {
         level.playSound(null, x + 0.5D, y + 0.5D, z + 0.5D, HBMSoundHandler.ufoBlast, SoundSource.HOSTILE, 15.0F, 1.0F);
-        // TODO(AuxParticlePacketNT/PacketThreading, Phase 5): CE also broadcasts a networked
-        // "PlasmaBlast" particle burst (color r/g/b, scale 7.5) here; that packet infrastructure
-        // doesn't exist in this port yet.
+
+        CompoundTag data = new CompoundTag();
+        data.putFloat("r", r);
+        data.putFloat("g", g);
+        data.putFloat("b", b);
+        data.putFloat("scale", 7.5F);
+        HbmEffect.sendPacket(level, HbmEffect.PLASMA_BLAST, x + 0.5D, y + 0.5D, z + 0.5D, 150, data);
     }
 
     public static boolean isJammed(Level level, Entity entity) {
@@ -310,7 +316,13 @@ public class EntityNukeExplosionMK3 extends EntityExplosionChunkloading {
                         double iz = i == 0 ? z : (entry.z + 0.5);
 
                         level.playSound(null, ix, iy, iz, HBMSoundHandler.ufoBlast, SoundSource.PLAYERS, 15.0F, 0.7F + level.getRandom().nextFloat() * 0.2F);
-                        // TODO(AuxParticlePacketNT, Phase 5): see createParticle().
+
+                        CompoundTag data = new CompoundTag();
+                        data.putFloat("r", 0.0F);
+                        data.putFloat("g", 0.75F);
+                        data.putFloat("b", 1.0F);
+                        data.putFloat("scale", 7.5F);
+                        HbmEffect.sendPacket(level, HbmEffect.PLASMA_BLAST, ix, iy, iz, 150, data);
                     }
                 }
 

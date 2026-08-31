@@ -2,7 +2,10 @@ package com.hbm.main;
 
 import com.hbm.handler.HbmKeybinds;
 import com.hbm.handler.HbmKeybinds.EnumKeybind;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -39,5 +42,20 @@ public class ClientProxy extends ServerProxy {
     @Override
     public Player me() {
         return Minecraft.getInstance().player;
+    }
+
+    /**
+     * Real client-side dispatch, mirroring CE's {@code ClientProxy.effectNT(HbmEffectNT,x,y,z,
+     * NBTTagCompound)} ({@code upstream/hbm-ce/.../main/ClientProxy.java:392-394}). {@link
+     * ServerProxy}'s base is a correct no-op (server has no particle system) but this override was
+     * missing entirely, so already-client-side callers that reach {@code MainRegistry.proxy.effectNT(...)}
+     * without a network round-trip (e.g. {@code EntityMist}) silently did nothing.
+     */
+    @Override
+    public void effectNT(HbmEffect effect, double x, double y, double z, CompoundTag data) {
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level != null) {
+            effect.summonParticle(level, x, y, z, data);
+        }
     }
 }

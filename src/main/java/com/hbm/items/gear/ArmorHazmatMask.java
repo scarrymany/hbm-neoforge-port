@@ -1,12 +1,14 @@
 package com.hbm.items.gear;
 
 import com.hbm.api.item.IGasMask;
+import com.hbm.client.render.armor.M65ArmorModel;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,6 +21,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,34 +32,41 @@ import java.util.function.Consumer;
  * {@link com.hbm.items.gear.SpecialArmorItems}), the hazmat family's helmet variant: extends
  * {@link ArmorHazmat} and additionally implements {@link IGasMask}.
  *
- * <p>{@link #hasCustomModel} replaces CE's {@code this == ModItems.hazmat_helmet_red ||
+ * <p>{@link #modelTexture} replaces CE's {@code this == ModItems.hazmat_helmet_red ||
  * this == ModItems.hazmat_helmet_grey} identity check in {@code getArmorModel} - only those 2 of
- * the 4 items get the shared {@code ModelM65} swap in CE; {@code hazmat_helmet}/
- * {@code hazmat_paa_helmet} get no custom model (plain texture dispatch, already handled by this
- * item's material - see {@link ArmorHazmat}'s javadoc). {@code getBlacklist} is a constant empty
- * list for all 4 items in CE (full protection, no hazard the mask itself refuses to filter) -
- * unlike sibling {@code ArmorGasMask}, no per-item field is needed here.
+ * the 4 items get the shared {@link M65ArmorModel} swap in CE (real textures {@code
+ * ModelHazRed.png}/{@code ModelHazGrey.png}, normalized to this port's snake_case asset convention
+ * by task {@code c7-armor-model-rendering} - see {@code SpecialArmorItems#hazmatMask}); {@code
+ * hazmat_helmet}/{@code hazmat_paa_helmet} pass {@code null} and get no custom model (plain texture
+ * dispatch, already handled by this item's material - see {@link ArmorHazmat}'s javadoc). {@code
+ * getBlacklist} is a constant empty list for all 4 items in CE (full protection, no hazard the mask
+ * itself refuses to filter) - unlike sibling {@code ArmorGasMask}, no per-item field is needed
+ * there.
  */
 public class ArmorHazmatMask extends ArmorHazmat implements IGasMask {
 
-    private final boolean hasCustomModel;
+    @Nullable
+    private final ResourceLocation modelTexture;
 
-    public ArmorHazmatMask(Holder<ArmorMaterial> material, Type type, Item.Properties properties, boolean hasCustomModel) {
+    private M65ArmorModel model;
+
+    public ArmorHazmatMask(Holder<ArmorMaterial> material, Type type, Item.Properties properties,
+                            @Nullable ResourceLocation modelTexture) {
         super(material, type, properties);
-        this.hasCustomModel = hasCustomModel;
+        this.modelTexture = modelTexture;
     }
 
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        if (!hasCustomModel) return;
+        if (modelTexture == null) return;
 
         consumer.accept(new IClientItemExtensions() {
             @Override
             public Model getGenericArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                // TODO(Phase 5): CE dispatches the shared ModelM65 instance here for
-                // hazmat_helmet_red/_grey; not ported yet - see ArmorGasMask's javadoc for the same
-                // gap. Falls back to the vanilla humanoid model.
-                return original;
+                if (equipmentSlot != EquipmentSlot.HEAD) return original;
+                if (model == null) model = new M65ArmorModel(equipmentSlot, modelTexture);
+                model.getPropertiesFrom(original, livingEntity);
+                return model;
             }
         });
     }

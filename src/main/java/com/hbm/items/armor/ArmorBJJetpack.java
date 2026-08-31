@@ -4,8 +4,10 @@ import com.hbm.capability.HbmPlayerAttachment;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.items.gear.ArmorFSB;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -29,10 +31,10 @@ import java.util.List;
  *     <li>a sneak-to-brake glide (damps downward fall speed toward zero while sneaking and not
  *     thrusting).</li>
  * </ul>
- * <b>Not ported</b> (documented TODO): CE's {@code AuxParticlePacketNT}/{@code HbmEffectNT.
- * Jetpack_BJ} thruster particle-trail packet - this port has no confirmed particle-packet system
- * yet (see {@code docs/phase3/armor_equippable_framework.md} Open questions #6); purely cosmetic,
- * no gameplay effect lost.
+ * CE's {@code AuxParticlePacketNT}/{@code HbmEffectNT.Jetpack_BJ} thruster particle-trail packet is
+ * wired via {@link com.hbm.particle.HbmEffect#JETPACK_BJ}, radius 100, matching CE's own
+ * {@code hasFSBArmor(player) && isJetpackActive()} gate 1:1
+ * ({@code upstream/hbm-ce/.../ArmorBJJetpack.java:56-60}).
  */
 public class ArmorBJJetpack extends ArmorBJ {
 
@@ -49,8 +51,11 @@ public class ArmorBJJetpack extends ArmorBJ {
 
         HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
 
-        // TODO(particle system): CE spawns a HbmEffectNT.Jetpack_BJ AuxParticlePacketNT here while
-        // thrusting server-side - see class javadoc.
+        if (props.isJetpackActive()) {
+            CompoundTag data = new CompoundTag();
+            data.putInt("player", player.getId());
+            HbmEffect.sendPacket(level, HbmEffect.JETPACK_BJ, player.getX(), player.getY(), player.getZ(), 100, data);
+        }
 
         ArmorUtil.resetFlightTime(player);
 

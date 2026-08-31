@@ -6,6 +6,7 @@ import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.entity.logic.IChunkLoader;
 import com.hbm.explosion.ExplosionLarge;
+import com.hbm.interfaces.IConstantRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
@@ -32,14 +33,23 @@ import net.minecraft.world.phys.Vec3;
  * ExplosionLarge#spawnShrapnelShower} pair {@link EntityMissileBaseNT} uses. Ballistic free-fall
  * only - inherits the parent missile's velocity at split time (set by {@code mirvSplit}) and never
  * seeks a target of its own.
+ *
+ * <p><b>{@link IConstantRenderer} added by {@code c4-boss-vehicle-renderers-batch1}</b>: CE's real
+ * {@code EntityMIRV implements ... IConstantRenderer ...} (confirmed,
+ * {@code upstream/hbm-ce/.../entity/missile/EntityMIRV.java:36}) - this port's class had not picked
+ * that up yet. See {@code com.hbm.client.render.entity.missile.MirvRenderer} for the renderer that
+ * now guards on {@code com.hbm.client.render.ConstantRenderSweep#isRenderingConstant()}.
  */
-public class EntityMIRV extends Projectile implements IChunkLoader, IRadarDetectable {
+public class EntityMIRV extends Projectile implements IChunkLoader, IRadarDetectable, IConstantRenderer {
 
     public int health = 25;
     private ChunkPos loadedChunkPos = new ChunkPos(0, 0);
 
     public EntityMIRV(EntityType<? extends EntityMIRV> type, Level level) {
         super(type, level);
+        // CE: `this.ignoreFrustumCheck = true;` (EntityMIRV.java:62) - paired with the IConstantRenderer
+        // marker added above; 1.21.1's equivalent field is Entity#noCulling.
+        this.noCulling = true;
     }
 
     @Override

@@ -5,7 +5,9 @@ import com.hbm.handler.ArmorUtil;
 import com.hbm.items.gear.ArmorFSB;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.MainRegistry;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -42,7 +44,9 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
  * scaled by the raw {@code EntityPlayer#moveForward} input - same unconfirmed-accessor gap as
  * {@link ArmorEnvsuit} (see its javadoc); the rest of the glide branch (fall-speed clamp, drag,
  * thruster sound) is ported in full. CE's {@code AuxParticlePacketNT}/{@code HbmEffectNT.
- * Jetpack_DNS} particle trail is likewise stubbed (no particle-packet system yet).
+ * Jetpack_DNS} particle trail is wired via {@link com.hbm.particle.HbmEffect#JETPACK_DNS}, matching
+ * CE's own {@code hasFSBArmor && (isJetpackActive || gliding)} gate 1:1
+ * ({@code upstream/hbm-ce/.../ArmorDNT.java:89-93}).
  */
 public class ArmorDNT extends ArmorFSBPowered {
 
@@ -72,8 +76,11 @@ public class ArmorDNT extends ArmorFSBPowered {
 
         boolean gliding = !player.onGround() && !player.isShiftKeyDown() && props.getEnableBackpack();
 
-        // TODO(particle system): CE spawns a HbmEffectNT.Jetpack_DNS AuxParticlePacketNT here
-        // server-side while jetting/gliding - see class javadoc.
+        if (ArmorFSB.hasFSBArmor(player) && (props.isJetpackActive() || gliding)) {
+            CompoundTag data = new CompoundTag();
+            data.putInt("player", player.getId());
+            HbmEffect.sendPacket(level, HbmEffect.JETPACK_DNS, player.getX(), player.getY(), player.getZ(), 100, data);
+        }
 
         if (!ArmorFSB.hasFSBArmor(player)) return;
 

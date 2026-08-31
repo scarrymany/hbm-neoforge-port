@@ -1,0 +1,46 @@
+{
+  "parent": "hbm:achburnerpress",
+  "display": {
+    "icon": {
+      "id": "hbm:ingot_starmetal"
+    },
+    "title": {
+      "translate": "achievement.selenium"
+    },
+    "description": {
+      "translate": "achievement.selenium.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crafting_hbm_piston_selenium": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:piston_selenium"
+          }
+        ]
+      }
+    },
+    "crafting_hbm_gun_b92": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:gun_b92"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "crafting_hbm_piston_selenium",
+      "crafting_hbm_gun_b92"
+    ]
+  ]
+}

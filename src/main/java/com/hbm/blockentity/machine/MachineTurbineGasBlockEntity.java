@@ -11,6 +11,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.container.machine.MachineTurbineGasMenu;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,6 +19,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -127,6 +129,13 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
             temp = TEMP_IDLE * (counter - 50) / 530;
         }
 
+        // CE: TileEntityMachineTurbineGas.startup() - one-shot ignition sound at the exact tick the
+        // rpm gauge's 0-100-0 sweep finishes and idle ramp-up begins.
+        if (counter == 50) {
+            level.playSound(null, worldPosition.getX(), worldPosition.getY() + 2, worldPosition.getZ(),
+                    HBMSoundHandler.turbinegasStartup.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+
         if (counter >= 580) {
             counter = 225;
             state = 1;
@@ -140,6 +149,10 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
 
         if (rpm <= 10 && counter > 0) {
             if (counter == 225) {
+                // CE: TileEntityMachineTurbineGas.shutdown() - one-shot spin-down sound the instant
+                // the cooldown ramp begins.
+                level.playSound(null, worldPosition.getX(), worldPosition.getY() + 2, worldPosition.getZ(),
+                        HBMSoundHandler.turbinegasShutdown.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                 rpmLast = rpm;
                 tempLast = temp;
             }
@@ -264,6 +277,15 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
             }
             default -> {
             }
+        }
+
+        // CE: TileEntityMachineTurbineGas's client-side branch - continuous AudioWrapper loop
+        // (HBMSoundHandler.turbinegasRunning, 20-tick keepAlive, pitch ramped by rpm) while
+        // rpm >= 10 and not mid-startup. No looped-block-audio bridge ported yet (see
+        // ChemPlantBlockEntity's identical note); substituted with a periodic broadcast every 20
+        // ticks, pitch approximating CE's 0.55 + 0.1 * rpm/10 ramp.
+        if (rpm >= 10 && state != -1 && level.getGameTime() % 20 == 0) {
+            level.playSound(null, worldPosition, HBMSoundHandler.turbinegasRunning.get(), SoundSource.BLOCKS, 2F, (float) (0.55D + 0.1D * rpm / 10D));
         }
 
         Direction dir = coreDirection();

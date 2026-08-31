@@ -1,0 +1,23 @@
+{
+  "parent": "hbm:bossmaskman",
+  "display": {
+    "icon": {
+      "id": "hbm:coin_worm"
+    },
+    "title": {
+      "translate": "achievement.bossWorm"
+    },
+    "description": {
+      "translate": "achievement.bossWorm.desc"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 120
+  }
+}

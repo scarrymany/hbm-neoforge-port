@@ -19,11 +19,15 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * {@link net.minecraft.sounds.SoundEvent} (not a datapack registry like {@code DamageType}) -
  * confirmed twice independently: Neo Edition's own {@code com.hbm.lib.ModEffect} (a different
  * project, real compiling 1.21.1 NeoForge source) and this port's own already-merged
- * {@link com.hbm.sound.ModSounds} (a different registry, identical
+ * {@link com.hbm.lib.HBMSoundHandler} (a different registry, identical
  * {@code DeferredRegister.create(BuiltInRegistries.X, MainRegistry.MODID)} shape). Call
  * {@link #register(IEventBus)} once from {@link MainRegistry}'s constructor, following the exact
- * {@code HBMSoundHandler.register(modEventBus); ModSounds.register(modEventBus);} precedent already
- * in that constructor's call list.
+ * {@code HBMSoundHandler.register(modEventBus);} precedent already in that constructor's call list.
+ * <p>
+ * <b>Note (f1-sound-registry-dedup):</b> a previously-duplicate {@code com.hbm.sound.ModSounds}
+ * {@code SoundEvent} registry (159 ids colliding with {@link com.hbm.lib.HBMSoundHandler}'s own)
+ * has been deleted; {@link com.hbm.lib.HBMSoundHandler} is now the sole {@code SoundEvent} registry
+ * in this port.
  * <p>
  * Every color literal below is CE's own real {@code preinit()} hex/decimal value (independently
  * decimal-to-hex verified in the research report) - <b>do not copy Neo Edition's own several wrong

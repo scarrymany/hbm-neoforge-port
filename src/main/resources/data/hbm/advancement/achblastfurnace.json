@@ -1,0 +1,35 @@
+{
+  "parent": "hbm:achburnerpress",
+  "display": {
+    "icon": {
+      "id": "hbm:machine_blast_furnace"
+    },
+    "title": {
+      "translate": "achievement.blastFurnace"
+    },
+    "description": {
+      "translate": "achievement.blastFurnace.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crafting_hbm_machine_blast_furnace": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:machine_blast_furnace"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "crafting_hbm_machine_blast_furnace"
+    ]
+  ]
+}

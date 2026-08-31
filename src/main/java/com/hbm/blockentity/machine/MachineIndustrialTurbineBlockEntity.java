@@ -5,12 +5,14 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -72,6 +74,17 @@ public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity 
         long target = Math.min((long) (Math.max(this.spin, 0.05D) * maxPower), this.flywheelEnergy);
         this.flywheelEnergy -= target;
         this.powerBuffer = target;
+
+        // CE: TileEntityMachineIndustrialTurbine.onClientTick() - continuous AudioWrapper loop
+        // (HBMSoundHandler.largeTurbineRunning, 20-tick keepAlive) while spinning, volume/pitch ramped
+        // live by `spin` and range-gated to nearby players client-side. No looped-block-audio bridge
+        // or per-client range gating ported yet (see ChemPlantBlockEntity's identical note);
+        // substituted with a periodic server broadcast every 20 ticks, pitch approximating CE's
+        // 0.5 + min(1, spin*2) * 0.5 ramp.
+        if (this.spin > 0 && level != null && level.getGameTime() % 20 == 0) {
+            float spinNum = (float) Math.min(1D, this.spin * 2D);
+            level.playSound(null, worldPosition, HBMSoundHandler.largeTurbineRunning.get(), SoundSource.BLOCKS, 0.25F + spinNum * 0.75F, 0.5F + spinNum * 0.5F);
+        }
     }
 
     @Override

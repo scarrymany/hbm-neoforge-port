@@ -1,8 +1,8 @@
 package com.hbm.packet.toclient;
 
 import com.hbm.main.MainRegistry;
+import com.hbm.particle.ModParticleTypes;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -28,14 +28,14 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  * {@link ExplosionEffectSyncPacket}/{@code ExplosionEffectStandard}
  * {@code CustomPacketPayload}/{@code PacketDistributor.sendToPlayersNear} pattern verbatim.
  * <p>
- * <b>Visual substitution, documented not silently invented</b>: CE's real {@code RadFog} particle
- * (a custom haze-puff sprite, {@code HbmEffectNT.RadFog}) has no 1.21 equivalent registered anywhere
- * in this port yet (no custom particle-type registry exists at all in this pass - confirmed by
- * repo-wide search). This client handler spawns a small burst of vanilla {@link ParticleTypes#CLOUD}
- * instead as a stand-in visual cue, matching this port's own precedent elsewhere (Phase 3's
- * {@code XFactoryEnergy}/{@code ExplosionNukeSmall} leave "TODO(phase5-particles)" markers for
- * identical missing-custom-particle gaps) - whichever future pass lands a real custom particle-type
- * registry should swap this stand-in for the genuine {@code RadFog} sprite.
+ * <b>Real {@code RadFog} particle now wired</b> (Phase 5 {@code c14-custom-particle-content} task):
+ * this handler originally spawned a vanilla {@link net.minecraft.core.particles.ParticleTypes#CLOUD}
+ * stand-in, documented at the time as waiting on "whichever future pass lands a real custom
+ * particle-type registry" - that registry ({@code com.hbm.particle.ModParticleTypes}, the sibling
+ * {@code f4-particle-registry-and-events} task) and this type's real render
+ * ({@code com.hbm.client.particle.RadiationFogParticle}, CE's own {@code ParticleRadiationFog}
+ * transcribed in full - see that class's javadoc) both now exist, so this handler spawns
+ * {@link ModParticleTypes#RADIATION_FOG} directly instead.
  */
 public record RadFogPayload(double x, double y, double z) implements CustomPacketPayload {
 
@@ -62,12 +62,11 @@ public record RadFogPayload(double x, double y, double z) implements CustomPacke
             Level level = Minecraft.getInstance().level;
             if (level == null) return;
 
-            for (int i = 0; i < 6; i++) {
-                double ox = packet.x + (level.random.nextDouble() - 0.5D) * 2.0D;
-                double oy = packet.y + (level.random.nextDouble() - 0.5D) * 1.0D;
-                double oz = packet.z + (level.random.nextDouble() - 0.5D) * 2.0D;
-                level.addParticle(ParticleTypes.CLOUD, ox, oy, oz, 0.0D, 0.01D, 0.0D);
-            }
+            // CE: HbmEffectNT.RadFog spawns exactly one ParticleRadiationFog at the broadcast point
+            // (HbmEffectNT.java:141-148) - that single instance's own 25-quad static offset cluster
+            // (see RadiationFogParticle's class javadoc) is what produces the sprawling haze look, not
+            // a manual multi-spawn burst at this call site.
+            level.addParticle(ModParticleTypes.RADIATION_FOG.get(), packet.x, packet.y, packet.z, 0.0D, 0.0D, 0.0D);
         });
     }
 

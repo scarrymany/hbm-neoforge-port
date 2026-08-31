@@ -17,9 +17,14 @@ import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
  *   derived check against {@link #ENABLE_EXPENSIVE_MODE}.</li>
  *   <li>The GL 3.3 capability gating that force-disabled {@code instancedParticles} and the
  *   shader-driven effects ({@code depthEffects}, {@code bloom}, {@code heatDistortion}, etc.) on
- *   unsupported hardware, via {@code com.hbm.render.GLCompat}. GL 3.3 is far below Minecraft
- *   1.21's own baseline, so the original safety net is obsolete; whoever owns the render pipeline
- *   intersection should confirm whether any such gate is still needed at all.</li>
+ *   unsupported hardware, via {@code com.hbm.render.GLCompat}. <b>Resolved</b> (per
+ *   {@code docs/phase5/particle_engine_and_generic_vfx.md} Finding 1/2): no such gate is needed at
+ *   all - the 1.21.1 particle-batch replacement ({@link com.hbm.particle.engine.ParticleEngineNT}) is
+ *   vanilla {@code RenderType}/{@code VertexConsumer} batching, not raw GL instancing, so there is no
+ *   hardware capability left to probe for. {@code INSTANCED_PARTICLES} is instead redefined as a
+ *   density knob: {@link com.hbm.particle.engine.ParticleEngineNT} halves its particle-count cap when
+ *   this is {@code false}, rather than forking two render code paths - see that class's own
+ *   javadoc.</li>
  *   <li>{@code leadSafeForgeContainerWhitelist} - CE entries are {@code modid:item:meta} triples,
  *   and item metadata no longer exists under the 1.21 Data Component model. This will need a
  *   redesign (likely keyed by item id alone) once fluid container itemization is ported.</li>

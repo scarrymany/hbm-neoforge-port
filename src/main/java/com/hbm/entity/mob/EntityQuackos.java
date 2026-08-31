@@ -1,6 +1,8 @@
 package com.hbm.entity.mob;
 
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -118,12 +120,21 @@ public class EntityQuackos extends EntityDuck {
     }
 
     /**
-     * CE: {@code despawn()} - a 150-particle {@code HbmEffectNT.BF} burst (Phase 5 client VFX, not
-     * ported - see this task's knownGaps) followed by {@code this.isDead = true}, bypassing the normal
-     * death event/loot path entirely. {@link com.hbm.items.tool.ItemPeas}'s sole call site.
+     * CE: {@code despawn()} - a 150-particle {@link HbmEffect#BF} burst (now wired, see this method's
+     * own inline comment for the network-efficiency deviation) followed by {@code this.isDead = true},
+     * bypassing the normal death event/loot path entirely. {@link com.hbm.items.tool.ItemPeas}'s sole
+     * call site.
      */
     public void despawn() {
         if (!this.level().isClientSide) {
+            // CE broadcasts 150 SEPARATE AuxParticlePacketNT(BF) packets here, each spawning one
+            // particle at its own randomized offset (upstream/hbm-ce/.../EntityQuackos.java:141-150) -
+            // collapsed into one packet carrying count=150, with the client spawning the whole burst
+            // locally from the same offset formula (see HbmEffect.BF's own handler javadoc for the
+            // matching network-side note). Radius 150, matching CE's own TargetPoint.
+            CompoundTag data = new CompoundTag();
+            data.putInt("count", 150);
+            HbmEffect.sendPacket(this.level(), HbmEffect.BF, this.getX(), this.getY(), this.getZ(), 150, data);
             this.discard();
         }
     }

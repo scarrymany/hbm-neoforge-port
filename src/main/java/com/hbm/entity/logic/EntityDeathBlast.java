@@ -4,6 +4,7 @@ import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.entity.projectile.LegacyMobBulletConfigs;
 import com.hbm.interfaces.IConstantRenderer;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,12 +33,11 @@ import javax.annotation.Nullable;
  *     <li>unconditionally: an explosion sound broadcast.</li>
  * </ol>
  * <p>
- * <b>Not ported</b>: CE's unconditional networked particle burst
- * ({@code AuxParticlePacketNT(HbmEffectNT.Muke, ...)} via {@code PacketThreading}) - that
- * packet/particle-helper infrastructure does not exist in this port yet, matching the identical
- * documented Phase 5 gap already established by {@code ExplosionLarge}/{@code ExplosionEffectWeapon}
- * for every other CE networked-particle call site. The sound half of that same CE line is real and
- * kept.
+ * <b>{@link HbmEffect#MUKE} broadcast now wired</b> (was previously dropped, matching the identical
+ * documented Phase 5 gap {@code ExplosionLarge}/{@code ExplosionEffectWeapon} had for every other CE
+ * networked-particle call site): CE's unconditional {@code AuxParticlePacketNT(HbmEffectNT.Muke, null,
+ * posX, posY+0.5, posZ)} broadcast, radius 250 ({@code upstream/hbm-ce/.../EntityDeathBlast.java:56}),
+ * now sent via {@link HbmEffect#sendPacket} - see {@code docs/phase5/particle_engine_and_generic_vfx.md}.
  * <p>
  * <b>Ring-fan velocity - a documented, deliberate adaptation, not a byte-for-byte match.</b> CE sets
  * each bolt's raw {@code motionX/Z} directly to a small (0.2 magnitude) vector with no re-scaling -
@@ -120,5 +120,6 @@ public class EntityDeathBlast extends Entity implements IConstantRenderer {
         }
 
         level().playSound(null, getX(), getY(), getZ(), HBMSoundHandler.mukeExplosion.get(), SoundSource.HOSTILE, 25.0F, 0.9F);
+        HbmEffect.sendPacket(level(), HbmEffect.MUKE, getX(), getY() + 0.5, getZ(), 250, null);
     }
 }

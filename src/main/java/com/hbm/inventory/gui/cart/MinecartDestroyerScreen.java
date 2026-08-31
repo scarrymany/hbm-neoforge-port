@@ -15,15 +15,18 @@ import net.minecraft.world.entity.player.Inventory;
  */
 public class MinecartDestroyerScreen extends GuiInfoContainer<MinecartDestroyerMenu> {
 
+    // CE's real filename is gui_destroyer.png, not gui_cart_destroyer.png - see the survey's
+    // Headline finding 2 (right folder, wrong filename).
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/cart/gui_cart_destroyer.png");
+            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/cart/gui_destroyer.png");
 
     public MinecartDestroyerScreen(MinecartDestroyerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         // CE: two 3x3 filter-template banks (rows end at y=71), player inventory rows starting at
         // y=84, hotbar at y=142 - see MinecartDestroyerMenu's own slot layout.
+        // ySize is CE's real 166, not 168 - see the survey's Headline finding 5.
         this.imageWidth = 176;
-        this.imageHeight = 168;
+        this.imageHeight = 166;
     }
 
     @Override

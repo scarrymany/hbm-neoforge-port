@@ -2,8 +2,12 @@ package com.hbm.entity.logic;
 
 import com.hbm.config.GeneralConfig;
 import com.hbm.explosion.ExplosionChaos;
+import com.hbm.interfaces.IConstantRenderer;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
@@ -29,10 +33,23 @@ import net.minecraft.world.phys.Vec3;
  * scope per this task's explicit instruction) and are left as documented no-op branches rather than
  * inventing new entity classes for them.
  * <p>
- * <b>CE's {@code STYLE} synced byte (cosmetic bomber-model variant selector) is not ported</b> - purely
- * a client rendering concern with zero gameplay effect, matching this port's established
- * deferred-cosmetic-field precedent (see e.g. {@code LegacyMobBulletConfigs}'s own class javadoc for
- * the identical reasoning applied to a sibling Phase 4 package).
+ * <b>CE's {@code STYLE} synced byte (cosmetic bomber-model variant selector) - now ported</b>, as a
+ * small, necessary addition for {@link com.hbm.client.render.entity.logic.BomberRenderer} (this
+ * task's own client-rendering pass, not the original Phase 4 port): a plain unsynced field would
+ * always read as its client-side default on every tracked instance (the same class of gap {@code
+ * docs/phase5/boss_and_vehicle_entity_renderers.md} Headline finding #5 flagged for {@code
+ * EntityUFO.beam}, fixed there the identical way), so {@link #STYLE} is a real {@link
+ * SynchedEntityData} accessor, matching CE's real {@code DataParameter<Byte> STYLE} 1:1, including
+ * every {@code statFacX} factory's exact assignment (Carpet/Napalm/Chlorine/Orange leave the
+ * registered default 0 - Dornier variant 0; ABomb rolls a random B29 variant 5-7, 1-in-100 chance of
+ * 8; Stinger/Boxcar/PC hard-code 4/6/6 respectively - transcribed 1:1 from CE's real {@code
+ * EntityBomber.java} source, not re-derived).</b>
+ * <p>
+ * <b>{@link #IConstantRenderer}</b> - CE's real {@code EntityBomber implements IConstantRenderer}
+ * (confirmed directly, {@code upstream/hbm-ce/.../EntityBomber.java:27}), independently re-confirmed
+ * here rather than merely inherited from the boss/vehicle report's citation; added alongside {@link
+ * #STYLE} for the same "small renderer-driven entity-side fix" reason, matching this task's own
+ * sibling fixes to {@code EntityBlackHole}/{@code EntityMIRV}/{@code EntityUFO}.
  * <p>
  * <b>{@code isWarDim} gate - a real, deliberate default-true stub</b>, matching this port's own
  * established convention for the identical CE mechanic (see {@code com.hbm.potion.
@@ -41,7 +58,11 @@ import net.minecraft.world.phys.Vec3;
  * operator opts a dimension out - stubbing {@code false} would silently disable real CE-default
  * behavior, not preserve it).
  */
-public class EntityBomber extends EntityPlaneBase {
+public class EntityBomber extends EntityPlaneBase implements IConstantRenderer {
+
+    /** See class javadoc's "STYLE synced byte" note. CE: {@code DataParameter<Byte> STYLE}. */
+    private static final EntityDataAccessor<Byte> STYLE =
+            SynchedEntityData.defineId(EntityBomber.class, EntityDataSerializers.BYTE);
 
     private int bombStart = 75;
     private int bombStop = 125;
@@ -54,6 +75,17 @@ public class EntityBomber extends EntityPlaneBase {
 
     public EntityBomber(Level level) {
         this(PlaneEntityTypes.BOMBER.get(), level);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(STYLE, (byte) 0);
+    }
+
+    /** CE: {@code RenderBomber}'s own {@code (int) entity.getDataManager().get(STYLE)} read. */
+    public byte getStyle() {
+        return this.entityData.get(STYLE);
     }
 
     public static EntityBomber statFacCarpet(Level level, double x, double y, double z) {
@@ -107,6 +139,15 @@ public class EntityBomber extends EntityPlaneBase {
         bomber.bombStop = 70;
         bomber.bombRate = 65;
         bomber.fac(x, y, z);
+        // CE: a random B29 variant (5-7), with a 1-in-100 chance of the rare 4th variant (8).
+        int style;
+        switch (level.random.nextInt(3)) {
+            case 0 -> style = 5;
+            case 1 -> style = 6;
+            default -> style = 7;
+        }
+        if (level.random.nextInt(100) == 0) style = 8;
+        bomber.entityData.set(STYLE, (byte) style);
         bomber.type = 4;
         return bomber;
     }
@@ -118,6 +159,7 @@ public class EntityBomber extends EntityPlaneBase {
         bomber.bombStop = 150;
         bomber.bombRate = 10;
         bomber.fac(x, y, z);
+        bomber.entityData.set(STYLE, (byte) 4);
         bomber.type = 5;
         return bomber;
     }
@@ -129,6 +171,7 @@ public class EntityBomber extends EntityPlaneBase {
         bomber.bombStop = 150;
         bomber.bombRate = 10;
         bomber.fac(x, y, z);
+        bomber.entityData.set(STYLE, (byte) 6);
         bomber.type = 6;
         return bomber;
     }
@@ -140,6 +183,7 @@ public class EntityBomber extends EntityPlaneBase {
         bomber.bombStop = 125;
         bomber.bombRate = 1;
         bomber.fac(x, y, z);
+        bomber.entityData.set(STYLE, (byte) 6);
         bomber.type = 7;
         return bomber;
     }
@@ -211,6 +255,8 @@ public class EntityBomber extends EntityPlaneBase {
         this.bombStop = tag.getInt("bombStop");
         this.bombRate = tag.getInt("bombRate");
         this.type = tag.getInt("type");
+        // CE: readEntityFromNBT also restores STYLE from NBT (EntityBomber.java:319) - matched here.
+        this.entityData.set(STYLE, tag.getByte("style"));
     }
 
     @Override
@@ -220,5 +266,7 @@ public class EntityBomber extends EntityPlaneBase {
         tag.putInt("bombStop", this.bombStop);
         tag.putInt("bombRate", this.bombRate);
         tag.putInt("type", this.type);
+        // CE: writeEntityToNBT also persists STYLE (EntityBomber.java:330) - matched here.
+        tag.putByte("style", this.entityData.get(STYLE));
     }
 }

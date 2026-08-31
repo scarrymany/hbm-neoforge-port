@@ -9,6 +9,7 @@ import com.hbm.inventory.recipes.chem.CentrifugeRecipes;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.inventory.container.machine.chem.CentrifugeMenu;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -16,6 +17,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -172,6 +174,14 @@ public class CentrifugeBlockEntity extends MachineBaseBlockEntity
             }
         } else {
             progress = 0;
+        }
+
+        // CE: TileEntityMachineCentrifuge.getLoopedSound() - continuous AudioWrapper loop
+        // (HBMSoundHandler.centrifugeOperate, 20-tick keepAlive) while spinning. No looped-block-audio
+        // bridge ported yet (see ChemPlantBlockEntity's identical note); substituted with a periodic
+        // broadcast every 20 ticks while progressing.
+        if (isProgressing && level.getGameTime() % 20 == 0) {
+            level.playSound(null, worldPosition, HBMSoundHandler.centrifugeOperate.get(), SoundSource.BLOCKS, 1F, 1.0F);
         }
 
         dataChanged();

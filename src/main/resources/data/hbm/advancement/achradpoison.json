@@ -1,0 +1,22 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:geiger_counter"
+    },
+    "title": {
+      "translate": "achievement.radPoison"
+    },
+    "description": {
+      "translate": "achievement.radPoison.desc"
+    }
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 17
+  }
+}

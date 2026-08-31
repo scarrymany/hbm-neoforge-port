@@ -16,6 +16,8 @@ import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Gaseous;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Gaseous_ART;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Liquid;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple.FT_Viscous;
+import com.hbm.main.MainRegistry;
+import com.hbm.particle.HbmEffect;
 import com.hbm.util.ContaminationUtil;
 import com.hbm.util.ContaminationUtil.ContaminationType;
 import com.hbm.util.ContaminationUtil.HazardType;
@@ -186,8 +188,24 @@ public class EntityMist extends Entity {
                 }
             }
         } else {
-            // TODO(Phase 5): CE's client-side HbmEffectNT.Tower particle broadcast (2 per tick, purely
-            // cosmetic) lives here - see class javadoc.
+            // CE's client-side HbmEffectNT.Tower particle broadcast (2 per tick, purely cosmetic,
+            // upstream/hbm-ce/.../EntityMist.java:141-155) - already running client-side (this is the
+            // level().isClientSide() branch), so dispatched directly via MainRegistry.proxy.effectNT
+            // rather than a network round-trip, matching CE's own MainRegistry.proxy.effectNT(...)
+            // direct-call shape exactly.
+            for (int i = 0; i < 2; i++) {
+                double px = getX() - width / 2D + level().random.nextDouble() * width;
+                double py = getY() + level().random.nextDouble() * height;
+                double pz = getZ() - width / 2D + level().random.nextDouble() * width;
+
+                CompoundTag fx = new CompoundTag();
+                fx.putFloat("lift", 0.5F);
+                fx.putFloat("base", 0.75F);
+                fx.putFloat("max", 2F);
+                fx.putInt("life", 50 + level().random.nextInt(10));
+                fx.putInt("color", getType().getColor());
+                MainRegistry.proxy.effectNT(HbmEffect.TOWER, px, py, pz, fx);
+            }
         }
     }
 

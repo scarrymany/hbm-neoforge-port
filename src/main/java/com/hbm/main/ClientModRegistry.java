@@ -8,10 +8,18 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
+import com.hbm.blockentity.machine.rbmk.RBMKBlockEntities;
+import com.hbm.client.render.ClientEntityRenderers;
+import com.hbm.client.render.blockentity.rbmk.RBMKAutoloaderPistonRenderer;
+import com.hbm.client.render.blockentity.rbmk.RBMKConsoleHeatmapRenderer;
+import com.hbm.client.render.blockentity.rbmk.RBMKControlRodRenderer;
+import com.hbm.client.render.blockentity.rbmk.RBMKFuelColumnRenderer;
 import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.gui.BatteryScreen;
 import com.hbm.inventory.gui.CrateScreen;
 import com.hbm.inventory.gui.FluidTankScreen;
+import com.hbm.particle.HbmEffect;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
 /**
  * Client-only bootstrap mod class, mirroring the Neo Edition reference's
@@ -55,11 +63,23 @@ public class ClientModRegistry {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            // Ready for the first area that needs client-only setup work to add to:
-            // item/block renderer registration, tooltip hooks, entity/block-entity
-            // renderer registration, RegisterColorHandlersEvent-adjacent follow-up, etc.
-            // See NuclearTechModClient.onClientSetup in the Neo Edition reference for the
-            // confirmed real-world shape once work lands here.
+            // Phase 5: bulk safe-fallback + bespoke EntityRenderers pass for every one of this port's
+            // custom EntityTypes - see com.hbm.client.render.ClientEntityRenderers's own class javadoc.
+            ClientEntityRenderers.registerAll();
+
+            // Phase 5 (reactor_and_explosion_visual_effects / c1-rbmk-renderers): the 4 RBMK reactor
+            // BlockEntityRenderers, each backing 1-2 concrete BlockEntityTypes.
+            BlockEntityRenderers.register(RBMKBlockEntities.CONTROL_MANUAL.get(), RBMKControlRodRenderer.Provider::new);
+            BlockEntityRenderers.register(RBMKBlockEntities.CONTROL_AUTO.get(), RBMKControlRodRenderer.Provider::new);
+            BlockEntityRenderers.register(RBMKBlockEntities.ROD.get(), RBMKFuelColumnRenderer.Provider::new);
+            BlockEntityRenderers.register(RBMKBlockEntities.ROD_REASIM.get(), RBMKFuelColumnRenderer.Provider::new);
+            BlockEntityRenderers.register(RBMKBlockEntities.CONSOLE.get(), RBMKConsoleHeatmapRenderer.Provider::new);
+            BlockEntityRenderers.register(RBMKBlockEntities.AUTOLOADER.get(), RBMKAutoloaderPistonRenderer.Provider::new);
+
+            // Phase 5 (particle_engine_and_generic_vfx): registers every HbmEffect constant's
+            // client-only render handler - must run once, client-side only, before any
+            // HbmEffectPacket is handled.
+            HbmEffect.registerHandlers();
         });
     }
 

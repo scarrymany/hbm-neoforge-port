@@ -1,0 +1,22 @@
+{
+  "parent": "hbm:bosscreeper",
+  "display": {
+    "icon": {
+      "id": "hbm:coin_maskman"
+    },
+    "title": {
+      "translate": "achievement.bossMaskman"
+    },
+    "description": {
+      "translate": "achievement.bossMaskman.desc"
+    }
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 80
+  }
+}

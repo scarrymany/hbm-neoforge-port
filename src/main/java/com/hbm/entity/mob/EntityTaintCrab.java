@@ -3,7 +3,9 @@ package com.hbm.entity.mob;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.items.weapon.sedna.content.XFactory762mm;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import com.hbm.potion.HbmPotionEffects;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -93,11 +95,16 @@ public class EntityTaintCrab extends EntityCyberCrab {
         if (this.level().isClientSide) return;
 
         EntityBulletBaseMK4 bullet = new EntityBulletBaseMK4(this, XFactory762mm.r762_fmj, 10F, 0F, 0D, 0D, 0D);
+
+        CompoundTag data = new CompoundTag();
+        data.putString("mode", "flame");
+        data.putDouble("mX", bullet.getDeltaMovement().x * 0.3);
+        data.putDouble("mY", bullet.getDeltaMovement().y * 0.3);
+        data.putDouble("mZ", bullet.getDeltaMovement().z * 0.3);
+        HbmEffect.sendPacket(this.level(), HbmEffect.VANILLA, bullet.getX(), bullet.getY(), bullet.getZ(), 50, data);
+
         this.level().addFreshEntity(bullet);
         this.playSound(HBMSoundHandler.sawShoot.get(), 1.0F, 0.5F);
-        // CE also broadcasts a client-only AuxParticlePacketNT flame-trail burst here - Phase 5 VFX,
-        // not ported (HbmEffectNT doesn't exist in this port), matching this package's other
-        // deferred-particle notes.
     }
 
     @Override

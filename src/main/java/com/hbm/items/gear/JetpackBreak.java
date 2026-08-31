@@ -5,6 +5,8 @@ import com.hbm.handler.ArmorUtil;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.items.armor.JetpackFueledBase;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -25,8 +27,9 @@ import java.util.List;
  * {@code player.onGround()}/{@code getEnableBackpack()} accessor shapes). Registered at
  * {@code new JetpackBreak(properties, Fluids.KEROSENE, 12000)}.
  *
- * <p><b>Not ported</b> (documented TODO): CE's thruster particle packet - see
- * {@link JetpackRegular}'s identical note.
+ * <p>CE's thruster particle packet ({@link com.hbm.particle.HbmEffect#JETPACK}) is wired, gated on
+ * the same thrusting-or-gliding condition as the physics below
+ * ({@code upstream/hbm-ce/.../JetpackBreak.java:46-51}) - see {@link JetpackRegular}'s identical note.
  */
 public class JetpackBreak extends JetpackFueledBase {
 
@@ -46,10 +49,13 @@ public class JetpackBreak extends JetpackFueledBase {
     protected void onArmorTick(Level level, Player player, ItemStack stack) {
         HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
 
-        // TODO(particle system): CE spawns a HbmEffectNT.Jetpack AuxParticlePacketNT here while
-        // thrusting or gliding server-side - see class javadoc.
-
         if (getFuel(stack) <= 0) return;
+
+        if (props.isJetpackActive() || (!player.onGround() && !player.isShiftKeyDown() && props.getEnableBackpack())) {
+            CompoundTag data = new CompoundTag();
+            data.putInt("player", player.getId());
+            HbmEffect.sendPacket(level, HbmEffect.JETPACK, player.getX(), player.getY(), player.getZ(), 100, data);
+        }
 
         if (props.isJetpackActive()) {
             player.fallDistance = 0F;

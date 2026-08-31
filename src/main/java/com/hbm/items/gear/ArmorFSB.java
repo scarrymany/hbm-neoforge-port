@@ -28,6 +28,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 
@@ -356,6 +359,26 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
 
     public boolean isArmorEnabled(ItemStack stack) {
         return true;
+    }
+
+    /**
+     * CE: {@code ArmorFSB#handleOverlay(RenderGameOverlayEvent.Pre, EntityPlayer)} - a no-op base
+     * hook overridden by exactly one leaf class anywhere in CE, {@link com.hbm.items.armor.ArmorHEV}
+     * (confirmed by {@code grep -rln "void handleOverlay"} across all of CE - see
+     * {@code docs/phase5/hud_overlays_geiger_armor_gun.md} Headline finding 5 / Area B). Dispatched
+     * every frame, against the equipped helmet only, by
+     * {@code com.hbm.render.hud.ArmorHazardHudOverlay} - the 1.21.1 {@link RenderGuiLayerEvent.Pre}
+     * replacement for CE's {@code ModEventHandlerClient.onOverlayRender}, which called this same
+     * hook from two separate (redundant in CE) call sites.
+     * <p>
+     * A client-only event type directly on this common (both-physical-sides-loaded) item class
+     * follows this port's own already-committed precedent
+     * ({@link com.hbm.interfaces.IHoldableWeapon#renderHud}, {@code ItemGunBaseNT#renderHUD}) - safe
+     * because the JVM resolves method descriptors lazily and, like those two, this method is never
+     * invoked from any server-side code path (only from the client-only dispatcher named above).
+     */
+    @OnlyIn(Dist.CLIENT)
+    public void handleOverlay(RenderGuiLayerEvent.Pre event, Player player) {
     }
 
     public ArmorFSB enableThermalSight(boolean thermal) {

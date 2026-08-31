@@ -11,6 +11,7 @@ import com.hbm.inventory.fluid.trait.FT_Combustible;
 import com.hbm.inventory.container.machine.MachineCombustionEngineMenu;
 import com.hbm.items.machine.ItemPistons;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,6 +19,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -131,6 +133,14 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
         }
 
         if (power > MAX_POWER) power = MAX_POWER;
+
+        // CE: TileEntityMachineDiesel.getLoopedSound() - continuous AudioWrapper loop
+        // (HBMSoundHandler.engine, 10-tick keepAlive) while burning fuel. No looped-block-audio
+        // bridge ported yet (see ChemPlantBlockEntity's identical note); substituted with a periodic
+        // broadcast every 10 ticks while actively combusting.
+        if (wasOn && level.getGameTime() % 10 == 0) {
+            level.playSound(null, worldPosition, HBMSoundHandler.engine.get(), SoundSource.BLOCKS, 1F, 1.0F);
+        }
 
         if (wasOn) dataChanged();
         networkPackMK2(50);

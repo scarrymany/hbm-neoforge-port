@@ -14,6 +14,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes.ChemPlantRecipe;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,6 +22,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -224,6 +226,15 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
             } else {
                 isProcessing = false;
             }
+        }
+
+        // CE: TileEntityMachineChemicalPlant.getLoopedSound() - a continuous AudioWrapper loop
+        // (HBMSoundHandler.chemicalPlant, 20-tick keepAlive) while processing. This port has no
+        // looped-block-audio bridge yet (documented gap, see MachineRefineryBlockEntity's javadoc);
+        // substituted with a periodic broadcast every 20 ticks while active, matching EntityMeteor's
+        // established stand-in pattern for the same missing infra.
+        if (isProcessing && level.getGameTime() % 20 == 0) {
+            level.playSound(null, worldPosition, HBMSoundHandler.chemicalPlant.get(), SoundSource.BLOCKS, 1F, 1.0F);
         }
 
         dataChanged();

@@ -22,9 +22,15 @@ import java.util.Map;
  * new {@code Recipe<?>}/datagen shape for a single consumer, the lower-risk option that does not
  * block on the recipe/datagen cross-cutting work landing first.
  *
- * <p><b>Not ported</b>: CE's {@code getRefineryRecipe()}/{@code getVacuumRecipe()} (JEI-display-table
- * builders keyed by {@code ItemFluidIcon.make(...)}, an item this port has not ported) - JEI/REI
- * integration is out of this task's boundary per the research report's Deferred scope #8. The
+ * <p><b>Not ported</b>: CE's {@code getRefineryRecipe()}/{@code getVacuumRecipe()} (1.12.2-era
+ * JEI-display-table builders keyed by CE's own {@code ItemFluidIcon.make(...)}) - JEI/REI
+ * integration was out of this class's original task boundary per the research report's Deferred
+ * scope #8. <b>Correction (stale as of {@code c11-jei-recipe-categories}, docs/phase5/
+ * jei_integration.md's headline finding #3)</b>: the claim above that "an item this port has not
+ * ported" used to sit here - that is no longer true. This port's own {@link
+ * com.hbm.items.machine.ItemFluidIcon} (registered as {@code hbm:fluid_icon}) is the real
+ * equivalent and is what {@code com.hbm.compat.jei.category.RefineryCategory} (that task's own real
+ * JEI category for this class, added via {@link #getAllRefinery()} below) now uses. The
  * {@link #vacuum} data map itself is still ported (cheap, and {@code TileEntityMachineRefinery} never
  * actually reads it either in CE - no vacuum-refinery block/TE exists in either codebase - so
  * {@link #getVacuum(FluidType)} is provided for a future consumer, matching CE's own dead-until-used
@@ -127,5 +133,20 @@ public final class RefineryRecipes {
 
     public static Tuple.Quartet<FluidStack, FluidStack, FluidStack, FluidStack> getVacuum(FluidType oil) {
         return vacuum.get(oil);
+    }
+
+    /**
+     * Full-collection accessor added for {@code c11-jei-recipe-categories}
+     * ({@code docs/phase5/jei_integration.md}'s "Safe to build now" #4 - {@link #refinery} was
+     * previously point-lookup-only via {@link #getRefinery}) so a JEI category can enumerate every
+     * registered recipe, matching neo-edition's own real {@code RefineryRecipeHandler.getRecipes()}
+     * (which does the identical {@code refinery.entrySet()} flattening against its own structurally
+     * identical map). Calls {@link #registerRefinery()} defensively (idempotent) rather than
+     * assuming {@code CommonEvents}' common-setup call already ran - safe either way. Returns an
+     * unmodifiable view.
+     */
+    public static Map<FluidType, Tuple.Quintet<FluidStack, FluidStack, FluidStack, FluidStack, ItemStack>> getAllRefinery() {
+        registerRefinery();
+        return java.util.Collections.unmodifiableMap(refinery);
     }
 }

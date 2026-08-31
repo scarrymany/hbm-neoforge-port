@@ -1,0 +1,35 @@
+{
+  "parent": "hbm:achassembly",
+  "display": {
+    "icon": {
+      "id": "hbm:machine_chemical_plant"
+    },
+    "title": {
+      "translate": "achievement.chemplant"
+    },
+    "description": {
+      "translate": "achievement.chemplant.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crafting_hbm_machine_chemical_plant": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:machine_chemical_plant"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "crafting_hbm_machine_chemical_plant"
+    ]
+  ]
+}

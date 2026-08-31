@@ -1,0 +1,28 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:achievement_icon_questionmark"
+    },
+    "title": {
+      "translate": "achievement.hidden"
+    },
+    "description": {
+      "translate": "achievement.hidden.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

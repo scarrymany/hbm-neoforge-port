@@ -1,0 +1,28 @@
+{
+  "parent": "hbm:digammaknow",
+  "display": {
+    "icon": {
+      "id": "hbm:achievement_icon_digammakauaimoho"
+    },
+    "title": {
+      "translate": "achievement.digammaKauaiMoho"
+    },
+    "description": {
+      "translate": "achievement.digammaKauaiMoho.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

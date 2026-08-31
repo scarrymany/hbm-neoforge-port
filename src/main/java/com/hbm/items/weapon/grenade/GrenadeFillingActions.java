@@ -16,8 +16,10 @@ import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
 import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,9 +43,12 @@ import java.util.List;
  * <b>Forward references (documented, not silently dropped) - each one is called out again at its
  * exact call site below:</b>
  * <ul>
- *     <li>{@code com.hbm.entity.effect.EntityFireLingering} (INC/WP's lingering-fire payload) and the
- *     WP/energy-filling {@code AuxParticlePacketNT} VFX broadcasts - confirmed not ported anywhere in
- *     this tree (Phase 5 client-VFX scope per {@code docs/phase3/grenades.md}'s Deferred scope).</li>
+ *     <li>{@code com.hbm.entity.effect.EntityFireLingering} (INC/WP's lingering-fire payload) is
+ *     confirmed not ported anywhere in this tree. The WP/energy-filling {@code AuxParticlePacketNT}
+ *     VFX broadcasts ({@link #explodeWp}'s {@link com.hbm.particle.HbmEffect#HAZE} x3,
+ *     {@link #explodeStandardEnergy}'s {@link com.hbm.particle.HbmEffect#PLASMA_BLAST} x3,
+ *     {@link #spawnMush}'s {@link com.hbm.particle.HbmEffect#MUKE}) are now wired - see
+ *     {@code docs/phase5/particle_engine_and_generic_vfx.md}.</li>
  *     <li>{@code igniteAround}'s "ignite a flammable-adjacent air block" branch - CE's
  *     {@code Block#isFlammable(IBlockAccess,BlockPos,EnumFacing)} has no single confirmed 1.21.1
  *     replacement; dropped rather than guessed at, matching
@@ -120,7 +125,13 @@ public final class GrenadeFillingActions {
         standardExplode(grenade, 3F, 10F);
         // forward reference: EntityFireLingering(6x2 area, 600t, TYPE_PHOSPHORUS) - see class javadoc.
         // forward reference: igniteAround(...,3) - see class javadoc.
-        // forward reference: 3x AuxParticlePacketNT(Haze) broadcasts - see class javadoc.
+
+        Level level = grenade.level();
+        for (int i = 0; i < 3; i++) {
+            double hx = grenade.getX() + level.getRandom().nextGaussian() * 4;
+            double hz = grenade.getZ() + level.getRandom().nextGaussian() * 4;
+            HbmEffect.sendPacket(level, HbmEffect.HAZE, hx, grenade.getY(), hz, 150, null);
+        }
     }
 
     static void explodeCluster(EntityGrenadeUniversal grenade) {
@@ -148,16 +159,20 @@ public final class GrenadeFillingActions {
     }
 
     static void explodeEmp(EntityGrenadeUniversal grenade) {
-        explodeStandardEnergy(grenade, 30F, 3F);
+        // CE: explodeStandardEnergy(grenade, 30F, 3F, DamageClass.ELECTRIC, 0.5F, 0.5F, 1F, 3F) - a
+        // pale blue burst.
+        explodeStandardEnergy(grenade, 30F, 3F, 0.5F, 0.5F, 1F, 3F);
     }
 
     static void explodePlasma(EntityGrenadeUniversal grenade) {
         // CE's own code comment: "TODO: unique effect because this sucks" - CE itself flags this
         // filling's VFX as a placeholder; not worth over-polishing beyond parity here either.
-        explodeStandardEnergy(grenade, 50F, 5F);
+        // CE: explodeStandardEnergy(grenade, 50F, 5F, DamageClass.PLASMA, 0.5F, 1F, 0.5F, 4F) - a
+        // pale green burst.
+        explodeStandardEnergy(grenade, 50F, 5F, 0.5F, 1F, 0.5F, 4F);
     }
 
-    private static void explodeStandardEnergy(EntityGrenadeUniversal grenade, float damage, float range) {
+    private static void explodeStandardEnergy(EntityGrenadeUniversal grenade, float damage, float range, float r, float g, float b, float scale) {
         Level level = grenade.level();
         ExplosionVNT vnt = new ExplosionVNT(level, grenade.getX(), grenade.getY(), grenade.getZ(), range, grenade.getThrower());
         // forward reference: EntityProcessorCrossSmooth#setDamageClass(...) - see class javadoc.
@@ -166,7 +181,20 @@ public final class GrenadeFillingActions {
         vnt.explode();
         level.playSound(null, grenade.getX(), grenade.getY(), grenade.getZ(),
                 HBMSoundHandler.ufoBlast, SoundSource.HOSTILE, 5.0F, 0.9F + level.getRandom().nextFloat() * 0.2F);
-        // forward reference: 3x AuxParticlePacketNT(PlasmaBlast) broadcasts - see class javadoc.
+        level.playSound(null, grenade.getX(), grenade.getY(), grenade.getZ(),
+                SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.HOSTILE, 5.0F, 0.5F);
+
+        float yaw = level.getRandom().nextFloat() * 180F;
+        for (int i = 0; i < 3; i++) {
+            CompoundTag data = new CompoundTag();
+            data.putFloat("r", r);
+            data.putFloat("g", g);
+            data.putFloat("b", b);
+            data.putFloat("pitch", -60F + 60F * i);
+            data.putFloat("yaw", yaw);
+            data.putFloat("scale", scale);
+            HbmEffect.sendPacket(level, HbmEffect.PLASMA_BLAST, grenade.getX(), grenade.getY() + 0.125, grenade.getZ(), 100, data);
+        }
     }
 
     static void explodeLaser(EntityGrenadeUniversal grenade) {
@@ -243,7 +271,14 @@ public final class GrenadeFillingActions {
         // forward reference: SatelliteDetector.reportEvent(...) - see class javadoc. The sound below is real.
         level.playSound(null, grenade.getX(), grenade.getY(), grenade.getZ(),
                 HBMSoundHandler.mukeExplosion, SoundSource.HOSTILE, 15.0F, 1.0F);
-        // forward reference: AuxParticlePacketNT(Muke) mushroom-cloud broadcast - see class javadoc.
+
+        // CE's own rare "balefire" cosmetic flag (upstream/hbm-ce/.../ItemGrenadeFilling.java:265-266)
+        // - the random 1-in-100 half only; MainRegistry.polaroidID isn't confirmed ported.
+        CompoundTag data = new CompoundTag();
+        if (level.getRandom().nextInt(100) == 0) {
+            data.putBoolean("balefire", true);
+        }
+        HbmEffect.sendPacket(level, HbmEffect.MUKE, grenade.getX(), grenade.getY() + 0.5, grenade.getZ(), 250, data);
     }
 
     static void explodeSchrab(EntityGrenadeUniversal grenade) {

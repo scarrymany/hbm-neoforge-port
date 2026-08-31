@@ -134,6 +134,20 @@ public final class MixerRecipes {
     }
 
     /**
+     * Full-collection accessor added for {@code c11-jei-recipe-categories}
+     * ({@code docs/phase5/jei_integration.md}'s "Safe to build now" #4 - {@link #RECIPES} was
+     * previously point-lookup-only via {@link #getOutput}) so a JEI category can enumerate every
+     * registered recipe, including every entry of a competing-array output type (this port's own
+     * open-question flag on that array being easy to flatten incorrectly - see class javadoc - is
+     * why this returns the raw {@code Map<FluidType, MixerRecipe[]>} rather than pre-flattening it;
+     * the caller decides how to enumerate the array). Returns an unmodifiable view.
+     */
+    public static Map<FluidType, MixerRecipe[]> getAllRecipes() {
+        registerDefaults();
+        return java.util.Collections.unmodifiableMap(RECIPES);
+    }
+
+    /**
      * Auto-detection scan over every registered recipe, keyed by the two input tanks' current
      * contents plus the optional solid input - used by {@code MachineMixerBlockEntity} in place of
      * CE's manual "select target output fluid via GUI toggle, then the two input tanks re-derive

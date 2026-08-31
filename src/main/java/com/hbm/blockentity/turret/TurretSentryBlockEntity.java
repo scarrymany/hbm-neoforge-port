@@ -2,13 +2,17 @@ package com.hbm.blockentity.turret;
 
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Collections;
 import java.util.List;
@@ -136,13 +140,37 @@ public class TurretSentryBlockEntity extends TurretBaseBlockEntity {
                 consumeAmmo(conf.getAmmo());
                 level.playSound(null, worldPosition, HBMSoundHandler.sentryFire.get(), SoundSource.BLOCKS, 2.0F, 1.0F);
 
-                // TODO(phase3-gun-vfx): CE spawns a muzzle-flash particle burst here (AuxParticlePacketNT
-                // / HbmEffectNT.VanillaExt_LargeExplode) - deferred shared gun-VFX substrate.
+                // CE muzzle-flash burst (AuxParticlePacketNT/HbmEffectNT.VanillaExt_LargeExplode,
+                // upstream/hbm-ce/.../TileEntityTurretSentry.java:177-182, size=1F count=1) - simplified
+                // to the turret's own getTurretPos() rather than CE's exact barrel-side offset math
+                // (shared gun-VFX casing/muzzle substrate is still a documented open item, see class
+                // javadoc cross-reference to TurretBaseBlockEntity#spawnCasing).
+                CompoundTag flashData = new CompoundTag();
+                flashData.putFloat("size", 1F);
+                flashData.putInt("count", 1);
+                Vec3 muzzle = getTurretPos();
+                HbmEffect.sendPacket(level, HbmEffect.VANILLA_EXT_LARGE_EXPLODE, muzzle.x, muzzle.y, muzzle.z, 50, flashData);
 
                 if (shotSide) this.didJustShootLeft = true;
                 else this.didJustShootRight = true;
                 shotSide = !shotSide;
             }
+        }
+    }
+
+    /**
+     * CE: {@code TileEntityTurretSentry.seekNewTarget()} - plays a lock-on chirp exactly when the
+     * turret acquires a NEW target (not on every re-seek while already tracking the same one, and
+     * not on losing a target). Only this turret type plays this sound in CE (no other
+     * {@code TileEntityTurretBaseNT} subclass overrides {@code seekNewTarget} to add it).
+     */
+    @Override
+    protected void seekNewTarget() {
+        Entity previous = this.target;
+        super.seekNewTarget();
+
+        if (previous != this.target && this.target != null && level != null) {
+            level.playSound(null, worldPosition, HBMSoundHandler.sentryLockon.get(), SoundSource.BLOCKS, 2.0F, 1.5F);
         }
     }
 

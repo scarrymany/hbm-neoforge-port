@@ -1,7 +1,7 @@
 package com.hbm.entity.projectile;
 
 import com.hbm.damage.ModDamageTypes;
-import com.hbm.sound.ModSounds;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -137,7 +137,7 @@ public class EntityRubble extends ThrowableProjectile {
             this.discard();
 
             this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
-                    ModSounds.BLOCK_DEBRIS.get(), SoundSource.BLOCKS, 1.5F, 1.0F);
+                    HBMSoundHandler.blockDebris.get(), SoundSource.BLOCKS, 1.5F, 1.0F);
 
             // CE additionally broadcasts a custom ParticleBurstPacket(posX-1, posY, posZ-1, blockId,
             // meta) here - that packet type is not ported anywhere in this port. Substituted with the

@@ -1,0 +1,23 @@
+{
+  "parent": "hbm:horizonsend",
+  "display": {
+    "icon": {
+      "id": "hbm:sat_gerald"
+    },
+    "title": {
+      "translate": "achievement.horizonsBonus"
+    },
+    "description": {
+      "translate": "achievement.horizonsBonus.desc"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 2000
+  }
+}

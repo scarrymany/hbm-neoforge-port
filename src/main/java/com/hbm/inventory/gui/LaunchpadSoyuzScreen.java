@@ -16,16 +16,19 @@ import net.minecraft.world.entity.player.Inventory;
  */
 public class LaunchpadSoyuzScreen extends GuiInfoContainer<LaunchpadSoyuzMenu> {
 
+    // CE's real filename is gui_soyuz.png, not gui_launchpad_soyuz.png - see the survey's Headline
+    // finding 2 (right folder, wrong filename).
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/machine/gui_launchpad_soyuz.png");
+            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/machine/gui_soyuz.png");
 
     private final LaunchpadSoyuzBlockEntity pad;
 
     public LaunchpadSoyuzScreen(LaunchpadSoyuzMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.pad = menu.be;
+        // ySize is CE's real 244, not 240 - see the survey's Headline finding 4 (GUILaunchpadSoyuz.java).
         this.imageWidth = 194;
-        this.imageHeight = 240;
+        this.imageHeight = 244;
     }
 
     @Override

@@ -4,7 +4,9 @@ import com.hbm.config.BombConfig;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 
@@ -13,8 +15,11 @@ import net.minecraft.world.level.Level;
  * {@code @Deprecated} in CE itself) - a "mini-nuke" parameter-object builder used by several named
  * {@code MukeParams} presets (grenades/warheads at small-to-medium blast radii).
  * <p>
- * <b>Not ported (documented forward references)</b>: CE's networked particle burst ({@code
- * AuxParticlePacketNT}/{@code HbmEffectNT}, Phase 5) and the {@code params.miniNuke && !params.safe}
+ * <b>{@code MukeParams.particle} broadcast now wired</b> (defaults {@link com.hbm.particle.HbmEffect#MUKE},
+ * {@code PARAMS_TOTS} overrides to {@link com.hbm.particle.HbmEffect#TINY_TOT}, matching CE's own
+ * per-preset value) - see {@code docs/phase5/particle_engine_and_generic_vfx.md}.
+ * <p>
+ * <b>Not ported (documented forward reference)</b>: the {@code params.miniNuke && !params.safe}
  * branch's {@code ExplosionNT} mini-explosion (that older, non-vanillant explosion class was out of
  * this pass's read set per {@code docs/phase3/explosion_engine.md} - a real, separately-scoped
  * forward reference, not guessed at). {@link #dealDamage}'s AoE (via {@link
@@ -29,7 +34,16 @@ public final class ExplosionNukeSmall {
     }
 
     public static void explode(Level level, double posX, double posY, double posZ, MukeParams params) {
-        // TODO(AuxParticlePacketNT/HbmEffectNT, Phase 5): CE broadcasts a networked particle burst here.
+        if (params.particle != null) {
+            CompoundTag data = new CompoundTag();
+            // CE's own rare "balefire" cosmetic flag (upstream/hbm-ce/.../ExplosionNukeSmall.java:29-31)
+            // - a 1-in-100 chance tint, independent of CE's MainRegistry.polaroidID easter egg (that
+            // item/id is not confirmed ported anywhere in this port, so only the random half is kept).
+            if (params.particle == HbmEffect.MUKE && level.getRandom().nextInt(100) == 0) {
+                data.putBoolean("balefire", true);
+            }
+            HbmEffect.sendPacket(level, params.particle, posX, posY + 0.5, posZ, 250, data);
+        }
 
         level.playSound(null, BlockPos.containing(posX, posY, posZ), HBMSoundHandler.mukeExplosion.get(), SoundSource.BLOCKS, 15.0F, 1.0F);
 
@@ -76,6 +90,7 @@ public final class ExplosionNukeSmall {
     public static final MukeParams PARAMS_TOTS = new MukeParams() {{
         blastRadius = 10F;
         killRadius = 30F;
+        particle = HbmEffect.TINY_TOT;
         shrapnelCount = 0;
         radiationLevel = 1;
     }};
@@ -104,5 +119,7 @@ public final class ExplosionNukeSmall {
         public float radiationLevel = 1F;
         public int shrapnelCount = 25;
         public int resolution = 64;
+        /** CE: {@code MukeParams.particle}, defaults {@code HbmEffectNT.Muke} - {@code null} to send no particle broadcast at all. */
+        public HbmEffect particle = HbmEffect.MUKE;
     }
 }

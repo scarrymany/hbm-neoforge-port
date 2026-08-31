@@ -2,8 +2,10 @@ package com.hbm.items.food;
 
 import com.hbm.items.gear.GearItems;
 import com.hbm.items.special.ItemSimpleConsumable;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -91,6 +93,21 @@ public class ItemEnergy extends Item {
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         if (level.isClientSide() || !(entity instanceof Player player)) {
             return stack;
+        }
+
+        // c15 addition (docs/phase5/advancement_and_recipe_datagen_assets.md section 1.8's open
+        // question, resolved): achradium.json's minecraft:consume_item criterion needs
+        // CriteriaTriggers.CONSUME_ITEM fired for hbm:coffee_radium. ItemEnergy overrides Item#
+        // finishUsingItem the same way as the confirmed-real, compiling Neo Edition reference's own
+        // com.hbm.items.food.EnergyItem#finishUsingItem (upstream/neo-edition, read directly) -
+        // and that class, despite going through the exact same
+        // getUseDuration/getUseAnimation(DRINK)/ItemUtils.startUsingInstantly "hold to drink"
+        // pipeline this class uses, still calls CriteriaTriggers.CONSUME_ITEM.trigger(...) explicitly
+        // right here rather than relying on it firing automatically from some outer wrapper - so it
+        // does not fire "for free" in 1.21.1 either. Matched verbatim (same placement, same stack
+        // reference, before the effect switch below).
+        if (player instanceof ServerPlayer serverPlayer) {
+            CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, stack);
         }
 
         // TODO(VersatileConfig follow-up, docs/phase1/items_food_gear.md finding #2): CE calls

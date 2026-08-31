@@ -4,7 +4,9 @@ import com.hbm.handler.ArmorModHandler;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.gear.ArmorFSB;
+import com.hbm.particle.HbmEffect;
 import net.minecraft.core.Holder;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -25,9 +27,8 @@ import net.minecraft.world.level.Level;
  *     <li>accepting both {@code DIESEL} and {@code DIESEL_CRACK} as fuel (CE overrides
  *     {@code acceptsFluid} beyond {@link ArmorFSBFueled}'s single-{@code fuelType} default);</li>
  *     <li>a cosmetic particle-trail tick on the legs piece while the full set is worn, every 3
- *     ticks (CE: {@code AuxParticlePacketNT}/{@code HbmEffectNT.bnuuy}) - <b>stubbed</b> below with
- *     a documented TODO, since this port has no confirmed particle-packet system yet (see
- *     {@code docs/phase3/armor_equippable_framework.md} Open questions #6).</li>
+ *     ticks (CE: {@code AuxParticlePacketNT}/{@code HbmEffectNT.bnuuy}) - wired via
+ *     {@link com.hbm.particle.HbmEffect#BNUUY}, radius 100, matching CE's own call site 1:1.</li>
  * </ul>
  */
 public class ArmorDiesel extends ArmorFSBFueled {
@@ -66,9 +67,8 @@ public class ArmorDiesel extends ArmorFSBFueled {
         if (level.isClientSide() || !ArmorFSB.hasFSBArmor(player)) return;
         if (level.getGameTime() % 3 != 0) return;
 
-        // TODO(particle system): CE spawns a HbmEffectNT.bnuuy AuxParticlePacketNT here every 3
-        // ticks while the full set is worn. This port has no confirmed particle-packet system yet
-        // (docs/phase3/armor_equippable_framework.md Open questions #6) - purely cosmetic, no
-        // gameplay effect lost by the stub.
+        CompoundTag data = new CompoundTag();
+        data.putInt("player", player.getId());
+        HbmEffect.sendPacket(level, HbmEffect.BNUUY, player.getX(), player.getY(), player.getZ(), 100, data);
     }
 }

@@ -12,6 +12,7 @@ import com.hbm.inventory.recipes.CrystallizerRecipes;
 import com.hbm.inventory.recipes.CrystallizerRecipes.CrystallizerRecipe;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,6 +20,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -157,6 +159,14 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
 
         for (int cycle = 0; cycle < getCycleCount(); cycle++) {
             tick();
+        }
+
+        // CE: TileEntityMachineCrystallizer.getLoopedSound() - continuous AudioWrapper loop
+        // (HBMSoundHandler.chemicalPlant, pitch 0.75, 15-tick keepAlive) while a recipe is running.
+        // No looped-block-audio bridge ported yet (see ChemPlantBlockEntity's identical note);
+        // substituted with a periodic broadcast every 15 ticks while progress is advancing.
+        if (progress > 0 && level.getGameTime() % 15 == 0) {
+            level.playSound(null, worldPosition, HBMSoundHandler.chemicalPlant.get(), SoundSource.BLOCKS, 1F, 0.75F);
         }
 
         dataChanged();

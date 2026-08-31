@@ -14,6 +14,7 @@ import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes;
 import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes.PseudoFluidType;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
@@ -24,6 +25,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -268,6 +270,14 @@ public class GasCentrifugeBlockEntity extends MachineBaseBlockEntity
         } else {
             isProgressing = false;
             progress = 0;
+        }
+
+        // CE: TileEntityMachineGasCent.getLoopedSound() - continuous AudioWrapper loop
+        // (HBMSoundHandler.centrifugeOperate, 20-tick keepAlive) while enriching. No looped-block-audio
+        // bridge ported yet (see CentrifugeBlockEntity's identical note); substituted with a periodic
+        // broadcast every 20 ticks while progressing.
+        if (isProgressing && level.getGameTime() % 20 == 0) {
+            level.playSound(null, worldPosition, HBMSoundHandler.centrifugeOperate.get(), SoundSource.BLOCKS, 1F, 1.0F);
         }
 
         if (level.getGameTime() % 10 == 0) {

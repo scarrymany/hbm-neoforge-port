@@ -1,0 +1,31 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:fluid_icon",
+      "components": {
+        "hbm:fluid_id": 34
+      }
+    },
+    "title": {
+      "translate": "achievement.tasteofblood"
+    },
+    "description": {
+      "translate": "achievement.tasteofblood.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

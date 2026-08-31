@@ -8,9 +8,11 @@ import com.hbm.explosion.vanillant.standard.ExplosionEffectWeapon;
 import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
 import com.hbm.util.BobMathUtil;
 import com.hbm.util.ContaminationUtil;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -64,11 +66,12 @@ import java.util.function.BiConsumer;
  *     {@code HbmPotion} does not exist in this port yet (confirmed by the report's own Deferred scope,
  *     which names this exact gap and its owning package: {@code docs/phase4/hbm_potion_system.md}).</li>
  *     <li><b>Cosmetic-only legacy fields with no gameplay effect - {@code style}/{@code trail} (visual
- *     bullet appearance), {@code vPFX} (particle trail), and the client-side particle bursts in
- *     {@code getMaskmanMeteor}'s {@code bUpdate} / {@code getRocketUFOConfig}'s {@code bImpact} - are
- *     not ported</b>, matching the same deferred-particle pattern this port's own
- *     {@code XFactoryEnergy}/{@code XFactoryRocket} Sedna content already established (Phase 5 client
- *     scope; {@code HbmEffectNT}/{@code AuxParticlePacketNT} don't exist in this port).</li>
+ *     bullet appearance) and {@code vPFX} (particle trail) - are not ported</b>, matching the same
+ *     deferred-particle pattern this port's own {@code XFactoryEnergy}/{@code XFactoryRocket} Sedna
+ *     content already established. {@link #ufoRocketImpact}'s 3-shot {@code PlasmaBlast} burst
+ *     ({@code getRocketUFOConfig}'s {@code bImpact}, {@code upstream/hbm-ce/.../GunNPCFactory.java:328-338})
+ *     IS now wired via {@link com.hbm.particle.HbmEffect#PLASMA_BLAST} - see
+ *     {@code docs/phase5/particle_engine_and_generic_vfx.md}.</li>
  * </ul>
  */
 public final class LegacyMobBulletConfigs {
@@ -290,9 +293,17 @@ public final class LegacyMobBulletConfigs {
         // report's own returned knownGaps.
         level.playSound(null, pos.x, pos.y, pos.z, SoundEvents.FIREWORK_ROCKET_BLAST, SoundSource.HOSTILE, 5.0F, 0.5F);
         ContaminationUtil.radiate(level, pos.x, pos.y, pos.z, 50, 0, 0, 500);
-        // TODO(phase5-particles): CE also broadcasts a 3-shot PlasmaBlast particle burst here (client
-        // VFX) - HbmEffectNT/AuxParticlePacketNT don't exist in this port yet, matching this port's own
-        // XFactoryEnergy/XFactoryRocket deferred-particle precedent (see class javadoc).
+
+        for (int i = 0; i < 3; i++) {
+            CompoundTag data = new CompoundTag();
+            data.putFloat("r", 0.0F);
+            data.putFloat("g", 0.75F);
+            data.putFloat("b", 1.0F);
+            data.putFloat("pitch", -30F + 30F * i);
+            data.putFloat("yaw", level.random.nextFloat() * 180F);
+            data.putFloat("scale", 5F);
+            HbmEffect.sendPacket(level, HbmEffect.PLASMA_BLAST, pos.x, pos.y, pos.z, 100, data);
+        }
     }
 
     /**

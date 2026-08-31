@@ -2,6 +2,8 @@ package com.hbm.explosion.vanillant.standard;
 
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.interfaces.IExplosionSFX;
+import com.hbm.particle.HbmEffect;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 
 /**
@@ -11,17 +13,16 @@ import net.minecraft.world.level.Level;
  * this class's CE original doesn't even gate on {@code world.isRemote}, since the whole effect is a
  * single broadcast-and-forget packet).
  * <p>
- * {@code com.hbm.particle.helper.HbmEffectNT} / {@code com.hbm.packet.toclient.AuxParticlePacketNT} /
- * {@code com.hbm.handler.threading.PacketThreading} do not exist in this port yet (see
- * {@link ExplosionEffectTiny}'s javadoc - the same generic networked particle-effect framework, Phase
- * 5 scope). Left as a documented forward reference.
+ * Now wired via {@link com.hbm.particle.HbmEffect#AMAT_EXPLOSION}, radius 200, matching CE's own
+ * scale-carrying single-field payload and lack of an {@code isRemote} gate 1:1 (see
+ * {@link ExplosionEffectTiny}'s javadoc for the shared dispatch mechanism).
  */
 public class ExplosionEffectAmat implements IExplosionSFX {
 
     @Override
     public void doEffect(ExplosionVNT explosion, Level level, double x, double y, double z, float size) {
-        // forward reference: com.hbm.particle.helper.HbmEffectNT.AmatExplosion via
-        // com.hbm.packet.toclient.AuxParticlePacketNT / com.hbm.handler.threading.PacketThreading -
-        // CE's generic networked particle-effect framework, Phase 5 scope, not created this wave.
+        CompoundTag data = new CompoundTag();
+        data.putFloat("scale", size);
+        HbmEffect.sendPacket(level, HbmEffect.AMAT_EXPLOSION, x, y, z, 200, data);
     }
 }

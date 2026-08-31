@@ -1,0 +1,23 @@
+{
+  "parent": "hbm:bossworm",
+  "display": {
+    "icon": {
+      "id": "hbm:coin_ufo"
+    },
+    "title": {
+      "translate": "achievement.bossUFO"
+    },
+    "description": {
+      "translate": "achievement.bossUFO.desc"
+    },
+    "frame": "challenge"
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 200
+  }
+}

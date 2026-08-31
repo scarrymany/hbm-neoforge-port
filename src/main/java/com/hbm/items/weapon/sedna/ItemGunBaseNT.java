@@ -5,11 +5,14 @@ import com.hbm.interfaces.IItemHUD;
 import com.hbm.inventory.RecipesCommon;
 import com.hbm.items.IEquipReceiver;
 import com.hbm.items.IKeybindReceiver;
+import com.hbm.items.weapon.sedna.hud.HUDComponents;
+import com.hbm.items.weapon.sedna.hud.IHUDComponent;
 import com.hbm.items.weapon.sedna.mags.IMagazine;
 import com.hbm.items.weapon.sedna.mags.MagazineInfinite;
 import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.toclient.GunAnimationPayload;
+import com.hbm.render.misc.RenderScreenOverlay;
 import com.hbm.sound.AudioWrapper;
 import com.hbm.util.BobMathUtil;
 import com.hbm.weapon.anim.GunAnimationType;
@@ -31,6 +34,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
@@ -327,7 +331,11 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipRecei
      */
     public static void playAnimation(@Nullable Player player, ItemStack stack, HbmAnimationType type, int index) {
         if (player instanceof ServerPlayer serverPlayer) {
-            GunAnimationPayload.triggerGunAnimation(serverPlayer, stack, InteractionHand.MAIN_HAND, type, t -> true);
+            // c6-weapon-gun-rendering: pass `index` (the configs_DNA/gun-mode index) through to the
+            // network payload's new gunIndex field, instead of silently discarding it - see
+            // GunAnimationPayload's own class javadoc ("gunIndex()") for why this was a real, if
+            // narrow (single-config guns unaffected), Phase 3 wiring gap.
+            GunAnimationPayload.triggerGunAnimation(serverPlayer, stack, InteractionHand.MAIN_HAND, type, index, t -> true);
             setLastAnim(stack, index, type);
             setAnimTimer(stack, index, 0);
         }
@@ -472,16 +480,68 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipRecei
     }
 
     /**
-     * Stub - see {@code docs/phase3/weapon_animation_hooks.md}'s Deferred scope: the crosshair/HUD
-     * component render loop this replaces (CE's {@code renderHUD}) needs the not-yet-ported
-     * {@code hud} package ({@code IHUDComponent}) and this port's own client-side crosshair renderer,
-     * neither of which exist yet - Phase 5 scope. The hook point itself is wired (this class does
-     * implement {@link IItemHUD}) so Phase 5 has a real, already-correct call site to fill in rather
-     * than needing to add the {@code implements} clause itself.
+     * CE: {@code ItemGunBaseNT#renderHUD} (458-484, full) - see
+     * {@code docs/phase5/hud_overlays_geiger_armor_gun.md} Area C, read in full before editing.
+     * Dispatched by {@code com.hbm.render.hud.ItemHudDispatcher} against whichever hand holds this
+     * gun (CE: {@code ModEventHandlerClient.onOverlayRender}'s "HANDLE GUN AND AMMO OVERLAYS" block,
+     * main-hand-then-offhand priority) once per vanilla GUI layer that fires.
+     * <p>
+     * <b>CROSSHAIR</b>: cancels the vanilla crosshair and substitutes
+     * {@link RenderScreenOverlay#renderCustomCrosshairs}, using config index 0's crosshair choice -
+     * exactly CE's own real logic, including CE not gating this on first-person camera mode (see
+     * {@link RenderScreenOverlay}'s own javadoc for why that omission is intentionally preserved,
+     * not an oversight) and CE's own "leave the crosshair blank while aiming down sights" quirk
+     * ({@code getHideCrosshair(stack) && aimingProgress >= 1F} skips the draw call after already
+     * canceling vanilla's).
+     * <p>
+     * <b>Every other layer</b>: iterates every {@code GunConfig} this gun has (multi-config guns,
+     * e.g. akimbo/dual-receiver weapons) and every {@link IHUDComponent} each one lists, each
+     * component internally filtering to {@link VanillaGuiLayers#HOTBAR} itself (see
+     * {@code HUDComponentAmmoCounter}/{@code HUDComponentDurabilityBar}) - CE's own loop runs
+     * unconditionally over every event type for the same reason.
+     * <p>
+     * <b>CE bug fixed, not reproduced</b> ({@code docs/phase5/hud_overlays_geiger_armor_gun.md}
+     * Headline finding 9): CE re-declares {@code int bottomOffset = 0;} <i>inside</i> the
+     * per-component loop (its own line 477), so the running-total accumulation on the next line has
+     * no effect on the next component - every component in CE always renders at
+     * {@code bottomOffset = 0}. Neo Edition independently fixed this by moving the declaration
+     * outside the loop ({@code GunBaseNTItem.renderHUD}, 468, confirmed by direct read); this port
+     * follows Neo Edition's corrected version, per that finding's explicit recommendation.
+     * <p>
+     * <b>Real, documented deviation from CE</b>: when a config's {@code getHUDComponents(stack)}
+     * returns {@code null} (no {@code GunConfig#hud(...)} call was ever made for it), CE's own loop
+     * simply skips that config's HUD entirely ({@code if(components != null) for(...)}) - correct in
+     * CE only because {@code GunFactoryClient.init()} calls {@code .hud(...)} for every one of CE's
+     * ~60 Sedna guns by name, a per-gun wiring list this port does not yet reproduce (see
+     * {@link HUDComponents}' own javadoc). Falling back to {@link HUDComponents#DEFAULT} here instead
+     * of skipping means every Sedna gun in this port shows a real ammo counter + durability bar today
+     * rather than nothing, at the cost of not yet matching CE's handful of intentionally-different
+     * per-gun layouts (dual-mag mirroring, no-counter flamethrowers, ...) - a real, narrow, documented
+     * scope cut, not a silent behavior change for guns that already have {@code .hud(...)} wired.
      */
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderHUD(RenderGuiLayerEvent.Pre event, ResourceLocation layer, Player player, ItemStack stack, InteractionHand hand) {
-        // Intentionally empty - see method javadoc.
+        ItemGunBaseNT gun = (ItemGunBaseNT) stack.getItem();
+
+        if (layer.equals(VanillaGuiLayers.CROSSHAIR)) {
+            event.setCanceled(true);
+            GunConfig config = gun.getConfig(stack, 0);
+            if (config.getHideCrosshair(stack) && aimingProgress >= 1F) return;
+            RenderScreenOverlay.renderCustomCrosshairs(event.getGuiGraphics(), config.getCrosshair(stack));
+        }
+
+        int confNo = this.configs_DNA.length;
+
+        for (int i = 0; i < confNo; i++) {
+            IHUDComponent[] components = gun.getConfig(stack, i).getHUDComponents(stack);
+            if (components == null) components = HUDComponents.DEFAULT;
+
+            int bottomOffset = 0;
+            for (IHUDComponent component : components) {
+                component.renderHUDComponent(event, player, stack, bottomOffset, i);
+                bottomOffset += component.getComponentHeight(player, stack);
+            }
+        }
     }
 }

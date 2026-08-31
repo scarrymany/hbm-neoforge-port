@@ -90,6 +90,7 @@ public class ModItems {
         com.hbm.items.armor.ModCharmItems.registerAll();
         com.hbm.items.tool.MeteorToolItems.registerAll();
         com.hbm.items.tool.CartItems.registerAll();
+        com.hbm.items.special.AchievementIconItems.registerAll();
         ITEMS.register(modEventBus);
     }
 }

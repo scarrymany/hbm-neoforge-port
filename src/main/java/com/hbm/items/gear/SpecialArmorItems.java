@@ -1,9 +1,11 @@
 package com.hbm.items.gear;
 
 import com.hbm.items.ModItems;
+import com.hbm.main.MainRegistry;
 import com.hbm.main.MaterialRegistry;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ArmorItem;
@@ -17,6 +19,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -94,22 +97,35 @@ public final class SpecialArmorItems {
                     new Item.Properties().stacksTo(1).rarity(Rarity.EPIC)));
 
     // ==================== Gas masks (4) - ArmorGasMask, HEAD-only, IGasMask ====================
-    // CE ModItems.java:724-727, ArmorMaterial.IRON, vanilla COMBAT tab.
+    // CE ModItems.java:724-727, ArmorMaterial.IRON, vanilla COMBAT tab. Model/texture dispatch per
+    // item added by task c7-armor-model-rendering - see ArmorGasMask's own class javadoc for the
+    // real CE getArmorModel/getArmorTexture identity dispatch this mirrors.
 
     public static final DeferredItem<Item> GAS_MASK = gasMask("gas_mask",
-            List.of(HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT));
+            List.of(HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT),
+            ArmorGasMask.ModelKind.GAS_MASK, tex("gas_mask.png"));
     public static final DeferredItem<Item> GAS_MASK_M65 = gasMask("gas_mask_m65",
-            List.of(HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT));
+            List.of(HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT),
+            ArmorGasMask.ModelKind.M65, tex("gas_mask_m65.png"));
     public static final DeferredItem<Item> GAS_MASK_MONO = gasMask("gas_mask_mono",
-            List.of(HazardClass.GAS_LUNG, HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT, HazardClass.BACTERIA));
+            List.of(HazardClass.GAS_LUNG, HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT, HazardClass.BACTERIA),
+            ArmorGasMask.ModelKind.M65, tex("gas_mask_mono.png"));
     public static final DeferredItem<Item> GAS_MASK_OLDE = gasMask("gas_mask_olde",
-            List.of(HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT));
+            List.of(HazardClass.GAS_BLISTERING, HazardClass.NERVE_AGENT),
+            ArmorGasMask.ModelKind.M65, tex("mask_olde.png"));
 
-    private static DeferredItem<Item> gasMask(String name, List<HazardClass> blacklist) {
+    private static DeferredItem<Item> gasMask(String name, List<HazardClass> blacklist,
+                                               ArmorGasMask.ModelKind modelKind, ResourceLocation modelTexture) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () ->
-                new ArmorGasMask(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET), blacklist));
+                new ArmorGasMask(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET),
+                        blacklist, modelKind, modelTexture));
         COMBAT_TAB.add(item);
         return item;
+    }
+
+    /** {@code "textures/armor/" + fileName}, this port's asset-path convention (see e.g. {@code GunModels}). */
+    private static ResourceLocation tex(String fileName) {
+        return ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/armor/" + fileName);
     }
 
     // ==================== Hazmat suits (12) - ArmorHazmat, no special behavior ====================
@@ -135,16 +151,18 @@ public final class SpecialArmorItems {
     }
 
     // ==================== Hazmat helmets (4) - ArmorHazmatMask extends ArmorHazmat, + IGasMask ====================
-    // CE ModItems.java:448-467. Only _red/_grey get the shared custom model in CE.
+    // CE ModItems.java:448-467. Only _red/_grey get the shared ModelM65 custom model in CE (real
+    // textures ModelHazRed.png/ModelHazGrey.png, normalized here to this port's snake_case asset
+    // convention - see task c7-armor-model-rendering).
 
-    public static final DeferredItem<Item> HAZMAT_HELMET = hazmatMask("hazmat_helmet", MaterialRegistry.aMatHaz, false);
-    public static final DeferredItem<Item> HAZMAT_HELMET_RED = hazmatMask("hazmat_helmet_red", MaterialRegistry.aMatHaz2, true);
-    public static final DeferredItem<Item> HAZMAT_HELMET_GREY = hazmatMask("hazmat_helmet_grey", MaterialRegistry.aMatHaz3, true);
-    public static final DeferredItem<Item> HAZMAT_PAA_HELMET = hazmatMask("hazmat_paa_helmet", MaterialRegistry.aMatPaa, false);
+    public static final DeferredItem<Item> HAZMAT_HELMET = hazmatMask("hazmat_helmet", MaterialRegistry.aMatHaz, null);
+    public static final DeferredItem<Item> HAZMAT_HELMET_RED = hazmatMask("hazmat_helmet_red", MaterialRegistry.aMatHaz2, tex("hazmat_red.png"));
+    public static final DeferredItem<Item> HAZMAT_HELMET_GREY = hazmatMask("hazmat_helmet_grey", MaterialRegistry.aMatHaz3, tex("hazmat_grey.png"));
+    public static final DeferredItem<Item> HAZMAT_PAA_HELMET = hazmatMask("hazmat_paa_helmet", MaterialRegistry.aMatPaa, null);
 
-    private static DeferredItem<Item> hazmatMask(String name, Holder<ArmorMaterial> material, boolean hasCustomModel) {
+    private static DeferredItem<Item> hazmatMask(String name, Holder<ArmorMaterial> material, @Nullable ResourceLocation modelTexture) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () ->
-                new ArmorHazmatMask(material, ArmorItem.Type.HELMET, props(material, ArmorItem.Type.HELMET), hasCustomModel));
+                new ArmorHazmatMask(material, ArmorItem.Type.HELMET, props(material, ArmorItem.Type.HELMET), modelTexture));
         COMBAT_TAB.add(item);
         return item;
     }

@@ -1,6 +1,9 @@
 package com.hbm.items.gear;
 
 import com.hbm.api.item.IGasMask;
+import com.hbm.client.render.armor.ArmorModelBase;
+import com.hbm.client.render.armor.GasMaskArmorModel;
+import com.hbm.client.render.armor.M65ArmorModel;
 import com.hbm.handler.ArmorUtil;
 import com.hbm.util.ArmorRegistry.HazardClass;
 import com.hbm.util.i18n.I18nUtil;
@@ -8,6 +11,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -45,23 +49,41 @@ import java.util.function.Consumer;
  * {@code ArmorUtil}'s already-real {@code GAS_MASK_FILTER} data-component-backed implementation
  * (ported by the sibling {@code hazmat_protection_integration} package) - no NBT anywhere.
  *
- * <p>The custom armor model dispatch ({@link #initializeClient}) is the confirmed hook point only
- * (per this package's task brief) - {@code ModelGasMask}/{@code ModelM65} are not ported (Phase 5
- * rendering work), so this falls back to the vanilla humanoid model until a later phase supplies a
- * real {@link Model}. The per-item durability-scaled blur overlay ({@code renderHelmetOverlay}) is
- * pure GL-immediate-mode rendering with no confirmed 1.21 client-item-extension equivalent surveyed
- * in this pass (see {@code com.hbm.items.gear.ArmorModel}'s javadoc, which skips the same CE
- * mechanism for the same reason) - not attempted here; the mask's own wear level still uses
- * vanilla's ordinary damage bar (this item is constructed with real durability, see
- * {@code SpecialArmorItems}), so nothing is lost mechanically, only the cosmetic fog-up render.
+ * <p>The custom armor model dispatch ({@link #initializeClient}) is filled in by task {@code
+ * c7-armor-model-rendering}: {@link #modelKind} + {@link #modelTexture} (constructor parameters,
+ * one per concrete item - see {@code SpecialArmorItems#gasMask}) select between {@link
+ * GasMaskArmorModel} ({@code gas_mask}, CE: {@code ModelGasMask}) and the shared {@link
+ * M65ArmorModel} ({@code gas_mask_m65}/{@code _mono}/{@code _olde}, CE: a shared {@code ModelM65}
+ * instance) exactly matching CE's own {@code ArmorGasMask#getArmorModel}'s {@code this ==
+ * ModItems.gas_mask} / {@code this == ModItems.gas_mask_m65 || ...} identity dispatch (translated
+ * into a constructor-supplied enum since concrete leaves are no longer distinguished by identity
+ * comparison against not-yet-registered sibling fields in this port - see this class's own
+ * "{@link #blacklist}" note for the identical reasoning already established for the hazard list).
+ * The per-item durability-scaled blur overlay ({@code renderHelmetOverlay}) is pure GL-immediate-
+ * mode rendering with no confirmed 1.21 client-item-extension equivalent surveyed in this pass (see
+ * {@code com.hbm.items.gear.ArmorModel}'s javadoc, which skips the same CE mechanism for the same
+ * reason) - not attempted here; the mask's own wear level still uses vanilla's ordinary damage bar
+ * (this item is constructed with real durability, see {@code SpecialArmorItems}), so nothing is
+ * lost mechanically, only the cosmetic fog-up render.
  */
 public class ArmorGasMask extends ArmorItem implements IGasMask {
 
-    private final List<HazardClass> blacklist;
+    /** Which CE render/model class this concrete gas mask item uses - see class javadoc. */
+    public enum ModelKind { GAS_MASK, M65 }
 
-    public ArmorGasMask(Holder<ArmorMaterial> material, Type type, Item.Properties properties, List<HazardClass> blacklist) {
+    private final List<HazardClass> blacklist;
+    private final ModelKind modelKind;
+    private final ResourceLocation modelTexture;
+
+    private GasMaskArmorModel gasMaskModel;
+    private M65ArmorModel m65Model;
+
+    public ArmorGasMask(Holder<ArmorMaterial> material, Type type, Item.Properties properties, List<HazardClass> blacklist,
+                         ModelKind modelKind, ResourceLocation modelTexture) {
         super(material, type, properties);
         this.blacklist = blacklist;
+        this.modelKind = modelKind;
+        this.modelTexture = modelTexture;
     }
 
     @Override
@@ -69,10 +91,20 @@ public class ArmorGasMask extends ArmorItem implements IGasMask {
         consumer.accept(new IClientItemExtensions() {
             @Override
             public Model getGenericArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-                // TODO(Phase 5): CE dispatches ModelGasMask (gas_mask) / a shared ModelM65 instance
-                // (gas_mask_m65/_mono/_olde) here; neither model class is ported yet - see class
-                // javadoc. Falls back to the vanilla humanoid model.
-                return original;
+                if (equipmentSlot != EquipmentSlot.HEAD) return original;
+
+                ArmorModelBase replacement = switch (modelKind) {
+                    case GAS_MASK -> {
+                        if (gasMaskModel == null) gasMaskModel = new GasMaskArmorModel(equipmentSlot);
+                        yield gasMaskModel;
+                    }
+                    case M65 -> {
+                        if (m65Model == null) m65Model = new M65ArmorModel(equipmentSlot, modelTexture);
+                        yield m65Model;
+                    }
+                };
+                replacement.getPropertiesFrom(original, livingEntity);
+                return replacement;
             }
         });
     }

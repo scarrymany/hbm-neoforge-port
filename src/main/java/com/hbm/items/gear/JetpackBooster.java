@@ -4,6 +4,8 @@ import com.hbm.capability.HbmPlayerAttachment;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.items.armor.JetpackFueledBase;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -30,8 +32,8 @@ import java.util.List;
  * {@code modUpdate}/{@code inventoryTick} call it unconditionally after every {@code onArmorTick}
  * regardless of leaf, which is what covers this class.
  *
- * <p><b>Not ported</b> (documented TODO): CE's thruster particle packet - see
- * {@link JetpackRegular}'s identical note.
+ * <p>CE's thruster particle packet ({@link com.hbm.particle.HbmEffect#JETPACK}, mode 1) is wired -
+ * see {@link JetpackRegular}'s identical note.
  */
 public class JetpackBooster extends JetpackFueledBase {
 
@@ -50,10 +52,12 @@ public class JetpackBooster extends JetpackFueledBase {
     protected void onArmorTick(Level level, Player player, ItemStack stack) {
         HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
 
-        // TODO(particle system): CE spawns a HbmEffectNT.Jetpack (mode 1) AuxParticlePacketNT here
-        // while thrusting server-side - see class javadoc.
-
         if (getFuel(stack) <= 0 || !props.isJetpackActive()) return;
+
+        CompoundTag data = new CompoundTag();
+        data.putInt("player", player.getId());
+        data.putInt("mode", 1);
+        HbmEffect.sendPacket(level, HbmEffect.JETPACK, player.getX(), player.getY(), player.getZ(), 100, data);
 
         if (player.getDeltaMovement().y < 0.6D) {
             player.setDeltaMovement(player.getDeltaMovement().x, player.getDeltaMovement().y + 0.1D, player.getDeltaMovement().z);

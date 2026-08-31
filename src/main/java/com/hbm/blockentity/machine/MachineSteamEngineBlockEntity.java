@@ -9,12 +9,14 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -108,7 +110,14 @@ public class MachineSteamEngineBlockEntity extends MachineBaseBlockEntity
 
             acceleration = Math.max(0F, Math.min(40F, acceleration + (ops > 0 ? 0.1F : -0.1F)));
         }
-        rotor = (rotor + acceleration) % 360F;
+        rotor += acceleration;
+
+        // CE: TileEntityMachineSteamEngine.update():130-140 - plays once per full rotor revolution
+        // (not every tick), pitch driven by the current acceleration so a spun-up engine sounds higher.
+        if (rotor >= 360F) {
+            rotor -= 360F;
+            level.playSound(null, worldPosition, HBMSoundHandler.steamEngineOperate.get(), SoundSource.BLOCKS, 1F, 0.5F + (acceleration / 80F));
+        }
 
         for (DirPos dirPos : getConPos()) {
             BlockPos p = dirPos.getPos();

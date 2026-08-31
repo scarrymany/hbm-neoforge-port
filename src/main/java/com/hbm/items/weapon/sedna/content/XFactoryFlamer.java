@@ -14,6 +14,7 @@ import com.hbm.items.weapon.sedna.factory.Lego;
 import com.hbm.items.weapon.sedna.mags.IMagazine;
 import com.hbm.items.weapon.sedna.mags.MagazineFluid;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import com.hbm.util.EntityDamageUtil;
@@ -52,6 +53,14 @@ import java.util.function.BiFunction;
  * fluid consumption gated on {@code amount > 0}, direct damage plus ignition on a living hit - so the
  * gun holds, aims, drains its tank and deals damage exactly on CE's cadence; only the "which chemical
  * does what" table is deferred to whichever future package wires real chemical-warfare effects.
+ * <p>
+ * <b>c12-sound-wiring:</b> confirmed against CE's real {@code XFactoryFlamer.init()} that
+ * {@code gun_flamer}/{@code gun_flamer_topaz}/{@code gun_chemthrower} genuinely have no
+ * {@code Receiver#sound(...)} call in CE either (they fire silently but for their reload/orchestra
+ * cues, which this port doesn't reproduce - see {@code ItemGunBaseNT}'s javadoc) - not a port
+ * omission. Only {@code gun_flamer_daybreaker} calls {@code .sound(HBMSoundHandler.fireBlackPowder,
+ * 1.0F, 1.0F)} in CE; this port's copy was missing that one call (the only real gap in this file)
+ * until this pass added it back.
  */
 public final class XFactoryFlamer {
 
@@ -121,7 +130,7 @@ public final class XFactoryFlamer {
                 new GunConfig()
                         .dura(20_000).draw(10).inspect(17).crosshair(Crosshair.L_CIRCLE)
                         .rec(new Receiver(0)
-                                .dmg(25F).spreadHipfire(0F).delay(10).auto(true).reload(90).jam(17)
+                                .dmg(25F).spreadHipfire(0F).delay(10).auto(true).reload(90).jam(17).sound(HBMSoundHandler.fireBlackPowder.get(), 1.0F, 1.0F)
                                 .mag(new MagazineFullReload(0, 50).addConfigs(flame_daybreaker_diesel, flame_daybreaker_gas, flame_daybreaker_napalm, flame_daybreaker_balefire))
                                 .offset(0.75, -0.0625, -0.25D)
                                 .setupStandardFire())

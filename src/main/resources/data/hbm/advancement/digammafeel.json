@@ -1,0 +1,28 @@
+{
+  "parent": "hbm:digammasee",
+  "display": {
+    "icon": {
+      "id": "hbm:achievement_icon_digammafeel"
+    },
+    "title": {
+      "translate": "achievement.digammaFeel"
+    },
+    "description": {
+      "translate": "achievement.digammaFeel.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

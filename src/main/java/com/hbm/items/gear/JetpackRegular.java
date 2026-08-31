@@ -5,6 +5,8 @@ import com.hbm.handler.ArmorUtil;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.items.armor.JetpackFueledBase;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.particle.HbmEffect;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -21,10 +23,9 @@ import java.util.List;
  * lateral vector. Registered at {@code new JetpackRegular(properties, Fluids.KEROSENE, 12000)},
  * confirmed against CE's own {@code ModItems} call site.
  *
- * <p><b>Not ported</b> (documented TODO, per {@code docs/phase3/fsb_armor_and_jetpacks.md} Deferred
- * scope): CE's {@code AuxParticlePacketNT}/{@code HbmEffectNT.Jetpack} thruster particle-trail
- * packet - no particle-packet system exists yet in this port. Purely cosmetic; the physics below are
- * ported in full.
+ * <p>CE's {@code AuxParticlePacketNT}/{@code HbmEffectNT.Jetpack} thruster particle-trail packet is
+ * wired via {@link com.hbm.particle.HbmEffect#JETPACK}, radius 100, matching CE's own call site 1:1
+ * ({@code upstream/hbm-ce/.../JetpackRegular.java:47-49}). The physics below are ported in full.
  */
 public class JetpackRegular extends JetpackFueledBase {
 
@@ -42,10 +43,11 @@ public class JetpackRegular extends JetpackFueledBase {
     protected void onArmorTick(Level level, Player player, ItemStack stack) {
         HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
 
-        // TODO(particle system): CE spawns a HbmEffectNT.Jetpack AuxParticlePacketNT here while
-        // thrusting server-side - see class javadoc.
-
         if (getFuel(stack) > 0 && props.isJetpackActive()) {
+            CompoundTag data = new CompoundTag();
+            data.putInt("player", player.getId());
+            HbmEffect.sendPacket(level, HbmEffect.JETPACK, player.getX(), player.getY(), player.getZ(), 100, data);
+
             player.fallDistance = 0F;
 
             if (player.getDeltaMovement().y < 0.4D) {

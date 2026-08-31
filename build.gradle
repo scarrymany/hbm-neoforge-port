@@ -54,6 +54,38 @@ neoForge {
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+// Third-party mod-compat dependencies. Declared as plain top-level `repositories {}` /
+// `dependencies {}` blocks (not nested inside `neoForge { ... }`) - the net.neoforged.moddev
+// plugin does not require or expect mod dependencies to be declared through its own DSL; a
+// `compileOnly`/`runtimeOnly` dependency against another mod's published API jar is an ordinary
+// Gradle dependency, and moddev's `neoForge { }` block only configures the NeoForge/Minecraft
+// artifact itself plus its own run configs. Confirmed against a real, structurally-identical
+// precedent that resolves against this exact `net.neoforged.moddev` plugin version and this
+// exact `neo_version=21.1.228`: upstream/neo-edition/build.gradle's own top-level
+// `repositories { ... }` (lines ~117-131) and `dependencies { ... }` (lines ~134-151) blocks,
+// placed in the same position (after the `neoForge { }` block, before `ProcessResources`). See
+// docs/phase5/jei_integration.md "Safe to build now" #1 for the research trail.
+repositories {
+    maven {
+        // Hosts mezz.jei:jei-* artifacts. Same host upstream/neo-edition's own real, compiling
+        // build already depends on for the identical neo_version/minecraft_version pin
+        // (upstream/neo-edition/build.gradle line ~120).
+        url = 'https://maven.blamejared.com'
+    }
+}
+
+dependencies {
+    // JEI (Just Enough Items) - compat plugin skeleton lives at
+    // com.hbm.compat.jei.HbmJeiPlugin. compileOnly against JEI's API-only jar (matches
+    // upstream/neo-edition's own real dependency shape exactly: JEI must not be bundled into
+    // this mod's jar, and the API surface is compile-time only); runtimeOnly for the real
+    // implementation jar so JEI itself is present in dev/run configs (mirrors neo-edition's
+    // `runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"`, i.e. every
+    // player still needs to install JEI separately - this mod does not ship it).
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+}
+
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
             minecraft_version       : minecraft_version,

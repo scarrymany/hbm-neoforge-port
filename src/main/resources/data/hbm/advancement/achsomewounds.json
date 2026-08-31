@@ -1,0 +1,22 @@
+{
+  "parent": "hbm:root",
+  "display": {
+    "icon": {
+      "id": "hbm:injector_knife"
+    },
+    "title": {
+      "translate": "hbm.achievement.someWounds"
+    },
+    "description": {
+      "translate": "hbm.achievement.someWounds.desc"
+    }
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "rewards": {
+    "experience": 17
+  }
+}

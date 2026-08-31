@@ -5,11 +5,14 @@ import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.explosion.ExplosionNukeSmall;
 import com.hbm.interfaces.IRadiationImmune;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.AdvancementManager;
+import com.hbm.particle.HbmEffect;
 import com.hbm.util.ContaminationUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -72,9 +75,11 @@ import java.util.List;
  * branch: powered+griefing spawns a real 50-yield {@link EntityNukeExplosionMK5} (already-ported
  * Phase 3 class); powered+no-griefing calls {@link ExplosionNukeGeneric#dealDamage} (damage-only, no
  * terrain destruction); unpowered uses {@link ExplosionNukeSmall#explode} with
- * {@code PARAMS_MEDIUM}/{@code PARAMS_SAFE}. CE's VFX (a client-broadcast {@code AuxParticlePacketNT}
- * + {@code HBMSoundHandler.mukeExplosion}) is explicitly out of this phase's scope per the research
- * report ("Phase 5, Client & UX") and is not reproduced.
+ * {@code PARAMS_MEDIUM}/{@code PARAMS_SAFE}. CE's unconditional VFX (a client-broadcast
+ * {@code AuxParticlePacketNT(HbmEffectNT.Muke,...)} + {@code HBMSoundHandler.mukeExplosion}, both
+ * before the powered/unpowered branch, {@code upstream/hbm-ce/.../EntityCreeperNuclear.java:117-118})
+ * is now wired via {@link com.hbm.particle.HbmEffect#MUKE} - see
+ * {@code docs/phase5/particle_engine_and_generic_vfx.md}.
  * <p>
  * <b>{@link #die}</b>: grants {@link AdvancementManager#bossCreeper} (now real, foundation wave) to
  * every player within 50 blocks. CE's bonus "Nuke Standard ammo on skeleton/dispenser-arrow kill" drop
@@ -171,6 +176,13 @@ public class EntityCreeperNuclear extends Creeper implements IRadiationImmune {
 
         Level level = this.level();
         boolean mobGriefing = level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+
+        // CE plays this sound+particle unconditionally, before the powered/unpowered branch below
+        // (upstream/hbm-ce/.../EntityCreeperNuclear.java:117-118) - preserved 1:1, including CE's own
+        // double-sound quirk in the unpowered branch (ExplosionNukeSmall.explode also plays
+        // mukeExplosion), rather than "fixed" - CE is the sole source of truth for behavior here.
+        HbmEffect.sendPacket(level, HbmEffect.MUKE, this.getX(), this.getY() + 0.5, this.getZ(), 250, null);
+        level.playSound(null, this.getX(), this.getY() + 0.5, this.getZ(), HBMSoundHandler.mukeExplosion.get(), SoundSource.HOSTILE, 15.0F, 1.0F);
 
         if (this.isPowered()) {
             if (mobGriefing) {

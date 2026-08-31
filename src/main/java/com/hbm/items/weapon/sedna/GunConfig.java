@@ -2,12 +2,16 @@ package com.hbm.items.weapon.sedna;
 
 import com.hbm.items.weapon.sedna.factory.GunStateDecider;
 import com.hbm.items.weapon.sedna.factory.Lego;
+import com.hbm.items.weapon.sedna.hud.IHUDComponent;
 import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
+import com.hbm.render.anim.sedna.BusAnimationSedna;
 import com.hbm.render.misc.RenderScreenOverlay;
+import com.hbm.weapon.anim.HbmAnimationType;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 /**
  * Port of CE's {@code com.hbm.items.weapon.sedna.GunConfig} (168 lines) - per-gun-mode "DNA": the
@@ -20,18 +24,32 @@ import java.util.function.BiConsumer;
  * pass-through when the stack carries no installed-mod list for this config index, so an unmodified
  * gun behaves exactly as it did before this wiring landed.
  * <p>
- * Not ported from CE's own field set (see {@code docs/phase3/gun_framework.md}'s Deferred scope):
- * {@code animations_DNA}/{@code getAnims}/{@code anim(...)} (needs
- * {@code com.hbm.render.anim.sedna.BusAnimationSedna}, unported Phase 5 keyframe-animation data - see
- * {@code docs/phase3/weapon_animation_hooks.md}) and {@code hudComponents_DNA}/
- * {@code getHUDComponents}/{@code hud(...)} (needs {@code com.hbm.items.weapon.sedna.hud.IHUDComponent},
- * unported Phase 5 HUD-widget package). Both were purely client-rendering config slots in CE (their
- * own field comments in CE say as much - {@code smokeHandler_DNA} is commented "Handles smoke
- * clientside" right next to them) with no bearing on the fire/reload state machine itself. Because
- * neither field/getter exists here, any weapon mod whose CE {@code eval()} body branches on
- * {@code GunConfig.FUN_ANIMNATIONS}/{@code O_HUDCOMPONENTS} (bayonet/sawed-off/speedloader mods'
- * custom animation overrides) simply never has that branch reached in this port - documented per-mod
- * where it matters, not a silent gap.
+ * <b>{@code animations_DNA}/{@code getAnims}/{@code anim(...)}</b> - added by Phase 5
+ * ({@code c6-weapon-gun-rendering}), unblocking the gap this class's own javadoc used to name
+ * (previously "not ported ... needs {@code com.hbm.render.anim.sedna.BusAnimationSedna}, unported
+ * Phase 5 keyframe-animation data" - that engine is now ported, see
+ * {@link com.hbm.render.anim.sedna.BusAnimationSedna}). Typed over this port's own
+ * {@link HbmAnimationType} marker rather than CE's concrete {@code AnimationEnums.GunAnimation}
+ * enum, per this class's own original design intent (the same marker interface already serves both
+ * {@link com.hbm.weapon.anim.GunAnimationType} and {@link com.hbm.weapon.anim.ToolAnimationType}).
+ * A gun's animation lambda is registered <i>client-side only</i>, after common registration
+ * completes, by mutating the already-constructed shared {@link GunConfig} instance (via
+ * {@link #anim(BiFunction)}) from a {@code RegisterClientExtensionsEvent}/
+ * {@code FMLClientSetupEvent} handler - see
+ * {@code com.hbm.client.render.item.weapon.GunAnimationRegistration} for the 3 concrete guns this
+ * task wired end-to-end - <b>not</b> from this class's own common-loaded {@code XFactory*.java}
+ * construction site, because a lambda referencing {@code ResourceManager}-style client-only
+ * animation-map fields must never be reachable from a class that also loads on a dedicated server.
+ * <p>
+ * <b>{@code hudComponents_DNA}/{@code getHUDComponents}/{@code hud(...)}</b> - added by
+ * {@code c8-hud-overlays} (Phase 5), unblocking the gap this class's own javadoc used to name
+ * (previously "not ported ... needs {@code com.hbm.items.weapon.sedna.hud.IHUDComponent}, a
+ * separate unported Phase 5 HUD-widget package"). See {@code docs/phase5/hud_overlays_geiger_armor_gun.md}
+ * Area C and {@link com.hbm.items.weapon.sedna.hud.HUDComponents} for the real HUD-widget package
+ * this now routes through, plus that class's own javadoc for the documented scope cut (this port
+ * does not yet reproduce CE's ~60-gun-by-name {@code GunFactoryClient#init()} HUD wiring list -
+ * {@code ItemGunBaseNT#renderHUD} falls back to a sane default for any gun whose config has not had
+ * {@code .hud(...)} called).
  */
 public class GunConfig {
 
@@ -61,9 +79,7 @@ public class GunConfig {
     public static final String CON_ONRELEASETERTIARY = "CON_ONRELEASETERTIARY";
     public static final String CON_ONRELEASERELOAD = "CON_ONRELEASERELOAD";
     public static final String CON_DECIDER = "CON_DECIDER";
-    /** Key string only - see class javadoc, no {@code animations_DNA} field/getter exists to route through it yet. */
     public static final String FUN_ANIMNATIONS = "FUN_ANIMNATIONS";
-    /** Key string only - see class javadoc, no {@code hudComponents_DNA} field/getter exists to route through it yet. */
     public static final String O_HUDCOMPONENTS = "O_HUDCOMPONENTS";
 
     /* FIELDS */
@@ -95,6 +111,10 @@ public class GunConfig {
     protected BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> onReleaseReload_DNA;
     /** The engine for the state machine that determines the gun's overall behavior. */
     protected BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> decider_DNA;
+    /** Client-side-only per-trigger {@link BusAnimationSedna} lookup - see class javadoc for why this is populated from client bootstrap code, never from a common {@code XFactory*.java} construction site. */
+    protected BiFunction<ItemStack, HbmAnimationType, BusAnimationSedna> animations_DNA;
+    /** Client-side-only HUD widget list (ammo counter, durability bar, ...) - see class javadoc. */
+    protected IHUDComponent[] hudComponents_DNA;
 
     /* GETTERS - every value routes through XWeaponModManager.eval, see class javadoc */
 
@@ -133,6 +153,11 @@ public class GunConfig {
     public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getReleaseReload(ItemStack stack) { return XWeaponModManager.eval(onReleaseReload_DNA, stack, CON_ONRELEASERELOAD, this, this.index); }
 
     public BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> getDecider(ItemStack stack) { return XWeaponModManager.eval(decider_DNA, stack, CON_DECIDER, this, this.index); }
+    @Nullable
+    public BiFunction<ItemStack, HbmAnimationType, BusAnimationSedna> getAnims(ItemStack stack) { return XWeaponModManager.eval(animations_DNA, stack, FUN_ANIMNATIONS, this, this.index); }
+    /** {@code null} (not an empty array) when no {@link #hud(IHUDComponent...)} call was ever made - {@code ItemGunBaseNT#renderHUD} treats that as "use the default layout", not "show nothing" (see that method's own javadoc). */
+    @Nullable
+    public IHUDComponent[] getHUDComponents(ItemStack stack) { return XWeaponModManager.eval(hudComponents_DNA, stack, O_HUDCOMPONENTS, this, this.index); }
 
     /* SETTERS - fluent builder, field-for-field port of CE's own */
 
@@ -165,6 +190,11 @@ public class GunConfig {
 
     // decider
     public GunConfig decider(BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> lambda) { this.decider_DNA = lambda; return this; }
+
+    /** See class javadoc - call only from client-side registration code, never from a common {@code XFactory*.java} gun-construction site. */
+    public GunConfig anim(BiFunction<ItemStack, HbmAnimationType, BusAnimationSedna> lambda) { this.animations_DNA = lambda; return this; }
+    /** See class javadoc - call only from client-side registration code, never from a common {@code XFactory*.java} gun-construction site (an {@link IHUDComponent} array is a client-rendering-only value). */
+    public GunConfig hud(IHUDComponent... components) { this.hudComponents_DNA = components; return this; }
 
     /**
      * Standard package for keybind handling and decider using LEGO prefabs: primary fire on LMB,

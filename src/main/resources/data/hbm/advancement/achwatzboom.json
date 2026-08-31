@@ -1,0 +1,28 @@
+{
+  "parent": "hbm:achwatz",
+  "display": {
+    "icon": {
+      "id": "hbm:fluid_icon"
+    },
+    "title": {
+      "translate": "achievement.watzBoom"
+    },
+    "description": {
+      "translate": "achievement.watzBoom.desc"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "impossible": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "impossible"
+    ]
+  ]
+}

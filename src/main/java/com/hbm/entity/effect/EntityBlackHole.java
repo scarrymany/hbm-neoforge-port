@@ -2,6 +2,7 @@ package com.hbm.entity.effect;
 
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.entity.projectile.EntityRubble;
+import com.hbm.interfaces.IConstantRenderer;
 import com.hbm.items.special.ScatteredMilitaryItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -65,8 +66,22 @@ import java.util.List;
  * {@link #ignoreExplosion(Explosion)} is placed on this base class (CE's real placement - all 3
  * subclasses inherit it), <b>not</b> only on {@code EntityRagingVortex} the way Neo Edition's parallel
  * port mistakenly does - confirmed a real gap in that reference, not a CE behavior to reproduce.
+ *
+ * <p><b>{@link IConstantRenderer} added by {@code c4-boss-vehicle-renderers-batch1}</b>: CE's real
+ * {@code EntityBlackHole implements IConstantRenderer} (confirmed,
+ * {@code upstream/hbm-ce/.../entity/effect/EntityBlackHole.java:32}) - this port's own class had not
+ * picked that up yet (confirmed by {@code docs/phase5/reactor_and_explosion_visual_effects.md}'s own
+ * grep, which found only 5 consumers and did not include this family). {@link EntityVortex}/
+ * {@link EntityRagingVortex}/{@link EntityQuasar} all inherit it from here, matching CE's own
+ * per-subclass {@code implements IConstantRenderer} declarations (each subclass re-declares it in CE
+ * only because CE has no shared supertype relationship among them the way this port does - the same
+ * marker, inherited once, is the correct, non-duplicated translation). See
+ * {@code com.hbm.client.render.ConstantRenderSweep} for the sweep this marker opts every gravity-well
+ * instance into, and {@code com.hbm.client.render.entity.effect.BlackHoleRenderer}/{@code
+ * QuasarRenderer} for the renderers that now guard on {@link
+ * com.hbm.client.render.ConstantRenderSweep#isRenderingConstant()}.
  */
-public class EntityBlackHole extends Entity {
+public class EntityBlackHole extends Entity implements IConstantRenderer {
 
     protected static final EntityDataAccessor<Float> SIZE =
             SynchedEntityData.defineId(EntityBlackHole.class, EntityDataSerializers.FLOAT);

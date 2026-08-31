@@ -19,15 +19,21 @@ import net.minecraft.world.entity.player.Inventory;
  */
 public class MinecartCrateScreen extends GuiInfoContainer<MinecartCrateMenu> {
 
+    // CE never drew a dedicated cart-crate texture - its real GuiCartCrate inner class reuses the
+    // steel storage crate's own PNG directly (confirmed by reading EntityMinecartCrate.java:176-201).
+    // This port's previous "gui/cart/gui_cart_crate.png" path was invented and will never resolve,
+    // even after the asset-copy pass - see the survey's Headline finding 2. CrateScreen's own STEEL
+    // CrateType needs this exact same file (CrateBlockEntity.java:59,97), so no new art is needed.
     private static final ResourceLocation TEXTURE =
-            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/cart/gui_cart_crate.png");
+            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/storage/gui_crate_steel.png");
 
     public MinecartCrateScreen(MinecartCrateMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         // CE: 6x9 cargo grid (rows end at y=126), player inventory rows starting at y=140, hotbar at
         // y=198 - see MinecartCrateMenu's own slot layout.
+        // ySize is CE's real 222, not 224 - see the survey's Headline finding 5.
         this.imageWidth = 176;
-        this.imageHeight = 224;
+        this.imageHeight = 222;
     }
 
     @Override
