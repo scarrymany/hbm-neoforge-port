@@ -42,9 +42,9 @@ public class ItemSatInterface extends ItemSatChip {
         if (level.isClientSide()) {
             int freq = this.getFreq(stack);
             if (coordVariant) {
-                net.minecraft.client.Minecraft.getInstance().setScreen(new com.hbm.inventory.gui.SatCoordScreen(freq));
+                com.hbm.client.ClientScreens.satCoord(freq);
             } else {
-                net.minecraft.client.Minecraft.getInstance().setScreen(new com.hbm.inventory.gui.SatInterfaceScreen(freq));
+                com.hbm.client.ClientScreens.satInterface(freq);
             }
         }
 

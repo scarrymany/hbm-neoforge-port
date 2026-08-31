@@ -1,7 +1,6 @@
 package com.hbm.blocks;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -25,7 +24,7 @@ import java.util.List;
 public interface ITooltipProvider {
 
     default void addStandardInfo(List<Component> tooltip) {
-        if (Screen.hasShiftDown()) {
+        if (com.hbm.client.ClientScreens.hasShiftDown()) {
             tooltip.add(Component.translatable(((Block) this).getDescriptionId() + ".desc").withStyle(ChatFormatting.YELLOW));
         } else {
             tooltip.add(Component.literal("Hold <")

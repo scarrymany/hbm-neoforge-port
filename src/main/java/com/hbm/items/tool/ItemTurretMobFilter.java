@@ -50,7 +50,7 @@ public class ItemTurretMobFilter extends ItemBase {
         if (!(level.getBlockEntity(corePos) instanceof TurretBaseBlockEntity)) return InteractionResult.PASS;
 
         if (level.isClientSide()) {
-            net.minecraft.client.Minecraft.getInstance().setScreen(new com.hbm.inventory.gui.turret.TurretMobFilterScreen(corePos));
+            com.hbm.client.ClientScreens.turretMobFilter(corePos);
         }
 
         return InteractionResult.SUCCESS;

@@ -42,6 +42,12 @@ This slice landed code, not another research dump. Gaps below are still open.
 - Crater biome `EnumProxy` grass tint — `ModCraterBiomes` needs `META-INF/enumextensions.json`;
   bootstrap uses `GrassColorModifier.NONE` so runData can emit biome JSON.
 
+## Verification (this follow-up)
+
+- `./gradlew compileJava` / `./gradlew build` — green. Jar `build/libs/hbm-0.0.1.jar` **5,979,328** bytes (after runData resources).
+- `./gradlew runData` — **SUCCESS** (2984 files written). Generated tree committed under `src/generated/resources/`.
+- `./gradlew runServer` — **FAIL after RegisterEvent**. Dist `Screen`/`Model` classrefs in common items were moved behind `ClientScreens` / `ArmorHatClient`. Next brick: `ModConfigSpec$ValueSpec.test` NPE (`ImmutableList.contains(null)`) while writing default configs. `runClient` skipped (no display).
+
 ## Explicitly not Phase 8
 
 Phase 9 entities, Phase 10 bulk assets, Phase 11 final parity report.
