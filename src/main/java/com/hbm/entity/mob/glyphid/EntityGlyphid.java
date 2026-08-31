@@ -45,8 +45,7 @@ import java.util.Locale;
 
 /**
  * CE: {@code com.hbm.entity.mob.glyphid.EntityGlyphid} (674 lines). Combat / armor / subtype /
- * maggot-on-death / IResistanceProvider ported. Hive waypoint + Rampant dig need
- * {@code EntityWaypoint} (not in this port) — TASK_* constants + NBT kept for later.
+ * maggot-on-death / IResistanceProvider ported. {@code EntityWaypoint} assigns {@link #TASK_*}.
  */
 public class EntityGlyphid extends Monster implements IResistanceProvider {
 
@@ -55,6 +54,7 @@ public class EntityGlyphid extends Monster implements IResistanceProvider {
     public int homeY;
     public int homeZ;
     protected byte currentTask = 0;
+    protected Entity waypoint;
 
     public static final byte TASK_IDLE = 0;
     public static final byte TASK_RETREAT_FOR_REINFORCEMENTS = 1;
@@ -303,8 +303,18 @@ public class EntityGlyphid extends Monster implements IResistanceProvider {
         return currentTask;
     }
 
+    public Entity getWaypoint() {
+        return waypoint;
+    }
+
     public void setCurrentTask(byte task) {
+        setCurrentTask(task, null);
+    }
+
+    /** CE: {@code setCurrentTask(byte, EntityWaypoint)} — next hop stored, hive path not simulated. */
+    public void setCurrentTask(byte task, Entity next) {
         this.currentTask = task;
+        this.waypoint = next;
     }
 
     public void communicate(byte task) {

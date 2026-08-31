@@ -30,6 +30,7 @@ import com.hbm.entity.mob.WormEntityTypes;
 import com.hbm.entity.projectile.ChopperMineEntityTypes;
 import com.hbm.entity.projectile.FallingNukeEntityTypes;
 import com.hbm.entity.projectile.MeteorEntityTypes;
+import com.hbm.entity.projectile.Phase9TailEntityTypes;
 import com.hbm.entity.projectile.RubbleEntityTypes;
 import com.hbm.entity.train.TrainEntityTypes;
 import com.hbm.hazard.HazardComponents;
@@ -91,6 +92,7 @@ public class MainRegistry {
         Phase9MobEntityTypes.register(modEventBus);
         GlyphidEntityTypes.register(modEventBus);
         BoatEntityTypes.register(modEventBus);
+        Phase9TailEntityTypes.register(modEventBus);
         ModItems.register(modEventBus);
         HbmDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);

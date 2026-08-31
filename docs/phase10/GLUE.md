@@ -1,24 +1,22 @@
 # Phase 10 glue — texture aliases + lang
 
-Datagen ID set from the last `runData` lang dump (2353 items / 849 blocks),
-measured before aliases vs after pointing JSON at existing CE pngs.
+Census is Java `register`/`reg`/`stair`/`slab` + Mats autogen + plant/glyph loops +
+bedrock-ore 6×26 grid. Lang keys are **not** ids (that polluted v2 to 4544/1433).
 
 ## Texture miss-rate (registered id → playable model)
 
 | | items | blocks |
 |---|---:|---:|
-| Registered (datagen census) | 2353 | 849 |
-| Exact-path png before | 1146 (48.7%) | 373 (44.0%) |
-| Playable miss **before** | **1588 (67.5%)** | **541 (63.7%)** |
-| Unresolved **after** aliases | **764 (32.5%)** | **329 (38.8%)** |
-| Alias models written | 824 item + later remaps | 255 block + later remaps |
-| Blockstates given `""` default | — | 338 |
+| Registered (Java+autogen+loops) | **1771** | **579** |
+| Playable miss **before** v3 remaps | 320 (18.1%) | 96 (16.6%) |
+| Unresolved **after** remaps | **164 (9.3%)** | **96 (16.6%)** |
+| Prior datagen-lang dump (legacy) | 2353 / 32.5% after v1 | 849 / 38.8% after v1 |
 
 Playable = item model JSON exists *and* its texture resolves, or blockstate + block tex.
 
-Remaining misses are mostly: powered-armor sets without inventory png (AJR/BJ),
-Mats `BLOCK` autogen with no CE cube (`americium241_block`), debug ammo, TESR-only
-machines. No art invented — those stay missing until a real CE file exists.
+Leftovers (`docs/phase10/LEFTOVER_MISSES.md`): Mats `BLOCK` cubes with no CE png
+(26), TESR/machine/duct (29+18), debug ammo, remaining no-file ids. Powered armor
+now aliases to existing `plate_armor_{ajr,fau,hev,lunar,dnt,titanium}`. No art invented.
 
 ## Remap rules (JSON → existing png)
 

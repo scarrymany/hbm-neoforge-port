@@ -26,6 +26,7 @@ import com.hbm.entity.mob.WormEntityTypes;
 import com.hbm.entity.projectile.ChopperMineEntityTypes;
 import com.hbm.entity.projectile.FallingNukeEntityTypes;
 import com.hbm.entity.projectile.MeteorEntityTypes;
+import com.hbm.entity.projectile.Phase9TailEntityTypes;
 import com.hbm.entity.projectile.RubbleEntityTypes;
 import com.hbm.entity.train.TrainEntityTypes;
 
@@ -147,6 +148,7 @@ public final class ClientEntityRenderers {
         registerNukes();
         registerSatellitePayloads();
         registerPlanes();
+        registerPhase9Tails();
     }
 
     /** {@code com.hbm.entity.GunEntityTypes} - hitscan-adjacent bullet/coin projectiles, invisible. */
@@ -452,5 +454,63 @@ public final class ClientEntityRenderers {
     private static void registerPlanes() {
         EntityRenderers.register(PlaneEntityTypes.C130.get(), FallbackEntityRenderer::new);
         EntityRenderers.register(PlaneEntityTypes.BOMBER.get(), BomberRenderer::new);
+    }
+
+    /** Phase 9 leftover CE {@code @AutoRegister} projectiles / soyuz / waypoint. Fallback OK. */
+    private static void registerPhase9Tails() {
+        EntityRenderers.register(Phase9TailEntityTypes.ACID_BOMB.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.CHEMICAL.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SHRAPNEL.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SOYUZ.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SOYUZ_CAPSULE.get(), FallbackEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.WAYPOINT.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SAWBLADE.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.RAINBOW.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.MINI_NUKE.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.PLASMA_BEAM.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.LASER_BEAM.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.LASER.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.ZIRNOX_DEBRIS.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.FIRE.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.ROCKET.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.RBMK_DEBRIS.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.MINI_MIRV.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SCHRAB.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.TORPEDO.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.MINER_BEAM.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SIEGE_LASER.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.LN2.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SPARK_BEAM.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.MOD_BEAM.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.RAILGUN_PELLET.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.BULLET.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.DUCHESSGAMBIT.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.BUILDING.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.EXPLOSIVE_BEAM.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.AA_SHELL.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.ZETA.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.ARTILLERY_ROCKET.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.BULLET_MK2.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.BOXCAR.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.BURNING_FOEQ.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.ARTILLERY_SHELL.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.COMBINE_BALL.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.COG.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.VORTEX_BEAM.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.DISCHARGE.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.BULLET_MK3.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.BOBMAZON.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SELENA.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.MINER_ROCKET.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.C_PACKAGE.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.ITEM_WASTE.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.FIREWORK_BALL.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.ITEM_BUOYANT.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.MINECART_TEST.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.WASTE_PEARL.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.SPEAR.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.MOD_FX_SHADOW.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.FLEIJA_RAINBOW.get(), EmptyEntityRenderer::new);
+        EntityRenderers.register(Phase9TailEntityTypes.EMP.get(), EmptyEntityRenderer::new);
     }
 }
