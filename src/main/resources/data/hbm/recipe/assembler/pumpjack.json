@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_dura_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_sextuple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:drill_titanium"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_pumpjack",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

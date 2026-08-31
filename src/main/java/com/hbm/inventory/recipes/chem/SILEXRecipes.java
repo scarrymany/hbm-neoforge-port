@@ -133,6 +133,13 @@ public final class SILEXRecipes {
                         .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM.get()), 3)
                         .addOut(new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM.get()), 2));
 
+        // CE SILEXRecipes.java:50-54 PU.ingot() (dictTranslation dust→ingot already implied)
+        RECIPES.put(new ComparableStack(IngotNuggetItems.INGOT_PLUTONIUM.get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.VISIBLE)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU238.get()), 3)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU239.get()), 4)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU240.get()), 2));
+
         // CE key: Items.DYE meta 4 (lapis dye) - 1.21.1 has no more meta variants, Items.LAPIS_LAZULI
         // is the direct equivalent. A previous pass of this file mis-keyed this entry on
         // Items.DIAMOND instead (see class javadoc, mrec_03_silex_misc.md open question #2).

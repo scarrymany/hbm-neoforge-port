@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:coil_magnetized_tungsten"
+  },
+  "output": {
+    "id": "hbm:powder_magnetized_tungsten",
+    "count": 1
+  },
+  "duration": 60
+}

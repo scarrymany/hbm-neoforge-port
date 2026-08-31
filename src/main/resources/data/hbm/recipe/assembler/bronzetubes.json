@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:item_expensive_heavy_frame"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:item_expensive_ferro_plating"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:bismuthbronze_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:zirconium_plate_sextuple"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:item_expensive_bronze_tubes",
+    "count": 1
+  },
+  "duration": 3000,
+  "power": 250000,
+  "input_fluids": [
+    {
+      "type": "PERFLUOROMETHYL_COLD",
+      "fill": 4000
+    }
+  ],
+  "output_fluids": [
+    {
+      "type": "PERFLUOROMETHYL",
+      "fill": 4000
+    }
+  ]
+}

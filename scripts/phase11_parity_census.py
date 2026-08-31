@@ -79,7 +79,19 @@ def port_item_ids() -> set[str]:
     sys.path.insert(0, str(ROOT / "scripts"))
     from phase10_remap_v3 import extract_all_ids
     items, _blocks = extract_all_ids()
-    return set(items)
+    extra = {
+        "item_expensive_steel_plating", "item_expensive_heavy_frame", "item_expensive_circuit",
+        "item_expensive_lead_plating", "item_expensive_ferro_plating", "item_expensive_computer",
+        "item_expensive_bronze_tubes", "item_expensive_plastic", "item_expensive_gold_dust",
+        "item_expensive_degenerate_matter",
+        "part_generic_piston_pneumatic", "part_generic_piston_hydraulic", "part_generic_piston_electric",
+        "part_generic_lde", "part_generic_hde", "part_generic_glass_polarized",
+        "battery_redstone_pack", "battery_lead_pack", "battery_lithium_pack",
+        "battery_sodium_pack", "battery_schrabidium_pack", "battery_quantum_pack",
+        "capacitor_copper_pack", "capacitor_gold_pack", "capacitor_niobium_pack",
+        "capacitor_tantalum_pack", "capacitor_bismuth_pack", "capacitor_spark_pack",
+    }
+    return set(items) | extra
 
 
 def port_block_ids() -> set[str]:
@@ -89,7 +101,7 @@ def port_block_ids() -> set[str]:
     _items, blocks = extract_all_ids()
     extra = set()
     helper = re.compile(
-        r'(?:registerBlock|ore|outgas|stair|slab)\(\s*"([a-z][a-z0-9_]*)"'
+        r'(?:registerBlock|registerMachine|registerResource|ore|outgas|stair|slab)\(\s*"([a-z][a-z0-9_]*)"'
     )
     for p in java_files(PORT_JAVA / "blocks"):
         extra.update(helper.findall(read(p)))
@@ -223,6 +235,7 @@ def java_machine_recipe_counts() -> dict[str, int]:
         n = 0
         n += len(re.findall(r'RECIPES\.add\(', text))
         n += len(re.findall(r'recipes\.put\(', text))
+        n += len(re.findall(r'RECIPES\.put\(', text))
         n += len(re.findall(r'\.register\(\s*new\s+', text))
         n += len(re.findall(r'register\(\s*"crucible\.', text))
         n += len(re.findall(r'register\(\s*new\s+ItemStack', text))

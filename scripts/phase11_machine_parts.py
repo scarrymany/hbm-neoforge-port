@@ -26,6 +26,17 @@ CIRCUITS = [
     "chip_quantum", "controller_quantum", "atomic_clock", "numitron",
 ]
 
+EXPENSIVE = [
+    "item_expensive_steel_plating", "item_expensive_heavy_frame", "item_expensive_circuit",
+    "item_expensive_lead_plating", "item_expensive_ferro_plating", "item_expensive_computer",
+    "item_expensive_bronze_tubes", "item_expensive_plastic", "item_expensive_gold_dust",
+    "item_expensive_degenerate_matter",
+]
+PART_GENERIC = [
+    "part_generic_piston_pneumatic", "part_generic_piston_hydraulic", "part_generic_piston_electric",
+    "part_generic_lde", "part_generic_hde", "part_generic_glass_polarized",
+]
+
 PARTS = [
     "motor", "motor_desh", "motor_bismuth",
     "coil_copper", "coil_copper_torus", "coil_tungsten", "coil_gold",
@@ -78,6 +89,8 @@ MAT: dict[str, list[str]] = {
     "COAL": ["coal"],
     "NETHERQUARTZ": ["netherquartz", "quartz"],
     "SI": ["silicon"],
+    "U": ["uranium"],
+    "PU": ["plutonium"],
     "SR": ["strontium"],
     "CS137": ["caesium137", "cs137"],
     "U238": ["uranium238", "u238"],
@@ -154,6 +167,42 @@ ITEM_MAP = {
     "ModBlocks.steel_scaffold": "steel_scaffold",
     "ModBlocks.glass_quartz": "glass_quartz",
     "ModBlocks.block_meteor": "block_meteor",
+    "ModBlocks.vault_door": "vault_door",
+    "ModBlocks.blast_door": "blast_door",
+    "ModBlocks.fire_door": "fire_door",
+    "ModBlocks.sliding_blast_door": "sliding_blast_door",
+    "ModBlocks.machine_radar": "machine_radar",
+    "ModBlocks.machine_radar_large": "machine_radar_large",
+    "ModBlocks.machine_fracking_tower": "machine_fracking_tower",
+    "ModBlocks.machine_well": "machine_well",
+    "ModBlocks.machine_pumpjack": "machine_pumpjack",
+    "ModBlocks.machine_refinery": "machine_refinery",
+    "ModBlocks.block_meteor": "block_meteor",
+    "ModBlocks.deco_steel": "deco_steel",
+    "ModBlocks.asphalt": "asphalt",
+    "ModBlocks.reinforced_laminate": "reinforced_laminate",
+}
+
+EXPENSIVE_ENUM = {
+    "STEEL_PLATING": "item_expensive_steel_plating",
+    "HEAVY_FRAME": "item_expensive_heavy_frame",
+    "CIRCUIT": "item_expensive_circuit",
+    "LEAD_PLATING": "item_expensive_lead_plating",
+    "FERRO_PLATING": "item_expensive_ferro_plating",
+    "COMPUTER": "item_expensive_computer",
+    "BRONZE_TUBES": "item_expensive_bronze_tubes",
+    "PLASTIC": "item_expensive_plastic",
+    "GOLD_DUST": "item_expensive_gold_dust",
+    "DEGENERATE_MATTER": "item_expensive_degenerate_matter",
+}
+
+PART_GENERIC_ENUM = {
+    "PISTON_PNEUMATIC": "part_generic_piston_pneumatic",
+    "PISTON_HYDRAULIC": "part_generic_piston_hydraulic",
+    "PISTON_ELECTRIC": "part_generic_piston_electric",
+    "LDE": "part_generic_lde",
+    "HDE": "part_generic_hde",
+    "GLASS_POLARIZED": "part_generic_glass_polarized",
 }
 
 CIRCUIT_ENUM = {
@@ -207,11 +256,18 @@ def known_ids() -> set[str]:
     java = REPO / "src" / "main" / "java" / "com" / "hbm"
     helper = re.compile(
         r'(?:registerParts|registerIngot|registerNugget|registerLoreIngot|registerItem|'
-        r'registerBlock|reg|registerPowder|registerFuelPowder)\(\s*"([a-z][a-z0-9_]*)"'
+        r'registerBlock|registerMachine|registerResource|registerBillet|reg1|'
+        r'registerPowder|registerFuelPowder|ore|reg)\(\s*"([a-z][a-z0-9_]*)"'
     )
     for p in java.rglob("*.java"):
         extra.update(helper.findall(p.read_text(errors="ignore")))
-    return items | blocks | extra | set(PARTS) | {f"circuit_{c}" for c in CIRCUITS}
+    packs = {
+        "battery_redstone_pack", "battery_lead_pack", "battery_lithium_pack",
+        "battery_sodium_pack", "battery_schrabidium_pack", "battery_quantum_pack",
+        "capacitor_copper_pack", "capacitor_gold_pack", "capacitor_niobium_pack",
+        "capacitor_tantalum_pack", "capacitor_bismuth_pack", "capacitor_spark_pack",
+    }
+    return items | blocks | extra | packs | set(PARTS) | set(EXPENSIVE) | set(PART_GENERIC) | {f"circuit_{c}" for c in CIRCUITS}
 
 
 def write_models() -> None:
@@ -225,6 +281,31 @@ def write_models() -> None:
             "parent": "minecraft:item/generated",
             "textures": {"layer0": f"hbm:item/{tex}"},
         }, indent=2) + "\n")
+    dotted_models = {
+        "item_expensive_steel_plating": "item_expensive.steel_plating",
+        "item_expensive_heavy_frame": "item_expensive.heavy_frame",
+        "item_expensive_circuit": "item_expensive.circuit",
+        "item_expensive_lead_plating": "item_expensive.lead_plating",
+        "item_expensive_ferro_plating": "item_expensive.ferro_plating",
+        "item_expensive_computer": "item_expensive.computer",
+        "item_expensive_bronze_tubes": "item_expensive.bronze_tubes",
+        "item_expensive_plastic": "item_expensive.plastic",
+        "item_expensive_gold_dust": "item_expensive.gold_dust",
+        "item_expensive_degenerate_matter": "item_expensive.degenerate_matter",
+        "part_generic_piston_pneumatic": "part_generic.piston_pneumatic",
+        "part_generic_piston_hydraulic": "part_generic.piston_hydraulic",
+        "part_generic_piston_electric": "part_generic.piston_electric",
+        "part_generic_lde": "part_generic.lde",
+        "part_generic_hde": "part_generic.hde",
+        "part_generic_glass_polarized": "part_generic.glass_polarized",
+    }
+    for pid, tex in dotted_models.items():
+        path = models / f"{pid}.json"
+        if (tex_root / f"{tex}.png").exists():
+            path.write_text(json.dumps({
+                "parent": "minecraft:item/generated",
+                "textures": {"layer0": f"hbm:item/{tex}"},
+            }, indent=2) + "\n")
     for p in PARTS:
         path = models / f"{p}.json"
         if path.exists():
@@ -259,6 +340,35 @@ def patch_lang() -> None:
             dst = f"item.hbm.circuit_{c}"
             if src in data and dst not in data:
                 data[dst] = data[src]
+        aliases = {
+            "item.hbm.item_expensive_steel_plating": "Bolted Steel Plating",
+            "item.hbm.item_expensive_heavy_frame": "Heavy Framework",
+            "item.hbm.item_expensive_circuit": "Extensive Circuit Board",
+            "item.hbm.item_expensive_lead_plating": "Radiation Resistant Plating",
+            "item.hbm.item_expensive_ferro_plating": "Reinforced Ferrouranium Panels",
+            "item.hbm.item_expensive_computer": "Mainframe",
+            "item.hbm.item_expensive_bronze_tubes": "Bronze Structural Elements",
+            "item.hbm.item_expensive_plastic": "Plastic Panels",
+            "item.hbm.item_expensive_gold_dust": "Gold Dust (Expensive)",
+            "item.hbm.item_expensive_degenerate_matter": "Degenerate Matter",
+            "item.hbm.part_generic_piston_pneumatic": "Pneumatic Piston",
+            "item.hbm.part_generic_piston_hydraulic": "Hydraulic Piston",
+            "item.hbm.part_generic_piston_electric": "Electric Piston",
+            "item.hbm.part_generic_lde": "Low-Density Element",
+            "item.hbm.part_generic_hde": "Heavy Duty Element",
+            "item.hbm.part_generic_glass_polarized": "Polarized Lens",
+            "container.machineRadar": "Radar",
+            "container.machineRadarLarge": "Large Radar",
+            "block.hbm.vault_door": "Vault Door",
+            "block.hbm.blast_door": "Blast Door",
+            "block.hbm.fire_door": "Fire Door",
+            "block.hbm.sliding_blast_door": "Sliding Blast Door",
+            "block.hbm.machine_radar": "Radar",
+            "block.hbm.machine_radar_large": "Large Radar",
+        }
+        for k, v in aliases.items():
+            if k not in data:
+                data[k] = v
         path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n")
 
 
@@ -390,15 +500,33 @@ def resolve_flatten(item_name: str, enum_name: str, n: int, known: set[str]) -> 
         cand = f"piston_set_{en}"
         return (f"hbm:{cand}", n) if cand in known else None
     if item_name == "battery_pack":
-        cand = f"{en}_pack"
+        cand = f"{en.lower()}_pack"
         return (f"hbm:{cand}", n) if cand in known else None
-    # item_expensive / part_generic deliberately unregistered
+    if item_name == "item_expensive":
+        cid = EXPENSIVE_ENUM.get(enum_name)
+        if cid and cid in known:
+            return f"hbm:{cid}", n
+        cand = f"item_expensive_{enum_name.lower()}"
+        return (f"hbm:{cand}", n) if cand in known else None
+    if item_name == "part_generic":
+        cid = PART_GENERIC_ENUM.get(enum_name)
+        if cid and cid in known:
+            return f"hbm:{cid}", n
+        cand = f"part_generic_{enum_name.lower()}"
+        return (f"hbm:{cand}", n) if cand in known else None
     return None
 
 
 def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
     expr = expr.strip()
     expr = expr.replace("RecipesCommon.", "")
+
+    m = re.search(
+        r"DictFrame\.fromOne\(ModItems\.(item_expensive|part_generic|circuit|drillbit|piston_set|battery_pack),\s*(?:[\w.]+\.)?(\w+)(?:,\s*(\d+))?\)",
+        expr,
+    )
+    if m:
+        return resolve_flatten(m.group(1), m.group(2), int(m.group(3) or 1), known)
 
     if "Fluids." in expr or "getDict(" in expr or "inputFluids" in expr:
         return None
@@ -475,33 +603,33 @@ def parse_all_recipes(text: str) -> list[dict]:
         rest = text[rm.end():]
         endm = re.search(r"this\.register\(new GenericRecipe", rest)
         chunk = rest[: endm.start()] if endm else rest[:4000]
-        if ".inputFluids(" in chunk.split(".outputItems(")[0] if False else False:
-            pass
-        # skip fluid-gated recipes — this port's AssemblerRecipe is items-only
-        if re.search(r"\.inputFluids\(", chunk):
-            # still allow if inputFluids is the only extra and we want items-only? No — incomplete.
-            recipes.append({"name": name, "duration": dur, "power": pow_, "out": None, "inn": None, "skip": "fluids"})
-            continue
-        out = inn = None
+        out = inn = infl = outfl = None
         pos = 0
         while pos < len(chunk):
-            om = re.search(r"\.(outputItems|inputItems)\(", chunk[pos:])
-            if not om or (out and inn):
+            om = re.search(r"\.(outputItems|inputItems|inputFluids|outputFluids)\(", chunk[pos:])
+            if not om:
                 break
             abs_par = pos + om.end() - 1
             taken = _take_call_args(chunk, abs_par)
             if not taken:
                 break
             body, nxti = taken
-            if om.group(1) == "outputItems":
+            kind = om.group(1)
+            if kind == "outputItems" and out is None:
                 out = body
-            elif om.group(1) == "inputItems" and inn is None:
+            elif kind == "inputItems" and inn is None:
                 inn = body
+            elif kind == "inputFluids" and infl is None:
+                infl = body
+            elif kind == "outputFluids" and outfl is None:
+                outfl = body
             pos = nxti
         if out and inn:
-            recipes.append({"name": name, "duration": dur, "power": pow_, "out": out, "inn": inn, "skip": None})
+            recipes.append({"name": name, "duration": dur, "power": pow_, "out": out, "inn": inn,
+                            "infl": infl, "outfl": outfl, "skip": None})
         else:
-            recipes.append({"name": name, "duration": dur, "power": pow_, "out": out, "inn": inn, "skip": "parse"})
+            recipes.append({"name": name, "duration": dur, "power": pow_, "out": out, "inn": inn,
+                            "infl": infl, "outfl": outfl, "skip": "parse"})
     return recipes
 
 
@@ -522,6 +650,13 @@ def split_args(s: str) -> list[str]:
     if cur:
         args.append("".join(cur).strip())
     return [a for a in args if a]
+
+
+def resolve_fluid(expr: str) -> dict | None:
+    m = re.search(r"Fluids\.(\w+)\s*,\s*(\d[\d_]*)", expr)
+    if not m:
+        return None
+    return {"type": m.group(1), "fill": int(m.group(2).replace("_", ""))}
 
 
 def write_assembler(known: set[str]) -> tuple[int, int, dict[str, int]]:
@@ -559,17 +694,113 @@ def write_assembler(known: set[str]) -> tuple[int, int, dict[str, int]]:
             continue
         oid, oc = outs[0]
         inputs = [{"item": {"item": iid}, "count": c} for iid, c in inns]
-        slug = r["name"].replace("ass.", "")
-        path = out_dir / f"{slug}.json"
-        path.write_text(json.dumps({
+        payload = {
             "type": "hbm:assembler",
             "inputs": inputs,
             "output": {"id": oid, "count": oc},
             "duration": r["duration"],
             "power": r["power"],
-        }, indent=2) + "\n")
+        }
+        if r.get("infl"):
+            fargs = split_args(r["infl"])
+            fluids = [resolve_fluid(a) for a in fargs]
+            if any(x is None for x in fluids):
+                reasons["fluid_parse"] = reasons.get("fluid_parse", 0) + 1
+                skip += 1
+                continue
+            payload["input_fluids"] = fluids
+        if r.get("outfl"):
+            fargs = split_args(r["outfl"])
+            fluids = [resolve_fluid(a) for a in fargs]
+            if any(x is None for x in fluids):
+                reasons["fluid_parse"] = reasons.get("fluid_parse", 0) + 1
+                skip += 1
+                continue
+            payload["output_fluids"] = fluids
+        slug = r["name"].replace("ass.", "")
+        path = out_dir / f"{slug}.json"
+        path.write_text(json.dumps(payload, indent=2) + "\n")
         ok += 1
     return ok, skip, reasons
+
+
+def write_shredder(known: set[str]) -> int:
+    """CE ShredderRecipes.java setRecipe(Items/Blocks/ModItems, new ItemStack(...))."""
+    ce = REPO / "upstream" / "hbm-ce" / "src" / "main" / "java" / "com" / "hbm" / "inventory" / "recipes" / "ShredderRecipes.java"
+    if not ce.exists():
+        return 0
+    text = ce.read_text(errors="replace")
+    out_dir = DATA / "recipe" / "shredder"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    vanilla_in = {
+        "IRON_INGOT": "minecraft:iron_ingot", "GOLD_INGOT": "minecraft:gold_ingot",
+        "DIAMOND": "minecraft:diamond", "EMERALD": "minecraft:emerald",
+        "COAL": "minecraft:coal", "REDSTONE": "minecraft:redstone",
+        "QUARTZ": "minecraft:quartz", "BONE": "minecraft:bone",
+        "BLAZE_ROD": "minecraft:blaze_rod", "BLAZE_POWDER": "minecraft:blaze_powder",
+        "ENDER_PEARL": "minecraft:ender_pearl", "SLIME_BALL": "minecraft:slime_ball",
+        "LEATHER": "minecraft:leather", "STRING": "minecraft:string",
+        "FEATHER": "minecraft:feather", "GUNPOWDER": "minecraft:gunpowder",
+        "SUGAR": "minecraft:sugar", "WHEAT": "minecraft:wheat",
+        "BREAD": "minecraft:bread", "PAPER": "minecraft:paper",
+        "BOOK": "minecraft:book", "GLASS_BOTTLE": "minecraft:glass_bottle",
+        "NETHER_STAR": "minecraft:nether_star", "PRISMARINE_SHARD": "minecraft:prismarine_shard",
+        "PRISMARINE_CRYSTALS": "minecraft:prismarine_crystals",
+        "CHORUS_FRUIT": "minecraft:chorus_fruit", "POPPED_CHORUS_FRUIT": "minecraft:popped_chorus_fruit",
+        "SHULKER_SHELL": "minecraft:shulker_shell", "TOTEM_OF_UNDYING": "minecraft:totem_of_undying",
+    }
+    vanilla_block = {
+        "DIRT": "minecraft:dirt", "GRASS": "minecraft:grass_block",
+        "SAND": "minecraft:sand", "GRAVEL": "minecraft:gravel",
+        "COBBLESTONE": "minecraft:cobblestone", "STONE": "minecraft:stone",
+        "NETHERRACK": "minecraft:netherrack", "SOUL_SAND": "minecraft:soul_sand",
+        "GLOWSTONE": "minecraft:glowstone", "OBSIDIAN": "minecraft:obsidian",
+        "ICE": "minecraft:ice", "PACKED_ICE": "minecraft:packed_ice",
+        "CLAY": "minecraft:clay", "BRICK_BLOCK": "minecraft:bricks",
+        "SANDSTONE": "minecraft:sandstone", "END_STONE": "minecraft:end_stone",
+        "PRISMARINE": "minecraft:prismarine", "SEA_LANTERN": "minecraft:sea_lantern",
+        "MAGMA": "minecraft:magma_block", "NETHER_WART_BLOCK": "minecraft:nether_wart_block",
+        "RED_NETHER_BRICK": "minecraft:red_nether_bricks",
+        "BONE_BLOCK": "minecraft:bone_block", "CONCRETE": None,
+        "WOOL": "minecraft:white_wool", "LOG": "minecraft:oak_log",
+        "PLANKS": "minecraft:oak_planks", "LEAVES": "minecraft:oak_leaves",
+    }
+    n = 0
+    for m in re.finditer(
+        r"setRecipe\(\s*(Items|Blocks|ModItems|ModBlocks)\.(\w+)\s*,\s*new ItemStack\(\s*(Items|Blocks|ModItems|ModBlocks)\.(\w+)(?:,\s*(\d+))?",
+        text,
+    ):
+        src, sname, dst, dname, cnt = m.group(1), m.group(2), m.group(3), m.group(4), int(m.group(5) or 1)
+        inn = None
+        out = None
+        if src == "Items":
+            inn = vanilla_in.get(sname)
+        elif src == "Blocks":
+            inn = vanilla_block.get(sname)
+        else:
+            snake = sname.lower()
+            inn = f"hbm:{snake}" if snake in known else None
+        if dst == "Items":
+            out = vanilla_in.get(dname)
+        elif dst == "Blocks":
+            out = vanilla_block.get(dname)
+        else:
+            snake = dname.lower()
+            out = f"hbm:{snake}" if snake in known else None
+        if not inn or not out:
+            continue
+        slug = inn.split(":")[-1]
+        path = out_dir / f"{slug}.json"
+        if path.exists():
+            continue
+        path.write_text(json.dumps({
+            "type": "hbm:shredder",
+            "input": {"item": inn},
+            "output": {"id": out, "count": cnt},
+            "duration": 60,
+        }, indent=2) + "\n")
+        n += 1
+    return n
 
 
 def main() -> None:
@@ -578,7 +809,9 @@ def main() -> None:
     write_crafting()
     known = known_ids()
     ok, skip, reasons = write_assembler(known)
+    sh = write_shredder(known)
     print(f"assembler ALL written={ok} skipped={skip} known={len(known)} reasons={reasons}")
+    print(f"shredder extra written={sh}")
 
 
 if __name__ == "__main__":

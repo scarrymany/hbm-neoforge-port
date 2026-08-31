@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_weaponsteel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:mike_deut",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100,
+  "input_fluids": [
+    {
+      "type": "DEUTERIUM",
+      "fill": 10000
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ingot_schraranium"
+  },
+  "output": {
+    "id": "hbm:nugget_schrabidium",
+    "count": 2
+  },
+  "duration": 60
+}

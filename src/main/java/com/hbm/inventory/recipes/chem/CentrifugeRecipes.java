@@ -158,6 +158,53 @@ public final class CentrifugeRecipes {
 
         RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_NITER.get()), new ItemStack[]{
                 new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
+
+        // CE CentrifugeRecipes.java:267-285 remaining crystals whose I/O is registered
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_THORIUM.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_THORIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_THORIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_URANIUM.get(), 1),
+                new ItemStack(IngotNuggetItems.NUGGET_RA226.get(), 1)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_PLUTONIUM.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_PLUTONIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_PLUTONIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_POLONIUM.get(), 1),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_TITANIUM.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get(), 1),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_TUNGSTEN.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_TUNGSTEN.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_TUNGSTEN.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get(), 1),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_BERYLLIUM.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_BERYLLIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_BERYLLIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_QUARTZ.get(), 1),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_SCHRARANIUM.get()), new ItemStack[]{
+                new ItemStack(IngotNuggetItems.NUGGET_SCHRABIDIUM.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_SCHRABIDIUM.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_URANIUM.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM.get(), 2)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_SCHRABIDIUM.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_SCHRABIDIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_SCHRABIDIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_PLUTONIUM.get(), 1),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_RARE.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_DESH_MIX.get(), 1),
+                new ItemStack(BilletPowderItems.POWDER_DESH_MIX.get(), 1),
+                new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get(), 2)});
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_COBALT.get()), new ItemStack[]{
+                new ItemStack(BilletPowderItems.POWDER_COBALT.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get(), 3),
+                new ItemStack(BilletPowderItems.POWDER_COPPER.get(), 3),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
     }
 
     /**

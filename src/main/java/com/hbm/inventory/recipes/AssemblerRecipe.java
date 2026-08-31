@@ -1,5 +1,6 @@
 package com.hbm.inventory.recipes;
 
+import com.hbm.inventory.fluid.FluidStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -30,15 +31,9 @@ import java.util.List;
  * hardcoded TE constant - see {@code docs/phase2/machines_shredder_assembler_crystallizer_mixer.md}'s
  * "Power draw" analysis: {@code maxPower = recipe.power * 100}).
  * <p>
- * <b>Deliberately not the full {@code GenericRecipe} shape</b>: no fluid input/output slot, no
- * chance-weighted ({@code IOutput}) output, no blueprint-pool metadata. Per this task's brief ("port
- * the data now, using the scaffolding as-is... do not block on a bigger recipe-system redesign"), the
- * concrete recipe data ported alongside this class (see {@code data/hbm/recipe/assembler/*.json})
- * only needs plain item-in/item-out shapes, so those extra fields are left for a future machine
- * family that actually needs them (chemical plant, PUREX, etc.) rather than spun up speculatively
- * here. {@link com.hbm.inventory.fluid.FluidStack} has no {@code Codec}/{@code StreamCodec} of its
- * own yet either (a real, separately-scoped gap - see that design doc's Part B data-model table), so
- * a fluid-bearing variant of this class could not be JSON-loaded today regardless.
+ * Optional {@code input_fluids}/{@code output_fluids} match CE {@code GenericRecipe.inputFluids}/
+ * {@code outputFluids} (AssemblyMachineRecipes.java:78-96 — sulfuric acid / lubricant / etc.).
+ * {@link FluidStack} now has {@code Codec}/{@code StreamCodec}. Item-only recipes omit the fields.
  * <p>
  * <b>Recipe selection</b>: CE's real assembler picks one recipe by name via a blueprint item + GUI
  * dropdown ({@code TileEntityMachineAssemblyMachine.receiveControl}/{@code assemblerModule.recipe}),
@@ -59,13 +54,22 @@ public class AssemblerRecipe implements Recipe<AssemblerRecipe.Input> {
     protected final ItemStack output;
     protected final int duration;
     protected final long power;
+    protected final List<FluidStack> inputFluids;
+    protected final List<FluidStack> outputFluids;
 
     public AssemblerRecipe(String group, List<Entry> inputs, ItemStack output, int duration, long power) {
+        this(group, inputs, output, duration, power, List.of(), List.of());
+    }
+
+    public AssemblerRecipe(String group, List<Entry> inputs, ItemStack output, int duration, long power,
+                           List<FluidStack> inputFluids, List<FluidStack> outputFluids) {
         this.group = group;
         this.inputs = inputs;
         this.output = output;
         this.duration = duration;
         this.power = power;
+        this.inputFluids = inputFluids == null ? List.of() : inputFluids;
+        this.outputFluids = outputFluids == null ? List.of() : outputFluids;
     }
 
     public List<Entry> getInputEntries() {
@@ -78,6 +82,14 @@ public class AssemblerRecipe implements Recipe<AssemblerRecipe.Input> {
 
     public long getPower() {
         return power;
+    }
+
+    public List<FluidStack> getInputFluids() {
+        return inputFluids;
+    }
+
+    public List<FluidStack> getOutputFluids() {
+        return outputFluids;
     }
 
     /**
@@ -188,17 +200,35 @@ public class AssemblerRecipe implements Recipe<AssemblerRecipe.Input> {
                 Entry.CODEC.listOf().fieldOf("inputs").forGetter(r -> r.inputs),
                 ItemStack.CODEC.fieldOf("output").forGetter(r -> r.output),
                 Codec.INT.optionalFieldOf("duration", 0).forGetter(AssemblerRecipe::getDuration),
-                Codec.LONG.optionalFieldOf("power", 0L).forGetter(AssemblerRecipe::getPower)
+                Codec.LONG.optionalFieldOf("power", 0L).forGetter(AssemblerRecipe::getPower),
+                FluidStack.CODEC.listOf().optionalFieldOf("input_fluids", List.of()).forGetter(AssemblerRecipe::getInputFluids),
+                FluidStack.CODEC.listOf().optionalFieldOf("output_fluids", List.of()).forGetter(AssemblerRecipe::getOutputFluids)
         ).apply(instance, AssemblerRecipe::new));
 
-        private static final StreamCodec<RegistryFriendlyByteBuf, AssemblerRecipe> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.STRING_UTF8, r -> r.group,
-                Entry.STREAM_CODEC.apply(ByteBufCodecs.list()), r -> r.inputs,
-                ItemStack.STREAM_CODEC, r -> r.output,
-                ByteBufCodecs.VAR_INT, AssemblerRecipe::getDuration,
-                ByteBufCodecs.VAR_LONG, AssemblerRecipe::getPower,
-                AssemblerRecipe::new
-        );
+        // 7 fields — vanilla StreamCodec.composite tops out at 6.
+        private static final StreamCodec<RegistryFriendlyByteBuf, List<Entry>> ENTRIES_STREAM =
+                Entry.STREAM_CODEC.apply(ByteBufCodecs.list());
+        private static final StreamCodec<RegistryFriendlyByteBuf, List<FluidStack>> FLUIDS_STREAM =
+                FluidStack.STREAM_CODEC.apply(ByteBufCodecs.list());
+
+        private static final StreamCodec<RegistryFriendlyByteBuf, AssemblerRecipe> STREAM_CODEC =
+                StreamCodec.of((buf, r) -> {
+                    ByteBufCodecs.STRING_UTF8.encode(buf, r.group);
+                    ENTRIES_STREAM.encode(buf, r.inputs);
+                    ItemStack.STREAM_CODEC.encode(buf, r.output);
+                    ByteBufCodecs.VAR_INT.encode(buf, r.duration);
+                    ByteBufCodecs.VAR_LONG.encode(buf, r.power);
+                    FLUIDS_STREAM.encode(buf, r.inputFluids);
+                    FLUIDS_STREAM.encode(buf, r.outputFluids);
+                }, buf -> new AssemblerRecipe(
+                        ByteBufCodecs.STRING_UTF8.decode(buf),
+                        ENTRIES_STREAM.decode(buf),
+                        ItemStack.STREAM_CODEC.decode(buf),
+                        ByteBufCodecs.VAR_INT.decode(buf),
+                        ByteBufCodecs.VAR_LONG.decode(buf),
+                        FLUIDS_STREAM.decode(buf),
+                        FLUIDS_STREAM.decode(buf)
+                ));
 
         @Override
         public MapCodec<AssemblerRecipe> codec() {

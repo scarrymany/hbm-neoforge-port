@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:aluminum_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:plate_dura_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:mingrade_wire"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:boy_igniter",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

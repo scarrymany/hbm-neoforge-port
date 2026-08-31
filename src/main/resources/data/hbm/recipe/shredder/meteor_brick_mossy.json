@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:meteor_brick_mossy"
+  },
+  "output": {
+    "id": "hbm:powder_meteorite",
+    "count": 1
+  },
+  "duration": 60
+}

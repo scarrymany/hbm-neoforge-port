@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:item_expensive_lead_plating"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:ferrouranium_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:item_expensive_ferro_plating",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 10000,
+  "input_fluids": [
+    {
+      "type": "UNSATURATEDS",
+      "fill": 1000
+    }
+  ]
+}

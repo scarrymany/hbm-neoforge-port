@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_dura_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:coil_copper"
+      },
+      "count": 5
+    },
+    {
+      "item": {
+        "item": "hbm:coil_tungsten"
+      },
+      "count": 5
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:mike_cooling_unit",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

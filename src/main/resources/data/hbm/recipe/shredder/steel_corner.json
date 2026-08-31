@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:steel_corner"
+  },
+  "output": {
+    "id": "hbm:powder_steel_tiny",
+    "count": 18
+  },
+  "duration": 60
+}

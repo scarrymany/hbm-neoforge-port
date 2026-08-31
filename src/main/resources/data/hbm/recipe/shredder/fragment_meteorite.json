@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:fragment_meteorite"
+  },
+  "output": {
+    "id": "hbm:powder_meteorite_tiny",
+    "count": 1
+  },
+  "duration": 60
+}

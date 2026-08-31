@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_capacitor"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:item_expensive_circuit",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 4000,
+  "input_fluids": [
+    {
+      "type": "SULFURIC_ACID",
+      "fill": 1000
+    }
+  ]
+}

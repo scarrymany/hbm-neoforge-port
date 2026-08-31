@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_dura_steel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:vault_door",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

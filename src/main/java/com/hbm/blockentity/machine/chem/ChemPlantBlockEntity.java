@@ -66,20 +66,10 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     public boolean isProcessing;
     private String activeRecipeName;
 
-    /**
-     * Input tanks are fixed to one real fluid each rather than starting {@link Fluids#NONE} - same
-     * reasoning as {@code GasCentrifugeBlockEntity}'s tank: {@code IFluidStandardReceiverMK2}'s demand
-     * check requires {@code tank.getTankType() == type} already, so a {@code NONE}-typed tank can
-     * never receive anything through the pipe network without CE's dropped item-identifier retyping
-     * mechanic. The three fixed types ({@link Fluids#WATER}, {@link Fluids#AIR}, {@link Fluids#LAVA})
-     * cover every fluid input this pass's {@link ChemPlantRecipes} subset needs.
-     */
-    private static final FluidType[] FIXED_INPUT_TYPES = {Fluids.WATER, Fluids.AIR, Fluids.LAVA};
-
     public ChemPlantBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 7, true, true);
         for (int i = 0; i < 3; i++) {
-            inputTanks[i] = new FluidTankNTM(FIXED_INPUT_TYPES[i], TANK_CAPACITY).withOwner(this);
+            inputTanks[i] = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
             outputTanks[i] = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
         }
     }
@@ -118,10 +108,27 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         return null;
     }
 
+    @Nullable
+    private ChemPlantRecipe findItemOnlyRecipe() {
+        for (ChemPlantRecipe recipe : ChemPlantRecipes.RECIPES) {
+            if (matchesItems(recipe)) return recipe;
+        }
+        return null;
+    }
+
     private boolean matchesItems(ChemPlantRecipe recipe) {
-        for (int i = 0; i < recipe.inputItems.length; i++) {
-            AStack key = recipe.inputItems[i];
-            if (i >= 3 || !key.matchesRecipe(inventory.getStackInSlot(ITEM_IN_START + i), false)) return false;
+        boolean[] used = new boolean[3];
+        for (AStack key : recipe.inputItems) {
+            boolean found = false;
+            for (int i = 0; i < 3; i++) {
+                if (used[i]) continue;
+                if (key.matchesRecipe(inventory.getStackInSlot(ITEM_IN_START + i), false)) {
+                    used[i] = true;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return false;
         }
         return true;
     }
@@ -146,11 +153,11 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < recipe.outputItems.length && i < 3; i++) {
             if (!inventory.insertItem(ITEM_OUT_START + i, recipe.outputItems[i], true).isEmpty()) return false;
         }
-        if (recipe.outputFluid != null) {
+        for (FluidStack out : recipe.outputFluids) {
             boolean placed = false;
             for (FluidTankNTM tank : outputTanks) {
-                if ((tank.getTankType() == recipe.outputFluid.type || tank.getTankType() == Fluids.NONE)
-                        && tank.getFill() + recipe.outputFluid.fill <= tank.getMaxFill()) {
+                if ((tank.getTankType() == out.type || tank.getTankType() == Fluids.NONE)
+                        && tank.getFill() + out.fill <= tank.getMaxFill()) {
                     placed = true;
                     break;
                 }
@@ -161,8 +168,16 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     }
 
     private void process(ChemPlantRecipe recipe) {
-        for (int i = 0; i < recipe.inputItems.length && i < 3; i++) {
-            inventory.extractItem(ITEM_IN_START + i, recipe.inputItems[i].count(), false);
+        boolean[] used = new boolean[3];
+        for (AStack key : recipe.inputItems) {
+            for (int i = 0; i < 3; i++) {
+                if (used[i]) continue;
+                if (key.matchesRecipe(inventory.getStackInSlot(ITEM_IN_START + i), false)) {
+                    inventory.extractItem(ITEM_IN_START + i, key.count(), false);
+                    used[i] = true;
+                    break;
+                }
+            }
         }
         for (FluidStack need : recipe.inputFluids) {
             FluidTankNTM tank = findInputTank(need.type);
@@ -171,11 +186,23 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < recipe.outputItems.length && i < 3; i++) {
             inventory.insertItem(ITEM_OUT_START + i, recipe.outputItems[i].copy(), false);
         }
-        if (recipe.outputFluid != null) {
+        for (FluidStack out : recipe.outputFluids) {
             for (FluidTankNTM tank : outputTanks) {
-                if (tank.getTankType() == recipe.outputFluid.type || tank.getTankType() == Fluids.NONE) {
-                    tank.setTankType(recipe.outputFluid.type);
-                    tank.setFill(tank.getFill() + recipe.outputFluid.fill);
+                if (tank.getTankType() == out.type || tank.getTankType() == Fluids.NONE) {
+                    tank.setTankType(out.type);
+                    tank.setFill(tank.getFill() + out.fill);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void retargetEmptyTanks(ChemPlantRecipe recipe) {
+        for (FluidStack need : recipe.inputFluids) {
+            if (findInputTank(need.type) != null) continue;
+            for (FluidTankNTM tank : inputTanks) {
+                if (tank.getFill() == 0) {
+                    tank.setTankType(need.type);
                     break;
                 }
             }
@@ -197,6 +224,9 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, maxPower);
+
+        ChemPlantRecipe itemOnly = findItemOnlyRecipe();
+        if (itemOnly != null) retargetEmptyTanks(itemOnly);
 
         for (DirPos dp : getConPos()) {
             trySubscribe(level, dp);
@@ -258,6 +288,32 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     @Override
     public long getMaxPower() {
         return maxPower;
+    }
+
+    @Override
+    public long getDemand(FluidType type, int pressure) {
+        long amount = 0;
+        for (FluidTankNTM tank : getReceivingTanks()) {
+            if (tank.getPressure() != pressure) continue;
+            if (tank.getTankType() == type || (tank.getTankType() == Fluids.NONE && tank.getFill() == 0)) {
+                amount += tank.getMaxFill() - tank.getFill();
+            }
+        }
+        return amount;
+    }
+
+    @Override
+    public long transferFluid(FluidType type, int pressure, long amount) {
+        for (FluidTankNTM tank : getReceivingTanks()) {
+            if (tank.getPressure() != pressure) continue;
+            if (tank.getTankType() == Fluids.NONE && tank.getFill() == 0) tank.setTankType(type);
+            if (tank.getTankType() != type) continue;
+            int toAdd = (int) Math.min(amount, tank.getMaxFill() - tank.getFill());
+            tank.setFill(tank.getFill() + toAdd);
+            amount -= toAdd;
+            if (amount <= 0) break;
+        }
+        return amount;
     }
 
     @Override

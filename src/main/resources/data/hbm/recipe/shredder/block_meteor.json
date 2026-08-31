@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:block_meteor"
+  },
+  "output": {
+    "id": "hbm:powder_meteorite",
+    "count": 10
+  },
+  "duration": 60
+}

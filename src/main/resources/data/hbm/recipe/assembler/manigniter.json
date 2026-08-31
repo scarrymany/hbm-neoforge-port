@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:gold_wire"
+      },
+      "count": 24
+    }
+  ],
+  "output": {
+    "id": "hbm:man_igniter",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

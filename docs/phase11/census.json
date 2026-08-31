@@ -1,20 +1,20 @@
 {
-  "weighted_pct": 57.6,
-  "unweighted_pct": 77.5,
+  "weighted_pct": 60.5,
+  "unweighted_pct": 79.1,
   "ce_sum": 7453,
-  "port_sum": 4291,
+  "port_sum": 4508,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 1796,
-      "pct": 96.4
+      "port": 1830,
+      "pct": 98.2
     },
     {
       "cat": "blocks",
       "ce": 1169,
-      "port": 649,
-      "pct": 55.5
+      "port": 665,
+      "pct": 56.9
     },
     {
       "cat": "fluids",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 1695,
-      "port": 227,
-      "pct": 13.4
+      "port": 394,
+      "pct": 23.2
     },
     {
       "cat": "advancements",
@@ -59,14 +59,14 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 1796,
+      "port": 1830,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
       "ce": 1169,
       "ce_fields": 1169,
       "ce_string_ctors": 290,
-      "port": 649,
+      "port": 665,
       "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
     },
     "fluids": {
@@ -170,18 +170,24 @@
         "SuperComputerRecipes": 14,
         "WasteDrumRecipes": 20
       },
-      "port_json": 184,
+      "port_json": 247,
       "port_java": {
         "AmmoPressRecipes": 7,
-        "CrucibleRecipes": 13,
+        "CrucibleRecipes": 14,
+        "CrystallizerRecipes": 1,
+        "HeatRecipes": 2,
         "MagicRecipes": 3,
+        "MixerRecipes": 1,
         "PyroOvenRecipes": 10,
-        "ChemPlantRecipes": 4,
-        "SILEXRecipes": 6
+        "CentrifugeRecipes": 29,
+        "ChemPlantRecipes": 53,
+        "CyclotronRecipes": 1,
+        "ElectrolyserFluidRecipes": 7,
+        "SILEXRecipes": 19
       },
-      "port": 227,
+      "port": 394,
       "by_type": {
-        "hbm:assembler": 110,
+        "hbm:assembler": 125,
         "hbm:breeder": 30,
         "hbm:container_upgrade_crate_desh": 1,
         "hbm:container_upgrade_crate_tungsten": 1,
@@ -189,7 +195,7 @@
         "hbm:grenade_crafting": 1,
         "hbm:rbmk_fuel_recycle": 1,
         "hbm:scrap_split": 1,
-        "hbm:shredder": 44
+        "hbm:shredder": 92
       }
     },
     "advancements": {
@@ -197,10 +203,10 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 1796,
-      "reachable_via_recipe_or_loot": 746,
-      "pct": 41.5
+      "port_items": 1830,
+      "reachable_via_recipe_or_loot": 766,
+      "pct": 41.9
     }
   },
-  "recipe_json_total": 1006
+  "recipe_json_total": 1069
 }

@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:crystal_coal"
+  },
+  "output": {
+    "id": "hbm:powder_coal",
+    "count": 3
+  },
+  "duration": 60
+}

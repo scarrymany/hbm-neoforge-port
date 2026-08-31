@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_sextuple"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:magnetron"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:crt_display"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_radar_large",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

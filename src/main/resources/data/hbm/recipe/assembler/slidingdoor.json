@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tungsten"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:reinforced_glass"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:sliding_blast_door",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

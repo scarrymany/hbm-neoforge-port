@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:steel_beam"
+  },
+  "output": {
+    "id": "hbm:powder_steel_tiny",
+    "count": 3
+  },
+  "duration": 60
+}

@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:coil_gold_torus"
+  },
+  "output": {
+    "id": "hbm:powder_gold",
+    "count": 2
+  },
+  "duration": 60
+}

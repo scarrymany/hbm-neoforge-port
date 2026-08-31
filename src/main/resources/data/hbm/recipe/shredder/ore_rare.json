@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ore_rare"
+  },
+  "output": {
+    "id": "hbm:powder_desh_mix",
+    "count": 1
+  },
+  "duration": 60
+}

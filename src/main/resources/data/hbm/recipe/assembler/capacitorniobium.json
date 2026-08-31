@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:niobium_dense_wire"
+      },
+      "count": 24
+    }
+  ],
+  "output": {
+    "id": "hbm:capacitor_niobium_pack",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 1000
+}

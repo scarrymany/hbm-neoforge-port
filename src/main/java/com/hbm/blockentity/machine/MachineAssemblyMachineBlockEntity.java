@@ -6,6 +6,8 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.MachineAssemblyMachineMenu;
+import com.hbm.inventory.fluid.FluidStack;
+import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.AssemblerRecipe;
@@ -130,9 +132,35 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
         if (level == null) return null;
         AssemblerRecipe.Input input = AssemblerRecipe.Input.of(inputSnapshot());
         for (RecipeHolder<AssemblerRecipe> holder : level.getRecipeManager().getAllRecipesFor(ProcessingRecipes.ASSEMBLER_TYPE.get())) {
-            if (holder.value().matches(input, level)) return holder.value();
+            AssemblerRecipe recipe = holder.value();
+            if (!recipe.matches(input, level)) continue;
+            if (!matchesFluids(recipe)) continue;
+            return recipe;
         }
         return null;
+    }
+
+    private boolean matchesFluids(AssemblerRecipe recipe) {
+        for (FluidStack need : recipe.getInputFluids()) {
+            if (need == null || need.type == null || need.type == Fluids.NONE) continue;
+            if (inputTank.getTankType() != need.type || inputTank.getFill() < need.fill) return false;
+        }
+        for (FluidStack out : recipe.getOutputFluids()) {
+            if (out == null || out.type == null || out.type == Fluids.NONE) continue;
+            if (outputTank.getTankType() != Fluids.NONE && outputTank.getTankType() != out.type) return false;
+            if (outputTank.getFill() + out.fill > outputTank.getMaxFill()) return false;
+        }
+        return true;
+    }
+
+    private void retargetInputTank(AssemblerRecipe recipe) {
+        if (inputTank.getFill() > 0) return;
+        for (FluidStack need : recipe.getInputFluids()) {
+            if (need != null && need.type != null && need.type != Fluids.NONE) {
+                inputTank.setTankType(need.type);
+                return;
+            }
+        }
     }
 
     private int speedLevel() {
@@ -173,6 +201,19 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
                 needed -= take;
             }
         }
+        for (FluidStack need : recipe.getInputFluids()) {
+            if (need == null || need.type == Fluids.NONE) continue;
+            if (inputTank.getTankType() == need.type) {
+                inputTank.setFill(Math.max(0, inputTank.getFill() - need.fill));
+            }
+        }
+        for (FluidStack out : recipe.getOutputFluids()) {
+            if (out == null || out.type == Fluids.NONE) continue;
+            if (outputTank.getTankType() == Fluids.NONE || outputTank.getTankType() == out.type) {
+                outputTank.setTankType(out.type);
+                outputTank.setFill(outputTank.getFill() + out.fill);
+            }
+        }
     }
 
     private boolean canFitOutput(ItemStack output) {
@@ -194,6 +235,9 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
 
         upgradeManager.checkSlots(inventory, UPGRADE_START, UPGRADE_END);
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, maxPower);
+
+        AssemblerRecipe itemMatch = findItemOnlyRecipe();
+        if (itemMatch != null) retargetInputTank(itemMatch);
 
         AssemblerRecipe recipe = findMatchingRecipe();
         if (recipe == null) {
@@ -248,6 +292,42 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
     @Override
     public List<FluidTankNTM> getSendingTanks() {
         return List.of(outputTank);
+    }
+
+    @Nullable
+    private AssemblerRecipe findItemOnlyRecipe() {
+        if (level == null) return null;
+        AssemblerRecipe.Input input = AssemblerRecipe.Input.of(inputSnapshot());
+        for (RecipeHolder<AssemblerRecipe> holder : level.getRecipeManager().getAllRecipesFor(ProcessingRecipes.ASSEMBLER_TYPE.get())) {
+            if (holder.value().matches(input, level)) return holder.value();
+        }
+        return null;
+    }
+
+    @Override
+    public long getDemand(FluidType type, int pressure) {
+        long amount = 0;
+        for (FluidTankNTM tank : getReceivingTanks()) {
+            if (tank.getPressure() != pressure) continue;
+            if (tank.getTankType() == type || (tank.getTankType() == Fluids.NONE && tank.getFill() == 0)) {
+                amount += tank.getMaxFill() - tank.getFill();
+            }
+        }
+        return amount;
+    }
+
+    @Override
+    public long transferFluid(FluidType type, int pressure, long amount) {
+        for (FluidTankNTM tank : getReceivingTanks()) {
+            if (tank.getPressure() != pressure) continue;
+            if (tank.getTankType() == Fluids.NONE && tank.getFill() == 0) tank.setTankType(type);
+            if (tank.getTankType() != type) continue;
+            int toAdd = (int) Math.min(amount, tank.getMaxFill() - tank.getFill());
+            tank.setFill(tank.getFill() + toAdd);
+            amount -= toAdd;
+            if (amount <= 0) break;
+        }
+        return amount;
     }
 
     @Override

@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:item_expensive_steel_plating"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_sextuple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_desh"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 32
+    }
+  ],
+  "output": {
+    "id": "hbm:item_expensive_heavy_frame",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 800
+}

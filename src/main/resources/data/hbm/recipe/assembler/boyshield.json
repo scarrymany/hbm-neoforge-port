@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_paa"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:boy_shielding",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

@@ -277,6 +277,14 @@ public final class GenericBlocks {
         registerBlock("door_metal", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(5.0F, 5.0F).sound(SoundType.METAL).noOcclusion()), null);
         registerBlock("door_office", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 10.0F).sound(SoundType.METAL).noOcclusion()), null);
         registerBlock("door_bunker", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()), null);
+        // CE vault/blast/fire/sliding doors are custom multiblock TEs (not vanilla DoorBlock).
+        // Placeable casings so assembler recipes can output them; full open/close TE later.
+        // Assets already exist as cube_all (blockstates/vault_door.json etc.).
+        BlockBehaviour.Properties blast = BlockBehaviour.Properties.of().strength(10.0F, 6000.0F).sound(SoundType.METAL);
+        registerBlock("vault_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("blast_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("fire_door", () -> new BlockBase(BlockBehaviour.Properties.of().strength(10.0F, 1500.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        registerBlock("sliding_blast_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
     }
 
     /** CE's twelve registrations; only {@code ladder_red_top} sets {@code capTop}. */

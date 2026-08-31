@@ -5,6 +5,8 @@ import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.NTMMaterial;
 import com.hbm.items.ItemEnums.EnumCircuitType;
+import com.hbm.items.ItemEnums.EnumExpensiveType;
+import com.hbm.items.ItemEnums.EnumPartType;
 import com.hbm.items.ModItems;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
@@ -65,6 +67,10 @@ public final class MachineItems {
 
     /** CE {@code ModItems.circuit} {@code ItemEnumMulti<EnumCircuitType>} flattened. */
     public static final Map<EnumCircuitType, DeferredItem<Item>> CIRCUITS = new EnumMap<>(EnumCircuitType.class);
+    /** CE {@code ModItems.item_expensive} {@code ItemEnumMulti<EnumExpensiveType>} flattened. */
+    public static final Map<EnumExpensiveType, DeferredItem<Item>> EXPENSIVE = new EnumMap<>(EnumExpensiveType.class);
+    /** CE {@code ModItems.part_generic} {@code ItemEnumMulti<EnumPartType>} flattened. */
+    public static final Map<EnumPartType, DeferredItem<Item>> PART_GENERIC = new EnumMap<>(EnumPartType.class);
     public static DeferredItem<Item> MOTOR, MOTOR_DESH, MOTOR_BISMUTH;
     public static DeferredItem<Item> COIL_COPPER, COIL_COPPER_TORUS, COIL_TUNGSTEN, COIL_GOLD, COIL_GOLD_TORUS, COIL_MAGNETIZED_TUNGSTEN;
     public static DeferredItem<Item> CENTRIFUGE_ELEMENT, THERMO_ELEMENT, RTG_UNIT, DRILL_TITANIUM;
@@ -145,6 +151,18 @@ public final class MachineItems {
         HAZMAT_CLOTH_GREY = tab(ModCreativeTabs.PARTS, reg("hazmat_cloth_grey", () -> new Item(props())));
         ASBESTOS_CLOTH = tab(ModCreativeTabs.PARTS, reg("asbestos_cloth", () -> new Item(props())));
         FILTER_COAL = tab(ModCreativeTabs.PARTS, reg("filter_coal", () -> new Item(props())));
+        // CE ModItems.java:2798 / 2800 — ItemEnumMulti flatten. Unlocks assembler expensive-part
+        // chain (AssemblyMachineRecipes.java:74-97) and chem.polarized.
+        for (EnumExpensiveType type : EnumExpensiveType.VALUES) {
+            DeferredItem<Item> item = tab(ModCreativeTabs.PARTS,
+                    reg("item_expensive_" + lower(type.name()), () -> new Item(props())));
+            EXPENSIVE.put(type, item);
+        }
+        for (EnumPartType type : EnumPartType.VALUES) {
+            DeferredItem<Item> item = tab(ModCreativeTabs.PARTS,
+                    reg("part_generic_" + lower(type.name()), () -> new Item(props())));
+            PART_GENERIC.put(type, item);
+        }
     }
 
     // ==================== ItemArcElectrode / ItemArcElectrodeBurnt ====================

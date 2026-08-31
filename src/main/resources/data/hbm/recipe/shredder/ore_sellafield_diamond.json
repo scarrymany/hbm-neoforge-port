@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ore_sellafield_diamond"
+  },
+  "output": {
+    "id": "hbm:gravel_diamond",
+    "count": 2
+  },
+  "duration": 60
+}

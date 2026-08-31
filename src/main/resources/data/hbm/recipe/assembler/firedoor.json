@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:fire_door",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

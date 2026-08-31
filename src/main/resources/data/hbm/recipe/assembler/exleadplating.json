@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:item_expensive_steel_plating"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_boron"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:tungsten_bolt"
+      },
+      "count": 32
+    }
+  ],
+  "output": {
+    "id": "hbm:item_expensive_lead_plating",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 4000,
+  "input_fluids": [
+    {
+      "type": "LUBRICANT",
+      "fill": 1000
+    }
+  ]
+}
