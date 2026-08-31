@@ -10,6 +10,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BushBlock;
@@ -48,6 +50,12 @@ import net.minecraft.world.level.levelgen.Heightmap;
  *   behavior needed beyond what {@code dirt_oily}/{@code dirt_dead} already do.</li>
  *   <li>CE's {@code BlockPlantEnumMeta} willow-stem protection check is dropped along with
  *   {@code addWillows} (nothing plants willows here for it to protect).</li>
+ *   <li><b>World-gen callers must pass {@link WorldGenLevel}, not {@link Level}.</b> CE's
+ *   {@code world.getHeight(rX, rZ)} on 1.12 {@code World} is fine; Neo 1.21
+ *   {@link Level#getHeight} loads neighboring chunks via {@code ServerChunkCache.getChunk} and
+ *   deadlocks when invoked from {@code Feature#place} (OilBubble / BedrockOil). The
+ *   {@link LevelAccessor} overload skips columns whose chunk is not already present and uses
+ *   {@link Heightmap.Types#WORLD_SURFACE_WG} on a {@link WorldGenLevel}.</li>
  * </ul>
  */
 public final class OilSpot {
@@ -85,20 +93,36 @@ public final class OilSpot {
     }
 
     /**
+     * Live-world overload (fracking tower). {@link Level#getHeight} is safe here - the chunk
+     * is already loaded.
+     *
      * @param addWillows accepted for CE API-signature parity, not implemented (see class javadoc) -
      *                   every in-repo caller passes {@code false}.
      */
     public static void generateOilSpot(Level level, int x, int z, int width, int count, boolean addWillows) {
-        if (level == null || level.isClientSide) return;
+        generateOilSpot((LevelAccessor) level, x, z, width, count, addWillows);
+    }
+
+    /**
+     * World-gen-safe entry. Feature callers must pass the {@link WorldGenLevel} from
+     * {@code Feature#place}, not {@code WorldGenLevel#getLevel()} / {@code ServerLevel}.
+     */
+    public static void generateOilSpot(LevelAccessor level, int x, int z, int width, int count, boolean addWillows) {
+        if (level == null) return;
+        if (level instanceof Level live && live.isClientSide) return;
 
         RandomSource random = level.getRandom();
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
         int minY = level.getMinBuildHeight();
+        Heightmap.Types heightmap = level instanceof WorldGenLevel
+                ? Heightmap.Types.WORLD_SURFACE_WG
+                : Heightmap.Types.WORLD_SURFACE;
 
         for (int i = 0; i < count; i++) {
             int rX = x + (int) (random.nextGaussian() * width);
             int rZ = z + (int) (random.nextGaussian() * width);
-            int rY = level.getHeight(Heightmap.Types.WORLD_SURFACE, rX, rZ);
+            if (!level.hasChunk(rX >> 4, rZ >> 4)) continue;
+            int rY = level.getHeight(heightmap, rX, rZ);
 
             for (int y = rY; y > rY - 4 && y > minY; y--) {
                 pos.set(rX, y - 1, rZ);
