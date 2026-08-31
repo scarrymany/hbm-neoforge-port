@@ -17,6 +17,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -104,6 +105,8 @@ public final class OreBlocks {
         registerDepthOres();
         registerBasalt();
         registerBiomeStone();
+        registerSellafieldOres();
+        registerImpactOres();
     }
 
     private static void registerOverworldOres() {
@@ -249,6 +252,38 @@ public final class OreBlocks {
         registerBlock("stone_biome_woodland",
                 () -> new BlockBase(oreProps(STD_HARDNESS, STD_RESISTANCE, 0)),
                 ModCreativeTabs.BLOCKS);
+    }
+
+    /**
+     * CE {@code ModBlocks.java}:309-313 — {@code BlockSellafieldOre} drops
+     * ({@code BlockSellafieldOre.java}:50-55). Shade/variant rendering deferred (Phase 5).
+     */
+    private static void registerSellafieldOres() {
+        ore("ore_sellafield_diamond", 2, 5, STD_HARDNESS, 6.0F,
+                oreType(() -> Items.DIAMOND, OreBlocks::basaltQuantity));
+        ore("ore_sellafield_emerald", 2, 5, STD_HARDNESS, 6.0F,
+                oreType(() -> Items.EMERALD, OreBlocks::basaltQuantity));
+        ore("ore_sellafield_radgem", 2, 5, STD_HARDNESS, 6.0F,
+                oreType(() -> PlateCrystalWasteItems.GEM_RAD.get(), OreBlocks::basaltQuantity));
+        ore("ore_sellafield_schrabidium", 3, STD_HARDNESS, 6.0F, null);
+        ore("ore_sellafield_uranium_scorched", 1, STD_HARDNESS, 6.0F, null);
+        registerBlock("sellafield_bedrock",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(-1.0F, 6_000_000.0F).sound(SoundType.STONE)),
+                ModCreativeTabs.RESOURCE);
+    }
+
+    /**
+     * CE {@code ModBlocks.java}:353 / 489 — {@code ore_volcano} TE/fluid sender skipped
+     * (Phase 2); unbreakable glowing casing only. {@code ore_tektite_osmiridium} is a plain cube.
+     */
+    private static void registerImpactOres() {
+        registerBlock("ore_volcano",
+                () -> new BlockBase(BlockBehaviour.Properties.of()
+                        .strength(-1.0F, 1_000_000.0F).sound(SoundType.STONE).lightLevel(state -> 15)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("ore_tektite_osmiridium",
+                () -> new BlockBase(oreProps(2.5F, 20.0F, 0)),
+                ModCreativeTabs.RESOURCE);
     }
 
     // ==================== construction helpers ====================

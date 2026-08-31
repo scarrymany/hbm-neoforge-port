@@ -5,6 +5,7 @@ import com.hbm.main.MainRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.BaseRailBlock;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
@@ -28,6 +29,12 @@ public class ModBlockTagProvider extends BlockTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         var pickaxeMineable = this.tag(BlockTags.MINEABLE_WITH_PICKAXE);
-        ModBlocks.BLOCKS.getEntries().forEach(holder -> pickaxeMineable.add(holder.get()));
+        var rails = this.tag(BlockTags.RAILS);
+        ModBlocks.BLOCKS.getEntries().forEach(holder -> {
+            pickaxeMineable.add(holder.get());
+            if (holder.get() instanceof BaseRailBlock) {
+                rails.add(holder.get());
+            }
+        });
     }
 }

@@ -3,6 +3,10 @@ package com.hbm.blocks.generic;
 import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.BlockFallingBase;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.machine.NTMAnvil;
+import com.hbm.blocks.machine.RailBooster;
+import com.hbm.blocks.machine.RailGeneric;
+import com.hbm.blocks.machine.RailHighspeed;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ModItems;
@@ -49,6 +53,9 @@ public final class Phase8Blocks {
         registerBlock("block_electrical_scrap",
                 () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(2.5F, 5.0F).sound(SoundType.METAL)),
                 ModCreativeTabs.BLOCKS);
+        registerStorageLeftovers();
+        registerRails();
+        registerAnvils();
     }
 
     /** CE ModBlocks.java:497-504 — deco_* storage cubes used by vertibird / radio_house palettes. */
@@ -180,6 +187,116 @@ public final class Phase8Blocks {
         registerBlock("brick_dungeon_circle", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("brick_fire", () -> new BlockBase(stone(10.0F, 10.0F)), ModCreativeTabs.BLOCKS);
         stair("brick_fire_stairs", 15.0F, 35.0F);
+    }
+
+    /**
+     * CE storage/deco cubes that are <b>not</b> Mats {@code *_block} autogen
+     * ({@code ModBlocks.java}:299, 458-479, 573-574, 609, 623, 636, 650-652, 864, 1421).
+     * Skip prefix-first aliases of already-registered suffix-first Mats blocks.
+     */
+    private static void registerStorageLeftovers() {
+        registerBlock("block_scrap",
+                () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(2.5F, 5.0F).sound(SoundType.GRAVEL)),
+                ModCreativeTabs.BLOCKS);
+        BlockBehaviour.Properties waste = BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL);
+        registerBlock("block_waste_painted", () -> new BlockNuclearWaste(waste), ModCreativeTabs.BLOCKS);
+        registerBlock("block_waste_vitrified", () -> new BlockNuclearWaste(waste), ModCreativeTabs.BLOCKS);
+        registerBlock("block_fallout",
+                () -> new BlockHazardFalling(BlockBehaviour.Properties.of().strength(0.2F).sound(SoundType.GRAVEL)),
+                ModCreativeTabs.RESOURCE);
+        registerBlock("block_foam",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(0.5F, 0.0F).sound(SoundType.SNOW)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("block_yellowcake",
+                () -> new BlockHazardFalling(BlockBehaviour.Properties.of().strength(5.0F, 300.0F).sound(SoundType.SAND)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("block_white_phosphorus",
+                () -> new BlockHazard(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.STONE)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("block_au198",
+                () -> new BlockHazard(BlockBehaviour.Properties.of().strength(5.0F, 300.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("ash_digamma",
+                () -> new BlockHazardFalling(BlockBehaviour.Properties.of().strength(0.5F, 150.0F).sound(SoundType.SAND)),
+                ModCreativeTabs.RESOURCE);
+        registerBlock("ancient_scrap",
+                () -> new BlockOutgas(BlockBehaviour.Properties.of().strength(100.0F, 6000.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.RESOURCE);
+
+        BlockBehaviour.Properties fuel = BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL);
+        registerBlock("block_mox_fuel", () -> new BlockHazard(fuel), ModCreativeTabs.BLOCKS);
+        registerBlock("block_thorium_fuel", () -> new BlockHazard(fuel), ModCreativeTabs.BLOCKS);
+        registerBlock("block_plutonium_fuel", () -> new BlockHazard(fuel), ModCreativeTabs.BLOCKS);
+        registerBlock("block_uranium_fuel", () -> new BlockHazard(fuel), ModCreativeTabs.BLOCKS);
+        registerBlock("block_schrabidium_fuel",
+                () -> new BlockHazard(BlockBehaviour.Properties.of().strength(5.0F, 300.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+
+        BlockBehaviour.Properties metal = BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL);
+        registerBlock("block_red_copper", () -> new BlockBase(metal), ModCreativeTabs.BLOCKS);
+        registerBlock("block_tcalloy",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 70.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("block_cdalloy",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 70.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("block_euphemium",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 30000.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("block_smore",
+                () -> new BlockBase(stone(15.0F, 450.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("block_graphite",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+
+        registerBlock("tektite", () -> new BlockBase(stone(1.5F, 10.0F)), ModCreativeTabs.RESOURCE);
+        registerBlock("gravel_obsidian",
+                () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(5.0F, 300.0F).sound(SoundType.GRAVEL)),
+                ModCreativeTabs.RESOURCE);
+        registerBlock("gravel_diamond",
+                () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.6F).sound(SoundType.GRAVEL)),
+                ModCreativeTabs.RESOURCE);
+        registerBlock("moon_turf",
+                () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)),
+                ModCreativeTabs.RESOURCE);
+        registerBlock("stone_porous", () -> new BlockBase(stone(5.0F, 10.0F)), ModCreativeTabs.RESOURCE);
+
+        registerBlock("basalt", () -> new BlockBase(stone(5.0F, 10.0F)), ModCreativeTabs.RESOURCE);
+        registerBlock("basalt_smooth", () -> new BlockBase(stone(5.0F, 10.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("basalt_brick", () -> new BlockBase(stone(5.0F, 10.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("basalt_polished", () -> new BlockBase(stone(5.0F, 10.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("basalt_tiles", () -> new BlockBase(stone(5.0F, 10.0F)), ModCreativeTabs.BLOCKS);
+    }
+
+    /**
+     * Vanilla-compatible minecart rails. CE {@code ModBlocks.java}:836-839.
+     * {@code rail_large_*}/{@code rail_narrow_straight/curve} need {@code IRailNTM} implementors
+     * (none exist — same skip as meteor jigsaw walker).
+     */
+    private static void registerRails() {
+        BlockBehaviour.Properties rail = BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).noCollission();
+        registerBlock("rail_highspeed", () -> new RailHighspeed(rail), ModCreativeTabs.BLOCKS);
+        registerBlock("rail_booster", () -> new RailBooster(rail), ModCreativeTabs.BLOCKS);
+        registerBlock("rail_wood", () -> new RailGeneric(rail, 0.2F), ModCreativeTabs.BLOCKS);
+        registerBlock("rail_narrow", () -> new RailGeneric(rail, 0.4F), ModCreativeTabs.BLOCKS);
+    }
+
+    /** CE {@code ModBlocks.java}:1094-1105 — facing falling casings, no GUI this pass. */
+    private static void registerAnvils() {
+        BlockBehaviour.Properties anvil = BlockBehaviour.Properties.of()
+                .strength(5.0F, 100.0F).sound(SoundType.ANVIL).noOcclusion();
+        registerBlock("anvil_iron", () -> new NTMAnvil(anvil, NTMAnvil.TIER_IRON), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_lead", () -> new NTMAnvil(anvil, NTMAnvil.TIER_IRON), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_steel", () -> new NTMAnvil(anvil, NTMAnvil.TIER_STEEL), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_desh", () -> new NTMAnvil(anvil, NTMAnvil.TIER_OIL), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_ferrouranium", () -> new NTMAnvil(anvil, NTMAnvil.TIER_NUCLEAR), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_saturnite", () -> new NTMAnvil(anvil, NTMAnvil.TIER_RBMK), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_bismuth_bronze", () -> new NTMAnvil(anvil, NTMAnvil.TIER_RBMK), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_arsenic_bronze", () -> new NTMAnvil(anvil, NTMAnvil.TIER_RBMK), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_schrabidate", () -> new NTMAnvil(anvil, NTMAnvil.TIER_FUSION), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_dnt", () -> new NTMAnvil(anvil, NTMAnvil.TIER_PARTICLE), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_osmiridium", () -> new NTMAnvil(anvil, NTMAnvil.TIER_GERALD), ModCreativeTabs.MACHINE);
+        registerBlock("anvil_murky", () -> new NTMAnvil(anvil, 1916169), ModCreativeTabs.MACHINE);
     }
 
     /** CE {@code ModBlocks.java}:857 / {@code GeigerCounter.java}:28 — facing casing for Bunker. */

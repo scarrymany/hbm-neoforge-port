@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "hbm:rail_highspeed",
+    "hbm:rail_booster",
+    "hbm:rail_wood",
+    "hbm:rail_narrow"
+  ]
+}
