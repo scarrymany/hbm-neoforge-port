@@ -198,6 +198,9 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
             trySubscribe(tank.getTankType(), level, neighbor, dir);
         }
 
+        EnumWavelengths fromFel = com.hbm.blockentity.machine.accel.FelBlockEntity.laserHitting(level, worldPosition);
+        if (fromFel != EnumWavelengths.NULL) mode = fromFel;
+
         loadFeedstock();
 
         if (!process()) progress = 0;

@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:battery_lithium_pack"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:part_generic_glass_polarized"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_capacitor"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_fel",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

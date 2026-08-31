@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_aluminium"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_capacitor"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:coil_copper"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_solidifier",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

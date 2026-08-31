@@ -19,8 +19,8 @@ import java.util.Map;
 
 /**
  * CE {@code LiquefactionRecipes.java:32-69}. Each insert is a live {@code RECIPES.put} for the census.
- * Skipped: {@code KEY_*_TAR} ({@code oil_tar}), lignite gem, {@code glyphid_gland_empty},
- * {@code plant_flower} metas, {@code PB.block}, food→SALIENT dynamic.
+ * Skipped: lignite gem, {@code glyphid_gland_empty}, {@code plant_flower} metas,
+ * {@code PB.block}, food→SALIENT dynamic. Tar keys landed ({@code oil_tar_*} flatten).
  */
 public final class LiquefactionRecipes {
 
@@ -34,6 +34,12 @@ public final class LiquefactionRecipes {
     public static synchronized void register() {
         if (registered) return;
         registered = true;
+
+        // :32 KEY_*_TAR → oil_tar flatten
+        RECIPES.put(new ComparableStack(item("oil_tar_coal")), new FluidStack(Fluids.COALOIL, 200));
+        RECIPES.put(new ComparableStack(item("oil_tar_wood")), new FluidStack(Fluids.HEATINGOIL, 200));
+        RECIPES.put(new ComparableStack(item("oil_tar_wax")), new FluidStack(Fluids.LUBRICANT, 100));
+        RECIPES.put(new ComparableStack(item("oil_tar_paraffin")), new FluidStack(Fluids.LUBRICANT, 100));
 
         // :33-34
         RECIPES.put(new ComparableStack(Items.COAL), new FluidStack(Fluids.COALOIL, 250));

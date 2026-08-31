@@ -17,5 +17,6 @@ public final class ReprocessClientRegistry {
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ReprocessMenus.MACHINE_PUREX.get(), PurexScreen::new);
         event.register(ReprocessMenus.MACHINE_LIQUEFACTOR.get(), LiquefactorScreen::new);
+        event.register(ReprocessMenus.MACHINE_SOLIDIFIER.get(), SolidifierScreen::new);
     }
 }

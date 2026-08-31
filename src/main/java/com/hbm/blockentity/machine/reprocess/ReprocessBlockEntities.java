@@ -10,6 +10,7 @@ public final class ReprocessBlockEntities {
 
     public static Supplier<BlockEntityType<PurexBlockEntity>> MACHINE_PUREX;
     public static Supplier<BlockEntityType<LiquefactorBlockEntity>> MACHINE_LIQUEFACTOR;
+    public static Supplier<BlockEntityType<SolidifierBlockEntity>> MACHINE_SOLIDIFIER;
 
     private ReprocessBlockEntities() {
     }
@@ -22,6 +23,10 @@ public final class ReprocessBlockEntities {
         MACHINE_LIQUEFACTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_liquefactor", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new LiquefactorBlockEntity(MACHINE_LIQUEFACTOR.get(), pos, state),
                 ReprocessBlocks.MACHINE_LIQUEFACTOR.get()
+        ).build(null));
+        MACHINE_SOLIDIFIER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_solidifier", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new SolidifierBlockEntity(MACHINE_SOLIDIFIER.get(), pos, state),
+                ReprocessBlocks.MACHINE_SOLIDIFIER.get()
         ).build(null));
     }
 }

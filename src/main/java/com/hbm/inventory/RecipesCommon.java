@@ -358,6 +358,10 @@ public final class RecipesCommon {
             return new OreDictStack(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", path)));
         }
 
+        public static OreDictStack ofHbmTag(String path, int count) {
+            return new OreDictStack(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path)), count);
+        }
+
         public List<ItemStack> toStacks() {
             List<ItemStack> stacks = new ArrayList<>();
             for (var holder : BuiltInRegistries.ITEM.getTagOrEmpty(tag)) {

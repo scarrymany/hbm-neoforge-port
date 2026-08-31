@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "minecraft:stone_bricks"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "minecraft:iron_ingot"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_analog"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_excavator",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

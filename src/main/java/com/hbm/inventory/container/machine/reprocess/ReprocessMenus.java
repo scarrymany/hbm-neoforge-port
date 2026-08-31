@@ -2,6 +2,7 @@ package com.hbm.inventory.container.machine.reprocess;
 
 import com.hbm.blockentity.machine.reprocess.LiquefactorBlockEntity;
 import com.hbm.blockentity.machine.reprocess.PurexBlockEntity;
+import com.hbm.blockentity.machine.reprocess.SolidifierBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -13,6 +14,7 @@ public final class ReprocessMenus {
 
     public static DeferredHolder<MenuType<?>, MenuType<PurexMenu>> MACHINE_PUREX;
     public static DeferredHolder<MenuType<?>, MenuType<LiquefactorMenu>> MACHINE_LIQUEFACTOR;
+    public static DeferredHolder<MenuType<?>, MenuType<SolidifierMenu>> MACHINE_SOLIDIFIER;
 
     private ReprocessMenus() {
     }
@@ -22,6 +24,8 @@ public final class ReprocessMenus {
                 new PurexMenu(id, inv, (PurexBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_LIQUEFACTOR = reg("machine_liquefactor", (id, inv, buf) ->
                 new LiquefactorMenu(id, inv, (LiquefactorBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_SOLIDIFIER = reg("machine_solidifier", (id, inv, buf) ->
+                new SolidifierMenu(id, inv, (SolidifierBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

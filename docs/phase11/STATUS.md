@@ -1,8 +1,9 @@
 # Phase 11 status
 
-- Census: `docs/phase11/PARITY_REPORT.md` — **61.5% weighted / 79.8% unweighted**. Not ≥90%.
-- Machine recipes **394 → 483 (23.2% → 27.6%)**. Blocks **665 → 667 (56.9% → 57.1%)**. Items **1830 → 1854 (98.2% → 99.5%)**.
-- This session: PUREX + liquefactor (real TE + menu) + leftover chem (`biogas`/`deicer`/`schrabidic`/`batteryquantum`). Census now counts CE `this.register((PUREXRecipe)` and port `RECIPES.add`/`RECIPES.put`.
-- Leftover CE `@AutoRegister` entities: **none missing**. `docs/phase9/ENTITY_CENSUS.md`.
-- `compileJava` 0, `build` SUCCESS, jar **66355148**, `runServer` **Done (5.040s)** wiped world, 2366 recipes.
+- Census: `docs/phase11/PARITY_REPORT.md` — **62.9% weighted / 80.7% unweighted**. Not ≥90%.
+- Machine recipes **483 → 573 (27.6% → 31.5%)**. Blocks **667 → 676 (57.1% → 57.8%)**. Items **1854 → 1897**.
+- This session: solidifier (47 CE) + FEL + excavator + PA parts/detector + ANY_TAR + leftover chem (explosives/solid_fuel/dust/tarsand/tel) + cyclotron `part_*` assembler.
+- Census: CE Solidification `registerRecipe`/`registerSFAuto` + PA `recipes.add`. Port `RECIPES.put`/`RECIPES.add`/`registerSFAuto(Fluids.`.
+- Leftover CE `@AutoRegister` entities: **none missing**.
+- `compileJava` 0. `build` / `runServer` recorded after this snapshot.
 - No GitHub Release. `master` untouched.

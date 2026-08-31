@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:pa_beamline",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

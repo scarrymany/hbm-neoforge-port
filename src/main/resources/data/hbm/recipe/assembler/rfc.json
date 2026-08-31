@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:pa_beamline"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_pc"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:magnetron"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:pa_rfc",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

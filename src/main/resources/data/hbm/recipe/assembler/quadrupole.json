@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:pa_beamline"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_pc"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_bismoid"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:pa_quadrupole",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

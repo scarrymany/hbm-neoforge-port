@@ -27,12 +27,13 @@ import java.util.List;
  * Recipe data for the Chemical Plant, ported from CE {@code ChemicalPlantRecipes.java}.
  * Numbers cited per call site. Blocked recipes (unregistered items) are listed in the header, not invented.
  * <p>
- * Landed this pass: {@code chem.biogas} (:85), {@code chem.deicer} (:112), {@code chem.schrabidic}
- * (:282), {@code chem.batteryquantum} (:176). Still skipped: {@code chem.tarsand} (:102 ANY_TAR),
- * {@code chem.tel} (:107 ANY_TAR+oil_tar), {@code chem.meatprocessing} (:235 glyphid meat),
- * {@code chem.biosolidfuel}/ {@code chem.biooilsolidfuel} (:246/:250 {@code solid_fuel}),
- * {@code chem.coltancleaning}/ {@code chem.coltancrystal} (:293/:304 generic {@code dust}),
- * explosives / {@code canister_napalm}, {@code chem.uf6} (:361 sulfur item).
+ * Landed this pass: {@code chem.tarsand}/{:102}, {@code chem.tel}/{:107},
+ * {@code chem.biosolidfuel}/{:246}, {@code chem.biooilsolidfuel}/{:250},
+ * {@code chem.coltancleaning}/{:293}, {@code chem.coltancrystal}/{:304},
+ * explosives {@code chem.cordite}/{:310} {@code chem.rocketfuel}/{:315}
+ * {@code chem.dynamite}/{:320} {@code chem.tnt}/{:324} {@code chem.tatb}/{:329}
+ * {@code chem.napalm}/{:339}. Still skipped: {@code chem.meatprocessing} (:235 glyphid meat),
+ * {@code chem.uf6} (:361 sulfur item).
  */
 public final class ChemPlantRecipes {
 
@@ -137,6 +138,20 @@ public final class ChemPlantRecipes {
                 new FluidStack[]{new FluidStack(Fluids.NAPHTHA, 1_000)},
                 new ItemStack[0],
                 new FluidStack(Fluids.GASOLINE, 800)));
+
+        // :102 ANY_TAR
+        RECIPES.add(new ChemPlantRecipe("chem.tarsand", 200, 100,
+                new AStack[]{new ComparableStack(block("ore_oil_sand"), 16), OreDictStack.ofHbmTag("any_tar", 1)},
+                new FluidStack[0],
+                new ItemStack[]{new ItemStack(Blocks.SAND, 16)},
+                new FluidStack(Fluids.BITUMEN, 1_000)));
+
+        // :107 ANY_TAR + PB.dust
+        RECIPES.add(new ChemPlantRecipe("chem.tel", 40, 100,
+                new AStack[]{OreDictStack.ofHbmTag("any_tar", 1), new ComparableStack(BilletPowderItems.POWDER_LEAD.get())},
+                new FluidStack[]{new FluidStack(Fluids.PETROLEUM, 100), new FluidStack(Fluids.STEAM, 1_000)},
+                new ItemStack[]{new ItemStack(item("fuel_additive_antiknock"))},
+                (FluidStack) null));
 
         // :112
         RECIPES.add(new ChemPlantRecipe("chem.deicer", 40, 100,
@@ -320,6 +335,18 @@ public final class ChemPlantRecipes {
                 new ItemStack[]{new ItemStack(block("deco_rusty_steel"), 8)},
                 (FluidStack) null));
 
+        // :246 / :250 solid_fuel
+        RECIPES.add(new ChemPlantRecipe("chem.biosolidfuel", 40, 100,
+                new AStack[]{new ComparableStack(item("biomass_compressed"), 4)},
+                new FluidStack[0],
+                new ItemStack[]{new ItemStack(item("solid_fuel"))},
+                (FluidStack) null));
+        RECIPES.add(new ChemPlantRecipe("chem.biooilsolidfuel", 40, 100,
+                new AStack[]{new ComparableStack(item("biomass_compressed"), 2)},
+                new FluidStack[]{new FluidStack(Fluids.HEATINGOIL, 100)},
+                new ItemStack[]{new ItemStack(item("solid_fuel"))},
+                (FluidStack) null));
+
         // :255 / :259 arc_electrode GRAPHITE
         RECIPES.add(new ChemPlantRecipe("chem.oilelectrodes", 600, 100,
                 new AStack[0],
@@ -374,12 +401,58 @@ public final class ChemPlantRecipes {
                 new ItemStack[]{new ItemStack(BilletPowderItems.POWDER_SCHRABIDATE.get())},
                 (FluidStack) null));
 
+        // :293 generic dust byproduct
+        RECIPES.add(new ChemPlantRecipe("chem.coltancleaning", 60, 100,
+                new AStack[]{new ComparableStack(BilletPowderItems.POWDER_COLTAN.get(), 2), new ComparableStack(BilletPowderItems.POWDER_COAL.get())},
+                new FluidStack[]{new FluidStack(Fluids.PEROXIDE, 250), new FluidStack(Fluids.HYDROGEN, 500)},
+                new ItemStack[]{new ItemStack(BilletPowderItems.POWDER_COLTAN.get()), new ItemStack(BilletPowderItems.POWDER_NIOBIUM.get()), new ItemStack(item("dust"))},
+                new FluidStack(Fluids.WATER, 500)));
+
         // :299
         RECIPES.add(new ChemPlantRecipe("chem.coltanpain", 120, 100,
                 new AStack[]{new ComparableStack(BilletPowderItems.POWDER_COLTAN.get()), new ComparableStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get())},
                 new FluidStack[]{new FluidStack(Fluids.GAS, 1_000), new FluidStack(Fluids.OXYGEN, 500)},
                 new ItemStack[0],
                 new FluidStack(Fluids.PAIN, 1_000)));
+
+        // :304
+        RECIPES.add(new ChemPlantRecipe("chem.coltancrystal", 80, 100,
+                new AStack[0],
+                new FluidStack[]{new FluidStack(Fluids.PAIN, 1_000), new FluidStack(Fluids.PEROXIDE, 500)},
+                new ItemStack[]{new ItemStack(item("gem_tantalium")), new ItemStack(item("dust"), 3)},
+                new FluidStack(Fluids.WATER, 250)));
+
+        // :310 / :315 / :320 / :324 / :329 / :339 explosives
+        RECIPES.add(new ChemPlantRecipe("chem.cordite", 40, 100,
+                new AStack[]{new ComparableStack(PlateCrystalWasteItems.CRYSTAL_NITER.get(), 2), new ComparableStack(item("powder_sawdust"), 2)},
+                new FluidStack[]{new FluidStack(Fluids.GAS, 200)},
+                new ItemStack[]{new ItemStack(item("cordite"), 4)},
+                (FluidStack) null));
+        RECIPES.add(new ChemPlantRecipe("chem.rocketfuel", 200, 100,
+                new AStack[]{new ComparableStack(item("solid_fuel"), 2)},
+                new FluidStack[]{new FluidStack(Fluids.PETROLEUM, 200), new FluidStack(Fluids.NITRIC_ACID, 100)},
+                new ItemStack[]{new ItemStack(item("rocket_fuel"), 4)},
+                (FluidStack) null));
+        RECIPES.add(new ChemPlantRecipe("chem.dynamite", 50, 100,
+                new AStack[]{new ComparableStack(Items.SUGAR), new ComparableStack(PlateCrystalWasteItems.CRYSTAL_NITER.get()), new ComparableStack(Blocks.SAND)},
+                new FluidStack[0],
+                new ItemStack[]{new ItemStack(item("ball_dynamite"), 2)},
+                (FluidStack) null));
+        RECIPES.add(new ChemPlantRecipe("chem.tnt", 100, 1_000,
+                new AStack[]{new ComparableStack(PlateCrystalWasteItems.CRYSTAL_NITER.get())},
+                new FluidStack[]{new FluidStack(Fluids.AROMATICS, 500)},
+                new ItemStack[]{new ItemStack(item("ball_tnt"), 4)},
+                (FluidStack) null));
+        RECIPES.add(new ChemPlantRecipe("chem.tatb", 50, 5_000,
+                new AStack[]{new ComparableStack(item("ball_tnt"))},
+                new FluidStack[]{new FluidStack(Fluids.SOURGAS, 200), new FluidStack(Fluids.NITRIC_ACID, 10)},
+                new ItemStack[]{new ItemStack(item("ball_tatb"))},
+                (FluidStack) null));
+        RECIPES.add(new ChemPlantRecipe("chem.napalm", 40, 100,
+                new AStack[]{new ComparableStack(item("canister_empty"))},
+                new FluidStack[]{new FluidStack(Fluids.GASOLINE, 100), new FluidStack(Fluids.AROMATICS, 50)},
+                new ItemStack[]{new ItemStack(item("canister_napalm"))},
+                (FluidStack) null));
 
         // :334
         RECIPES.add(new ChemPlantRecipe("chem.c4", 100, 1_000,

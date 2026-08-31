@@ -90,9 +90,17 @@ def port_item_ids() -> set[str]:
         "battery_sodium_pack", "battery_schrabidium_pack", "battery_quantum_pack",
         "capacitor_copper_pack", "capacitor_gold_pack", "capacitor_niobium_pack",
         "capacitor_tantalum_pack", "capacitor_bismuth_pack", "capacitor_spark_pack",
-        "pellet_charged", "biomass", "biomass_compressed",
+        "pellet_charged", "biomass", "biomass_compressed", "bio_wafer",
         "fuel_additive_antiknock", "fuel_additive_deicer",
         "nuclear_waste_tiny", "nuclear_waste_vitrified",
+        "dust", "solid_fuel", "solid_fuel_bf", "cordite", "ball_tnt",
+        "ball_dynamite", "ball_tatb", "rocket_fuel", "powder_sawdust",
+        "gem_tantalium", "canister_napalm",
+        "part_lithium", "part_beryllium", "part_carbon", "part_copper", "part_plutonium",
+        "oil_tar_crude", "oil_tar_crack", "oil_tar_coal", "oil_tar_wood", "oil_tar_wax", "oil_tar_paraffin",
+        "particle_empty", "particle_hydrogen", "particle_copper", "particle_lead",
+        "particle_amat", "particle_aschrab", "particle_dark", "particle_higgs",
+        "particle_tachyon", "particle_strange", "particle_sparkticle",
     }
     for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
               "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):
@@ -245,6 +253,9 @@ def java_machine_recipe_counts() -> dict[str, int]:
         n += len(re.findall(r'\.register\(\s*new\s+', text))
         n += len(re.findall(r'register\(\s*"crucible\.', text))
         n += len(re.findall(r'register\(\s*new\s+ItemStack', text))
+        # SolidificationRecipes: helper RECIPES.put is one site; count live SF-auto calls too.
+        if name == "SolidificationRecipes":
+            n += len(re.findall(r'registerSFAuto\(Fluids\.', text))
         if n:
             counts[name] = n
     return counts
@@ -262,6 +273,11 @@ def ce_machine_recipe_counts() -> dict[str, int]:
         n += len(re.findall(r'this\.register\(\s*\(PUREXRecipe\)', text))
         n += len(re.findall(r'recipes\.put\(', text))
         n += len(re.findall(r'RECIPES\.add\(', text))
+        if p.stem == "SolidificationRecipes":
+            n += len(re.findall(r'registerRecipe\([A-Z_]+,', text))
+            n += len(re.findall(r'registerSFAuto\([A-Z_]+', text))
+        if p.stem == "ParticleAcceleratorRecipes":
+            n += len(re.findall(r'recipes\.add\(', text))
         n += len(re.findall(r'registerDefaults', text)) and 0
         n += len(re.findall(r'\.register\(\s*new\s+', text))
         n += len(re.findall(r'addRecipe\(', text))

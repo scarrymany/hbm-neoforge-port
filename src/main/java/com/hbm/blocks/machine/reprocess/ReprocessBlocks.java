@@ -15,8 +15,8 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import java.util.function.Supplier;
 
 /**
- * PUREX + liquefactor family. CE {@code machine_purex} / {@code machine_liquefactor}.
- * Real TE + menu (auto-detect recipes, no stub GUI).
+ * PUREX + liquefactor + solidifier. CE {@code machine_purex} / {@code machine_liquefactor} /
+ * {@code machine_solidifier}. Real TE + menu (auto-detect recipes, no stub GUI).
  */
 public final class ReprocessBlocks {
 
@@ -25,6 +25,7 @@ public final class ReprocessBlocks {
 
     public static DeferredBlock<PurexBlock> MACHINE_PUREX;
     public static DeferredBlock<LiquefactorBlock> MACHINE_LIQUEFACTOR;
+    public static DeferredBlock<SolidifierBlock> MACHINE_SOLIDIFIER;
 
     private ReprocessBlocks() {
     }
@@ -32,6 +33,7 @@ public final class ReprocessBlocks {
     public static void registerAll() {
         MACHINE_PUREX = registerBlock("machine_purex", () -> new PurexBlock(MACHINE_PROPS));
         MACHINE_LIQUEFACTOR = registerBlock("machine_liquefactor", () -> new LiquefactorBlock(MACHINE_PROPS));
+        MACHINE_SOLIDIFIER = registerBlock("machine_solidifier", () -> new SolidifierBlock(MACHINE_PROPS));
         ReprocessBlockEntities.registerAll();
         ReprocessMenus.registerAll();
     }

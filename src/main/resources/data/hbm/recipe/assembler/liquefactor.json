@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "tag": "hbm:any_tar"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_capacitor"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:coil_tungsten"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_liquefactor",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}
