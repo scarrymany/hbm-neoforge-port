@@ -27,9 +27,9 @@ public final class XFactoryDebug {
     private XFactoryDebug() {
     }
 
-    public static final Item ITEM_AMMO_DEBUG = new Item(new Item.Properties());
+    public static Item ITEM_AMMO_DEBUG;
 
-    public static final BulletConfig ammo_debug = new BulletConfig("ammo_debug").setItem(ITEM_AMMO_DEBUG)
+    public static final BulletConfig ammo_debug = new BulletConfig("ammo_debug").setItem(() -> ITEM_AMMO_DEBUG)
             .setSpread(0.01F).setRicochetAngle(45);
 
     public static ItemGunBaseNT gun_debug() {

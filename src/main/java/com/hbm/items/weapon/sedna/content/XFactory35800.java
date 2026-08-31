@@ -36,13 +36,13 @@ public final class XFactory35800 {
 
     // ==================== ammo ====================
 
-    public static final Item ITEM_P35800 = new Item(new Item.Properties());
-    public static final Item ITEM_P35800_BL = new Item(new Item.Properties());
+    public static Item ITEM_P35800;
+    public static Item ITEM_P35800_BL;
 
-    public static final BulletConfig p35800 = new BulletConfig("p35800").setItem(ITEM_P35800)
+    public static final BulletConfig p35800 = new BulletConfig("p35800").setItem(() -> ITEM_P35800)
             .setArmorPiercing(0.5F).setThresholdNegation(50F).setBeam().setSpread(0F).setLife(3).setRenderRotations(false)
             .setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
-    public static final BulletConfig p35800_bl = new BulletConfig("p35800_bl").setItem(ITEM_P35800_BL)
+    public static final BulletConfig p35800_bl = new BulletConfig("p35800_bl").setItem(() -> ITEM_P35800_BL)
             .setArmorPiercing(0.5F).setThresholdNegation(50F).setBeam().setSpread(0F).setLife(3).setRenderRotations(false)
             .setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
 

@@ -56,14 +56,14 @@ public final class XFactoryFolly {
     // holdable items per this port's established secret-ammo convention (see GunPistolItems/
     // GunRifleItems' registerAmmoHidden precedent for M44_EQUESTRIAN/BMG50_BLACK etc).
 
-    public static final Item ITEM_FOLLY_SM = new Item(new Item.Properties());
-    public static final Item ITEM_FOLLY_NUKE = new Item(new Item.Properties());
+    public static Item ITEM_FOLLY_SM;
+    public static Item ITEM_FOLLY_NUKE;
 
-    public static final BulletConfig folly_sm = new BulletConfig("folly_sm").setItem(ITEM_FOLLY_SM)
+    public static final BulletConfig folly_sm = new BulletConfig("folly_sm").setItem(() -> ITEM_FOLLY_SM)
             .setupDamageClass(DamageClass.SUBATOMIC).setBeam().setLife(100).setVel(2F).setGrav(0.015).setRenderRotations(false)
             .setSpectral(true).setDoesPenetrate(true).setOnUpdate(XFactoryFolly::smUpdate);
     /** The only ammo in the whole roster using {@link BulletConfig.ProjectileType#BULLET_CHUNKLOADING} - matches the report's flag exactly. */
-    public static final BulletConfig folly_nuke = new BulletConfig("folly_nuke").setItem(ITEM_FOLLY_NUKE)
+    public static final BulletConfig folly_nuke = new BulletConfig("folly_nuke").setItem(() -> ITEM_FOLLY_NUKE)
             .setChunkloading().setLife(600).setVel(4F).setGrav(0.015).setOnImpact(XFactoryFolly::nukeImpact);
 
     // ==================== gun ====================

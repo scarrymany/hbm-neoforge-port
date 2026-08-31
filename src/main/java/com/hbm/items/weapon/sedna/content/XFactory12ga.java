@@ -86,25 +86,25 @@ public final class XFactory12ga {
     // "advanced" tiers) is preserved in each field's comment for whoever wires that family + Ammo Press.
 
     /** casing: SHOTSHELL x12 */
-    public static final Item ITEM_G12_BP = new Item(new Item.Properties());
+    public static Item ITEM_G12_BP;
     /** casing: SHOTSHELL x12 */
-    public static final Item ITEM_G12_BP_MAGNUM = new Item(new Item.Properties());
+    public static Item ITEM_G12_BP_MAGNUM;
     /** casing: SHOTSHELL x12 */
-    public static final Item ITEM_G12_BP_SLUG = new Item(new Item.Properties());
+    public static Item ITEM_G12_BP_SLUG;
     /** casing: BUCKSHOT x6 */
-    public static final Item ITEM_G12 = new Item(new Item.Properties());
+    public static Item ITEM_G12;
     /** casing: BUCKSHOT x6 */
-    public static final Item ITEM_G12_SLUG = new Item(new Item.Properties());
+    public static Item ITEM_G12_SLUG;
     /** casing: BUCKSHOT x6 */
-    public static final Item ITEM_G12_FLECHETTE = new Item(new Item.Properties());
+    public static Item ITEM_G12_FLECHETTE;
     /** casing: BUCKSHOT_ADVANCED x6 */
-    public static final Item ITEM_G12_MAGNUM = new Item(new Item.Properties());
+    public static Item ITEM_G12_MAGNUM;
     /** casing: BUCKSHOT_ADVANCED x6 */
-    public static final Item ITEM_G12_EXPLOSIVE = new Item(new Item.Properties());
+    public static Item ITEM_G12_EXPLOSIVE;
     /** casing: BUCKSHOT_ADVANCED x6 */
-    public static final Item ITEM_G12_PHOSPHORUS = new Item(new Item.Properties());
+    public static Item ITEM_G12_PHOSPHORUS;
     /** CE's ammo_secret G12_EQUESTRIAN constant - one shared item, two BulletConfigs (bj/tkr impact effects). Hidden from the creative tab, matching CE. */
-    public static final Item ITEM_G12_EQUESTRIAN = new Item(new Item.Properties());
+    public static Item ITEM_G12_EQUESTRIAN;
 
     private static final float BUCKSHOT_SPREAD = 0.035F;
     private static final float MAGNUM_SPREAD = 0.015F;
@@ -156,28 +156,28 @@ public final class XFactory12ga {
     // (grepped, confirmed absent). Left with no onImpact so the 0-damage novelty round still
     // fires/consumes correctly, matching XFactory44's identical precedent for its equestrian rounds.
 
-    public static final BulletConfig g12_bp = new BulletConfig("g12_bp").setItem(ITEM_G12_BP)
+    public static final BulletConfig g12_bp = new BulletConfig("g12_bp").setItem(() -> ITEM_G12_BP)
             .setBlackPowder(true).setProjectiles(8).setDamage(0.75F / 8F).setSpread(BUCKSHOT_SPREAD).setRicochetAngle(15F);
-    public static final BulletConfig g12_bp_magnum = new BulletConfig("g12_bp_magnum").setItem(ITEM_G12_BP_MAGNUM)
+    public static final BulletConfig g12_bp_magnum = new BulletConfig("g12_bp_magnum").setItem(() -> ITEM_G12_BP_MAGNUM)
             .setBlackPowder(true).setProjectiles(4).setDamage(0.75F / 4F).setSpread(BUCKSHOT_SPREAD).setRicochetAngle(25F);
-    public static final BulletConfig g12_bp_slug = new BulletConfig("g12_bp_slug").setItem(ITEM_G12_BP_SLUG)
+    public static final BulletConfig g12_bp_slug = new BulletConfig("g12_bp_slug").setItem(() -> ITEM_G12_BP_SLUG)
             .setBlackPowder(true).setDamage(0.75F).setSpread(0.01F).setRicochetAngle(5F);
-    public static final BulletConfig g12 = new BulletConfig("g12").setItem(ITEM_G12)
+    public static final BulletConfig g12 = new BulletConfig("g12").setItem(() -> ITEM_G12)
             .setProjectiles(8).setDamage(1F / 8F).setSpread(BUCKSHOT_SPREAD).setRicochetAngle(15F).setThresholdNegation(2F);
-    public static final BulletConfig g12_slug = new BulletConfig("g12_slug").setItem(ITEM_G12_SLUG)
+    public static final BulletConfig g12_slug = new BulletConfig("g12_slug").setItem(() -> ITEM_G12_SLUG)
             .setHeadshot(1.5F).setSpread(0F).setRicochetAngle(25F).setThresholdNegation(4F).setArmorPiercing(0.15F);
     /** CE's field calls {@code setThresholdNegation} twice (5F, then 3F) - the second call wins, preserved verbatim rather than "fixed". */
-    public static final BulletConfig g12_flechette = new BulletConfig("g12_flechette").setItem(ITEM_G12_FLECHETTE)
+    public static final BulletConfig g12_flechette = new BulletConfig("g12_flechette").setItem(() -> ITEM_G12_FLECHETTE)
             .setProjectiles(8).setDamage(1F / 8F).setThresholdNegation(5F).setThresholdNegation(3F).setArmorPiercing(0.2F).setSpread(0.025F).setRicochetAngle(5F);
-    public static final BulletConfig g12_magnum = new BulletConfig("g12_magnum").setItem(ITEM_G12_MAGNUM)
+    public static final BulletConfig g12_magnum = new BulletConfig("g12_magnum").setItem(() -> ITEM_G12_MAGNUM)
             .setProjectiles(4).setDamage(2F / 4F).setSpread(MAGNUM_SPREAD).setRicochetAngle(15F).setThresholdNegation(4F);
-    public static final BulletConfig g12_explosive = new BulletConfig("g12_explosive").setItem(ITEM_G12_EXPLOSIVE)
+    public static final BulletConfig g12_explosive = new BulletConfig("g12_explosive").setItem(() -> ITEM_G12_EXPLOSIVE)
             .setDamage(2.5F).setOnImpact(LAMBDA_STANDARD_EXPLODE).setSpread(0F).setRicochetAngle(15F);
-    public static final BulletConfig g12_phosphorus = new BulletConfig("g12_phosphorus").setItem(ITEM_G12_PHOSPHORUS)
+    public static final BulletConfig g12_phosphorus = new BulletConfig("g12_phosphorus").setItem(() -> ITEM_G12_PHOSPHORUS)
             .setProjectiles(8).setDamage(1F / 8F).setSpread(MAGNUM_SPREAD).setRicochetAngle(15F).setOnImpact(LAMBDA_PHOSPHORUS_HIT);
-    public static final BulletConfig g12_equestrian_bj = new BulletConfig("g12_equestrian_bj").setItem(ITEM_G12_EQUESTRIAN)
+    public static final BulletConfig g12_equestrian_bj = new BulletConfig("g12_equestrian_bj").setItem(() -> ITEM_G12_EQUESTRIAN)
             .setDamage(0F);
-    public static final BulletConfig g12_equestrian_tkr = new BulletConfig("g12_equestrian_tkr").setItem(ITEM_G12_EQUESTRIAN)
+    public static final BulletConfig g12_equestrian_tkr = new BulletConfig("g12_equestrian_tkr").setItem(() -> ITEM_G12_EQUESTRIAN)
             .setDamage(0F);
 
     /** CE's {@code all[]} - every non-black-powder-exclusive... actually every regular tier (bp included), matches CE's array verbatim (used by every mag below except the belt-fed shredder/sexy/broken guns). */

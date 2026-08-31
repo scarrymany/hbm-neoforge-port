@@ -25,19 +25,19 @@ public final class GunLauncherItems {
     }
 
     // ==================== 40mm ammo (8) ====================
-    public static final DeferredItem<Item> G26_FLARE = registerAmmo("g26_flare", XFactory40mm.ITEM_G26_FLARE);
-    public static final DeferredItem<Item> G26_FLARE_SUPPLY = registerAmmo("g26_flare_supply", XFactory40mm.ITEM_G26_FLARE_SUPPLY);
-    public static final DeferredItem<Item> G26_FLARE_WEAPON = registerAmmo("g26_flare_weapon", XFactory40mm.ITEM_G26_FLARE_WEAPON);
-    public static final DeferredItem<Item> G40_HE = registerAmmo("g40_he", XFactory40mm.ITEM_G40_HE);
-    public static final DeferredItem<Item> G40_HEAT = registerAmmo("g40_heat", XFactory40mm.ITEM_G40_HEAT);
-    public static final DeferredItem<Item> G40_DEMO = registerAmmo("g40_demo", XFactory40mm.ITEM_G40_DEMO);
-    public static final DeferredItem<Item> G40_INC = registerAmmo("g40_inc", XFactory40mm.ITEM_G40_INC);
-    public static final DeferredItem<Item> G40_PHOSPHORUS = registerAmmo("g40_phosphorus", XFactory40mm.ITEM_G40_PHOSPHORUS);
+    public static final DeferredItem<Item> G26_FLARE = registerAmmo("g26_flare", () -> { if (XFactory40mm.ITEM_G26_FLARE == null) XFactory40mm.ITEM_G26_FLARE = new Item(new Item.Properties()); return XFactory40mm.ITEM_G26_FLARE; });
+    public static final DeferredItem<Item> G26_FLARE_SUPPLY = registerAmmo("g26_flare_supply", () -> { if (XFactory40mm.ITEM_G26_FLARE_SUPPLY == null) XFactory40mm.ITEM_G26_FLARE_SUPPLY = new Item(new Item.Properties()); return XFactory40mm.ITEM_G26_FLARE_SUPPLY; });
+    public static final DeferredItem<Item> G26_FLARE_WEAPON = registerAmmo("g26_flare_weapon", () -> { if (XFactory40mm.ITEM_G26_FLARE_WEAPON == null) XFactory40mm.ITEM_G26_FLARE_WEAPON = new Item(new Item.Properties()); return XFactory40mm.ITEM_G26_FLARE_WEAPON; });
+    public static final DeferredItem<Item> G40_HE = registerAmmo("g40_he", () -> { if (XFactory40mm.ITEM_G40_HE == null) XFactory40mm.ITEM_G40_HE = new Item(new Item.Properties()); return XFactory40mm.ITEM_G40_HE; });
+    public static final DeferredItem<Item> G40_HEAT = registerAmmo("g40_heat", () -> { if (XFactory40mm.ITEM_G40_HEAT == null) XFactory40mm.ITEM_G40_HEAT = new Item(new Item.Properties()); return XFactory40mm.ITEM_G40_HEAT; });
+    public static final DeferredItem<Item> G40_DEMO = registerAmmo("g40_demo", () -> { if (XFactory40mm.ITEM_G40_DEMO == null) XFactory40mm.ITEM_G40_DEMO = new Item(new Item.Properties()); return XFactory40mm.ITEM_G40_DEMO; });
+    public static final DeferredItem<Item> G40_INC = registerAmmo("g40_inc", () -> { if (XFactory40mm.ITEM_G40_INC == null) XFactory40mm.ITEM_G40_INC = new Item(new Item.Properties()); return XFactory40mm.ITEM_G40_INC; });
+    public static final DeferredItem<Item> G40_PHOSPHORUS = registerAmmo("g40_phosphorus", () -> { if (XFactory40mm.ITEM_G40_PHOSPHORUS == null) XFactory40mm.ITEM_G40_PHOSPHORUS = new Item(new Item.Properties()); return XFactory40mm.ITEM_G40_PHOSPHORUS; });
 
     // ==================== 7.5mm bolt ammo (3) ====================
-    public static final DeferredItem<Item> B75 = registerAmmo("b75", XFactory75Bolt.ITEM_B75);
-    public static final DeferredItem<Item> B75_INC = registerAmmo("b75_inc", XFactory75Bolt.ITEM_B75_INC);
-    public static final DeferredItem<Item> B75_EXP = registerAmmo("b75_exp", XFactory75Bolt.ITEM_B75_EXP);
+    public static final DeferredItem<Item> B75 = registerAmmo("b75", () -> { if (XFactory75Bolt.ITEM_B75 == null) XFactory75Bolt.ITEM_B75 = new Item(new Item.Properties()); return XFactory75Bolt.ITEM_B75; });
+    public static final DeferredItem<Item> B75_INC = registerAmmo("b75_inc", () -> { if (XFactory75Bolt.ITEM_B75_INC == null) XFactory75Bolt.ITEM_B75_INC = new Item(new Item.Properties()); return XFactory75Bolt.ITEM_B75_INC; });
+    public static final DeferredItem<Item> B75_EXP = registerAmmo("b75_exp", () -> { if (XFactory75Bolt.ITEM_B75_EXP == null) XFactory75Bolt.ITEM_B75_EXP = new Item(new Item.Properties()); return XFactory75Bolt.ITEM_B75_EXP; });
 
     // ==================== 40mm guns (3) ====================
     public static final DeferredItem<Item> GUN_FLAREGUN = registerGun("gun_flaregun", XFactory40mm::gun_flaregun);
@@ -51,8 +51,8 @@ public final class GunLauncherItems {
     public static void registerAll() {
     }
 
-    private static DeferredItem<Item> registerAmmo(String name, Item instance) {
-        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmo(String name, java.util.function.Supplier<Item> instance) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, instance);
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }

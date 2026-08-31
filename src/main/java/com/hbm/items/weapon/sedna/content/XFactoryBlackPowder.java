@@ -52,20 +52,20 @@ public final class XFactoryBlackPowder {
 
     // ==================== ammo (4) ====================
 
-    public static final Item ITEM_STONE = new Item(new Item.Properties());
-    public static final Item ITEM_STONE_AP = new Item(new Item.Properties());
-    public static final Item ITEM_STONE_IRON = new Item(new Item.Properties());
-    public static final Item ITEM_STONE_SHOT = new Item(new Item.Properties());
+    public static Item ITEM_STONE;
+    public static Item ITEM_STONE_AP;
+    public static Item ITEM_STONE_IRON;
+    public static Item ITEM_STONE_SHOT;
 
-    public static final BulletConfig stone = new BulletConfig("stone").setItem(ITEM_STONE)
+    public static final BulletConfig stone = new BulletConfig("stone").setItem(() -> ITEM_STONE)
             .setBlackPowder(true).setHeadshot(1F).setSpread(0.025F).setRicochetAngle(15);
-    public static final BulletConfig stone_ap = new BulletConfig("stone_ap").setItem(ITEM_STONE_AP)
+    public static final BulletConfig stone_ap = new BulletConfig("stone_ap").setItem(() -> ITEM_STONE_AP)
             .setBlackPowder(true).setHeadshot(1F).setSpread(0.01F).setRicochetAngle(5)
             .setDoesPenetrate(true).setDamage(1.5F);
-    public static final BulletConfig stone_iron = new BulletConfig("stone_iron").setItem(ITEM_STONE_IRON)
+    public static final BulletConfig stone_iron = new BulletConfig("stone_iron").setItem(() -> ITEM_STONE_IRON)
             .setBlackPowder(true).setHeadshot(1F).setSpread(0F).setRicochetAngle(90).setRicochetCount(5)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F);
-    public static final BulletConfig stone_shot = new BulletConfig("stone_shot").setItem(ITEM_STONE_SHOT)
+    public static final BulletConfig stone_shot = new BulletConfig("stone_shot").setItem(() -> ITEM_STONE_SHOT)
             .setBlackPowder(true).setHeadshot(1F).setSpread(0.1F).setRicochetAngle(45).setProjectiles(6, 6)
             .setDamage(1F / 6F);
 

@@ -50,37 +50,37 @@ public final class XFactory44 {
     // family registered anywhere in this port yet). CE's casing type + count preserved per field below.
 
     /** casing: SMALL x12 */
-    public static final Item ITEM_M44_BP = new Item(new Item.Properties());
+    public static Item ITEM_M44_BP;
     /** casing: SMALL x6 */
-    public static final Item ITEM_M44_SP = new Item(new Item.Properties());
+    public static Item ITEM_M44_SP;
     /** casing: SMALL x6 */
-    public static final Item ITEM_M44_FMJ = new Item(new Item.Properties());
+    public static Item ITEM_M44_FMJ;
     /** casing: SMALL x6 */
-    public static final Item ITEM_M44_JHP = new Item(new Item.Properties());
+    public static Item ITEM_M44_JHP;
     /** casing: SMALL_STEEL x6 */
-    public static final Item ITEM_M44_AP = new Item(new Item.Properties());
+    public static Item ITEM_M44_AP;
     /** casing: SMALL x6 */
-    public static final Item ITEM_M44_EXPRESS = new Item(new Item.Properties());
+    public static Item ITEM_M44_EXPRESS;
     /** CE's ammo_secret M44_EQUESTRIAN constant - one shared item, two BulletConfigs (pip/mn7 impact effects). Hidden from the creative tab, matching CE. */
-    public static final Item ITEM_M44_EQUESTRIAN = new Item(new Item.Properties());
+    public static Item ITEM_M44_EQUESTRIAN;
 
-    public static final BulletConfig m44_bp = new BulletConfig("m44_bp").setItem(ITEM_M44_BP)
+    public static final BulletConfig m44_bp = new BulletConfig("m44_bp").setItem(() -> ITEM_M44_BP)
             .setDamage(0.75F).setBlackPowder(true);
-    public static final BulletConfig m44_sp = new BulletConfig("m44_sp").setItem(ITEM_M44_SP);
-    public static final BulletConfig m44_fmj = new BulletConfig("m44_fmj").setItem(ITEM_M44_FMJ)
+    public static final BulletConfig m44_sp = new BulletConfig("m44_sp").setItem(() -> ITEM_M44_SP);
+    public static final BulletConfig m44_fmj = new BulletConfig("m44_fmj").setItem(() -> ITEM_M44_FMJ)
             .setDamage(0.8F).setThresholdNegation(3F).setArmorPiercing(0.1F);
-    public static final BulletConfig m44_jhp = new BulletConfig("m44_jhp").setItem(ITEM_M44_JHP)
+    public static final BulletConfig m44_jhp = new BulletConfig("m44_jhp").setItem(() -> ITEM_M44_JHP)
             .setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F);
-    public static final BulletConfig m44_ap = new BulletConfig("m44_ap").setItem(ITEM_M44_AP)
+    public static final BulletConfig m44_ap = new BulletConfig("m44_ap").setItem(() -> ITEM_M44_AP)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(7.5F)
             .setArmorPiercing(0.15F);
-    public static final BulletConfig m44_express = new BulletConfig("m44_express").setItem(ITEM_M44_EXPRESS)
+    public static final BulletConfig m44_express = new BulletConfig("m44_express").setItem(() -> ITEM_M44_EXPRESS)
             .setDoesPenetrate(true).setDamage(1.5F).setThresholdNegation(3F).setArmorPiercing(0.1F).setWear(1.5F);
 
     // TODO(phase3/phase4-entities): see class javadoc - EntityBoxcar/EntityTorpedo don't exist yet.
-    public static final BulletConfig m44_equestrian_pip = new BulletConfig("m44_equestrian_pip").setItem(ITEM_M44_EQUESTRIAN)
+    public static final BulletConfig m44_equestrian_pip = new BulletConfig("m44_equestrian_pip").setItem(() -> ITEM_M44_EQUESTRIAN)
             .setDamage(0F);
-    public static final BulletConfig m44_equestrian_mn7 = new BulletConfig("m44_equestrian_mn7").setItem(ITEM_M44_EQUESTRIAN)
+    public static final BulletConfig m44_equestrian_mn7 = new BulletConfig("m44_equestrian_mn7").setItem(() -> ITEM_M44_EQUESTRIAN)
             .setDamage(0F);
 
     // ==================== recoil (see XFactory556mm's javadoc - not currently wired anywhere, kept for 1:1 parity) ====================

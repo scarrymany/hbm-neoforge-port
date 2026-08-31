@@ -49,20 +49,20 @@ public final class XFactory22lr {
     // family registered anywhere in this port yet). CE's casing type + count preserved per field below.
 
     /** casing: SMALL x24 */
-    public static final Item ITEM_P22_SP = new Item(new Item.Properties());
+    public static Item ITEM_P22_SP;
     /** casing: SMALL x24 */
-    public static final Item ITEM_P22_FMJ = new Item(new Item.Properties());
+    public static Item ITEM_P22_FMJ;
     /** casing: SMALL x24 */
-    public static final Item ITEM_P22_JHP = new Item(new Item.Properties());
+    public static Item ITEM_P22_JHP;
     /** casing: SMALL_STEEL x24 */
-    public static final Item ITEM_P22_AP = new Item(new Item.Properties());
+    public static Item ITEM_P22_AP;
 
-    public static final BulletConfig p22_sp = new BulletConfig("p22_sp").setItem(ITEM_P22_SP).setKnockback(0F);
-    public static final BulletConfig p22_fmj = new BulletConfig("p22_fmj").setItem(ITEM_P22_FMJ).setKnockback(0F)
+    public static final BulletConfig p22_sp = new BulletConfig("p22_sp").setItem(() -> ITEM_P22_SP).setKnockback(0F);
+    public static final BulletConfig p22_fmj = new BulletConfig("p22_fmj").setItem(() -> ITEM_P22_FMJ).setKnockback(0F)
             .setDamage(0.8F).setThresholdNegation(1F).setArmorPiercing(0.1F);
-    public static final BulletConfig p22_jhp = new BulletConfig("p22_jhp").setItem(ITEM_P22_JHP).setKnockback(0F)
+    public static final BulletConfig p22_jhp = new BulletConfig("p22_jhp").setItem(() -> ITEM_P22_JHP).setKnockback(0F)
             .setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F);
-    public static final BulletConfig p22_ap = new BulletConfig("p22_ap").setItem(ITEM_P22_AP).setKnockback(0F)
+    public static final BulletConfig p22_ap = new BulletConfig("p22_ap").setItem(() -> ITEM_P22_AP).setKnockback(0F)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(2.5F)
             .setArmorPiercing(0.15F);
 

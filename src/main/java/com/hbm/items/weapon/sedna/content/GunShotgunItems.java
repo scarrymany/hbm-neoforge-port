@@ -32,24 +32,24 @@ public final class GunShotgunItems {
     }
 
     // ==================== 12ga ammo (9 regular + 1 secret) ====================
-    public static final DeferredItem<Item> G12_BP = registerAmmo("g12_bp", XFactory12ga.ITEM_G12_BP);
-    public static final DeferredItem<Item> G12_BP_MAGNUM = registerAmmo("g12_bp_magnum", XFactory12ga.ITEM_G12_BP_MAGNUM);
-    public static final DeferredItem<Item> G12_BP_SLUG = registerAmmo("g12_bp_slug", XFactory12ga.ITEM_G12_BP_SLUG);
-    public static final DeferredItem<Item> G12 = registerAmmo("g12", XFactory12ga.ITEM_G12);
-    public static final DeferredItem<Item> G12_SLUG = registerAmmo("g12_slug", XFactory12ga.ITEM_G12_SLUG);
-    public static final DeferredItem<Item> G12_FLECHETTE = registerAmmo("g12_flechette", XFactory12ga.ITEM_G12_FLECHETTE);
-    public static final DeferredItem<Item> G12_MAGNUM = registerAmmo("g12_magnum", XFactory12ga.ITEM_G12_MAGNUM);
-    public static final DeferredItem<Item> G12_EXPLOSIVE = registerAmmo("g12_explosive", XFactory12ga.ITEM_G12_EXPLOSIVE);
-    public static final DeferredItem<Item> G12_PHOSPHORUS = registerAmmo("g12_phosphorus", XFactory12ga.ITEM_G12_PHOSPHORUS);
+    public static final DeferredItem<Item> G12_BP = registerAmmo("g12_bp", () -> { if (XFactory12ga.ITEM_G12_BP == null) XFactory12ga.ITEM_G12_BP = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_BP; });
+    public static final DeferredItem<Item> G12_BP_MAGNUM = registerAmmo("g12_bp_magnum", () -> { if (XFactory12ga.ITEM_G12_BP_MAGNUM == null) XFactory12ga.ITEM_G12_BP_MAGNUM = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_BP_MAGNUM; });
+    public static final DeferredItem<Item> G12_BP_SLUG = registerAmmo("g12_bp_slug", () -> { if (XFactory12ga.ITEM_G12_BP_SLUG == null) XFactory12ga.ITEM_G12_BP_SLUG = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_BP_SLUG; });
+    public static final DeferredItem<Item> G12 = registerAmmo("g12", () -> { if (XFactory12ga.ITEM_G12 == null) XFactory12ga.ITEM_G12 = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12; });
+    public static final DeferredItem<Item> G12_SLUG = registerAmmo("g12_slug", () -> { if (XFactory12ga.ITEM_G12_SLUG == null) XFactory12ga.ITEM_G12_SLUG = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_SLUG; });
+    public static final DeferredItem<Item> G12_FLECHETTE = registerAmmo("g12_flechette", () -> { if (XFactory12ga.ITEM_G12_FLECHETTE == null) XFactory12ga.ITEM_G12_FLECHETTE = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_FLECHETTE; });
+    public static final DeferredItem<Item> G12_MAGNUM = registerAmmo("g12_magnum", () -> { if (XFactory12ga.ITEM_G12_MAGNUM == null) XFactory12ga.ITEM_G12_MAGNUM = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_MAGNUM; });
+    public static final DeferredItem<Item> G12_EXPLOSIVE = registerAmmo("g12_explosive", () -> { if (XFactory12ga.ITEM_G12_EXPLOSIVE == null) XFactory12ga.ITEM_G12_EXPLOSIVE = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_EXPLOSIVE; });
+    public static final DeferredItem<Item> G12_PHOSPHORUS = registerAmmo("g12_phosphorus", () -> { if (XFactory12ga.ITEM_G12_PHOSPHORUS == null) XFactory12ga.ITEM_G12_PHOSPHORUS = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_PHOSPHORUS; });
     /** Secret round - hidden from the creative tab, see class javadoc. Backs both g12_equestrian_bj and _tkr. */
-    public static final DeferredItem<Item> G12_EQUESTRIAN = registerAmmoHidden("g12_equestrian", XFactory12ga.ITEM_G12_EQUESTRIAN);
+    public static final DeferredItem<Item> G12_EQUESTRIAN = registerAmmoHidden("g12_equestrian", () -> { if (XFactory12ga.ITEM_G12_EQUESTRIAN == null) XFactory12ga.ITEM_G12_EQUESTRIAN = new Item(new Item.Properties()); return XFactory12ga.ITEM_G12_EQUESTRIAN; });
 
     // ==================== 10ga ammo (5) ====================
-    public static final DeferredItem<Item> G10 = registerAmmo("g10", XFactory10ga.ITEM_G10);
-    public static final DeferredItem<Item> G10_SHRAPNEL = registerAmmo("g10_shrapnel", XFactory10ga.ITEM_G10_SHRAPNEL);
-    public static final DeferredItem<Item> G10_DU = registerAmmo("g10_du", XFactory10ga.ITEM_G10_DU);
-    public static final DeferredItem<Item> G10_SLUG = registerAmmo("g10_slug", XFactory10ga.ITEM_G10_SLUG);
-    public static final DeferredItem<Item> G10_EXPLOSIVE = registerAmmo("g10_explosive", XFactory10ga.ITEM_G10_EXPLOSIVE);
+    public static final DeferredItem<Item> G10 = registerAmmo("g10", () -> { if (XFactory10ga.ITEM_G10 == null) XFactory10ga.ITEM_G10 = new Item(new Item.Properties()); return XFactory10ga.ITEM_G10; });
+    public static final DeferredItem<Item> G10_SHRAPNEL = registerAmmo("g10_shrapnel", () -> { if (XFactory10ga.ITEM_G10_SHRAPNEL == null) XFactory10ga.ITEM_G10_SHRAPNEL = new Item(new Item.Properties()); return XFactory10ga.ITEM_G10_SHRAPNEL; });
+    public static final DeferredItem<Item> G10_DU = registerAmmo("g10_du", () -> { if (XFactory10ga.ITEM_G10_DU == null) XFactory10ga.ITEM_G10_DU = new Item(new Item.Properties()); return XFactory10ga.ITEM_G10_DU; });
+    public static final DeferredItem<Item> G10_SLUG = registerAmmo("g10_slug", () -> { if (XFactory10ga.ITEM_G10_SLUG == null) XFactory10ga.ITEM_G10_SLUG = new Item(new Item.Properties()); return XFactory10ga.ITEM_G10_SLUG; });
+    public static final DeferredItem<Item> G10_EXPLOSIVE = registerAmmo("g10_explosive", () -> { if (XFactory10ga.ITEM_G10_EXPLOSIVE == null) XFactory10ga.ITEM_G10_EXPLOSIVE = new Item(new Item.Properties()); return XFactory10ga.ITEM_G10_EXPLOSIVE; });
 
     // ==================== 12ga guns (8) ====================
     public static final DeferredItem<Item> GUN_MARESLEG = registerGun("gun_maresleg", XFactory12ga::gun_maresleg);
@@ -71,15 +71,15 @@ public final class GunShotgunItems {
     public static void registerAll() {
     }
 
-    private static DeferredItem<Item> registerAmmo(String name, Item instance) {
-        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmo(String name, java.util.function.Supplier<Item> instance) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, instance);
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }
 
     /** Registered as a real item (matching CE's EnumAmmoSecret being a real ItemStack variant) but not added to any creative tab. */
-    private static DeferredItem<Item> registerAmmoHidden(String name, Item instance) {
-        return ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmoHidden(String name, java.util.function.Supplier<Item> instance) {
+        return ModItems.ITEMS.register(name, instance);
     }
 
     /**

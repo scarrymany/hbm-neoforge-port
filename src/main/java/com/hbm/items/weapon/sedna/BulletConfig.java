@@ -37,6 +37,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * Port of CE's {@code com.hbm.items.weapon.sedna.BulletConfig} (470 lines) - the ammo/projectile
@@ -264,6 +265,7 @@ public class BulletConfig implements Cloneable {
     public ResourceLocation id;
 
     private @Nullable ComparableStack ammo;
+    private @Nullable Supplier<? extends Item> ammoSupplier;
     private @Nullable ItemStack casingItem;
     public int casingAmount;
     /** How much ammo is added to a standard mag when loading one item. */
@@ -365,6 +367,10 @@ public class BulletConfig implements Cloneable {
 
     @Nullable
     public ComparableStack getAmmo() {
+        if (this.ammo == null && this.ammoSupplier != null) {
+            Item item = this.ammoSupplier.get();
+            if (item != null) this.ammo = new ComparableStack(item);
+        }
         return this.ammo;
     }
 
@@ -391,9 +397,10 @@ public class BulletConfig implements Cloneable {
     public BulletConfig setBeam() { this.pType = ProjectileType.BEAM; return this; }
     public BulletConfig setChunkloading() { this.pType = ProjectileType.BULLET_CHUNKLOADING; return this; }
 
-    public BulletConfig setItem(Item ammo) { this.ammo = new ComparableStack(ammo); return this; }
-    public BulletConfig setItem(ItemStack ammo) { this.ammo = new ComparableStack(ammo); return this; }
-    public BulletConfig setItem(ComparableStack ammo) { this.ammo = ammo; return this; }
+    public BulletConfig setItem(Item ammo) { this.ammo = new ComparableStack(ammo); this.ammoSupplier = null; return this; }
+    public BulletConfig setItem(Supplier<? extends Item> ammo) { this.ammoSupplier = ammo; return this; }
+    public BulletConfig setItem(ItemStack ammo) { this.ammo = new ComparableStack(ammo); this.ammoSupplier = null; return this; }
+    public BulletConfig setItem(ComparableStack ammo) { this.ammo = ammo; this.ammoSupplier = null; return this; }
 
     public BulletConfig setCasing(ItemStack item, int amount) { this.casingItem = item; this.casingAmount = amount; return this; }
 

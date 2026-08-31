@@ -59,32 +59,32 @@ public final class XFactoryTool {
     // CE backs all 3 with one ammo_fireext ItemEnumMulti (3 metadata variants) - flattened per this
     // port's metadata-flattening convention into 3 distinct items, matching every other family.
 
-    public static final Item ITEM_FEXT_WATER = new Item(new Item.Properties());
-    public static final Item ITEM_FEXT_FOAM = new Item(new Item.Properties());
-    public static final Item ITEM_FEXT_SAND = new Item(new Item.Properties());
+    public static Item ITEM_FEXT_WATER;
+    public static Item ITEM_FEXT_FOAM;
+    public static Item ITEM_FEXT_SAND;
 
-    public static final BulletConfig fext_water = new BulletConfig("fext_water").setItem(ITEM_FEXT_WATER)
+    public static final BulletConfig fext_water = new BulletConfig("fext_water").setItem(() -> ITEM_FEXT_WATER)
             .setReloadCount(300).setLife(100).setVel(0.75F).setGrav(0.04).setSpread(0.025F)
             .setOnEntityHit(XFactoryTool::extinguishHit).setOnRicochet((b, bhr) -> b.discard());
-    public static final BulletConfig fext_foam = new BulletConfig("fext_foam").setItem(ITEM_FEXT_FOAM)
+    public static final BulletConfig fext_foam = new BulletConfig("fext_foam").setItem(() -> ITEM_FEXT_FOAM)
             .setReloadCount(300).setLife(100).setVel(0.75F).setGrav(0.04).setSpread(0.05F)
             .setOnEntityHit(XFactoryTool::extinguishHit).setOnRicochet((b, bhr) -> b.discard());
-    public static final BulletConfig fext_sand = new BulletConfig("fext_sand").setItem(ITEM_FEXT_SAND)
+    public static final BulletConfig fext_sand = new BulletConfig("fext_sand").setItem(() -> ITEM_FEXT_SAND)
             .setReloadCount(300).setLife(100).setVel(0.75F).setGrav(0.04).setSpread(0.05F)
             .setOnEntityHit(XFactoryTool::extinguishHit).setOnRicochet((b, bhr) -> b.discard());
 
     // ==================== charge-thrower ammo ====================
 
-    public static final Item ITEM_CT_HOOK = new Item(new Item.Properties());
-    public static final Item ITEM_CT_MORTAR = new Item(new Item.Properties());
-    public static final Item ITEM_CT_MORTAR_CHARGE = new Item(new Item.Properties());
+    public static Item ITEM_CT_HOOK;
+    public static Item ITEM_CT_MORTAR;
+    public static Item ITEM_CT_MORTAR_CHARGE;
 
-    public static final BulletConfig ct_hook = new BulletConfig("ct_hook").setItem(ITEM_CT_HOOK)
+    public static final BulletConfig ct_hook = new BulletConfig("ct_hook").setItem(() -> ITEM_CT_HOOK)
             .setRenderRotations(false).setLife(6_000).setVel(3F).setGrav(0.035).setDoesPenetrate(true).setDamageFalloffByPen(false)
             .setOnImpact(XFactoryTool::hookImpact);
-    public static final BulletConfig ct_mortar = new BulletConfig("ct_mortar").setItem(ITEM_CT_MORTAR)
+    public static final BulletConfig ct_mortar = new BulletConfig("ct_mortar").setItem(() -> ITEM_CT_MORTAR)
             .setDamage(2.5F).setLife(200).setVel(3F).setGrav(0.035).setOnImpact(XFactoryTool::mortarImpact);
-    public static final BulletConfig ct_mortar_charge = new BulletConfig("ct_mortar_charge").setItem(ITEM_CT_MORTAR_CHARGE)
+    public static final BulletConfig ct_mortar_charge = new BulletConfig("ct_mortar_charge").setItem(() -> ITEM_CT_MORTAR_CHARGE)
             .setDamage(5F).setLife(200).setVel(3F).setGrav(0.035).setOnImpact(XFactoryTool::mortarChargeImpact);
 
     // ==================== guns ====================

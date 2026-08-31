@@ -44,31 +44,31 @@ public final class GunRifleItems {
     }
 
     // ==================== 5.56mm ammo (4) ====================
-    public static final DeferredItem<Item> R556_SP = registerAmmo("r556_sp", XFactory556mm.ITEM_R556_SP);
-    public static final DeferredItem<Item> R556_FMJ = registerAmmo("r556_fmj", XFactory556mm.ITEM_R556_FMJ);
-    public static final DeferredItem<Item> R556_JHP = registerAmmo("r556_jhp", XFactory556mm.ITEM_R556_JHP);
-    public static final DeferredItem<Item> R556_AP = registerAmmo("r556_ap", XFactory556mm.ITEM_R556_AP);
+    public static final DeferredItem<Item> R556_SP = registerAmmo("r556_sp", () -> { if (XFactory556mm.ITEM_R556_SP == null) XFactory556mm.ITEM_R556_SP = new Item(new Item.Properties()); return XFactory556mm.ITEM_R556_SP; });
+    public static final DeferredItem<Item> R556_FMJ = registerAmmo("r556_fmj", () -> { if (XFactory556mm.ITEM_R556_FMJ == null) XFactory556mm.ITEM_R556_FMJ = new Item(new Item.Properties()); return XFactory556mm.ITEM_R556_FMJ; });
+    public static final DeferredItem<Item> R556_JHP = registerAmmo("r556_jhp", () -> { if (XFactory556mm.ITEM_R556_JHP == null) XFactory556mm.ITEM_R556_JHP = new Item(new Item.Properties()); return XFactory556mm.ITEM_R556_JHP; });
+    public static final DeferredItem<Item> R556_AP = registerAmmo("r556_ap", () -> { if (XFactory556mm.ITEM_R556_AP == null) XFactory556mm.ITEM_R556_AP = new Item(new Item.Properties()); return XFactory556mm.ITEM_R556_AP; });
 
     // ==================== 7.62mm ammo (6) ====================
-    public static final DeferredItem<Item> R762_SP = registerAmmo("r762_sp", XFactory762mm.ITEM_R762_SP);
-    public static final DeferredItem<Item> R762_FMJ = registerAmmo("r762_fmj", XFactory762mm.ITEM_R762_FMJ);
-    public static final DeferredItem<Item> R762_JHP = registerAmmo("r762_jhp", XFactory762mm.ITEM_R762_JHP);
-    public static final DeferredItem<Item> R762_AP = registerAmmo("r762_ap", XFactory762mm.ITEM_R762_AP);
-    public static final DeferredItem<Item> R762_DU = registerAmmo("r762_du", XFactory762mm.ITEM_R762_DU);
-    public static final DeferredItem<Item> R762_HE = registerAmmo("r762_he", XFactory762mm.ITEM_R762_HE);
+    public static final DeferredItem<Item> R762_SP = registerAmmo("r762_sp", () -> { if (XFactory762mm.ITEM_R762_SP == null) XFactory762mm.ITEM_R762_SP = new Item(new Item.Properties()); return XFactory762mm.ITEM_R762_SP; });
+    public static final DeferredItem<Item> R762_FMJ = registerAmmo("r762_fmj", () -> { if (XFactory762mm.ITEM_R762_FMJ == null) XFactory762mm.ITEM_R762_FMJ = new Item(new Item.Properties()); return XFactory762mm.ITEM_R762_FMJ; });
+    public static final DeferredItem<Item> R762_JHP = registerAmmo("r762_jhp", () -> { if (XFactory762mm.ITEM_R762_JHP == null) XFactory762mm.ITEM_R762_JHP = new Item(new Item.Properties()); return XFactory762mm.ITEM_R762_JHP; });
+    public static final DeferredItem<Item> R762_AP = registerAmmo("r762_ap", () -> { if (XFactory762mm.ITEM_R762_AP == null) XFactory762mm.ITEM_R762_AP = new Item(new Item.Properties()); return XFactory762mm.ITEM_R762_AP; });
+    public static final DeferredItem<Item> R762_DU = registerAmmo("r762_du", () -> { if (XFactory762mm.ITEM_R762_DU == null) XFactory762mm.ITEM_R762_DU = new Item(new Item.Properties()); return XFactory762mm.ITEM_R762_DU; });
+    public static final DeferredItem<Item> R762_HE = registerAmmo("r762_he", () -> { if (XFactory762mm.ITEM_R762_HE == null) XFactory762mm.ITEM_R762_HE = new Item(new Item.Properties()); return XFactory762mm.ITEM_R762_HE; });
 
     // ==================== .50 BMG ammo (7 regular + 2 secret) ====================
-    public static final DeferredItem<Item> BMG50_SP = registerAmmo("bmg50_sp", XFactory50.ITEM_BMG50_SP);
-    public static final DeferredItem<Item> BMG50_FMJ = registerAmmo("bmg50_fmj", XFactory50.ITEM_BMG50_FMJ);
-    public static final DeferredItem<Item> BMG50_JHP = registerAmmo("bmg50_jhp", XFactory50.ITEM_BMG50_JHP);
-    public static final DeferredItem<Item> BMG50_AP = registerAmmo("bmg50_ap", XFactory50.ITEM_BMG50_AP);
-    public static final DeferredItem<Item> BMG50_DU = registerAmmo("bmg50_du", XFactory50.ITEM_BMG50_DU);
-    public static final DeferredItem<Item> BMG50_HE = registerAmmo("bmg50_he", XFactory50.ITEM_BMG50_HE);
-    public static final DeferredItem<Item> BMG50_SM = registerAmmo("bmg50_sm", XFactory50.ITEM_BMG50_SM);
+    public static final DeferredItem<Item> BMG50_SP = registerAmmo("bmg50_sp", () -> { if (XFactory50.ITEM_BMG50_SP == null) XFactory50.ITEM_BMG50_SP = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_SP; });
+    public static final DeferredItem<Item> BMG50_FMJ = registerAmmo("bmg50_fmj", () -> { if (XFactory50.ITEM_BMG50_FMJ == null) XFactory50.ITEM_BMG50_FMJ = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_FMJ; });
+    public static final DeferredItem<Item> BMG50_JHP = registerAmmo("bmg50_jhp", () -> { if (XFactory50.ITEM_BMG50_JHP == null) XFactory50.ITEM_BMG50_JHP = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_JHP; });
+    public static final DeferredItem<Item> BMG50_AP = registerAmmo("bmg50_ap", () -> { if (XFactory50.ITEM_BMG50_AP == null) XFactory50.ITEM_BMG50_AP = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_AP; });
+    public static final DeferredItem<Item> BMG50_DU = registerAmmo("bmg50_du", () -> { if (XFactory50.ITEM_BMG50_DU == null) XFactory50.ITEM_BMG50_DU = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_DU; });
+    public static final DeferredItem<Item> BMG50_HE = registerAmmo("bmg50_he", () -> { if (XFactory50.ITEM_BMG50_HE == null) XFactory50.ITEM_BMG50_HE = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_HE; });
+    public static final DeferredItem<Item> BMG50_SM = registerAmmo("bmg50_sm", () -> { if (XFactory50.ITEM_BMG50_SM == null) XFactory50.ITEM_BMG50_SM = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_SM; });
     /** Secret round - hidden from the creative tab, see class javadoc. */
-    public static final DeferredItem<Item> BMG50_BLACK = registerAmmoHidden("bmg50_black", XFactory50.ITEM_BMG50_BLACK);
+    public static final DeferredItem<Item> BMG50_BLACK = registerAmmoHidden("bmg50_black", () -> { if (XFactory50.ITEM_BMG50_BLACK == null) XFactory50.ITEM_BMG50_BLACK = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_BLACK; });
     /** Secret round - hidden from the creative tab, see class javadoc. */
-    public static final DeferredItem<Item> BMG50_EQUESTRIAN = registerAmmoHidden("bmg50_equestrian", XFactory50.ITEM_BMG50_EQUESTRIAN);
+    public static final DeferredItem<Item> BMG50_EQUESTRIAN = registerAmmoHidden("bmg50_equestrian", () -> { if (XFactory50.ITEM_BMG50_EQUESTRIAN == null) XFactory50.ITEM_BMG50_EQUESTRIAN = new Item(new Item.Properties()); return XFactory50.ITEM_BMG50_EQUESTRIAN; });
 
     // ==================== 5.56mm guns (3) ====================
     public static final DeferredItem<Item> GUN_G3 = registerGun("gun_g3", XFactory556mm::gun_g3);
@@ -92,15 +92,15 @@ public final class GunRifleItems {
     public static void registerAll() {
     }
 
-    private static DeferredItem<Item> registerAmmo(String name, Item instance) {
-        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmo(String name, java.util.function.Supplier<Item> instance) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, instance);
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }
 
     /** Registered as a real item (matching CE's EnumAmmoSecret being a real ItemStack variant) but not added to any creative tab. */
-    private static DeferredItem<Item> registerAmmoHidden(String name, Item instance) {
-        return ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmoHidden(String name, java.util.function.Supplier<Item> instance) {
+        return ModItems.ITEMS.register(name, instance);
     }
 
     /**

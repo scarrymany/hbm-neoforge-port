@@ -73,21 +73,21 @@ public final class XFactory40mm {
     // round in this family) is preserved below for whoever wires that family + Ammo Press.
 
     /** casing: LARGE x4 */
-    public static final Item ITEM_G26_FLARE = new Item(new Item.Properties());
+    public static Item ITEM_G26_FLARE;
     /** casing: LARGE x4 */
-    public static final Item ITEM_G26_FLARE_SUPPLY = new Item(new Item.Properties());
+    public static Item ITEM_G26_FLARE_SUPPLY;
     /** casing: LARGE x4 */
-    public static final Item ITEM_G26_FLARE_WEAPON = new Item(new Item.Properties());
+    public static Item ITEM_G26_FLARE_WEAPON;
     /** casing: LARGE x4 */
-    public static final Item ITEM_G40_HE = new Item(new Item.Properties());
+    public static Item ITEM_G40_HE;
     /** casing: LARGE x4 */
-    public static final Item ITEM_G40_HEAT = new Item(new Item.Properties());
+    public static Item ITEM_G40_HEAT;
     /** casing: LARGE x4 */
-    public static final Item ITEM_G40_DEMO = new Item(new Item.Properties());
+    public static Item ITEM_G40_DEMO;
     /** casing: LARGE x4 */
-    public static final Item ITEM_G40_INC = new Item(new Item.Properties());
+    public static Item ITEM_G40_INC;
     /** casing: LARGE x4 */
-    public static final Item ITEM_G40_PHOSPHORUS = new Item(new Item.Properties());
+    public static Item ITEM_G40_PHOSPHORUS;
 
     /**
      * Port of CE's {@code g26_flare}'s {@code LAMBDA_STANDARD_IGNITE} onImpact - adds 200 to the hit
@@ -176,16 +176,16 @@ public final class XFactory40mm {
     private static final BiConsumer<EntityBulletBaseMK4, HitResult> LAMBDA_STANDARD_EXPLODE_INC = (bullet, hr) -> spawnFire(bullet, hr, false, 200);
     private static final BiConsumer<EntityBulletBaseMK4, HitResult> LAMBDA_STANDARD_EXPLODE_PHOSPHORUS = (bullet, hr) -> spawnFire(bullet, hr, true, 400);
 
-    public static final BulletConfig g26_flare = new BulletConfig("g26_flare").setItem(ITEM_G26_FLARE)
+    public static final BulletConfig g26_flare = new BulletConfig("g26_flare").setItem(() -> ITEM_G26_FLARE)
             .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE);
     /** Phase 4 (entities_vehicles_aircraft/entities_orbital_and_beam_payloads): closes this class's own
      *  previously-documented forward reference now that {@code EntityC130} is real - see {@link
      *  #spawnPlane}. */
-    public static final BulletConfig g26_flare_supply = new BulletConfig("g26_flare_supply").setItem(ITEM_G26_FLARE_SUPPLY)
+    public static final BulletConfig g26_flare_supply = new BulletConfig("g26_flare_supply").setItem(() -> ITEM_G26_FLARE_SUPPLY)
             .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE)
             .setOnUpdate(entity -> spawnPlane(entity, com.hbm.entity.logic.EntityC130.C130PayloadType.SUPPLIES));
     /** Same as {@link #g26_flare_supply} (weapons-payload variant). */
-    public static final BulletConfig g26_flare_weapon = new BulletConfig("g26_flare_weapon").setItem(ITEM_G26_FLARE_WEAPON)
+    public static final BulletConfig g26_flare_weapon = new BulletConfig("g26_flare_weapon").setItem(() -> ITEM_G26_FLARE_WEAPON)
             .setLife(100).setVel(2F).setGrav(0.015D).setRenderRotations(false).setOnImpact(LAMBDA_STANDARD_IGNITE)
             .setOnUpdate(entity -> spawnPlane(entity, com.hbm.entity.logic.EntityC130.C130PayloadType.WEAPONS));
 
@@ -214,15 +214,15 @@ public final class XFactory40mm {
         level.addFreshEntity(c130);
     }
 
-    public static final BulletConfig g40_he = new BulletConfig("g40_he").setItem(ITEM_G40_HE)
+    public static final BulletConfig g40_he = new BulletConfig("g40_he").setItem(() -> ITEM_G40_HE)
             .setLife(200).setVel(2F).setGrav(0.035D).setOnImpact(LAMBDA_STANDARD_EXPLODE);
-    public static final BulletConfig g40_heat = new BulletConfig("g40_heat").setItem(ITEM_G40_HEAT)
+    public static final BulletConfig g40_heat = new BulletConfig("g40_heat").setItem(() -> ITEM_G40_HEAT)
             .setLife(200).setVel(2F).setGrav(0.035D).setDamage(0.5F).setOnImpact(LAMBDA_STANDARD_EXPLODE_HEAT);
-    public static final BulletConfig g40_demo = new BulletConfig("g40_demo").setItem(ITEM_G40_DEMO)
+    public static final BulletConfig g40_demo = new BulletConfig("g40_demo").setItem(() -> ITEM_G40_DEMO)
             .setLife(200).setVel(2F).setGrav(0.035D).setDamage(0.75F).setOnImpact(LAMBDA_STANDARD_EXPLODE_DEMO);
-    public static final BulletConfig g40_inc = new BulletConfig("g40_inc").setItem(ITEM_G40_INC)
+    public static final BulletConfig g40_inc = new BulletConfig("g40_inc").setItem(() -> ITEM_G40_INC)
             .setLife(200).setVel(2F).setGrav(0.035D).setDamage(0.75F).setOnImpact(LAMBDA_STANDARD_EXPLODE_INC);
-    public static final BulletConfig g40_phosphorus = new BulletConfig("g40_phosphorus").setItem(ITEM_G40_PHOSPHORUS)
+    public static final BulletConfig g40_phosphorus = new BulletConfig("g40_phosphorus").setItem(() -> ITEM_G40_PHOSPHORUS)
             .setLife(200).setVel(2F).setGrav(0.035D).setDamage(0.75F).setOnImpact(LAMBDA_STANDARD_EXPLODE_PHOSPHORUS);
 
     // ==================== recoil (see XFactory556mm's javadoc - not currently wired anywhere, kept for 1:1 parity) ====================
