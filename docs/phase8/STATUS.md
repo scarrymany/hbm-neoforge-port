@@ -19,6 +19,12 @@ This slice landed code, not another research dump. Gaps below are still open.
   Chest: 8 rolls of `POOL_ANTENNA`, EAST-facing, matching CE line 53.
 - `ModDataGenerators` — merged Ore + OilMeteor + creeper `RegistrySetBuilder` bootstraps. Two
   `.add(CONFIGURED_FEATURE, …)` calls on one builder overwrite; ores would have vanished at runData.
+- `red_barrel` / `pink_barrel` / `lox_barrel` / `taint_barrel` / `yellow_barrel` — CE
+  `RedBarrel`/`YellowBarrel` (ModBlocks.java:751-756). Fire-chain 2.5F (red/pink), idle rad tick
+  5/75 + detonation waste 35 + rad 35/1500 (yellow). LOX freezer + taint scatter + `toxic_block`
+  1-in-3 replace still missing (`ExplosionThermo` / `BlockTaint` / toxic fluid not ported).
+- `red_wire_coated` — CE `WireCoated` (full-cube `TileEntityCableBaseNT`).
+- `ItemPoolsLegacy` remaps CE `block_*` → port autogen `*_block` (`block_tungsten` → `tungsten_block`).
 
 ## Not this slice (still Phase 8)
 
@@ -31,8 +37,7 @@ This slice landed code, not another research dump. Gaps below are still open.
 - `EntityLootSubProvider` — still absent. Existing mobs already drop via `dropCustomDeathLoot`
   (creeper variants, Mask Man, crabs, RAD Beast). Adding datapack tables on top would double drops.
   Convert Java drops → loot tables when Phase 9 lands more entities.
-- Remaining ~500 missing block ids (PARITY_REPORT 642 / ~1165). Next high-value: `red_barrel` /
-  `yellow_barrel` / `block_tungsten` / `red_wire_coated` (pool + machine refs).
+- Remaining ~500 missing block ids (PARITY_REPORT 642 / ~1165).
 - CE `GeneralConfig.enableDungeons` gate — not ported; Antenna uses only the per-dim 1-in-N roll.
 - Crater biome `EnumProxy` grass tint — `ModCraterBiomes` needs `META-INF/enumextensions.json`;
   bootstrap uses `GrassColorModifier.NONE` so runData can emit biome JSON.

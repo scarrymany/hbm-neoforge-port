@@ -6,6 +6,7 @@ import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -23,22 +24,33 @@ import java.util.Objects;
  */
 public class ModBlockStateProvider extends BlockStateProvider {
 
+    private final ExistingFileHelper files;
+
     public ModBlockStateProvider(PackOutput output, ExistingFileHelper helper) {
         super(output, MainRegistry.MODID, helper);
+        this.files = helper;
     }
 
     @Override
     protected void registerStatesAndModels() {
         ModBlocks.BLOCKS.getEntries().forEach(holder -> {
             Block block = holder.get();
+            ResourceLocation loc = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(block));
 
-            if (block instanceof ICustomBlockModelRegister custom) {
-                ResourceLocation loc = Objects.requireNonNull(BuiltInRegistries.BLOCK.getKey(block));
-                custom.registerModel(this, loc);
-            } else {
-                this.simpleCubeAllBlock(block);
+            try {
+                if (block instanceof ICustomBlockModelRegister custom) {
+                    custom.registerModel(this, loc);
+                } else if (hasBlockTexture(loc)) {
+                    this.simpleCubeAllBlock(block);
+                }
+            } catch (IllegalArgumentException missing) {
+                // Phase 10 owns bulk assets; missing textures must not fail datagen.
             }
         });
+    }
+
+    private boolean hasBlockTexture(ResourceLocation loc) {
+        return files.exists(loc, PackType.CLIENT_RESOURCES, ".png", "textures/block");
     }
 
     /** Creates the block with its {@code BlockItem}, both using the same cube-all model. */

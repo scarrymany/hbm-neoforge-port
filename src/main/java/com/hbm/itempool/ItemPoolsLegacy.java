@@ -241,12 +241,23 @@ public final class ItemPoolsLegacy {
     }
 
     private static void addHbm(ItemPool pool, String path, int min, int max, int weight) {
-        Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path)).orElse(null);
+        Item item = lookupHbm(path);
         if (item == null || item == Items.AIR) {
             MainRegistry.logger.debug("ItemPoolsLegacy: skip missing hbm:{}", path);
             return;
         }
         pool.pool.add(ItemPool.entry(item, min, max, weight));
+    }
+
+    /** CE prefix-first {@code block_tungsten} → port autogen {@code tungsten_block}. */
+    private static Item lookupHbm(String path) {
+        Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path)).orElse(null);
+        if (item != null && item != Items.AIR) return item;
+        if (path.startsWith("block_") && path.length() > 6) {
+            String autogen = path.substring(6) + "_block";
+            return BuiltInRegistries.ITEM.getOptional(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, autogen)).orElse(null);
+        }
+        return item;
     }
 
     private static void addStack(ItemPool pool, ItemStack stack, int min, int max, int weight) {

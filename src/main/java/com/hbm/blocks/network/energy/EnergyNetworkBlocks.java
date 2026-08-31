@@ -25,9 +25,7 @@ import java.util.function.Supplier;
  * wiring notes) - no other shared file needs a direct edit.
  * <p>
  * <b>Not ported</b> (see the research report's own "Phase-2-safe scope"/"Deferred scope" tables):
- * {@code WireCoated}/{@code WireCoatedRadResistant} (plain texture variants and a radiation-package
- * marker interface, respectively - neither adds network-graph behavior beyond what {@link BlockCable}
- * already demonstrates), {@code BlockCableGauge} (OpenComputers integration explicitly recommended
+ * {@code WireCoatedRadResistant} (radiation-package marker), {@code BlockCableGauge} (OpenComputers integration explicitly recommended
  * for dropping, no NeoForge OpenComputers release exists to compile against anyway),
  * {@code BlockCablePaintable} (paint/facade mechanic explicitly flagged as needing a cross-team call
  * with whichever area owns {@code com.hbm.items.util} paint tools), {@code PowerDetector} (a
@@ -43,6 +41,7 @@ public final class EnergyNetworkBlocks {
     private static final BlockBehaviour.Properties PYLON_PROPS =
             BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).noOcclusion().noCollission();
 
+    public static DeferredBlock<WireCoated> RED_WIRE_COATED;
     public static DeferredBlock<BlockCable> RED_CABLE;
     public static DeferredBlock<BlockCableClassic> RED_CABLE_CLASSIC;
     public static DeferredBlock<PowerCableBoxBlock> RED_CABLE_BOX;
@@ -60,6 +59,9 @@ public final class EnergyNetworkBlocks {
     }
 
     public static void registerAll() {
+        // CE ModBlocks.java:765 — WireCoated, 5.0F/10.0F, machineTab. Full cube, not thin cable.
+        RED_WIRE_COATED = registerBlock("red_wire_coated",
+                () -> new WireCoated(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)));
         RED_CABLE = registerBlock("red_cable", () -> new BlockCable(CABLE_PROPS));
         RED_CABLE_CLASSIC = registerBlock("red_cable_classic", () -> new BlockCableClassic(CABLE_PROPS));
         RED_CABLE_BOX = registerBlock("red_cable_box", () -> new PowerCableBoxBlock(CABLE_PROPS));
