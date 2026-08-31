@@ -24,3 +24,10 @@ Hive waypoint / `EntityWaypoint` / `GlyphidHive` / `EntityAcidBomb` / `EntityChe
 ## Still missing vs CE (projectiles / FX / vehicles, not this slice)
 
 `EntitySoyuz`, `EntitySoyuzCapsule`, `EntityDuchessGambit`, leftover projectiles (`EntityShrapnel`, `EntityBoxcar`, beams, …).
+
+## Verified
+
+- `./gradlew compileJava` — 0 errors
+- `./gradlew build` — SUCCESS
+- jar `hbm-0.0.1.jar` **66,090,939** bytes (**63.03 MB**)
+- `./gradlew runServer` — **Done (5.207s)** on wiped world. Spawn 2% → 51% → Done. No deadlock.
