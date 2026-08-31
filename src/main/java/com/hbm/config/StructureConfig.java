@@ -6,6 +6,7 @@ import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 import net.neoforged.neoforge.common.ModConfigSpec.DoubleValue;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -73,11 +74,13 @@ public class StructureConfig {
     static void init(ModConfigSpec.Builder builder) {
         builder.push("structures");
 
+        // ArrayList, not List.of: NeoForge defineInList uses acceptable::contains and
+        // ValueSpec.test(null) on missing keys. Java 21 List.of().contains(null) NPEs.
         ENABLE_STRUCTURES = builder
                 .comment("Whether modern NTM structures will spawn. WORLD_FLAG respects the world's \"Generate Structures\" flag. [CE: 15.00_enableStructures]")
-                .defineInList("enableStructures", StructureFlag.WORLD_FLAG.name(), List.of(
+                .defineInList("enableStructures", StructureFlag.WORLD_FLAG.name(), new ArrayList<>(List.of(
                         StructureFlag.TRUE.name(), StructureFlag.FALSE.name(), StructureFlag.WORLD_FLAG.name()
-                ));
+                )));
         STRUCTURE_MIN_CHUNKS = builder.comment("Minimum non-zero distance between structures in chunks (settings lower than 8 may be problematic). [CE: 15.01_structureMinChunks]")
                 .defineInRange("structureMinChunks", 4, 1, Integer.MAX_VALUE);
         STRUCTURE_MAX_CHUNKS = builder.comment("Maximum non-zero distance between structures in chunks. [CE: 15.02_structureMaxChunks]")
