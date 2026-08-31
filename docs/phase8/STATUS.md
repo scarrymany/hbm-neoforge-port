@@ -7,52 +7,51 @@ This slice landed code, not another research dump. Gaps below are still open.
 
 ## Landed this slice
 
-- `ItemPoolsLegacy` — CE `itempool/ItemPoolsLegacy.java` (238 lines). All 7 pool names verbatim
-  (`POOL_GENERIC` / `POOL_ANTENNA` / `POOL_EXPENSIVE` / `POOL_NUKE_TRASH` / `POOL_NUKE_MISC` /
-  `POOL_VERTIBIRD` / `POOL_SPACESHIP`). Wired from `CommonEvents` FMLCommonSetup after RegisterEvent.
-  Meta-flattened CE entries remapped to discrete items or skipped (circuits/casings/rods/grenade
-  shells/fusion_core/scrap) via `BuiltInRegistries` lookup.
-- `deco_steel` + `steel_scaffold` — CE `ModBlocks` entries missing from the original deco table;
-  Antenna schematic + `POOL_ANTENNA` need both.
-- `AntennaFeature` — CE `world/Antenna.java` (238 lines) as a `Feature<NoneFeatureConfiguration>`
-  on the existing oil/meteor pipeline. 1-in-750 overworld (`CompatibilityConfig.antennaStructure`).
-  Chest: 8 rolls of `POOL_ANTENNA`, EAST-facing, matching CE line 53.
-- `ModDataGenerators` — merged Ore + OilMeteor + creeper `RegistrySetBuilder` bootstraps. Two
-  `.add(CONFIGURED_FEATURE, …)` calls on one builder overwrite; ores would have vanished at runData.
-- `red_barrel` / `pink_barrel` / `lox_barrel` / `taint_barrel` / `yellow_barrel` — CE
-  `RedBarrel`/`YellowBarrel` (ModBlocks.java:751-756). Fire-chain 2.5F (red/pink), idle rad tick
-  5/75 + detonation waste 35 + rad 35/1500 (yellow). LOX freezer + taint scatter + `toxic_block`
-  1-in-3 replace still missing (`ExplosionThermo` / `BlockTaint` / toxic fluid not ported).
-- `red_wire_coated` — CE `WireCoated` (full-cube `TileEntityCableBaseNT`).
-- `ItemPoolsLegacy` remaps CE `block_*` → port autogen `*_block` (`block_tungsten` → `tungsten_block`).
-- `ItemPoolsComponent` / `ItemPoolsSingle` / `ItemPoolsRedRoom` / `ItemPoolsPile` /
-  `ItemPoolsVendingMachine` — CE pool-name strings verbatim (SHA `e5ed5ec` / `a23316ca` /
-  `293649fc` / `4c61be97` / `565968ad`). Wired from `CommonEvents` FMLCommonSetup.
-  Meta remaps: circuits, stamp_book PRINTING1–8, deco_computer IBM_300PL, blueprint_folder
-  base/discover/secret. Grenade-shell / `item_secret` / material-meta bolt-shell skipped.
+- **CE `.nbt` assets** — 70 templates copied from CE `assets/hbm/structures/` (skip `test-*`)
+  into `data/hbm/structure/` (1.21 datapack path). `StructureManager.java`:55-66 / meteor tree.
+- **`StructureType` `hbm:nbt_poi`** + `StructurePieceType` + `NbtPoiStructure` / `NbtPoiPiece`.
+  Custom placer reads CE 1.10+ `palette`/`blocks` NBT (not fake `setBlockState` walls).
+  1.12→1.21 id remap in `StructureBlockRemap` (vanilla flattenings + port flattened deco/slabs).
+- **31 structures + 6 structure_sets** via datagen (`ModStructures` / `ModStructureSets`):
+  vertibird / crashed_vertibird / radio_house / meteor_dungeon (core piece at y=32) plus the rest
+  of CE `NTMWorldGenerator` single-NBT roster (shacks, ruins A–J, planes, factory, crane, dish,
+  lab, forest_*, ocean trio, spire). Heights/offsets from `NTMWorldGenerator.java`:71-242.
+  Biome gates in `findGenerationPoint` (sandy/flat/ocean/rain/low). Config gates:
+  `enableStructures` / `enableOceanStructures` / `enableRuins`.
+- **`BlockWandLoot` / `wand_loot`** — CE `BlockWandLoot.java`:235-400. Paste-time chest +
+  `ItemPool` roll (`pool`/`min`/`max` keys). `debugStructures` keeps the marker.
+- **Phase 8 block families** (`Phase8Blocks`, CE `ModBlocks.java`:86-210 / 398-405 / 497-504):
+  deco metals (titanium/tungsten/lead/aluminium/rusty_steel/red_copper/beryllium/asbestos),
+  missing brick/concrete cubes, meteor brick set, 25 stairs + 19 slabs, `block_electrical_scrap`.
+  Stairs use `Blocks.STONE` base state — no `DeferredBlock.get()` in static init.
+- **Creeper `RegisterSpawnPlacementsEvent`** — gold / phosgene / volatile / tainted / nuclear
+  (`ON_GROUND` + `Monster::checkMonsterSpawnRules`).
+- Prior slice (still landed): `ItemPools*` + barrels + coated wire + Antenna + `deco_steel`.
 
 ## Not this slice (still Phase 8)
 
-- Legacy schematics: `Bunker.java` (1565), `Radio01`+`Radio02` (~7282). Capture as `.nbt`, do not
-  transliterate `setBlockState` walls. See `docs/phase4/worldgen_structures_bunkers_stations.md`.
-- Modern `.nbt` structures: vertibird / crashed_vertibird / radio_house / meteor_dungeon jigsaw.
-  Assets live under CE `assets/hbm/structures/`; need `StructureType` + `structure_set` + block-id remap.
-- `EntityLootSubProvider` — still absent. Existing mobs already drop via `dropCustomDeathLoot`
-  (creeper variants, Mask Man, crabs, RAD Beast). Adding datapack tables on top would double drops.
-  Convert Java drops → loot tables when Phase 9 lands more entities.
-- Remaining ~500 missing block ids (PARITY_REPORT 642 / ~1165).
-- CE `GeneralConfig.enableDungeons` gate — not ported; Antenna uses only the per-dim 1-in-N roll.
-- Crater biome `EnumProxy` grass tint — `ModCraterBiomes` needs `META-INF/enumextensions.json`;
-  bootstrap uses `GrassColorModifier.NONE` so runData can emit biome JSON.
+- Legacy schematics: `Bunker.java` (1565) / `Radio01`+`Radio02` (~7282). Still no captured `.nbt`
+  (do not transliterate `setBlockState` walls).
+- Meteor dungeon is **core piece only** — CE 9-pool jigsaw (`wand_jigsaw`, `NTMWorldGenerator.java`:260-373)
+  not walked. All meteor `*.nbt` pieces are in the jar for a later walker.
+- `EntityLootSubProvider` — still absent (Java `dropCustomDeathLoot` would double-drop).
+- Remaining block gap (recount this slice): CE constructor-string ids **1135**, this port
+  `registerBlock("literal")` **567** plus ~44 stairs/slabs registered via helpers ≈ **610+**
+  distinct ids. Largest leftover families: `machine_*` (117, mostly Phase 2 TE machines),
+  `block_*` material cubes (77, overlap with Mats `*_block` autogen), remaining concrete/brick
+  colored stairs/slabs (~84), deco props (32), rails/anvils/RBMK leftovers.
+- Procedural `BunkerComponents` room graph — not this slice.
+- CE `GeneralConfig.enableDungeons` gate — Antenna still per-dim 1-in-N only.
 
 ## Verification (this follow-up)
 
-- `./gradlew compileJava` / `./gradlew build` — green. Jar `build/libs/hbm-0.0.1.jar` **5,991,369** bytes.
-- `./gradlew runData` — **SUCCESS** (previous slice; 2984 files). Generated tree committed.
-- `./gradlew runServer` — **SUCCESS.** Dedicated-server `"Done (0.592s)!"` on `d7418d2`.
-  Fixed this turn: `defineInList` `List.of().contains(null)` NPE (`f387aee`); `@OnlyIn`
-  `handleClient` DistCleaner NSME (`d7418d2` → `ClientPackets`). Non-fatal: 3 creeper variants
-  missing `RegisterSpawnPlacementsEvent` (gold/phosgene/volatile). `runClient` skipped (no display).
+- `./gradlew compileJava` — **0 errors** (73 pre-existing deprecation warnings).
+- `./gradlew build` — **SUCCESS.** Jar `build/libs/hbm-0.0.1.jar` **6,428,399** bytes
+  (CE `.nbt` templates + generated structure/loot/lang).
+- `./gradlew runData` — **SUCCESS.** 3138 generated files (was 2984; +155 this slice:
+  31 structures, 6 structure_sets, block loot/lang for new ids).
+- `runServer` not re-run this slice (no packet/config/registration-shape change beyond
+  `StructureType` + spawn placements). Previous slice: dedicated `Done` on `d7418d2`.
 
 ## Explicitly not Phase 8
 

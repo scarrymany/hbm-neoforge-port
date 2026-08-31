@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-31T20:22:26.937279959	Registries
+// 1.21.1	2026-08-31T20:49:03.796527041	Registries
 03966dfba196cc09b2ca6555814d282d86225526 data/hbm/damage_type/acid.json
 67a94f28eda6d843b473b7fe2076f20d9f16d5ae data/hbm/damage_type/acid_player.json
 5934241799051acdb590c1c46f50eb1a56038314 data/hbm/damage_type/ams.json
@@ -207,3 +207,40 @@ add86d7c98645419f75490522ea3e227f1af5070 data/hbm/worldgen/placed_feature/sulfur
 4df89172a0c61577ab1ed91ebfdb118ee40e8eee data/hbm/worldgen/placed_feature/titanium.json
 83ef2f418c9dd39efd4a8c310028e30000844577 data/hbm/worldgen/placed_feature/tungsten.json
 d14cfe754ef8a2d29f015cb4dd99d19db2438864 data/hbm/worldgen/placed_feature/uranium.json
+c29c23f0b067a9240a23b95eebfd87099f634c91 data/hbm/worldgen/structure/aircraft_carrier.json
+1a220e77016d55f101cfcdbdc8881d9445386759 data/hbm/worldgen/structure/beached_patrol.json
+8cfea239369b9768444e739d9339bf51d60ac801 data/hbm/worldgen/structure/broadcasting_tower.json
+8f3d81f3925137177e4eebfcb9c7fccf5d4ba28f data/hbm/worldgen/structure/crane.json
+21e1fe5ca3efc21e9374313ffb66b15efa1573fe data/hbm/worldgen/structure/crashed_plane_1.json
+732e77d3f9c5291cd30c0d0db62e0a05c0c081a1 data/hbm/worldgen/structure/crashed_plane_2.json
+3ec70d6bd714a9d70f8711a1cafa10108bdc90ec data/hbm/worldgen/structure/crashed_vertibird.json
+ed5e0b4c19554904a5cf2792f821205353247c71 data/hbm/worldgen/structure/desert_shack_1.json
+c069dd98d75bc16ad6f45917f46f0a47cbbd8c3c data/hbm/worldgen/structure/desert_shack_2.json
+675d58883357a77fe245fc63b4811e9d9286cfe6 data/hbm/worldgen/structure/desert_shack_3.json
+12cca8c688f23a6f9c0b48eb81cc23ff85297d6d data/hbm/worldgen/structure/dish.json
+225b3302a9ad43cdd7ad1ed61c7bacb3e48c73a0 data/hbm/worldgen/structure/factory.json
+fcf5d938a13c0514fea2c0e067c7fb3037974d08 data/hbm/worldgen/structure/forest_chem.json
+76ce81e12f965131181fd8837c56983ddab77c67 data/hbm/worldgen/structure/forest_post.json
+0763a3c8f82747fb5b809a4e331698c4ded846de data/hbm/worldgen/structure/laboratory.json
+a6b8b904a11e64ae31eac135397d4b5fc3f97b93 data/hbm/worldgen/structure/lighthouse.json
+a1384d6571189000d20754239363ec055cccfb9f data/hbm/worldgen/structure/meteor_dungeon.json
+2154cb4de67fc473dbaa3e92898ea15aeb7278f0 data/hbm/worldgen/structure/ntmruins_a.json
+0530f0bdb64b3aa4a74b9a59b789dc7c3d08a3bf data/hbm/worldgen/structure/ntmruins_b.json
+b0fef241e6696f1617943b15a2cc5a5c6d865613 data/hbm/worldgen/structure/ntmruins_c.json
+9bf3acadb6841f882499bf365b8283c62dffb212 data/hbm/worldgen/structure/ntmruins_d.json
+e919daf5248fb3d36041e08dbf534675ddda1550 data/hbm/worldgen/structure/ntmruins_e.json
+1367c4ea25f799d822624a4a9ed1f0c60a0e53b5 data/hbm/worldgen/structure/ntmruins_f.json
+654704241086f8f9a491f42a3c497b28164fe69d data/hbm/worldgen/structure/ntmruins_g.json
+7f3215acf52f7f618a15d427cef248a499e7d058 data/hbm/worldgen/structure/ntmruins_h.json
+72a0ab599477069142a52e32f456b37d06614434 data/hbm/worldgen/structure/ntmruins_i.json
+e11b84048ecef669070ca7413462e17d3054ba2c data/hbm/worldgen/structure/ntmruins_j.json
+38cfd345a4ef634c689e121d5c3d4f91624f2cfd data/hbm/worldgen/structure/oil_rig.json
+c9fc005211b0f1066cfb9941bf0c6adec177deb5 data/hbm/worldgen/structure/radio_house.json
+0610f80047abc29c03ab8e638ad589985fce35e6 data/hbm/worldgen/structure/spire.json
+eddaa2b9315c311547a0e965ca24fba60a6711ba data/hbm/worldgen/structure/vertibird.json
+31286df342b956388a073d2250ba654ad2bbe5b8 data/hbm/worldgen/structure_set/ntm_flat.json
+70da3f6cb2d90641275662830c69446bd0b98778 data/hbm/worldgen/structure_set/ntm_land.json
+4aa2b478b070d3ba7e500317d4370befcc6f9519 data/hbm/worldgen/structure_set/ntm_meteor.json
+d9386e552ac306ec230258d344e75d0f783417ec data/hbm/worldgen/structure_set/ntm_ocean.json
+a79537eb74f522efdd22903b4ed32f00a2180da9 data/hbm/worldgen/structure_set/ntm_ruins.json
+84afe69eec40713e498791c9d8076315c8c60451 data/hbm/worldgen/structure_set/ntm_sandy.json

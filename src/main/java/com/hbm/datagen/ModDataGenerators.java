@@ -16,6 +16,8 @@ import com.hbm.world.gen.OilMeteorPlacedFeatures;
 import com.hbm.world.gen.OreBiomeModifiers;
 import com.hbm.world.gen.OreConfiguredFeatures;
 import com.hbm.world.gen.OrePlacedFeatures;
+import com.hbm.world.gen.structure.ModStructureSets;
+import com.hbm.world.gen.structure.ModStructures;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
@@ -87,6 +89,8 @@ public class ModDataGenerators {
             OilMeteorBiomeModifiers.bootstrap(context);
             CreeperVariantBiomeModifiers.bootstrap(context);
         });
+        registrySetBuilder.add(Registries.STRUCTURE, ModStructures::bootstrap);
+        registrySetBuilder.add(Registries.STRUCTURE_SET, ModStructureSets::bootstrap);
         DatapackBuiltinEntriesProvider datapackProvider =
                 new DatapackBuiltinEntriesProvider(output, lookup, registrySetBuilder, Set.of(MainRegistry.MODID));
         generator.addProvider(event.includeServer(), datapackProvider);

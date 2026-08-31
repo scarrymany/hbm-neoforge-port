@@ -1,0 +1,11 @@
+{
+  "type": "hbm:nbt_poi",
+  "biome_gate": "low",
+  "biomes": "#minecraft:is_overworld",
+  "fixed_y": 0,
+  "height_offset": -8,
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "template": "crashed_plane_2",
+  "terrain_adaptation": "beard_thin"
+}

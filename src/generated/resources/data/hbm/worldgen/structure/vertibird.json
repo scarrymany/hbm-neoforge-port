@@ -1,0 +1,11 @@
+{
+  "type": "hbm:nbt_poi",
+  "biome_gate": "sandy",
+  "biomes": "#minecraft:is_overworld",
+  "fixed_y": 0,
+  "height_offset": -3,
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "template": "vertibird",
+  "terrain_adaptation": "beard_thin"
+}

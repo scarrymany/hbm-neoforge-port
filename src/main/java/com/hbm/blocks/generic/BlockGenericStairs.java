@@ -72,7 +72,8 @@ public class BlockGenericStairs extends StairBlock implements ICustomBlockModelR
     @Override
     public void registerModel(BlockStateProvider provider, ResourceLocation modelLocation) {
         String name = modelLocation.getPath();
-        ResourceLocation texture = provider.modLoc("block/" + name);
+        String base = name.endsWith("_stairs") ? name.substring(0, name.length() - "_stairs".length()) : name;
+        ResourceLocation texture = provider.modLoc("block/" + base);
 
         provider.stairsBlock(this, texture);
         provider.simpleBlockItem(this, new net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile(texture));

@@ -112,6 +112,7 @@ public class MainRegistry {
         DroneEntityTypes.register(modEventBus);
         OreWorldGenFeatures.register(modEventBus);
         OilMeteorWorldGenFeatures.register(modEventBus);
+        com.hbm.world.gen.structure.ModStructureTypes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         MaterialRegistry.register(modEventBus);
         HbmRecipes.register(modEventBus);

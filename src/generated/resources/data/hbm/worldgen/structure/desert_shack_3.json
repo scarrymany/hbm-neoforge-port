@@ -1,0 +1,11 @@
+{
+  "type": "hbm:nbt_poi",
+  "biome_gate": "sandy",
+  "biomes": "#minecraft:is_overworld",
+  "fixed_y": 0,
+  "height_offset": -5,
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "template": "desert_shack_3",
+  "terrain_adaptation": "beard_thin"
+}

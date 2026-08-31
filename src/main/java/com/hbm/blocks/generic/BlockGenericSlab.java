@@ -67,7 +67,8 @@ public class BlockGenericSlab extends SlabBlock implements ICustomBlockModelRegi
     @Override
     public void registerModel(BlockStateProvider provider, ResourceLocation modelLocation) {
         String name = modelLocation.getPath();
-        ResourceLocation texture = provider.modLoc("block/" + name);
+        String base = name.endsWith("_slab") ? name.substring(0, name.length() - "_slab".length()) : name;
+        ResourceLocation texture = provider.modLoc("block/" + base);
 
         provider.slabBlock(this, texture, texture);
         provider.simpleBlockItem(this, new net.neoforged.neoforge.client.model.generators.ModelFile.UncheckedModelFile(texture));

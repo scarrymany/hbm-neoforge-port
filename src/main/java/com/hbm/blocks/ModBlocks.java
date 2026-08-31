@@ -62,6 +62,7 @@ public final class ModBlocks {
     public static void register(IEventBus modEventBus) {
         OreBlocks.registerAll();
         com.hbm.blocks.generic.GenericBlocks.registerAll();
+        com.hbm.blocks.generic.Phase8Blocks.registerAll();
         MaterialBlockGenerator.registerAll();
         com.hbm.blocks.gas.GasBlocks.registerAll();
         com.hbm.blocks.machine.PowerGenBlocks.registerAll();

@@ -1,0 +1,12 @@
+{
+  "type": "hbm:nbt_poi",
+  "biome_gate": "rain",
+  "biomes": "#minecraft:is_overworld",
+  "config_gate": "ruins",
+  "fixed_y": 0,
+  "height_offset": -1,
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "template": "ntmruins_b",
+  "terrain_adaptation": "beard_thin"
+}
