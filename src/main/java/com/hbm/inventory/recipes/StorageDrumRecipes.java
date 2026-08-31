@@ -84,18 +84,39 @@ public final class StorageDrumRecipes {
         RECIPE_WASTES.put(input, new int[]{chance, wasteLiquid, wasteGas});
     }
 
-    /** Ported from CE's own {@code StorageDrumRecipes.getOutput(ItemStack)}. */
+    /**
+     * Ported from CE's own {@code StorageDrumRecipes.getOutput(ItemStack)}. CE's real lookup is a
+     * direct {@code HashMap.get(new ComparableStack(stack))} - which, since CE's own
+     * {@code ComparableStack.equals} folds {@code stacksize} into the comparison, only matches a
+     * queried stack whose count is exactly the registered recipe's (1 here). Matched here via
+     * {@code matchesRecipe(stack, true)} (ignoring count) instead - the same linear-scan, item-identity
+     * -only lookup {@link WasteDrumRecipes#getOutput} (this port's closest sibling passive-decay
+     * table) already established - so a >1-count stack in a drum slot still resolves correctly
+     * regardless of exactly how a future {@code MachineStorageDrum} block entity presents it.
+     */
     public static ItemStack getOutput(ItemStack stack) {
         register();
         if (stack == null || stack.isEmpty()) return null;
-        ItemStack out = RECIPE_OUTPUTS.get(new ComparableStack(stack).makeSingular());
-        return out == null ? null : out.copy();
+        for (Map.Entry<ComparableStack, ItemStack> entry : RECIPE_OUTPUTS.entrySet()) {
+            if (entry.getKey().matchesRecipe(stack, true)) {
+                return entry.getValue().copy();
+            }
+        }
+        return null;
     }
 
-    /** Ported from CE's own {@code StorageDrumRecipes.getWaste(ItemStack)}: {chance, wasteLiquid, wasteGas}. */
+    /**
+     * Ported from CE's own {@code StorageDrumRecipes.getWaste(ItemStack)}: {chance, wasteLiquid,
+     * wasteGas}. Same item-identity-only lookup as {@link #getOutput(ItemStack)} above.
+     */
     public static int[] getWaste(ItemStack stack) {
         register();
         if (stack == null || stack.isEmpty()) return null;
-        return RECIPE_WASTES.get(new ComparableStack(stack).makeSingular());
+        for (Map.Entry<ComparableStack, int[]> entry : RECIPE_WASTES.entrySet()) {
+            if (entry.getKey().matchesRecipe(stack, true)) {
+                return entry.getValue();
+            }
+        }
+        return null;
     }
 }

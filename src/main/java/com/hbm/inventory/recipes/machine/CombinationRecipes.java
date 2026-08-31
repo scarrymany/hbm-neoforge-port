@@ -43,10 +43,10 @@ import java.util.Map;
  * <p><b>Scope: only CE's fully item-ready entries are ported</b> (per this task's ground rules - do
  * not stub missing items). Of CE's 53 real entries (23 individually-written + a 6-type x 5-grade-pair
  * bedrock-roasting loop), <b>38</b> are ported here: <b>8</b> of the 23 individual entries (CE lines
- * 96, 97, 100, 104, 106, 108-109 is excluded - see below, 120, 121, 103) plus <b>all 30</b>
- * bedrock-roasting loop entries (CE lines 123-134) - the single largest "ready" finding for this
- * class, since {@code BedrockOreType}/{@code BedrockOreGrade}/{@link BedrockOreItems} are all
- * verified fully registered (156-item grid). The other 15 individual entries are <b>not</b> ported:
+ * 96, 97, 100, 103, 104, 106, 120, 121) plus <b>all 30</b> bedrock-roasting loop entries (CE lines
+ * 123-134) - the single largest "ready" finding for this class, since {@code BedrockOreType}/
+ * {@code BedrockOreGrade}/{@link BedrockOreItems} are all verified fully registered (156-item grid).
+ * The other 15 individual entries are <b>not</b> ported:
  * each is blocked on one or more of these missing port-side items (grepped absent, corroborated by
  * this port's own existing code comments - see the research report's "Item/registry dependency
  * check"):
