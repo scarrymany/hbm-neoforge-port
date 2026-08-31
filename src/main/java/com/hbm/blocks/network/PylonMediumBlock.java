@@ -5,7 +5,7 @@ import com.hbm.blockentity.network.energy.PylonBaseBlockEntity;
 import com.hbm.blockentity.network.energy.PylonMediumBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ITooltipProvider;
-import com.hbm.blocks.network.energy.EnergyNetworkBlockEntities;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
