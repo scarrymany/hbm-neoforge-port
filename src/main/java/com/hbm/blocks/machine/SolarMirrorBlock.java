@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code SolarMirror} (regname {@code solar_mirror}): a plain single block, not
@@ -20,6 +21,13 @@ import org.jetbrains.annotations.Nullable;
  * {@link SolarMirrorBlockEntity}'s javadoc.
  */
 public class SolarMirrorBlock extends BaseEntityBlock {
+
+    public static final MapCodec<SolarMirrorBlock> CODEC = simpleCodec(SolarMirrorBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public SolarMirrorBlock(Properties properties) {
         super(properties);

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "item": "hbm:ingot_weaponsteel"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    }
+  },
+  "pattern": [
+    " I ",
+    " M ",
+    "I I"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_slowdown"
+  }
+}

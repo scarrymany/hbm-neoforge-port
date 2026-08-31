@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "D": {
+      "item": "hbm:ingot_dura_steel"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " D",
+    "S ",
+    " S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:hand_drill"
+  }
+}

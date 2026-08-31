@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "F": {
+      "item": "hbm:gun_flamer"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    }
+  },
+  "pattern": [
+    " M ",
+    "MFM",
+    " M "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_flamer_topaz"
+  }
+}

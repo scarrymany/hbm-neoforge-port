@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code BlockPWR} (regname {@code pwr_block}, read in full - CE's own file carries
@@ -35,6 +36,13 @@ import org.jetbrains.annotations.Nullable;
  * {@link MachinePWRControllerBlock#assemble}'s structure replacement, never placed or held directly.
  */
 public class PWRProxyBlock extends BaseEntityBlock {
+
+    public static final MapCodec<PWRProxyBlock> CODEC = simpleCodec(PWRProxyBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final BooleanProperty IO_ENABLED = BooleanProperty.create("io");
 

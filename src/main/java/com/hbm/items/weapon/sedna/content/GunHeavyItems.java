@@ -30,28 +30,28 @@ public final class GunHeavyItems {
     }
 
     // ==================== rocket ammo (5) ====================
-    public static final DeferredItem<Item> ROCKET_HE = registerAmmo("rocket_he", XFactoryRocket.ITEM_ROCKET_HE);
-    public static final DeferredItem<Item> ROCKET_HEAT = registerAmmo("rocket_heat", XFactoryRocket.ITEM_ROCKET_HEAT);
-    public static final DeferredItem<Item> ROCKET_DEMO = registerAmmo("rocket_demo", XFactoryRocket.ITEM_ROCKET_DEMO);
-    public static final DeferredItem<Item> ROCKET_INC = registerAmmo("rocket_inc", XFactoryRocket.ITEM_ROCKET_INC);
-    public static final DeferredItem<Item> ROCKET_PHOSPHORUS = registerAmmo("rocket_phosphorus", XFactoryRocket.ITEM_ROCKET_PHOSPHORUS);
+    public static final DeferredItem<Item> ROCKET_HE = registerAmmo("rocket_he", () -> { if (XFactoryRocket.ITEM_ROCKET_HE == null) XFactoryRocket.ITEM_ROCKET_HE = new Item(new Item.Properties()); return XFactoryRocket.ITEM_ROCKET_HE; });
+    public static final DeferredItem<Item> ROCKET_HEAT = registerAmmo("rocket_heat", () -> { if (XFactoryRocket.ITEM_ROCKET_HEAT == null) XFactoryRocket.ITEM_ROCKET_HEAT = new Item(new Item.Properties()); return XFactoryRocket.ITEM_ROCKET_HEAT; });
+    public static final DeferredItem<Item> ROCKET_DEMO = registerAmmo("rocket_demo", () -> { if (XFactoryRocket.ITEM_ROCKET_DEMO == null) XFactoryRocket.ITEM_ROCKET_DEMO = new Item(new Item.Properties()); return XFactoryRocket.ITEM_ROCKET_DEMO; });
+    public static final DeferredItem<Item> ROCKET_INC = registerAmmo("rocket_inc", () -> { if (XFactoryRocket.ITEM_ROCKET_INC == null) XFactoryRocket.ITEM_ROCKET_INC = new Item(new Item.Properties()); return XFactoryRocket.ITEM_ROCKET_INC; });
+    public static final DeferredItem<Item> ROCKET_PHOSPHORUS = registerAmmo("rocket_phosphorus", () -> { if (XFactoryRocket.ITEM_ROCKET_PHOSPHORUS == null) XFactoryRocket.ITEM_ROCKET_PHOSPHORUS = new Item(new Item.Properties()); return XFactoryRocket.ITEM_ROCKET_PHOSPHORUS; });
 
     // ==================== tool ammo (6) ====================
-    public static final DeferredItem<Item> FEXT_WATER = registerAmmo("fext_water", XFactoryTool.ITEM_FEXT_WATER);
-    public static final DeferredItem<Item> FEXT_FOAM = registerAmmo("fext_foam", XFactoryTool.ITEM_FEXT_FOAM);
-    public static final DeferredItem<Item> FEXT_SAND = registerAmmo("fext_sand", XFactoryTool.ITEM_FEXT_SAND);
-    public static final DeferredItem<Item> CT_HOOK = registerAmmo("ct_hook", XFactoryTool.ITEM_CT_HOOK);
-    public static final DeferredItem<Item> CT_MORTAR = registerAmmo("ct_mortar", XFactoryTool.ITEM_CT_MORTAR);
-    public static final DeferredItem<Item> CT_MORTAR_CHARGE = registerAmmo("ct_mortar_charge", XFactoryTool.ITEM_CT_MORTAR_CHARGE);
+    public static final DeferredItem<Item> FEXT_WATER = registerAmmo("fext_water", () -> { if (XFactoryTool.ITEM_FEXT_WATER == null) XFactoryTool.ITEM_FEXT_WATER = new Item(new Item.Properties()); return XFactoryTool.ITEM_FEXT_WATER; });
+    public static final DeferredItem<Item> FEXT_FOAM = registerAmmo("fext_foam", () -> { if (XFactoryTool.ITEM_FEXT_FOAM == null) XFactoryTool.ITEM_FEXT_FOAM = new Item(new Item.Properties()); return XFactoryTool.ITEM_FEXT_FOAM; });
+    public static final DeferredItem<Item> FEXT_SAND = registerAmmo("fext_sand", () -> { if (XFactoryTool.ITEM_FEXT_SAND == null) XFactoryTool.ITEM_FEXT_SAND = new Item(new Item.Properties()); return XFactoryTool.ITEM_FEXT_SAND; });
+    public static final DeferredItem<Item> CT_HOOK = registerAmmo("ct_hook", () -> { if (XFactoryTool.ITEM_CT_HOOK == null) XFactoryTool.ITEM_CT_HOOK = new Item(new Item.Properties()); return XFactoryTool.ITEM_CT_HOOK; });
+    public static final DeferredItem<Item> CT_MORTAR = registerAmmo("ct_mortar", () -> { if (XFactoryTool.ITEM_CT_MORTAR == null) XFactoryTool.ITEM_CT_MORTAR = new Item(new Item.Properties()); return XFactoryTool.ITEM_CT_MORTAR; });
+    public static final DeferredItem<Item> CT_MORTAR_CHARGE = registerAmmo("ct_mortar_charge", () -> { if (XFactoryTool.ITEM_CT_MORTAR_CHARGE == null) XFactoryTool.ITEM_CT_MORTAR_CHARGE = new Item(new Item.Properties()); return XFactoryTool.ITEM_CT_MORTAR_CHARGE; });
 
     // ==================== flamer ammo (4) ====================
-    public static final DeferredItem<Item> FLAME_DIESEL = registerAmmo("flame_diesel", XFactoryFlamer.ITEM_FLAME_DIESEL);
-    public static final DeferredItem<Item> FLAME_GAS = registerAmmo("flame_gas", XFactoryFlamer.ITEM_FLAME_GAS);
-    public static final DeferredItem<Item> FLAME_NAPALM = registerAmmo("flame_napalm", XFactoryFlamer.ITEM_FLAME_NAPALM);
-    public static final DeferredItem<Item> FLAME_BALEFIRE = registerAmmo("flame_balefire", XFactoryFlamer.ITEM_FLAME_BALEFIRE);
+    public static final DeferredItem<Item> FLAME_DIESEL = registerAmmo("flame_diesel", () -> { if (XFactoryFlamer.ITEM_FLAME_DIESEL == null) XFactoryFlamer.ITEM_FLAME_DIESEL = new Item(new Item.Properties()); return XFactoryFlamer.ITEM_FLAME_DIESEL; });
+    public static final DeferredItem<Item> FLAME_GAS = registerAmmo("flame_gas", () -> { if (XFactoryFlamer.ITEM_FLAME_GAS == null) XFactoryFlamer.ITEM_FLAME_GAS = new Item(new Item.Properties()); return XFactoryFlamer.ITEM_FLAME_GAS; });
+    public static final DeferredItem<Item> FLAME_NAPALM = registerAmmo("flame_napalm", () -> { if (XFactoryFlamer.ITEM_FLAME_NAPALM == null) XFactoryFlamer.ITEM_FLAME_NAPALM = new Item(new Item.Properties()); return XFactoryFlamer.ITEM_FLAME_NAPALM; });
+    public static final DeferredItem<Item> FLAME_BALEFIRE = registerAmmo("flame_balefire", () -> { if (XFactoryFlamer.ITEM_FLAME_BALEFIRE == null) XFactoryFlamer.ITEM_FLAME_BALEFIRE = new Item(new Item.Properties()); return XFactoryFlamer.ITEM_FLAME_BALEFIRE; });
 
     // ==================== debug ammo (1, not part of ammo_standard) ====================
-    public static final DeferredItem<Item> AMMO_DEBUG = registerAmmo("ammo_debug", XFactoryDebug.ITEM_AMMO_DEBUG);
+    public static final DeferredItem<Item> AMMO_DEBUG = registerAmmo("ammo_debug", () -> { if (XFactoryDebug.ITEM_AMMO_DEBUG == null) XFactoryDebug.ITEM_AMMO_DEBUG = new Item(new Item.Properties()); return XFactoryDebug.ITEM_AMMO_DEBUG; });
 
     // ==================== rocket guns (4) ====================
     public static final DeferredItem<Item> GUN_PANZERSCHRECK = registerGun("gun_panzerschreck", XFactoryRocket::gun_panzerschreck);
@@ -82,8 +82,8 @@ public final class GunHeavyItems {
     public static void registerAll() {
     }
 
-    private static DeferredItem<Item> registerAmmo(String name, Item instance) {
-        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmo(String name, java.util.function.Supplier<Item> instance) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, instance);
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }

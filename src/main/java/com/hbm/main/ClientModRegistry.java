@@ -69,12 +69,12 @@ public class ClientModRegistry {
 
             // Phase 5 (reactor_and_explosion_visual_effects / c1-rbmk-renderers): the 4 RBMK reactor
             // BlockEntityRenderers, each backing 1-2 concrete BlockEntityTypes.
-            BlockEntityRenderers.register(RBMKBlockEntities.CONTROL_MANUAL.get(), RBMKControlRodRenderer.Provider::new);
-            BlockEntityRenderers.register(RBMKBlockEntities.CONTROL_AUTO.get(), RBMKControlRodRenderer.Provider::new);
-            BlockEntityRenderers.register(RBMKBlockEntities.ROD.get(), RBMKFuelColumnRenderer.Provider::new);
-            BlockEntityRenderers.register(RBMKBlockEntities.ROD_REASIM.get(), RBMKFuelColumnRenderer.Provider::new);
-            BlockEntityRenderers.register(RBMKBlockEntities.CONSOLE.get(), RBMKConsoleHeatmapRenderer.Provider::new);
-            BlockEntityRenderers.register(RBMKBlockEntities.AUTOLOADER.get(), RBMKAutoloaderPistonRenderer.Provider::new);
+            BlockEntityRenderers.register(RBMKBlockEntities.CONTROL_MANUAL.get(), new RBMKControlRodRenderer.Provider());
+            BlockEntityRenderers.register(RBMKBlockEntities.CONTROL_AUTO.get(), new RBMKControlRodRenderer.Provider());
+            BlockEntityRenderers.register(RBMKBlockEntities.ROD.get(), new RBMKFuelColumnRenderer.Provider());
+            BlockEntityRenderers.register(RBMKBlockEntities.ROD_REASIM.get(), new RBMKFuelColumnRenderer.Provider());
+            BlockEntityRenderers.register(RBMKBlockEntities.CONSOLE.get(), new RBMKConsoleHeatmapRenderer.Provider());
+            BlockEntityRenderers.register(RBMKBlockEntities.AUTOLOADER.get(), new RBMKAutoloaderPistonRenderer.Provider());
 
             // Phase 5 (particle_engine_and_generic_vfx): registers every HbmEffect constant's
             // client-only render handler - must run once, client-side only, before any

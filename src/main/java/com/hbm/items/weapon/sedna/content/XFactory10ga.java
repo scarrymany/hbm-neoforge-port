@@ -59,15 +59,15 @@ public final class XFactory10ga {
     // that family + Ammo Press.
 
     /** casing: BUCKSHOT_ADVANCED x4 */
-    public static final Item ITEM_G10 = new Item(new Item.Properties());
+    public static Item ITEM_G10;
     /** casing: BUCKSHOT_ADVANCED x4 */
-    public static final Item ITEM_G10_SHRAPNEL = new Item(new Item.Properties());
+    public static Item ITEM_G10_SHRAPNEL;
     /** casing: BUCKSHOT_ADVANCED x4 */
-    public static final Item ITEM_G10_DU = new Item(new Item.Properties());
+    public static Item ITEM_G10_DU;
     /** casing: BUCKSHOT_ADVANCED x4 */
-    public static final Item ITEM_G10_SLUG = new Item(new Item.Properties());
+    public static Item ITEM_G10_SLUG;
     /** casing: BUCKSHOT_ADVANCED x4 */
-    public static final Item ITEM_G10_EXPLOSIVE = new Item(new Item.Properties());
+    public static Item ITEM_G10_EXPLOSIVE;
 
     private static final float BUCKSHOT_SPREAD = 0.035F;
 
@@ -98,16 +98,16 @@ public final class XFactory10ga {
         bullet.discard();
     };
 
-    public static final BulletConfig g10 = new BulletConfig("g10").setItem(ITEM_G10)
+    public static final BulletConfig g10 = new BulletConfig("g10").setItem(() -> ITEM_G10)
             .setProjectiles(10).setDamage(1F / 10F).setSpread(BUCKSHOT_SPREAD).setRicochetAngle(15F).setThresholdNegation(5F);
-    public static final BulletConfig g10_shrapnel = new BulletConfig("g10_shrapnel").setItem(ITEM_G10_SHRAPNEL)
+    public static final BulletConfig g10_shrapnel = new BulletConfig("g10_shrapnel").setItem(() -> ITEM_G10_SHRAPNEL)
             .setProjectiles(10).setDamage(1F / 10F).setSpread(BUCKSHOT_SPREAD).setRicochetAngle(90F).setRicochetCount(15).setThresholdNegation(5F);
-    public static final BulletConfig g10_du = new BulletConfig("g10_du").setItem(ITEM_G10_DU)
+    public static final BulletConfig g10_du = new BulletConfig("g10_du").setItem(() -> ITEM_G10_DU)
             .setProjectiles(10).setDamage(1F / 4F).setSpread(BUCKSHOT_SPREAD).setRicochetAngle(15F).setThresholdNegation(10F).setArmorPiercing(0.2F)
             .setDoesPenetrate(true).setDamageFalloffByPen(false);
-    public static final BulletConfig g10_slug = new BulletConfig("g10_slug").setItem(ITEM_G10_SLUG)
+    public static final BulletConfig g10_slug = new BulletConfig("g10_slug").setItem(() -> ITEM_G10_SLUG)
             .setRicochetAngle(15F).setThresholdNegation(10F).setArmorPiercing(0.1F).setDoesPenetrate(true);
-    public static final BulletConfig g10_explosive = new BulletConfig("g10_explosive").setItem(ITEM_G10_EXPLOSIVE)
+    public static final BulletConfig g10_explosive = new BulletConfig("g10_explosive").setItem(() -> ITEM_G10_EXPLOSIVE)
             .setWear(3F).setProjectiles(10).setDamage(1F / 4F).setSpread(BUCKSHOT_SPREAD).setOnImpact(LAMBDA_TINY_EXPLODE);
 
     // ==================== recoil (see XFactory556mm's javadoc - not currently wired anywhere, kept for 1:1 parity) ====================

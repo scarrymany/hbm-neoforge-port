@@ -69,21 +69,21 @@ public final class XFactoryFlamer {
 
     // ==================== ammo ====================
 
-    public static final Item ITEM_FLAME_DIESEL = new Item(new Item.Properties());
-    public static final Item ITEM_FLAME_GAS = new Item(new Item.Properties());
-    public static final Item ITEM_FLAME_NAPALM = new Item(new Item.Properties());
-    public static final Item ITEM_FLAME_BALEFIRE = new Item(new Item.Properties());
+    public static Item ITEM_FLAME_DIESEL;
+    public static Item ITEM_FLAME_GAS;
+    public static Item ITEM_FLAME_NAPALM;
+    public static Item ITEM_FLAME_BALEFIRE;
 
-    public static final BulletConfig flame_diesel = new BulletConfig("flame_diesel").setItem(ITEM_FLAME_DIESEL)
+    public static final BulletConfig flame_diesel = new BulletConfig("flame_diesel").setItem(() -> ITEM_FLAME_DIESEL)
             .setupDamageClass(DamageClass.FIRE).setLife(100).setVel(1F).setGrav(0.02).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
             .setOnImpact(XFactoryFlamer::igniteFire);
-    public static final BulletConfig flame_gas = new BulletConfig("flame_gas").setItem(ITEM_FLAME_GAS)
+    public static final BulletConfig flame_gas = new BulletConfig("flame_gas").setItem(() -> ITEM_FLAME_GAS)
             .setupDamageClass(DamageClass.FIRE).setLife(10).setSpread(0.05F).setVel(1F).setGrav(0).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
             .setOnImpact(XFactoryFlamer::igniteFire);
-    public static final BulletConfig flame_napalm = new BulletConfig("flame_napalm").setItem(ITEM_FLAME_NAPALM)
+    public static final BulletConfig flame_napalm = new BulletConfig("flame_napalm").setItem(() -> ITEM_FLAME_NAPALM)
             .setupDamageClass(DamageClass.FIRE).setLife(200).setVel(1F).setGrav(0.02).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
             .setOnImpact(XFactoryFlamer::igniteFire);
-    public static final BulletConfig flame_balefire = new BulletConfig("flame_balefire").setItem(ITEM_FLAME_BALEFIRE)
+    public static final BulletConfig flame_balefire = new BulletConfig("flame_balefire").setItem(() -> ITEM_FLAME_BALEFIRE)
             .setupDamageClass(DamageClass.FIRE).setLife(200).setVel(1F).setGrav(0.02).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
             .setOnImpact(XFactoryFlamer::igniteBalefire);
 

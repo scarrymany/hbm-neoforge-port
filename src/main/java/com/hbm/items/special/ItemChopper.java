@@ -6,6 +6,7 @@ import com.hbm.entity.mob.EntityHunterChopper;
 import com.hbm.entity.mob.EntityUFO;
 import com.hbm.entity.mob.Phase4BossEntityTypes2;
 import com.hbm.entity.mob.WormEntityTypes;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -95,7 +96,7 @@ public class ItemChopper extends Item {
                 spawned.setYRot(yaw);
                 spawned.setYHeadRot(yaw);
                 spawned.yBodyRot = yaw;
-                if (stack.hasCustomHoverName()) {
+                if (stack.has(DataComponents.CUSTOM_NAME)) {
                     spawned.setCustomName(stack.getHoverName());
                 }
                 level.addFreshEntity(spawned);

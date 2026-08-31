@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:light_barrels/weaponsteel"
+    },
+    "G": {
+      "tag": "c:grips/rubber"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "R": {
+      "tag": "c:light_receivers/weaponsteel"
+    },
+    "S": {
+      "tag": "c:stocks/wood"
+    },
+    "W": {
+      "tag": "c:grips/wood"
+    }
+  },
+  "pattern": [
+    "BRM",
+    "WGS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_g3"
+  }
+}

@@ -1,10 +1,13 @@
 package com.hbm.world.gen;
 
 import com.hbm.main.MainRegistry;
+import com.hbm.world.feature.AntennaFeature;
 import com.hbm.world.feature.BedrockOilDepositFeature;
+import com.hbm.world.feature.BunkerFeature;
 import com.hbm.world.feature.MeteoriteFeature;
 import com.hbm.world.feature.OilBubbleFeature;
 import com.hbm.world.feature.OilSandBubbleFeature;
+import com.hbm.world.feature.RadioFeature;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -36,6 +39,12 @@ public final class OilMeteorWorldGenFeatures {
             FEATURES.register("oil_sand_bubble", () -> new OilSandBubbleFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, MeteoriteFeature> METEORITE =
             FEATURES.register("meteorite", () -> new MeteoriteFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, AntennaFeature> ANTENNA =
+            FEATURES.register("antenna", () -> new AntennaFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, BunkerFeature> BUNKER =
+            FEATURES.register("bunker", () -> new BunkerFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, RadioFeature> RADIO =
+            FEATURES.register("radio", () -> new RadioFeature(NoneFeatureConfiguration.CODEC));
 
     private OilMeteorWorldGenFeatures() {
     }

@@ -37,7 +37,7 @@ public class ItemBattery extends Item implements IBatteryItem {
     }
 
     public ItemBattery(long maxCharge, long chargeRate, long dischargeRate, Rarity rarity, boolean percentOnlyTooltip, Properties properties) {
-        super(properties.stacksTo(1));
+        super(properties.stacksTo(1).rarity(rarity));
         this.maxCharge = maxCharge;
         this.chargeRate = chargeRate;
         this.dischargeRate = dischargeRate;
@@ -65,7 +65,6 @@ public class ItemBattery extends Item implements IBatteryItem {
         return this.dischargeRate;
     }
 
-    @Override
     public Rarity getRarity(ItemStack stack) {
         return this.rarity;
     }

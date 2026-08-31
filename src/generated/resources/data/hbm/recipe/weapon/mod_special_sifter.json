@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": {
+      "item": "hbm:steel_grate"
+    },
+    "I": {
+      "item": "hbm:ingot_dura_steel"
+    }
+  },
+  "pattern": [
+    "IGI",
+    "IGI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_sifter"
+  }
+}

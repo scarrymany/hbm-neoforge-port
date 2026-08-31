@@ -489,4 +489,9 @@ public class GeneralConfig {
     public static boolean enableLBSM() {
         return ENABLE_LBSM.get() && !ENABLE_528.get();
     }
+
+    /** Runtime HE→FE factor. Do not call from static field initializers. */
+    public static double conversionRateHeToRF() {
+        return CONVERSION_RATE_HE_TO_RF.get();
+    }
 }

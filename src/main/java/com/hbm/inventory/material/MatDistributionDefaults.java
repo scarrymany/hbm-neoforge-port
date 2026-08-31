@@ -86,7 +86,7 @@ public final class MatDistributionDefaults {
         registerEntry(Blocks.RAIL.asItem(), MAT_IRON, INGOT.q(6, 16));
 
         // #5
-        registerEntry(Blocks.GOLDEN_RAIL.asItem(), MAT_GOLD, INGOT.q(6, 6), MAT_REDSTONE, DUST.q(1, 6));
+        registerEntry(Blocks.POWERED_RAIL.asItem(), MAT_GOLD, INGOT.q(6, 6), MAT_REDSTONE, DUST.q(1, 6));
 
         // #6
         registerEntry(Blocks.DETECTOR_RAIL.asItem(), MAT_IRON, INGOT.q(6, 6), MAT_REDSTONE, DUST.q(1, 6));

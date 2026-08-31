@@ -269,7 +269,7 @@ public final class MixerRecipes {
      * below are exactly that shape.
      */
     private static Item hbmItem(String path) {
-        return BuiltInRegistries.ITEM.getValue(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
     }
 
     private static void register(FluidType outputType, MixerRecipe... recipes) {

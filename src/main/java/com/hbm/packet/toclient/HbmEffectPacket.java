@@ -1,18 +1,15 @@
 package com.hbm.packet.toclient;
 
+import com.hbm.client.ClientPackets;
 import com.hbm.main.MainRegistry;
 import com.hbm.particle.HbmEffect;
 import com.hbm.util.EnumUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
@@ -49,13 +46,8 @@ public record HbmEffectPacket(HbmEffect effect, double x, double y, double z, Co
             HbmEffectPacket::new
     );
 
-    @OnlyIn(Dist.CLIENT)
     public static void handleClient(HbmEffectPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            ClientLevel level = Minecraft.getInstance().level;
-            if (level == null) return;
-            packet.effect().summonParticle(level, packet.x(), packet.y(), packet.z(), packet.data());
-        });
+        ClientPackets.hbmEffect(packet, context);
     }
 
     @Override

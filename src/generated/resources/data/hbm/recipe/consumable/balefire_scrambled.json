@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:bowl"
+    },
+    {
+      "item": "hbm:egg_balefire"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:balefire_scrambled"
+  }
+}

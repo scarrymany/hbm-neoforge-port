@@ -4,6 +4,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,11 +36,13 @@ public class PotionConfig {
         DO_JUMP_BOOST = builder
                 .comment("Whether Servos and Armors should give Jump Boost. [CE: 8.02_doJumpBoost]")
                 .define("doJumpBoost", true);
+        // ArrayList, not List.of: NeoForge defineInList uses acceptable::contains and
+        // ValueSpec.test(null) on missing keys. Java 21 List.of().contains(null) NPEs.
         POTION_SICKNESS = builder
                 .comment("Valid values are OFF, NORMAL and TERRARIA. [CE: 8.03_potionSickness]")
-                .defineInList("potionSickness", SicknessMode.OFF.name(), List.of(
+                .defineInList("potionSickness", SicknessMode.OFF.name(), new ArrayList<>(List.of(
                         SicknessMode.OFF.name(), SicknessMode.NORMAL.name(), SicknessMode.TERRARIA.name()
-                ));
+                )));
 
         builder.pop();
     }

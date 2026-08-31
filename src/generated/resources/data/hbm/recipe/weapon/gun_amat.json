@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:heavy_barrels/ferrouranium"
+    },
+    "C": {
+      "item": "hbm:weapon_mod_special_scope"
+    },
+    "G": {
+      "tag": "c:grips/wood"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "R": {
+      "tag": "c:heavy_receivers/ferrouranium"
+    },
+    "S": {
+      "tag": "c:stocks/wood"
+    }
+  },
+  "pattern": [
+    " C ",
+    "BRS",
+    " MG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_amat"
+  }
+}

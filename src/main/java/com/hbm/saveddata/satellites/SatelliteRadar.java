@@ -67,8 +67,8 @@ public class SatelliteRadar extends Satellite {
             // API for this (unlike the newer LevelEntityGetter#getAll(), not independently
             // re-verified in this pass).
             net.minecraft.world.phys.AABB searchBox = new net.minecraft.world.phys.AABB(
-                    targetX - MAX_SCAN_RANGE, serverLevel.getMinY(), targetZ - MAX_SCAN_RANGE,
-                    targetX + MAX_SCAN_RANGE, serverLevel.getMaxY() + 1, targetZ + MAX_SCAN_RANGE);
+                    targetX - MAX_SCAN_RANGE, serverLevel.getMinBuildHeight(), targetZ - MAX_SCAN_RANGE,
+                    targetX + MAX_SCAN_RANGE, serverLevel.getMaxBuildHeight() + 1, targetZ + MAX_SCAN_RANGE);
 
             for (Entity entity : serverLevel.getEntitiesOfClass(Entity.class, searchBox)) {
                 if (!(entity instanceof IRadarDetectableNT radar)) continue;

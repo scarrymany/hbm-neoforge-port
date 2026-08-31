@@ -116,6 +116,11 @@ public class ItemRTGPellet extends ItemBase {
         return Math.round(13.0F * (1F - (float) getDecayFraction(stack)));
     }
 
+    /** 0 when fresh, 1 when fully depleted — CE {@code getDurabilityForDisplay}. */
+    public double getDurabilityForDisplay(ItemStack stack) {
+        return 1D - getDecayFraction(stack);
+    }
+
     @Override
     public int getBarColor(ItemStack stack) {
         return 0x40FF40;

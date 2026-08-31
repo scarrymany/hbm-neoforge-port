@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_plate_paa": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:plate_paa"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:armor/hazmat_paa_legs"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_plate_paa"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:armor/hazmat_paa_legs"
+    ]
+  }
+}

@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Single-block HE battery, ported from CE's {@code com.hbm.blocks.machine.MachineBattery} (read in
@@ -35,6 +36,13 @@ import org.jetbrains.annotations.Nullable;
  * entity's full CE-vs-port scope notes.
  */
 public class BatteryBlock extends BaseEntityBlock {
+
+    public static final MapCodec<BatteryBlock> CODEC = simpleCodec(p -> new BatteryBlock(p, 0L));
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -93,9 +101,9 @@ public class BatteryBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         IPersistentNBT.onBlockHarvested(level, pos, player);
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     /**

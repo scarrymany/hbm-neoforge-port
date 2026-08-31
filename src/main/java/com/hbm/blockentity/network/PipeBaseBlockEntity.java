@@ -123,7 +123,7 @@ public class PipeBaseBlockEntity extends LoadedBaseBlockEntity
         return true;
     }
 
-    public FluidType getType() {
+    public FluidType getFluidType() {
         return this.type;
     }
 
@@ -211,7 +211,7 @@ public class PipeBaseBlockEntity extends LoadedBaseBlockEntity
         HbmPlayerAttachment data = HbmPlayerAttachment.getData(player);
         if (data.getKeyPressed(EnumKeybind.TOOL_CTRL)
                 && world.getBlockState(worldPosition).getBlock() instanceof IBlockFluidDuct duct) {
-            duct.changeTypeRecursively(world, worldPosition, getType(), fluid, 64);
+            duct.changeTypeRecursively(world, worldPosition, getFluidType(), fluid, 64);
         } else {
             this.setType(fluid);
         }

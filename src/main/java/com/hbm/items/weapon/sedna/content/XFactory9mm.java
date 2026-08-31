@@ -51,20 +51,20 @@ public final class XFactory9mm {
     // family registered anywhere in this port yet). CE's casing type + count preserved per field below.
 
     /** casing: SMALL x12 */
-    public static final Item ITEM_P9_SP = new Item(new Item.Properties());
+    public static Item ITEM_P9_SP;
     /** casing: SMALL x12 */
-    public static final Item ITEM_P9_FMJ = new Item(new Item.Properties());
+    public static Item ITEM_P9_FMJ;
     /** casing: SMALL x12 */
-    public static final Item ITEM_P9_JHP = new Item(new Item.Properties());
+    public static Item ITEM_P9_JHP;
     /** casing: SMALL_STEEL x12 */
-    public static final Item ITEM_P9_AP = new Item(new Item.Properties());
+    public static Item ITEM_P9_AP;
 
-    public static final BulletConfig p9_sp = new BulletConfig("p9_sp").setItem(ITEM_P9_SP);
-    public static final BulletConfig p9_fmj = new BulletConfig("p9_fmj").setItem(ITEM_P9_FMJ)
+    public static final BulletConfig p9_sp = new BulletConfig("p9_sp").setItem(() -> ITEM_P9_SP);
+    public static final BulletConfig p9_fmj = new BulletConfig("p9_fmj").setItem(() -> ITEM_P9_FMJ)
             .setDamage(0.8F).setThresholdNegation(2F).setArmorPiercing(0.1F);
-    public static final BulletConfig p9_jhp = new BulletConfig("p9_jhp").setItem(ITEM_P9_JHP)
+    public static final BulletConfig p9_jhp = new BulletConfig("p9_jhp").setItem(() -> ITEM_P9_JHP)
             .setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F);
-    public static final BulletConfig p9_ap = new BulletConfig("p9_ap").setItem(ITEM_P9_AP)
+    public static final BulletConfig p9_ap = new BulletConfig("p9_ap").setItem(() -> ITEM_P9_AP)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(5F)
             .setArmorPiercing(0.15F);
 

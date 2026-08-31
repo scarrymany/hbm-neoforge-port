@@ -1,0 +1,35 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:heavy_barrels/weaponsteel"
+    },
+    "D": {
+      "tag": "c:shells/weaponsteel"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "R": {
+      "tag": "c:heavy_receivers/weaponsteel"
+    }
+  },
+  "pattern": [
+    " GG",
+    "BRM",
+    " D "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_mk108"
+  }
+}

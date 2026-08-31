@@ -66,29 +66,29 @@ public final class XFactoryRocket {
 
     // ==================== ammo (shared 5-round template) ====================
 
-    public static final Item ITEM_ROCKET_HE = new Item(new Item.Properties());
-    public static final Item ITEM_ROCKET_HEAT = new Item(new Item.Properties());
-    public static final Item ITEM_ROCKET_DEMO = new Item(new Item.Properties());
-    public static final Item ITEM_ROCKET_INC = new Item(new Item.Properties());
-    public static final Item ITEM_ROCKET_PHOSPHORUS = new Item(new Item.Properties());
+    public static Item ITEM_ROCKET_HE;
+    public static Item ITEM_ROCKET_HEAT;
+    public static Item ITEM_ROCKET_DEMO;
+    public static Item ITEM_ROCKET_INC;
+    public static Item ITEM_ROCKET_PHOSPHORUS;
 
     private static final Consumer<Entity> LAMBDA_ACCELERATE = entity -> {
         if (entity instanceof EntityBulletBaseMK4 bullet && bullet.accel < 7) bullet.accel += 0.4D;
     };
 
-    public static final BulletConfig rocket_he = new BulletConfig("rocket_he").setItem(ITEM_ROCKET_HE)
+    public static final BulletConfig rocket_he = new BulletConfig("rocket_he").setItem(() -> ITEM_ROCKET_HE)
             .setLife(300).setSelfDamageDelay(10).setVel(0F).setGrav(0).setOnEntityHit(null).setOnRicochet(null).setOnUpdate(LAMBDA_ACCELERATE)
             .setOnImpact(XFactoryRocket::explodeHe);
-    public static final BulletConfig rocket_heat = new BulletConfig("rocket_heat").setItem(ITEM_ROCKET_HEAT)
+    public static final BulletConfig rocket_heat = new BulletConfig("rocket_heat").setItem(() -> ITEM_ROCKET_HEAT)
             .setLife(300).setSelfDamageDelay(10).setVel(0F).setGrav(0).setOnEntityHit(null).setOnRicochet(null).setOnUpdate(LAMBDA_ACCELERATE)
             .setDamage(0.5F).setOnImpact(XFactoryRocket::explodeHeat);
-    public static final BulletConfig rocket_demo = new BulletConfig("rocket_demo").setItem(ITEM_ROCKET_DEMO)
+    public static final BulletConfig rocket_demo = new BulletConfig("rocket_demo").setItem(() -> ITEM_ROCKET_DEMO)
             .setLife(300).setSelfDamageDelay(10).setVel(0F).setGrav(0).setOnEntityHit(null).setOnRicochet(null).setOnUpdate(LAMBDA_ACCELERATE)
             .setDamage(0.75F).setOnImpact(XFactoryRocket::explodeDemo);
-    public static final BulletConfig rocket_inc = new BulletConfig("rocket_inc").setItem(ITEM_ROCKET_INC)
+    public static final BulletConfig rocket_inc = new BulletConfig("rocket_inc").setItem(() -> ITEM_ROCKET_INC)
             .setLife(300).setSelfDamageDelay(10).setVel(0F).setGrav(0).setOnEntityHit(null).setOnRicochet(null).setOnUpdate(LAMBDA_ACCELERATE)
             .setDamage(0.75F).setOnImpact((bullet, hit) -> explodeIncendiary(bullet, hit, 3F));
-    public static final BulletConfig rocket_phosphorus = new BulletConfig("rocket_phosphorus").setItem(ITEM_ROCKET_PHOSPHORUS)
+    public static final BulletConfig rocket_phosphorus = new BulletConfig("rocket_phosphorus").setItem(() -> ITEM_ROCKET_PHOSPHORUS)
             .setLife(300).setSelfDamageDelay(10).setVel(0F).setGrav(0).setOnEntityHit(null).setOnRicochet(null).setOnUpdate(LAMBDA_ACCELERATE)
             .setDamage(0.75F).setOnImpact((bullet, hit) -> explodeIncendiary(bullet, hit, 3F));
 

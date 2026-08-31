@@ -23,6 +23,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.Substation} (read in full):

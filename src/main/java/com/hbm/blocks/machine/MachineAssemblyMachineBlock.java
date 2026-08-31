@@ -15,9 +15,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /** Ported from CE's {@code MachineAssemblyMachine} (regname {@code machine_assembly_machine}): single-block, not dummyable. */
 public class MachineAssemblyMachineBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachineAssemblyMachineBlock> CODEC = simpleCodec(MachineAssemblyMachineBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public MachineAssemblyMachineBlock(Properties properties) {
         super(properties);

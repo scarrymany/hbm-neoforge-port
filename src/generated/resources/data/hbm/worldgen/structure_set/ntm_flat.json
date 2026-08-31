@@ -1,0 +1,38 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 184018402,
+    "separation": 8,
+    "spacing": 16
+  },
+  "structures": [
+    {
+      "structure": "hbm:radio_house",
+      "weight": 25
+    },
+    {
+      "structure": "hbm:spire",
+      "weight": 2
+    },
+    {
+      "structure": "hbm:dish",
+      "weight": 10
+    },
+    {
+      "structure": "hbm:laboratory",
+      "weight": 20
+    },
+    {
+      "structure": "hbm:factory",
+      "weight": 40
+    },
+    {
+      "structure": "hbm:crane",
+      "weight": 20
+    },
+    {
+      "structure": "hbm:broadcasting_tower",
+      "weight": 25
+    }
+  ]
+}

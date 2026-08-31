@@ -25,10 +25,14 @@ public interface IDoor {
 
     default Mode getConfiguredMode() {
         String name = BuiltInRegistries.BLOCK.getKey(((BlockEntity) this).getBlockState().getBlock()).toString();
-        if (MachineConfig.doorConf.containsKey(name)) {
-            return MachineConfig.doorConf.get(name);
+        java.util.Map<String, String> conf = MachineConfig.doorConf();
+        String mode = conf.get(name);
+        if (mode == null) mode = conf.getOrDefault("ALL", "DEFAULT");
+        try {
+            return Mode.valueOf(mode);
+        } catch (IllegalArgumentException e) {
+            return Mode.DEFAULT;
         }
-        return MachineConfig.doorConf.getOrDefault("ALL", Mode.DEFAULT);
     }
 
     default boolean isRedstoneOnly() {

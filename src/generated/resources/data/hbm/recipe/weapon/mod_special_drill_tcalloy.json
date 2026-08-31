@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": [
+      {
+        "item": "hbm:ingot_tcalloy"
+      },
+      {
+        "item": "hbm:ingot_cdalloy"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "P": {
+      "item": "hbm:ingot_rubber"
+    }
+  },
+  "pattern": [
+    " IP",
+    "IIM",
+    " IP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_drill_tcalloy"
+  }
+}

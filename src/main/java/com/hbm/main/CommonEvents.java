@@ -34,10 +34,14 @@ import com.hbm.inventory.recipes.chem.SILEXRecipes;
 import com.hbm.itempool.ItemPoolsSatellite;
 import com.hbm.items.weapon.sedna.mods.XWeaponModManager;
 import com.hbm.saveddata.satellites.Satellite;
+import net.minecraft.world.entity.SpawnPlacementTypes;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
 /**
  * Mod-bus common setup. {@code bus = Bus.MOD} is required: {@link FMLCommonSetupEvent} implements
@@ -107,6 +111,13 @@ public class CommonEvents {
             // com.hbm.itempool.ItemPoolsC130#init() has the exact same DeferredItem.get()-during-
             // pool-construction timing requirement as ItemPoolsSatellite#init() above.
             com.hbm.itempool.ItemPoolsC130.init();
+            // Phase 8 — structure loot (CE ItemPools*.java). Same DeferredItem.get() timing.
+            com.hbm.itempool.ItemPoolsLegacy.init();
+            com.hbm.itempool.ItemPoolsComponent.init();
+            com.hbm.itempool.ItemPoolsSingle.init();
+            com.hbm.itempool.ItemPoolsRedRoom.init();
+            com.hbm.itempool.ItemPoolsVendingMachine.init();
+            com.hbm.itempool.ItemPoolsPile.init();
         });
     }
 
@@ -151,5 +162,24 @@ public class CommonEvents {
         // Phase 4 (entities_bosses - RAD Beast, boss-adjacent elite). Same "safe to .get() here"
         // reasoning as above.
         event.put(RadBeastEntityTypes.RAD_BEAST.get(), EntityRADBeast.createAttributes().build());
+    }
+
+    /**
+     * Dedicated-server {@code RegisterSpawnPlacementsEvent} — gold/phosgene/volatile (and the other
+     * two creeper variants) were missing this; vanilla {@code Monster} on-ground rules match CE's
+     * creeper-shaped mobs. {@code bus=MOD} already on this class.
+     */
+    @SubscribeEvent
+    public static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
+        registerCreeper(event, CreeperVariantEntityTypes.CREEPER_GOLD.get());
+        registerCreeper(event, CreeperVariantEntityTypes.CREEPER_VOLATILE.get());
+        registerCreeper(event, CreeperVariantEntityTypes.CREEPER_PHOSGENE.get());
+        registerCreeper(event, CreeperVariantEntityTypes.CREEPER_TAINTED.get());
+        registerCreeper(event, CreeperVariantEntityTypes.CREEPER_NUCLEAR.get());
+    }
+
+    private static void registerCreeper(RegisterSpawnPlacementsEvent event, net.minecraft.world.entity.EntityType<? extends Monster> type) {
+        event.register(type, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Monster::checkMonsterSpawnRules, RegisterSpawnPlacementsEvent.Operation.OR);
     }
 }

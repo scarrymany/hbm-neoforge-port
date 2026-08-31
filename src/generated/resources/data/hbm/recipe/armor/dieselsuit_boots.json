@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "S": {
+      "item": "hbm:ingot_steel"
+    },
+    "W": {
+      "item": "minecraft:red_wool"
+    }
+  },
+  "pattern": [
+    "W W",
+    "S S"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:dieselsuit_boots"
+  }
+}

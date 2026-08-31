@@ -60,20 +60,20 @@ public final class XFactory556mm {
     // Ammo Press recipes.
 
     /** casing: SMALL x8 */
-    public static final Item ITEM_R556_SP = new Item(new Item.Properties());
+    public static Item ITEM_R556_SP;
     /** casing: SMALL x8 */
-    public static final Item ITEM_R556_FMJ = new Item(new Item.Properties());
+    public static Item ITEM_R556_FMJ;
     /** casing: SMALL x8 */
-    public static final Item ITEM_R556_JHP = new Item(new Item.Properties());
+    public static Item ITEM_R556_JHP;
     /** casing: SMALL_STEEL x8 */
-    public static final Item ITEM_R556_AP = new Item(new Item.Properties());
+    public static Item ITEM_R556_AP;
 
-    public static final BulletConfig r556_sp = new BulletConfig("r556_sp").setItem(ITEM_R556_SP);
-    public static final BulletConfig r556_fmj = new BulletConfig("r556_fmj").setItem(ITEM_R556_FMJ)
+    public static final BulletConfig r556_sp = new BulletConfig("r556_sp").setItem(() -> ITEM_R556_SP);
+    public static final BulletConfig r556_fmj = new BulletConfig("r556_fmj").setItem(() -> ITEM_R556_FMJ)
             .setDamage(0.8F).setThresholdNegation(4F).setArmorPiercing(0.1F);
-    public static final BulletConfig r556_jhp = new BulletConfig("r556_jhp").setItem(ITEM_R556_JHP)
+    public static final BulletConfig r556_jhp = new BulletConfig("r556_jhp").setItem(() -> ITEM_R556_JHP)
             .setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F);
-    public static final BulletConfig r556_ap = new BulletConfig("r556_ap").setItem(ITEM_R556_AP)
+    public static final BulletConfig r556_ap = new BulletConfig("r556_ap").setItem(() -> ITEM_R556_AP)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(10F).setArmorPiercing(0.15F);
 
     // r556_inc_sp/fmj/jhp/ap (the "incendiary" set gun_g3_zebra's magazine references) are a CONFIRMED

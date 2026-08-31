@@ -88,9 +88,10 @@ public abstract class BlockTNTBase extends BlockDetonatable implements IToolable
 
     /** CE: {@code onPlayerDestroy} - manually mining this block respects the "ignite on break" toggle, same as ambient fire adjacency. */
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        super.playerWillDestroy(level, pos, state, player);
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+        BlockState result = super.playerWillDestroy(level, pos, state, player);
         prime(level, pos, false, player);
+        return result;
     }
 
     /**

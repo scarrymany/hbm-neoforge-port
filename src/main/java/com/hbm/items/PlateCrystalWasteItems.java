@@ -231,14 +231,8 @@ public final class PlateCrystalWasteItems {
     // static-textured item meanwhile.
     public static final DeferredItem<Item> GEM_ALEXANDRITE = registerParts("gem_alexandrite");
 
-    // crystal_xen: CE assigns MainRegistry.controlTab, not partsTab, and caps the stack at 1.
-    public static final DeferredItem<Item> CRYSTAL_XEN;
-
-    static {
-        DeferredItem<Item> item = register("crystal_xen", new Item.Properties().stacksTo(1));
-        CreativeTabContents.add(ModCreativeTabs.CONTROL, item);
-        CRYSTAL_XEN = item;
-    }
+    // crystal_xen lives on ScatteredMilitaryItems.CRYSTAL_XEN (CE ItemDrop). Do not ITEMS.register
+    // it here — a second registration crashes runData with Duplicate registration crystal_xen.
 
     // crystal_energy: CE sets setCreativeTab(null) - deliberately hidden from every creative tab.
     // Registered but intentionally never passed to CreativeTabContents.add(...).

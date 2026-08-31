@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.hbm.lib.internal.UnsafeHolder.U;
 import static com.hbm.lib.internal.UnsafeHolder.fieldOffset;
@@ -512,6 +515,93 @@ public class NonBlockingHashMap<TypeK, TypeV>
         assert !(V instanceof Prime); // Never return a Prime
         assert V != TOMBSTONE;
         return (TypeV)V;
+    }
+
+    @Override
+    public TypeV getOrDefault(Object key, TypeV defaultValue) {
+        TypeV v = get(key);
+        return v != null ? v : defaultValue;
+    }
+
+    @Override
+    public TypeV merge(TypeK key, TypeV value, BiFunction<? super TypeV, ? super TypeV, ? extends TypeV> remappingFunction) {
+        if (key == null || value == null || remappingFunction == null) throw new NullPointerException();
+        while (true) {
+            TypeV old = get(key);
+            if (old == null) {
+                if (putIfAbsent(key, value) == null) return value;
+            } else {
+                TypeV next = remappingFunction.apply(old, value);
+                if (next == null) {
+                    if (remove(key, old)) return null;
+                } else if (replace(key, old, next)) {
+                    return next;
+                }
+            }
+        }
+    }
+
+    @Override
+    public TypeV compute(TypeK key, BiFunction<? super TypeK, ? super TypeV, ? extends TypeV> remappingFunction) {
+        if (key == null || remappingFunction == null) throw new NullPointerException();
+        while (true) {
+            TypeV old = get(key);
+            TypeV next = remappingFunction.apply(key, old);
+            if (next == null) {
+                if (old == null || remove(key, old)) return null;
+            } else if (old == null) {
+                if (putIfAbsent(key, next) == null) return next;
+            } else if (replace(key, old, next)) {
+                return next;
+            }
+        }
+    }
+
+    @Override
+    public TypeV computeIfAbsent(TypeK key, Function<? super TypeK, ? extends TypeV> mappingFunction) {
+        if (key == null || mappingFunction == null) throw new NullPointerException();
+        TypeV old = get(key);
+        if (old != null) return old;
+        TypeV next = mappingFunction.apply(key);
+        if (next == null) return null;
+        TypeV raced = putIfAbsent(key, next);
+        return raced != null ? raced : next;
+    }
+
+    @Override
+    public TypeV computeIfPresent(TypeK key, BiFunction<? super TypeK, ? super TypeV, ? extends TypeV> remappingFunction) {
+        if (key == null || remappingFunction == null) throw new NullPointerException();
+        while (true) {
+            TypeV old = get(key);
+            if (old == null) return null;
+            TypeV next = remappingFunction.apply(key, old);
+            if (next == null) {
+                if (remove(key, old)) return null;
+            } else if (replace(key, old, next)) {
+                return next;
+            }
+        }
+    }
+
+    @Override
+    public void forEach(BiConsumer<? super TypeK, ? super TypeV> action) {
+        if (action == null) throw new NullPointerException();
+        for (TypeK key : keySet()) {
+            TypeV v = get(key);
+            if (v != null) action.accept(key, v);
+        }
+    }
+
+    @Override
+    public void replaceAll(BiFunction<? super TypeK, ? super TypeV, ? extends TypeV> function) {
+        if (function == null) throw new NullPointerException();
+        for (TypeK key : keySet()) {
+            TypeV old = get(key);
+            if (old == null) continue;
+            TypeV next = function.apply(key, old);
+            if (next == null) remove(key, old);
+            else replace(key, old, next);
+        }
     }
 
     private static final Object get_impl( final NonBlockingHashMap topmap, final Object[] kvs, final Object key ) {

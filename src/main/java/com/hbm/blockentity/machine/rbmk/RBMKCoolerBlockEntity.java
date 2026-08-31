@@ -35,7 +35,6 @@ public class RBMKCoolerBlockEntity extends RBMKBaseBlockEntity implements IFluid
         };
     }
 
-    @Override
     protected Component getDefaultName() {
         return Component.translatable("container.rbmkCooler");
     }

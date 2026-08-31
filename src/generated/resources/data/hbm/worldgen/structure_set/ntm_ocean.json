@@ -1,0 +1,22 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 184018404,
+    "separation": 12,
+    "spacing": 24
+  },
+  "structures": [
+    {
+      "structure": "hbm:aircraft_carrier",
+      "weight": 3
+    },
+    {
+      "structure": "hbm:oil_rig",
+      "weight": 5
+    },
+    {
+      "structure": "hbm:lighthouse",
+      "weight": 1
+    }
+  ]
+}

@@ -55,7 +55,7 @@ public class ItemDesignatorManual extends Item implements IDesignatorItem, IItem
         ItemStack stack = player.getItemInHand(hand);
 
         if (level.isClientSide()) {
-            net.minecraft.client.Minecraft.getInstance().setScreen(new com.hbm.inventory.gui.DesignatorManualScreen(stack));
+            com.hbm.client.ClientScreens.designatorManual(stack);
         }
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());

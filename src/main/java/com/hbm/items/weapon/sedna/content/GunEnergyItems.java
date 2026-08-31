@@ -31,22 +31,22 @@ public final class GunEnergyItems {
     }
 
     // ==================== accelerator ammo ====================
-    public static final DeferredItem<Item> TAU_URANIUM = registerAmmo("tau_uranium", XFactoryAccelerator.ITEM_TAU_URANIUM);
-    public static final DeferredItem<Item> COIL_TUNGSTEN = registerAmmo("coil_tungsten", XFactoryAccelerator.ITEM_COIL_TUNGSTEN);
-    public static final DeferredItem<Item> COIL_FERROURANIUM = registerAmmo("coil_ferrouranium", XFactoryAccelerator.ITEM_COIL_FERROURANIUM);
+    public static final DeferredItem<Item> TAU_URANIUM = registerAmmo("tau_uranium", () -> { if (XFactoryAccelerator.ITEM_TAU_URANIUM == null) XFactoryAccelerator.ITEM_TAU_URANIUM = new Item(new Item.Properties()); return XFactoryAccelerator.ITEM_TAU_URANIUM; });
+    public static final DeferredItem<Item> COIL_TUNGSTEN = registerAmmo("coil_tungsten", () -> { if (XFactoryAccelerator.ITEM_COIL_TUNGSTEN == null) XFactoryAccelerator.ITEM_COIL_TUNGSTEN = new Item(new Item.Properties()); return XFactoryAccelerator.ITEM_COIL_TUNGSTEN; });
+    public static final DeferredItem<Item> COIL_FERROURANIUM = registerAmmo("coil_ferrouranium", () -> { if (XFactoryAccelerator.ITEM_COIL_FERROURANIUM == null) XFactoryAccelerator.ITEM_COIL_FERROURANIUM = new Item(new Item.Properties()); return XFactoryAccelerator.ITEM_COIL_FERROURANIUM; });
 
     // ==================== energy ammo ====================
-    public static final DeferredItem<Item> CAPACITOR = registerAmmo("capacitor", XFactoryEnergy.ITEM_CAPACITOR);
-    public static final DeferredItem<Item> CAPACITOR_OVERCHARGE = registerAmmo("capacitor_overcharge", XFactoryEnergy.ITEM_CAPACITOR_OVERCHARGE);
-    public static final DeferredItem<Item> CAPACITOR_IR = registerAmmo("capacitor_ir", XFactoryEnergy.ITEM_CAPACITOR_IR);
+    public static final DeferredItem<Item> CAPACITOR = registerAmmo("capacitor", () -> { if (XFactoryEnergy.ITEM_CAPACITOR == null) XFactoryEnergy.ITEM_CAPACITOR = new Item(new Item.Properties()); return XFactoryEnergy.ITEM_CAPACITOR; });
+    public static final DeferredItem<Item> CAPACITOR_OVERCHARGE = registerAmmo("capacitor_overcharge", () -> { if (XFactoryEnergy.ITEM_CAPACITOR_OVERCHARGE == null) XFactoryEnergy.ITEM_CAPACITOR_OVERCHARGE = new Item(new Item.Properties()); return XFactoryEnergy.ITEM_CAPACITOR_OVERCHARGE; });
+    public static final DeferredItem<Item> CAPACITOR_IR = registerAmmo("capacitor_ir", () -> { if (XFactoryEnergy.ITEM_CAPACITOR_IR == null) XFactoryEnergy.ITEM_CAPACITOR_IR = new Item(new Item.Properties()); return XFactoryEnergy.ITEM_CAPACITOR_IR; });
 
     // ==================== folly ammo (secret, 2) ====================
-    public static final DeferredItem<Item> FOLLY_SM = registerAmmoHidden("folly_sm", XFactoryFolly.ITEM_FOLLY_SM);
-    public static final DeferredItem<Item> FOLLY_NUKE = registerAmmoHidden("folly_nuke", XFactoryFolly.ITEM_FOLLY_NUKE);
+    public static final DeferredItem<Item> FOLLY_SM = registerAmmoHidden("folly_sm", () -> { if (XFactoryFolly.ITEM_FOLLY_SM == null) XFactoryFolly.ITEM_FOLLY_SM = new Item(new Item.Properties()); return XFactoryFolly.ITEM_FOLLY_SM; });
+    public static final DeferredItem<Item> FOLLY_NUKE = registerAmmoHidden("folly_nuke", () -> { if (XFactoryFolly.ITEM_FOLLY_NUKE == null) XFactoryFolly.ITEM_FOLLY_NUKE = new Item(new Item.Properties()); return XFactoryFolly.ITEM_FOLLY_NUKE; });
 
     // ==================== 35800 ammo (secret) ====================
-    public static final DeferredItem<Item> P35800 = registerAmmoHidden("p35_800", XFactory35800.ITEM_P35800);
-    public static final DeferredItem<Item> P35800_BL = registerAmmoHidden("p35_800_bl", XFactory35800.ITEM_P35800_BL);
+    public static final DeferredItem<Item> P35800 = registerAmmoHidden("p35_800", () -> { if (XFactory35800.ITEM_P35800 == null) XFactory35800.ITEM_P35800 = new Item(new Item.Properties()); return XFactory35800.ITEM_P35800; });
+    public static final DeferredItem<Item> P35800_BL = registerAmmoHidden("p35_800_bl", () -> { if (XFactory35800.ITEM_P35800_BL == null) XFactory35800.ITEM_P35800_BL = new Item(new Item.Properties()); return XFactory35800.ITEM_P35800_BL; });
 
     // ==================== accelerator guns (3) ====================
     public static final DeferredItem<Item> GUN_TAU = registerGun("gun_tau", XFactoryAccelerator::gun_tau);
@@ -71,14 +71,14 @@ public final class GunEnergyItems {
     public static void registerAll() {
     }
 
-    private static DeferredItem<Item> registerAmmo(String name, Item instance) {
-        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmo(String name, java.util.function.Supplier<Item> instance) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, instance);
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }
 
-    private static DeferredItem<Item> registerAmmoHidden(String name, Item instance) {
-        return ModItems.ITEMS.register(name, () -> instance);
+    private static DeferredItem<Item> registerAmmoHidden(String name, java.util.function.Supplier<Item> instance) {
+        return ModItems.ITEMS.register(name, instance);
     }
 
     private static DeferredItem<Item> registerGun(String name, Supplier<? extends ItemGunBaseNT> factory) {

@@ -241,7 +241,7 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
 
         for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, box)) {
             entity.hurt(level.damageSources().lava(), 5F);
-            entity.setSecondsOnFire(5);
+            entity.igniteForSeconds(5);
         }
     }
 

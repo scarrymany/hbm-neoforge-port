@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.machine.BlockSiloHatch} (237 lines, read in full) - a
@@ -48,6 +49,13 @@ import org.jetbrains.annotations.Nullable;
  * javadoc for the identical precedent), dropped entirely rather than guessed at here.
  */
 public class BlockSiloHatch extends BaseEntityBlock implements IBomb, IMultiBlock, IRadResistantBlock {
+
+    public static final MapCodec<BlockSiloHatch> CODEC = simpleCodec(BlockSiloHatch::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 

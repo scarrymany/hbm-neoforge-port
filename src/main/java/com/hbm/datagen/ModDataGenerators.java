@@ -16,6 +16,8 @@ import com.hbm.world.gen.OilMeteorPlacedFeatures;
 import com.hbm.world.gen.OreBiomeModifiers;
 import com.hbm.world.gen.OreConfiguredFeatures;
 import com.hbm.world.gen.OrePlacedFeatures;
+import com.hbm.world.gen.structure.ModStructureSets;
+import com.hbm.world.gen.structure.ModStructures;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
@@ -72,40 +74,45 @@ public class ModDataGenerators {
         // three remaining stages of the Feature -> ConfiguredFeature -> PlacedFeature -> BiomeModifier
         // pipeline (Feature instances themselves are registered separately via
         // OreWorldGenFeatures.register(modEventBus), like any other DeferredRegister).
-        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, OreConfiguredFeatures::bootstrap);
-        registrySetBuilder.add(Registries.PLACED_FEATURE, OrePlacedFeatures::bootstrap);
-        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, OreBiomeModifiers::bootstrap);
-        // Phase 4 oil-deposit + ambient meteorite world-gen
-        // (docs/phase4/worldgen_oil_and_meteor_dungeons.md Part 1 + Part 2a) - same three-stage
-        // pipeline, its own Feature instances registered separately via
-        // OilMeteorWorldGenFeatures.register(modEventBus).
-        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, OilMeteorConfiguredFeatures::bootstrap);
-        registrySetBuilder.add(Registries.PLACED_FEATURE, OilMeteorPlacedFeatures::bootstrap);
-        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, OilMeteorBiomeModifiers::bootstrap);
-        // Phase 4 (entities_creeper_variants) - natural biome spawning for the Gold/Volatile/Phosgene
-        // creeper variants (CE's EntityMappings.writeSpawns()). Same BiomeModifier pipeline as the two
-        // groups above; EntityType DeferredHolders are registered separately via
-        // CreeperVariantEntityTypes.register(modEventBus), like any other DeferredRegister.
-        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, CreeperVariantBiomeModifiers::bootstrap);
+        // One bootstrap per registry key — RegistrySetBuilder.add overwrites a previous add for
+        // the same key, so Ore + OilMeteor + creeper modifiers must share a single lambda.
+        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, context -> {
+            OreConfiguredFeatures.bootstrap(context);
+            OilMeteorConfiguredFeatures.bootstrap(context);
+        });
+        registrySetBuilder.add(Registries.PLACED_FEATURE, context -> {
+            OrePlacedFeatures.bootstrap(context);
+            OilMeteorPlacedFeatures.bootstrap(context);
+        });
+        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
+            OreBiomeModifiers.bootstrap(context);
+            OilMeteorBiomeModifiers.bootstrap(context);
+            CreeperVariantBiomeModifiers.bootstrap(context);
+        });
+        registrySetBuilder.add(Registries.STRUCTURE, ModStructures::bootstrap);
+        registrySetBuilder.add(Registries.STRUCTURE_SET, ModStructureSets::bootstrap);
         DatapackBuiltinEntriesProvider datapackProvider =
                 new DatapackBuiltinEntriesProvider(output, lookup, registrySetBuilder, Set.of(MainRegistry.MODID));
         generator.addProvider(event.includeServer(), datapackProvider);
+        // Tags must see datapack-registered damage types / biomes / features — vanilla lookup
+        // does not include RegistrySetBuilder entries and fails with "missing following references".
+        CompletableFuture<HolderLookup.Provider> registries = datapackProvider.getRegistryProvider();
 
         generator.addProvider(event.includeClient(), new ModItemModelProvider(output, helper));
         generator.addProvider(event.includeClient(), new ModBlockStateProvider(output, helper));
         generator.addProvider(event.includeClient(), new ModLanguageProvider(output));
 
-        BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(output, lookup, helper);
+        BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(output, registries, helper);
         generator.addProvider(event.includeServer(), blockTagsProvider);
         generator.addProvider(event.includeServer(),
-                new ModItemTagProvider(output, lookup, blockTagsProvider.contentsGetter(), helper));
-        generator.addProvider(event.includeServer(), new ModDamageTypeTagsProvider(output, lookup, helper));
+                new ModItemTagProvider(output, registries, blockTagsProvider.contentsGetter(), helper));
+        generator.addProvider(event.includeServer(), new ModDamageTypeTagsProvider(output, registries, helper));
 
         LootTableProvider.SubProviderEntry blockLootSubProvider =
                 new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK);
         generator.addProvider(event.includeServer(),
                 (DataProvider.Factory<LootTableProvider>) lootOutput ->
-                        new LootTableProvider(lootOutput, Collections.emptySet(), List.of(blockLootSubProvider), lookup));
+                        new LootTableProvider(lootOutput, Collections.emptySet(), List.of(blockLootSubProvider), registries));
 
         // c16-recipe-datagen: highest-value slice of CE's vanilla-crafting-table recipe corpus
         // (ToolRecipes/ArmorRecipes/MineralRecipes) - see ModRecipeProvider's own class javadoc for

@@ -18,12 +18,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.CableSwitch}: a right-click toggle that
  * gates {@link CableSwitchBlockEntity#shouldCreateNode()} on {@link #STATE} (CE's meta 0/1 off/on).
  */
 public class CableSwitchBlock extends BaseEntityBlock {
+
+    public static final MapCodec<CableSwitchBlock> CODEC = simpleCodec(CableSwitchBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final BooleanProperty STATE = BooleanProperty.create("state");
 

@@ -25,6 +25,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.CompoundIngredient;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -2239,10 +2240,12 @@ public class ModRecipeProvider extends RecipeProvider {
         TagKey<Item> weaponsteelShell = MaterialShapes.SHELL.commonTag(Mats.MAT_WEAPONSTEEL);
         Item ingotPolymer = item("ingot_polymer");
         Item ingotBakelite = item("ingot_bakelite");
-        Ingredient anyPlasticGrip = Ingredient.of(
-                MaterialShapes.GRIP.commonTag(Mats.MAT_POLYMER), MaterialShapes.GRIP.commonTag(Mats.MAT_BAKELITE));
-        Ingredient anyPlasticStock = Ingredient.of(
-                MaterialShapes.STOCK.commonTag(Mats.MAT_POLYMER), MaterialShapes.STOCK.commonTag(Mats.MAT_BAKELITE));
+        Ingredient anyPlasticGrip = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.GRIP.commonTag(Mats.MAT_POLYMER)),
+                Ingredient.of(MaterialShapes.GRIP.commonTag(Mats.MAT_BAKELITE)));
+        Ingredient anyPlasticStock = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.STOCK.commonTag(Mats.MAT_POLYMER)),
+                Ingredient.of(MaterialShapes.STOCK.commonTag(Mats.MAT_BAKELITE)));
         Ingredient anyPlasticIngot = Ingredient.of(ingotPolymer, ingotBakelite);
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("gun_star_f"))
                 .pattern("BRM").pattern("  G")
@@ -2360,8 +2363,10 @@ public class ModRecipeProvider extends RecipeProvider {
         TagKey<Item> cdalloyLightBarrel = MaterialShapes.LIGHTBARREL.commonTag(Mats.MAT_CDALLOY);
         TagKey<Item> tcalloyLightReceiver = MaterialShapes.LIGHTRECEIVER.commonTag(Mats.MAT_TCALLOY);
         TagKey<Item> cdalloyLightReceiver = MaterialShapes.LIGHTRECEIVER.commonTag(Mats.MAT_CDALLOY);
-        Ingredient anyResistantAlloyLightBarrel = Ingredient.of(tcalloyLightBarrel, cdalloyLightBarrel);
-        Ingredient anyResistantAlloyLightReceiver = Ingredient.of(tcalloyLightReceiver, cdalloyLightReceiver);
+        Ingredient anyResistantAlloyLightBarrel = CompoundIngredient.of(
+                Ingredient.of(tcalloyLightBarrel), Ingredient.of(cdalloyLightBarrel));
+        Ingredient anyResistantAlloyLightReceiver = CompoundIngredient.of(
+                Ingredient.of(tcalloyLightReceiver), Ingredient.of(cdalloyLightReceiver));
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("gun_lag"))
                 .pattern("BRM").pattern("  G")
                 .define('B', anyResistantAlloyLightBarrel).define('R', anyResistantAlloyLightReceiver)
@@ -2371,8 +2376,9 @@ public class ModRecipeProvider extends RecipeProvider {
         Item crystalRedstone = item("crystal_redstone");
         TagKey<Item> bigmtLightReceiver = MaterialShapes.LIGHTRECEIVER.commonTag(Mats.MAT_SATURN);
         Item ingotPvc = item("ingot_pvc");
-        Ingredient anyHardplasticGrip = Ingredient.of(
-                MaterialShapes.GRIP.commonTag(Mats.MAT_HARDPLASTIC), MaterialShapes.GRIP.commonTag(Mats.MAT_PVC));
+        Ingredient anyHardplasticGrip = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.GRIP.commonTag(Mats.MAT_HARDPLASTIC)),
+                Ingredient.of(MaterialShapes.GRIP.commonTag(Mats.MAT_PVC)));
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("gun_laser_pistol"))
                 .pattern("CRM").pattern("GG ")
                 .define('C', crystalRedstone).define('R', bigmtLightReceiver).define('M', bigmtMechanism).define('G', anyHardplasticGrip)

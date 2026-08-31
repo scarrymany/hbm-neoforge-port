@@ -71,10 +71,10 @@ public class HazardTypeContaminating implements IHazardType {
     }
 
     protected static void getUsed(final Block b, final BlockPos pos, final Level level) {
-        if (b == ModBlocks.tile_lab.get() && level.getRandom().nextInt(2000) == 0) {
-            level.setBlock(pos, ModBlocks.tile_lab_cracked.get().defaultBlockState(), SET_BLOCK_FLAGS);
-        } else if (b == ModBlocks.tile_lab_cracked.get() && level.getRandom().nextInt(10000) == 0) {
-            level.setBlock(pos, ModBlocks.tile_lab_broken.get().defaultBlockState(), SET_BLOCK_FLAGS);
+        if (b == ModBlocks.TILE_LAB.get() && level.getRandom().nextInt(2000) == 0) {
+            level.setBlock(pos, ModBlocks.TILE_LAB_CRACKED.get().defaultBlockState(), SET_BLOCK_FLAGS);
+        } else if (b == ModBlocks.TILE_LAB_CRACKED.get() && level.getRandom().nextInt(10000) == 0) {
+            level.setBlock(pos, ModBlocks.TILE_LAB_BROKEN.get().defaultBlockState(), SET_BLOCK_FLAGS);
         }
     }
 }

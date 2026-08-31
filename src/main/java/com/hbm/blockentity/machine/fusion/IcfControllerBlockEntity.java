@@ -116,7 +116,7 @@ public class IcfControllerBlockEntity extends LoadedBaseBlockEntity implements I
         List<Entity> hit = level.getEntitiesOfClass(Entity.class, beam);
         for (Entity e : hit) {
             e.hurt(level.damageSources().inFire(), 50F);
-            e.setSecondsOnFire(5);
+            e.igniteForSeconds(5);
         }
     }
 

@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "hbm:crystal_redstone"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polycarbonate"
+      },
+      {
+        "tag": "c:grips/pvc"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/saturnite"
+    },
+    "R": {
+      "tag": "c:light_receivers/saturnite"
+    }
+  },
+  "pattern": [
+    "CRM",
+    "GG "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_laser_pistol"
+  }
+}

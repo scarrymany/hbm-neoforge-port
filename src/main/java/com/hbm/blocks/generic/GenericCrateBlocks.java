@@ -25,13 +25,9 @@ import java.util.function.Supplier;
  * barrels, loot containers" section. Mirrors {@link com.hbm.blocks.OreBlocks}'s
  * table-driven-{@code registerAll()} shape.
  * <p>
- * <b>{@code BaseBarrel}.</b> CE never registers a plain {@code BaseBarrel} instance itself - only its
- * Red/Yellow (explosive/nuclear-waste content) subclasses, both deferred to Phase 2 per
- * {@link BaseBarrel}'s own class javadoc and this area's research report. Since the shell class is
- * documented there as Phase-1-safe on its own, and this pass is what makes the class compile into
- * the game, one plain generic barrel ("barrel") is registered here with the same hardness/resistance
- * CE gives every barrel subclass, so the block exists for the explosive/waste subclasses to extend
- * once Phase 2 lands, per {@link BaseBarrel}'s "left open for those future subclasses to extend" note.
+ * <b>{@code BaseBarrel} / {@link RedBarrel} / {@link YellowBarrel}.</b> CE never registers a plain
+ * {@code BaseBarrel} — only Red/Pink/LOX/Taint ({@code RedBarrel}) and {@code yellow_barrel}.
+ * Phase 8 registers those CE ids (nuke tab, 0.5F/2.5F) plus the Phase-1 placeholder {@code barrel}.
  * <p>
  * <b>{@link BlockCrate}/{@link BlockAmmoCrate}/{@link BlockCanCrate}/{@link BlockJungleCrate}'s empty
  * loot pools.</b> Each of those classes' own javadoc already documents why their drop pools are wired
@@ -95,6 +91,12 @@ public final class GenericCrateBlocks {
         return CRATE_RED;
     }
 
+    public static DeferredBlock<RedBarrel> RED_BARREL;
+    public static DeferredBlock<RedBarrel> PINK_BARREL;
+    public static DeferredBlock<RedBarrel> LOX_BARREL;
+    public static DeferredBlock<RedBarrel> TAINT_BARREL;
+    public static DeferredBlock<YellowBarrel> YELLOW_BARREL;
+
     private static DeferredBlock<BlockSupplyCrate> CRATE_SUPPLY;
     private static DeferredBlock<BlockCrate> CRATE_STANDARD;
     private static DeferredBlock<BlockCrate> CRATE_WEAPON;
@@ -111,10 +113,15 @@ public final class GenericCrateBlocks {
         registerLootContainers();
     }
 
-    /** See the class javadoc's {@code BaseBarrel} note: CE itself never registers this base shape. */
+    /** CE ModBlocks.java:751-756 — RedBarrel/YellowBarrel, nukeTab, 0.5F/2.5F. */
     private static void registerBarrel() {
-        registerBlock("barrel", () -> new BaseBarrel(BlockBehaviour.Properties.of().strength(0.5F, 2.5F).sound(SoundType.METAL)),
-                ModCreativeTabs.BLOCKS);
+        // Fresh Properties per block — BlockBehaviour.Properties is single-use.
+        registerBlock("barrel", () -> new BaseBarrel(barrelProps()), ModCreativeTabs.BLOCKS);
+        RED_BARREL = registerBlock("red_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.RED), ModCreativeTabs.NUKE);
+        PINK_BARREL = registerBlock("pink_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.PINK), ModCreativeTabs.NUKE);
+        LOX_BARREL = registerBlock("lox_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.LOX), ModCreativeTabs.NUKE);
+        TAINT_BARREL = registerBlock("taint_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.TAINT), ModCreativeTabs.NUKE);
+        YELLOW_BARREL = registerBlock("yellow_barrel", () -> new YellowBarrel(barrelProps()), ModCreativeTabs.NUKE);
     }
 
     private static void registerCrates() {
@@ -153,6 +160,10 @@ public final class GenericCrateBlocks {
                 () -> new BlockSkeletonHolder(BlockBehaviour.Properties.of().strength(2.0F, CRATE_RESISTANCE)), null);
         SKELETON_HOLDER_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("skeleton_holder",
                 () -> BlockEntityType.Builder.of(BlockSkeletonHolder.SkeletonHolderBlockEntity::new, skeletonHolderBlock.get()).build(null));
+    }
+
+    private static BlockBehaviour.Properties barrelProps() {
+        return BlockBehaviour.Properties.of().strength(0.5F, 2.5F).sound(SoundType.METAL);
     }
 
     private static BlockBehaviour.Properties crateProps(SoundType sound) {

@@ -491,8 +491,9 @@ public final class GenericBlocks {
     }
 
     private static void registerClean() {
-        registerBlock("tile_lab", () -> new BlockClean(BlockBehaviour.Properties.of().strength(1.0F, 20.0F).sound(SoundType.GLASS)), ModCreativeTabs.BLOCKS);
-        registerBlock("tile_lab_cracked", () -> new BlockClean(BlockBehaviour.Properties.of().strength(1.0F, 20.0F).sound(SoundType.GLASS)), ModCreativeTabs.BLOCKS);
+        ModBlocks.TILE_LAB = registerBlock("tile_lab", () -> new BlockClean(BlockBehaviour.Properties.of().strength(1.0F, 20.0F).sound(SoundType.GLASS)), ModCreativeTabs.BLOCKS);
+        ModBlocks.TILE_LAB_CRACKED = registerBlock("tile_lab_cracked", () -> new BlockClean(BlockBehaviour.Properties.of().strength(1.0F, 20.0F).sound(SoundType.GLASS)), ModCreativeTabs.BLOCKS);
+        ModBlocks.TILE_LAB_BROKEN = registerBlock("tile_lab_broken", () -> new BlockClean(BlockBehaviour.Properties.of().strength(1.0F, 20.0F).sound(SoundType.GLASS)), ModCreativeTabs.BLOCKS);
         registerBlock("deco_rbmk", () -> new BlockClean(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.BLOCKS);
         registerBlock("deco_rbmk_smooth", () -> new BlockClean(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.BLOCKS);
         registerBlock("deco_rbmk_panel", () -> new BlockClean(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.BLOCKS);

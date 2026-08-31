@@ -24,7 +24,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.PalettedContainer;
 
 import javax.annotation.Nullable;
 import java.util.ArrayDeque;
@@ -238,8 +240,8 @@ public class EntityFalloutRain extends EntityExplosionChunkloading {
      */
     private void stompColumn(Level level, int x, int z, double distPercent, BlockPos.MutableBlockPos pos, RandomSource random) {
         int solidDepth = 0;
-        int minY = level.getMinY();
-        int maxY = level.getMaxY();
+        int minY = level.getMinBuildHeight();
+        int maxY = level.getMaxBuildHeight();
         List<FalloutEntry> entries = FalloutConfigJSON.ENTRIES;
 
         for (int y = maxY; y >= minY; y--) {
@@ -321,12 +323,18 @@ public class EntityFalloutRain extends EntityExplosionChunkloading {
         if (holderOpt.isEmpty()) return;
         Holder<Biome> holder = holderOpt.get();
 
-        ChunkAccess chunk = serverLevel.getChunk(x >> 4, z >> 4);
-        int qx = x >> 2;
-        int qz = z >> 2;
-        for (int qy = level.getMinY() >> 2; qy <= level.getMaxY() >> 2; qy++) {
-            chunk.setBiome(qx, qy, qz, holder);
+        LevelChunk chunk = serverLevel.getChunk(x >> 4, z >> 4);
+        int localX = (x & 15) >> 2;
+        int localZ = (z & 15) >> 2;
+        for (LevelChunkSection section : chunk.getSections()) {
+            @SuppressWarnings("unchecked")
+            PalettedContainer<Holder<Biome>> biomes = (PalettedContainer<Holder<Biome>>) section.getBiomes();
+            biomes.set(localX, 0, localZ, holder);
+            biomes.set(localX, 1, localZ, holder);
+            biomes.set(localX, 2, localZ, holder);
+            biomes.set(localX, 3, localZ, holder);
         }
+        chunk.setUnsaved(true);
     }
 
     // ==================== persistence ====================

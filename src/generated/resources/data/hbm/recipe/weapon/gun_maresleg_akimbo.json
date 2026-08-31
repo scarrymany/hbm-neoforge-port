@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "S": {
+      "item": "hbm:gun_maresleg"
+    }
+  },
+  "pattern": [
+    "SMS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_maresleg_akimbo"
+  }
+}

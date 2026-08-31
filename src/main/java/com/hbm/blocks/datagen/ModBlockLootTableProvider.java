@@ -3,8 +3,11 @@ package com.hbm.blocks.datagen;
 import com.hbm.blocks.ModBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,24 +28,40 @@ import java.util.Set;
  * table, on pain of {@link IllegalStateException} at {@code runData} time.
  *
  * <p>Only reachable through a {@link net.minecraft.data.loot.LootTableProvider.SubProviderEntry}
- * factory reference (confirmed real, not an oversight - see {@code com.hbm.datagen.ModDataGenerators}),
- * hence the {@code protected} constructor.
+ * factory reference (confirmed real, not an oversight - see {@code com.hbm.datagen.ModDataGenerators}).
+ * Constructor is public so {@code ModBlockLootTableProvider::new} is a legal method reference from
+ * that other class (javac rejects a {@code protected} ctor used as a cross-package {@code ::new}).
  */
 public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
-    protected ModBlockLootTableProvider(HolderLookup.Provider registries) {
+    public ModBlockLootTableProvider(HolderLookup.Provider registries) {
         super(Set.of(), FeatureFlags.REGISTRY.allFlags(), registries);
     }
 
     @Override
     protected void generate() {
-        ModBlocks.BLOCKS.getEntries().forEach(holder -> this.dropSelf(holder.get()));
+        ModBlocks.BLOCKS.getEntries().forEach(holder -> {
+            Block block = holder.get();
+            if (hasRealLootTable(block)) {
+                this.dropSelf(block);
+            }
+        });
     }
 
     @Override
     protected Iterable<Block> getKnownBlocks() {
         List<Block> blocks = new ArrayList<>();
-        ModBlocks.BLOCKS.getEntries().forEach(holder -> blocks.add(holder.get()));
+        ModBlocks.BLOCKS.getEntries().forEach(holder -> {
+            if (hasRealLootTable(holder.get())) {
+                blocks.add(holder.get());
+            }
+        });
         return blocks;
+    }
+
+    /** {@code Properties.noLootTable()} maps to {@code minecraft:empty}; BlockLootSubProvider rejects that. */
+    private static boolean hasRealLootTable(Block block) {
+        ResourceKey<LootTable> table = block.getLootTable();
+        return table != null && !BuiltInLootTables.EMPTY.equals(table);
     }
 }

@@ -21,7 +21,7 @@ import java.util.Set;
  * needs are re-keyed and ported below, by dimension {@code ResourceLocation} string (see "world_gen"
  * and "structures" sections) - see {@code docs/phase4/ore_veins_and_bedrock_ores.md} and
  * {@code docs/phase4/worldgen_oil_and_meteor_dungeons.md} for the exact CE line numbers and default
- * values these were re-keyed from. The remaining ~20 (CE's {@code radioStructure},
+ * values these were re-keyed from. The remaining ~18 (CE leftover
  * {@code dimensionRad}, {@code peaceDimensions}, {@code fillCraterWithWater}, Galacticraft/
  * ExtraPlanets/other-mod-specific oil/gas maps such as {@code dunaOilSpawn}/{@code laytheOilSpawn}/
  * {@code eveGasSpawn}, and {@code isWarDim(World)}) are intentionally NOT ported here - they refer
@@ -91,6 +91,9 @@ public class CompatibilityConfig {
     public static ConfigValue<List<? extends String>> OIL_BUBBLE_SPAWN_RAW;
     public static ConfigValue<List<? extends String>> BEDROCK_OIL_SPAWN_RAW;
     public static ConfigValue<List<? extends String>> METEORITE_SPAWN_RAW;
+    public static ConfigValue<List<? extends String>> ANTENNA_STRUCTURE_RAW;
+    public static ConfigValue<List<? extends String>> BUNKER_STRUCTURE_RAW;
+    public static ConfigValue<List<? extends String>> RADIO_STRUCTURE_RAW;
 
     static void init(ModConfigSpec.Builder builder) {
         builder.push("mobs");
@@ -310,6 +313,15 @@ public class CompatibilityConfig {
         METEORITE_SPAWN_RAW = builder
                 .comment("Spawns a fallen, ambient/passive meteorite every Nth chunk (1-in-N chance). [CE: 03.19_meteoriteSpawn]")
                 .defineListAllowEmpty("meteoriteSpawn", () -> List.of("minecraft:overworld=200"), entry -> entry instanceof String);
+        ANTENNA_STRUCTURE_RAW = builder
+                .comment("Spawns CE's Antenna radio mast every Nth chunk (1-in-N chance). [CE CompatibilityConfig.antennaStructure default 0:750]")
+                .defineListAllowEmpty("antennaStructure", () -> List.of("minecraft:overworld=750"), entry -> entry instanceof String);
+        BUNKER_STRUCTURE_RAW = builder
+                .comment("Spawns CE's underground Bunker every Nth chunk (1-in-N chance). [CE CompatibilityConfig.bunkerStructure default 0:1000]")
+                .defineListAllowEmpty("bunkerStructure", () -> List.of("minecraft:overworld=1000"), entry -> entry instanceof String);
+        RADIO_STRUCTURE_RAW = builder
+                .comment("Spawns CE's Radio station (Radio01+Radio02) every Nth chunk (1-in-N chance). [CE CompatibilityConfig.radioStructure default 0:1000]")
+                .defineListAllowEmpty("radioStructure", () -> List.of("minecraft:overworld=1000"), entry -> entry instanceof String);
 
         builder.pop();
     }
@@ -399,4 +411,7 @@ public class CompatibilityConfig {
     public static Map<String, Integer> oilBubbleSpawn() { return spawnMap(OIL_BUBBLE_SPAWN_RAW); }
     public static Map<String, Integer> bedrockOilSpawn() { return spawnMap(BEDROCK_OIL_SPAWN_RAW); }
     public static Map<String, Integer> meteoriteSpawn() { return spawnMap(METEORITE_SPAWN_RAW); }
+    public static Map<String, Integer> antennaStructure() { return spawnMap(ANTENNA_STRUCTURE_RAW); }
+    public static Map<String, Integer> bunkerStructure() { return spawnMap(BUNKER_STRUCTURE_RAW); }
+    public static Map<String, Integer> radioStructure() { return spawnMap(RADIO_STRUCTURE_RAW); }
 }

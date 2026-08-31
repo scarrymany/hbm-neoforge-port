@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "H": {
+      "tag": "c:pipes/rubber"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "P": {
+      "tag": "c:heavy_barrels/weaponsteel"
+    },
+    "S": {
+      "tag": "c:shells/weaponsteel"
+    },
+    "W": {
+      "item": "hbm:wrench"
+    }
+  },
+  "pattern": [
+    "MHW",
+    "PSS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_chemthrower"
+  }
+}

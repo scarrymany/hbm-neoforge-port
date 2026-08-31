@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_coal"
+    },
+    {
+      "item": "hbm:powder_euphemium"
+    },
+    {
+      "item": "hbm:canteen_vodka"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:five_htp"
+  }
+}

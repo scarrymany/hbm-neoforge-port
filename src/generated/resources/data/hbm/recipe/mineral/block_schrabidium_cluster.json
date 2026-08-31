@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "hbm:ingot_schrabidium"
+    },
+    "S": {
+      "item": "hbm:ingot_starmetal"
+    },
+    "X": {
+      "item": "hbm:ingot_schrabidate"
+    }
+  },
+  "pattern": [
+    "#S#",
+    "SXS",
+    "#S#"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:block_schrabidium_cluster"
+  }
+}

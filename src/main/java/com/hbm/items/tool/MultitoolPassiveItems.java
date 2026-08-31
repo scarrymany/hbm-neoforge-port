@@ -32,23 +32,25 @@ public final class MultitoolPassiveItems {
     private MultitoolPassiveItems() {
     }
 
-    public static final DeferredItem<Item> MULTITOOL_EXT =
-            reg("multitool_ext", ItemMultitoolPassive.Rung.EXT, () -> MULTITOOL_MINER.get());
-    public static final DeferredItem<Item> MULTITOOL_MINER =
-            reg("multitool_miner", ItemMultitoolPassive.Rung.MINER, () -> MULTITOOL_HIT.get());
-    public static final DeferredItem<Item> MULTITOOL_HIT =
-            reg("multitool_hit", ItemMultitoolPassive.Rung.HIT, () -> MULTITOOL_BEAM.get());
-    public static final DeferredItem<Item> MULTITOOL_BEAM =
-            reg("multitool_beam", ItemMultitoolPassive.Rung.BEAM, () -> MULTITOOL_SKY.get());
-    public static final DeferredItem<Item> MULTITOOL_SKY =
-            reg("multitool_sky", ItemMultitoolPassive.Rung.SKY, () -> MULTITOOL_MEGA.get());
-    public static final DeferredItem<Item> MULTITOOL_MEGA =
-            reg("multitool_mega", ItemMultitoolPassive.Rung.MEGA, () -> MULTITOOL_JOULE.get());
-    public static final DeferredItem<Item> MULTITOOL_JOULE =
-            reg("multitool_joule", ItemMultitoolPassive.Rung.JOULE, () -> MULTITOOL_DECON.get());
+    // Declared last-rung-first so each next-rung lambda reads a field that is already initialized
+    // (javac treats the capture as an illegal forward reference even inside a lambda).
     /** Closes the loop back to Phase 1's already-registered {@code multitool_dig}. */
     public static final DeferredItem<Item> MULTITOOL_DECON =
             reg("multitool_decon", ItemMultitoolPassive.Rung.DECON, () -> ToolItems.MULTITOOL_DIG.get());
+    public static final DeferredItem<Item> MULTITOOL_JOULE =
+            reg("multitool_joule", ItemMultitoolPassive.Rung.JOULE, () -> MULTITOOL_DECON.get());
+    public static final DeferredItem<Item> MULTITOOL_MEGA =
+            reg("multitool_mega", ItemMultitoolPassive.Rung.MEGA, () -> MULTITOOL_JOULE.get());
+    public static final DeferredItem<Item> MULTITOOL_SKY =
+            reg("multitool_sky", ItemMultitoolPassive.Rung.SKY, () -> MULTITOOL_MEGA.get());
+    public static final DeferredItem<Item> MULTITOOL_BEAM =
+            reg("multitool_beam", ItemMultitoolPassive.Rung.BEAM, () -> MULTITOOL_SKY.get());
+    public static final DeferredItem<Item> MULTITOOL_HIT =
+            reg("multitool_hit", ItemMultitoolPassive.Rung.HIT, () -> MULTITOOL_BEAM.get());
+    public static final DeferredItem<Item> MULTITOOL_MINER =
+            reg("multitool_miner", ItemMultitoolPassive.Rung.MINER, () -> MULTITOOL_HIT.get());
+    public static final DeferredItem<Item> MULTITOOL_EXT =
+            reg("multitool_ext", ItemMultitoolPassive.Rung.EXT, () -> MULTITOOL_MINER.get());
 
     /** No-op body; referencing this class forces the static initializers above to run. */
     public static void registerAll() {

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "item": "hbm:plate_iron"
+    },
+    "U": {
+      "item": "hbm:billet_ra226be"
+    }
+  },
+  "pattern": [
+    " U ",
+    "PUP",
+    " U "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:pile_rod_source"
+  }
+}

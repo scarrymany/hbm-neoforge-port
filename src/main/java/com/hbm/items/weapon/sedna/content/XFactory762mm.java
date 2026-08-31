@@ -62,17 +62,17 @@ public final class XFactory762mm {
     // family) is preserved in each field's comment for whoever wires that family + Ammo Press later.
 
     /** casing: SMALL x6 */
-    public static final Item ITEM_R762_SP = new Item(new Item.Properties());
+    public static Item ITEM_R762_SP;
     /** casing: SMALL x6 */
-    public static final Item ITEM_R762_FMJ = new Item(new Item.Properties());
+    public static Item ITEM_R762_FMJ;
     /** casing: SMALL x6 */
-    public static final Item ITEM_R762_JHP = new Item(new Item.Properties());
+    public static Item ITEM_R762_JHP;
     /** casing: SMALL_STEEL x6 */
-    public static final Item ITEM_R762_AP = new Item(new Item.Properties());
+    public static Item ITEM_R762_AP;
     /** casing: SMALL_STEEL x6 */
-    public static final Item ITEM_R762_DU = new Item(new Item.Properties());
+    public static Item ITEM_R762_DU;
     /** casing: SMALL_STEEL x6 */
-    public static final Item ITEM_R762_HE = new Item(new Item.Properties());
+    public static Item ITEM_R762_HE;
 
     /**
      * Reimplementation of CE's {@code Lego.tinyExplode(bullet, mop, range, 1F)} - this port's own
@@ -105,16 +105,16 @@ public final class XFactory762mm {
         bullet.discard();
     };
 
-    public static final BulletConfig r762_sp = new BulletConfig("r762_sp").setItem(ITEM_R762_SP);
-    public static final BulletConfig r762_fmj = new BulletConfig("r762_fmj").setItem(ITEM_R762_FMJ)
+    public static final BulletConfig r762_sp = new BulletConfig("r762_sp").setItem(() -> ITEM_R762_SP);
+    public static final BulletConfig r762_fmj = new BulletConfig("r762_fmj").setItem(() -> ITEM_R762_FMJ)
             .setDamage(0.8F).setThresholdNegation(5F).setArmorPiercing(0.1F);
-    public static final BulletConfig r762_jhp = new BulletConfig("r762_jhp").setItem(ITEM_R762_JHP)
+    public static final BulletConfig r762_jhp = new BulletConfig("r762_jhp").setItem(() -> ITEM_R762_JHP)
             .setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F);
-    public static final BulletConfig r762_ap = new BulletConfig("r762_ap").setItem(ITEM_R762_AP)
+    public static final BulletConfig r762_ap = new BulletConfig("r762_ap").setItem(() -> ITEM_R762_AP)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(12.5F).setArmorPiercing(0.15F);
-    public static final BulletConfig r762_du = new BulletConfig("r762_du").setItem(ITEM_R762_DU)
+    public static final BulletConfig r762_du = new BulletConfig("r762_du").setItem(() -> ITEM_R762_DU)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(2.5F).setThresholdNegation(15F).setArmorPiercing(0.25F);
-    public static final BulletConfig r762_he = new BulletConfig("r762_he").setItem(ITEM_R762_HE)
+    public static final BulletConfig r762_he = new BulletConfig("r762_he").setItem(() -> ITEM_R762_HE)
             .setWear(3F).setDamage(2F).setOnImpact(LAMBDA_TINY_EXPLODE);
 
     // energy_lacunae/_overcharge/_ir - beam ammo, no setItem(...) yet, see class javadoc.

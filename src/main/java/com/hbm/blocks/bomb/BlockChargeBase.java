@@ -45,6 +45,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.bomb.BlockChargeBase} (264 lines, read in full) -
@@ -57,6 +58,13 @@ import java.util.List;
  * standard CE pattern also used verbatim.
  */
 public abstract class BlockChargeBase extends BaseEntityBlock implements IBomb, IToolable, IExploder {
+
+    public static final MapCodec<BlockChargeBase> CODEC = simpleCodec(p -> { throw new UnsupportedOperationException("BlockChargeBase is code-registered, not data-driven"); });
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
@@ -164,7 +172,7 @@ public abstract class BlockChargeBase extends BaseEntityBlock implements IBomb, 
         if (!(level.getBlockEntity(pos) instanceof ChargeBlockEntity charge)) return InteractionResult.PASS;
 
         if (!charge.started) {
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 if (charge.timer > 0) {
                     charge.started = true;
                     level.playSound(null, pos, HBMSoundHandler.fstbmbStart.get(), SoundSource.BLOCKS, 1.0F, 1.0F);

@@ -15,9 +15,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /** Ported from CE's {@code MachineTurbine} (regname {@code machine_turbine}): single-block small turbine. */
 public class MachineTurbineBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachineTurbineBlock> CODEC = simpleCodec(MachineTurbineBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public MachineTurbineBlock(Properties properties) {
         super(properties);

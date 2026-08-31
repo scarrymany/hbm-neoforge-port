@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Abstract base for the entire {@code FluidDuctBase} family (10 concrete blocks, 8 distinct block
@@ -52,6 +53,13 @@ import java.util.List;
  * for a model that doesn't exist yet.
  */
 public abstract class FluidDuctBaseBlock extends BaseEntityBlock implements IAnalyzable, IBlockFluidDuct {
+
+    public static final MapCodec<FluidDuctBaseBlock> CODEC = simpleCodec(p -> { throw new UnsupportedOperationException("FluidDuctBaseBlock is code-registered, not data-driven"); });
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     protected FluidDuctBaseBlock(Properties properties) {
         super(properties);
@@ -82,9 +90,9 @@ public abstract class FluidDuctBaseBlock extends BaseEntityBlock implements IAna
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         IPersistentNBT.onBlockHarvested(level, pos, player);
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     /**
@@ -103,7 +111,7 @@ public abstract class FluidDuctBaseBlock extends BaseEntityBlock implements IAna
     @Override
     public void changeTypeRecursively(Level level, BlockPos pos, FluidType prevType, FluidType type, int loopsRemaining) {
         if (!(level.getBlockEntity(pos) instanceof PipeBaseBlockEntity pipe)) return;
-        if (pipe.getType() != prevType || pipe.getType() == type) return;
+        if (pipe.getFluidType() != prevType || pipe.getFluidType() == type) return;
 
         pipe.setType(type);
         if (loopsRemaining <= 0) return;
@@ -120,7 +128,7 @@ public abstract class FluidDuctBaseBlock extends BaseEntityBlock implements IAna
     public List<String> getDebugInfo(Level level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof PipeBaseBlockEntity pipe)) return null;
 
-        FluidType type = pipe.getType();
+        FluidType type = pipe.getFluidType();
         if (type == null) return null;
 
         FluidNode node = (FluidNode) UniNodespace.getNode(level, pos, type.getNetworkProvider());

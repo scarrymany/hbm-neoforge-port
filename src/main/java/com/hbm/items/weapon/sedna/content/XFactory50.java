@@ -49,23 +49,23 @@ public final class XFactory50 {
     // for bmg50_sm) is preserved in each field's comment for whoever wires that family + Ammo Press.
 
     /** casing: LARGE x12 */
-    public static final Item ITEM_BMG50_SP = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_SP;
     /** casing: LARGE x12 */
-    public static final Item ITEM_BMG50_FMJ = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_FMJ;
     /** casing: LARGE x12 */
-    public static final Item ITEM_BMG50_JHP = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_JHP;
     /** casing: LARGE_STEEL x12 */
-    public static final Item ITEM_BMG50_AP = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_AP;
     /** casing: LARGE_STEEL x12 */
-    public static final Item ITEM_BMG50_DU = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_DU;
     /** casing: LARGE_STEEL x12 */
-    public static final Item ITEM_BMG50_HE = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_HE;
     /** casing: LARGE_STEEL x6 */
-    public static final Item ITEM_BMG50_SM = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_SM;
     /** secret round - EnumAmmoSecret.BMG50_BLACK, hidden from creative tab, see class javadoc. */
-    public static final Item ITEM_BMG50_BLACK = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_BLACK;
     /** secret round - EnumAmmoSecret.BMG50_EQUESTRIAN, hidden from creative tab, see class javadoc. */
-    public static final Item ITEM_BMG50_EQUESTRIAN = new Item(new Item.Properties());
+    public static Item ITEM_BMG50_EQUESTRIAN;
 
     /**
      * Reimplementation of CE's {@code Lego.tinyExplode(bullet, mop, range, 1F)} - see
@@ -102,22 +102,22 @@ public final class XFactory50 {
      */
     private static final BiConsumer<EntityBulletBaseMK4, HitResult> LAMBDA_BUILDING_STUB = (bullet, hr) -> bullet.discard();
 
-    public static final BulletConfig bmg50_sp = new BulletConfig("bmg50_sp").setItem(ITEM_BMG50_SP);
-    public static final BulletConfig bmg50_fmj = new BulletConfig("bmg50_fmj").setItem(ITEM_BMG50_FMJ)
+    public static final BulletConfig bmg50_sp = new BulletConfig("bmg50_sp").setItem(() -> ITEM_BMG50_SP);
+    public static final BulletConfig bmg50_fmj = new BulletConfig("bmg50_fmj").setItem(() -> ITEM_BMG50_FMJ)
             .setDamage(0.8F).setThresholdNegation(7F).setArmorPiercing(0.1F);
-    public static final BulletConfig bmg50_jhp = new BulletConfig("bmg50_jhp").setItem(ITEM_BMG50_JHP)
+    public static final BulletConfig bmg50_jhp = new BulletConfig("bmg50_jhp").setItem(() -> ITEM_BMG50_JHP)
             .setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F);
-    public static final BulletConfig bmg50_ap = new BulletConfig("bmg50_ap").setItem(ITEM_BMG50_AP)
+    public static final BulletConfig bmg50_ap = new BulletConfig("bmg50_ap").setItem(() -> ITEM_BMG50_AP)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(17.5F).setArmorPiercing(0.15F);
-    public static final BulletConfig bmg50_du = new BulletConfig("bmg50_du").setItem(ITEM_BMG50_DU)
+    public static final BulletConfig bmg50_du = new BulletConfig("bmg50_du").setItem(() -> ITEM_BMG50_DU)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(2.5F).setThresholdNegation(21F).setArmorPiercing(0.25F);
-    public static final BulletConfig bmg50_he = new BulletConfig("bmg50_he").setItem(ITEM_BMG50_HE)
+    public static final BulletConfig bmg50_he = new BulletConfig("bmg50_he").setItem(() -> ITEM_BMG50_HE)
             .setWear(3F).setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.75F).setOnImpact(LAMBDA_STANDARD_EXPLODE);
-    public static final BulletConfig bmg50_sm = new BulletConfig("bmg50_sm").setItem(ITEM_BMG50_SM)
+    public static final BulletConfig bmg50_sm = new BulletConfig("bmg50_sm").setItem(() -> ITEM_BMG50_SM)
             .setWear(10F).setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(2.5F).setThresholdNegation(30F).setArmorPiercing(0.35F);
-    public static final BulletConfig bmg50_black = new BulletConfig("bmg50_black").setItem(ITEM_BMG50_BLACK)
+    public static final BulletConfig bmg50_black = new BulletConfig("bmg50_black").setItem(() -> ITEM_BMG50_BLACK)
             .setWear(5F).setDoesPenetrate(true).setDamageFalloffByPen(false).setSpectral(true).setDamage(1.5F).setHeadshot(3F).setThresholdNegation(30F).setArmorPiercing(0.35F);
-    public static final BulletConfig bmg50_equestrian = new BulletConfig("bmg50_equestrian").setItem(ITEM_BMG50_EQUESTRIAN)
+    public static final BulletConfig bmg50_equestrian = new BulletConfig("bmg50_equestrian").setItem(() -> ITEM_BMG50_EQUESTRIAN)
             .setDamage(0F).setOnImpact(LAMBDA_BUILDING_STUB);
 
     // ==================== recoil (see XFactory556mm's javadoc - not currently wired anywhere, kept for 1:1 parity) ====================

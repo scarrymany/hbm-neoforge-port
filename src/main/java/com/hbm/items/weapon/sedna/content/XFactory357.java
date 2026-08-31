@@ -46,29 +46,29 @@ public final class XFactory357 {
     // family registered anywhere in this port yet). CE's casing type + count preserved per field below.
 
     /** casing: SMALL x16 */
-    public static final Item ITEM_M357_BP = new Item(new Item.Properties());
+    public static Item ITEM_M357_BP;
     /** casing: SMALL x8 */
-    public static final Item ITEM_M357_SP = new Item(new Item.Properties());
+    public static Item ITEM_M357_SP;
     /** casing: SMALL x8 */
-    public static final Item ITEM_M357_FMJ = new Item(new Item.Properties());
+    public static Item ITEM_M357_FMJ;
     /** casing: SMALL x8 */
-    public static final Item ITEM_M357_JHP = new Item(new Item.Properties());
+    public static Item ITEM_M357_JHP;
     /** casing: SMALL_STEEL x8 */
-    public static final Item ITEM_M357_AP = new Item(new Item.Properties());
+    public static Item ITEM_M357_AP;
     /** casing: SMALL x8 */
-    public static final Item ITEM_M357_EXPRESS = new Item(new Item.Properties());
+    public static Item ITEM_M357_EXPRESS;
 
-    public static final BulletConfig m357_bp = new BulletConfig("m357_bp").setItem(ITEM_M357_BP)
+    public static final BulletConfig m357_bp = new BulletConfig("m357_bp").setItem(() -> ITEM_M357_BP)
             .setDamage(0.75F).setBlackPowder(true);
-    public static final BulletConfig m357_sp = new BulletConfig("m357_sp").setItem(ITEM_M357_SP);
-    public static final BulletConfig m357_fmj = new BulletConfig("m357_fmj").setItem(ITEM_M357_FMJ)
+    public static final BulletConfig m357_sp = new BulletConfig("m357_sp").setItem(() -> ITEM_M357_SP);
+    public static final BulletConfig m357_fmj = new BulletConfig("m357_fmj").setItem(() -> ITEM_M357_FMJ)
             .setDamage(0.8F).setThresholdNegation(2F).setArmorPiercing(0.1F);
-    public static final BulletConfig m357_jhp = new BulletConfig("m357_jhp").setItem(ITEM_M357_JHP)
+    public static final BulletConfig m357_jhp = new BulletConfig("m357_jhp").setItem(() -> ITEM_M357_JHP)
             .setDamage(1.5F).setHeadshot(1.5F).setArmorPiercing(-0.25F);
-    public static final BulletConfig m357_ap = new BulletConfig("m357_ap").setItem(ITEM_M357_AP)
+    public static final BulletConfig m357_ap = new BulletConfig("m357_ap").setItem(() -> ITEM_M357_AP)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setDamage(1.5F).setThresholdNegation(5F)
             .setArmorPiercing(0.15F);
-    public static final BulletConfig m357_express = new BulletConfig("m357_express").setItem(ITEM_M357_EXPRESS)
+    public static final BulletConfig m357_express = new BulletConfig("m357_express").setItem(() -> ITEM_M357_EXPRESS)
             .setDoesPenetrate(true).setDamage(1.5F).setThresholdNegation(2F).setArmorPiercing(0.1F).setWear(1.5F);
 
     // ==================== recoil (see XFactory556mm's javadoc - not currently wired anywhere, kept for 1:1 parity) ====================

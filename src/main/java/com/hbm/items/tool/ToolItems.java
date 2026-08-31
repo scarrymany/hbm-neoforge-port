@@ -324,6 +324,7 @@ public final class ToolItems {
     public static final DeferredItem<Item> CASING_BAG = ModItems.ITEMS.register("casing_bag", () -> new ItemCasingBag(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> PLASTIC_BAG = ModItems.ITEMS.register("plastic_bag", () -> new ItemPlasticBag(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> CONTAINMENT_BOX = ModItems.ITEMS.register("containment_box", () -> new ItemLeadBox(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> REACHER = ModItems.ITEMS.register("reacher", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> TOOLBOX = ModItems.ITEMS.register("toolbox", () -> new ItemToolBox(new Item.Properties().stacksTo(1)));
 
     // ==================== Phase 3 (turret_system) ====================

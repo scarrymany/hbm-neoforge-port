@@ -1,0 +1,14 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "hbm:oil_bubble",
+    "hbm:bedrock_oil_deposit",
+    "hbm:oil_sand_bubble",
+    "hbm:meteorite",
+    "hbm:antenna",
+    "hbm:bunker",
+    "hbm:radio"
+  ],
+  "step": "underground_ores"
+}

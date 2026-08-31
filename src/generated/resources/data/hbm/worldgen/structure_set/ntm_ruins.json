@@ -1,0 +1,50 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 184018405,
+    "separation": 8,
+    "spacing": 16
+  },
+  "structures": [
+    {
+      "structure": "hbm:ntmruins_a",
+      "weight": 10
+    },
+    {
+      "structure": "hbm:ntmruins_b",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_c",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_d",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_e",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_f",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_g",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_h",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_i",
+      "weight": 12
+    },
+    {
+      "structure": "hbm:ntmruins_j",
+      "weight": 12
+    }
+  ]
+}

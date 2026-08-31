@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_glass_boron": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:glass_boron"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:tool/chemistry_set_boron"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_glass_boron"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:tool/chemistry_set_boron"
+    ]
+  }
+}

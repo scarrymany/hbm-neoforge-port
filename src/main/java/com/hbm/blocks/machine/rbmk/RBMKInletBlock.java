@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Standalone water-feed pipe stub, not an RBMK grid column - see
@@ -19,6 +20,13 @@ import org.jetbrains.annotations.Nullable;
  * {@code RBMKInlet} block class.
  */
 public class RBMKInletBlock extends BaseEntityBlock {
+
+    public static final MapCodec<RBMKInletBlock> CODEC = simpleCodec(RBMKInletBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public RBMKInletBlock(Properties properties) {
         super(properties);

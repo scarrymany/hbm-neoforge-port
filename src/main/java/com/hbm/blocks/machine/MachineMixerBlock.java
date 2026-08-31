@@ -15,9 +15,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /** Ported from CE's {@code MachineMixer} (regname {@code machine_mixer}): single-block, not dummyable. */
 public class MachineMixerBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachineMixerBlock> CODEC = simpleCodec(MachineMixerBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public MachineMixerBlock(Properties properties) {
         super(properties);

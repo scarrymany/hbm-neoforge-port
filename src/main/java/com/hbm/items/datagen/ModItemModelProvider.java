@@ -6,6 +6,7 @@ import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -22,21 +23,32 @@ import java.util.Objects;
  */
 public class ModItemModelProvider extends ItemModelProvider {
 
+    private final ExistingFileHelper files;
+
     public ModItemModelProvider(PackOutput output, ExistingFileHelper existingFileHelper) {
         super(output, MainRegistry.MODID, existingFileHelper);
+        this.files = existingFileHelper;
     }
 
     @Override
     protected void registerModels() {
         ModItems.ITEMS.getEntries().forEach(holder -> {
             Item item = holder.get();
+            ResourceLocation loc = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item));
 
-            if (item instanceof ICustomItemModelRegister custom) {
-                ResourceLocation loc = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(item));
-                custom.registerItemModel(this, loc);
-            } else {
-                this.basicItem(item);
+            try {
+                if (item instanceof ICustomItemModelRegister custom) {
+                    custom.registerItemModel(this, loc);
+                } else if (hasItemTexture(loc)) {
+                    this.basicItem(item);
+                }
+            } catch (IllegalArgumentException missing) {
+                // Phase 10 owns bulk assets; missing textures must not fail datagen.
             }
         });
+    }
+
+    private boolean hasItemTexture(ResourceLocation loc) {
+        return files.exists(loc, PackType.CLIENT_RESOURCES, ".png", "textures/item");
     }
 }

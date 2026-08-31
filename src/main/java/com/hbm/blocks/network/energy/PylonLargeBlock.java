@@ -21,6 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.PylonLarge} (read in full): the large-tier

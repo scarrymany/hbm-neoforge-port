@@ -62,22 +62,22 @@ public final class XFactoryAccelerator {
 
     // ==================== ammo ====================
 
-    public static final Item ITEM_TAU_URANIUM = new Item(new Item.Properties());
-    public static final Item ITEM_COIL_TUNGSTEN = new Item(new Item.Properties());
-    public static final Item ITEM_COIL_FERROURANIUM = new Item(new Item.Properties());
+    public static Item ITEM_TAU_URANIUM;
+    public static Item ITEM_COIL_TUNGSTEN;
+    public static Item ITEM_COIL_FERROURANIUM;
 
-    public static final BulletConfig tau_uranium = new BulletConfig("tau_uranium").setItem(ITEM_TAU_URANIUM)
+    public static final BulletConfig tau_uranium = new BulletConfig("tau_uranium").setItem(() -> ITEM_TAU_URANIUM)
             .setupDamageClass(DamageClass.SUBATOMIC).setBeam().setLife(5).setRenderRotations(false)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setOnBeamImpact(BulletConfig.LAMBDA_BEAM_HIT);
     /** Charged alt-fire round - spectral (ignores blocks), otherwise identical; never mag-loaded, only reached via {@link #LAMBDA_TAU_SECONDARY_RELEASE}. */
-    public static final BulletConfig tau_uranium_charge = new BulletConfig("tau_uranium_charge").setItem(ITEM_TAU_URANIUM)
+    public static final BulletConfig tau_uranium_charge = new BulletConfig("tau_uranium_charge").setItem(() -> ITEM_TAU_URANIUM)
             .setupDamageClass(DamageClass.SUBATOMIC).setBeam().setLife(5).setRenderRotations(false)
             .setDoesPenetrate(true).setDamageFalloffByPen(false).setSpectral(true).setOnBeamImpact(BulletConfig.LAMBDA_BEAM_HIT);
 
-    public static final BulletConfig coil_tungsten = new BulletConfig("coil_tungsten").setItem(ITEM_COIL_TUNGSTEN)
+    public static final BulletConfig coil_tungsten = new BulletConfig("coil_tungsten").setItem(() -> ITEM_COIL_TUNGSTEN)
             .setVel(7.5F).setLife(50).setDoesPenetrate(true).setDamageFalloffByPen(false).setSpectral(true)
             .setOnUpdate(entity -> breakInPath(entity, 1.25F));
-    public static final BulletConfig coil_ferrouranium = new BulletConfig("coil_ferrouranium").setItem(ITEM_COIL_FERROURANIUM)
+    public static final BulletConfig coil_ferrouranium = new BulletConfig("coil_ferrouranium").setItem(() -> ITEM_COIL_FERROURANIUM)
             .setVel(7.5F).setLife(50).setDoesPenetrate(true).setDamageFalloffByPen(false).setSpectral(true)
             .setOnUpdate(entity -> breakInPath(entity, 2.5F));
 

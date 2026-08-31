@@ -1,15 +1,12 @@
 package com.hbm.packet.toclient;
 
-import com.hbm.explosion.vanillant.standard.ExplosionEffectStandard;
+import com.hbm.client.ClientPackets;
 import com.hbm.main.MainRegistry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.ArrayList;
@@ -57,12 +54,8 @@ public record ExplosionEffectSyncPacket(double x, double y, double z, float size
         }
     };
 
-    @OnlyIn(Dist.CLIENT)
     public static void handleClient(ExplosionEffectSyncPacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (Minecraft.getInstance().level == null) return;
-            ExplosionEffectStandard.performClient(Minecraft.getInstance().level, packet.x, packet.y, packet.z, packet.size, packet.affectedBlocks);
-        });
+        ClientPackets.explosionEffect(packet, context);
     }
 
     @Override

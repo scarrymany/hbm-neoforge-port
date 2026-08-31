@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "hbm:ingot_bismuth"
+    },
+    "M": {
+      "item": "hbm:ingot_meteorite"
+    },
+    "P": {
+      "item": "hbm:starmetal_axe"
+    },
+    "T": {
+      "tag": "c:bolts/tungsten"
+    }
+  },
+  "pattern": [
+    " BM",
+    "BPB",
+    "TB "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:bismuth_axe"
+  }
+}

@@ -29,7 +29,7 @@ public class PipeGaugeBlockEntity extends PipeBaseBlockEntity implements IRORVal
         super.updateEntity();
 
         if (level != null && !level.isClientSide) {
-            if (node != null && node.net != null && getType() != Fluids.NONE) {
+            if (node != null && node.net != null && getFluidType() != Fluids.NONE) {
                 deltaTick = node.net.fluidTracker;
                 if (level.getGameTime() % 20L == 0) {
                     secondEMA.next(this.lastSecond = this.deltaSecond);

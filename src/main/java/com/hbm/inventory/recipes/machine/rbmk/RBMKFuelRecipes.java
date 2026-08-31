@@ -44,7 +44,7 @@ public final class RBMKFuelRecipes {
         String pelletId = RBMKRods.getPelletId(rodId.getPath());
         if (pelletId == null) return ItemStack.EMPTY;
 
-        Item pellet = BuiltInRegistries.ITEM.getValue(ResourceLocation.fromNamespaceAndPath("hbm", pelletId));
+        Item pellet = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath("hbm", pelletId));
         if (pellet == null || pellet == Items.AIR) return ItemStack.EMPTY;
 
         return new ItemStack(pellet, 8);

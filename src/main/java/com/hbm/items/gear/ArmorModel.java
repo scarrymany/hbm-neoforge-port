@@ -12,6 +12,8 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 import java.util.function.Consumer;
@@ -61,6 +63,7 @@ public class ArmorModel extends ArmorItem {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
             @Override
@@ -75,6 +78,7 @@ public class ArmorModel extends ArmorItem {
      * ModelBiped)}. Overridden by a Phase 5 leaf item to swap in a custom {@link Model}
      * (goggles/mask/cape/hat); the base class has no model of its own to offer.
      */
+    @OnlyIn(Dist.CLIENT)
     protected Model getGenericArmorModel(LivingEntity entity, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> original) {
         return original;
     }

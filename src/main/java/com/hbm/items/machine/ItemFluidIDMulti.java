@@ -78,9 +78,9 @@ public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier {
         FluidType handType = getType(stack, true);
         if (level.isClientSide) return InteractionResult.SUCCESS;
 
-        if (handType != duct.getType()) {
+        if (handType != duct.getFluidType()) {
             if (player != null && player.isShiftKeyDown()) {
-                spreadType(level, pos, handType, duct.getType(), SPREAD_LIMIT);
+                spreadType(level, pos, handType, duct.getFluidType(), SPREAD_LIMIT);
             } else {
                 duct.setType(handType);
             }
@@ -108,7 +108,7 @@ public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier {
     private static void spreadType(Level level, BlockPos pos, FluidType hand, FluidType pipe, int remaining) {
         if (remaining <= 0) return;
         if (!(level.getBlockEntity(pos) instanceof PipeBaseBlockEntity duct)) return;
-        if (duct.getType() != pipe) return;
+        if (duct.getFluidType() != pipe) return;
 
         duct.setType(hand);
         duct.setChanged();

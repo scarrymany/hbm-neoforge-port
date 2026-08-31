@@ -6,6 +6,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -265,11 +266,11 @@ public class ItemMissile extends Item {
         }
     }
 
-    private static Component bold(String s) {
+    private static MutableComponent bold(String s) {
         return Component.literal(s).withStyle(ChatFormatting.BOLD);
     }
 
-    private static Component gray(String s) {
+    private static MutableComponent gray(String s) {
         return Component.literal(s).withStyle(ChatFormatting.GRAY);
     }
 

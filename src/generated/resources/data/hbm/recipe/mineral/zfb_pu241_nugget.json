@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:nugget_zirconium"
+    },
+    {
+      "item": "hbm:nugget_zirconium"
+    },
+    {
+      "item": "hbm:nugget_zirconium"
+    },
+    {
+      "item": "hbm:nugget_u235"
+    },
+    {
+      "item": "hbm:nugget_pu240"
+    },
+    {
+      "item": "hbm:nugget_pu241"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:billet_zfb_pu241"
+  }
+}

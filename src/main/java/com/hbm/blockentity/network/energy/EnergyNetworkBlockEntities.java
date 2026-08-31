@@ -30,7 +30,8 @@ public final class EnergyNetworkBlockEntities {
     public static void registerAll() {
         CABLE = ModBlocks.BLOCK_ENTITY_TYPES.register("red_cable", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new CableBaseBlockEntity(CABLE.get(), pos, state),
-                EnergyNetworkBlocks.RED_CABLE.get(), EnergyNetworkBlocks.RED_CABLE_CLASSIC.get(), EnergyNetworkBlocks.RED_CABLE_BOX.get()
+                EnergyNetworkBlocks.RED_CABLE.get(), EnergyNetworkBlocks.RED_CABLE_CLASSIC.get(),
+                EnergyNetworkBlocks.RED_CABLE_BOX.get(), EnergyNetworkBlocks.RED_WIRE_COATED.get()
         ).build(null));
 
         CABLE_SWITCH = ModBlocks.BLOCK_ENTITY_TYPES.register("cable_switch", () -> BlockEntityType.Builder.of(

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:light_barrels/steel"
+    },
+    "P": [
+      {
+        "item": "hbm:ingot_polymer"
+      },
+      {
+        "item": "hbm:ingot_bakelite"
+      }
+    ]
+  },
+  "pattern": [
+    "P",
+    "B",
+    "P"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_silencer"
+  }
+}

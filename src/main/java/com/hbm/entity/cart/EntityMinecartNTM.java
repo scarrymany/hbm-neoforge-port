@@ -1,5 +1,6 @@
 package com.hbm.entity.cart;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -68,6 +69,16 @@ public abstract class EntityMinecartNTM extends AbstractMinecart {
         return true;
     }
 
+    @Override
+    public Type getMinecartType() {
+        return Type.RIDEABLE;
+    }
+
+    @Override
+    protected Item getDropItem() {
+        return getCartItem();
+    }
+
     /** CE: {@code getCartItem()} - each subclass's own item form. */
     public abstract Item getCartItem();
 
@@ -88,7 +99,7 @@ public abstract class EntityMinecartNTM extends AbstractMinecart {
     protected void killMinecart(DamageSource source) {
         this.discard();
         ItemStack stack = new ItemStack(getCartItem());
-        if (this.hasCustomName()) stack.setHoverName(this.getCustomName());
+        if (this.hasCustomName()) stack.set(DataComponents.CUSTOM_NAME, this.getCustomName());
         this.spawnAtLocation(stack, 0F);
     }
 

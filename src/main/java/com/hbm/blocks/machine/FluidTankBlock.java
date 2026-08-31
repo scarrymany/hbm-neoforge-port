@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Single-block TE-backed fluid storage tank - see {@link FluidTankBlockEntity}'s javadoc for why this
@@ -27,6 +28,13 @@ import org.jetbrains.annotations.Nullable;
  * CE's real 5x5-multiblock {@code machine_fluidtank}.
  */
 public class FluidTankBlock extends BaseEntityBlock {
+
+    public static final MapCodec<FluidTankBlock> CODEC = simpleCodec(FluidTankBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public FluidTankBlock(Properties properties) {
         super(properties);
@@ -62,9 +70,9 @@ public class FluidTankBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         IPersistentNBT.onBlockHarvested(level, pos, player);
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     /**

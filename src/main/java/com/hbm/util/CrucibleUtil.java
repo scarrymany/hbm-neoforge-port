@@ -6,6 +6,7 @@ import com.hbm.inventory.material.NTMMaterial;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -49,7 +50,7 @@ public final class CrucibleUtil {
 
         Vec3 start = new Vec3(x, y, z);
         Vec3 end = new Vec3(x, y - range, z);
-        BlockHitResult hit = level.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+        BlockHitResult hit = level.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
 
         ICrucibleAcceptor acceptor = getPouringTarget(level, hit);
         if (acceptor == null) {

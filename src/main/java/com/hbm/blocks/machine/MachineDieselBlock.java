@@ -15,9 +15,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /** Ported from CE's {@code MachineDiesel} (regname {@code machine_diesel}): single-block, not dummyable. */
 public class MachineDieselBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachineDieselBlock> CODEC = simpleCodec(MachineDieselBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public MachineDieselBlock(Properties properties) {
         super(properties);

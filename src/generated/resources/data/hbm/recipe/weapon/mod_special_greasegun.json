@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:light_barrels/weaponsteel"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "P": {
+      "item": "hbm:plate_dura_steel"
+    },
+    "R": {
+      "tag": "c:light_receivers/weaponsteel"
+    }
+  },
+  "pattern": [
+    "BRM",
+    "P G"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_greasegun"
+  }
+}

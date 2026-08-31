@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "hbm:ingot_cobalt"
+    },
+    "G": {
+      "item": "hbm:glass_boron"
+    },
+    "I": {
+      "item": "hbm:ingot_steel"
+    }
+  },
+  "pattern": [
+    "GIG",
+    "GCG"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:chemistry_set_boron"
+  }
+}

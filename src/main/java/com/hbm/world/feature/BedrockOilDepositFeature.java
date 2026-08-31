@@ -78,11 +78,9 @@ public class BedrockOilDepositFeature extends Feature<NoneFeatureConfiguration> 
         }
 
         if (placed) {
-            // OilSpot.generateOilSpot takes a real Level, not WorldGenLevel (WorldGenLevel is a plain
-            // LevelAccessor - its actual runtime implementation during chunk generation, WorldGenRegion,
-            // is not a Level at all) - route through the same WorldGenLevel#getLevel() conversion
-            // OreShapeUtil.dimension already uses.
-            OilSpot.generateOilSpot(OreShapeUtil.serverLevel(level), centerX, centerZ, OIL_SPOT_RADIUS, OIL_SPOT_COUNT, true);
+            // Pass WorldGenLevel, not ServerLevel: Level#getHeight during Feature#place deadlocks
+            // via ServerChunkCache.getChunk (CE OilSpot.java uses World.getHeight which is fine on 1.12).
+            OilSpot.generateOilSpot(level, centerX, centerZ, OIL_SPOT_RADIUS, OIL_SPOT_COUNT, true);
         }
         return placed;
     }

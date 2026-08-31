@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "D": [
+      {
+        "item": "hbm:ingot_polymer"
+      },
+      {
+        "item": "hbm:ingot_bakelite"
+      }
+    ],
+    "P": {
+      "tag": "c:dense_wires/gold"
+    },
+    "S": {
+      "item": "hbm:capacitor_gold_pack"
+    }
+  },
+  "pattern": [
+    "DSD",
+    "PPP",
+    "DSD"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_engine_electric"
+  }
+}

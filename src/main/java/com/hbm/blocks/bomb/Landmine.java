@@ -49,6 +49,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 
 import java.util.List;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.bomb.Landmine} (270 lines, read in full) -
@@ -69,6 +70,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * cloud is kept.
  */
 public class Landmine extends BaseEntityBlock implements IBomb {
+
+    public static final MapCodec<Landmine> CODEC = simpleCodec(p -> new Landmine(p, 0.0D, 0.0D));
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     private static final VoxelShape AP_SHAPE = Block.box(5, 0, 5, 11, 1, 11);
     private static final VoxelShape HE_SHAPE = Block.box(4, 0, 4, 12, 2, 12);

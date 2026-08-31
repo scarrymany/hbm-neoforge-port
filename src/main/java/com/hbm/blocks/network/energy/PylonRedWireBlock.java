@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.PylonRedWire} (read in full) - a plain

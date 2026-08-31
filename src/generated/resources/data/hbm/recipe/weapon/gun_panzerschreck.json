@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:heavy_barrels/workersalloy"
+    },
+    "G": {
+      "tag": "c:grips/workersalloy"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/gunmetal"
+    },
+    "P": {
+      "tag": "c:plates_triple/steel"
+    }
+  },
+  "pattern": [
+    "BBB",
+    "PGM"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_panzerschreck"
+  }
+}

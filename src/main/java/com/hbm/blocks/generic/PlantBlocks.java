@@ -208,7 +208,7 @@ public final class PlantBlocks {
 
     private static void registerReeds() {
         REEDS = registerBlock("plant_reeds",
-                () -> new BlockReeds(BlockBehaviour.Properties.of().noCollission().instabreak().sound(SoundType.PLANT).noOcclusion()),
+                () -> new BlockReeds(BlockBehaviour.Properties.of().noCollission().instabreak().sound(SoundType.GRASS).noOcclusion()),
                 ModCreativeTabs.BLOCKS);
     }
 

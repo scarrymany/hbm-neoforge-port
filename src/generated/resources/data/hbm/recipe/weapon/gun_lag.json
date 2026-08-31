@@ -1,0 +1,41 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": [
+      {
+        "tag": "c:light_barrels/tcalloy"
+      },
+      {
+        "tag": "c:light_barrels/cdalloy"
+      }
+    ],
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "R": [
+      {
+        "tag": "c:light_receivers/tcalloy"
+      },
+      {
+        "tag": "c:light_receivers/cdalloy"
+      }
+    ]
+  },
+  "pattern": [
+    "BRM",
+    "  G"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_lag"
+  }
+}

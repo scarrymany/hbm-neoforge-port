@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "item": "hbm:ingot_gunmetal"
+    },
+    "P": {
+      "item": "hbm:plate_weaponsteel"
+    },
+    "W": {
+      "tag": "c:dense_wires/gold"
+    }
+  },
+  "pattern": [
+    "PIP",
+    "WWW",
+    "PIP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_speedup"
+  }
+}

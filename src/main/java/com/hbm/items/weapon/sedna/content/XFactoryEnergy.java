@@ -84,28 +84,28 @@ public final class XFactoryEnergy {
     // javadoc for the same omission on cased ammo) - CE's own energy rounds consume ingot_polymer as
     // a raw-material "capacitor" cost via .setCasing(...), not tracked here for the same reason.
 
-    public static final Item ITEM_CAPACITOR = new Item(new Item.Properties());
-    public static final Item ITEM_CAPACITOR_OVERCHARGE = new Item(new Item.Properties());
-    public static final Item ITEM_CAPACITOR_IR = new Item(new Item.Properties());
+    public static Item ITEM_CAPACITOR;
+    public static Item ITEM_CAPACITOR_OVERCHARGE;
+    public static Item ITEM_CAPACITOR_IR;
 
-    public static final BulletConfig energy_tesla = new BulletConfig("energy_tesla").setItem(ITEM_CAPACITOR)
+    public static final BulletConfig energy_tesla = new BulletConfig("energy_tesla").setItem(() -> ITEM_CAPACITOR)
             .setupDamageClass(DamageClass.ELECTRIC).setBeam().setSpread(0F).setLife(5).setRenderRotations(false).setDoesPenetrate(true)
             .setOnBeamImpact(XFactoryEnergy::lightningHit);
-    public static final BulletConfig energy_tesla_overcharge = new BulletConfig("energy_tesla_overcharge").setItem(ITEM_CAPACITOR_OVERCHARGE)
+    public static final BulletConfig energy_tesla_overcharge = new BulletConfig("energy_tesla_overcharge").setItem(() -> ITEM_CAPACITOR_OVERCHARGE)
             .setupDamageClass(DamageClass.ELECTRIC).setBeam().setSpread(0F).setLife(5).setRenderRotations(false).setDoesPenetrate(true)
             .setDamage(1.5F).setOnBeamImpact(XFactoryEnergy::lightningHit);
-    public static final BulletConfig energy_tesla_ir = new BulletConfig("energy_tesla_ir").setItem(ITEM_CAPACITOR_IR)
+    public static final BulletConfig energy_tesla_ir = new BulletConfig("energy_tesla_ir").setItem(() -> ITEM_CAPACITOR_IR)
             .setupDamageClass(DamageClass.ELECTRIC).setBeam().setSpread(0F).setLife(5).setRenderRotations(false)
             .setDamage(0.8F).setOnBeamImpact(XFactoryEnergy::lightningSplit);
-    public static final BulletConfig energy_tesla_ir_sub = new BulletConfig("energy_tesla_ir_sub").setItem(ITEM_CAPACITOR_IR)
+    public static final BulletConfig energy_tesla_ir_sub = new BulletConfig("energy_tesla_ir_sub").setItem(() -> ITEM_CAPACITOR_IR)
             .setupDamageClass(DamageClass.ELECTRIC).setBeam().setSpread(0F).setLife(3).setWear(3F).setRenderRotations(false).setDoesPenetrate(true)
             .setDamage(0.5F).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
 
-    public static final BulletConfig energy_las = new BulletConfig("energy_las").setItem(ITEM_CAPACITOR)
+    public static final BulletConfig energy_las = new BulletConfig("energy_las").setItem(() -> ITEM_CAPACITOR)
             .setupDamageClass(DamageClass.LASER).setBeam().setSpread(0F).setLife(5).setRenderRotations(false).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
-    public static final BulletConfig energy_las_overcharge = new BulletConfig("energy_las_overcharge").setItem(ITEM_CAPACITOR_OVERCHARGE)
+    public static final BulletConfig energy_las_overcharge = new BulletConfig("energy_las_overcharge").setItem(() -> ITEM_CAPACITOR_OVERCHARGE)
             .setupDamageClass(DamageClass.LASER).setBeam().setSpread(0F).setLife(5).setRenderRotations(false).setDoesPenetrate(true).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
-    public static final BulletConfig energy_las_ir = new BulletConfig("energy_las_ir").setItem(ITEM_CAPACITOR_IR)
+    public static final BulletConfig energy_las_ir = new BulletConfig("energy_las_ir").setItem(() -> ITEM_CAPACITOR_IR)
             .setupDamageClass(DamageClass.FIRE).setBeam().setSpread(0F).setLife(5).setRenderRotations(false).setOnBeamImpact(XFactoryEnergy::irHit);
 
     public static final BulletConfig energy_emerald = energy_las.clone("energy_emerald").setArmorPiercing(0.5F).setThresholdNegation(10F);

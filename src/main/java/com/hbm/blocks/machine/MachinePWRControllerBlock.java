@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code MachinePWRController} (regname {@code pwr_controller}, read in full).
@@ -56,6 +57,13 @@ import java.util.Map;
  * documented substitution) - same information reaches the player, different presentation.
  */
 public class MachinePWRControllerBlock extends BaseEntityBlock {
+
+    public static final MapCodec<MachinePWRControllerBlock> CODEC = simpleCodec(MachinePWRControllerBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 

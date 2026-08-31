@@ -1,0 +1,8 @@
+{
+  "values": [
+    "hbm:nuclear_blast",
+    "hbm:blast",
+    "hbm:tau_blast",
+    "hbm:sedna_explosion"
+  ]
+}

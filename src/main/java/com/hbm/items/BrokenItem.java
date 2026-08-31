@@ -37,9 +37,7 @@ public class BrokenItem extends ItemBase {
      * Wraps a copy of the given stack (count 1) into a broken_item stack, preserving the
      * original stack's count as the broken_item's own count - matching CE's make(ItemStack).
      *
-     * Depends on ModItems.BROKEN_ITEM, which does not exist yet: Phase 1 must register a
-     * DeferredItem<Item> named BROKEN_ITEM in ModItems backed by this class for this method to
-     * compile.
+     * Depends on SpecialItems.BROKEN_ITEM (registered as {@code hbm:broken_item}).
      */
     public static ItemStack make(ItemStack stack) {
         return make(stack, stack.getCount());
@@ -50,7 +48,7 @@ public class BrokenItem extends ItemBase {
     }
 
     public static ItemStack make(ItemStack stack, int stackSize) {
-        ItemStack broken = new ItemStack(ModItems.BROKEN_ITEM.get(), stackSize);
+        ItemStack broken = new ItemStack(com.hbm.items.special.SpecialItems.BROKEN_ITEM.get(), stackSize);
         broken.set(HbmDataComponents.WRAPPED_ITEM.get(), stack.copyWithCount(1));
         return broken;
     }

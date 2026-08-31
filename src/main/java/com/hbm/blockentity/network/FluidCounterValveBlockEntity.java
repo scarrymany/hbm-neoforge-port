@@ -40,7 +40,7 @@ public class FluidCounterValveBlockEntity extends PipeBaseBlockEntity implements
     }
 
     private void updateCounter() {
-        if (node != null && node.net != null && getType() != Fluids.NONE) {
+        if (node != null && node.net != null && getFluidType() != Fluids.NONE) {
             counter += node.net.fluidTracker;
         }
     }

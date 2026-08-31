@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_billet": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:billet_ra226"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:mineral/ra226_ingot_from_billet"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_billet"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:mineral/ra226_ingot_from_billet"
+    ]
+  }
+}

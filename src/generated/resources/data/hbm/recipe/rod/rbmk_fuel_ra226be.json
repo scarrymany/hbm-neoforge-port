@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rbmk_fuel_empty"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    },
+    {
+      "item": "hbm:billet_ra226be"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:rbmk_fuel_ra226be"
+  }
+}

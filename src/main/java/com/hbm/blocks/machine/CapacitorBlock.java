@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Directional HE capacitor, ported from CE's {@code com.hbm.blocks.machine.MachineCapacitor} (read
@@ -32,6 +33,13 @@ import org.jetbrains.annotations.Nullable;
  * scope notes, including one documented facing-rotation simplification.
  */
 public class CapacitorBlock extends BaseEntityBlock {
+
+    public static final MapCodec<CapacitorBlock> CODEC = simpleCodec(p -> new CapacitorBlock(p, 0L));
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
@@ -87,8 +95,8 @@ public class CapacitorBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         IPersistentNBT.onBlockHarvested(level, pos, player);
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 }

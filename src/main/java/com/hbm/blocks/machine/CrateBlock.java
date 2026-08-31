@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Mass storage crate block, ported from CE's {@code com.hbm.blocks.generic.BlockStorageCrate}
@@ -60,6 +61,13 @@ import org.jetbrains.annotations.Nullable;
  * not a new abstract class, is where the interface lands.
  */
 public class CrateBlock extends BaseEntityBlock implements IRadResistantBlock, BlockStorageCrate {
+
+    public static final MapCodec<CrateBlock> CODEC = simpleCodec(p -> new CrateBlock(p, CrateType.IRON));
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -131,9 +139,9 @@ public class CrateBlock extends BaseEntityBlock implements IRadResistantBlock, B
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         IPersistentNBT.onBlockHarvested(level, pos, player);
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     /**

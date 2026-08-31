@@ -45,6 +45,9 @@ public final class OilMeteorPlacedFeatures {
     public static final ResourceKey<PlacedFeature> BEDROCK_OIL_DEPOSIT = key("bedrock_oil_deposit");
     public static final ResourceKey<PlacedFeature> OIL_SAND_BUBBLE = key("oil_sand_bubble");
     public static final ResourceKey<PlacedFeature> METEORITE = key("meteorite");
+    public static final ResourceKey<PlacedFeature> ANTENNA = key("antenna");
+    public static final ResourceKey<PlacedFeature> BUNKER = key("bunker");
+    public static final ResourceKey<PlacedFeature> RADIO = key("radio");
 
     private OilMeteorPlacedFeatures() {
     }
@@ -56,6 +59,9 @@ public final class OilMeteorPlacedFeatures {
         register(context, BEDROCK_OIL_DEPOSIT, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.BEDROCK_OIL_DEPOSIT), SURFACE_MODIFIERS);
         register(context, OIL_SAND_BUBBLE, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.OIL_SAND_BUBBLE), SURFACE_MODIFIERS);
         register(context, METEORITE, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.METEORITE), SURFACE_MODIFIERS);
+        register(context, ANTENNA, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.ANTENNA), SURFACE_MODIFIERS);
+        register(context, BUNKER, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.BUNKER), SURFACE_MODIFIERS);
+        register(context, RADIO, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.RADIO), SURFACE_MODIFIERS);
     }
 
     private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,

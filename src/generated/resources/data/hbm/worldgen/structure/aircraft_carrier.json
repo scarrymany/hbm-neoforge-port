@@ -1,0 +1,12 @@
+{
+  "type": "hbm:nbt_poi",
+  "biome_gate": "ocean",
+  "biomes": "#minecraft:is_ocean",
+  "config_gate": "ocean",
+  "fixed_y": 0,
+  "height_offset": -6,
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "template": "aircraft_carrier",
+  "terrain_adaptation": "beard_thin"
+}

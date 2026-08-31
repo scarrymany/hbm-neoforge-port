@@ -10,10 +10,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * Generic barrel shell, ported from CE's {@code BaseBarrel}. CE's Red/Yellow barrel subclasses
- * (explosive/nuclear-waste content) are deferred to their own explosion/radiation systems (Phase 2)
- * per the research report; this base shape is Phase-1-safe and left open for those future
- * subclasses to extend.
+ * Generic barrel shell, ported from CE's {@code BaseBarrel}. Subclasses
+ * {@link RedBarrel} / {@link YellowBarrel} are registered from {@link GenericCrateBlocks}.
  */
 public class BaseBarrel extends Block {
 

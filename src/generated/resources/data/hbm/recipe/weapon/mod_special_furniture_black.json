@@ -1,0 +1,41 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "D": {
+      "item": "minecraft:black_dye"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "P": [
+      {
+        "item": "hbm:ingot_polymer"
+      },
+      {
+        "item": "hbm:ingot_bakelite"
+      }
+    ],
+    "S": [
+      {
+        "tag": "c:stocks/polymer"
+      },
+      {
+        "tag": "c:stocks/bakelite"
+      }
+    ]
+  },
+  "pattern": [
+    "PDS",
+    "  G"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_furniture_black"
+  }
+}

@@ -19,6 +19,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.CableDiode} (read in full; block half only -
@@ -28,6 +30,13 @@ import net.minecraft.world.phys.BlockHitResult;
  * energy logic - unlike {@link BlockCable}'s mask, which also drives collision shape).
  */
 public class CableDiodeBlock extends BaseEntityBlock {
+
+    public static final MapCodec<CableDiodeBlock> CODEC = simpleCodec(CableDiodeBlock::new);
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 

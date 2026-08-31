@@ -33,6 +33,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.Direction;
@@ -607,7 +608,7 @@ public abstract class TurretBaseBlockEntity extends MachineBaseBlockEntity
         // own - vanilla's ClipContext accepts a @Nullable entity (falls back to
         // CollisionContext.empty() internally), matching CE's own entity-less
         // Library.isObstructedOpaque raytrace exactly.
-        ClipContext ctx = new ClipContext(pos, ent, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
+        ClipContext ctx = new ClipContext(pos, ent, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
         return level.clip(ctx).getType() == HitResult.Type.MISS;
     }
 

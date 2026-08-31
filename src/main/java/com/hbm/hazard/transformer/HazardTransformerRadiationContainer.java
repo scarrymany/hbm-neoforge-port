@@ -4,8 +4,7 @@ import com.hbm.blocks.generic.BlockStorageCrate;
 import com.hbm.hazard.HazardEntry;
 import com.hbm.hazard.HazardRegistry;
 import com.hbm.hazard.HazardSystem;
-import com.hbm.items.ModItems;
-import com.hbm.util.BobMathUtil;
+import com.hbm.items.tool.ToolItems;
 import com.hbm.util.ItemStackUtil;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -30,8 +29,8 @@ public class HazardTransformerRadiationContainer implements IHazardTransformer {
     public void transformPost(final ItemStack stack, final List<HazardEntry> entries) {
 
         final boolean isCrate = stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof BlockStorageCrate;
-        final boolean isBox = stack.getItem() == ModItems.containment_box;
-        final boolean isBag = stack.getItem() == ModItems.plastic_bag;
+        final boolean isBox = stack.getItem() == ToolItems.CONTAINMENT_BOX.get();
+        final boolean isBag = stack.getItem() == ToolItems.PLASTIC_BAG.get();
 
         if (!isCrate && !isBox && !isBag) return;
         // Mirrors a CE quirk: this second guard makes the isBag branch below unreachable, so plastic
@@ -54,7 +53,7 @@ public class HazardTransformerRadiationContainer implements IHazardTransformer {
                 }
             }
 
-            radiation = BobMathUtil.sqrt(radiation);
+            radiation = Math.sqrt(radiation);
         }
 
         if (isBag) {

@@ -20,6 +20,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.List;
+import com.mojang.serialization.MapCodec;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.PylonBase} (abstract shared base for
@@ -37,6 +38,13 @@ import java.util.List;
  * non-solid contract) so players are not blocked or shown a placeholder cube hitbox in the meantime.
  */
 public abstract class PylonBaseBlock extends BaseEntityBlock implements ITooltipProvider {
+
+    public static final MapCodec<PylonBaseBlock> CODEC = simpleCodec(p -> { throw new UnsupportedOperationException("PylonBaseBlock is code-registered, not data-driven"); });
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     protected PylonBaseBlock(Properties properties) {
         super(properties);

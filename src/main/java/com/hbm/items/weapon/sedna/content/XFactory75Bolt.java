@@ -45,14 +45,14 @@ public final class XFactory75Bolt {
     // not this port's usual "casing item family not registered yet" omission, it's CE's own genuine
     // behavior for this caliber (see class javadoc).
 
-    public static final Item ITEM_B75 = new Item(new Item.Properties());
-    public static final Item ITEM_B75_INC = new Item(new Item.Properties());
-    public static final Item ITEM_B75_EXP = new Item(new Item.Properties());
+    public static Item ITEM_B75;
+    public static Item ITEM_B75_INC;
+    public static Item ITEM_B75_EXP;
 
-    public static final BulletConfig b75 = new BulletConfig("b75").setItem(ITEM_B75);
-    public static final BulletConfig b75_inc = new BulletConfig("b75_inc").setItem(ITEM_B75_INC)
+    public static final BulletConfig b75 = new BulletConfig("b75").setItem(() -> ITEM_B75);
+    public static final BulletConfig b75_inc = new BulletConfig("b75_inc").setItem(() -> ITEM_B75_INC)
             .setDamage(0.8F).setArmorPiercing(0.1F);
-    public static final BulletConfig b75_exp = new BulletConfig("b75_exp").setItem(ITEM_B75_EXP)
+    public static final BulletConfig b75_exp = new BulletConfig("b75_exp").setItem(() -> ITEM_B75_EXP)
             .setDamage(1.5F).setArmorPiercing(-0.25F);
 
     // ==================== recoil (see XFactory556mm's javadoc - not currently wired anywhere, kept for 1:1 parity) ====================

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_precursor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:billet_ra226"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:mineral/bealloy_billet_ra226be_small"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_precursor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:mineral/bealloy_billet_ra226be_small"
+    ]
+  }
+}

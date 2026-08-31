@@ -1,0 +1,12 @@
+// 1.21.1	2026-08-31T20:22:26.935722578	Tags for minecraft:damage_type mod id hbm
+3367bcc5676e7e0cbfbe72126635d32945e4a1d2 data/hbm/tags/damage_type/absolute.json
+c7e70d53eb843450608b9c11bfb7f1c911d20920 data/hbm/tags/damage_type/is_energy.json
+328cba4118fcacf6a4076d101670e15f411208f1 data/hbm/tags/damage_type/is_subatomic.json
+d83f303025ebe2f5d4f25daccc2fa286590e232e data/hbm/tags/damage_type/is_tau.json
+6871e5a08b268a38f84ac0ee98a545bdae960df0 data/minecraft/tags/damage_type/bypasses_armor.json
+3367bcc5676e7e0cbfbe72126635d32945e4a1d2 data/minecraft/tags/damage_type/bypasses_effects.json
+3b1cb465893aae06d3d2db370c81b213615ab177 data/minecraft/tags/damage_type/bypasses_invulnerability.json
+ac4cc3b79fc4991ba2964f33ec0ea148a29bf733 data/minecraft/tags/damage_type/bypasses_resistance.json
+f7565657b3e0051cc4372f0f9639599a5bf24831 data/minecraft/tags/damage_type/is_explosion.json
+cdc78d1edbfe449d9faae11f397b4487cae2bb77 data/minecraft/tags/damage_type/is_fire.json
+fec4b1d7901f8ce961b322e26a55d30bcda0f0d3 data/minecraft/tags/damage_type/is_projectile.json

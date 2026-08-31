@@ -1,22 +1,18 @@
 package com.hbm.entity.mob;
 
 import com.hbm.main.MainRegistry;
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.BiomeModifiers.AddSpawnsBiomeModifier;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,15 +57,11 @@ public final class CreeperVariantBiomeModifiers {
     public static void bootstrap(BootstrapContext<BiomeModifier> context) {
         HolderGetter<Biome> biomes = context.lookup(Registries.BIOME);
 
-        List<Holder<Biome>> overworldExceptMushroom = new ArrayList<>();
-        for (Holder<Biome> holder : biomes.getOrThrow(BiomeTags.IS_OVERWORLD)) {
-            if (!holder.is(Biomes.MUSHROOM_FIELDS)) {
-                overworldExceptMushroom.add(holder);
-            }
-        }
-
+        // Cannot iterate IS_OVERWORLD during RegistrySetBuilder construction (tag not
+        // dereferenceable). Pass the named tag HolderSet through; mushroom-fields exclusion
+        // (CE EntityMappings) is a documented follow-up, not a datagen-time filter.
         context.register(ADD_CREEPER_VARIANT_SPAWNS, new AddSpawnsBiomeModifier(
-                HolderSet.direct(overworldExceptMushroom),
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
                 List.of(
                         new MobSpawnSettings.SpawnerData(CreeperVariantEntityTypes.CREEPER_PHOSGENE.get(), 5, 1, 1),
                         new MobSpawnSettings.SpawnerData(CreeperVariantEntityTypes.CREEPER_VOLATILE.get(), 10, 1, 1),

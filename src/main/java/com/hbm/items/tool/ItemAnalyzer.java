@@ -64,7 +64,7 @@ public class ItemAnalyzer extends Item {
             }
 
             if (te instanceof PipeBaseBlockEntity pipe) {
-                player.displayClientMessage(Component.literal("Duct Type: ").append(pipe.getType().getLocalizedName()), false);
+                player.displayClientMessage(Component.literal("Duct Type: ").append(pipe.getFluidType().getLocalizedName()), false);
             }
 
             if (te instanceof PylonBaseBlockEntity pylon) {

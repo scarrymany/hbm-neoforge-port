@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities;
 
 /**
  * Ported from CE's {@code com.hbm.blocks.network.energy.BlockCable} (read in full): a plain 6-way
