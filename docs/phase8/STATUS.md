@@ -47,7 +47,7 @@ This slice landed code, not another research dump. Gaps below are still open.
 
 ## Verification (this follow-up)
 
-- `./gradlew compileJava` — green after config + Dist packet fixes.
+- `./gradlew compileJava` / `./gradlew build` — green. Jar `build/libs/hbm-0.0.1.jar` **5,991,369** bytes.
 - `./gradlew runData` — **SUCCESS** (previous slice; 2984 files). Generated tree committed.
 - `./gradlew runServer` — **SUCCESS.** Dedicated-server `"Done (0.592s)!"` on `d7418d2`.
   Fixed this turn: `defineInList` `List.of().contains(null)` NPE (`f387aee`); `@OnlyIn`
