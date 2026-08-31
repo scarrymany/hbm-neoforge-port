@@ -15,6 +15,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.FlyingMob;
 import net.minecraft.world.entity.LivingEntity;
@@ -406,5 +407,18 @@ public class EntityHunterChopper extends FlyingMob implements Enemy, IRadiationI
     public void stopSeenByPlayer(net.minecraft.server.level.ServerPlayer player) {
         super.stopSeenByPlayer(player);
         this.bossEvent.removePlayer(player);
+    }
+
+    /**
+     * Not a CE port - a correctness fix matching {@code EntityMaskMan}'s identical override: without
+     * clearing {@link #bossEvent} on removal, the boss bar would stay stuck on every tracking player's
+     * screen forever after this entity dies/unloads, since {@link ServerBossEvent} is not itself tied
+     * to this entity's lifecycle. Matches vanilla {@code EnderDragon}/{@code WitherBoss}'s own
+     * {@code remove(RemovalReason)} override for exactly this purpose.
+     */
+    @Override
+    public void remove(Entity.RemovalReason reason) {
+        super.remove(reason);
+        this.bossEvent.removeAllPlayers();
     }
 }

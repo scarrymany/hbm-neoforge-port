@@ -1,5 +1,6 @@
 package com.hbm.packet.toserver;
 
+import com.hbm.capability.HbmPlayerAttachment;
 import com.hbm.handler.HbmKeybinds;
 import com.hbm.items.IKeybindReceiver;
 import com.hbm.main.MainRegistry;
@@ -54,10 +55,22 @@ public record KeybindPacket(HbmKeybinds.EnumKeybind keybind, boolean state) impl
      * IKeybindReceiver#canHandleKeybind} agrees this keybind is relevant to it - mirroring CE's own
      * server-side keybind-packet handler, which performs the same held-item resolution and
      * {@code canHandleKeybind} gate before dispatching.
+     * <p>
+     * <b>Second pre-existing gap this method fixes:</b> CE's own server-side handler
+     * ({@code HbmKeybindsServer.onPressedServer}) always does two things - dispatch to the held
+     * item's keybind receiver, and record the raw press/release state onto the player's own
+     * capability (which is what CE's {@code getKeyPressed}/{@code isJetpackActive} and the
+     * {@code TOGGLE_JETPACK}/{@code TOGGLE_HEAD}/{@code TOGGLE_MAGNET} toggle logic actually read).
+     * This handler previously only did the first half, so {@link HbmPlayerAttachment#setKeyPressed}
+     * was defined but never called from anywhere - silently breaking every fueled jetpack's thrust
+     * (gated on {@code isJetpackActive()}), the 3 toggle keybinds, and {@code PipeBaseBlockEntity}'s
+     * {@code TOOL_CTRL} branch, all of which always read the Java-default {@code false}.
      */
     public static void handleServer(KeybindPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             Player player = context.player();
+
+            HbmPlayerAttachment.getData(player).setKeyPressed(packet.keybind(), packet.state());
 
             ItemStack mainHand = player.getMainHandItem();
             if (mainHand.getItem() instanceof IKeybindReceiver receiver

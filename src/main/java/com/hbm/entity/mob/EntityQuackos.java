@@ -152,4 +152,17 @@ public class EntityQuackos extends EntityDuck {
         super.stopSeenByPlayer(player);
         this.bossEvent.removePlayer(player);
     }
+
+    /**
+     * Not a CE port - a correctness fix matching {@code EntityMaskMan}'s identical override: without
+     * clearing {@link #bossEvent} on removal, the boss bar would stay stuck on every tracking player's
+     * screen forever after this entity dies/unloads, since {@link ServerBossEvent} is not itself tied
+     * to this entity's lifecycle. Matches vanilla {@code EnderDragon}/{@code WitherBoss}'s own
+     * {@code remove(RemovalReason)} override for exactly this purpose.
+     */
+    @Override
+    public void remove(Entity.RemovalReason reason) {
+        super.remove(reason);
+        this.bossEvent.removeAllPlayers();
+    }
 }
