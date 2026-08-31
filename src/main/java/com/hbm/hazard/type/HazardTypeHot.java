@@ -23,7 +23,7 @@ public class HazardTypeHot implements IHazardType {
         final boolean wetOrReacher = HazardHelper.isHoldingReacher(target) || target.isInWaterOrRain();
         if (RadiationConfig.DISABLE_HOT.get() || wetOrReacher) return;
         if (target instanceof Player player && player.isCreative()) return;
-        target.setRemainingFireTicks((int) Math.ceil(level) * hazardRate);
+        target.setRemainingFireTicks((int) Math.ceil(level) * IHazardType.hazardRate());
     }
 
     @Override

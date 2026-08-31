@@ -1,6 +1,7 @@
 package com.hbm.capability;
 
 import com.hbm.api.energymk2.IBatteryItem;
+import com.hbm.inventory.FluidContainerRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -31,6 +32,13 @@ public final class ModCapabilities {
     private ModCapabilities() {}
 
     public static void register(RegisterCapabilitiesEvent event) {
+        // Must run before NTMFluidCapabilityHandler.initialize() below: that method's own javadoc
+        // requires FluidContainerRegistry to already be populated, and nothing else in this port calls
+        // FluidContainerRegistry.register() (CE calls it from FMLPostInitializationEvent - this port
+        // has no direct analog wired to that registry yet, so the call is anchored here instead, right
+        // before the one thing that actually needs its output). Idempotent on both sides, so this is
+        // safe however many times RegisterCapabilitiesEvent ends up firing.
+        FluidContainerRegistry.register();
         NTMFluidCapabilityHandler.initialize();
 
         List<ItemLike> batteryItems = BuiltInRegistries.ITEM.stream()

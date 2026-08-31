@@ -19,6 +19,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  *     {@link com.hbm.hazard.transformer.HazardTransformerRadiationNBT}</li>
  *     <li>{@code timer} (int) -&gt; {@link #UNSTABLE_DECAY_TIMER} - see
  *     {@link com.hbm.hazard.type.HazardTypeUnstable}</li>
+ *     <li>{@code cRads} (double, CE's {@code BlockStorageCrate.CRATE_RAD_KEY}) -&gt;
+ *     {@link #CRATE_RAD_KEY} - see {@link com.hbm.blocks.generic.BlockStorageCrate}, which
+ *     re-exposes this same holder under the name its consumer code
+ *     ({@link com.hbm.hazard.transformer.HazardTransformerRadiationContainer}) expects</li>
  * </ul>
  */
 public class HazardComponents {
@@ -36,6 +40,19 @@ public class HazardComponents {
             DATA_COMPONENT_TYPES.register("unstable_decay_timer", () -> DataComponentType.<Integer>builder()
                     .persistent(Codec.INT)
                     .networkSynchronized(ByteBufCodecs.VAR_INT)
+                    .build());
+
+    /**
+     * Contained-item radiation carried by a dropped {@link com.hbm.blocks.generic.BlockStorageCrate}
+     * item (CE: raw {@code double} NBT tag {@code "cRads"}, written straight onto the dropped item's
+     * root NBT compound - see {@code upstream/hbm-ce}'s {@code BlockStorageCrate#CRATE_RAD_KEY} and
+     * {@code TileEntityCrateBase#applyDropData}/{@code #assembleDropTag}). {@code Double}, not
+     * {@code Float}, to match CE's {@code NBTTagCompound#setDouble}/{@code #getDouble} exactly.
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> CRATE_RAD_KEY =
+            DATA_COMPONENT_TYPES.register("crate_rad_key", () -> DataComponentType.<Double>builder()
+                    .persistent(Codec.DOUBLE)
+                    .networkSynchronized(ByteBufCodecs.DOUBLE)
                     .build());
 
     public static void register(final IEventBus modEventBus) {

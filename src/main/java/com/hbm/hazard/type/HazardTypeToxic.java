@@ -36,7 +36,7 @@ public class HazardTypeToxic implements IHazardType {
             hasToxFilter = ArmorRegistry.hasProtection(player, EquipmentSlot.HEAD, ArmorRegistry.HazardClass.NERVE_AGENT);
 
             if (hasToxFilter) {
-                ArmorUtil.damageGasMaskFilter(player, hazardRate);
+                ArmorUtil.damageGasMaskFilter(player, IHazardType.hazardRate());
             }
 
             hasHazmat = ArmorUtil.checkForHazmat(player);

@@ -18,7 +18,7 @@ public class HazardTypeDigamma implements IHazardType {
 
     @Override
     public void onUpdate(final LivingEntity target, final double level, final ItemStack stack) {
-        ContaminationUtil.applyDigammaData(target, (float) ((level * stack.getCount() / 20D) * hazardRate));
+        ContaminationUtil.applyDigammaData(target, (float) ((level * stack.getCount() / 20D) * IHazardType.hazardRate()));
     }
 
     @Override

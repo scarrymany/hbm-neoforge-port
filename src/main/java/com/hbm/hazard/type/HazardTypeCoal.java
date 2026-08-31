@@ -27,10 +27,10 @@ public class HazardTypeCoal implements IHazardType {
         if (RadiationConfig.DISABLE_COAL.get()) return;
 
         if (!ArmorRegistry.hasProtection(target, EquipmentSlot.HEAD, HazardClass.PARTICLE_COARSE)) {
-            HbmLivingProps.incrementBlackLung(target, (int) Math.min(level * stack.getCount(), 10) * hazardRate);
+            HbmLivingProps.incrementBlackLung(target, (int) Math.min(level * stack.getCount(), 10) * IHazardType.hazardRate());
         } else {
             if (target.getRandom().nextInt(Math.max(65 - stack.getCount(), 1)) == 0) {
-                ArmorUtil.damageGasMaskFilter(target, (int) level * hazardRate);
+                ArmorUtil.damageGasMaskFilter(target, (int) level * IHazardType.hazardRate());
             }
         }
     }

@@ -27,9 +27,9 @@ public class HazardTypeAsbestos implements IHazardType {
         if (RadiationConfig.DISABLE_ASBESTOS.get()) return;
 
         if (ArmorRegistry.hasProtection(target, EquipmentSlot.HEAD, HazardClass.PARTICLE_FINE))
-            ArmorUtil.damageGasMaskFilter(target, (int) level * hazardRate);
+            ArmorUtil.damageGasMaskFilter(target, (int) level * IHazardType.hazardRate());
         else
-            HbmLivingProps.incrementAsbestos(target, (int) Math.min(level, 10) * hazardRate);
+            HbmLivingProps.incrementAsbestos(target, (int) Math.min(level, 10) * IHazardType.hazardRate());
     }
 
     @Override

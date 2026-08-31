@@ -4,6 +4,8 @@ import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.ClimbableRegistry;
+import com.hbm.interfaces.IClimbable;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.MachineCrystallizerMenu;
 import com.hbm.inventory.fluid.Fluids;
@@ -22,12 +24,15 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -49,11 +54,20 @@ import java.util.concurrent.ThreadLocalRandom;
  * 8 slots, 0 input/1 battery/2 output/3-4 fluid-load/5-6 upgrade/7 fluid-id). The acid tank itself is
  * unaffected - it still fills purely over the fluid pipe network via {@link IFluidStandardReceiverMK2}.
  * <p>
- * <b>Not ported</b>: {@code IClimbable} (the crystallizer's tower model doubling as an in-world
- * ladder - a renderer/hitbox-shape detail with no block model to hang it off yet, tracked as a
- * follow-up for whoever ports this block's real model) and the legacy {@code FluidTank}/
- * {@code converted} migration path (CE-only save-upgrade shim, explicitly recommended dropped by the
- * research report).
+ * <b>{@code IClimbable}</b>: CE's tower model doubles as an in-world ladder via a small AABB offset
+ * to one side of the machine, rotated to match the block's placed {@code BlockDirectional} facing
+ * (see CE's {@code getLadderAABB()}, using {@code ForgeDirection.getOrientation(meta - 10)}). This
+ * port's {@link com.hbm.blocks.machine.MachineCrystallizerBlock} has no {@code FACING} blockstate
+ * property yet (and no block model/blockstate JSON at all - a gap shared by every block in this port
+ * pending a later asset pass, not specific to this machine), so {@link #getClimbAABBForIndexing()}
+ * below pins the ladder box to a fixed side ({@code +X}) instead of rotating with placement; the
+ * registry plumbing itself ({@link ClimbableRegistry}, {@link IClimbable#registerClimbable()} /
+ * {@link IClimbable#unregisterClimbable()} in {@link #onLoad()}/{@link #setRemoved()}/
+ * {@link #onChunkUnloaded()}) matches CE exactly. Whoever gives this block a real {@code FACING}
+ * property and model can recompute the offset from that facing the same way CE does.
+ * <p>
+ * <b>Not ported</b>: the legacy {@code FluidTank}/{@code converted} migration path (CE-only
+ * save-upgrade shim, explicitly recommended dropped by the research report).
  * <p>
  * <b>Upgrade formulas</b> (ported from CE's {@code TileEntityMachineCrystallizer}, all capped at
  * level 3): {@link #getPowerRequired()} {@code = 1000 + speed*1000 + effect*2000} (up to 10,000 HE/t
@@ -64,7 +78,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * accidentally simplify away).
  */
 public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider, IClimbable {
 
     public static final long MAX_POWER = 1_000_000L;
     public static final int TANK_CAPACITY = 8_000;
@@ -89,6 +103,9 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
     private long power;
     private int progress;
     private int maxProgress;
+
+    /** Lazily-built climb hitbox for {@link IClimbable} - see class javadoc's {@code IClimbable} note. */
+    private AABB ladderAABB;
 
     public MachineCrystallizerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, true, true);
@@ -280,5 +297,49 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new MachineCrystallizerMenu(containerId, playerInventory, this);
+    }
+
+    /**
+     * CE: {@code TileEntityMachineCrystallizer.getLadderAABB()} - a 0.5x5x0.5 climb box running from
+     * {@code y+1} to {@code y+6}, offset 1.5 blocks sideways from the block's own footprint. CE
+     * rotates the offset with the block's placed facing; this port pins it to {@code +X} instead - see
+     * class javadoc's {@code IClimbable} note for why.
+     */
+    private AABB getLadderAABB() {
+        if (ladderAABB == null) {
+            ladderAABB = new AABB(
+                    worldPosition.getX() + 0.25, worldPosition.getY() + 1, worldPosition.getZ() + 0.25,
+                    worldPosition.getX() + 0.75, worldPosition.getY() + 6, worldPosition.getZ() + 0.75)
+                    .move(1.5, 0, 0);
+        }
+        return ladderAABB;
+    }
+
+    @Override
+    public boolean isEntityInClimbAABB(@NotNull LivingEntity entity) {
+        return entity.getBoundingBox().intersects(getLadderAABB());
+    }
+
+    @Override
+    public @Nullable AABB getClimbAABBForIndexing() {
+        return getLadderAABB();
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        registerClimbable();
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        unregisterClimbable();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        unregisterClimbable();
+        super.onChunkUnloaded();
     }
 }

@@ -1,9 +1,12 @@
 package com.hbm.config;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
 import net.neoforged.neoforge.common.ModConfigSpec.DoubleValue;
 import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
+
+import java.util.Set;
 
 /**
  * Port of CE's {@code GeneralConfig}: the catch-all bucket of misc gameplay/rendering toggles,
@@ -25,12 +28,27 @@ import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
  *   density knob: {@link com.hbm.particle.engine.ParticleEngineNT} halves its particle-count cap when
  *   this is {@code false}, rather than forking two render code paths - see that class's own
  *   javadoc.</li>
- *   <li>{@code leadSafeForgeContainerWhitelist} - CE entries are {@code modid:item:meta} triples,
- *   and item metadata no longer exists under the 1.21 Data Component model. This will need a
- *   redesign (likely keyed by item id alone) once fluid container itemization is ported.</li>
+ *   <li>{@code leadSafeForgeContainerWhitelist}'s TOML-backed loader ({@code loadLeadSafeForgeContainerWhitelist}
+ *   / {@code 1.99_CE_forgeFluidLeadSafeContainers} in CE) - CE entries are {@code modid:item:meta}
+ *   triples, and item metadata no longer exists under the 1.21 Data Component model, so the string
+ *   format needs a redesign (keyed by item id alone, as
+ *   {@link com.hbm.capability.NTMFluidCapabilityHandler#isLeadSafeForgeContainer} already assumes)
+ *   before a real config-list entry can be added here. Until then the field below
+ *   is a plain empty set, not backed by a config value - which reproduces CE's own default exactly
+ *   ("Default empty means generic Forge Fluid containers are not lead-safe.", CE
+ *   {@code GeneralConfig#loadLeadSafeForgeContainerWhitelist}), just not yet player-configurable.</li>
  * </ul>
  */
 public class GeneralConfig {
+
+    /**
+     * Set of {@code modid:item} ids treated as "lead-safe" generic Forge fluid containers (i.e. they
+     * may hold {@link com.hbm.inventory.fluid.FluidType#needsLeadContainer()} fluids despite not being
+     * one of NTM's own lead containers). Mirrors CE's {@code GeneralConfig.leadSafeForgeContainerWhitelist},
+     * minus its {@code :meta} suffix (see class javadoc) and minus its TOML-backed loader - empty by
+     * default, matching CE's own default. See {@link com.hbm.capability.NTMFluidCapabilityHandler#isLeadSafeForgeContainer}.
+     */
+    public static final Set<String> leadSafeForgeContainerWhitelist = new ObjectOpenHashSet<>();
 
     // networking
     public static BooleanValue ENABLE_PACKET_THREADING;

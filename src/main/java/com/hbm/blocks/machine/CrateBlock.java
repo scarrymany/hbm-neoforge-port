@@ -4,6 +4,7 @@ import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.machine.CrateBlockEntity;
 import com.hbm.blockentity.machine.CrateBlockEntity.CrateType;
 import com.hbm.blockentity.machine.StorageBlockEntities;
+import com.hbm.blocks.generic.BlockStorageCrate;
 import com.hbm.handler.radiation.RadiationSystemNT;
 import com.hbm.interfaces.IRadResistantBlock;
 import com.hbm.inventory.container.CrateMenu;
@@ -47,8 +48,14 @@ import org.jetbrains.annotations.Nullable;
  * {@link CrateType#TUNGSTEN}'s laser-heating mechanic ({@code ILaserable}, CE's
  * {@code TileEntityCrateTungsten}) is a separate, documented follow-up - see
  * {@code docs/phase2/machines_storage.md}'s "Open questions" - this class ships the plain-crate shell.
+ *
+ * <p>Also implements {@link BlockStorageCrate} (added in the Phase 6 parity-audit pass) - the marker
+ * interface {@link com.hbm.hazard.transformer.HazardTransformerRadiationContainer}'s
+ * {@code instanceof BlockStorageCrate} check needs to recognize crate_iron/steel/tungsten/desh/safe
+ * as CE's real {@code BlockStorageCrate} lineage; see that interface's javadoc for why this class,
+ * not a new abstract class, is where the interface lands.
  */
-public class CrateBlock extends BaseEntityBlock implements IRadResistantBlock {
+public class CrateBlock extends BaseEntityBlock implements IRadResistantBlock, BlockStorageCrate {
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 

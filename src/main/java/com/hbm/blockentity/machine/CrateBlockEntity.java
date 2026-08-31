@@ -2,7 +2,10 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.generic.BlockStorageCrate;
 import com.hbm.blocks.machine.CrateBlock;
+import com.hbm.hazard.HazardSystem;
+import com.hbm.util.ContaminationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -132,12 +135,13 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
      */
 
     /**
-     * Drop-on-break payload: slot contents only (CE also stores accumulated radiation via
-     * {@code HazardSystem.getTotalRadsFromStack} for the tooltip's "this crate carries N rads" line;
-     * dropped here since the hazard/radiation display system this feeds hasn't landed for any Phase 2
-     * package yet - see {@code machines_storage.md}'s HazardSystem note. Slot contents are the load-
-     * bearing half of this feature: without them, breaking a full crate would silently void its
-     * inventory instead of dropping one item that remembers what was inside).
+     * Drop-on-break payload: slot contents. (Phase 6 update: accumulated contained-item radiation -
+     * CE's {@code HazardSystem.getTotalRadsFromStack} sum - is no longer dropped here; it is now
+     * carried by {@link #writeItemComponents} instead, once {@link BlockStorageCrate#CRATE_RAD_KEY}
+     * gave it somewhere real to live. See that method for the port of CE's radiation sum itself.)
+     * Slot contents are the load-bearing half of this feature either way: without them, breaking a
+     * full crate would silently void its inventory instead of dropping one item that remembers what
+     * was inside.
      */
     @Override
     public void writeNBT(CompoundTag nbt) {
@@ -158,6 +162,34 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
             if (data.contains(key)) {
                 inventory.setStackInSlot(i, ItemStack.parseOptional(this.level.registryAccess(), data.getCompound(key)));
             }
+        }
+    }
+
+    /**
+     * Direct port of CE's {@code TileEntityCrateBase.buildDropData} radiation sum, attached to the
+     * dropped stack via {@link BlockStorageCrate#CRATE_RAD_KEY} instead of CE's raw {@code cRads} NBT
+     * double (see that field's javadoc - the 1.21 data-component replacement for it).
+     * <p>
+     * CE: {@code radiation += HazardSystem.getTotalRadsFromStack(stack) * stack.getCount();} where
+     * {@code getTotalRadsFromStack = getHazardLevelFromStack(RADIATION) + ContaminationUtil.getNeutronRads(stack)}
+     * and {@code ContaminationUtil.getNeutronRads} <em>already</em> multiplies by {@code stack.getCount()}
+     * internally - so CE's neutron-contamination term is count-multiplied twice per slot. That is
+     * preserved verbatim here (this port's {@link HazardSystem#getRawRadsFromStack} and
+     * {@link ContaminationUtil#getNeutronRads} match their CE counterparts exactly, including that same
+     * internal count multiplication on the neutron term), matching this port's established precedent of
+     * carrying CE quirks over rather than silently "fixing" them (see
+     * {@code HazardTransformerRadiationContainer}'s own preserved plastic-bag-unreachable-branch quirk).
+     */
+    @Override
+    public void writeItemComponents(ItemStack itemstack) {
+        double radiation = 0D;
+        for (int i = 0; i < inventory.getSlots(); i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (stack.isEmpty()) continue;
+            radiation += (HazardSystem.getRawRadsFromStack(stack) + ContaminationUtil.getNeutronRads(stack)) * stack.getCount();
+        }
+        if (radiation > 0D) {
+            itemstack.set(BlockStorageCrate.CRATE_RAD_KEY.get(), radiation);
         }
     }
 }

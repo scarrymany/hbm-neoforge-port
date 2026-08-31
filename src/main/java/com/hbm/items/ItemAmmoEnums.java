@@ -8,9 +8,9 @@ import java.util.Set;
 /**
  * Ported verbatim from CE - pure data, no Minecraft/NeoForge types involved.
  *
- * Depends on com.hbm.items.weapon.ItemAmmo.AmmoItemTrait, which is Phase 1 content (weapon
- * package, out of this agent's scope) and does not exist in this tree yet. This file will not
- * compile until Phase 1 creates ItemAmmo with a nested AmmoItemTrait enum.
+ * Depends on {@link com.hbm.items.weapon.ItemAmmo.AmmoItemTrait} - see that class's javadoc for how
+ * this port represents CE's {@code ItemAmmo<E>}/{@code ItemEnumMulti<E>} metadata-multiplexed item
+ * family.
  */
 public class ItemAmmoEnums {
 

@@ -38,7 +38,7 @@ public class HazardTypeRadiation implements IHazardType {
                 rad = BobMathUtil.sqrt(rad); // Reworked radiation function: sqrt(x+1/(x+2)^2)-1/(x+2)
             }
 
-            ContaminationUtil.contaminate(target, HazardType.RADIATION, ContaminationType.CREATIVE, (float) (rad * hazardRate));
+            ContaminationUtil.contaminate(target, HazardType.RADIATION, ContaminationType.CREATIVE, (float) (rad * IHazardType.hazardRate()));
         }
     }
 

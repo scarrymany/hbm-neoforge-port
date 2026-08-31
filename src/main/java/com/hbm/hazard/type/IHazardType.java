@@ -18,7 +18,19 @@ import java.util.List;
  */
 public interface IHazardType {
 
-    int hazardRate = RadiationConfig.HAZARD_RATE.get();
+    /**
+     * Lazy accessor for CE's {@code hazardRate} tick cadence (see {@link RadiationConfig#HAZARD_RATE}).
+     * Deliberately a method, not an interface constant field: a {@code static final} field
+     * initializer here would call {@code RadiationConfig.HAZARD_RATE.get()} eagerly at this
+     * interface's own class-init time, which for a NeoForge {@code ModConfigSpec} value throws
+     * {@code IllegalStateException} if that happens before {@code ModConfigEvent.Loading} has
+     * fired (the exact same eager-.get()-before-ready hazard the DeferredHolder pattern has, just
+     * for the config subsystem instead of the registry subsystem) - see this port's own
+     * ground rules on lazy static factory methods for eager holder/config access.
+     */
+    static int hazardRate() {
+        return RadiationConfig.HAZARD_RATE.get();
+    }
 
     /**
      * Does the thing. Called by {@link com.hbm.hazard.HazardEntry#applyHazard}.

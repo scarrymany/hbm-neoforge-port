@@ -66,6 +66,7 @@ public interface IPersistentNBT {
             CompoundTag data = new CompoundTag();
             persistentTE.writeNBT(data);
             if (!data.isEmpty()) TagsUtil.putCustomData(itemstack, data);
+            persistentTE.writeItemComponents(itemstack);
             if (tile instanceof IWorldRenameable nameable && nameable.hasCustomName()) {
                 itemstack.set(DataComponents.CUSTOM_NAME, nameable.getName());
                 nameable.setCustomName(null);
@@ -144,4 +145,17 @@ public interface IPersistentNBT {
     void writeNBT(CompoundTag nbt);
 
     void readNBT(CompoundTag nbt);
+
+    /**
+     * Optional hook for implementers that need to attach additional item
+     * {@link net.minecraft.core.component.DataComponentType}s (as opposed to raw NBT via
+     * {@link #writeNBT}) to the item this block drops on break. Called from {@link #breakBlock} right
+     * after {@link #writeNBT}'s tag is applied, on the same freshly-built drop stack. No-op by
+     * default - only {@code com.hbm.blockentity.machine.CrateBlockEntity} overrides this today, to
+     * carry {@code com.hbm.blocks.generic.BlockStorageCrate#CRATE_RAD_KEY} (CE's raw {@code cRads}
+     * NBT double, ported to a real data component precisely because it lives on the root item tag,
+     * not under {@link #NBT_PERSISTENT_KEY}, so it can't be written through {@link #writeNBT} alone).
+     */
+    default void writeItemComponents(ItemStack itemstack) {
+    }
 }

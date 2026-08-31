@@ -39,8 +39,10 @@ import java.util.List;
  * <p>
  * <b>Not ported (Phase 5 client scope, see {@code docs/phase3/grenades.md}'s Deferred scope):</b>
  * {@code IAnimatedItem}/{@code getAnimation()}'s 4 per-shell {@code BusAnimation} equip-bob/ring-spin
- * sequences (depend on {@code com.hbm.render.anim.BusAnimation}, not ported anywhere in this tree)
- * and the {@code sendEquipAnimation}/{@code HbmEffectNT.Anim} equip-cue trigger packet. The shell-
+ * sequences - this item does not implement {@link com.hbm.items.IAnimatedItem}/{@code getAnimation()}
+ * itself; {@link com.hbm.render.anim.BusAnimation} was ported in Phase 6, but wiring it back onto this
+ * item plus the client-side render-loop sampler CE calls {@code HbmAnimations} remains deferred - and
+ * the {@code sendEquipAnimation}/{@code HbmEffectNT.Anim} equip-cue trigger packet. The shell-
  * specific reload-cue *sounds* (revolver-cock/bolt-open/etc. tick thresholds) are real gameplay-
  * adjacent audio cues, not rendering, and are kept.
  */

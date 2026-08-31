@@ -2,12 +2,10 @@ package com.hbm.client.particle;
 
 import com.hbm.main.MainRegistry;
 import com.hbm.particle.ModParticleTypes;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 
 /**
  * Client-only {@link net.minecraft.client.particle.ParticleProvider} registration for every entry in
@@ -33,6 +31,15 @@ import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
  * {@code bus = EventBusSubscriber.Bus.MOD} to not repeat that mistake, following this port's own
  * already-correct {@code ClientModRegistry} precedent instead of copying Neo Edition's annotation
  * line verbatim.
+ * <p>
+ * <b>Phase 6 whole-tree sweep fix</b>: this class used to also carry a {@code
+ * TextureAtlasStitchedEvent} sprite-capture handler. That same source report (lines 151-157)
+ * separately confirmed {@code TextureAtlasStitchedEvent} is a real game-bus event, not {@code
+ * IModBusEvent} - the exact opposite of {@code RegisterParticleProvidersEvent} - so co-locating it
+ * on this {@code bus = Bus.MOD}-only class made it silently unreachable (the same "one class, one
+ * bus" gotcha this whole file exists to avoid, just pointed the other way). Moved to its own
+ * {@link ParticleAtlasHook}, a plain {@code Bus.GAME}-default class - see that class's javadoc for
+ * the full account. No current behavior change: nothing reads that field yet either way.
  * <p>
  * <b>Why every entry uses {@code registerSpecial}, none use {@code registerSpriteSet}</b> (a
  * deliberate, documented scope/risk decision, not an oversight - flagged per this task's ground rules
@@ -70,23 +77,14 @@ public final class ModParticleProviders {
     /**
      * The sprite-stitching hook {@code particle_engine_and_generic_vfx.md}/
      * {@code custom_particle_types_registry.md} both name (finding 3 / the "Confirmed real NeoForge
-     * 1.21.1 registration API shape" section) - captures the live particle {@link TextureAtlas}
-     * instance, gated on {@link TextureAtlas#LOCATION_PARTICLES} exactly like Neo Edition's own
-     * (cross-checked) {@code NuclearTechModClient.onTextureAtlasStitched}. No entry in this file uses
-     * {@code registerSpriteSet} yet (see class javadoc), so nothing currently reads
-     * {@link #particleAtlas} - it is captured here so the Content wave's {@code c14} task has a ready,
-     * already-wired atlas reference to call {@code TextureAtlas#getSprite(ResourceLocation)} against
-     * once real particle textures/JSON land, instead of needing to rediscover this event.
+     * 1.21.1 registration API shape" section) now lives on {@link ParticleAtlasHook#particleAtlas}
+     * (moved out in the Phase 6 whole-tree sweep fix - see this class's own javadoc and {@link
+     * ParticleAtlasHook}'s for why). No entry in this file uses {@code registerSpriteSet} yet (see
+     * class javadoc), so nothing currently reads that field - it is captured there so the Content
+     * wave's {@code c14} task has a ready, already-wired atlas reference to call {@code
+     * TextureAtlas#getSprite(ResourceLocation)} against once real particle textures/JSON land,
+     * instead of needing to rediscover this event.
      */
-    public static TextureAtlas particleAtlas;
-
-    @SubscribeEvent
-    public static void onTextureAtlasStitched(TextureAtlasStitchedEvent event) {
-        if (event.getAtlas().location().equals(TextureAtlas.LOCATION_PARTICLES)) {
-            particleAtlas = event.getAtlas();
-        }
-    }
-
     @SubscribeEvent
     public static void registerProviders(RegisterParticleProvidersEvent event) {
         // --- Tier 1 (HbmEffectNT.java:449-454, 841-878, 1435-1441, 165-291, 205-218) ---
