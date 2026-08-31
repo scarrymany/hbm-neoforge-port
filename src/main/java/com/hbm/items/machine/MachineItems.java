@@ -121,7 +121,8 @@ public final class MachineItems {
         MOTOR_BISMUTH = tab(ModCreativeTabs.PARTS, reg("motor_bismuth", () -> new Item(props())));
         COIL_COPPER = tab(ModCreativeTabs.PARTS, reg("coil_copper", () -> new Item(props())));
         COIL_COPPER_TORUS = tab(ModCreativeTabs.PARTS, reg("coil_copper_torus", () -> new Item(props())));
-        COIL_TUNGSTEN = tab(ModCreativeTabs.PARTS, reg("coil_tungsten", () -> new Item(props())));
+        // CE uses the same coil_tungsten item as coilgun ammo (GunEnergyItems / XFactoryAccelerator).
+        COIL_TUNGSTEN = tab(ModCreativeTabs.PARTS, com.hbm.items.weapon.sedna.content.GunEnergyItems.COIL_TUNGSTEN);
         COIL_GOLD = tab(ModCreativeTabs.PARTS, reg("coil_gold", () -> new Item(props())));
         COIL_GOLD_TORUS = tab(ModCreativeTabs.PARTS, reg("coil_gold_torus", () -> new Item(props())));
         COIL_MAGNETIZED_TUNGSTEN = tab(ModCreativeTabs.PARTS, reg("coil_magnetized_tungsten", () -> new Item(props())));
