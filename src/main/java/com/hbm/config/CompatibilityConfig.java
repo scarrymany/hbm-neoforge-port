@@ -91,6 +91,7 @@ public class CompatibilityConfig {
     public static ConfigValue<List<? extends String>> OIL_BUBBLE_SPAWN_RAW;
     public static ConfigValue<List<? extends String>> BEDROCK_OIL_SPAWN_RAW;
     public static ConfigValue<List<? extends String>> METEORITE_SPAWN_RAW;
+    public static ConfigValue<List<? extends String>> ANTENNA_STRUCTURE_RAW;
 
     static void init(ModConfigSpec.Builder builder) {
         builder.push("mobs");
@@ -310,6 +311,9 @@ public class CompatibilityConfig {
         METEORITE_SPAWN_RAW = builder
                 .comment("Spawns a fallen, ambient/passive meteorite every Nth chunk (1-in-N chance). [CE: 03.19_meteoriteSpawn]")
                 .defineListAllowEmpty("meteoriteSpawn", () -> List.of("minecraft:overworld=200"), entry -> entry instanceof String);
+        ANTENNA_STRUCTURE_RAW = builder
+                .comment("Spawns CE's Antenna radio mast every Nth chunk (1-in-N chance). [CE CompatibilityConfig.antennaStructure default 0:750]")
+                .defineListAllowEmpty("antennaStructure", () -> List.of("minecraft:overworld=750"), entry -> entry instanceof String);
 
         builder.pop();
     }
@@ -399,4 +403,5 @@ public class CompatibilityConfig {
     public static Map<String, Integer> oilBubbleSpawn() { return spawnMap(OIL_BUBBLE_SPAWN_RAW); }
     public static Map<String, Integer> bedrockOilSpawn() { return spawnMap(BEDROCK_OIL_SPAWN_RAW); }
     public static Map<String, Integer> meteoriteSpawn() { return spawnMap(METEORITE_SPAWN_RAW); }
+    public static Map<String, Integer> antennaStructure() { return spawnMap(ANTENNA_STRUCTURE_RAW); }
 }

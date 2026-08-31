@@ -45,7 +45,8 @@ public final class OilMeteorBiomeModifiers {
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.OIL_BUBBLE),
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.BEDROCK_OIL_DEPOSIT),
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.OIL_SAND_BUBBLE),
-                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.METEORITE));
+                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.METEORITE),
+                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.ANTENNA));
 
         context.register(ADD_OIL_METEOR_WORLDGEN, new AddFeaturesBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD), HolderSet.direct(features), GenerationStep.Decoration.UNDERGROUND_ORES));

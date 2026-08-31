@@ -120,6 +120,10 @@ public final class GenericDecoBlocks {
         registerBlock("steel_poles", () -> new DecoSteelPoles(deco15Props()), ModCreativeTabs.BLOCKS);
         registerBlock("pole_top", () -> new DecoPoleTop(deco15Props()), ModCreativeTabs.BLOCKS);
         registerBlock("pole_satellite_receiver", () -> new DecoPoleSatelliteReceiver(deco15Props()), ModCreativeTabs.BLOCKS);
+        // CE ModBlocks.deco_steel / steel_scaffold — missing from the original deco table; Antenna
+        // (CE Antenna.java:48) and ItemPoolsLegacy.POOL_ANTENNA need both.
+        registerBlock("deco_steel", () -> new DecoBlock(deco15Props(), DecoBlock.Shape.PLAIN), ModCreativeTabs.BLOCKS);
+        registerBlock("steel_scaffold", () -> new DecoBlock(deco15Props(), DecoBlock.Shape.BEAM), ModCreativeTabs.BLOCKS);
     }
 
     private static void registerDecoCRT() {

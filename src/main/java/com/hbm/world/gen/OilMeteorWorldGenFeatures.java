@@ -1,6 +1,7 @@
 package com.hbm.world.gen;
 
 import com.hbm.main.MainRegistry;
+import com.hbm.world.feature.AntennaFeature;
 import com.hbm.world.feature.BedrockOilDepositFeature;
 import com.hbm.world.feature.MeteoriteFeature;
 import com.hbm.world.feature.OilBubbleFeature;
@@ -36,6 +37,8 @@ public final class OilMeteorWorldGenFeatures {
             FEATURES.register("oil_sand_bubble", () -> new OilSandBubbleFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, MeteoriteFeature> METEORITE =
             FEATURES.register("meteorite", () -> new MeteoriteFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, AntennaFeature> ANTENNA =
+            FEATURES.register("antenna", () -> new AntennaFeature(NoneFeatureConfiguration.CODEC));
 
     private OilMeteorWorldGenFeatures() {
     }

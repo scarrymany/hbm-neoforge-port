@@ -107,6 +107,8 @@ public class CommonEvents {
             // com.hbm.itempool.ItemPoolsC130#init() has the exact same DeferredItem.get()-during-
             // pool-construction timing requirement as ItemPoolsSatellite#init() above.
             com.hbm.itempool.ItemPoolsC130.init();
+            // Phase 8 — structure loot (CE ItemPoolsLegacy.java). Same DeferredItem.get() timing.
+            com.hbm.itempool.ItemPoolsLegacy.init();
         });
     }
 

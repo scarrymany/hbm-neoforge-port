@@ -72,21 +72,21 @@ public class ModDataGenerators {
         // three remaining stages of the Feature -> ConfiguredFeature -> PlacedFeature -> BiomeModifier
         // pipeline (Feature instances themselves are registered separately via
         // OreWorldGenFeatures.register(modEventBus), like any other DeferredRegister).
-        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, OreConfiguredFeatures::bootstrap);
-        registrySetBuilder.add(Registries.PLACED_FEATURE, OrePlacedFeatures::bootstrap);
-        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, OreBiomeModifiers::bootstrap);
-        // Phase 4 oil-deposit + ambient meteorite world-gen
-        // (docs/phase4/worldgen_oil_and_meteor_dungeons.md Part 1 + Part 2a) - same three-stage
-        // pipeline, its own Feature instances registered separately via
-        // OilMeteorWorldGenFeatures.register(modEventBus).
-        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, OilMeteorConfiguredFeatures::bootstrap);
-        registrySetBuilder.add(Registries.PLACED_FEATURE, OilMeteorPlacedFeatures::bootstrap);
-        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, OilMeteorBiomeModifiers::bootstrap);
-        // Phase 4 (entities_creeper_variants) - natural biome spawning for the Gold/Volatile/Phosgene
-        // creeper variants (CE's EntityMappings.writeSpawns()). Same BiomeModifier pipeline as the two
-        // groups above; EntityType DeferredHolders are registered separately via
-        // CreeperVariantEntityTypes.register(modEventBus), like any other DeferredRegister.
-        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, CreeperVariantBiomeModifiers::bootstrap);
+        // One bootstrap per registry key — RegistrySetBuilder.add overwrites a previous add for
+        // the same key, so Ore + OilMeteor + creeper modifiers must share a single lambda.
+        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, context -> {
+            OreConfiguredFeatures.bootstrap(context);
+            OilMeteorConfiguredFeatures.bootstrap(context);
+        });
+        registrySetBuilder.add(Registries.PLACED_FEATURE, context -> {
+            OrePlacedFeatures.bootstrap(context);
+            OilMeteorPlacedFeatures.bootstrap(context);
+        });
+        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, context -> {
+            OreBiomeModifiers.bootstrap(context);
+            OilMeteorBiomeModifiers.bootstrap(context);
+            CreeperVariantBiomeModifiers.bootstrap(context);
+        });
         DatapackBuiltinEntriesProvider datapackProvider =
                 new DatapackBuiltinEntriesProvider(output, lookup, registrySetBuilder, Set.of(MainRegistry.MODID));
         generator.addProvider(event.includeServer(), datapackProvider);
