@@ -46,6 +46,14 @@ public class GibletParticle extends Particle {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/particle/meat.png");
 
+    /**
+     * Billboard quad half-size. Vanilla {@link Particle} has no such field - only its
+     * {@link net.minecraft.client.particle.TextureSheetParticle} subclass declares one - so, like this
+     * port's own {@code com.hbm.particle.engine.ParticleNT#quadSize} and CE's real
+     * {@code particleScale}, it's declared locally here.
+     */
+    private float quadSize;
+
     public GibletParticle(ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
         super(level, x, y, z, dx, dy, dz);
         this.lifetime = 140 + this.random.nextInt(20);

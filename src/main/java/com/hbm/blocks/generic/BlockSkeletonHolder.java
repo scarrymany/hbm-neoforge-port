@@ -1,10 +1,12 @@
 package com.hbm.blocks.generic;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -33,6 +35,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  */
 public class BlockSkeletonHolder extends BaseEntityBlock {
 
+    /**
+     * NeoForge 1.20.5+ requires every {@link BaseEntityBlock} subtype to hand back a
+     * {@link MapCodec} for data-driven (de)serialization; see the reference NeoForge 1.21.1 port's
+     * {@code CrateBlock}/{@code BarrelBlock} for the same {@code simpleCodec} pattern.
+     */
+    public static final MapCodec<BlockSkeletonHolder> CODEC = simpleCodec(BlockSkeletonHolder::new);
+
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final VoxelShape SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 16.0, 14.0);
@@ -40,6 +49,11 @@ public class BlockSkeletonHolder extends BaseEntityBlock {
     public BlockSkeletonHolder(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected MapCodec<BlockSkeletonHolder> codec() {
+        return CODEC;
     }
 
     @Override
@@ -68,27 +82,27 @@ public class BlockSkeletonHolder extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                            InteractionHand hand, BlockHitResult hit) {
         if (player.isShiftKeyDown()) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         BlockEntity be = level.getBlockEntity(pos);
         if (!(be instanceof SkeletonHolderBlockEntity holder)) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         if (holder.item.isEmpty() && !stack.isEmpty()) {
             if (level.isClientSide) {
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
             holder.item = stack.copy();
             stack.shrink(stack.getCount());
             holder.setChanged();
             level.sendBlockUpdated(pos, state, state, 3);
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine;
 
 import com.hbm.blockentity.ITickableBE;
+import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.MachineReactorBreedingMenu;
 import com.hbm.inventory.recipes.machine.BreederRecipe;
 import com.hbm.inventory.recipes.machine.BreederRecipes;

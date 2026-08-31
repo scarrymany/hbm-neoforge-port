@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.gametest.EmptyTemplate;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -47,13 +46,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p><b>Verification status</b>: never compiled or run (see this task's structured-output notes and
  * the manual scenario document's own §0). {@link IBomb}, {@code NukeTsarBlockEntity}'s slot layout,
  * and {@code NukeCasingBlocks.NUKE_TSAR} are all confirmed real by direct source read (cited
- * inline); the {@code @GameTestHolder}/{@code @PrefixGameTestTemplate}/{@code @EmptyTemplate}
- * annotation shapes carry the same unverified-against-a-real-compile caveat documented in
- * {@link ProgressionChainGameTests}'s own javadoc, and so does this file's specific use of
- * {@code GameTestHelper#absolutePos} (relative-to-world coordinate conversion, needed here because
- * {@link IBomb#explode} takes real world coordinates, unlike most other {@code GameTestHelper}
- * calls in this file which operate in the test's own relative space) - if that exact method name
- * differs, the fix is a one-line rename, not a logic change.
+ * inline). {@code @GameTestHolder} and {@code @PrefixGameTestTemplate} are real NeoForge 1.21.1
+ * annotations (confirmed against a fresh clone of neoforged/NeoForge, branch {@code 1.21.1}) and
+ * are used correctly below; {@code @EmptyTemplate} was not real and its usage below has been
+ * stubbed out - see {@link ProgressionChainGameTests}'s javadoc and the TODO at this file's one
+ * usage for the full explanation. This file's specific use of {@code GameTestHelper#absolutePos}
+ * (relative-to-world coordinate conversion, needed here because {@link IBomb#explode} takes real
+ * world coordinates, unlike most other {@code GameTestHelper} calls in this file which operate in
+ * the test's own relative space) still carries the original unverified-method-name caveat - if
+ * that exact method name differs, the fix is a one-line rename, not a logic change.
  */
 @GameTestHolder("hbm")
 @PrefixGameTestTemplate(false)
@@ -92,8 +93,18 @@ public final class ExplosionPerfGameTests {
      * minutes at normal tick rate) to match the manual script's own suggested default budget - see
      * docs/phase6/playtest_scenarios.md §6's note on adjusting this to real hardware.
      */
+    // TODO(gametest, fc7-gametest-emptytemplate): removed `@EmptyTemplate(value = {9, 9, 9})`.
+    // That annotation does not exist in real NeoForge 1.21.1 (or any NeoForge branch from 1.20.2
+    // through the current tip, 25w14craftmine - confirmed against a fresh clone of
+    // neoforged/NeoForge) - it was invented, not a real API. With `@GameTest(template = "", ...)`
+    // below, NeoForge's own GameTestRegistry#turnMethodIntoTestFunction derives the structure
+    // resource name from the class+method and looks it up as a real registered structure
+    // template - there is no vanilla/NeoForge mechanism in this version to synthesize an empty
+    // NxHxD structure without one. A real fix needs either an actual `.nbt` structure template at
+    // that resource location (intended size was 9x9x9), or some other verified way to register an
+    // empty template at runtime. This stub only unblocks `compileJava`; the test is not runnable
+    // as-is. See this class's own javadoc above.
     @GameTest(template = "", timeoutTicks = 6000, batch = "hbm.explosion_perf")
-    @EmptyTemplate(value = {9, 9, 9})
     public static void tsarDetonationStaysWithinTickBudget(GameTestHelper helper) {
         BlockPos pos = new BlockPos(4, 2, 4);
         helper.setBlock(pos, NukeCasingBlocks.NUKE_TSAR.get());

@@ -1,6 +1,7 @@
 package com.hbm.blocks.generic;
 
 import com.hbm.lib.HBMSoundHandler;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -8,6 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -36,10 +38,22 @@ import java.util.List;
  */
 public class BlockSupplyCrate extends BaseEntityBlock {
 
+    /**
+     * NeoForge 1.20.5+ requires every {@link BaseEntityBlock} subtype to hand back a
+     * {@link MapCodec} for data-driven (de)serialization; see the reference NeoForge 1.21.1 port's
+     * {@code CrateBlock}/{@code BarrelBlock} for the same {@code simpleCodec} pattern.
+     */
+    public static final MapCodec<BlockSupplyCrate> CODEC = simpleCodec(BlockSupplyCrate::new);
+
     private static final VoxelShape SHAPE = Block.box(1.0, 0.0, 1.0, 15.0, 15.0, 15.0);
 
     public BlockSupplyCrate(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<BlockSupplyCrate> codec() {
+        return CODEC;
     }
 
     @Override
@@ -70,7 +84,6 @@ public class BlockSupplyCrate extends BaseEntityBlock {
                 ItemStack drop = new ItemStack(this);
                 CompoundTag saved = crate.saveContents();
                 if (!saved.isEmpty()) {
-                    net.minecraft.core.component.DataComponents.CUSTOM_DATA.value();
                     drop.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA,
                             net.minecraft.world.item.component.CustomData.of(saved));
                 }
@@ -95,10 +108,10 @@ public class BlockSupplyCrate extends BaseEntityBlock {
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                            InteractionHand hand, BlockHitResult hit) {
         if (!stack.is(BlockCrate.CROWBAR_TAG)) {
-            return InteractionResult.PASS;
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
 
         if (!level.isClientSide) {
@@ -111,7 +124,7 @@ public class BlockSupplyCrate extends BaseEntityBlock {
             level.removeBlock(pos, false);
             level.playSound(null, pos, HBMSoundHandler.crateBreak.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
         }
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     public static class SupplyCrateBlockEntity extends BlockEntity {

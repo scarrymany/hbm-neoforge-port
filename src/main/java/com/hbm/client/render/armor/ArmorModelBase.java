@@ -1,5 +1,7 @@
 package com.hbm.client.render.armor;
 
+import java.util.function.Function;
+
 import javax.annotation.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -7,6 +9,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -122,17 +125,41 @@ public abstract class ArmorModelBase extends Model {
      * @param slot the equipment slot this instance renders - see {@link #slot}.
      */
     protected ArmorModelBase(EquipmentSlot slot) {
+        this(slot, RenderType::entityCutoutNoCull);
+    }
+
+    /**
+     * @param slot       the equipment slot this instance renders - see {@link #slot}.
+     * @param renderType this instance's texture -> {@link RenderType} function, forwarded straight
+     *                   to {@link Model}'s own constructor. <b>This is the only real customization
+     *                   point left</b>: real 1.21.1 {@link Model#renderType(ResourceLocation)} is
+     *                   {@code final} (confirmed directly by the real javac diagnostic this
+     *                   constructor overload exists to fix - {@code
+     *                   docs/phase6/BUILD_ERRORS.md} cluster {@code fc8-armor-rendertype-final}) -
+     *                   a leaf can no longer override that method to pick a per-instance texture the
+     *                   way {@link GasMaskArmorModel}/{@link JetpackWornModel}/{@link M65ArmorModel}/
+     *                   {@link ObjArmorModel} each need to. A leaf wanting non-default behavior must
+     *                   instead build its own {@code ResourceLocation -> RenderType} lambda and pass
+     *                   it here, exactly like each of those four leaves' constructors now do -
+     *                   ordinary Java constructor-argument scoping (evaluated before {@code super()}
+     *                   runs) lets such a lambda close over the leaf's own constructor parameters
+     *                   (e.g. {@link M65ArmorModel}'s {@code texture} parameter) or {@code static}
+     *                   fields (e.g. {@link GasMaskArmorModel#TEXTURE}) without ever needing to
+     *                   capture {@code this} before the supertype constructor has run.
+     */
+    protected ArmorModelBase(EquipmentSlot slot, Function<ResourceLocation, RenderType> renderType) {
         // Model's constructor wants a texture -> RenderType function (used by generic model-render
         // call sites that ask a Model for its own RenderType via #renderType(ResourceLocation), not
         // by the armor-layer render path itself - that path resolves its RenderType independently
         // from the item's own vanilla armor-texture resolution and hands this class's
-        // #renderToBuffer a VertexConsumer already bound to it). entityCutoutNoCull matches CE's own
-        // choice of cutout, double-sided-disabled rendering for its OBJ armor parts (RenderFloodlight
-        // and this area's own HbmObjModel.renderType(ResourceLocation) default agree - see that
-        // method's javadoc) and is a safe default for a leaf that never calls #renderType itself.
-        // Confirmed real, compiling constructor shape: upstream/neo-edition's ModelArmorBase.java,
-        // `super(RenderType::entityCutoutNoCull);`.
-        super(RenderType::entityCutoutNoCull);
+        // #renderToBuffer a VertexConsumer already bound to it). The single-arg constructor's
+        // entityCutoutNoCull default matches CE's own choice of cutout, double-sided-disabled
+        // rendering for its OBJ armor parts (RenderFloodlight and this area's own HbmObjModel.
+        // renderType(ResourceLocation) default agree - see that method's javadoc) and is a safe
+        // default for a leaf that needs no per-instance texture. Confirmed real, compiling
+        // constructor shape: upstream/neo-edition's ModelArmorBase.java, `super(RenderType::
+        // entityCutoutNoCull);`.
+        super(renderType);
         this.slot = slot;
     }
 

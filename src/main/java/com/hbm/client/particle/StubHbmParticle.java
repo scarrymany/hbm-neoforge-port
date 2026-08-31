@@ -1,5 +1,7 @@
 package com.hbm.client.particle;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
@@ -20,11 +22,11 @@ import net.minecraft.core.particles.SimpleParticleType;
  * <p>
  * <b>Why this renders nothing (deliberately, not a bug)</b>: extends vanilla {@link Particle} directly
  * (not {@link net.minecraft.client.particle.TextureSheetParticle}, which needs a real
- * {@link net.minecraft.client.particle.TextureAtlasSprite} to draw). {@link Particle#render} has an
- * empty no-op default body in vanilla (only overridden by subclasses that actually draw something,
- * e.g. {@code TextureSheetParticle}) - this class does not override it, so nothing is drawn regardless
- * of {@link #getRenderType()}'s bucket; {@link #getRenderType()} still must return a real, valid
- * constant (it is {@code abstract} on {@link Particle}), so {@link ParticleRenderType#PARTICLE_SHEET_TRANSLUCENT}
+ * {@link net.minecraft.client.particle.TextureAtlasSprite} to draw). {@link Particle#render} is
+ * {@code abstract} in real 1.21.1 (there is no no-op default to inherit, unlike this class's original
+ * assumption), so this class supplies its own deliberately empty override below - nothing is drawn
+ * regardless of {@link #getRenderType()}'s bucket; {@link #getRenderType()} still must return a real, valid
+ * constant (it is also {@code abstract} on {@link Particle}), so {@link ParticleRenderType#PARTICLE_SHEET_TRANSLUCENT}
  * is used here as a safe, extremely well-established vanilla constant with no missing-asset risk,
  * rather than risking an unverified {@code NO_RENDER}-style constant name this sandbox cannot
  * compile-check (ground rule: this port cannot run {@code ./gradlew} or launch a client). The particle
@@ -42,6 +44,16 @@ public class StubHbmParticle extends Particle {
     @Override
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    }
+
+    /**
+     * {@link Particle#render} is {@code abstract} in real 1.21.1 (unlike the assumption this class's
+     * own class javadoc made about a no-op vanilla default - there is none), so an override is
+     * mandatory. Deliberately empty: this stub has no texture/sprite to draw (see class javadoc) -
+     * drawing nothing here is the intended placeholder behavior, not an unimplemented TODO.
+     */
+    @Override
+    public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
     }
 
     /**

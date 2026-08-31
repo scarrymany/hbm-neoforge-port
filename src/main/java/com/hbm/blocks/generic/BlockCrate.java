@@ -1,6 +1,7 @@
 package com.hbm.blocks.generic;
 
 import com.hbm.lib.HBMSoundHandler;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -8,6 +9,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -39,6 +41,15 @@ import java.util.List;
 public class BlockCrate extends FallingBlock {
 
     /**
+     * NeoForge 1.20.5+ requires every {@link FallingBlock} subtype to hand back a {@link MapCodec}
+     * for data-driven (de)serialization. CE's five crate blocks share this one class distinguished
+     * only by {@link Type}, so the codec reconstructs the {@link Type#STANDARD} variant, matching how
+     * {@code CrateBlock} in the reference NeoForge 1.21.1 port collapses its own per-type constructor
+     * the same way.
+     */
+    public static final MapCodec<BlockCrate> CODEC = simpleCodec(properties -> new BlockCrate(properties, Type.STANDARD));
+
+    /**
      * CE gates crate-breaking on holding {@code ModItems.crowbar}, which does not exist in the
      * items catalog yet (owned by the tools area, not yet registered as of this port pass). Gating
      * on a tag instead of a concrete item reference lets that area add the real crowbar item to
@@ -58,6 +69,11 @@ public class BlockCrate extends FallingBlock {
         this.type = type;
     }
 
+    @Override
+    protected MapCodec<BlockCrate> codec() {
+        return CODEC;
+    }
+
     /** Registers one more weighted entry into {@code type}'s loot pool. */
     public static void addLoot(Type type, ItemStack stack, int weight) {
         POOLS.computeIfAbsent(type, t -> new ArrayList<>()).add(new WeightedEntry(stack, weight));
@@ -69,13 +85,13 @@ public class BlockCrate extends FallingBlock {
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player,
                                            InteractionHand hand, BlockHitResult hit) {
         if (!stack.is(CROWBAR_TAG)) {
             if (level.isClientSide) {
                 player.displayClientMessage(Component.translatable("chat.crate.needcrowbar"), true);
             }
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
 
         if (!level.isClientSide) {
@@ -83,7 +99,7 @@ public class BlockCrate extends FallingBlock {
             level.removeBlock(pos, false);
             level.playSound(null, pos, HBMSoundHandler.crateBreak.get(), SoundSource.BLOCKS, 0.5F, 1.0F);
         }
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @Override

@@ -82,7 +82,11 @@ public final class JetpackWornModel extends ArmorModelBase {
     private final ModelPart jetPack;
 
     public JetpackWornModel(EquipmentSlot slot) {
-        super(slot);
+        // Real 1.21.1 Model#renderType(ResourceLocation) is final (see ArmorModelBase's two-arg
+        // constructor javadoc) - this texture is fixed per-class, so the mapping function below
+        // ignores vanilla's own resolved location and always answers TEXTURE, replacing what used
+        // to be this class's own `renderType(ResourceLocation)` override.
+        super(slot, rl -> RenderType.entityCutoutNoCull(TEXTURE));
         this.jetPack = bakedRoot().getChild("jetpack");
     }
 
@@ -133,11 +137,6 @@ public final class JetpackWornModel extends ArmorModelBase {
                 PartPose.offset(-3.5F, 10.5F, 2.5F));
 
         return LayerDefinition.create(mesh, 32, 32);
-    }
-
-    @Override
-    public RenderType renderType(ResourceLocation vanillaResolvedLocation) {
-        return RenderType.entityCutoutNoCull(TEXTURE);
     }
 
     @Override

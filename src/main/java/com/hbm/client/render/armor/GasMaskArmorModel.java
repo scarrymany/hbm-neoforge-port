@@ -74,7 +74,11 @@ public final class GasMaskArmorModel extends ArmorModelBase {
     private final ModelPart mask;
 
     public GasMaskArmorModel(EquipmentSlot slot) {
-        super(slot);
+        // Real 1.21.1 Model#renderType(ResourceLocation) is final (see ArmorModelBase's two-arg
+        // constructor javadoc) - this texture is fixed per-class, so the mapping function below
+        // ignores vanilla's own resolved location and always answers TEXTURE, replacing what used
+        // to be this class's own `renderType(ResourceLocation)` override.
+        super(slot, rl -> RenderType.entityCutoutNoCull(TEXTURE));
         this.mask = bakedRoot().getChild("mask");
     }
 
@@ -116,11 +120,6 @@ public final class GasMaskArmorModel extends ArmorModelBase {
                 PartPose.offset(-4F, -4.9625F, -1F));
 
         return LayerDefinition.create(mesh, 64, 32);
-    }
-
-    @Override
-    public RenderType renderType(ResourceLocation vanillaResolvedLocation) {
-        return RenderType.entityCutoutNoCull(TEXTURE);
     }
 
     @Override

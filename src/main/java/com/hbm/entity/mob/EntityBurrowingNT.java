@@ -24,7 +24,13 @@ import net.minecraft.world.phys.Vec3;
  * probe) is functionally identical to vanilla {@link #isInWall()} (used both here and by
  * {@code EntityWormBaseNT#isCourseTraversable}), so this port reuses that one vanilla method instead of
  * reimplementing the corner probe. CE's {@code getEyeHeight()} (a simple {@code height * 0.5F} getter)
- * maps onto the modern per-pose {@link #getStandingEyeHeight(Pose, EntityDimensions)} override point.
+ * maps onto vanilla {@link net.minecraft.world.entity.Entity}'s own protected per-pose override
+ * point, which in 1.21.1 is named {@code getEyeHeight(Pose, EntityDimensions)} - not {@code
+ * getStandingEyeHeight}, an older/different-mapping name that does not exist on this version's
+ * {@code Entity}/{@code LivingEntity} (confirmed by the real "does not override or implement a
+ * method from a supertype" javac error against the old name; the real name/signature is
+ * well-established Minecraft-modding knowledge for the 1.20+ era, not independently verified
+ * against a compiled jar in this sandbox).
  */
 public abstract class EntityBurrowingNT extends PathfinderMob {
 
@@ -41,7 +47,7 @@ public abstract class EntityBurrowingNT extends PathfinderMob {
     }
 
     @Override
-    protected float getStandingEyeHeight(Pose pose, EntityDimensions dimensions) {
+    protected float getEyeHeight(Pose pose, EntityDimensions dimensions) {
         return dimensions.height() * 0.5F;
     }
 

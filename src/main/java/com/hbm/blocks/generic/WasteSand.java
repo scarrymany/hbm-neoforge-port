@@ -1,5 +1,6 @@
 package com.hbm.blocks.generic;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.block.FallingBlock;
 
 /**
@@ -14,7 +15,14 @@ import net.minecraft.world.level.block.FallingBlock;
  */
 public class WasteSand extends FallingBlock {
 
+    public static final MapCodec<WasteSand> CODEC = simpleCodec(WasteSand::new);
+
     public WasteSand(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<WasteSand> codec() {
+        return CODEC;
     }
 }

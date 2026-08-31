@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Generic stairs base for a mod building material, replacing CE's {@code BlockGenericStairs}.
@@ -36,12 +35,12 @@ public class BlockGenericStairs extends StairBlock implements ICustomBlockModelR
 
     private static final float BLAST_RESISTANCE_TOOLTIP_THRESHOLD = 50.0F;
 
-    public BlockGenericStairs(Supplier<BlockState> baseState, Properties properties) {
+    public BlockGenericStairs(BlockState baseState, Properties properties) {
         super(baseState, properties);
     }
 
     public BlockGenericStairs(Block baseBlock, Properties properties) {
-        this(baseBlock::defaultBlockState, properties);
+        this(baseBlock.defaultBlockState(), properties);
     }
 
     @Override

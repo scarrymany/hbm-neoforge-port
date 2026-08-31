@@ -40,6 +40,13 @@ public class BulletImpactParticle extends Particle {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/misc/impact.png");
 
+    /**
+     * Billboard quad half-size. Vanilla {@link Particle} has no such field - only its
+     * {@link net.minecraft.client.particle.TextureSheetParticle} subclass declares one - so, like this
+     * port's own {@code com.hbm.particle.engine.ParticleNT#quadSize} and CE's real
+     * {@code particleScale}, it's declared locally here.
+     */
+    private float quadSize;
     private final float roll;
 
     public BulletImpactParticle(ClientLevel level, double x, double y, double z) {

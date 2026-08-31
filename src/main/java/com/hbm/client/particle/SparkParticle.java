@@ -44,6 +44,13 @@ public class SparkParticle extends Particle {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/models/bfg/particle.png");
 
+    /**
+     * Billboard quad half-size. Vanilla {@link Particle} has no such field - only its
+     * {@link net.minecraft.client.particle.TextureSheetParticle} subclass declares one - so, like this
+     * port's own {@code com.hbm.particle.engine.ParticleNT#quadSize} and CE's real
+     * {@code particleScale}, it's declared locally here.
+     */
+    private float quadSize;
     /** CE {@code ParticleSpark.stretch} - ribbon length multiplier along the motion axis, default 1.0F. */
     private final float stretch;
     /** CE {@code ParticleSpark.gravity}, default {@code 9.81F * 0.01F} (HbmEffectNT.java:848). */

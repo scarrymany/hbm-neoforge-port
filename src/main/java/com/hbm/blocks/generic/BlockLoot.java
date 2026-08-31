@@ -1,5 +1,6 @@
 package com.hbm.blocks.generic;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -33,10 +34,17 @@ import java.util.List;
  */
 public class BlockLoot extends BaseEntityBlock {
 
+    public static final MapCodec<BlockLoot> CODEC = simpleCodec(BlockLoot::new);
+
     private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0);
 
     public BlockLoot(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override

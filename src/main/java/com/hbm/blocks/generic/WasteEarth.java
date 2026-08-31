@@ -63,7 +63,7 @@ public class WasteEarth extends Block implements ICustomBlockModelRegister {
     }
 
     @Override
-    protected void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (kind == Kind.BURNING) {
             level.addParticle(ParticleTypes.FLAME,
                     pos.getX() + 0.25 + random.nextDouble() * 0.5, pos.getY() + 1.1, pos.getZ() + 0.25 + random.nextDouble() * 0.5,

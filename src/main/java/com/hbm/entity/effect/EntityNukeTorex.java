@@ -370,7 +370,13 @@ public class EntityNukeTorex extends Entity implements IConstantRenderer {
         return this.entityData.get(SCALE);
     }
 
-    public byte getType() {
+    // CE: EntityNukeTorex.getType() -> byte (a 0/1 color-scheme status code stored in the TYPE
+    // synced data value, unrelated to vanilla's own Entity#getType() -> EntityType<?>). Renamed to
+    // getTorexType() so this class's own byte accessor no longer collides with - and fails to
+    // override - vanilla's real getType() (confirmed real/1.21.1 by javac's own "getType() in
+    // EntityNukeTorex cannot override getType() in Entity... return type byte is not compatible
+    // with EntityType<?>" error against the old name).
+    public byte getTorexType() {
         return this.entityData.get(TYPE);
     }
 
@@ -638,7 +644,7 @@ public class EntityNukeTorex extends Entity implements IConstantRenderer {
 
             double col = 2D / Math.max(distSq, 1); // col goes from 2-0
 
-            byte type = EntityNukeTorex.this.getType();
+            byte type = EntityNukeTorex.this.getTorexType();
             if (type == 0) {
                 this.colorR = nr2 + (nr1 - nr2) * col;
                 this.colorG = ng2 + (ng1 - ng2) * col;

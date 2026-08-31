@@ -470,7 +470,7 @@ public final class RBMKNeutronHandler {
                         return;
                     }
                 } else if (type == RBMKType.CONTROL_ROD && columnEntry instanceof IRBMKControlColumn control) {
-                    if (control.getLevel() > 0.0D) {
+                    if (control.getExtraction() > 0.0D) {
                         this.fluxQuantity *= control.getMult();
                         continue;
                     }

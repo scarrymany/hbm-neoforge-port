@@ -17,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.gametest.EmptyTemplate;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -38,11 +37,16 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
  * (e.g. {@code MachineAssemblyMachineBlockEntity.BATTERY_SLOT}, {@code ChemPlantBlockEntity
  * .outputTanks}, {@code ItemRBMKRod.getCoreHeat}) was confirmed by directly reading the real,
  * already-committed source file it comes from - cited per-method below - so the domain logic this
- * class exercises is grounded. The one genuinely unverified piece is the exact shape of NeoForge's
- * {@code @GameTestHolder}/{@code @PrefixGameTestTemplate}/{@code @EmptyTemplate} annotations
- * (no in-repo precedent exists to cross-check against - a grep of upstream/neo-edition for
- * "GameTest" returns zero hits); if any of their argument names differ from what's written here,
- * the fix is mechanical and does not change this class's actual test logic.
+ * class exercises is grounded. {@code @GameTestHolder} and {@code @PrefixGameTestTemplate} are
+ * real NeoForge 1.21.1 annotations (confirmed against a fresh clone of neoforged/NeoForge, branch
+ * {@code 1.21.1}) and are used correctly below. {@code @EmptyTemplate} is NOT real: it does not
+ * exist anywhere in {@code net.neoforged.neoforge.gametest} in that branch, nor in any other
+ * NeoForge branch checked (1.20.2 through the current tip, 25w14craftmine) - it was evidently
+ * invented by whoever originally wrote this class, with no real basis. Per this fix's own task
+ * instructions, its usages below are stubbed out (commented, with a TODO) rather than guessed at,
+ * since there is no verified NeoForge/vanilla mechanism in 1.21.1 for an auto-generated, data-file
+ * -free "empty" test structure of a given size - see the TODO at the first usage for the full
+ * explanation and what a real fix would need.
  */
 @GameTestHolder("hbm")
 @PrefixGameTestTemplate(false)
@@ -70,8 +74,20 @@ public final class ProgressionChainGameTests {
      * {@code MachineAssemblyMachineBlockEntity.java:74-80}: slot 0 battery, slots 4-15 input, slot
      * 16 output.
      */
+    // TODO(gametest, fc7-gametest-emptytemplate): removed `@EmptyTemplate(value = {5, 5, 5})`.
+    // That annotation does not exist in real NeoForge 1.21.1 (or any NeoForge branch from 1.20.2
+    // through the current tip, 25w14craftmine - confirmed against a fresh clone of
+    // neoforged/NeoForge) - it was invented, not a real API. With `@GameTest(template = "", ...)`
+    // above, NeoForge's own GameTestRegistry#turnMethodIntoTestFunction derives the structure
+    // resource name from the class+method (roughly
+    // `hbm:progressionchaingametests.assemblercraftssteelplate`, per
+    // net.neoforged.neoforge.gametest.GameTestHooks#prefixGameTestTemplate) and looks it up as a
+    // real registered structure template - there is no vanilla/NeoForge mechanism in this version
+    // to synthesize an empty NxHxD structure without one. A real fix needs either an actual
+    // `.nbt` structure template at that resource location (intended size was 5x5x5), or some
+    // other verified way to register an empty template at runtime. This stub only unblocks
+    // `compileJava`; the test is not runnable as-is. See this class's own javadoc above.
     @GameTest(template = "", timeoutTicks = 200)
-    @EmptyTemplate(value = {5, 5, 5})
     public static void assemblerCraftsSteelPlate(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 2, 2);
         helper.setBlock(pos, ProcessingBlocks.MACHINE_ASSEMBLER.get());
@@ -98,8 +114,10 @@ public final class ProgressionChainGameTests {
      * -70}, the only fluid-input-free recipe in this port's chem plant table). Battery slot
      * confirmed {@code ChemPlantBlockEntity.java:55} ({@code BATTERY_SLOT = 6}).
      */
+    // TODO(gametest, fc7-gametest-emptytemplate): removed `@EmptyTemplate(value = {5, 5, 5})` -
+    // same non-existent-annotation issue as assemblerCraftsSteelPlate above; see that method's
+    // TODO and this class's javadoc for the full explanation.
     @GameTest(template = "", timeoutTicks = 300)
-    @EmptyTemplate(value = {5, 5, 5})
     public static void chemPlantMakesEthanol(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 2, 2);
         helper.setBlock(pos, ChemIsotopeBlocks.CHEM_PLANT.get());
@@ -128,8 +146,10 @@ public final class ProgressionChainGameTests {
      * {@code rbmk_rod} block (BlockDummyable convention, confirmed
      * {@code blocks/machine/rbmk/RBMKBaseBlock.java}), so only one {@code setBlock} call is needed.
      */
+    // TODO(gametest, fc7-gametest-emptytemplate): removed `@EmptyTemplate(value = {5, 8, 5})` -
+    // same non-existent-annotation issue as assemblerCraftsSteelPlate above; see that method's
+    // TODO and this class's javadoc for the full explanation.
     @GameTest(template = "", timeoutTicks = 400)
-    @EmptyTemplate(value = {5, 8, 5})
     public static void rbmkRodCoreHeatRises(GameTestHelper helper) {
         BlockPos pos = new BlockPos(2, 2, 2);
         helper.setBlock(pos, RBMKBlocks.ROD.get());

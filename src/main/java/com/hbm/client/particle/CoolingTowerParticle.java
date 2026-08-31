@@ -53,6 +53,14 @@ public class CoolingTowerParticle extends Particle {
     private static final float STRAFE = 0.075F;
     private static final float ALPHA_MOD = 0.25F;
 
+    /**
+     * Billboard quad half-size. Vanilla {@link Particle} has no such field - only its
+     * {@link net.minecraft.client.particle.TextureSheetParticle} subclass declares one - so, like this
+     * port's own {@code com.hbm.particle.engine.ParticleNT#quadSize} and CE's real
+     * {@code particleScale}, it's declared locally here.
+     */
+    private float quadSize;
+
     public CoolingTowerParticle(ClientLevel level, double x, double y, double z) {
         super(level, x, y, z);
         this.lifetime = 750 + this.random.nextInt(250);

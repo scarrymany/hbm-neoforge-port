@@ -6,6 +6,7 @@ import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.util.i18n.I18nUtil;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -44,8 +45,15 @@ import java.util.List;
  */
 public class BlockBedrockOreTE extends BaseEntityBlock implements ILookOverlay {
 
+    public static final MapCodec<BlockBedrockOreTE> CODEC = simpleCodec(BlockBedrockOreTE::new);
+
     public BlockBedrockOreTE(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     /** CE's {@code onEntityWalk}: walking across the deposit sets the entity on fire for 3 seconds. */

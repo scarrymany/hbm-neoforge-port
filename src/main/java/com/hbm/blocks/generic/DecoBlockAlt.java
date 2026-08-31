@@ -1,5 +1,6 @@
 package com.hbm.blocks.generic;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -39,6 +40,14 @@ import java.util.function.Supplier;
  */
 public class DecoBlockAlt extends BaseEntityBlock {
 
+    /**
+     * {@code pulsing} is a construction-time flag (see {@code GenericDecoBlocks}' four registrations,
+     * three {@code false} and one {@code true}) rather than data carried in a saved {@link BlockState},
+     * so - matching neo-edition's {@code CrateBlock} precedent for its own construction-time {@code Type}
+     * field - the codec's reflective-construction path just pins the common, non-pulsing variant.
+     */
+    public static final MapCodec<DecoBlockAlt> CODEC = simpleCodec(properties -> new DecoBlockAlt(properties, false));
+
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     private static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 8.0, 16.0);
@@ -56,6 +65,11 @@ public class DecoBlockAlt extends BaseEntityBlock {
     /** The block returned as this statue's drop, matching CE's {@code getItemDropped} override. */
     public void setBaseStatue(Supplier<? extends Block> baseStatue) {
         this.baseStatue = baseStatue;
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override

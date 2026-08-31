@@ -111,9 +111,13 @@ public abstract class RBMKControlBlockEntity extends RBMKSlottedBlockEntity impl
         this.targetLevel = target;
     }
 
-    // implements IRBMKControlColumn.getLevel() - com.hbm.api.rbmk.IRBMKControlColumn
+    // implements IRBMKControlColumn.getExtraction() - com.hbm.api.rbmk.IRBMKControlColumn. Named
+    // getExtraction() rather than CE's own getLevel() because BlockEntity itself declares a
+    // @Nullable Level getLevel() accessor (the world) in NeoForge 1.21.1 - see the interface
+    // method's own javadoc and this class's javadoc for the matching level -> extraction field
+    // rename this mirrors.
     @Override
-    public double getLevel() {
+    public double getExtraction() {
         return this.extraction;
     }
 

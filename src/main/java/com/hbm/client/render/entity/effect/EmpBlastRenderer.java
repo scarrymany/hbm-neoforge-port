@@ -67,15 +67,13 @@ public class EmpBlastRenderer extends EntityRenderer<EntityEMPBlast> {
         poseStack.scale(s, 1F, s);
 
         VertexConsumer consumer = buffer.getBuffer(HbmObjModel.renderType(TEXTURE));
-        HbmObjModel.get(MODEL).renderAll(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY);
+        // CE: EntityEMPBlast.getBrightnessForRender() -> 15728880 (full-bright) - see
+        // CloudFleijaRenderer's class javadoc for why the incoming packedLight parameter is
+        // deliberately ignored/replaced with LightTexture.FULL_BRIGHT here rather than overriding a
+        // (nonexistent in 1.21.1) EntityRenderer#getPackedLight hook.
+        HbmObjModel.get(MODEL).renderAll(poseStack, consumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
-    }
-
-    /** CE: {@code EntityEMPBlast.getBrightnessForRender() -> 15728880} - see {@link CloudFleijaRenderer} javadoc. */
-    @Override
-    public int getPackedLight(EntityEMPBlast entity, float partialTick) {
-        return LightTexture.FULL_BRIGHT;
     }
 
     @Override

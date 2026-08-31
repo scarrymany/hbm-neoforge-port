@@ -52,18 +52,17 @@ import net.minecraft.resources.ResourceLocation;
  *       framework's one shared convenience RenderType rather than add a second bespoke one for a
  *       purely-cosmetic difference" call, not a missed detail.</li>
  *   <li>{@code getBrightnessForRender() -> 15728880} (CE, {@code EntityCloudFleija.java}) has no
- *       1.21.1 {@code Entity}-side equivalent to port onto the already-committed entity class - the
- *       correct hook is {@link EntityRenderer#getPackedLight(net.minecraft.world.entity.Entity,
- *       float)}, overridden below to return {@link LightTexture#FULL_BRIGHT} (packs to the exact
- *       same {@code 0xF000F0}/{@code 15728880} CE's own magic number already encodes). <b>This
- *       constant's exact name/location is well-established Minecraft-modding knowledge, cited by
- *       this task's own research report ({@code docs/phase5/
- *       reactor_and_explosion_visual_effects.md}, "Key design/API decisions"), and independently
- *       confirmed real/compiling at this exact {@code neo_version=21.1.228} by {@code
- *       upstream/neo-edition}'s own {@code RenderContext.java}/{@code RenderTom.java}/{@code
- *       RenderDeathBlast.java} (all import and use {@code LightTexture.FULL_BRIGHT}) - not,
- *       however, verified against a real compiled jar in this sandbox (network policy blocks the
- *       actual Mojang/NeoForge artifact hosts).</b></li>
+ *       1.21.1 {@code Entity}-side equivalent to port onto the already-committed entity class.
+ *       {@code EntityRenderer<T>} has <b>no {@code getPackedLight(T, float)} method to override</b>
+ *       in 1.21.1 - the packed light for a draw is computed upstream by {@code
+ *       EntityRenderDispatcher#getPackedLightCoords} and simply handed to {@link #render} as its
+ *       {@code packedLight} parameter (confirmed by this port's own {@code
+ *       com.hbm.client.render.ConstantRenderSweep}, which calls that exact dispatcher method).
+ *       Full-bright is instead achieved the confirmed-real way {@code upstream/neo-edition}'s own
+ *       {@code RenderTom.java}/{@code RenderDeathBlast.java} do it (neither overrides any such
+ *       method) - by ignoring the incoming {@code packedLight} argument inside {@link #render} and
+ *       substituting {@link LightTexture#FULL_BRIGHT} directly at the draw call (packs to the exact
+ *       same {@code 0xF000F0}/{@code 15728880} CE's own magic number already encodes).</li>
  * </ul>
  *
  * <h2>Asset gap (flagged, not fixed here - not this task's job)</h2>
@@ -99,15 +98,14 @@ public class CloudFleijaRenderer extends EntityRenderer<EntityCloudFleija> {
         poseStack.scale(s, s, s);
 
         VertexConsumer consumer = buffer.getBuffer(HbmObjModel.renderType(TEXTURE));
-        HbmObjModel.get(MODEL).renderAll(poseStack, consumer, packedLight, OverlayTexture.NO_OVERLAY);
+        // CE: EntityCloudFleija.getBrightnessForRender() -> 15728880 (full-bright) - see class
+        // javadoc. EntityRenderer<T> has no getPackedLight(T, float) hook to override in 1.21.1
+        // (confirmed by upstream/neo-edition's own RenderTom.java/RenderDeathBlast.java, neither of
+        // which override any such method - both substitute LightTexture.FULL_BRIGHT directly at the
+        // draw call instead), so the incoming packedLight parameter is deliberately ignored here.
+        HbmObjModel.get(MODEL).renderAll(poseStack, consumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
-    }
-
-    /** CE: {@code EntityCloudFleija.getBrightnessForRender() -> 15728880} - see class javadoc. */
-    @Override
-    public int getPackedLight(EntityCloudFleija entity, float partialTick) {
-        return LightTexture.FULL_BRIGHT;
     }
 
     @Override

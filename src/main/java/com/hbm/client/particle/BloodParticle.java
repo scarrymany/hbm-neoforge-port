@@ -54,6 +54,13 @@ public class BloodParticle extends Particle {
     private static final int GRID = 4;
     private static final float CELL = 1F / GRID;
 
+    /**
+     * Billboard quad half-size. Vanilla {@link Particle} has no such field - only its
+     * {@link net.minecraft.client.particle.TextureSheetParticle} subclass declares one - so, like this
+     * port's own {@code com.hbm.particle.engine.ParticleNT#quadSize} and CE's real
+     * {@code particleScale}, it's declared locally here.
+     */
+    private float quadSize;
     private final int texIdx;
     private float scaleOverLifetime;
     private float rotation;

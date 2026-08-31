@@ -164,8 +164,12 @@ public class CloudSoliniumRenderer extends EntityRenderer<EntityCloudSolinium> {
         HbmObjModel model = HbmObjModel.get(MODEL);
 
         // Inner opaque sphere - alpha 1 (CE: GlStateManager.color(fr,fg,fb), 3-arg = alpha defaults to 1).
+        // CE: EntityCloudSolinium.getBrightnessForRender() -> 15728880 (full-bright) - see
+        // CloudFleijaRenderer's class javadoc for why the incoming packedLight parameter is
+        // deliberately ignored/replaced with LightTexture.FULL_BRIGHT here rather than overriding a
+        // (nonexistent in 1.21.1) EntityRenderer#getPackedLight hook.
         VertexConsumer solidConsumer = buffer.getBuffer(SOLID);
-        model.renderAll(poseStack, solidConsumer, packedLight, OverlayTexture.NO_OVERLAY,
+        model.renderAll(poseStack, solidConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                 packArgb(TINT_R, TINT_G, TINT_B, 1F));
 
         // 3 outer additive glow shells - alpha 0.125, compounding 1.025x scale each iteration
@@ -174,16 +178,10 @@ public class CloudSoliniumRenderer extends EntityRenderer<EntityCloudSolinium> {
         int glowArgb = packArgb(TINT_R, TINT_G, TINT_B, 0.125F);
         for (int i = 0; i < 3; i++) {
             poseStack.scale(1.025F, 1.025F, 1.025F);
-            model.renderAll(poseStack, glowConsumer, packedLight, OverlayTexture.NO_OVERLAY, glowArgb);
+            model.renderAll(poseStack, glowConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, glowArgb);
         }
 
         poseStack.popPose();
-    }
-
-    /** CE: {@code EntityCloudSolinium.getBrightnessForRender() -> 15728880} - see {@link CloudFleijaRenderer} javadoc. */
-    @Override
-    public int getPackedLight(EntityCloudSolinium entity, float partialTick) {
-        return LightTexture.FULL_BRIGHT;
     }
 
     /** CE binds no texture for this entity at all - see class javadoc. Never called by this class's own render path. */

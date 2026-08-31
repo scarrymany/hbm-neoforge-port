@@ -66,7 +66,13 @@ public final class M65ArmorModel extends ArmorModelBase {
      *                class javadoc for why this is a constructor parameter, not a constant.
      */
     public M65ArmorModel(EquipmentSlot slot, ResourceLocation texture) {
-        super(slot);
+        // Real 1.21.1 Model#renderType(ResourceLocation) is final (see ArmorModelBase's two-arg
+        // constructor javadoc) - this class shares one model across 5 differently-textured items
+        // (see class javadoc), so the mapping function below closes over the `texture` constructor
+        // parameter (legal: it is a local parameter, evaluated before super() runs, not a capture of
+        // `this`) and ignores vanilla's own resolved location, replacing what used to be this
+        // class's own `renderType(ResourceLocation)` override.
+        super(slot, rl -> RenderType.entityCutoutNoCull(texture));
         this.texture = texture;
         bake();
         this.mask = bakedMask;
@@ -124,11 +130,6 @@ public final class M65ArmorModel extends ArmorModelBase {
                 PartPose.offsetAndRotation(-2F, -1.5F, -4F, 0.6108652F, 0F, 0F));
 
         return LayerDefinition.create(mesh, 32, 32);
-    }
-
-    @Override
-    public RenderType renderType(ResourceLocation vanillaResolvedLocation) {
-        return RenderType.entityCutoutNoCull(texture);
     }
 
     @Override

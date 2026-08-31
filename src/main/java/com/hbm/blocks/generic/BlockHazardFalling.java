@@ -1,6 +1,7 @@
 package com.hbm.blocks.generic;
 
 import com.hbm.hazard.HazardSystem;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,8 +19,15 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public class BlockHazardFalling extends FallingBlock {
 
+    public static final MapCodec<BlockHazardFalling> CODEC = simpleCodec(BlockHazardFalling::new);
+
     public BlockHazardFalling(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<BlockHazardFalling> codec() {
+        return CODEC;
     }
 
     @Override

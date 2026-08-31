@@ -39,6 +39,13 @@ public class GasFlameParticle extends Particle {
     private static final ResourceLocation TEXTURE =
             ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/particle/particlesmoke.png");
 
+    /**
+     * Billboard quad half-size. Vanilla {@link Particle} has no such field - only its
+     * {@link net.minecraft.client.particle.TextureSheetParticle} subclass declares one - so, like this
+     * port's own {@code com.hbm.particle.engine.ParticleNT#quadSize} and CE's real
+     * {@code particleScale}, it's declared locally here.
+     */
+    private float quadSize;
     /** CE's own per-spawn scale, {@code HbmEffectNT.java:470-471} (falls back to CE's own 6.5F default). */
     public final float scale;
     /** CE {@code ParticleGasFlame.colorMod}, a fixed per-particle brightness jitter (0.8-1.0). */

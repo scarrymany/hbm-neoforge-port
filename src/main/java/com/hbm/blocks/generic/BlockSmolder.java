@@ -30,7 +30,7 @@ public class BlockSmolder extends Block {
     }
 
     @Override
-    protected void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (level.getBlockState(pos.above()).isAir()) {
             level.addParticle(ParticleTypes.LAVA,
                     pos.getX() + 0.25 + random.nextDouble() * 0.5, pos.getY() + 1.1, pos.getZ() + 0.25 + random.nextDouble() * 0.5,

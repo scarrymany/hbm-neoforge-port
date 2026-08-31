@@ -267,7 +267,13 @@ public class TorexRenderer extends EntityRenderer<EntityNukeTorex> {
                 // 1.21.1 LivingEntity renames maxHurtTime -> hurtDuration, attackedAtYaw -> hurtDir
                 // (confirmed via upstream/neo-edition's own NukeTorex.render, see class javadoc) -
                 // the distance-scaled formula itself is CE's own and is preserved here, not Neo
-                // Edition's simplified hardcoded 15/15/0.
+                // Edition's simplified hardcoded 15/15/0. Player#hurtDir is `protected` in real
+                // 1.21.1 vanilla (unlike hurtTime/hurtDuration, both already public) - writing it
+                // from here requires the `public net.minecraft.world.entity.player.Player hurtDir`
+                // access-transformer entry in src/main/resources/META-INF/accesstransformer.cfg,
+                // the same confirmed-real fix upstream/neo-edition's own accesstransformer.cfg
+                // applies for this exact field so its own identical `player.hurtDir = 0.0F;` line
+                // (NukeTorex.java) compiles.
                 player.hurtTime = diff > 0 ? (int) (diff * 1.5F) : 0;
                 player.hurtDuration = Math.max(diff, 0);
                 player.hurtDir = 0F;

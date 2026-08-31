@@ -45,12 +45,12 @@ import com.hbm.render.loader.ModelFormatException;
  * {@link ArmorModelBase}'s class javadoc) hands this class exactly <b>one</b> {@link
  * VertexConsumer}, already bound to exactly one {@link RenderType}/texture for the whole call -
  * there is no {@code MultiBufferSource} reachable from inside {@code renderToBuffer} to open a
- * second buffer for a second texture. This class resolves that texture by overriding {@link
- * #renderType(ResourceLocation)} to ignore vanilla's own resolved location and always return
- * {@link HbmObjModel#renderType(ResourceLocation)} of {@link SlotRecipe#texture()} for the current
- * slot - a well-established, long-stable {@code Model} override technique (not independently
- * confirmed by a compiling call site in either reference tree in this sandbox, per this task's
- * ground rules), which at least gives full, deliberate control over which single texture is used,
+ * second buffer for a second texture. This class resolves that texture via the {@code
+ * ResourceLocation -> RenderType} function passed to {@link ArmorModelBase}'s two-arg constructor
+ * (real 1.21.1 {@link #renderType(ResourceLocation)} is {@code final} - see that constructor's own
+ * javadoc for the citation trail), a lambda that ignores vanilla's own resolved location and always
+ * returns {@link HbmObjModel#renderType(ResourceLocation)} of {@link SlotRecipe#texture()} for the
+ * current slot, which at least gives full, deliberate control over which single texture is used,
  * rather than an arbitrary vanilla-resolved one. <b>The practical consequence</b>: every part drawn
  * for one slot (e.g. a chestplate's body <i>and</i> arms) shares that slot's one primary texture
  * (chosen as CE's own "chest"/"leg"/helmet file, matching {@link SlotRecipe#texture()} per call
@@ -128,7 +128,19 @@ public class ObjArmorModel extends ArmorModelBase {
     private volatile boolean warned;
 
     public ObjArmorModel(EquipmentSlot slot, ResourceLocation objResource, Map<EquipmentSlot, SlotRecipe> recipes) {
-        super(slot);
+        // Real 1.21.1 Model#renderType(ResourceLocation) is final (see ArmorModelBase's two-arg
+        // constructor javadoc) - this class's single-texture-per-slot resolution (see class javadoc)
+        // needs both `recipes` and the current `slot`, so the mapping function below closes over
+        // both constructor parameters (legal: local parameters, evaluated before super() runs, not a
+        // capture of `this`), replacing what used to be this class's own
+        // `renderType(ResourceLocation)` override. Falls back to plain entityCutoutNoCull of
+        // vanilla's own resolved location for a slot with no recipe entry, matching the old
+        // override's `super.renderType(vanillaResolvedLocation)` fallback exactly (see
+        // ArmorModelBase's single-arg constructor, which forwards that same default).
+        super(slot, rl -> {
+            SlotRecipe recipe = recipes.get(slot);
+            return recipe != null ? HbmObjModel.renderType(recipe.texture()) : RenderType.entityCutoutNoCull(rl);
+        });
         this.objResource = objResource;
         this.recipes = recipes;
     }
@@ -152,12 +164,6 @@ public class ObjArmorModel extends ArmorModelBase {
             }
         }
         return m;
-    }
-
-    @Override
-    public RenderType renderType(ResourceLocation vanillaResolvedLocation) {
-        SlotRecipe recipe = recipes.get(getSlot());
-        return recipe != null ? HbmObjModel.renderType(recipe.texture()) : super.renderType(vanillaResolvedLocation);
     }
 
     @Override
