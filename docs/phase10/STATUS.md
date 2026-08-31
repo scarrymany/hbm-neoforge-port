@@ -69,5 +69,12 @@ keys so Cassette/`getOrCreate` can resolve them.
 - Entity loot datagen (Phase 8 leftover).
 - IRailNTM implementors still absent in CE.
 
+## Verified this session
+
+- `./gradlew compileJava` — 0 errors (73 pre-existing deprecation warnings)
+- `./gradlew build` — SUCCESS
+- jar `build/libs/hbm-0.0.1.jar` **65,142,562** bytes (**62.12 MB**), was 6,514,445
+- jar contains 6967 png / 548 ogg / 634 obj / `sounds.json`
+
 Repro: `python3 scripts/phase10_copy_ce_assets.py` (idempotent; needs
 `upstream/hbm-ce`).
