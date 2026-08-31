@@ -22,6 +22,8 @@ public final class OilMeteorConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> OIL_SAND_BUBBLE = key("oil_sand_bubble");
     public static final ResourceKey<ConfiguredFeature<?, ?>> METEORITE = key("meteorite");
     public static final ResourceKey<ConfiguredFeature<?, ?>> ANTENNA = key("antenna");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> BUNKER = key("bunker");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> RADIO = key("radio");
 
     private OilMeteorConfiguredFeatures() {
     }
@@ -32,6 +34,8 @@ public final class OilMeteorConfiguredFeatures {
         context.register(OIL_SAND_BUBBLE, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.OIL_SAND_BUBBLE.get(), NoneFeatureConfiguration.INSTANCE));
         context.register(METEORITE, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.METEORITE.get(), NoneFeatureConfiguration.INSTANCE));
         context.register(ANTENNA, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.ANTENNA.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(BUNKER, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.BUNKER.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(RADIO, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.RADIO.get(), NoneFeatureConfiguration.INSTANCE));
     }
 
     private static ResourceKey<ConfiguredFeature<?, ?>> key(String path) {

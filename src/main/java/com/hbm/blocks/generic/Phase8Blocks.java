@@ -18,14 +18,16 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 /**
  * Phase 8 block families required by CE {@code .nbt} palettes ({@code StructureManager.java} +
  * {@code assets/hbm/structures/*.nbt}) and the leftover brick/concrete/stairs/slab table in
- * {@code ModBlocks.java}:496-504 / 86-210. Stairs use {@link Blocks#STONE} as the {@link
- * net.minecraft.world.level.block.StairBlock} base state so we never call {@code DeferredBlock#get()}
- * from a static registrar (CE {@code BlockGenericStairs} took the live parent block).
+ * {@code ModBlocks.java}:86-227 / 398-434 / 497-504 / 643-644 / 857. Stairs use {@link Blocks#STONE}
+ * as the {@link net.minecraft.world.level.block.StairBlock} base state so we never call
+ * {@code DeferredBlock#get()} from a static registrar (CE {@code BlockGenericStairs} took the live
+ * parent block).
  */
 public final class Phase8Blocks {
 
@@ -40,6 +42,9 @@ public final class Phase8Blocks {
         registerMeteorBricks();
         registerStairs();
         registerSlabs();
+        registerColoredConcreteStairsSlabs();
+        registerJungleDungeonBricks();
+        registerGeiger();
         registerWandLoot();
         registerBlock("block_electrical_scrap",
                 () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(2.5F, 5.0F).sound(SoundType.METAL)),
@@ -138,6 +143,50 @@ public final class Phase8Blocks {
         slab("concrete_smooth_slab", 15.0F, 70.0F);
         slab("concrete_asbestos_slab", 15.0F, 70.0F);
         slab("brick_slab", 15.0F, 70.0F);
+        slab("ducrete_smooth_slab", 20.0F, 250.0F);
+        slab("ducrete_slab", 20.0F, 250.0F);
+        slab("ducrete_brick_slab", 15.0F, 375.0F);
+        slab("ducrete_reinforced_slab", 20.0F, 500.0F);
+        slab("tile_lab_slab", 1.0F, 10.0F);
+        slab("tile_lab_cracked_slab", 1.0F, 10.0F);
+        slab("tile_lab_broken_slab", 1.0F, 10.0F);
+    }
+
+    /**
+     * CE {@code ModBlocks.java}:150-181 / 212-227 — 16 dye-color stairs+slabs (1.12 {@code silver}
+     * kept as the registry path) plus 8 {@code concrete_colored_ext} stairs.
+     */
+    private static void registerColoredConcreteStairsSlabs() {
+        String[] colors = {
+                "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
+                "silver", "cyan", "purple", "blue", "brown", "green", "red", "black"
+        };
+        for (String color : colors) {
+            stair("concrete_colored_stairs_" + color, 15.0F, 94.0F);
+            slab("concrete_" + color + "_slab", 15.0F, 70.0F);
+        }
+        for (BlockConcreteColoredExt.Type type : BlockConcreteColoredExt.Type.VALUES) {
+            stair("concrete_colored_ext_stairs_" + type.name().toLowerCase(Locale.US), 15.0F, 94.0F);
+        }
+    }
+
+    /** CE {@code ModBlocks.java}:407-434 / 643-644 — jungle/dungeon cubes (plain BlockBase only). */
+    private static void registerJungleDungeonBricks() {
+        registerBlock("brick_jungle", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_jungle_cracked", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_dungeon", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_dungeon_flat", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_dungeon_tile", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_dungeon_circle", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_fire", () -> new BlockBase(stone(10.0F, 10.0F)), ModCreativeTabs.BLOCKS);
+        stair("brick_fire_stairs", 15.0F, 35.0F);
+    }
+
+    /** CE {@code ModBlocks.java}:857 / {@code GeigerCounter.java}:28 — facing casing for Bunker. */
+    private static void registerGeiger() {
+        registerBlock("geiger",
+                () -> new BlockGeiger(BlockBehaviour.Properties.of().strength(15.0F, 0.25F).sound(SoundType.STONE).noOcclusion()),
+                ModCreativeTabs.MACHINE);
     }
 
     /** CE {@code BlockWandLoot} / {@code wand_loot} — structure loot marker. */
