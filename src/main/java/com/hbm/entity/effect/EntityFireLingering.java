@@ -89,7 +89,7 @@ public class EntityFireLingering extends Entity {
         return this;
     }
 
-    public int getType() {
+    public int getLingeringType() {
         return this.entityData.get(TYPE);
     }
 
@@ -109,7 +109,7 @@ public class EntityFireLingering extends Entity {
 
             float width = this.entityData.get(WIDTH);
             float height = this.entityData.get(HEIGHT);
-            int type = getType();
+            int type = getLingeringType();
 
             AABB scan = new AABB(
                     getX() - width / 2D, getY(), getZ() - width / 2D,

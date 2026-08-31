@@ -130,7 +130,7 @@ public class EntityMist extends Entity {
         builder.define(HEIGHT, 0F);
     }
 
-    public FluidType getType() {
+    public FluidType getFluidType() {
         return Fluids.fromID(this.entityData.get(TYPE));
     }
 
@@ -160,7 +160,7 @@ public class EntityMist extends Entity {
             }
             this.age++;
 
-            FluidType type = getType();
+            FluidType type = getFluidType();
 
             if (type.hasTrait(FT_VentRadiation.class)) {
                 FT_VentRadiation trait = type.getTrait(FT_VentRadiation.class);
@@ -203,7 +203,7 @@ public class EntityMist extends Entity {
                 fx.putFloat("base", 0.75F);
                 fx.putFloat("max", 2F);
                 fx.putInt("life", 50 + level().random.nextInt(10));
-                fx.putInt("color", getType().getColor());
+                fx.putInt("color", getFluidType().getColor());
                 MainRegistry.proxy.effectNT(HbmEffect.TOWER, px, py, pz, fx);
             }
         }
@@ -212,7 +212,7 @@ public class EntityMist extends Entity {
     /** Can't reuse a generic chemical-cloud entity here - while similar in some places, the actual effects often differ. */
     protected void affect(Entity entity, double intensity) {
 
-        FluidType type = getType();
+        FluidType type = getFluidType();
         LivingEntity living = entity instanceof LivingEntity le ? le : null;
 
         if (type.temperature >= 100) {
@@ -308,7 +308,7 @@ public class EntityMist extends Entity {
     }
 
     protected boolean isExtinguishing(FluidType type) {
-        return getType().temperature < 50 && !type.hasTrait(FT_Flammable.class);
+        return getFluidType().temperature < 50 && !type.hasTrait(FT_Flammable.class);
     }
 
     // terribly copy-pasted from EntityChemical.class, whose method was terribly copy-pasted from
@@ -347,7 +347,7 @@ public class EntityMist extends Entity {
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-        Fluids.writeType(tag, "type", getType());
+        Fluids.writeType(tag, "type", getFluidType());
         tag.putFloat("width", this.entityData.get(WIDTH));
         tag.putFloat("height", this.entityData.get(HEIGHT));
     }

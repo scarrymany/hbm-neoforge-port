@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Entity.MoveFunction;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -99,8 +100,10 @@ public abstract class EntityRailCarRidable extends EntityRailCarCargo {
     }
 
     @Override
-    public Entity getControllingPassenger() {
-        return this.getPassengers().isEmpty() ? null : this.getPassengers().get(0);
+    public LivingEntity getControllingPassenger() {
+        if (this.getPassengers().isEmpty()) return null;
+        Entity passenger = this.getPassengers().get(0);
+        return passenger instanceof LivingEntity living ? living : null;
     }
 
     @Override

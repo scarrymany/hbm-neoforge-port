@@ -111,7 +111,7 @@ public abstract class FluidDuctBaseBlock extends BaseEntityBlock implements IAna
     @Override
     public void changeTypeRecursively(Level level, BlockPos pos, FluidType prevType, FluidType type, int loopsRemaining) {
         if (!(level.getBlockEntity(pos) instanceof PipeBaseBlockEntity pipe)) return;
-        if (pipe.getType() != prevType || pipe.getType() == type) return;
+        if (pipe.getFluidType() != prevType || pipe.getFluidType() == type) return;
 
         pipe.setType(type);
         if (loopsRemaining <= 0) return;
@@ -128,7 +128,7 @@ public abstract class FluidDuctBaseBlock extends BaseEntityBlock implements IAna
     public List<String> getDebugInfo(Level level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof PipeBaseBlockEntity pipe)) return null;
 
-        FluidType type = pipe.getType();
+        FluidType type = pipe.getFluidType();
         if (type == null) return null;
 
         FluidNode node = (FluidNode) UniNodespace.getNode(level, pos, type.getNetworkProvider());

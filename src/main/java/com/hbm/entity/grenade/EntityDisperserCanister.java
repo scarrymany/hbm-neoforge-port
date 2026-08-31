@@ -52,7 +52,7 @@ public class EntityDisperserCanister extends EntityGrenadeBase {
     }
 
     @Nullable
-    public Item getType() {
+    public Item getCanisterItem() {
         String raw = this.getEntityData().get(DATA_ITEM);
         return raw.isEmpty() ? null : BuiltInRegistries.ITEM.get(ResourceLocation.parse(raw));
     }

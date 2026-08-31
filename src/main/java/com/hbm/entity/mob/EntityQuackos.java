@@ -90,7 +90,7 @@ public class EntityQuackos extends EntityDuck {
     }
 
     @Override
-    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+    public InteractionResult mobInteract(Player player, InteractionHand hand) {
         InteractionResult result = super.mobInteract(player, hand);
         if (result.consumesAction()) return result;
 

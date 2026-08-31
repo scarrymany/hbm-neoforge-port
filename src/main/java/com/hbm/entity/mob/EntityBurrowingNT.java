@@ -46,7 +46,6 @@ public abstract class EntityBurrowingNT extends PathfinderMob {
         return false;
     }
 
-    @Override
     protected float getEyeHeight(Pose pose, EntityDimensions dimensions) {
         return dimensions.height() * 0.5F;
     }

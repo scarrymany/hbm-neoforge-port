@@ -25,12 +25,13 @@ import java.util.Set;
  * table, on pain of {@link IllegalStateException} at {@code runData} time.
  *
  * <p>Only reachable through a {@link net.minecraft.data.loot.LootTableProvider.SubProviderEntry}
- * factory reference (confirmed real, not an oversight - see {@code com.hbm.datagen.ModDataGenerators}),
- * hence the {@code protected} constructor.
+ * factory reference (confirmed real, not an oversight - see {@code com.hbm.datagen.ModDataGenerators}).
+ * Constructor is public so {@code ModBlockLootTableProvider::new} is a legal method reference from
+ * that other class (javac rejects a {@code protected} ctor used as a cross-package {@code ::new}).
  */
 public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
-    protected ModBlockLootTableProvider(HolderLookup.Provider registries) {
+    public ModBlockLootTableProvider(HolderLookup.Provider registries) {
         super(Set.of(), FeatureFlags.REGISTRY.allFlags(), registries);
     }
 

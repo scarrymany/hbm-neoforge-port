@@ -68,6 +68,11 @@ public abstract class EntityMinecartNTM extends AbstractMinecart {
         return true;
     }
 
+    @Override
+    public Type getMinecartType() {
+        return Type.RIDEABLE;
+    }
+
     /** CE: {@code getCartItem()} - each subclass's own item form. */
     public abstract Item getCartItem();
 
