@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:heavy_barrels/ferrouranium"
+    },
+    "G": {
+      "tag": "c:grips/wood"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "R": {
+      "tag": "c:heavy_receivers/ferrouranium"
+    }
+  },
+  "pattern": [
+    "  G",
+    "BRM",
+    "  G"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_m2"
+  }
+}

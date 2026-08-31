@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:ingot_steel"
+    },
+    {
+      "item": "hbm:powder_coal"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:ingot_steel_dusted_0"
+  }
+}

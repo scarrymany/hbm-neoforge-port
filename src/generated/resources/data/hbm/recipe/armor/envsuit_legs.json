@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "tag": "c:plates_triple/titanium"
+    },
+    "R": {
+      "item": "hbm:ingot_rubber"
+    },
+    "T": {
+      "item": "hbm:plate_titanium"
+    }
+  },
+  "pattern": [
+    "TCT",
+    "R R",
+    "T T"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:envsuit_legs"
+  }
+}

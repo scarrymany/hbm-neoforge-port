@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_lead_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:ingot_lead"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:tool/rbmk_tool"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_lead_ingot"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:tool/rbmk_tool"
+    ]
+  }
+}

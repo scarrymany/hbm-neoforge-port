@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_gun": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:gun_laser_pistol"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:weapon/gun_laser_pistol_pew_pew"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_gun"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:weapon/gun_laser_pistol_pew_pew"
+    ]
+  }
+}

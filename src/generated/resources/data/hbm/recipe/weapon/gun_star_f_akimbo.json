@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "M": {
+      "tag": "c:gun_mechanisms/saturnite"
+    },
+    "U": {
+      "item": "hbm:gun_star_f"
+    }
+  },
+  "pattern": [
+    "UMU"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_star_f_akimbo"
+  }
+}

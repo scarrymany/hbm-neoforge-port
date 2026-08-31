@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_scrambled": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:balefire_scrambled"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:consumable/balefire_and_ham"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_scrambled"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:consumable/balefire_and_ham"
+    ]
+  }
+}

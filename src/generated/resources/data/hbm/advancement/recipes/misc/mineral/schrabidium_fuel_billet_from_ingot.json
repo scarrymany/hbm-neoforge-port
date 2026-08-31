@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:ingot_schrabidium_fuel"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:mineral/schrabidium_fuel_billet_from_ingot"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ingot"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:mineral/schrabidium_fuel_billet_from_ingot"
+    ]
+  }
+}

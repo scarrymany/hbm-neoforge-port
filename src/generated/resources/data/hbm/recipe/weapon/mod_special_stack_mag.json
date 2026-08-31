@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "M": {
+      "tag": "c:gun_mechanisms/saturnite"
+    },
+    "P": {
+      "item": "hbm:plate_weaponsteel"
+    }
+  },
+  "pattern": [
+    "P P",
+    "P P",
+    "PMP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_stack_mag"
+  }
+}

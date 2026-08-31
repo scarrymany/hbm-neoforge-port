@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:weapon/mp_thruster_15_balefire_large_rad"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_thruster": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:mp_thruster_15_balefire_large"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_thruster"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:weapon/mp_thruster_15_balefire_large_rad"
+    ]
+  }
+}

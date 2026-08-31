@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": {
+      "item": "hbm:gem_volcanic"
+    },
+    "M": {
+      "item": "hbm:fragment_meteorite"
+    }
+  },
+  "pattern": [
+    " M ",
+    "MDM",
+    " M "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:meteor_charm"
+  }
+}

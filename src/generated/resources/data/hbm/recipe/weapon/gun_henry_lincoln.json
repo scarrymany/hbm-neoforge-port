@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "G": {
+      "item": "hbm:gun_henry"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "P": {
+      "tag": "c:plates_triple/gold"
+    }
+  },
+  "pattern": [
+    " M ",
+    "PGP",
+    " M "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_henry_lincoln"
+  }
+}

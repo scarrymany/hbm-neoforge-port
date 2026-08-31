@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "hbm:gun_autoshotgun"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/saturnite"
+    }
+  },
+  "pattern": [
+    " M ",
+    "MAM",
+    " M "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_autoshotgun_shredder"
+  }
+}

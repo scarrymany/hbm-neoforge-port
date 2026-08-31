@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "minecraft:apple"
+    },
+    "E": {
+      "item": "hbm:nugget_euphemium"
+    }
+  },
+  "pattern": [
+    "EEE",
+    "EAE",
+    "EEE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:apple_euphemium"
+  }
+}

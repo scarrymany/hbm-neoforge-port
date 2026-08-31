@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "hbm:ingot_lead"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "pattern": [
+    " A ",
+    " IA",
+    "I  "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:rbmk_tool"
+  }
+}

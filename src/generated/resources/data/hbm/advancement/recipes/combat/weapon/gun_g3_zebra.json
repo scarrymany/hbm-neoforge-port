@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_gun": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:gun_g3"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:weapon/gun_g3_zebra"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_gun"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:weapon/gun_g3_zebra"
+    ]
+  }
+}

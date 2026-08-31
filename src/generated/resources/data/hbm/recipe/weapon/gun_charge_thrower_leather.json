@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:heavy_barrels/steel"
+    },
+    "G": {
+      "tag": "c:grips/steel"
+    },
+    "L": {
+      "item": "minecraft:leather"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/gunmetal"
+    }
+  },
+  "pattern": [
+    "MMM",
+    "BBL",
+    "GG "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_charge_thrower"
+  }
+}

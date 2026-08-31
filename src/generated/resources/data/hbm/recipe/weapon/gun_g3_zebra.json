@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "M": {
+      "tag": "c:gun_mechanisms/saturnite"
+    },
+    "P": {
+      "item": "hbm:gun_g3"
+    }
+  },
+  "pattern": [
+    " M ",
+    "MPM",
+    " M "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_g3_zebra"
+  }
+}

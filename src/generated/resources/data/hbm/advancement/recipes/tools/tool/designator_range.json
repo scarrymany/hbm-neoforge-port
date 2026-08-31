@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_rangefinder": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:rangefinder"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:tool/designator_range"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_rangefinder"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:tool/designator_range"
+    ]
+  }
+}

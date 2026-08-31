@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:light_barrels/workersalloy"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/gunmetal"
+    },
+    "R": {
+      "tag": "c:light_receivers/workersalloy"
+    },
+    "S": {
+      "tag": "c:stocks/workersalloy"
+    }
+  },
+  "pattern": [
+    "BRM",
+    "BGS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_spas12"
+  }
+}

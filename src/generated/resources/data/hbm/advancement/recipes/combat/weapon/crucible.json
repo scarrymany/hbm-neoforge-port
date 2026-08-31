@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_demon_core": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:demon_core_closed"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:weapon/crucible"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_demon_core"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:weapon/crucible"
+    ]
+  }
+}

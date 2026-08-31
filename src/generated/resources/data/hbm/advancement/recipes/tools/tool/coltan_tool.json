@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_crystal": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:crystal_cinnabar"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:tool/coltan_tool"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_crystal"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:tool/coltan_tool"
+    ]
+  }
+}

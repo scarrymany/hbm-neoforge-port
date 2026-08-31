@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:light_barrels/weaponsteel"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "R": {
+      "tag": "c:light_receivers/weaponsteel"
+    }
+  },
+  "pattern": [
+    "BRM",
+    "  G"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_star_f"
+  }
+}

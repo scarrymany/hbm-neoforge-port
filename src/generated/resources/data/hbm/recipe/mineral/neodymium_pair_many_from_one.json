@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_neodymium"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "hbm:powder_neodymium_tiny"
+  }
+}

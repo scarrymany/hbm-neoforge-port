@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_many": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:nugget_mercury_tiny"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:mineral/mercury_pair_one_from_many"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_many"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:mineral/mercury_pair_one_from_many"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "hbm:bj_plate_jetpack"
+    },
+    "C": {
+      "item": "hbm:singularity_spark"
+    },
+    "P": {
+      "item": "hbm:plate_armor_dnt"
+    },
+    "S": {
+      "item": "hbm:ingot_chainsteel"
+    }
+  },
+  "pattern": [
+    "PCP",
+    "PBP",
+    "PSP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:dns_plate"
+  }
+}

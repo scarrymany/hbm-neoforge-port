@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:billet_sr90"
+    },
+    {
+      "item": "hbm:billet_sr90"
+    },
+    {
+      "item": "hbm:billet_sr90"
+    },
+    {
+      "item": "hbm:plate_iron"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:pellet_rtg_strontium"
+  }
+}

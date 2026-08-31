@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.1,
+  "ingredient": {
+    "item": "hbm:plastic_scrap_board_transistor"
+  },
+  "result": {
+    "count": 1,
+    "id": "hbm:ingot_polymer"
+  }
+}

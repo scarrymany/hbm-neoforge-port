@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_mush": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:mush"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:consumable/glowing_stew"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_mush"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:consumable/glowing_stew"
+    ]
+  }
+}

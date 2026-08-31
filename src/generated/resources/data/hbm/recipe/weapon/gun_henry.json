@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:light_barrels/steel"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/gunmetal"
+    },
+    "P": {
+      "item": "hbm:plate_gunmetal"
+    },
+    "R": {
+      "tag": "c:light_receivers/gunmetal"
+    },
+    "S": {
+      "tag": "c:stocks/wood"
+    }
+  },
+  "pattern": [
+    "BRP",
+    "BMS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_henry"
+  }
+}

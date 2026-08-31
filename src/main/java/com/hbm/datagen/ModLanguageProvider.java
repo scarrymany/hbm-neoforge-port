@@ -9,7 +9,9 @@ import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * English display names for every registered item/block, plus a large first real-content pass of
@@ -73,8 +75,17 @@ import java.util.Map;
  */
 public class ModLanguageProvider extends LanguageProvider {
 
+    private final Set<String> seenKeys = new HashSet<>();
+
     public ModLanguageProvider(PackOutput output) {
         super(output, MainRegistry.MODID, "en_us");
+    }
+
+    /** BlockItems share {@code block.hbm.*} with their Block — LanguageProvider forbids dups. */
+    @Override
+    public void add(String key, String value) {
+        if (!seenKeys.add(key)) return;
+        super.add(key, value);
     }
 
     @Override

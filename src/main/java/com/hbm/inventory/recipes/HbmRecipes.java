@@ -64,6 +64,8 @@ public final class HbmRecipes {
             RECIPE_SERIALIZERS.register("hbm_simple", () -> HbmSimpleRecipe.Serializer.INSTANCE);
 
     public static void register(IEventBus modEventBus) {
+        // Force static DeferredHolder fields onto RECIPE_SERIALIZERS before the bus bind.
+        com.hbm.inventory.recipes.crafting.DynamicCraftingRecipes.bootstrap();
         RECIPE_TYPES.register(modEventBus);
         RECIPE_SERIALIZERS.register(modEventBus);
     }

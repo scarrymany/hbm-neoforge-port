@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 10.0,
+  "ingredient": {
+    "item": "hbm:block_meteor_ore_copper"
+  },
+  "result": {
+    "count": 16,
+    "id": "hbm:ingot_copper"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "hbm:battery_lead_pack"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "W": {
+      "tag": "c:wires/mingrade"
+    }
+  },
+  "pattern": [
+    "WRW",
+    " I ",
+    " B "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:power_net_tool"
+  }
+}

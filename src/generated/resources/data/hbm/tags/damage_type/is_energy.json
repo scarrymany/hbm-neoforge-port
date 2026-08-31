@@ -1,0 +1,9 @@
+{
+  "values": [
+    "hbm:sedna_laser",
+    "hbm:sedna_microwave",
+    "hbm:sedna_subatomic",
+    "hbm:sedna_electric",
+    "hbm:sedna_plasma"
+  ]
+}

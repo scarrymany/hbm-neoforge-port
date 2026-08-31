@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:bolts/steel"
+    },
+    "H": {
+      "item": "hbm:plate_dura_steel"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "BBS",
+    "BHS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_saw"
+  }
+}

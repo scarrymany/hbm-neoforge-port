@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_coal"
+    },
+    {
+      "item": "hbm:powder_polonium"
+    },
+    {
+      "item": "hbm:powder_strontium"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:fmn"
+  }
+}

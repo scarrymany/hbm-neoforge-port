@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 2.0,
+  "ingredient": {
+    "item": "hbm:crystal_phosphorus"
+  },
+  "result": {
+    "count": 6,
+    "id": "hbm:powder_fire"
+  }
+}

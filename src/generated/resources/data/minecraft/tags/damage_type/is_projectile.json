@@ -1,0 +1,18 @@
+{
+  "values": [
+    "hbm:suicide",
+    "hbm:rubble",
+    "hbm:shrapnel",
+    "hbm:revolver_bullet",
+    "hbm:gun_gib",
+    "hbm:chopper_bullet",
+    "hbm:tau",
+    "hbm:combine_ball",
+    "hbm:subatomic_1",
+    "hbm:subatomic_2",
+    "hbm:subatomic_3",
+    "hbm:subatomic_4",
+    "hbm:subatomic_5",
+    "hbm:sedna_physical"
+  ]
+}

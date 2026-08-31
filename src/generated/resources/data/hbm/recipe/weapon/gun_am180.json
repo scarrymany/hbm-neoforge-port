@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:light_barrels/durasteel"
+    },
+    "G": {
+      "tag": "c:grips/wood"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/gunmetal"
+    },
+    "R": {
+      "tag": "c:light_receivers/durasteel"
+    },
+    "S": {
+      "tag": "c:stocks/wood"
+    }
+  },
+  "pattern": [
+    "BBR",
+    "GMS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:gun_am180"
+  }
+}

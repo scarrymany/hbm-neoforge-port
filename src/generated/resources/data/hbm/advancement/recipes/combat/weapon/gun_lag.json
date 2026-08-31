@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_mechanism": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:gun_mechanisms/weaponsteel"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:weapon/gun_lag"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_mechanism"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:weapon/gun_lag"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "F": {
+      "item": "hbm:billet_u235"
+    },
+    "I": {
+      "item": "hbm:plate_polymer"
+    }
+  },
+  "pattern": [
+    "F",
+    "I",
+    "F"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:pwr_fuel_heu235"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "tag": "c:wires/lead"
+    },
+    "Z": {
+      "tag": "c:wires/zirconium"
+    }
+  },
+  "pattern": [
+    "ZLZ",
+    "L L",
+    "ZLZ"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:icf_pellet_empty"
+  }
+}

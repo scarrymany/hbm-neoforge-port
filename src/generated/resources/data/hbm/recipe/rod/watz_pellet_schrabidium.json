@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "hbm:ingot_graphite"
+    },
+    "I": {
+      "item": "hbm:ingot_schrabidium"
+    }
+  },
+  "pattern": [
+    " I ",
+    "IGI",
+    " I "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:watz_pellet_schrabidium"
+  }
+}

@@ -3,8 +3,11 @@ package com.hbm.blocks.datagen;
 import com.hbm.blocks.ModBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +40,28 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-        ModBlocks.BLOCKS.getEntries().forEach(holder -> this.dropSelf(holder.get()));
+        ModBlocks.BLOCKS.getEntries().forEach(holder -> {
+            Block block = holder.get();
+            if (hasRealLootTable(block)) {
+                this.dropSelf(block);
+            }
+        });
     }
 
     @Override
     protected Iterable<Block> getKnownBlocks() {
         List<Block> blocks = new ArrayList<>();
-        ModBlocks.BLOCKS.getEntries().forEach(holder -> blocks.add(holder.get()));
+        ModBlocks.BLOCKS.getEntries().forEach(holder -> {
+            if (hasRealLootTable(holder.get())) {
+                blocks.add(holder.get());
+            }
+        });
         return blocks;
+    }
+
+    /** {@code Properties.noLootTable()} maps to {@code minecraft:empty}; BlockLootSubProvider rejects that. */
+    private static boolean hasRealLootTable(Block block) {
+        ResourceKey<LootTable> table = block.getLootTable();
+        return table != null && !BuiltInLootTables.EMPTY.equals(table);
     }
 }

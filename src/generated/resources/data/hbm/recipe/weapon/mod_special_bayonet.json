@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "tag": "c:bolts/steel"
+    },
+    "P": {
+      "item": "hbm:plate_weaponsteel"
+    }
+  },
+  "pattern": [
+    "  P",
+    "BBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_bayonet"
+  }
+}

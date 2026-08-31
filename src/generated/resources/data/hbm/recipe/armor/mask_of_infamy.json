@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "item": "hbm:plate_iron"
+    }
+  },
+  "pattern": [
+    "III",
+    "III",
+    " I "
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:mask_of_infamy"
+  }
+}

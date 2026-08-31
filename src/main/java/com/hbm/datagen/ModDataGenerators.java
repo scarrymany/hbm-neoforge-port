@@ -90,22 +90,25 @@ public class ModDataGenerators {
         DatapackBuiltinEntriesProvider datapackProvider =
                 new DatapackBuiltinEntriesProvider(output, lookup, registrySetBuilder, Set.of(MainRegistry.MODID));
         generator.addProvider(event.includeServer(), datapackProvider);
+        // Tags must see datapack-registered damage types / biomes / features — vanilla lookup
+        // does not include RegistrySetBuilder entries and fails with "missing following references".
+        CompletableFuture<HolderLookup.Provider> registries = datapackProvider.getRegistryProvider();
 
         generator.addProvider(event.includeClient(), new ModItemModelProvider(output, helper));
         generator.addProvider(event.includeClient(), new ModBlockStateProvider(output, helper));
         generator.addProvider(event.includeClient(), new ModLanguageProvider(output));
 
-        BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(output, lookup, helper);
+        BlockTagsProvider blockTagsProvider = new ModBlockTagProvider(output, registries, helper);
         generator.addProvider(event.includeServer(), blockTagsProvider);
         generator.addProvider(event.includeServer(),
-                new ModItemTagProvider(output, lookup, blockTagsProvider.contentsGetter(), helper));
-        generator.addProvider(event.includeServer(), new ModDamageTypeTagsProvider(output, lookup, helper));
+                new ModItemTagProvider(output, registries, blockTagsProvider.contentsGetter(), helper));
+        generator.addProvider(event.includeServer(), new ModDamageTypeTagsProvider(output, registries, helper));
 
         LootTableProvider.SubProviderEntry blockLootSubProvider =
                 new LootTableProvider.SubProviderEntry(ModBlockLootTableProvider::new, LootContextParamSets.BLOCK);
         generator.addProvider(event.includeServer(),
                 (DataProvider.Factory<LootTableProvider>) lootOutput ->
-                        new LootTableProvider(lootOutput, Collections.emptySet(), List.of(blockLootSubProvider), lookup));
+                        new LootTableProvider(lootOutput, Collections.emptySet(), List.of(blockLootSubProvider), registries));
 
         // c16-recipe-datagen: highest-value slice of CE's vanilla-crafting-table recipe corpus
         // (ToolRecipes/ArmorRecipes/MineralRecipes) - see ModRecipeProvider's own class javadoc for
