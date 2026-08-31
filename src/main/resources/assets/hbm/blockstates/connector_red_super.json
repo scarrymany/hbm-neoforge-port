@@ -17,6 +17,9 @@
     },
     "facing=east": {
       "model": "hbm:block/red_connector"
+    },
+    "": {
+      "model": "hbm:block/red_connector"
     }
   }
 }

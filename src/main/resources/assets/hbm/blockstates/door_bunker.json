@@ -119,6 +119,9 @@
     "facing=north,half=upper,hinge=right,open=true": {
       "model": "hbm:block/door_bunker_top",
       "y": 180
+    },
+    "": {
+      "model": "hbm:block/door_bunker_bottom"
     }
   }
 }

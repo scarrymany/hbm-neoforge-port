@@ -17,6 +17,9 @@
     },
     "facing=east": {
       "model": "hbm:block/deco_emitter"
+    },
+    "": {
+      "model": "hbm:block/deco_emitter"
     }
   }
 }

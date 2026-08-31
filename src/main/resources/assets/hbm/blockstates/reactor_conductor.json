@@ -5,6 +5,9 @@
     },
     "activated=false": {
       "model": "hbm:block/reactor_conductor"
+    },
+    "": {
+      "model": "hbm:block/reactor_conductor"
     }
   }
 }

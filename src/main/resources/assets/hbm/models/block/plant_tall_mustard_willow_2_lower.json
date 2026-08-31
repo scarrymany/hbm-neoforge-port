@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "hbm:block/plant_tall_mustard_willow_2_lower"
+  }
+}

@@ -59,6 +59,19 @@
           }
         }
       }
+    },
+    "": {
+      "false": {},
+      "true": {
+        "submodel": {
+          "conn_pos_x": {
+            "model": "hbm:block/barrel_connector",
+            "textures": {
+              "all": "hbm:block/barrel_iron_flipped"
+            }
+          }
+        }
+      }
     }
   }
 }

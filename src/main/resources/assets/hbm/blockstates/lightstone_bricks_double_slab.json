@@ -8,6 +8,9 @@
     },
     "type=top": {
       "model": "hbm:block/lightstone_bricks_double_slab"
+    },
+    "": {
+      "model": "hbm:block/lightstone_bricks_double_slab"
     }
   }
 }

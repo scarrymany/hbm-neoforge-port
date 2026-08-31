@@ -5,6 +5,9 @@
     },
     "activated=false": {
       "model": "hbm:block/watz_control"
+    },
+    "": {
+      "model": "hbm:block/watz_control"
     }
   }
 }

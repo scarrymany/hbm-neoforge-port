@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "hbm:item/pellet_rtg_depleted_neptunium"
+    "layer0": "hbm:item/pellet_rtg_depleted.neptunium"
   }
 }

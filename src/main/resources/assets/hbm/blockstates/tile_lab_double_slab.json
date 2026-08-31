@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/tile_lab"
+    },
+    "": {
+      "model": "hbm:block/tile_lab"
     }
   }
 }

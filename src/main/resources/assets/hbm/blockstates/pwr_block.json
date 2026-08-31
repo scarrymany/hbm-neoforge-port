@@ -5,6 +5,9 @@
     },
     "io=true": {
       "model": "hbm:block/pwr_casing_port"
+    },
+    "": {
+      "model": "hbm:block/pwr_block"
     }
   }
 }

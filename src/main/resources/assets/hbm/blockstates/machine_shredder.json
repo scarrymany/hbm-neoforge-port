@@ -14,6 +14,9 @@
     "facing=west": {
       "model": "hbm:block/machine_shredder",
       "y": 270
+    },
+    "": {
+      "model": "hbm:block/machine_shredder"
     }
   }
 }

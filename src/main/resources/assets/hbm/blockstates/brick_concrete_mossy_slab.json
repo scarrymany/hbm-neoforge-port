@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/upper_slab_brick_concrete_mossy"
+    },
+    "": {
+      "model": "hbm:block/half_slab_brick_concrete_mossy"
     }
   }
 }

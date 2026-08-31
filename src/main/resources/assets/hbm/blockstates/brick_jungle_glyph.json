@@ -47,6 +47,9 @@
     },
     "type=15": {
       "model": "hbm:block/brick_jungle_glyph15"
+    },
+    "": {
+      "model": "hbm:block/brick_jungle_glyph0"
     }
   }
 }

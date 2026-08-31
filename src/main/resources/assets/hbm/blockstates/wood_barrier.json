@@ -11,6 +11,9 @@
     },
     "facing=east": {
       "model": "hbm:block/wood_barrier"
+    },
+    "": {
+      "model": "hbm:block/wood_barrier"
     }
   }
 }

@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/upper_slab_ducrete_reinforced"
+    },
+    "": {
+      "model": "hbm:block/half_slab_ducrete_reinforced"
     }
   }
 }

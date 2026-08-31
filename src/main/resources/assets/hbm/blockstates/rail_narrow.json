@@ -35,6 +35,9 @@
     "shape=north_east": {
       "model": "hbm:block/rail_narrow_curved",
       "y": 270
+    },
+    "": {
+      "model": "hbm:block/rail_narrow_flat"
     }
   }
 }

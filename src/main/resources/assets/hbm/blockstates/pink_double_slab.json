@@ -5,6 +5,9 @@
     },
     "type=bottom": {
       "model": "hbm:block/pink_planks"
+    },
+    "": {
+      "model": "hbm:block/pink_planks"
     }
   }
 }

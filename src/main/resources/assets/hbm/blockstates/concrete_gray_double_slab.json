@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/concrete_gray"
+    },
+    "": {
+      "model": "hbm:block/concrete_gray"
     }
   }
 }

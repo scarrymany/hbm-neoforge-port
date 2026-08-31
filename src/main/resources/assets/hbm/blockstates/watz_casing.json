@@ -5,6 +5,9 @@
     },
     "tooled=true": {
       "model": "hbm:block/watz_casing_tooled"
+    },
+    "": {
+      "model": "hbm:block/watz_casing"
     }
   }
 }

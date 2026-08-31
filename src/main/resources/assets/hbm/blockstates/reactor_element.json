@@ -5,6 +5,9 @@
     },
     "activated=false": {
       "model": "hbm:block/reactor_element_nuke"
+    },
+    "": {
+      "model": "hbm:block/reactor_element_nonuke"
     }
   }
 }

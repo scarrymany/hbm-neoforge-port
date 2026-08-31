@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/upper_slab_lightstone_bricks"
+    },
+    "": {
+      "model": "hbm:block/half_slab_lightstone_bricks"
     }
   }
 }

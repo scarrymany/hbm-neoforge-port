@@ -73,6 +73,12 @@
         "model": "hbm:block/conveyor_lift_2.obj",
         "y": 270
       }
+    ],
+    "": [
+      {
+        "model": "hbm:block/conveyor_lift_0.obj",
+        "y": 180
+      }
     ]
   }
 }

@@ -8,6 +8,9 @@
     },
     "part=hang": {
       "model": "hbm:block/vine_phosphor_hang"
+    },
+    "": {
+      "model": "hbm:block/vine_phosphor_ground"
     }
   }
 }

@@ -73,6 +73,11 @@
         "model": "hbm:block/conveyor_chute_2.obj",
         "y": 90
       }
+    ],
+    "": [
+      {
+        "model": "hbm:block/conveyor_chute_0.obj"
+      }
     ]
   }
 }

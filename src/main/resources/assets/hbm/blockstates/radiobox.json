@@ -29,6 +29,9 @@
     "facing=east,state=true": {
       "model": "hbm:block/radiobox",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/radiobox"
     }
   }
 }

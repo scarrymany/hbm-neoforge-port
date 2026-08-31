@@ -22,6 +22,9 @@
     "facing=down": {
       "model": "hbm:block/dfc_receiver",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/dfc_receiver"
     }
   }
 }

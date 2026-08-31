@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/upper_slab_brick_fire"
+    },
+    "": {
+      "model": "hbm:block/half_slab_brick_fire"
     }
   }
 }

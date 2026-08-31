@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/struct_icf_core",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/struct_icf_core"
     }
   }
 }

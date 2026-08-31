@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/brick_obsidian"
+    },
+    "": {
+      "model": "hbm:block/brick_obsidian"
     }
   }
 }

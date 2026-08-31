@@ -29,6 +29,9 @@
     },
     "axis=none,out=true": {
       "model": "hbm:block/block_graphite_rod_out"
+    },
+    "": {
+      "model": "hbm:block/block_graphite_rod_in"
     }
   }
 }

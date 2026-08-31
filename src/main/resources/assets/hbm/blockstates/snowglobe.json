@@ -1,51 +1,6 @@
 {
   "variants": {
-    "rot=0": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=1": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=2": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=3": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=4": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=5": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=6": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=7": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=8": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=9": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=10": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=11": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=12": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=13": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=14": {
-      "model": "hbm:block/snowglobe"
-    },
-    "rot=15": {
+    "": {
       "model": "hbm:block/snowglobe"
     }
   }

@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/machine_autocrafter",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/machine_autocrafter"
     }
   }
 }

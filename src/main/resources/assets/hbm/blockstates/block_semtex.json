@@ -22,6 +22,9 @@
     "facing=down": {
       "model": "hbm:block/block_semtex",
       "x": 90
+    },
+    "": {
+      "model": "hbm:block/block_semtex"
     }
   }
 }

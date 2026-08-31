@@ -17,6 +17,9 @@
     },
     "facing=east": {
       "model": "hbm:block/charge_c4"
+    },
+    "": {
+      "model": "hbm:block/charge_c4"
     }
   }
 }

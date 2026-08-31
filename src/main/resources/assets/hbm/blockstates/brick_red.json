@@ -1,29 +1,8 @@
 {
   "variants": {
-    "meta=0": {
+    "": {
       "model": "hbm:block/brick_red_top",
       "x": 180
-    },
-    "meta=1": {
-      "model": "hbm:block/brick_red_top"
-    },
-    "meta=2": {
-      "model": "hbm:block/brick_red"
-    },
-    "meta=3": {
-      "model": "hbm:block/brick_red",
-      "y": 180
-    },
-    "meta=4": {
-      "model": "hbm:block/brick_red",
-      "y": 270
-    },
-    "meta=5": {
-      "model": "hbm:block/brick_red",
-      "y": 90
-    },
-    "meta=6": {
-      "model": "hbm:block/brick_base"
     }
   }
 }

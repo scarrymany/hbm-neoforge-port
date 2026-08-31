@@ -20,6 +20,9 @@
     },
     "shape=ascending_south": {
       "model": "hbm:block/highspeed_rail_raised_sw"
+    },
+    "": {
+      "model": "hbm:block/highspeed_rail_flat"
     }
   }
 }

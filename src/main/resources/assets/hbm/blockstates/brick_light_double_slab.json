@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/brick_light"
+    },
+    "": {
+      "model": "hbm:block/brick_light"
     }
   }
 }

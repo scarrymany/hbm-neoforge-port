@@ -1,51 +1,6 @@
 {
   "variants": {
-    "rot=0": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=1": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=2": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=3": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=4": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=5": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=6": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=7": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=8": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=9": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=10": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=11": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=12": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=13": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=14": {
-      "model": "hbm:block/plushie"
-    },
-    "rot=15": {
+    "": {
       "model": "hbm:block/plushie"
     }
   }

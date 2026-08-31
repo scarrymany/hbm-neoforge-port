@@ -22,6 +22,9 @@
     "facing=down": {
       "model": "hbm:block/dfc_injector",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/dfc_injector"
     }
   }
 }

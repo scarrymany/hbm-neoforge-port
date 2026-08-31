@@ -17,6 +17,9 @@
     },
     "facing=east": {
       "model": "hbm:block/charge_miner"
+    },
+    "": {
+      "model": "hbm:block/charge_miner"
     }
   }
 }

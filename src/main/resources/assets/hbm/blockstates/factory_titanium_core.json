@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hbm:block/factory_titanium_core"
+    }
+  }
+}

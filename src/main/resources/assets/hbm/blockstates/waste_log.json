@@ -11,6 +11,9 @@
       "model": "hbm:block/waste_log",
       "x": 90,
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/waste_log"
     }
   }
 }

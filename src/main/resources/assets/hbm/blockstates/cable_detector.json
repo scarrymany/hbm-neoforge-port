@@ -5,6 +5,9 @@
     },
     "state=false": {
       "model": "hbm:block/cable_detector_off"
+    },
+    "": {
+      "model": "hbm:block/cable_detector_on"
     }
   }
 }

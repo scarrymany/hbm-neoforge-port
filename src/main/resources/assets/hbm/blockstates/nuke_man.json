@@ -11,6 +11,9 @@
     },
     "facing=5": {
       "model": "hbm:block/nuke_man"
+    },
+    "": {
+      "model": "hbm:block/nuke_man"
     }
   }
 }

@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/reinforced_brick"
+    },
+    "": {
+      "model": "hbm:block/reinforced_brick"
     }
   }
 }

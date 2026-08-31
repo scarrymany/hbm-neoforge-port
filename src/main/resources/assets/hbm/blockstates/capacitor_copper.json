@@ -24,6 +24,10 @@
       "model": "hbm:block/capacitor_copper",
       "x": 90,
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/capacitor_copper",
+      "x": 180
     }
   }
 }

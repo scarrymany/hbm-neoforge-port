@@ -51,6 +51,9 @@
     ],
     "down=true,facing=west,up=true": [
       {}
+    ],
+    "": [
+      {}
     ]
   }
 }

@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/obj_tester",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/obj_tester"
     }
   }
 }

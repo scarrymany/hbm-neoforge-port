@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/upper_slab_cmb_brick_reinforced"
+    },
+    "": {
+      "model": "hbm:block/half_slab_cmb_brick_reinforced"
     }
   }
 }

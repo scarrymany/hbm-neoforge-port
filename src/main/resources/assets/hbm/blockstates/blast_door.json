@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/blast_door",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/blast_door"
     }
   }
 }

@@ -8,6 +8,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -90,6 +98,7 @@ public class ModLanguageProvider extends LanguageProvider {
 
     @Override
     protected void addTranslations() {
+        addFromStaticCeLang();
         Map<String, String> itemNames = itemNames();
         Map<String, String> blockNames = blockNames();
 
@@ -114,6 +123,32 @@ public class ModLanguageProvider extends LanguageProvider {
         addContainerTitles();
         addDeathMessages();
         addMiscKeys();
+    }
+
+    /**
+     * Phase 10 static CE lang ({@code src/main/resources/assets/hbm/lang/en_us.json}) is the
+     * content-truth dump. Load it first so {@link #add(String, String)} dedup skips title-case
+     * stubs, and so a later {@code runData} cannot shadow the corpus with generated placeholders.
+     */
+    private void addFromStaticCeLang() {
+        Path path = Path.of("src/main/resources/assets/hbm/lang/en_us.json");
+        if (!Files.isRegularFile(path)) {
+            return;
+        }
+        try (Reader reader = Files.newBufferedReader(path)) {
+            JsonElement root = JsonParser.parseReader(reader);
+            if (!root.isJsonObject()) {
+                return;
+            }
+            JsonObject obj = root.getAsJsonObject();
+            for (Map.Entry<String, JsonElement> e : obj.entrySet()) {
+                if (e.getValue().isJsonPrimitive()) {
+                    this.add(e.getKey(), e.getValue().getAsString());
+                }
+            }
+        } catch (IOException ignored) {
+            // datagen still emits the hand-curated tables below
+        }
     }
 
     private static String titleCase(String registryPath) {

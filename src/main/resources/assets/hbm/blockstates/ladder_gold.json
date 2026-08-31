@@ -14,6 +14,9 @@
     "facing=west": {
       "model": "hbm:block/ladder_gold",
       "y": 270
+    },
+    "": {
+      "model": "hbm:block/ladder_gold"
     }
   }
 }

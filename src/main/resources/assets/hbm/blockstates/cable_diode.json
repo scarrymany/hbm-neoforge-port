@@ -17,6 +17,9 @@
     },
     "facing=down": {
       "model": "hbm:block/cable_diode"
+    },
+    "": {
+      "model": "hbm:block/cable_diode"
     }
   }
 }

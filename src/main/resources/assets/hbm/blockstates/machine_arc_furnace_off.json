@@ -29,6 +29,9 @@
     "facing=east,rods=true": {
       "model": "hbm:block/machine_arc_furnace_off_rods",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/machine_arc_furnace_off"
     }
   }
 }

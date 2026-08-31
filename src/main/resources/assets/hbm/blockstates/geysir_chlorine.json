@@ -5,6 +5,9 @@
     },
     "active=false": {
       "model": "hbm:block/geysir_chlorine"
+    },
+    "": {
+      "model": "hbm:block/geysir_chlorine"
     }
   }
 }

@@ -14,6 +14,9 @@
     },
     "axis=none": {
       "model": "minecraft:block/oak_bark"
+    },
+    "": {
+      "model": "hbm:block/pink_log"
     }
   }
 }

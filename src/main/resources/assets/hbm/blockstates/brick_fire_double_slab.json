@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/brick_fire"
+    },
+    "": {
+      "model": "hbm:block/brick_fire"
     }
   }
 }

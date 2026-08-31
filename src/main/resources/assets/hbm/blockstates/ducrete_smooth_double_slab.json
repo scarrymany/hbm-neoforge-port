@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/ducrete_smooth"
+    },
+    "": {
+      "model": "hbm:block/ducrete_smooth"
     }
   }
 }

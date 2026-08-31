@@ -5,6 +5,9 @@
     },
     "is_on=false": {
       "model": "hbm:block/machine_detector_off"
+    },
+    "": {
+      "model": "hbm:block/machine_detector_on"
     }
   }
 }

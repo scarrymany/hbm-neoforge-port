@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/seal_controller",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/seal_controller"
     }
   }
 }

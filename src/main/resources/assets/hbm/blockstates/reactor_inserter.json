@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/reactor_inserter",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/reactor_inserter"
     }
   }
 }

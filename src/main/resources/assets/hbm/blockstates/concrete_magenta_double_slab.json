@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/concrete_magenta"
+    },
+    "": {
+      "model": "hbm:block/concrete_magenta"
     }
   }
 }

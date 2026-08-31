@@ -29,6 +29,16 @@
         "model": "hbm:block/glyphid_base_rad_alt",
         "weight": 1
       }
+    ],
+    "": [
+      {
+        "model": "hbm:block/glyphid_base",
+        "weight": 2
+      },
+      {
+        "model": "hbm:block/glyphid_base_alt",
+        "weight": 1
+      }
     ]
   }
 }

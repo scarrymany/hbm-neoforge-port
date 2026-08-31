@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/upper_slab_concrete_smooth"
+    },
+    "": {
+      "model": "hbm:block/half_slab_concrete_smooth"
     }
   }
 }

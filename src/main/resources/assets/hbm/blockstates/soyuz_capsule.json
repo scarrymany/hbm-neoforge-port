@@ -5,6 +5,9 @@
     },
     "rusty=false": {
       "model": "hbm:block/soyuz_capsule"
+    },
+    "": {
+      "model": "hbm:block/soyuz_capsule"
     }
   }
 }

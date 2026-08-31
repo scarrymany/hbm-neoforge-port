@@ -38,6 +38,14 @@
       "east": {
         "y": 90
       }
+    },
+    "": {
+      "true": {
+        "model": "hbm:block/dungeon_chain_wall"
+      },
+      "false": {
+        "model": "hbm:block/dungeon_chain"
+      }
     }
   }
 }

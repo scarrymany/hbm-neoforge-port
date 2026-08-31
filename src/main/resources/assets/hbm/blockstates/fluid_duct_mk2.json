@@ -5,6 +5,9 @@
     },
     "extracts=true": {
       "model": "hbm:block/fluid_duct_mk2"
+    },
+    "": {
+      "model": "hbm:block/fluid_duct_mk2"
     }
   }
 }

@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/machine_rtg_furnace_off",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/machine_rtg_furnace_off"
     }
   }
 }

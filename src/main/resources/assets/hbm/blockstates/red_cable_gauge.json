@@ -22,6 +22,9 @@
     "facing=down": {
       "model": "hbm:block/red_cable_gauge",
       "x": 90
+    },
+    "": {
+      "model": "hbm:block/red_cable_gauge"
     }
   }
 }

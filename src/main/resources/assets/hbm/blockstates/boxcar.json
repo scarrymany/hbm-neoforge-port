@@ -11,6 +11,9 @@
     },
     "facing=east": {
       "model": "hbm:block/boxcar"
+    },
+    "": {
+      "model": "hbm:block/boxcar"
     }
   }
 }

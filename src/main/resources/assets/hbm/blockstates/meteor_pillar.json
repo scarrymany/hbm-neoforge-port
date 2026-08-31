@@ -11,6 +11,9 @@
       "model": "hbm:block/meteor_pillar",
       "x": 90,
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/meteor_pillar"
     }
   }
 }

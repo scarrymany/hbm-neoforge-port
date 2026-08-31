@@ -11,6 +11,9 @@
     },
     "facing=east": {
       "model": "hbm:block/boat"
+    },
+    "": {
+      "model": "hbm:block/boat"
     }
   }
 }

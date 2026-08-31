@@ -20,6 +20,9 @@
     },
     "shape=ascending_south": {
       "model": "hbm:block/booster_rail_raised_sw"
+    },
+    "": {
+      "model": "hbm:block/booster_rail_flat"
     }
   }
 }

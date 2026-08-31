@@ -14,6 +14,9 @@
     "facing=east": {
       "model": "hbm:block/deco_sat_mapper",
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/deco_sat_mapper"
     }
   }
 }

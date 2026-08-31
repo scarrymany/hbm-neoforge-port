@@ -24,6 +24,10 @@
       "model": "hbm:block/capacitor_schrabidate",
       "x": 90,
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/capacitor_schrabidate",
+      "x": 180
     }
   }
 }

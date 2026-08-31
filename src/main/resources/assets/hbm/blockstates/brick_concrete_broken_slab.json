@@ -5,6 +5,9 @@
     },
     "type=top": {
       "model": "hbm:block/upper_slab_brick_concrete_broken"
+    },
+    "": {
+      "model": "hbm:block/half_slab_brick_concrete_broken"
     }
   }
 }

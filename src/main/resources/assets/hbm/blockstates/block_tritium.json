@@ -11,6 +11,9 @@
       "model": "hbm:block/block_tritium",
       "x": 90,
       "y": 90
+    },
+    "": {
+      "model": "hbm:block/block_tritium"
     }
   }
 }
