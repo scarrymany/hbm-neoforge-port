@@ -60,6 +60,14 @@ public class EntityChemical extends EntityThrowableNT {
         super(Phase9TailEntityTypes.CHEMICAL.get(), level, thrower);
     }
 
+    /**
+     * CE {@code EntityChemical(World, EntityLivingBase, double, double, double)} line 66 —
+     * offsets are unused there too; kept so Behemoth / chemthrower call sites match.
+     */
+    public EntityChemical(Level level, LivingEntity thrower, double sideOffset, double heightOffset, double frontOffset) {
+        this(level, thrower);
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);

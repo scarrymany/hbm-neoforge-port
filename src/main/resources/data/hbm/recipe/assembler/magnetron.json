@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:tungsten_wire"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:magnetron",
+    "count": 1
+  },
+  "duration": 40,
+  "power": 100
+}

@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:nugget_schrabidium"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:float_bomb",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

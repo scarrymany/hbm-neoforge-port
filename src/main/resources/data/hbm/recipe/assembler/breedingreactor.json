@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:reactor_core"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:plate_lead"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:reinforced_glass"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_asbestos"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:crt_display"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_reactor_breeding",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

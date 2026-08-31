@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_magnetized_tungsten"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ducrete"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:cmb_brick"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:cmb_brick_reinforced",
+    "count": 8
+  },
+  "duration": 100,
+  "power": 100
+}

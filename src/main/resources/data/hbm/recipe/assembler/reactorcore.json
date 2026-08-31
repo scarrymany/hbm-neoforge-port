@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_beryllium"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_dura_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_asbestos"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:reactor_core",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

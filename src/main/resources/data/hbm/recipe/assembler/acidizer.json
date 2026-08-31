@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_sextuple"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_desh"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_crystallizer",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

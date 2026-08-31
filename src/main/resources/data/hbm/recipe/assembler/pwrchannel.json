@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:pwr_channel",
+    "count": 4
+  },
+  "duration": 200,
+  "power": 500
+}

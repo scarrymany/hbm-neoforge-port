@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_shredder",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

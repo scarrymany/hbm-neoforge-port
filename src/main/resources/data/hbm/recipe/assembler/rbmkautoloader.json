@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_sextuple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_boron"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:rbmk_autoloader",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

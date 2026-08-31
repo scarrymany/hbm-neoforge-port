@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_copper"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:canister_empty"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_combustion_engine",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

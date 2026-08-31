@@ -9,21 +9,18 @@ import com.hbm.inventory.container.LaunchpadSoyuzMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.ISatChip;
+import com.hbm.items.special.ItemSoyuz;
 import com.hbm.lib.Library;
-import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,12 +38,9 @@ import java.util.List;
  * {@code // TBI: countdown, retracting the struts, launch}). Do not "finish" what CE itself never
  * finished.
  * <p>
- * <b>Blocked, documented</b>: {@code ModItems.missile_soyuz}/{@code missile_soyuz_lander} are not
- * registered anywhere in this port yet (confirmed absent from {@code MissileItems}/{@code ModItems}
- * by grep) - {@code missile_soyuz} is resolved lazily by registry name via
- * {@link #soyuzMissileItem()} rather than a compile-time reference, so this class compiles and runs
- * correctly today ({@link #hasRocketLoaded()} simply never returns {@code true} until that item
- * exists) and starts working with zero further changes once a future missile-item pass adds it.
+ * Soyuz rocket item is the flattened {@link ItemSoyuz} family
+ * ({@code missile_soyuz_normal}/{@code _lunar}/{@code _post_war}). CE's single {@code missile_soyuz}
+ * metadata item is gone. {@code missile_soyuz_lander} (slot 3) is still unregistered.
  * {@code missile_soyuz_lander} (slot 3, the lander module) is left permanently rejecting items
  * ({@link #isItemValidForSlot}) for the same reason - CE's own {@code cargoMode} gate around it is
  * preserved in shape but has nothing valid to accept yet. {@code loadedType} (CE: the loaded
@@ -105,8 +99,8 @@ public class LaunchpadSoyuzBlockEntity extends MachineBaseBlockEntity
         return prevPositions[index] + (positions[index] - prevPositions[index]) * interp;
     }
 
-    private static Item soyuzMissileItem() {
-        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "missile_soyuz"));
+    private static boolean isSoyuzMissile(ItemStack stack) {
+        return !stack.isEmpty() && stack.getItem() instanceof ItemSoyuz;
     }
 
     @Override
@@ -130,7 +124,8 @@ public class LaunchpadSoyuzBlockEntity extends MachineBaseBlockEntity
 
                 this.loadedType = -1;
             } else {
-                this.loadedType = 0;
+                ItemStack rocket = inventory.getStackInSlot(0);
+                this.loadedType = rocket.getItem() instanceof ItemSoyuz soyuz ? soyuz.getSkin().ordinal() : 0;
             }
 
             if (this.power >= CONSUMPTION) {
@@ -278,8 +273,7 @@ public class LaunchpadSoyuzBlockEntity extends MachineBaseBlockEntity
     }
 
     public boolean hasRocketLoaded() {
-        ItemStack stack = inventory.getStackInSlot(0);
-        return !stack.isEmpty() && stack.getItem() == soyuzMissileItem();
+        return isSoyuzMissile(inventory.getStackInSlot(0));
     }
 
     public boolean finishedMoving(int index) {
@@ -315,7 +309,7 @@ public class LaunchpadSoyuzBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        if (slot == 0) return stack.getItem() == soyuzMissileItem();
+        if (slot == 0) return isSoyuzMissile(stack);
         if (slot == 1) return stack.getItem() instanceof IDesignatorItem;
         if (slot == 2) return stack.getItem() instanceof ISatChip && !cargoMode;
         if (slot == 3) return false; // lander module item not yet registered, see class javadoc

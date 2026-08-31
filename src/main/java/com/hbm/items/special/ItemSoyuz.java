@@ -34,6 +34,10 @@ public class ItemSoyuz extends Item {
         this.skin = skin;
     }
 
+    public SoyuzSkinType getSkin() {
+        return skin;
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.literal("Skin:"));

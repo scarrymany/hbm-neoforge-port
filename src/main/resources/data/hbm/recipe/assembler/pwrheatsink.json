@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:saturnite_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_triple"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:pwr_heatsink",
+    "count": 4
+  },
+  "duration": 200,
+  "power": 500
+}

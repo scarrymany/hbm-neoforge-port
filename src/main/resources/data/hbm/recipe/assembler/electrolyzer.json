@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_firebrick"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:coil_copper"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_electrolyser",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

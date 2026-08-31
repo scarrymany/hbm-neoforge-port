@@ -1,6 +1,8 @@
 package com.hbm.explosion;
 
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
+import com.hbm.entity.projectile.EntityRubble;
+import com.hbm.entity.projectile.EntityShrapnel;
 import com.hbm.particle.HbmEffect;
 import com.hbm.particle.HbmParticleOptions;
 import com.hbm.particle.ModParticleTypes;
@@ -11,6 +13,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -34,19 +37,10 @@ import java.util.Random;
  * {@code com.hbm.particle.ModParticleTypes.GAS_FLAME} type instead of the generic
  * {@code HbmEffect}/{@code AuxParticlePacketNT} path - see that method's own javadoc.
  * <p>
- * <b>Not ported (documented forward references)</b>: every debris-entity spawner ({@link #spawnRubble},
- * {@link #spawnShrapnels}, {@link #spawnTracers}, {@link #spawnShrapnelShower}) depends on
- * {@code EntityRubble}/{@code EntityShrapnel}, neither of which exists in this port yet (named as
- * Phase-3 prerequisites in {@code docs/phase1/items_special.md}/{@code items_food_gear.md}'s Deferred
- * sections, not this pass's to add). Kept as real methods with a documented no-op body (not silently
- * deleted) so every call site elsewhere in the mod - including {@link #explode}/{@link #explodeFire}/
- * {@link #buster} themselves, which call several of them internally - keeps compiling and running
- * (minus the debris) rather than needing to be rewritten once those dependencies land.
- * {@link #spawnMissileDebris} keeps its real item-drop logic (needs only
- * {@link net.minecraft.world.entity.item.ItemEntity}, which does exist) since it is not one of those
- * two blocked families. {@link #jolt} keeps its real block-removal loop (the actual "digs a tunnel"
- * gameplay effect) but stubs only the cosmetic {@code EntityRubble} spawn inside it, for the same
- * reason.
+ * <b>Debris entities</b>: {@link #spawnRubble}/{@link #spawnShrapnels}/{@link #spawnTracers}/
+ * {@link #spawnShrapnelShower} now spawn {@link EntityRubble}/{@link EntityShrapnel}
+ * (CE {@code ExplosionLarge} lines 73-192). Volcano/mud block placement on shrapnel impact is still
+ * skipped — those CE blocks are unregistered here.
  * <p>
  * CE's {@code isWarDim} gates on {@link #jolt}/{@link #explodeFire}/{@link #buster} are dropped per
  * this port's documented always-true default.
@@ -129,22 +123,58 @@ public final class ExplosionLarge {
         HbmEffect.sendPacket(level, HbmEffect.SMOKE_SHOCK, x, y + 0.5, z, 250, data);
     }
 
-    // --- debris entities (blocked on EntityRubble/EntityShrapnel, see class javadoc) ------------
+    // --- debris entities (CE ExplosionLarge.java:73-192) ----------------------------------------
 
     public static void spawnRubble(Level level, double x, double y, double z, int count) {
-        // TODO(EntityRubble): see class javadoc.
+        if (level.isClientSide()) return;
+        for (int i = 0; i < count; i++) {
+            EntityRubble rubble = new EntityRubble(level, x, y, z);
+            rubble.setBlockState(Blocks.STONE.defaultBlockState());
+            rubble.setDeltaMovement(
+                    RAND.nextGaussian() * 0.75 * (1 + (count / 50.0)),
+                    0.75 * (1 + ((count + RAND.nextInt(Math.max(1, count * 5)))) / 25.0),
+                    RAND.nextGaussian() * 0.75 * (1 + (count / 50.0)));
+            level.addFreshEntity(rubble);
+        }
     }
 
     public static void spawnShrapnels(Level level, double x, double y, double z, int count) {
-        // TODO(EntityShrapnel): see class javadoc.
+        if (level.isClientSide()) return;
+        for (int i = 0; i < count; i++) {
+            EntityShrapnel shrapnel = new EntityShrapnel(level, x, y, z);
+            shrapnel.setDeltaMovement(
+                    RAND.nextGaussian() * 1 * (1 + (count / 50.0)),
+                    ((RAND.nextFloat() * 0.5) + 0.5) * (1 + (count / (15.0 + RAND.nextInt(21)))) + (RAND.nextFloat() / 50.0 * count),
+                    RAND.nextGaussian() * 1 * (1 + (count / 50.0)));
+            shrapnel.setTrail(RAND.nextInt(3) == 0);
+            level.addFreshEntity(shrapnel);
+        }
     }
 
     public static void spawnTracers(Level level, double x, double y, double z, int count) {
-        // TODO(EntityShrapnel): see class javadoc.
+        if (level.isClientSide()) return;
+        for (int i = 0; i < count; i++) {
+            EntityShrapnel shrapnel = new EntityShrapnel(level, x, y, z);
+            shrapnel.setDeltaMovement(
+                    RAND.nextGaussian() * 1 * (1 + (count / 50.0)) * 0.25F,
+                    ((RAND.nextFloat() * 0.5) + 0.5) * (1 + (count / (15.0 + RAND.nextInt(21)))) + (RAND.nextFloat() / 50.0 * count) * 0.25F,
+                    RAND.nextGaussian() * 1 * (1 + (count / 50.0)) * 0.25F);
+            shrapnel.setTrail(true);
+            level.addFreshEntity(shrapnel);
+        }
     }
 
     public static void spawnShrapnelShower(Level level, double x, double y, double z, double motionX, double motionY, double motionZ, int count, double deviation) {
-        // TODO(EntityShrapnel): see class javadoc.
+        if (level.isClientSide()) return;
+        for (int i = 0; i < count; i++) {
+            EntityShrapnel shrapnel = new EntityShrapnel(level, x, y, z);
+            shrapnel.setDeltaMovement(
+                    motionX + RAND.nextGaussian() * deviation,
+                    motionY + RAND.nextGaussian() * deviation,
+                    motionZ + RAND.nextGaussian() * deviation);
+            shrapnel.setTrail(RAND.nextInt(3) == 0);
+            level.addFreshEntity(shrapnel);
+        }
     }
 
     public static void spawnMissileDebris(Level level, double x, double y, double z, double motionX, double motionY, double motionZ, double deviation, List<ItemStack> debris, ItemStack rareDrop) {
@@ -203,11 +233,13 @@ public final class ExplosionLarge {
                     if (!blockState.is(net.minecraft.world.level.block.Blocks.AIR)) {
                         if (block.getExplosionResistance() > 70) continue;
 
-                        // TODO(CompatDynamicTrees): tree-destruction compat hook not ported (no consumer mod present).
-                        // TODO(EntityRubble): see class javadoc - the debris-chunk visual is skipped, but the block
-                        // is still removed below, preserving jolt's real "digs a tunnel" gameplay effect.
+                        EntityRubble rubble = new EntityRubble(level, x0 + 0.5F, y0 + 0.5F, z0 + 0.5F);
+                        rubble.setBlockState(blockState);
+                        Vec3 vec4 = new Vec3(posX - rubble.getX(), posY - rubble.getY(), posZ - rubble.getZ()).normalize();
+                        rubble.setDeltaMovement(vec4.x * vel, vec4.y * vel, vec4.z * vel);
+                        level.addFreshEntity(rubble);
 
-                        level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
                         break;
                     }
                 }

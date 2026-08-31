@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_asbestos"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "minecraft:string"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:asbestos_cloth",
+    "count": 4
+  },
+  "duration": 50,
+  "power": 100
+}

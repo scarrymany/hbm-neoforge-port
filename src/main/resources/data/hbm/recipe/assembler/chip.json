@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_polymer"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_silicon"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:gold_wire"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:circuit_chip",
+    "count": 1
+  },
+  "duration": 50,
+  "power": 250
+}

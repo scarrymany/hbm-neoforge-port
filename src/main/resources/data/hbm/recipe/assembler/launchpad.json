@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:concrete_smooth"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:steel_scaffold"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:launch_pad_large",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

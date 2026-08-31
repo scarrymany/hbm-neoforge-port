@@ -1,11 +1,13 @@
 package com.hbm.entity.mob;
 
+import com.hbm.items.machine.MachineItems;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
@@ -20,8 +22,7 @@ import net.minecraft.world.level.Level;
  * Unlike {@link EntityTaintCrab}, this class's {@code onLivingUpdate} in CE has <b>no other</b>
  * mechanic alongside the zap call, so nothing else is lost by skipping it.
  * <p>
- * <b>{@code coil_copper} drop (1-in-200) not reproduced</b> - not registered in this port yet, same
- * documented items-scope gap as {@link EntityTaintCrab}.
+ * {@code coil_copper} drop is CE {@code dropLoot} line 40-42 (1-in-200).
  */
 public class EntityTeslaCrab extends EntityCyberCrab {
 
@@ -39,6 +40,8 @@ public class EntityTeslaCrab extends EntityCyberCrab {
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, source, recentlyHit);
-        // coil_copper (1-in-200) not registered in this port yet - see class javadoc.
+        if (this.getRandom().nextInt(200) == 0) {
+            this.spawnAtLocation(new ItemStack(MachineItems.COIL_COPPER.get()));
+        }
     }
 }

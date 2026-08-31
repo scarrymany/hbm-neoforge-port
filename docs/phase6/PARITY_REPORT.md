@@ -1,5 +1,9 @@
 # Parity report — CE vs. this port
 
+> **SUPERSEDED.** Live Phase 11 numbers are in [`docs/phase11/PARITY_REPORT.md`](../phase11/PARITY_REPORT.md).
+> Figures below (~54% weighted / ~67% unweighted, ~12% reachability) are **pre** Phase 7–10 and
+> must not be quoted as current.
+
 Phase 6 (`sy1-parity-report`). Answers PORT_SPEC.md §Phase 6's first deliverable: "dump CE
 registries... diff against 1.21.1 registries; target >=99% by count with an explicit, justified
 exclusion list." Covers the 8 categories PORT_SPEC.md names: items, blocks, fluids, entities, sounds,

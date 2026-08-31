@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:zirconium_plate_sextuple"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:pwr_fuelrod",
+    "count": 4
+  },
+  "duration": 200,
+  "power": 500
+}

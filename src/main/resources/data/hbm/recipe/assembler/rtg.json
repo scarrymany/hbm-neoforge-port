@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:rtg_unit"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:mingrade_wire"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_rtg_grey",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

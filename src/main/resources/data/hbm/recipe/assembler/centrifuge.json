@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:centrifuge_element"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_analog"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_centrifuge",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

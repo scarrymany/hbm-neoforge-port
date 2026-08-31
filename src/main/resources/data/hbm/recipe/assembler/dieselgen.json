@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_triple"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:coil_copper"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_diesel",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

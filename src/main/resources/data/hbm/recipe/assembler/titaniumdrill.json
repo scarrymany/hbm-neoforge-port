@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_dura_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:drill_titanium",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

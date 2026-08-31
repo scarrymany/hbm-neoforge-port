@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:powder_lead"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "minecraft:string"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:hazmat_cloth",
+    "count": 4
+  },
+  "duration": 50,
+  "power": 100
+}

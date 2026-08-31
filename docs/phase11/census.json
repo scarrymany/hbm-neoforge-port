@@ -1,0 +1,206 @@
+{
+  "weighted_pct": 57.6,
+  "unweighted_pct": 77.5,
+  "ce_sum": 7453,
+  "port_sum": 4291,
+  "rows": [
+    {
+      "cat": "items",
+      "ce": 1863,
+      "port": 1796,
+      "pct": 96.4
+    },
+    {
+      "cat": "blocks",
+      "ce": 1169,
+      "port": 649,
+      "pct": 55.5
+    },
+    {
+      "cat": "fluids",
+      "ce": 162,
+      "port": 162,
+      "pct": 100.0
+    },
+    {
+      "cat": "entities",
+      "ce": 168,
+      "port": 189,
+      "pct": 112.5
+    },
+    {
+      "cat": "sounds",
+      "ce": 381,
+      "port": 381,
+      "pct": 100.0
+    },
+    {
+      "cat": "vanilla_crafting",
+      "ce": 1950,
+      "port": 822,
+      "pct": 42.2
+    },
+    {
+      "cat": "machine_recipes",
+      "ce": 1695,
+      "port": 227,
+      "pct": 13.4
+    },
+    {
+      "cat": "advancements",
+      "ce": 65,
+      "port": 65,
+      "pct": 100.0
+    }
+  ],
+  "detail": {
+    "items": {
+      "ce_collapsed": 1863,
+      "ce_expanded_approx": 1863,
+      "ce_string_ctors": 1307,
+      "ce_used": 1863,
+      "port": 1796,
+      "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
+    },
+    "blocks": {
+      "ce": 1169,
+      "ce_fields": 1169,
+      "ce_string_ctors": 290,
+      "port": 649,
+      "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
+    },
+    "fluids": {
+      "ce": 162,
+      "port": 162
+    },
+    "entities": {
+      "ce": 168,
+      "port": 189,
+      "missing": [],
+      "extra": [
+        "cyber_crab_spawn_egg",
+        "duck_spawn_egg",
+        "entity_cloud_solinium",
+        "fbi_drone_spawn_egg",
+        "fbi_spawn_egg",
+        "glowing_one_spawn_egg",
+        "gold_creeper_spawn_egg",
+        "hunter_chopper_spawn_egg",
+        "mask_man_spawn_egg",
+        "nuclear_creeper_spawn_egg",
+        "parasite_maggot_spawn_egg",
+        "phosgene_creeper_spawn_egg",
+        "pigeon_spawn_egg",
+        "quackos_spawn_egg",
+        "rad_beast_spawn_egg",
+        "taint_crab_spawn_egg",
+        "taintcrawler_spawn_egg",
+        "tainted_creeper_spawn_egg",
+        "tesla_crab_spawn_egg",
+        "test_dummy_spawn_egg",
+        "undead_soldier_spawn_egg",
+        "volatile_creeper_spawn_egg"
+      ]
+    },
+    "sounds": {
+      "ce": 381,
+      "port": 381
+    },
+    "vanilla_crafting": {
+      "ce": 1950,
+      "ce_call_sites": {
+        "addRecipeAuto": 1332,
+        "addShapelessAuto": 464,
+        "addSlabStair": 25,
+        "add9or1": 43
+      },
+      "port": 822,
+      "by_type": {
+        "minecraft:crafting_shaped": 370,
+        "minecraft:crafting_shapeless": 323,
+        "minecraft:smelting": 123
+      }
+    },
+    "machine_recipes": {
+      "ce_regex_plus_packloop": 1695,
+      "ce_by_class": {
+        "AmmoPressRecipes": 1,
+        "AnnihilatorRecipes": 17,
+        "ArcFurnaceRecipes": 3,
+        "ArcWelderRecipes": 1,
+        "AssemblyMachineRecipes": 715,
+        "BlastFurnaceRecipes": 19,
+        "BreederRecipes": 7,
+        "CentrifugeRecipes": 78,
+        "ChemicalPlantRecipes": 145,
+        "CokerRecipes": 5,
+        "CombinationRecipes": 33,
+        "CompressorRecipes": 7,
+        "CrackingRecipes": 1,
+        "CrucibleRecipes": 17,
+        "CrystallizerRecipes": 5,
+        "CustomMachineRecipes": 2,
+        "CyclotronRecipes": 2,
+        "ElectrolyserFluidRecipes": 10,
+        "ElectrolyserMetalRecipes": 23,
+        "ExposureChamberRecipes": 1,
+        "FluidBreederRecipes": 3,
+        "FractionRecipes": 1,
+        "GasCentrifugeRecipes": 1,
+        "HydrotreatingRecipes": 7,
+        "LemegetonRecipes": 37,
+        "LiquefactionRecipes": 38,
+        "MixerRecipes": 3,
+        "NuclearTransmutationRecipes": 4,
+        "OutgasserRecipes": 22,
+        "ParticleAcceleratorRecipes": 1,
+        "PlasmaForgeRecipes": 1,
+        "PrecAssRecipes": 6,
+        "PressRecipes": 2,
+        "RBMKFuelRecipes": 4,
+        "RadiolysisRecipes": 1,
+        "RefineryRecipes": 2,
+        "ReformingRecipes": 10,
+        "RockMillRecipes": 18,
+        "RotaryFurnaceRecipes": 1,
+        "SILEXRecipes": 96,
+        "SolderingRecipes": 1,
+        "SolidificationRecipes": 3,
+        "StorageDrumRecipes": 7,
+        "SuperComputerRecipes": 14,
+        "WasteDrumRecipes": 20
+      },
+      "port_json": 184,
+      "port_java": {
+        "AmmoPressRecipes": 7,
+        "CrucibleRecipes": 13,
+        "MagicRecipes": 3,
+        "PyroOvenRecipes": 10,
+        "ChemPlantRecipes": 4,
+        "SILEXRecipes": 6
+      },
+      "port": 227,
+      "by_type": {
+        "hbm:assembler": 110,
+        "hbm:breeder": 30,
+        "hbm:container_upgrade_crate_desh": 1,
+        "hbm:container_upgrade_crate_tungsten": 1,
+        "hbm:container_upgrade_safe": 1,
+        "hbm:grenade_crafting": 1,
+        "hbm:rbmk_fuel_recycle": 1,
+        "hbm:scrap_split": 1,
+        "hbm:shredder": 44
+      }
+    },
+    "advancements": {
+      "ce": 65,
+      "port": 65
+    },
+    "reachability": {
+      "port_items": 1796,
+      "reachable_via_recipe_or_loot": 746,
+      "pct": 41.5
+    }
+  },
+  "recipe_json_total": 1006
+}

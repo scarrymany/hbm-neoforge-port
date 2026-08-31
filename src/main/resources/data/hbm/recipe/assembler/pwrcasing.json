@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_lead"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:concrete_smooth"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:pwr_casing",
+    "count": 4
+  },
+  "duration": 200,
+  "power": 500
+}

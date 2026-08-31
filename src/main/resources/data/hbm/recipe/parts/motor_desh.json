@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCP",
+    "DMD",
+    "PCP"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:ingot_polymer"
+    },
+    "C": {
+      "item": "hbm:gold_dense_wire"
+    },
+    "D": {
+      "item": "hbm:ingot_desh"
+    },
+    "M": {
+      "item": "hbm:motor"
+    }
+  },
+  "result": {
+    "id": "hbm:motor_desh",
+    "count": 1
+  }
+}

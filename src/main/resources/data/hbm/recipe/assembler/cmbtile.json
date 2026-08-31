@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:concrete_smooth"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_combine_steel"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:cmb_brick",
+    "count": 8
+  },
+  "duration": 100,
+  "power": 100
+}

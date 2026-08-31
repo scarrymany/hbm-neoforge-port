@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:thermo_element"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:rtg_unit",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

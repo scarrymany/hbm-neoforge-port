@@ -1,6 +1,7 @@
 package com.hbm.entity.mob;
 
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
+import com.hbm.items.machine.MachineItems;
 import com.hbm.items.weapon.sedna.content.XFactory762mm;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.particle.HbmEffect;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.RangedAttackGoal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
@@ -39,11 +41,8 @@ import net.minecraft.world.level.Level;
  * is a genuine, documented forward-reference gap (see this task's knownGaps), not a silent drop - the
  * taint-aura half of the same method (a separate, self-contained mechanic) is fully reproduced above.
  * <p>
- * <b>{@code coil_copper}/{@code coil_magnetized_tungsten} drops not reproduced</b> - neither item is
- * registered anywhere in this port yet (confirmed by grep; a Phase 1/2 items-scope gap, matching the
- * same "document and skip" precedent {@code EntityMissileTier0} already established for its own
- * unregistered {@code wire_fine} drop, rather than risk a duplicate-registration collision with a
- * concurrent sibling items package by registering a shared generic material here).
+ * Coil drops are CE {@code dropLoot} lines 65-68: always {@code coil_copper}, 1-in-200
+ * {@code coil_magnetized_tungsten}.
  */
 public class EntityTaintCrab extends EntityCyberCrab {
 
@@ -110,6 +109,9 @@ public class EntityTaintCrab extends EntityCyberCrab {
     @Override
     protected void dropCustomDeathLoot(ServerLevel level, DamageSource source, boolean recentlyHit) {
         super.dropCustomDeathLoot(level, source, recentlyHit);
-        // coil_copper / coil_magnetized_tungsten not registered in this port yet - see class javadoc.
+        this.spawnAtLocation(new ItemStack(MachineItems.COIL_COPPER.get()));
+        if (this.getRandom().nextInt(200) == 0) {
+            this.spawnAtLocation(new ItemStack(MachineItems.COIL_MAGNETIZED_TUNGSTEN.get()));
+        }
     }
 }

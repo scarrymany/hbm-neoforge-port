@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:concrete_asbestos"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:rbmk_blank",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

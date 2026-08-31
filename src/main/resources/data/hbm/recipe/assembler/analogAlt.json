@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:circuit_pcb"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_polymer"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:tungsten_wire"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_niobium"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:circuit_analog",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 250
+}

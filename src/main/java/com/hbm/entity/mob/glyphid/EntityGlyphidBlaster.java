@@ -36,4 +36,25 @@ public class EntityGlyphidBlaster extends EntityGlyphidBombardier {
     public boolean isArmorBroken(float amount) {
         return this.random.nextInt(100) <= Math.min(Math.pow(amount * 0.25, 2), 100);
     }
+
+    /** CE {@code EntityGlyphidBlaster} lines 46-62. */
+    @Override
+    public float getBombDamage() {
+        return 15F;
+    }
+
+    @Override
+    public int getBombCount() {
+        return 10;
+    }
+
+    @Override
+    public float getSpreadMult() {
+        return 0.5F;
+    }
+
+    @Override
+    public double getV0() {
+        return 1.25D;
+    }
 }

@@ -1,16 +1,20 @@
 # Phase 9 entity census (CE `@AutoRegister` vs port)
 
-CE named entity `@AutoRegister` (excluding `TileEntity*` / `tileentity_*`): **~170**.
-This session registered the leftover projectile / soyuz / waypoint set via `Phase9TailEntityTypes`.
+CE named entity `@AutoRegister` (excluding `TileEntity*` / `tileentity_*`): **168**.
+Port: **189** (spawn eggs + `entity_cloud_solinium` rename). **Missing list is empty**
+(Phase 11 census `scripts/phase11_parity_census.py`).
 
-## Named ports this session (CE file:line)
+Leftover projectile / soyuz / waypoint set is registered via `Phase9TailEntityTypes` and
+**spawn-wired** this session (not just class stubs).
 
-| CE id | CE cite | Port |
+## Named leftovers (CE file:line) — registered + wired
+
+| CE id | CE cite | Port + spawn site |
 |---|---|---|
-| `entity_acid_bomb` | `entity/projectile/EntityAcidBomb.java:11` | `EntityAcidBomb` |
-| `entity_chemthrower_splash` | `entity/projectile/EntityChemical.java:43` | `EntityChemical` (playable subset) |
-| `entity_shrapnel` | `entity/projectile/EntityShrapnel.java:23` | `EntityShrapnel` |
-| `entity_soyuz` | `entity/missile/EntitySoyuz.java:30` | `EntitySoyuz` |
+| `entity_acid_bomb` | `entity/projectile/EntityAcidBomb.java:11` | `EntityAcidBomb` — `EntityGlyphidBombardier.tick` (CE bombardier `onUpdate` 45-105); Blaster inherits + CE bomb overrides |
+| `entity_chemthrower_splash` | `entity/projectile/EntityChemical.java:43` | `EntityChemical` (playable subset) — `EntityGlyphidBehemoth.acidAttack` (CE 93-101); unused-offset ctor CE:66 |
+| `entity_shrapnel` | `entity/projectile/EntityShrapnel.java:23` | `EntityShrapnel` — `ExplosionLarge.spawnShrapnels` / tracers / shower (CE 73-192) |
+| `entity_soyuz` | `entity/missile/EntitySoyuz.java:30` | `EntitySoyuz` — pad `LAUNCHING` is TBI **in CE**; `LaunchpadSoyuzBlockEntity` now accepts flattened `ItemSoyuz` skins |
 | `entity_soyuz_capsule` | `entity/missile/EntitySoyuzCapsule.java:17` | `EntitySoyuzCapsule` (drops items; no `soyuz_capsule` block) |
 | `entity_waypoint` | `entity/logic/EntityWaypoint.java:22` | `EntityWaypoint` |
 

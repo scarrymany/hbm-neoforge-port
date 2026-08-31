@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_polymer"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_silicon"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:nugget_bismuth"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:gold_wire"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:circuit_chip_bismoid",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 1500
+}

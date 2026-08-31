@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:plate_weaponsteel"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:pwr_reflector",
+    "count": 4
+  },
+  "duration": 200,
+  "power": 500
+}

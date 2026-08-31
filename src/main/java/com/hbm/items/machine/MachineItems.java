@@ -4,6 +4,7 @@ import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.NTMMaterial;
+import com.hbm.items.ItemEnums.EnumCircuitType;
 import com.hbm.items.ModItems;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
@@ -62,6 +63,15 @@ public final class MachineItems {
     public static DeferredItem<Item> PELLET_RTG, PELLET_RTG_RADIUM, PELLET_RTG_WEAK, PELLET_RTG_STRONTIUM, PELLET_RTG_COBALT, PELLET_RTG_ACTINIUM,
             PELLET_RTG_POLONIUM, PELLET_RTG_LEAD, PELLET_RTG_GOLD, PELLET_RTG_AMERICIUM, PELLET_RTG_BALEFIRE;
 
+    /** CE {@code ModItems.circuit} {@code ItemEnumMulti<EnumCircuitType>} flattened. */
+    public static final Map<EnumCircuitType, DeferredItem<Item>> CIRCUITS = new EnumMap<>(EnumCircuitType.class);
+    public static DeferredItem<Item> MOTOR, MOTOR_DESH, MOTOR_BISMUTH;
+    public static DeferredItem<Item> COIL_COPPER, COIL_COPPER_TORUS, COIL_TUNGSTEN, COIL_GOLD, COIL_GOLD_TORUS, COIL_MAGNETIZED_TUNGSTEN;
+    public static DeferredItem<Item> CENTRIFUGE_ELEMENT, THERMO_ELEMENT, RTG_UNIT, DRILL_TITANIUM;
+    public static DeferredItem<Item> CANISTER_EMPTY, TURBINE_TITANIUM, TURBINE_TUNGSTEN, MAGNETRON, CRT_DISPLAY;
+    public static DeferredItem<Item> SPHERE_STEEL, FLYWHEEL_BERYLLIUM, REACTOR_CORE;
+    public static DeferredItem<Item> HAZMAT_CLOTH, HAZMAT_CLOTH_RED, HAZMAT_CLOTH_GREY, ASBESTOS_CLOTH, FILTER_COAL;
+
     public static void registerAll() {
         registerArcElectrodes();
         registerBatteries();
@@ -77,6 +87,7 @@ public final class MachineItems {
         registerGears();
         registerIcfPellet();
         registerLens();
+        registerMachineParts();
         registerMachineUpgrades();
         registerMold();
         registerPaCoils();
@@ -92,6 +103,47 @@ public final class MachineItems {
         registerTurretItems();
         registerWatzPellets();
         registerZirnoxRods();
+    }
+
+    /**
+     * CE {@code ModItems} lines 1298-1341 / 1871-1873 / 293 / 1275 / 1311 / 1322 —
+     * motors, coils, {@code ItemEnumMulti} circuit, centrifuge/thermo/rtg/drill parts.
+     * Flattened circuit ids match loot pools ({@code circuit_vacuum_tube}, …).
+     */
+    private static void registerMachineParts() {
+        for (EnumCircuitType type : EnumCircuitType.VALUES) {
+            DeferredItem<Item> item = tab(ModCreativeTabs.PARTS,
+                    reg("circuit_" + lower(type.name()), () -> new Item(props())));
+            CIRCUITS.put(type, item);
+        }
+        MOTOR = tab(ModCreativeTabs.PARTS, reg("motor", () -> new Item(props())));
+        MOTOR_DESH = tab(ModCreativeTabs.PARTS, reg("motor_desh", () -> new Item(props())));
+        MOTOR_BISMUTH = tab(ModCreativeTabs.PARTS, reg("motor_bismuth", () -> new Item(props())));
+        COIL_COPPER = tab(ModCreativeTabs.PARTS, reg("coil_copper", () -> new Item(props())));
+        COIL_COPPER_TORUS = tab(ModCreativeTabs.PARTS, reg("coil_copper_torus", () -> new Item(props())));
+        COIL_TUNGSTEN = tab(ModCreativeTabs.PARTS, reg("coil_tungsten", () -> new Item(props())));
+        COIL_GOLD = tab(ModCreativeTabs.PARTS, reg("coil_gold", () -> new Item(props())));
+        COIL_GOLD_TORUS = tab(ModCreativeTabs.PARTS, reg("coil_gold_torus", () -> new Item(props())));
+        COIL_MAGNETIZED_TUNGSTEN = tab(ModCreativeTabs.PARTS, reg("coil_magnetized_tungsten", () -> new Item(props())));
+        CENTRIFUGE_ELEMENT = tab(ModCreativeTabs.PARTS, reg("centrifuge_element", () -> new Item(props())));
+        THERMO_ELEMENT = tab(ModCreativeTabs.CONTROL, reg("thermo_element", () -> new Item(props())));
+        RTG_UNIT = tab(ModCreativeTabs.PARTS, reg("rtg_unit", () -> new Item(props())));
+        DRILL_TITANIUM = tab(ModCreativeTabs.PARTS, reg("drill_titanium", () -> new Item(props())));
+        // CE ModItems.java:396, 1230, 1280, 1306-1323, 1847, 2520 — parts that unlock assembler
+        // machine/generator recipes for already-registered blocks.
+        CANISTER_EMPTY = tab(ModCreativeTabs.CONTROL, reg("canister_empty", () -> new Item(props())));
+        TURBINE_TITANIUM = tab(ModCreativeTabs.PARTS, reg("turbine_titanium", () -> new Item(props())));
+        TURBINE_TUNGSTEN = tab(ModCreativeTabs.PARTS, reg("turbine_tungsten", () -> new Item(props())));
+        MAGNETRON = tab(ModCreativeTabs.PARTS, reg("magnetron", () -> new Item(props())));
+        CRT_DISPLAY = tab(ModCreativeTabs.PARTS, reg("crt_display", () -> new Item(props())));
+        SPHERE_STEEL = tab(ModCreativeTabs.PARTS, reg("sphere_steel", () -> new Item(props())));
+        FLYWHEEL_BERYLLIUM = tab(ModCreativeTabs.PARTS, reg("flywheel_beryllium", () -> new Item(props())));
+        REACTOR_CORE = tab(ModCreativeTabs.PARTS, reg("reactor_core", () -> new Item(props())));
+        HAZMAT_CLOTH = tab(ModCreativeTabs.PARTS, reg("hazmat_cloth", () -> new Item(props())));
+        HAZMAT_CLOTH_RED = tab(ModCreativeTabs.PARTS, reg("hazmat_cloth_red", () -> new Item(props())));
+        HAZMAT_CLOTH_GREY = tab(ModCreativeTabs.PARTS, reg("hazmat_cloth_grey", () -> new Item(props())));
+        ASBESTOS_CLOTH = tab(ModCreativeTabs.PARTS, reg("asbestos_cloth", () -> new Item(props())));
+        FILTER_COAL = tab(ModCreativeTabs.PARTS, reg("filter_coal", () -> new Item(props())));
     }
 
     // ==================== ItemArcElectrode / ItemArcElectrodeBurnt ====================
