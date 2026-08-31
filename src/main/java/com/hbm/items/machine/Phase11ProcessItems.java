@@ -36,8 +36,6 @@ public final class Phase11ProcessItems {
     public static DeferredItem<Item> BALL_DYNAMITE;
     public static DeferredItem<Item> BALL_TATB;
     public static DeferredItem<Item> ROCKET_FUEL;
-    public static DeferredItem<Item> POWDER_SAWDUST;
-    public static DeferredItem<Item> GEM_TANTALIUM;
     public static DeferredItem<Item> CANISTER_NAPALM;
     public static DeferredItem<Item> PART_LITHIUM;
     public static DeferredItem<Item> PART_BERYLLIUM;
@@ -65,8 +63,6 @@ public final class Phase11ProcessItems {
         BALL_DYNAMITE = parts("ball_dynamite");
         BALL_TATB = parts("ball_tatb");
         ROCKET_FUEL = fuel("rocket_fuel", 6400);
-        POWDER_SAWDUST = parts("powder_sawdust");
-        GEM_TANTALIUM = parts("gem_tantalium");
         CANISTER_NAPALM = parts("canister_napalm");
         PART_LITHIUM = parts("part_lithium");
         PART_BERYLLIUM = parts("part_beryllium");
