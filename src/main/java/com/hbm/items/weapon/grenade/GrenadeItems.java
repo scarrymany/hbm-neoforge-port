@@ -12,6 +12,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -33,15 +34,15 @@ import java.util.function.Supplier;
  * tooltip lookup targets via {@link #shellItem}/{@link #fillingItem}/{@link #fuzeItem}/
  * {@link #extraItem}, and are meant to be combined into a {@code grenade_universal} stack.
  * <p>
- * <b>Not implemented in this pass:</b> CE's dynamic shell+filling+fuze+(extra) crafting-table recipe
- * ({@code GrenadeCraftingHandler}, a custom-match {@code IRecipe}, not a static shape). Per
- * {@code docs/phase3/grenades.md}'s own explicit finding, this needs a 1.21.1 recipe API shape
- * (vanilla's {@code CustomRecipe}/{@code SimpleCraftingRecipeSerializer}-style "match a predicate,
- * produce a computed result" mechanism) that this repo has zero confirmed real usage of anywhere
- * (grepped, including {@code upstream/neo-edition}) - left unbuilt rather than guessed at. The
- * component items above and {@link ItemGrenadeUniversal#make} are fully usable via
- * {@code /give}/creative/other code in the meantime; only the survival crafting-table recipe itself
- * is missing.
+ * <b>Crafting-table recipe (Phase 7, {@code docs/phase7/crafting_dynamic_handlers.md}):</b> CE's
+ * dynamic shell+filling+fuze+(extra) crafting-table recipe ({@code GrenadeCraftingHandler}, a
+ * custom-match {@code IRecipe}, not a static shape) is now ported as
+ * {@link com.hbm.inventory.recipes.crafting.GrenadeCraftingRecipe} - see that class's javadoc for
+ * the 1.21.1 {@code Recipe<CraftingInput>} shape used. {@link #shellOf}/{@link #fillingOf}/
+ * {@link #fuzeOf}/{@link #extraOf} below are that recipe's reverse item-to-enum lookup (this port
+ * registers one distinct {@link Item} per enum value rather than CE's single metadata-varying
+ * {@code Item}, so the recipe needs a way back from a matched stack's item to which enum value it
+ * represents).
  */
 public final class GrenadeItems {
 
@@ -126,6 +127,48 @@ public final class GrenadeItems {
 
     public static Item extraItem(EnumGrenadeExtra extra) {
         return EXTRAS.get(extra).get();
+    }
+
+    /**
+     * Reverse lookup for {@link com.hbm.inventory.recipes.crafting.GrenadeCraftingRecipe} - which
+     * {@link EnumGrenadeShell} (if any) {@code item} is the registered item for. Small linear scan
+     * (4 entries max) rather than a cached reverse map, so it never touches {@link DeferredItem#get()}
+     * until actually called (i.e. never at class-load time - see this port's established
+     * "no {@code DeferredHolder.get()} inside a static field initializer" rule).
+     */
+    @Nullable
+    public static EnumGrenadeShell shellOf(Item item) {
+        for (Map.Entry<EnumGrenadeShell, DeferredItem<Item>> entry : SHELLS.entrySet()) {
+            if (entry.getValue().get() == item) return entry.getKey();
+        }
+        return null;
+    }
+
+    /** @see #shellOf(Item) */
+    @Nullable
+    public static EnumGrenadeFilling fillingOf(Item item) {
+        for (Map.Entry<EnumGrenadeFilling, DeferredItem<Item>> entry : FILLINGS.entrySet()) {
+            if (entry.getValue().get() == item) return entry.getKey();
+        }
+        return null;
+    }
+
+    /** @see #shellOf(Item) */
+    @Nullable
+    public static EnumGrenadeFuze fuzeOf(Item item) {
+        for (Map.Entry<EnumGrenadeFuze, DeferredItem<Item>> entry : FUZES.entrySet()) {
+            if (entry.getValue().get() == item) return entry.getKey();
+        }
+        return null;
+    }
+
+    /** @see #shellOf(Item) */
+    @Nullable
+    public static EnumGrenadeExtra extraOf(Item item) {
+        for (Map.Entry<EnumGrenadeExtra, DeferredItem<Item>> entry : EXTRAS.entrySet()) {
+            if (entry.getValue().get() == item) return entry.getKey();
+        }
+        return null;
     }
 
     /**

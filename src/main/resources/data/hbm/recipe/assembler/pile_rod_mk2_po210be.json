@@ -1,0 +1,17 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:billet_po210be"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:pile_rod_mk2_po210be",
+    "count": 1
+  },
+  "duration": 40,
+  "power": 200
+}

@@ -1,0 +1,17 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:nugget_u235"
+      },
+      "count": 9
+    }
+  ],
+  "output": {
+    "id": "hbm:boy_bullet",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

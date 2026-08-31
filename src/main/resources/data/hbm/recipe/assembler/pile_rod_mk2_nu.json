@@ -1,0 +1,17 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:billet_uranium"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:pile_rod_mk2_nu",
+    "count": 1
+  },
+  "duration": 40,
+  "power": 200
+}

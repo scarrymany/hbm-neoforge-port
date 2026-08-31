@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:nugget_pu239"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:nugget_beryllium"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:man_core",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

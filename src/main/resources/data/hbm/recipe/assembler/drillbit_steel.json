@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tungsten"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:drillbit_steel",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

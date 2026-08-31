@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_starmetal"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_saturnite"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_niobium"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_pipe"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:piston_set_starmetal",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

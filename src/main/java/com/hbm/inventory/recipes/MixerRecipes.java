@@ -6,6 +6,11 @@ import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.BilletPowderItems;
+import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.main.MainRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -32,19 +37,44 @@ import java.util.Map;
  * {@code DeferredItem.get()}).
  * <p>
  * <b>Scope trim vs. CE</b> (documented, not silent - matching {@link CrystallizerRecipes}' and
- * {@code RefineryRecipes}' precedent): CE's ~40 mixer recipes reference several items/fluids this
- * port hasn't registered yet ({@code niter}/{@code sulfur}/{@code fluorite} dusts, {@code
- * pellet_charged}, {@code fuel_additive}, ore-dictionary tag lookups via {@code OreDictManager}).
- * Every recipe below is a real CE recipe restricted to the subset whose fluids AND solid input item
- * (where present) are confirmed already registered in this port - see each recipe's inline CE-origin
- * comment. {@link Fluids#LUBRICANT}/{@link Fluids#NITROGLYCERIN}/{@link Fluids#OXYHYDROGEN} are
- * deliberately kept as their real CE 2-recipe pairs (not flattened to one), directly addressing that
- * "Open questions" flag: a machine implementer copying this file should treat the
- * multi-recipe-per-fluid array as load-bearing, not an accident of this data set. ({@code FRACKSOL}'s
- * own real 2-recipe pair is not ported - its second recipe needs a sulfur-dust item this port hasn't
- * registered yet, and porting only its first recipe would misrepresent {@code FRACKSOL} as
- * single-recipe when CE's real data is a competing pair - left out entirely rather than
- * half-ported.)
+ * {@code RefineryRecipes}' precedent): CE's 40 mixer output-fluid keys (50 {@code MixerRecipe}
+ * objects) reference several items/fluids this port hasn't registered yet. Every recipe below is a
+ * real CE recipe restricted to the subset whose fluids AND solid input item (where present) are
+ * confirmed already registered in this port - see each recipe's inline CE-origin comment.
+ * {@link Fluids#LUBRICANT}/{@link Fluids#NITROGLYCERIN}/{@link Fluids#OXYHYDROGEN}/
+ * {@link Fluids#FRACKSOL}/{@link Fluids#SOLVENT}/{@link Fluids#BIOFUEL} are deliberately kept as
+ * their real CE multi-recipe competing arrays (not flattened to one), directly addressing the
+ * research doc's "Open questions" flag on this array being easy to flatten incorrectly: a machine
+ * implementer copying this file should treat the multi-recipe-per-fluid array as load-bearing, not an
+ * accident of this data set.
+ * <p>
+ * <b>{@code mrec-03-silex-misc} pass</b> (see {@code docs/phase7/mrec_03_silex_misc.md}): extended
+ * this file with 20 more of CE's 29 previously-unported output-fluid keys (25 more
+ * {@code MixerRecipe} objects), using {@link PlateCrystalWasteItems#CRYSTAL_SULFUR}/
+ * {@link PlateCrystalWasteItems#CRYSTAL_NITER}/{@link PlateCrystalWasteItems#CRYSTAL_FLUORITE} as the
+ * standing substitution for CE's plain ore-dictionary sulfur/niter/fluorite dust lookups - the same
+ * substitution this port's own {@code SILEXRecipes}/{@code CentrifugeRecipes} already established,
+ * which resolves the research report's open question #3 (this class's own previous javadoc called
+ * {@code FRACKSOL}'s second recipe blocked on "a sulfur-dust item this port hasn't registered yet" -
+ * not true anymore, corrected here). {@code ENDERJUICE}'s CE {@code DIAMOND.dust()} solid input is
+ * ported as {@link BilletPowderItems#POWDER_DIAMOND}, not {@link Items#DIAMOND} (the gem) - matching
+ * {@link CrystallizerRecipes}'s own already-established {@code DIAMOND.dust()} -&gt;
+ * {@code POWDER_DIAMOND} substitution (see that class's {@code POWDER_DIAMOND} entry), a discrepancy
+ * from the research report's suggested {@code Items.DIAMOND} substitution.
+ * <p>
+ * <b>Still blocked</b> (9 keys, unregistered item families, matching the research report):
+ * {@code COLLOID} ({@code ModItems.dust}, a generic undifferentiated-dust item), {@code IONGEL}/
+ * {@code SCHRABIDIC} ({@code pellet_charged}), {@code FULLERENE}/{@code LYE} ({@code powder_ash}
+ * family), {@code PETROIL_LEADED}/{@code GASOLINE_LEADED}/{@code COALGAS_LEADED}
+ * ({@code fuel_additive}), {@code BITUMEN} ({@code oil_tar}/{@code EnumTarType}, same gap
+ * {@code RefineryRecipes} already documents). <b>Correction to the research report</b>: CE's
+ * {@code ALUMINA} key has a real 2-recipe pair, but only the first ({@code F.dust()} -&gt;
+ * {@code CRYSTAL_FLUORITE}) is portable - the report claimed CE's second recipe's
+ * {@code chunk_ore}/{@code EnumChunkType.CRYOLITE} item is "registered", but only the bare
+ * {@code EnumChunkType} enum exists (confirmed against {@code BlockResourceStone}'s and
+ * {@code OreBlocks}'s own javadoc, both independently citing {@code chunk_ore} as not yet a real
+ * item) - so {@code ALUMINA} below is ported single-recipe, same documented-partial treatment as
+ * {@code LUBRICANT}'s CE-3-recipe/ported-2 trim.
  */
 public final class MixerRecipes {
 
@@ -114,6 +144,132 @@ public final class MixerRecipes {
         register(Fluids.OXYHYDROGEN,
                 new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.HYDROGEN, 500)).setStack2(new FluidStack(Fluids.AIR, 2_000)),
                 new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.HYDROGEN, 500)).setStack2(new FluidStack(Fluids.OXYGEN, 500)));
+
+        // ==================== mrec-03-silex-misc additions ====================
+        // See class javadoc "mrec-03-silex-misc pass" for the CRYSTAL_SULFUR/CRYSTAL_NITER/
+        // CRYSTAL_FLUORITE substitution rationale and the ALUMINA/ENDERJUICE discrepancy notes.
+
+        // register(Fluids.COOLANT, new MixerRecipe(2_000, 50).setStack1(new FluidStack(Fluids.WATER, 1_800)).setSolid(new RecipesCommon.OreDictStack(KNO.dust())));
+        register(Fluids.COOLANT, new MixerRecipe(2_000, 50)
+                .setStack1(new FluidStack(Fluids.WATER, 1_800))
+                .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_NITER.get())));
+
+        // register(Fluids.FRACKSOL, <2 competing recipes>) - both ported (see javadoc: sulfur-dust blocker no longer applies)
+        register(Fluids.FRACKSOL,
+                new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.SULFURIC_ACID, 900)).setStack2(new FluidStack(Fluids.PETROLEUM, 100)),
+                new MixerRecipe(1_000, 20).setStack1(new FluidStack(Fluids.WATER, 1_000)).setStack2(new FluidStack(Fluids.PETROLEUM, 100))
+                        .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_SULFUR.get())));
+
+        // register(Fluids.ENDERJUICE, new MixerRecipe(100, 100).setStack1(new FluidStack(Fluids.XPJUICE, 500)).setSolid(new RecipesCommon.OreDictStack(DIAMOND.dust()))); - DIAMOND.dust() -> POWDER_DIAMOND, see javadoc
+        register(Fluids.ENDERJUICE, new MixerRecipe(100, 100)
+                .setStack1(new FluidStack(Fluids.XPJUICE, 500))
+                .setSolid(new ComparableStack(BilletPowderItems.POWDER_DIAMOND.get())));
+
+        // register(Fluids.SALIENT, new MixerRecipe(1000, 20).setStack1(new FluidStack(Fluids.SEEDSLURRY, 500)).setStack2(new FluidStack(Fluids.BLOOD, 500)));
+        register(Fluids.SALIENT, new MixerRecipe(1_000, 20)
+                .setStack1(new FluidStack(Fluids.SEEDSLURRY, 500))
+                .setStack2(new FluidStack(Fluids.BLOOD, 500)));
+
+        // register(Fluids.PHOSGENE, new MixerRecipe(1000, 20).setStack1(new FluidStack(Fluids.UNSATURATEDS, 500)).setStack2(new FluidStack(Fluids.CHLORINE, 500)));
+        register(Fluids.PHOSGENE, new MixerRecipe(1_000, 20)
+                .setStack1(new FluidStack(Fluids.UNSATURATEDS, 500))
+                .setStack2(new FluidStack(Fluids.CHLORINE, 500)));
+
+        // register(Fluids.MUSTARDGAS, new MixerRecipe(1000, 20).setStack1(new FluidStack(Fluids.REFORMGAS, 750)).setStack2(new FluidStack(Fluids.CHLORINE, 250)).setSolid(new RecipesCommon.OreDictStack(S.dust())));
+        register(Fluids.MUSTARDGAS, new MixerRecipe(1_000, 20)
+                .setStack1(new FluidStack(Fluids.REFORMGAS, 750))
+                .setStack2(new FluidStack(Fluids.CHLORINE, 250))
+                .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_SULFUR.get())));
+
+        // register(Fluids.EGG, new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.RADIOSOLVENT, 500)).setSolid(new ComparableStack(Items.EGG)));
+        register(Fluids.EGG, new MixerRecipe(1_000, 50)
+                .setStack1(new FluidStack(Fluids.RADIOSOLVENT, 500))
+                .setSolid(new ComparableStack(Items.EGG)));
+
+        // register(Fluids.SOLVENT, <4 competing recipes>) - all 4 ported, CE-faithful
+        register(Fluids.SOLVENT,
+                new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.NAPHTHA, 500)).setStack2(new FluidStack(Fluids.AROMATICS, 500)),
+                new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.NAPHTHA_CRACK, 500)).setStack2(new FluidStack(Fluids.AROMATICS, 500)),
+                new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.NAPHTHA_DS, 500)).setStack2(new FluidStack(Fluids.AROMATICS, 500)),
+                new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.NAPHTHA_COKER, 500)).setStack2(new FluidStack(Fluids.AROMATICS, 500)));
+
+        // register(Fluids.SULFURIC_ACID, new MixerRecipe(500, 50).setStack1(new FluidStack(Fluids.PEROXIDE, 800)).setSolid(new RecipesCommon.OreDictStack(S.dust())));
+        register(Fluids.SULFURIC_ACID, new MixerRecipe(500, 50)
+                .setStack1(new FluidStack(Fluids.PEROXIDE, 800))
+                .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_SULFUR.get())));
+
+        // register(Fluids.NITRIC_ACID, new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.SULFURIC_ACID, 500)).setSolid(new RecipesCommon.OreDictStack(KNO.dust())));
+        register(Fluids.NITRIC_ACID, new MixerRecipe(1_000, 50)
+                .setStack1(new FluidStack(Fluids.SULFURIC_ACID, 500))
+                .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_NITER.get())));
+
+        // register(Fluids.RADIOSOLVENT, new MixerRecipe(1000, 50).setStack1(new FluidStack(Fluids.REFORMGAS, 750)).setStack2(new FluidStack(Fluids.CHLORINE, 250)));
+        register(Fluids.RADIOSOLVENT, new MixerRecipe(1_000, 50)
+                .setStack1(new FluidStack(Fluids.REFORMGAS, 750))
+                .setStack2(new FluidStack(Fluids.CHLORINE, 250)));
+
+        // register(Fluids.PETROIL, new MixerRecipe(1_000, 30).setStack1(new FluidStack(Fluids.RECLAIMED, 800)).setStack2(new FluidStack(Fluids.LUBRICANT, 200)));
+        register(Fluids.PETROIL, new MixerRecipe(1_000, 30)
+                .setStack1(new FluidStack(Fluids.RECLAIMED, 800))
+                .setStack2(new FluidStack(Fluids.LUBRICANT, 200)));
+
+        // register(Fluids.BIOFUEL, <2 competing recipes>) - both ported, CE-faithful (note the differing output amounts, 250 vs 200 - not a typo, preserved from CE)
+        register(Fluids.BIOFUEL,
+                new MixerRecipe(250, 20).setStack1(new FluidStack(Fluids.FISHOIL, 500)).setStack2(new FluidStack(Fluids.WOODOIL, 500)),
+                new MixerRecipe(200, 20).setStack1(new FluidStack(Fluids.SUNFLOWEROIL, 500)).setStack2(new FluidStack(Fluids.WOODOIL, 500)));
+
+        // register(Fluids.DIESEL_CRACK_REFORM, new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.DIESEL_CRACK, 900)).setStack2(new FluidStack(Fluids.REFORMATE, 100)));
+        register(Fluids.DIESEL_CRACK_REFORM, new MixerRecipe(1_000, 50)
+                .setStack1(new FluidStack(Fluids.DIESEL_CRACK, 900))
+                .setStack2(new FluidStack(Fluids.REFORMATE, 100)));
+
+        // register(Fluids.KEROSENE_REFORM, new MixerRecipe(1_000, 50).setStack1(new FluidStack(Fluids.KEROSENE, 900)).setStack2(new FluidStack(Fluids.REFORMATE, 100)));
+        register(Fluids.KEROSENE_REFORM, new MixerRecipe(1_000, 50)
+                .setStack1(new FluidStack(Fluids.KEROSENE, 900))
+                .setStack2(new FluidStack(Fluids.REFORMATE, 100)));
+
+        // register(Fluids.CHLOROCALCITE_MIX, new MixerRecipe(1000, 50).setStack1(new FluidStack(Fluids.CHLOROCALCITE_SOLUTION, 500)).setStack2(new FluidStack(Fluids.SULFURIC_ACID, 500)).setSolid(new ComparableStack(ModItems.powder_flux)));
+        register(Fluids.CHLOROCALCITE_MIX, new MixerRecipe(1_000, 50)
+                .setStack1(new FluidStack(Fluids.CHLOROCALCITE_SOLUTION, 500))
+                .setStack2(new FluidStack(Fluids.SULFURIC_ACID, 500))
+                .setSolid(new ComparableStack(BilletPowderItems.POWDER_FLUX.get())));
+
+        // register(Fluids.PHEROMONE_M, new MixerRecipe(2000, 10).setStack1(new FluidStack(Fluids.PHEROMONE, 1500)).setStack2(new FluidStack(Fluids.BLOOD, 500)).setSolid(new ComparableStack(ModItems.pill_herbal)));
+        register(Fluids.PHEROMONE_M, new MixerRecipe(2_000, 10)
+                .setStack1(new FluidStack(Fluids.PHEROMONE, 1_500))
+                .setStack2(new FluidStack(Fluids.BLOOD, 500))
+                .setSolid(new ComparableStack(hbmItem("pill_herbal"))));
+
+        // register(Fluids.BAUXITE_SOLUTION, new MixerRecipe(300, 80).setStack1(new FluidStack(Fluids.LYE, 50)).setSolid(new ComparableStack(ModBlocks.stone_resource, 1, BAUXITE.ordinal())));
+        register(Fluids.BAUXITE_SOLUTION, new MixerRecipe(300, 80)
+                .setStack1(new FluidStack(Fluids.LYE, 50))
+                .setSolid(new ComparableStack(hbmItem("stone_resource_bauxite"))));
+
+        // register(Fluids.ALUMINA, <2 competing recipes>) - only the first is portable, see class javadoc ALUMINA/chunk_ore note
+        register(Fluids.ALUMINA,
+                new MixerRecipe(200, 40).setStack1(new FluidStack(Fluids.SODIUM_ALUMINATE, 150))
+                        .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get(), 3)));
+
+        // register(Fluids.PERFLUOROMETHYL, new MixerRecipe(1000, 20).setStack1(new FluidStack(Fluids.PETROLEUM, 1000)).setStack2(new FluidStack(Fluids.UNSATURATEDS, 500)).setSolid(new RecipesCommon.OreDictStack(F.dust())));
+        register(Fluids.PERFLUOROMETHYL, new MixerRecipe(1_000, 20)
+                .setStack1(new FluidStack(Fluids.PETROLEUM, 1_000))
+                .setStack2(new FluidStack(Fluids.UNSATURATEDS, 500))
+                .setSolid(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get())));
+    }
+
+    /**
+     * Resolves one of this port's own items by registry name, matching
+     * {@code CrucibleRecipes#blockIcon(String)}'s/{@code CrystallizerRecipes#hbmBlock(String)}'s
+     * already-established lazy-lookup pattern (see either method's own javadoc for the full safety
+     * reasoning) - safe here only because this method is only ever reachable through
+     * {@link #registerDefaults()}, which is itself only ever invoked lazily (see class javadoc "Lazy
+     * registration"), long after every item {@code RegisterEvent} has fired. Used for items this
+     * port's per-family item classes ({@code FoodItems}, {@code GenericBlocks}) register in a loop
+     * without keeping a named field per entry - {@code pill_herbal} and {@code stone_resource_bauxite}
+     * below are exactly that shape.
+     */
+    private static Item hbmItem(String path) {
+        return BuiltInRegistries.ITEM.getValue(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
     }
 
     private static void register(FluidType outputType, MixerRecipe... recipes) {

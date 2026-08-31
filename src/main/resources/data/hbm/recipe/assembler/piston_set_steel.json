@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tungsten"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:tungsten_bolt"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:piston_set_steel",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

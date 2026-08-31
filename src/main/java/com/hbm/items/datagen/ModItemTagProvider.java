@@ -16,6 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -25,11 +26,23 @@ import java.util.concurrent.CompletableFuture;
  * registered under {@link MainRegistry#MODID} at datagen time - never a hardcoded (material, shape)
  * list, so this needs zero coordination with whichever area registers a given material-shape item.
  *
- * <p>Only catches items registered under {@link MaterialShapes#buildRegistryName(NTMMaterial)}'s
- * exact naming convention (material-name suffixed with the shape token, e.g. {@code iron_ingot}).
- * CE-legacy hand-ported items that keep CE's original prefixed ids (e.g. {@code ingot_steel}) live
- * in a different naming scheme and are intentionally not matched here - see this area's final
- * report for why that split is expected, not a bug.
+ * <p>Two independent passes populate these tags:
+ * <ul>
+ *     <li>{@link #addTags(HolderLookup.Provider)}'s main loop catches items registered under
+ *     {@link MaterialShapes#buildRegistryName(NTMMaterial)}'s exact naming convention (material-name
+ *     suffixed with the shape token, e.g. {@code iron_ingot}) - this is the convention
+ *     {@code MaterialItemGenerator}/{@code MaterialBlockGenerator} use.</li>
+ *     <li>{@link #addLegacyMaterialTags()} catches CE-legacy hand-ported items that instead keep
+ *     CE's original prefixed ids (e.g. {@code ingot_steel}, {@code powder_iron}, {@code
+ *     plate_titanium}) - the naming scheme {@code IngotNuggetItems}/{@code BilletPowderItems}/
+ *     {@code PlateCrystalWasteItems} use. Without this second pass none of those ~460 items would
+ *     carry any {@code c:<tagFolder>/<material>} tag at all, and {@link Mats#getMaterialsFromItem}'s
+ *     generic ("Tier 1") auto-smelt lookup - the mechanism that lets a crucible turn e.g.
+ *     {@code ingot_titanium} back into 1 titanium ingot's worth of material with no per-item
+ *     {@code MatDistribution} entry, exactly like CE - would silently never fire for them. See
+ *     {@code docs/phase7/crucible_matdistribution.md}'s "two-tier lookup" section for the full
+ *     finding this pass closes.</li>
+ * </ul>
  */
 public class ModItemTagProvider extends ItemTagsProvider {
 
@@ -70,7 +83,51 @@ public class ModItemTagProvider extends ItemTagsProvider {
             }
         }
 
+        addLegacyMaterialTags();
         addToolTags();
+    }
+
+    /**
+     * Legacy prefix -> autogen shape pairs for CE's hand-named {@code <prefix>_<material>} resource
+     * item families ({@code IngotNuggetItems}/{@code BilletPowderItems}/{@code
+     * PlateCrystalWasteItems}), matched positionally against {@link #LEGACY_SHAPES}. {@code powder_}
+     * maps to {@link MaterialShapes#DUST} (CE's "powder" is this port's "dust" shape) rather than a
+     * same-named shape - every other prefix already matches its shape's own {@link
+     * MaterialShapes#registryName} token.
+     */
+    private static final String[] LEGACY_PREFIXES = {"ingot", "nugget", "billet", "powder", "plate", "crystal"};
+    private static final MaterialShapes[] LEGACY_SHAPES = {
+            MaterialShapes.INGOT, MaterialShapes.NUGGET, MaterialShapes.BILLET,
+            MaterialShapes.DUST, MaterialShapes.PLATE, MaterialShapes.CRYSTAL,
+    };
+
+    /**
+     * Closes the gap documented in this class's own javadoc: for every {@code (material, legacy
+     * shape)} pair, tries every one of that material's alias names (not just its canonical {@link
+     * NTMMaterial#getRegistryName()}) under every legacy prefix, e.g. {@code ingot_th232} for
+     * material {@code Thorium232} - CE's own field/id there uses the material's second alias
+     * ({@code Th232}), not its canonical first name, exactly the kind of per-material naming quirk
+     * that makes trying every alias necessary rather than just the canonical one. Stops at the first
+     * alias that resolves to a real registered item per (material, shape) pair, so one real item is
+     * never tagged twice into the same tag.
+     */
+    private void addLegacyMaterialTags() {
+        for (NTMMaterial mat : Mats.orderedList) {
+            for (int i = 0; i < LEGACY_PREFIXES.length; i++) {
+                String prefix = LEGACY_PREFIXES[i];
+                MaterialShapes shape = LEGACY_SHAPES[i];
+
+                for (String alias : mat.names) {
+                    ResourceLocation id = ResourceLocation.fromNamespaceAndPath(
+                            MainRegistry.MODID, prefix + "_" + alias.toLowerCase(Locale.US));
+                    Item item = BuiltInRegistries.ITEM.getOptional(id).orElse(null);
+                    if (item != null) {
+                        this.tag(shape.commonTag(mat)).add(item);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -26,19 +26,21 @@ import static com.hbm.inventory.material.MaterialShapes.*;
  * names directly as {@code String...}, so this class has zero dependency on the (not yet ported)
  * ore-dict system. The alias strings themselves are unchanged from CE.
  *
- * <p><b>Deferred to a later phase:</b> CE's {@code MatDistribution} (the JSON-backed crucible
- * table that populates {@link #materialEntries} / {@link #materialOreEntries} with ~40 curated
- * entries for vanilla ores, castable items, etc.) is not ported in Phase 0. It depends on
- * {@code ModItems}, {@code ModBlocks}, {@code OreDictManager} and {@code RecipesCommon}, none of
- * which exist yet - porting it now would either fail to compile or require inventing classes
- * outside this area's scope. {@link #registerEntry(Item, Object...)} and
- * {@link #registerOre(String, Object...)} are kept as the stable seam a future
- * {@code MatDistribution} port calls into; until then the maps are simply empty.
+ * <p><b>{@code MatDistribution} (Phase 7):</b> CE's {@code MatDistribution} - the curated table
+ * that populates {@link #materialEntries} / {@link #materialOreEntries} with ~41 entries for
+ * vanilla ores, castable items, etc. - is ported as {@link MatDistributionDefaults}, a sibling
+ * class in this package. {@link #registerEntry(Item, Object...)} and
+ * {@link #registerOre(String, Object...)} are the stable seam it calls into (see that class's own
+ * javadoc for why it currently calls only {@link #registerEntry}, not {@link #registerOre}, for
+ * every entry it ports). {@link MatDistributionDefaults#registerAll()} must run from
+ * {@code CommonEvents.commonSetup}'s {@code enqueueWork} block (not wired by this class itself -
+ * see that method's own javadoc); until that call happens the maps are empty.
  *
  * <p>{@link #getMaterialsFromItem(ItemStack)} already consults {@link #materialOreEntries} (keyed
  * by tag path, e.g. {@code registerOre("stone", ...)} matches any tag whose path is {@code stone})
- * as its first and primary lookup, mirroring CE, so entries a future {@code MatDistribution} port
- * adds are read correctly with no further changes here.
+ * as its first lookup and {@link #materialEntries} (keyed by exact item) unconditionally after,
+ * mirroring CE, so entries {@link MatDistributionDefaults} adds are read correctly with no further
+ * changes here.
  */
 public class Mats {
 

@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:nugget_solinium"
+      },
+      "count": 9
+    },
+    {
+      "item": {
+        "item": "hbm:nugget_euphemium"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:solinium_core",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

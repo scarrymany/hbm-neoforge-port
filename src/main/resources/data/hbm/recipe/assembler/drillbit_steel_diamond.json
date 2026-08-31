@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:drillbit_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:powder_diamond"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:drillbit_steel_diamond",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

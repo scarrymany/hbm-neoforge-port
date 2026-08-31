@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:niobium_dense_wire"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_dense_wire"
+      },
+      "count": 64
+    }
+  ],
+  "output": {
+    "id": "hbm:pa_coil_niobium",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

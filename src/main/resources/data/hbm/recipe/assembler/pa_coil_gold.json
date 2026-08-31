@@ -1,0 +1,17 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 128
+    }
+  ],
+  "output": {
+    "id": "hbm:pa_coil_gold",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}
