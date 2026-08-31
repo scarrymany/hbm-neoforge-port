@@ -1,4 +1,4 @@
-// 1.21.1	2026-08-31T20:49:03.796527041	Registries
+// 1.21.1	2026-08-31T21:00:54.734817419	Registries
 03966dfba196cc09b2ca6555814d282d86225526 data/hbm/damage_type/acid.json
 67a94f28eda6d843b473b7fe2076f20d9f16d5ae data/hbm/damage_type/acid_player.json
 5934241799051acdb590c1c46f50eb1a56038314 data/hbm/damage_type/ams.json
@@ -70,7 +70,7 @@ eeeac4b53973d722cc48d787717ad5f63e014780 data/hbm/damage_type/tau.json
 a8d7141b0fb21a683e09d3bce0752acf7118bfa3 data/hbm/neoforge/biome_modifier/add_creeper_variant_spawns.json
 46e8ccc6e91da0764d59da2cdcbb6d56b31680af data/hbm/neoforge/biome_modifier/add_end_ores.json
 ea59c184b0aa7a1f77d350441474718b4805b044 data/hbm/neoforge/biome_modifier/add_nether_ores.json
-c06973cb76d32a9e3baf131e43a3e0f732ec71ff data/hbm/neoforge/biome_modifier/add_oil_meteor_worldgen.json
+02c950eac70fcd8b3a20c65b1a073350415aa379 data/hbm/neoforge/biome_modifier/add_oil_meteor_worldgen.json
 a9f30026673f2f5d1a240dba46fa95d02aa0e9a8 data/hbm/neoforge/biome_modifier/add_overworld_ores.json
 e35a87d75bfecee7d7b0b01a7a5c578d899eed91 data/hbm/worldgen/biome/crater.json
 9d38e5d50886499d1289dc515f8a7c8709577079 data/hbm/worldgen/biome/crater_inner.json
@@ -85,6 +85,7 @@ f45bfd54a5b212ddcb4db630db87b128f05e20bf data/hbm/worldgen/configured_feature/au
 4904d77652362fb5438212295d5e5b14c5e1c404 data/hbm/worldgen/configured_feature/bedrock_ore_nether.json
 9567c1b0b45549b4f87839985e105057656de9e1 data/hbm/worldgen/configured_feature/bedrock_ore_overworld.json
 7a2f98fe43604f09bdd6b9384010e94abac66ae3 data/hbm/worldgen/configured_feature/beryllium.json
+927c38b17b152c94997d2ffd46950695ea3bcce9 data/hbm/worldgen/configured_feature/bunker.json
 fbd64ddd723662585ca5b0369d6b91bb603fee76 data/hbm/worldgen/configured_feature/cave_asbestos.json
 60c8024ab814556b9b05f1d2faa4ec51ac5da001 data/hbm/worldgen/configured_feature/cave_sulfur.json
 1a631a27b0b2719d0c034291da0ccf08772f5267 data/hbm/worldgen/configured_feature/cinnabar.json
@@ -134,6 +135,7 @@ fff6424540dfed36e00d8a2752f01aa99bb52748 data/hbm/worldgen/configured_feature/ne
 7d19cd7ad37c79da468cd48ef8ea810b0d96254f data/hbm/worldgen/configured_feature/niter.json
 caf6f2d3de7affff0abbedce678c29dae5c961c5 data/hbm/worldgen/configured_feature/oil_bubble.json
 efd8fb19871044e8d28574d23a7ed14f8d525125 data/hbm/worldgen/configured_feature/oil_sand_bubble.json
+18e087c404c648a48c1d4994e3d7a9aa8552c764 data/hbm/worldgen/configured_feature/radio.json
 ceb51cc891d5b0f0488bddf483925cb5b2f41a3d data/hbm/worldgen/configured_feature/rare.json
 ca9c18afb7b083c367fd462d7d7b1c7fe5b093b0 data/hbm/worldgen/configured_feature/smoldering_ore.json
 e2ed68d84662b1fc0ed9ca417a407e6ca55c9a10 data/hbm/worldgen/configured_feature/sulfur.json
@@ -151,6 +153,7 @@ a35b16eef4c928b6bf4a5542452ca5dfb778876b data/hbm/worldgen/placed_feature/bedroc
 36c6887476daef09e72638870f19260b161f4a0b data/hbm/worldgen/placed_feature/bedrock_ore_nether.json
 12f0d10354844fbdbe3868ee14eb0a707a1149bb data/hbm/worldgen/placed_feature/bedrock_ore_overworld.json
 734464a50fdb20641294c7b33c3042d70dea585a data/hbm/worldgen/placed_feature/beryllium.json
+db0e00ebced6487fe7135574e36d249bf009db79 data/hbm/worldgen/placed_feature/bunker.json
 64a6e464cb5ed3fa4024c3c9ea9cb0b6800f775f data/hbm/worldgen/placed_feature/cave_asbestos.json
 b8da0cd68c2a8d1bf327fe42b1681f2ad2da98a6 data/hbm/worldgen/placed_feature/cave_sulfur.json
 d968e9a18cf5226f5c800857ee1b6225aeba7020 data/hbm/worldgen/placed_feature/cinnabar.json
@@ -200,6 +203,7 @@ c0846494a39628160019e5fd7751a1f0dc4c81d9 data/hbm/worldgen/placed_feature/nether
 5fe590f903fc59f7e1b3f09a9992c09aad91cf0d data/hbm/worldgen/placed_feature/niter.json
 a8f252d815c2f92deff296da716a77afbc7bdc30 data/hbm/worldgen/placed_feature/oil_bubble.json
 4cd8803deb806fd1a160524b5b29762582919a4c data/hbm/worldgen/placed_feature/oil_sand_bubble.json
+42565f1075ccb2ef884f9c37e2e574a4aa5b2c14 data/hbm/worldgen/placed_feature/radio.json
 a99f872ad58a25274a223a2d2038970845c8e836 data/hbm/worldgen/placed_feature/rare.json
 e916c6a8698c48f38a84310075d6bb1954eb790b data/hbm/worldgen/placed_feature/smoldering_ore.json
 add86d7c98645419f75490522ea3e227f1af5070 data/hbm/worldgen/placed_feature/sulfur.json

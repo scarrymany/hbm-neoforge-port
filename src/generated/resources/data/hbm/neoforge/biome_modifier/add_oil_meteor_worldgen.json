@@ -6,7 +6,9 @@
     "hbm:bedrock_oil_deposit",
     "hbm:oil_sand_bubble",
     "hbm:meteorite",
-    "hbm:antenna"
+    "hbm:antenna",
+    "hbm:bunker",
+    "hbm:radio"
   ],
   "step": "underground_ores"
 }
