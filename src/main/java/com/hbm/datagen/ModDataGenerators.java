@@ -9,9 +9,13 @@ import com.hbm.items.datagen.ModItemModelProvider;
 import com.hbm.items.datagen.ModItemTagProvider;
 import com.hbm.main.MainRegistry;
 import com.hbm.world.biome.ModCraterBiomes;
+import com.hbm.world.gen.OreBiomeModifiers;
+import com.hbm.world.gen.OreConfiguredFeatures;
+import com.hbm.world.gen.OrePlacedFeatures;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -57,6 +61,13 @@ public class ModDataGenerators {
         RegistrySetBuilder registrySetBuilder = new RegistrySetBuilder();
         registrySetBuilder.add(Registries.DAMAGE_TYPE, ModDamageTypes::bootstrap);
         registrySetBuilder.add(Registries.BIOME, ModCraterBiomes::bootstrap);
+        // Phase 4 ore-vein/bedrock-ore world-gen (docs/phase4/ore_veins_and_bedrock_ores.md) - the
+        // three remaining stages of the Feature -> ConfiguredFeature -> PlacedFeature -> BiomeModifier
+        // pipeline (Feature instances themselves are registered separately via
+        // OreWorldGenFeatures.register(modEventBus), like any other DeferredRegister).
+        registrySetBuilder.add(Registries.CONFIGURED_FEATURE, OreConfiguredFeatures::bootstrap);
+        registrySetBuilder.add(Registries.PLACED_FEATURE, OrePlacedFeatures::bootstrap);
+        registrySetBuilder.add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, OreBiomeModifiers::bootstrap);
         DatapackBuiltinEntriesProvider datapackProvider =
                 new DatapackBuiltinEntriesProvider(output, lookup, registrySetBuilder, Set.of(MainRegistry.MODID));
         generator.addProvider(event.includeServer(), datapackProvider);

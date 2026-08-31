@@ -69,6 +69,13 @@ public class CommonEvents {
             CyclotronRecipes.register();
             ChemPlantRecipes.register();
             ElectrolyserFluidRecipes.register();
+            // Phase 4 (fallout_rain_and_effects) - com.hbm.config.FalloutConfigJSON#initDefault()
+            // eagerly resolves several DeferredBlock.get() calls (e.g. WastelandVirusBlocks.SELLAFIELD)
+            // while building its default block-transform table, so - same reasoning as the recipe
+            // tables above - it must run after every block RegisterEvent has fired, not from
+            // MainRegistry's constructor (unlike ExplosionNukeGeneric.loadSoliniumFromFile(), whose
+            // solinium.cfg table resolves block ids lazily by name at actual use time instead).
+            com.hbm.config.FalloutConfigJSON.initialize();
         });
     }
 }

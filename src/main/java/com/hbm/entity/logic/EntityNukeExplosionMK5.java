@@ -2,6 +2,7 @@ package com.hbm.entity.logic;
 
 import com.hbm.config.BombConfig;
 import com.hbm.config.GeneralConfig;
+import com.hbm.entity.effect.EntityFalloutRain;
 import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.explosion.ExplosionNukeRayBatched;
 import com.hbm.interfaces.IExplosionRay;
@@ -40,12 +41,12 @@ import java.util.UUID;
  * <p>
  * <b>Not ported (documented forward references, each a real dependency this port doesn't have
  * yet)</b>: {@code AdvancementManager.grantAchievement} (achievements, Phase 5), {@code
- * EntityGlowingOne.convertInRadiusToGlow} (mob-conversion, not this phase's scope), {@code
- * SatelliteDetector.reportEvent} (Phase 4 world/simulation), and the {@code EntityFalloutRain}
- * spawn on completion (Phase 4 - {@code docs/phase3/explosion_engine.md}'s "Fallout trigger hook"
- * names this exact call site as the stable interface Phase 4 needs to fill in). Each is a no-op
- * stub with a comment naming the real CE call it replaces; the core ray-based destruction, AoE
- * damage, and radiation-along-line-of-sight logic are all fully ported and functional.
+ * EntityGlowingOne.convertInRadiusToGlow} (mob-conversion, not this phase's scope), and {@code
+ * SatelliteDetector.reportEvent} (Phase 4 world/simulation). Each is a no-op stub with a comment
+ * naming the real CE call it replaces; the core ray-based destruction, AoE damage, and
+ * radiation-along-line-of-sight logic are all fully ported and functional. The {@code
+ * EntityFalloutRain} spawn on completion ({@code docs/phase3/explosion_engine.md}'s "Fallout
+ * trigger hook") is now wired - see {@code docs/phase4/fallout_rain_and_effects.md}.
  */
 public class EntityNukeExplosionMK5 extends EntityExplosionChunkloading {
 
@@ -145,11 +146,14 @@ public class EntityNukeExplosionMK5 extends EntityExplosionChunkloading {
                 MainRegistry.logger.info("[NUKE] Explosion complete. Time elapsed: {}ms", System.currentTimeMillis() - explosionStart);
             }
             if (fallout) {
-                // TODO(EntityFalloutRain, Phase 4 - see docs/phase3/explosion_engine.md's "Fallout
-                // trigger hook"): CE spawns a no-arg EntityFalloutRain here, sets its position to
-                // this entity's position, and scales it to
-                // (int)(this.radius * 2.5 + falloutAdd) * BombConfig.falloutRange / 100. Kept as a
-                // stable, named call site for whichever pass lands EntityFalloutRain.
+                // CE: no-arg EntityFalloutRain, positioned at this entity's own position, scaled to
+                // (int)(radius * 2.5 + falloutAdd) * BombConfig.falloutRange / 100 - no detonator
+                // propagated (real CE asymmetry vs. the MK3 "waste" path below, faithfully preserved;
+                // see docs/phase4/fallout_rain_and_effects.md's Key design/API decisions).
+                EntityFalloutRain rain = new EntityFalloutRain(level);
+                rain.setPos(getX(), getY(), getZ());
+                rain.setScale((int) (this.radius * 2.5 + falloutAdd) * BombConfig.FALLOUT_RANGE.get() / 100);
+                level.addFreshEntity(rain);
             }
             this.discard();
         }

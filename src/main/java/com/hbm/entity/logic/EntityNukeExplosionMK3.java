@@ -2,6 +2,7 @@ package com.hbm.entity.logic;
 
 import com.hbm.config.BombConfig;
 import com.hbm.config.GeneralConfig;
+import com.hbm.entity.effect.EntityFalloutRain;
 import com.hbm.explosion.ExplosionDrying;
 import com.hbm.explosion.ExplosionFleija;
 import com.hbm.explosion.ExplosionNukeAdvanced;
@@ -38,10 +39,9 @@ import java.util.UUID;
  * optimization for this family - see the research report's "CE's own performance characteristics").
  * <p>
  * <b>Not ported (documented forward references)</b>: {@code AdvancementManager.grantAchievement}
- * (Phase 5) and the {@code EntityFalloutRain} spawn on waste-path completion (Phase 4 - see {@code
- * docs/phase3/explosion_engine.md}'s "Fallout trigger hook", which documents this exact call site
- * including CE's own {@code new EntityFalloutRain(world, int)} vs. mk5's no-arg constructor
- * asymmetry as a real, faithfully-preservable CE inconsistency for whoever lands it). The anti-nuke
+ * (Phase 5). The {@code EntityFalloutRain} spawn on waste-path completion ({@code docs/phase3/
+ * explosion_engine.md}'s "Fallout trigger hook") is now wired - see {@code
+ * docs/phase4/fallout_rain_and_effects.md}. The anti-nuke
  * "jammer" mechanic ({@link #isJammed}/{@link #statFacFleija}) is ported with its actual gameplay
  * check intact but its particle-burst VFX ({@link #createParticle}) reduced to sound-only (the
  * packet-based particle broadcast it used, {@code AuxParticlePacketNT}, doesn't exist in this port -
@@ -226,11 +226,16 @@ public class EntityNukeExplosionMK3 extends EntityExplosionChunkloading {
             }
         } else {
             if (!did2 && waste) {
-                // TODO(EntityFalloutRain, Phase 4 - see docs/phase3/explosion_engine.md's "Fallout
-                // trigger hook"): CE spawns an EntityFalloutRain(world, (int)(destructionRange*1.8)*10)
-                // here, positions it at this entity's position, sets its detonator, and scales it
-                // to (int)(destructionRange * 1.8). Kept as a stable, named call site for whichever
-                // pass lands EntityFalloutRain.
+                // CE: EntityFalloutRain(world, (int)(destructionRange*1.8)*10) - the int arg is
+                // silently discarded by CE's own 2-arg constructor (see EntityFalloutRain's own
+                // javadoc); detonator IS propagated here (unlike MK5's fallout spawn - a real,
+                // faithfully-preserved CE asymmetry, see docs/phase4/fallout_rain_and_effects.md's
+                // Key design/API decisions).
+                EntityFalloutRain rain = new EntityFalloutRain(level, (int) (destructionRange * 1.8) * 10);
+                rain.setPos(getX(), getY(), getZ());
+                rain.detonator = this.detonator;
+                rain.setScale((int) (destructionRange * 1.8));
+                level.addFreshEntity(rain);
                 did2 = true;
             }
         }

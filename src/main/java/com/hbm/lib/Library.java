@@ -381,4 +381,29 @@ public final class Library {
     public static long blockPosToLong(BlockPos pos) {
         return pos.asLong();
     }
+
+    /**
+     * Phase 4's {@code com.hbm.world.feature.BedrockOreFeature} nether-ore weighted pick needs this
+     * one CE helper: a splitmix64-derived, chunk-keyed bounded-uniform RNG draw, ported verbatim from
+     * CE's {@code Library.nextIntDeterministic(long, int, int, int)} (13 lines, read in full -
+     * {@code HashCommon.murmurHash3} plus Lemire's rejection-sampling method for an unbiased bound).
+     * Deterministic given the same {@code (seed, chunkX, chunkZ, bound)} - CE's own nether
+     * bedrock-ore variant is the only caller, and deliberately uses the real world seed here (unlike
+     * the overworld tier scan's fixed literal seeds - see {@code BedrockOreFeature}'s own javadoc for
+     * that confirmed, preserved asymmetry).
+     */
+    public static int nextIntDeterministic(long seed, int chunkX, int chunkZ, int bound) {
+        if (bound <= 0) throw new IllegalArgumentException("bound must be > 0");
+        long state = seed ^ net.minecraft.world.level.ChunkPos.asLong(chunkX, chunkZ);
+        final long threshold = Integer.remainderUnsigned(-bound, bound) & 0xffff_ffffL;
+        while (true) {
+            state += 0x9E3779B97F4A7C15L;
+            long z = it.unimi.dsi.fastutil.HashCommon.murmurHash3(state);
+            long r = z >>> 32;
+            long m = r * (long) bound;
+            if ((m & 0xffff_ffffL) >= threshold) {
+                return (int) (m >>> 32);
+            }
+        }
+    }
 }

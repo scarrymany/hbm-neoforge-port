@@ -1,5 +1,6 @@
 package com.hbm.entity.logic;
 
+import com.hbm.entity.effect.EntityFalloutRain;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -10,16 +11,19 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
  * {@link EntityType} registration for the nuke-tier logic-driver entities ({@link
- * EntityNukeExplosionMK5}, {@link EntityNukeExplosionMK3}, {@link EntityBalefire}) - following the
+ * EntityNukeExplosionMK5}, {@link EntityNukeExplosionMK3}, {@link EntityBalefire}) plus {@link
+ * EntityFalloutRain} (Phase 4, {@code docs/phase4/fallout_rain_and_effects.md}) - following the
  * one confirmed, real registration precedent in this port, {@code com.hbm.entity.
  * ConveyorEntityTypes} (its own {@code DeferredRegister<EntityType<?>>} on {@code
  * BuiltInRegistries.ENTITY_TYPE}, one {@code DeferredRegister} per entity family rather than a
  * shared central registry - see that class's own javadoc for why). CE's
- * {@code @AutoRegister(name = "...", trackingRange = 1000)} annotations on each of these 3
- * classes supply the ids/tracking ranges below; CE never overrides these classes' default entity
- * size (no {@code setSize} call in any of the 3), so a small nominal, non-colliding size is picked
- * here instead of guessing at an intended visual footprint for entities that render nothing of
- * their own (Phase 5 scope) and exist purely as tick-driven world-mutation logic.
+ * {@code @AutoRegister(name = "...", trackingRange = 1000)} annotations on each of these classes
+ * supply the ids/tracking ranges below; CE never overrides mk3/mk5/balefire's default entity size
+ * (no {@code setSize} call in any of the 3), so a small nominal, non-colliding size is picked for
+ * those instead of guessing at an intended visual footprint for entities that render nothing of
+ * their own (Phase 5 scope) and exist purely as tick-driven world-mutation logic. {@code
+ * EntityFalloutRain} is the one real exception - CE's own constructor does call
+ * {@code setSize(4.0F, 20.0F)}, a real value carried over verbatim as {@code .sized(4F, 20F)}.
  */
 public final class NukeEntityTypes {
 
@@ -29,6 +33,7 @@ public final class NukeEntityTypes {
     public static DeferredHolder<EntityType<?>, EntityType<EntityNukeExplosionMK5>> NUKE_MK5;
     public static DeferredHolder<EntityType<?>, EntityType<EntityNukeExplosionMK3>> NUKE_MK3;
     public static DeferredHolder<EntityType<?>, EntityType<EntityBalefire>> BALEFIRE;
+    public static DeferredHolder<EntityType<?>, EntityType<EntityFalloutRain>> FALLOUT_RAIN;
 
     private NukeEntityTypes() {
     }
@@ -54,6 +59,13 @@ public final class NukeEntityTypes {
                         .sized(0.5F, 0.5F)
                         .setTrackingRange(1000)
                         .build("entity_balefire"));
+
+        FALLOUT_RAIN = ENTITY_TYPES.register("entity_fallout_rain", () ->
+                EntityType.Builder.<EntityFalloutRain>of(EntityFalloutRain::new, MobCategory.MISC)
+                        .noSummon()
+                        .sized(4.0F, 20.0F)
+                        .setTrackingRange(1000)
+                        .build("entity_fallout_rain"));
 
         ENTITY_TYPES.register(modEventBus);
     }

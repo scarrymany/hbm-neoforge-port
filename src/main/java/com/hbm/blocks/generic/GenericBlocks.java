@@ -62,6 +62,7 @@ public final class GenericBlocks {
         GenericDecoBlocks.registerAll();
         BedrockOreBlocks.registerAll();
         WastelandVirusBlocks.registerAll();
+        FalloutBlocks.registerAll();
 
         registerStructural();
         registerDoorsLaddersGlass();
