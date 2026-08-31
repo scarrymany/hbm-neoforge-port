@@ -130,13 +130,13 @@ public class EntityBOTPrimeBody extends EntityBOTPrimeBase {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("partID", this.getPartNumber());
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.setPartNumber(tag.getInt("partID"));
     }

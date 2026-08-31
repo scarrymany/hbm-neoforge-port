@@ -206,13 +206,13 @@ public abstract class EntityWormBaseNT extends EntityBurrowingNT {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("wormID", this.getHeadID());
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.setHeadID(tag.getInt("wormID"));
     }

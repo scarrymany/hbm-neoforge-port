@@ -213,7 +213,7 @@ public class EntityBOTPrimeHead extends EntityBOTPrimeBase {
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("spawnX", this.spawnPoint.getX());
         tag.putInt("spawnY", this.spawnPoint.getY());
@@ -221,7 +221,7 @@ public class EntityBOTPrimeHead extends EntityBOTPrimeBase {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.spawnPoint = new BlockPos(tag.getInt("spawnX"), tag.getInt("spawnY"), tag.getInt("spawnZ"));
     }
