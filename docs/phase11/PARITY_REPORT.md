@@ -6,8 +6,9 @@ is stale. Do not quote Phase 6 as current.
 Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_parity_census.py`
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg` + Mats autogen + plant/glyph/
 bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
-`src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors (build +
-`runServer` recorded after this snapshot). `hbm:oil_bubble` still logs `setBlock in a far chunk`
+`src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors, `./gradlew build` SUCCESS, jar
+`hbm-0.0.1.jar` **66,437,334** B (~63.36 MB), `./gradlew runServer` **Done (5.271s)**
+on a wiped world (2381 recipes). `hbm:oil_bubble` still logs `setBlock in a far chunk`
 (no deadlock).
 
 ## Top line

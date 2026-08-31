@@ -5,5 +5,5 @@
 - This session: solidifier (47 CE) + FEL + excavator + PA parts/detector + ANY_TAR + leftover chem (explosives/solid_fuel/dust/tarsand/tel) + cyclotron `part_*` assembler.
 - Census: CE Solidification `registerRecipe`/`registerSFAuto` + PA `recipes.add`. Port `RECIPES.put`/`RECIPES.add`/`registerSFAuto(Fluids.`.
 - Leftover CE `@AutoRegister` entities: **none missing**.
-- `compileJava` 0. `build` / `runServer` recorded after this snapshot.
+- `compileJava` 0. `./gradlew build` SUCCESS, jar **66,437,334** B (~63.36 MB). `runServer` **Done (5.271s)**, 2381 recipes.
 - No GitHub Release. `master` untouched.
