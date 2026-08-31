@@ -125,7 +125,7 @@ public class ArmorDNT extends ArmorFSBPowered {
         LivingEntity entity = event.getEntity();
         if (entity instanceof Player player && ArmorFSB.hasFSBArmor(player)) {
             if (event.getSource().is(DamageTypeTags.IS_EXPLOSION)) return;
-            SoundEvent breakSound = SoundEvents.ITEM_BREAK.value();
+            SoundEvent breakSound = SoundEvents.ITEM_BREAK;
             HbmPlayerAttachment.plink(player, breakSound, 5F, 1.0F + entity.getRandom().nextFloat() * 0.5F);
             event.setCanceled(true);
         }

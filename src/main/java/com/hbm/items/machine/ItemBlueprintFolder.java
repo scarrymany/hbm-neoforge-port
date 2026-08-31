@@ -2,7 +2,6 @@ package com.hbm.items.machine;
 
 import com.hbm.inventory.recipes.loader.GenericRecipes;
 import com.hbm.items.ItemBase;
-import com.hbm.items.ModItems;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -41,7 +40,7 @@ public class ItemBlueprintFolder extends ItemBase {
         if (!pools.isEmpty()) {
             stack.shrink(1);
             String chosen = pools.get(level.getRandom().nextInt(pools.size()));
-            return InteractionResultHolder.success(ItemBlueprints.make(ModItems.BLUEPRINTS, chosen));
+            return InteractionResultHolder.success(ItemBlueprints.make(MachineItems.BLUEPRINTS, chosen));
         }
 
         return InteractionResultHolder.pass(stack);

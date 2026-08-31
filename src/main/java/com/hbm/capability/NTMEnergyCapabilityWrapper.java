@@ -45,7 +45,7 @@ public class NTMEnergyCapabilityWrapper implements IEnergyStorage {
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        if (!canReceive() || maxReceive <= 0 || GeneralConfig.conversionRateHeToRF <= 0) return 0;
+        if (!canReceive() || maxReceive <= 0 || GeneralConfig.conversionRateHeToRF() <= 0) return 0;
         if (accessor != null) {
             var prev = CapabilityContextProvider.pushPos(accessor);
             try {
@@ -58,17 +58,17 @@ public class NTMEnergyCapabilityWrapper implements IEnergyStorage {
     }
 
     private int receiveEnergyInternal(int maxReceive, boolean simulate) {
-        long heToOffer = (long) Math.floor(maxReceive / GeneralConfig.conversionRateHeToRF);
+        long heToOffer = (long) Math.floor(maxReceive / GeneralConfig.conversionRateHeToRF());
         if (heToOffer <= 0) return simulate ? 1 : 0;
         long leftoverHE = receiver.transferPower(heToOffer, simulate);
         long acceptedHE = heToOffer - leftoverHE;
-        long acceptedFE = Math.round(acceptedHE * GeneralConfig.conversionRateHeToRF);
+        long acceptedFE = Math.round(acceptedHE * GeneralConfig.conversionRateHeToRF());
         return (int) Math.min(maxReceive, Math.min(Integer.MAX_VALUE, acceptedFE));
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        if (!canExtract() || maxExtract <= 0 || GeneralConfig.conversionRateHeToRF <= 0) return 0;
+        if (!canExtract() || maxExtract <= 0 || GeneralConfig.conversionRateHeToRF() <= 0) return 0;
         if (accessor != null) {
             var prev = CapabilityContextProvider.pushPos(accessor);
             try {
@@ -81,13 +81,13 @@ public class NTMEnergyCapabilityWrapper implements IEnergyStorage {
     }
 
     private int extractEnergyInternal(int maxExtract, boolean simulate) {
-        long heBudget = (long) Math.floor(maxExtract / GeneralConfig.conversionRateHeToRF);
+        long heBudget = (long) Math.floor(maxExtract / GeneralConfig.conversionRateHeToRF());
         if (heBudget <= 0) return simulate ? 1 : 0;
         long availableHE = Math.min(provider.getPower(), provider.getProviderSpeed());
         long heToExtract = Math.min(heBudget, availableHE);
         if (heToExtract <= 0) return 0;
         if (!simulate) provider.usePower(heToExtract);
-        long feExtracted = Math.round(heToExtract * GeneralConfig.conversionRateHeToRF);
+        long feExtracted = Math.round(heToExtract * GeneralConfig.conversionRateHeToRF());
         return (int) Math.min(maxExtract, Math.min(Integer.MAX_VALUE, feExtracted));
     }
 
@@ -96,12 +96,12 @@ public class NTMEnergyCapabilityWrapper implements IEnergyStorage {
         if (accessor != null) {
             var prev = CapabilityContextProvider.pushPos(accessor);
             try {
-                return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getPower() * GeneralConfig.conversionRateHeToRF));
+                return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getPower() * GeneralConfig.conversionRateHeToRF()));
             } finally {
                 CapabilityContextProvider.popPos(prev);
             }
         }
-        return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getPower() * GeneralConfig.conversionRateHeToRF));
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getPower() * GeneralConfig.conversionRateHeToRF()));
     }
 
     @Override
@@ -109,12 +109,12 @@ public class NTMEnergyCapabilityWrapper implements IEnergyStorage {
         if (accessor != null) {
             var prev = CapabilityContextProvider.pushPos(accessor);
             try {
-                return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getMaxPower() * GeneralConfig.conversionRateHeToRF));
+                return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getMaxPower() * GeneralConfig.conversionRateHeToRF()));
             } finally {
                 CapabilityContextProvider.popPos(prev);
             }
         }
-        return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getMaxPower() * GeneralConfig.conversionRateHeToRF));
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(handler.getMaxPower() * GeneralConfig.conversionRateHeToRF()));
     }
 
     @Override

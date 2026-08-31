@@ -4,7 +4,6 @@ import com.hbm.config.GeneralConfig;
 import com.hbm.hazard.helper.HazardHelper;
 import com.hbm.hazard.modifier.IHazardModifier;
 import com.hbm.lib.Library;
-import com.hbm.util.BobMathUtil;
 import com.hbm.util.ContaminationUtil;
 import com.hbm.util.ContaminationUtil.ContaminationType;
 import com.hbm.util.ContaminationUtil.HazardType;
@@ -35,7 +34,7 @@ public class HazardTypeRadiation implements IHazardType {
             if (GeneralConfig.enable528() && reacher) {
                 rad = rad / 49D; // More realistic function for 528: x / distance^2
             } else if (reacher) {
-                rad = BobMathUtil.sqrt(rad); // Reworked radiation function: sqrt(x+1/(x+2)^2)-1/(x+2)
+                rad = Math.sqrt(rad); // Reworked radiation function: sqrt(x+1/(x+2)^2)-1/(x+2)
             }
 
             ContaminationUtil.contaminate(target, HazardType.RADIATION, ContaminationType.CREATIVE, (float) (rad * IHazardType.hazardRate()));
@@ -54,11 +53,11 @@ public class HazardTypeRadiation implements IHazardType {
         if (level == 0) return;
 
         list.add(Component.literal("[" + I18nUtil.resolveKey("trait.radioactive") + "]").withStyle(ChatFormatting.GREEN));
-        list.add(Component.literal(" " + Library.roundFloat(getNewValue(level), 3) + getSuffix(level) + " " + I18nUtil.resolveKey("desc.rads")).withStyle(ChatFormatting.YELLOW));
+        list.add(Component.literal(" " + Library.roundFloat((float) getNewValue(level), 3) + getSuffix(level) + " " + I18nUtil.resolveKey("desc.rads")).withStyle(ChatFormatting.YELLOW));
 
         if (stack.getCount() > 1) {
             final double stackRad = level * stack.getCount();
-            list.add(Component.literal(" " + I18nUtil.resolveKey("desc.stack") + " " + Library.roundFloat(getNewValue(stackRad), 3) + getSuffix(stackRad) + " " + I18nUtil.resolveKey("desc.rads")).withStyle(ChatFormatting.YELLOW));
+            list.add(Component.literal(" " + I18nUtil.resolveKey("desc.stack") + " " + Library.roundFloat((float) getNewValue(stackRad), 3) + getSuffix(stackRad) + " " + I18nUtil.resolveKey("desc.rads")).withStyle(ChatFormatting.YELLOW));
         }
     }
 

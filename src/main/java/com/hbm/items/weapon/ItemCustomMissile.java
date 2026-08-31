@@ -6,6 +6,7 @@ import com.hbm.items.weapon.ItemMissile.WarheadType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -103,11 +104,11 @@ public class ItemCustomMissile extends Item {
         tooltip.add(bold("Health: ").append(Component.literal(health + "HP").withStyle(ChatFormatting.GREEN)));
     }
 
-    private static Component bold(String s) {
+    private static MutableComponent bold(String s) {
         return Component.literal(s).withStyle(ChatFormatting.BOLD);
     }
 
-    private static Component gray(String s) {
+    private static MutableComponent gray(String s) {
         return Component.literal(s).withStyle(ChatFormatting.GRAY);
     }
 

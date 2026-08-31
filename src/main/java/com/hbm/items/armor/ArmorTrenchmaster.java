@@ -63,7 +63,7 @@ public class ArmorTrenchmaster extends ArmorFSB {
 
         if (entity instanceof Player player && ArmorFSB.hasFSBArmor(player)) {
             if (entity.getRandom().nextInt(3) == 0) {
-                SoundEvent breakSound = SoundEvents.ITEM_BREAK.value();
+                SoundEvent breakSound = SoundEvents.ITEM_BREAK;
                 HbmPlayerAttachment.plink(player, breakSound, 0.5F, 1.0F + entity.getRandom().nextFloat() * 0.5F);
                 event.setCanceled(true);
             }

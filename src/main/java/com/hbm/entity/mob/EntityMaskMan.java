@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -133,7 +134,7 @@ public class EntityMaskMan extends Monster implements IRadiationImmune {
         }
 
         if (source.is(DamageTypeTags.IS_FIRE)) amount = 0F;
-        if (source.is(DamageTypeTags.IS_MAGIC)) amount = 0F;
+        if (source.is(DamageTypes.MAGIC) || source.is(DamageTypes.INDIRECT_MAGIC)) amount = 0F;
         if (source.is(DamageTypeTags.IS_PROJECTILE)) amount *= 0.25F;
         if (source.is(DamageTypeTags.IS_EXPLOSION)) amount *= 0.5F;
         if (amount > 50F) amount = 50F + (amount - 50F) * 0.25F;

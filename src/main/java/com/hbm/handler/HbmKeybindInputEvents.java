@@ -89,8 +89,8 @@ public class HbmKeybindInputEvents {
 
     public static void onPressedClient(Player player, EnumKeybind key, boolean state) {
         ItemStack held = player.getItemInHand(InteractionHand.MAIN_HAND);
-        if (held.getItem() instanceof IKeybindReceiver rec) {
-            if (rec.canHandleKeybind(player, held, key)) rec.handleKeybindClient(player, held, key, state);
+        if (held.getItem() instanceof IKeybindReceiver rec && player instanceof LocalPlayer local) {
+            if (rec.canHandleKeybind(player, held, key)) rec.handleKeybindClient(local, held, key, state);
         }
     }
 }

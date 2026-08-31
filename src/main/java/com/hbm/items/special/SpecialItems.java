@@ -41,6 +41,9 @@ public final class SpecialItems {
     public static void registerAll() {
     }
 
+    public static final DeferredItem<com.hbm.items.BrokenItem> BROKEN_ITEM = register("broken_item",
+            () -> new com.hbm.items.BrokenItem(new Item.Properties()));
+
     // ==================== ItemAMSCore (4 instances) ====================
 
     public static final DeferredItem<ItemAMSCore> AMS_CORE_SING = register("ams_core_sing",

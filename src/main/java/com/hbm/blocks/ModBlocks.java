@@ -1,5 +1,6 @@
 package com.hbm.blocks;
 
+import com.hbm.blocks.generic.BlockClean;
 import com.hbm.blocks.generic.BlockForgottenBrick;
 import com.hbm.blocks.generic.BlockGrate;
 import com.hbm.blocks.generic.BlockRotatablePillar;
@@ -48,6 +49,9 @@ public final class ModBlocks {
      * result stored for later cross-reference.
      */
     public static DeferredBlock<BlockForgottenBrick> BRICK_FORGOTTEN;
+    public static DeferredBlock<BlockClean> TILE_LAB;
+    public static DeferredBlock<BlockClean> TILE_LAB_CRACKED;
+    public static DeferredBlock<BlockClean> TILE_LAB_BROKEN;
     public static DeferredBlock<BlockGrate> STEEL_GRATE_WIDE;
     public static DeferredBlock<BlockRotatablePillar> BLOCK_SCHRABIDIUM_CLUSTER;
     public static DeferredBlock<BlockRotatablePillar> BLOCK_EUPHEMIUM_CLUSTER;

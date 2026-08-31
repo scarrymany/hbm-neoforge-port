@@ -130,7 +130,7 @@ public final class XFactoryFolly {
 
             for (int ix = x - 1; ix <= x + 1; ix++) for (int iy = y - 1; iy <= y + 1; iy++) for (int iz = z - 1; iz <= z + 1; iz++) {
                 BlockPos pos = new BlockPos(ix, iy, iz);
-                if (iy > level.getMinY() && iy < level.getMaxY()) level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                if (iy > level.getMinBuildHeight() && iy < level.getMaxBuildHeight()) level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
 
                 AABB aabb = new AABB(ix - 1, iy - 1, iz - 1, ix + 2, iy + 2, iz + 2);
                 for (Entity e : entities) {

@@ -403,6 +403,19 @@ public class NonBlockingLong2LongHashMap extends AbstractLong2LongMap implements
         }
     }
 
+    @Override
+    public Long merge(Long key, Long value, BiFunction<? super Long, ? super Long, ? extends Long> remappingFunction) {
+        if (key == null || value == null || remappingFunction == null) throw new NullPointerException();
+        Long old = get(key);
+        Long next = (old == null) ? value : remappingFunction.apply(old, value);
+        if (next == null) {
+            if (old != null) remove(key);
+            return null;
+        }
+        put(key, next);
+        return next;
+    }
+
     @Deprecated
     @Override
     public Long get(final Object key) {

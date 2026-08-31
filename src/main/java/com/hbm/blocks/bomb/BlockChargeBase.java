@@ -172,7 +172,7 @@ public abstract class BlockChargeBase extends BaseEntityBlock implements IBomb, 
         if (!(level.getBlockEntity(pos) instanceof ChargeBlockEntity charge)) return InteractionResult.PASS;
 
         if (!charge.started) {
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 if (charge.timer > 0) {
                     charge.started = true;
                     level.playSound(null, pos, HBMSoundHandler.fstbmbStart.get(), SoundSource.BLOCKS, 1.0F, 1.0F);

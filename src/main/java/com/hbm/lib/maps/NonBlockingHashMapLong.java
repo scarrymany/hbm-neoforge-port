@@ -1561,7 +1561,7 @@ public class NonBlockingHashMapLong<TypeV>
     @Override
     public TypeV computeIfPresent(Long key, BiFunction<? super Long, ? super TypeV, ? extends TypeV> remappingFunction) {
         if (remappingFunction == null) throw new NullPointerException();
-        return computeIfPresent(key.longValue(), remappingFunction::apply);
+        return computeIfPresent(key.longValue(), (long k, TypeV v) -> remappingFunction.apply(k, v));
     }
 
     public TypeV compute(long key, LongObjectBiFunction<? super TypeV, ? extends TypeV> remappingFunction) {
@@ -1596,7 +1596,7 @@ public class NonBlockingHashMapLong<TypeV>
     @Override
     public TypeV compute(Long key, BiFunction<? super Long, ? super TypeV, ? extends TypeV> remappingFunction) {
         if (remappingFunction == null) throw new NullPointerException();
-        return compute(key.longValue(), remappingFunction::apply);
+        return compute(key.longValue(), (long k, TypeV v) -> remappingFunction.apply(k, v));
     }
 
     public TypeV merge(long key, TypeV value, BiFunction<? super TypeV, ? super TypeV, ? extends TypeV> remappingFunction) {

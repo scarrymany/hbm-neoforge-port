@@ -1,7 +1,7 @@
 package com.hbm.hazard.helper;
 
 import com.hbm.config.GeneralConfig;
-import com.hbm.items.ModItems;
+import com.hbm.items.tool.ToolItems;
 import net.minecraft.core.Holder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -12,7 +12,7 @@ public class HazardHelper {
 
     public static boolean isHoldingReacher(final LivingEntity target) {
         if (target instanceof Player player && !GeneralConfig.enable528()) {
-            return player.getMainHandItem().is(ModItems.reacher.get()) || player.getOffhandItem().is(ModItems.reacher.get());
+            return player.getMainHandItem().is(ToolItems.REACHER.get()) || player.getOffhandItem().is(ToolItems.REACHER.get());
         }
         return false;
     }

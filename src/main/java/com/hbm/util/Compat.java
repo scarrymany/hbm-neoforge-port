@@ -25,6 +25,13 @@ public final class Compat {
     private Compat() {
     }
 
+    public static final class ModIds {
+        public static final String AE2 = "ae2";
+
+        private ModIds() {
+        }
+    }
+
     /**
      * @return the block entity at {@code pos}, or {@code null} if the chunk isn't loaded (avoiding
      * a forced chunk load) or no block entity is present.

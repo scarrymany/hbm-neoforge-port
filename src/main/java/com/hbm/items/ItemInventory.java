@@ -68,11 +68,11 @@ public class ItemInventory extends ItemStackHandler {
 
     public void openInventory() {
         if (player == null) return;
-        player.level().playSound(null, player.blockPosition(), HBMSoundHandler.crateOpen, SoundSource.BLOCKS, 1.0F, 0.8F);
+        player.level().playSound(null, player.blockPosition(), HBMSoundHandler.crateOpen.get(), SoundSource.BLOCKS, 1.0F, 0.8F);
     }
 
     public void closeInventory() {
         if (player == null) return;
-        player.level().playSound(null, player.blockPosition(), HBMSoundHandler.crateClose, SoundSource.BLOCKS, 1.0F, 0.8F);
+        player.level().playSound(null, player.blockPosition(), HBMSoundHandler.crateClose.get(), SoundSource.BLOCKS, 1.0F, 0.8F);
     }
 }

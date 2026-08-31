@@ -514,6 +514,12 @@ public class NonBlockingHashMap<TypeK, TypeV>
         return (TypeV)V;
     }
 
+    @Override
+    public TypeV getOrDefault(Object key, TypeV defaultValue) {
+        TypeV v = get(key);
+        return v != null ? v : defaultValue;
+    }
+
     private static final Object get_impl( final NonBlockingHashMap topmap, final Object[] kvs, final Object key ) {
         final int fullhash= hash (key); // throws NullPointerException if key is null
         final int len     = len  (kvs); // Count of key/value pairs, reads kvs.length

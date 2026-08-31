@@ -1,6 +1,7 @@
 package com.hbm.util;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -197,6 +198,10 @@ public class ItemStackUtil {
 
     public static ItemStack[] readStacksFromNBT(ItemStack stack, HolderLookup.Provider provider) {
         return readStacksFromNBT(stack, provider, 0);
+    }
+
+    public static ItemStack[] readStacksFromNBT(ItemStack stack) {
+        return readStacksFromNBT(stack, RegistryAccess.EMPTY);
     }
 
     /**

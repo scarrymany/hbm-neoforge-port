@@ -274,7 +274,7 @@ public final class FalloutConfigJSON {
             writer.endArray();
             writer.endObject();
         } catch (IOException e) {
-            MainRegistry.logger.catching(e);
+            MainRegistry.logger.error("Failed to write fallout config", e);
         }
     }
 
@@ -291,7 +291,7 @@ public final class FalloutConfigJSON {
             }
             return loaded;
         } catch (Exception e) {
-            MainRegistry.logger.catching(e);
+            MainRegistry.logger.error("Failed to read fallout config", e);
         }
         return null;
     }
@@ -549,7 +549,7 @@ public final class FalloutConfigJSON {
             try {
                 net.minecraft.nbt.Tag tag = net.minecraft.nbt.TagParser.parseTag(input);
                 if (!(tag instanceof net.minecraft.nbt.CompoundTag compound)) return null;
-                return net.minecraft.nbt.NbtUtils.readBlockState(BuiltInRegistries.BLOCK, compound);
+                return net.minecraft.nbt.NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), compound);
             } catch (Exception e) {
                 MainRegistry.logger.warn("FalloutConfigJSON: could not parse block state '{}': {}", input, e.toString());
                 return null;
