@@ -5,13 +5,21 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.generic.BlockStorageCrate;
 import com.hbm.blocks.machine.CrateBlock;
 import com.hbm.hazard.HazardSystem;
+import com.hbm.interfaces.ILaserable;
+import com.hbm.inventory.recipes.machine.DFCRecipes;
+import com.hbm.items.weapon.ItemCrucible;
+import com.hbm.items.weapon.WeaponMeleeItems;
 import com.hbm.util.ContaminationUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.ItemStackHandler;
@@ -48,8 +56,23 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * {@code ItemBlockStorageCrate.containsCrate} check does), the drop-on-break persistent payload
  * (slot contents, via {@link IPersistentNBT}), and the custom-name/GUI-metadata fields - is a direct
  * port of CE's {@code TileEntityCrate} behavior.
+ *
+ * <h2>{@link CrateType#TUNGSTEN} laser-heating ({@link ILaserable}), ported {@code c7-mrec-05-purex-misc}</h2>
+ * CE models this as a fifth behavior only {@code TileEntityCrateTungsten} (a distinct subclass) has;
+ * since every grade shares this one class (see above), {@link #addEnergy} is implemented
+ * unconditionally but only does real work when {@link #type} is {@link CrateType#TUNGSTEN} - a
+ * documented widening (other grades harmlessly accept the {@code ILaserable} call and do nothing),
+ * not a behavior change, since no other grade could ever receive a laser hit in CE either (nothing
+ * routes one to them). See {@link #addEnergy} for the full CE citation. <b>Not ported</b>: CE's
+ * {@code heatTimer} countdown / {@code AuxParticlePacket} heat-glow broadcast and its 20-tick
+ * periodic network resync (both {@code TileEntityCrateTungsten.update()}, an {@code ITickable} this
+ * class has no ticker for - {@link CrateBlock#getTicker} returns {@code null} for every grade) - pure
+ * client-visual polish with no gameplay effect, and {@code AuxParticlePacketNT} does not exist
+ * anywhere in this port yet (same documented gap {@code MachineCrucibleBlockEntity}'s own javadoc
+ * already flags for the identical class). {@link #joules} is kept (CE never persisted it either -
+ * network-synced only there) for a future GUI/tooltip to read.
  */
-public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersistentNBT {
+public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersistentNBT, ILaserable {
 
     /**
      * Per-grade layout/metadata table, replacing CE's five hard-coded subclass constructors (see
@@ -103,6 +126,9 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
 
     private final CrateType type;
 
+    /** Last energy value received via {@link #addEnergy} (not persisted - see class javadoc). */
+    private long joules = 0;
+
     public CrateBlockEntity(BlockEntityType<?> beType, BlockPos pos, BlockState state, CrateType type) {
         super(beType, pos, state, type.slots, false, false);
         this.type = type;
@@ -110,6 +136,77 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
 
     public CrateType getCrateType() {
         return this.type;
+    }
+
+    public long getJoules() {
+        return this.joules;
+    }
+
+    /**
+     * Direct port of CE's {@code TileEntityCrateTungsten.addEnergy} - see the class javadoc for what
+     * is and is not carried over. For every non-empty slot: look up a DFC transmutation
+     * ({@link DFCRecipes#getRequiredFlux}/{@link DFCRecipes#getOutput}, applied only once accumulated
+     * {@code energy} exceeds the recipe's required flux) falling back to a plain vanilla furnace
+     * smelting result when no DFC recipe applies or the flux threshold isn't met yet (CE computes the
+     * smelting fallback unconditionally first, then overwrites it with the DFC result when eligible -
+     * preserved in that exact order here); separately, an {@code ItemCrucible} weapon stack under 3
+     * charges is refilled to max whenever {@code energy > 10,000,000} (CE's own hardcoded threshold).
+     * Only {@link CrateType#TUNGSTEN} does any of this - see class javadoc.
+     */
+    @Override
+    public void addEnergy(Level level, BlockPos pos, long energy, Direction dir) {
+        this.joules = energy;
+        if (this.type != CrateType.TUNGSTEN || level.isClientSide) return;
+
+        boolean changed = false;
+        for (int i = 0; i < inventory.getSlots(); i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (stack.isEmpty()) continue;
+
+            ItemStack result = getSmeltingResult(level, stack);
+
+            long requiredFlux = DFCRecipes.getRequiredFlux(stack);
+            if (requiredFlux > -1 && energy > requiredFlux) {
+                result = DFCRecipes.getOutput(stack);
+            }
+
+            if (stack.getItem() == WeaponMeleeItems.CRUCIBLE.get() && ItemCrucible.getCharges(stack) < 3 && energy > 10_000_000L) {
+                ItemCrucible.charge(stack);
+                changed = true;
+            }
+
+            if (!result.isEmpty()) {
+                int size = stack.getCount();
+                if ((long) result.getCount() * size <= result.getMaxStackSize()) {
+                    ItemStack newStack = result.copy();
+                    newStack.setCount(result.getCount() * size);
+                    inventory.setStackInSlot(i, newStack);
+                    changed = true;
+                }
+            }
+        }
+        if (changed) setChanged();
+    }
+
+    /**
+     * Vanilla furnace-recipe lookup, same idiom already established by
+     * {@code ItemMultitoolPassive#getSmeltingResult}/{@code IToolHarvestAbility#getSmeltingResult}
+     * (CE: {@code FurnaceRecipes.instance().getSmeltingResult(stack)}, replaced by a real
+     * {@code RecipeManager} query in 1.21).
+     */
+    private static ItemStack getSmeltingResult(Level level, ItemStack input) {
+        SingleRecipeInput recipeInput = new SingleRecipeInput(input.copy());
+        for (var holder : level.getRecipeManager().getAllRecipesFor(RecipeType.SMELTING)) {
+            var recipe = holder.value();
+            if (!recipe.matches(recipeInput, level)) continue;
+
+            ItemStack result = recipe.getResultItem(level.registryAccess()).copy();
+            if (!result.isEmpty()) {
+                result.setCount(result.getCount() * input.getCount());
+                return result;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     /**

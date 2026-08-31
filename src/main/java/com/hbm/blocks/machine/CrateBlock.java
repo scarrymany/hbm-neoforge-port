@@ -46,8 +46,12 @@ import org.jetbrains.annotations.Nullable;
  * {@link #onRemove}, called unconditionally for every grade (not just tungsten) since a non-resistant
  * crate replacing a resistant one, or vice versa, still changes the section's resistant-block mask.
  * {@link CrateType#TUNGSTEN}'s laser-heating mechanic ({@code ILaserable}, CE's
- * {@code TileEntityCrateTungsten}) is a separate, documented follow-up - see
- * {@code docs/phase2/machines_storage.md}'s "Open questions" - this class ships the plain-crate shell.
+ * {@code TileEntityCrateTungsten}) - previously a documented follow-up here (see
+ * {@code docs/phase2/machines_storage.md}'s "Open questions") - is now wired on
+ * {@link CrateBlockEntity} itself (implements {@code ILaserable}; see that class's javadoc/
+ * {@code addEnergy}, ported {@code c7-mrec-05-purex-misc}). No laser <em>source</em> (CE's
+ * {@code TileEntityCoreEmitter}) exists anywhere in this port yet to ever call it - see that javadoc
+ * for why that remains a separate, unbuilt DFC-core machine system.
  *
  * <p>Also implements {@link BlockStorageCrate} (added in the Phase 6 parity-audit pass) - the marker
  * interface {@link com.hbm.hazard.transformer.HazardTransformerRadiationContainer}'s
