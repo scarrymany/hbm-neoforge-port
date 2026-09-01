@@ -54,23 +54,22 @@
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),
   `machine_deuterium_tower` TODO(CE: AnvilRecipes.java:453-462), flatten holders,
   mold 16–28 TODO(CE: AnvilRecipes.java:626-635).
-- This wave: `seal_*` + `pile_brick`. Controller FACING+ACTIVATED, frame 1–6,
-  hardness 10/100. Hatch TE `tileentity_seal_lid` ∞/∞, no tab. Frame stays
-  BlockBase. `pile_brick` IToolable HAND_DRILL MIN/MAX 5/15, flammable 30/5;
-  conversion to `pile_block` cited skip (no TileEntityPileCore stub).
-  Fusion torus/klystron not stubbed. `machine_watz_reactor` already live.
-  Transformers stay BlockBase. Turrets/factories stay accepted.
+- This wave: `nuke_solinium` / `nuke_fstbmb` / `vitrified_barrel`.
+  Solinium 9-slot TE, MK3 extType=1, r=150, cloud. fstbmb = CE NukeBalefire
+  id, shares live TE yield 250. Vitrified YellowBarrel idle 0.5/5.
+  Fusion/watz leftovers stay BlockBase. Pile conversion TODO stays.
+  Seal/turrets/factories stay accepted.
 - Prior Dummyable: `turret_arty` / `turret_himars`, `reactor_research` /
   `reactor_zirnox` stay accepted.
 - Live machines (CE has TE, **no GUI**): pumps/chimneys Dummyable+BE, thresher,
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.
 - Assembler skip **3** (nitra / digimemer / 50bmgbypass). `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0, `runServer` **Done (5.827s)** / 4052 recipes, port 25566.
-  RCON setblock size-1 SOUTH frame: close hatch + `tileentity_seal_lid`
-  controller long, falling RS keeps hatch, second pulse → air, break frame
-  → hatch air. `pile_brick` places, no TE. No client / no HAND_DRILL.
-  No Exception/ERROR.
+- Verified: `compileJava` 0, `runServer` **Done (5.633s)** / 4052 recipes, port 25566.
+  RCON: `nuke_solinium` TE `tileentity_nuke_solinium` Size 9;
+  `nuke_fstbmb` TE `nuke_balefire` timer 18000; `vitrified_barrel` no TE.
+  `/item replace` not a vanilla Container (same as other casings).
+  No r=150/250 detonation. No client / no GUI open. No Exception/ERROR.
 - Honest E2E: MCA 841 chunks. Forced `hiveSpawn=1` + `atomStructure=1` on
   desert seed `1833280291927865410`: hive **57** `glyphid_base` / **56**
   `glyphid_spawner` / **56** `deco_loot` / **53** wither skull / **5**

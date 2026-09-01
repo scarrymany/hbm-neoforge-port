@@ -9,7 +9,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.827s)** on wiped world port 25566, **4052 recipes**.
+`./gradlew runServer` **Done (5.633s)** on wiped world port 25566, **4052 recipes**.
 No recipe parse errors. No Exception/ERROR. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
@@ -148,9 +148,28 @@ Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
   `machine_watz_reactor` already live — no second Watz id.
   `watz_element` / `watz_cooler` / `machine_transformer*` stay BlockBase
   (CE ModBlocks.java:979-982 / :watz element-cooler).
-  Leftover later: `nuke_solinium` / `nuke_fstbmb`, `vitrified_barrel`.
+  Leftover later: fusion peripherals / `struct_torus_core` (no stub).
 
-## This wave (seal_* / pile_brick)
+## This wave (nuke_solinium / nuke_fstbmb / vitrified_barrel)
+
+- **`nuke_solinium`**: `NukeSolinium` + `TileEntityNukeSolinium`
+  (`tileentity_nuke_solinium`). 9 slots. MK3 `extType=1`, `waste=false`,
+  `coefficient=1.0`, radius **150** (`BombConfig.SOLINIUM_RADIUS`).
+  `EntityCloudSolinium`. GUI 176×222 CE slot coords.
+  TODO(CE: GUINukeSolinium.java:16) soliniumSchematic.png missing in tree.
+- **`nuke_fstbmb`**: CE `NukeBalefire` id (`ModBlocks.java:711`). Shares
+  live TE `nuke_balefire` + timer 18000 + `EntityBalefire` **250**.
+  `nuke_balefire` flatten stays. No invented yield.
+- **`vitrified_barrel`**: `YellowBarrel`, 0.5/2.5. Idle rad **0.5/5**
+  (yellow **5/75**). Explode toxic 1/3 else 18.0F, waste 35, rad 35/1500.
+  No TE (CE none).
+
+Honest E2E: compileJava 0 + runServer **Done (5.633s)** / 4052 / *:25566.
+RCON place + BE Size 9 / timer 18000 / no TE on vitrified.
+`/item replace` not vanilla Container. No r=150/250 detonation. No GUI.
+No Exception/ERROR.
+
+## Prior wave (seal_* / pile_brick)
 
 - **`seal_controller`**: `BlockSeal` (`BlockSeal.java`). FACING + ACTIVATED.
   Hardness **10 / 100** (`ModBlocks.java:885`). No own TE. Click / rising
