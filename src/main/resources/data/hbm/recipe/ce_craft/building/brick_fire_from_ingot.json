@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ingot_firebrick"
+    }
+  },
+  "result": {
+    "id": "hbm:brick_fire",
+    "count": 1
+  }
+}

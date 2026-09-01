@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B",
+    "I"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:steel_bolt"
+    },
+    "I": {
+      "item": "hbm:ingot_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:spikes",
+    "count": 4
+  }
+}

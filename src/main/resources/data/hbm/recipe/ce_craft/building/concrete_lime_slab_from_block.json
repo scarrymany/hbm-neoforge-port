@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_lime"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_lime_slab",
+    "count": 6
+  }
+}

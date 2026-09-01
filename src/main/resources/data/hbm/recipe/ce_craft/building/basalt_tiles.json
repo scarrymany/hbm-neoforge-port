@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:basalt_brick"
+    }
+  },
+  "result": {
+    "id": "hbm:basalt_tiles",
+    "count": 4
+  }
+}

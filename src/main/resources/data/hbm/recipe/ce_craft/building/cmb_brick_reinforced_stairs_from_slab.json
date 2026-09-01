@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:cmb_brick_reinforced_slab"
+    }
+  },
+  "result": {
+    "id": "hbm:cmb_brick_reinforced_stairs",
+    "count": 4
+  }
+}

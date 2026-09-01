@@ -5,14 +5,21 @@ import com.hbm.api.rbmk.IRBMKFluxReceiver;
 import com.hbm.api.rbmk.IRBMKLoadable;
 import com.hbm.handler.neutron.NeutronStream;
 import com.hbm.handler.neutron.RBMKNeutronHandler;
+import com.hbm.inventory.container.machine.rbmk.RBMKOutgasserMenu;
+import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.recipes.OutgasserRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,12 +34,9 @@ import java.util.List;
  * {@code RBMKNeutronHandler.RBMKNeutronStream.runStreamInteraction}'s {@code OUTGASSER} branch
  * (forward reference).
  * <p>
- * CE's real recipe-driven item processing ({@code OutgasserRecipes}/{@code RecipesCommon}, and the
- * {@code ContaminationUtil} call when nothing is loaded) are out of scope per the research report's
- * own Deferred Scope - the item slot here accepts anything and is never consumed, matching CE's
- * fallback "item just sits there generating gas" case rather than a real recipe lookup.
+ * Recipe table: {@link OutgasserRecipes} (CE {@code TileEntityRBMKOutgasser}:150-187).
  */
-public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements IRBMKFluxReceiver, IFluidStandardSenderMK2, IRBMKLoadable {
+public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements IRBMKFluxReceiver, IFluidStandardSenderMK2, IRBMKLoadable, MenuProvider {
 
     public final FluidTankNTM gas;
     public double progress = 0;
@@ -41,8 +45,18 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
     public double fluxQuantity;
 
     public RBMKOutgasserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1);
+        super(type, pos, state, 2);
         gas = new FluidTankNTM(Fluids.TRITIUM, 64_000).withOwner(this);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getDefaultName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new RBMKOutgasserMenu(containerId, playerInventory, this);
     }
 
     @Override
@@ -57,7 +71,34 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
     }
 
     public boolean canProcess() {
-        return !inventory.getStackInSlot(0).isEmpty() && gas.getFill() < gas.getMaxFill();
+        if (inventory.getStackInSlot(0).isEmpty()) return false;
+        OutgasserRecipes.OutgasserRecipe output = OutgasserRecipes.getRecipe(inventory.getStackInSlot(0));
+        if (output == null || output.fusionOnly) return false;
+
+        FluidStack fluid = output.fluidOutput;
+        if (fluid != null) {
+            if (gas.getTankType() != fluid.type && gas.getFill() > 0) return false;
+            gas.setTankType(fluid.type);
+            if (gas.getFill() + fluid.fill > gas.getMaxFill()) return false;
+        }
+
+        ItemStack out = output.solidOutput;
+        if (out == null || inventory.getStackInSlot(1).isEmpty()) return true;
+        ItemStack leftover = inventory.insertItem(1, out.copy(), true);
+        return leftover.isEmpty();
+    }
+
+    private void process() {
+        OutgasserRecipes.OutgasserRecipe output = OutgasserRecipes.getRecipe(inventory.getStackInSlot(0));
+        inventory.extractItem(0, 1, false);
+        this.progress = 0;
+        if (output == null) return;
+        if (output.fluidOutput != null) {
+            gas.setFill(gas.getFill() + output.fluidOutput.fill);
+        }
+        if (output.solidOutput != null) {
+            inventory.insertItem(1, output.solidOutput.copy(), false);
+        }
     }
 
     // implements IRBMKFluxReceiver.canReceiveFlux() - CE: TileEntityRBMKOutgasser#canProcess(), per that interface's own javadoc
@@ -74,10 +115,10 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
             if (canProcess() && fluxQuantity > 0) {
                 progress += fluxQuantity;
                 if (progress >= duration) {
-                    int batches = (int) (progress / duration);
-                    progress -= batches * duration;
-                    gas.setFill(Math.min(gas.getMaxFill(), gas.getFill() + batches * 100));
+                    process();
                 }
+            } else if (!canProcess()) {
+                progress = 0;
             }
             this.fluxQuantity = 0;
 
@@ -126,18 +167,25 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
     }
 
     @Override
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        if (slot != 0) return false;
+        OutgasserRecipes.OutgasserRecipe recipe = OutgasserRecipes.getRecipe(stack);
+        return recipe != null && !recipe.fusionOnly;
+    }
+
+    @Override
     public boolean canUnload() {
-        return !inventory.getStackInSlot(0).isEmpty();
+        return !inventory.getStackInSlot(1).isEmpty();
     }
 
     @Override
     public ItemStack provideNext() {
-        return inventory.getStackInSlot(0);
+        return inventory.getStackInSlot(1);
     }
 
     @Override
     public void unload() {
-        inventory.setStackInSlot(0, ItemStack.EMPTY);
+        inventory.setStackInSlot(1, ItemStack.EMPTY);
         setChanged();
     }
 

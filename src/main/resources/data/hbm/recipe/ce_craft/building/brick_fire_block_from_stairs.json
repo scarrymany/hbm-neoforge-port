@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:brick_fire_stairs"
+    },
+    {
+      "item": "hbm:brick_fire_stairs"
+    },
+    {
+      "item": "hbm:brick_fire_stairs"
+    },
+    {
+      "item": "hbm:brick_fire_stairs"
+    }
+  ],
+  "result": {
+    "id": "hbm:brick_fire",
+    "count": 3
+  }
+}

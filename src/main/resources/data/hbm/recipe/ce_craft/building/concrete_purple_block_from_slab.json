@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_purple_slab"
+    },
+    {
+      "item": "hbm:concrete_purple_slab"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete_purple",
+    "count": 1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:reinforced_sand_slab"
+    },
+    {
+      "item": "hbm:reinforced_sand_slab"
+    }
+  ],
+  "result": {
+    "id": "hbm:reinforced_sand",
+    "count": 1
+  }
+}

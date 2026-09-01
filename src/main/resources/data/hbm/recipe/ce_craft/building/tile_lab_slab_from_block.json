@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:tile_lab"
+    }
+  },
+  "result": {
+    "id": "hbm:tile_lab_slab",
+    "count": 6
+  }
+}

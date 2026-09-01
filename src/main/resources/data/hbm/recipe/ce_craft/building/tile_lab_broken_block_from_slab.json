@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:tile_lab_broken_slab"
+    },
+    {
+      "item": "hbm:tile_lab_broken_slab"
+    }
+  ],
+  "result": {
+    "id": "hbm:tile_lab_broken",
+    "count": 1
+  }
+}

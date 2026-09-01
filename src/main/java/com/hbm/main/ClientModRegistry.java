@@ -18,6 +18,7 @@ import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.gui.BatteryScreen;
 import com.hbm.inventory.gui.CrateScreen;
 import com.hbm.inventory.gui.FluidTankScreen;
+import com.hbm.inventory.gui.LemegetonScreen;
 import com.hbm.particle.HbmEffect;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
@@ -99,5 +100,6 @@ public class ClientModRegistry {
         event.register(ModMenuTypes.CRATE.get(), CrateScreen::new);
         event.register(ModMenuTypes.BATTERY.get(), BatteryScreen::new);
         event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
+        event.register(ModMenuTypes.LEMEGETON.get(), LemegetonScreen::new);
     }
 }

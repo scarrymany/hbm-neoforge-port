@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:ducrete_reinforced_stairs"
+    },
+    {
+      "item": "hbm:ducrete_reinforced_stairs"
+    },
+    {
+      "item": "hbm:ducrete_reinforced_stairs"
+    },
+    {
+      "item": "hbm:ducrete_reinforced_stairs"
+    }
+  ],
+  "result": {
+    "id": "hbm:ducrete_reinforced",
+    "count": 3
+  }
+}

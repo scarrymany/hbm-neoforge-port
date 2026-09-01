@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "  R",
+    " G ",
+    "G  "
+  ],
+  "key": {
+    "R": {
+      "item": "hbm:ingot_rubber"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    }
+  },
+  "result": {
+    "id": "hbm:pipette",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:tile_lab_cracked"
+    }
+  },
+  "result": {
+    "id": "hbm:tile_lab_cracked_stairs",
+    "count": 8
+  }
+}

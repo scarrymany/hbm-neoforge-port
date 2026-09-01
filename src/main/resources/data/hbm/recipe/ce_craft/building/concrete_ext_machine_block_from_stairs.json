@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_colored_ext_stairs_machine"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_machine"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_machine"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_machine"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete_ext_machine",
+    "count": 3
+  }
+}

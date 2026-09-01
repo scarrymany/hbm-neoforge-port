@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:brick_concrete_mossy_slab"
+    },
+    {
+      "item": "hbm:brick_concrete_mossy_slab"
+    }
+  ],
+  "result": {
+    "id": "hbm:brick_concrete_mossy",
+    "count": 1
+  }
+}

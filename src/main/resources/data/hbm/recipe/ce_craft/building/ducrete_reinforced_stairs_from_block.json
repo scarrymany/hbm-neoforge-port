@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ducrete_reinforced"
+    }
+  },
+  "result": {
+    "id": "hbm:ducrete_reinforced_stairs",
+    "count": 8
+  }
+}

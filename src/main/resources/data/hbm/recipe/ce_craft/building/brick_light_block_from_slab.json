@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:brick_light_slab"
+    },
+    {
+      "item": "hbm:brick_light_slab"
+    }
+  ],
+  "result": {
+    "id": "hbm:brick_light",
+    "count": 1
+  }
+}

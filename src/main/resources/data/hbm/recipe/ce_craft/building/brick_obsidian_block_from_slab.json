@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:brick_obsidian_slab"
+    },
+    {
+      "item": "hbm:brick_obsidian_slab"
+    }
+  ],
+  "result": {
+    "id": "hbm:brick_obsidian",
+    "count": 1
+  }
+}

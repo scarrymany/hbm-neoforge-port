@@ -75,6 +75,9 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<MinecartDestroyerMenu>> CART_DESTROYER =
             reg("entity_ntm_cart_destroyer", MinecartDestroyerMenu::fromNetwork);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<LemegetonMenu>> LEMEGETON =
+            reg("lemegeton", LemegetonMenu::fromNetwork);
+
     private ModMenuTypes() {
     }
 

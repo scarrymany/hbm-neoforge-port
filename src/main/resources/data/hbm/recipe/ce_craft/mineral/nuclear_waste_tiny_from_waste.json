@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:nuclear_waste"
+    }
+  ],
+  "result": {
+    "id": "hbm:nuclear_waste_tiny",
+    "count": 9
+  }
+}

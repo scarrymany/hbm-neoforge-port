@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_colored_stairs_pink"
+    },
+    {
+      "item": "hbm:concrete_colored_stairs_pink"
+    },
+    {
+      "item": "hbm:concrete_colored_stairs_pink"
+    },
+    {
+      "item": "hbm:concrete_colored_stairs_pink"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete_pink",
+    "count": 3
+  }
+}

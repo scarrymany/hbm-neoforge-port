@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:stone_depth"
+    }
+  },
+  "result": {
+    "id": "hbm:depth_brick",
+    "count": 4
+  }
+}

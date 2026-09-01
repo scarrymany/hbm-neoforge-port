@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_smooth_slab"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_smooth_stairs",
+    "count": 4
+  }
+}

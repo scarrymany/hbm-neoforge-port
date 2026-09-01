@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_colored_stairs_silver"
+    },
+    {
+      "item": "hbm:concrete_colored_stairs_silver"
+    },
+    {
+      "item": "hbm:concrete_colored_stairs_silver"
+    },
+    {
+      "item": "hbm:concrete_colored_stairs_silver"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete_light_gray",
+    "count": 3
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:ducrete_brick_slab"
+    },
+    {
+      "item": "hbm:ducrete_brick_slab"
+    }
+  ],
+  "result": {
+    "id": "hbm:ducrete_brick",
+    "count": 1
+  }
+}

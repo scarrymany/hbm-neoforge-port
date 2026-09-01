@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:basalt_smooth"
+    }
+  },
+  "result": {
+    "id": "hbm:basalt_polished",
+    "count": 4
+  }
+}

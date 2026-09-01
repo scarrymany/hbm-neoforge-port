@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BLB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:ingot_boron"
+    },
+    "L": {
+      "item": "hbm:rbmk_blank"
+    }
+  },
+  "result": {
+    "id": "hbm:rbmk_absorber",
+    "count": 1
+  }
+}

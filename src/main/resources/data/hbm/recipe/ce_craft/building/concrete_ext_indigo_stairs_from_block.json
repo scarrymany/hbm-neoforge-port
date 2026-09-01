@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_ext_indigo"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_colored_ext_stairs_indigo",
+    "count": 8
+  }
+}

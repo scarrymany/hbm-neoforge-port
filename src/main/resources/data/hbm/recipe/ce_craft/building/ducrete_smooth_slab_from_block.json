@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ducrete_smooth"
+    }
+  },
+  "result": {
+    "id": "hbm:ducrete_smooth_slab",
+    "count": 6
+  }
+}

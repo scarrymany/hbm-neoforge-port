@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ducrete_brick"
+    }
+  },
+  "result": {
+    "id": "hbm:ducrete_brick_slab",
+    "count": 6
+  }
+}

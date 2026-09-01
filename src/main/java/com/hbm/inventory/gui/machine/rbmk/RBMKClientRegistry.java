@@ -34,5 +34,6 @@ public final class RBMKClientRegistry {
         event.register(RBMKMenuTypes.BOILER.get(), RBMKBoilerScreen::new);
         event.register(RBMKMenuTypes.CONSOLE.get(), RBMKConsoleScreen::new);
         event.register(RBMKMenuTypes.AUTOLOADER.get(), RBMKAutoloaderScreen::new);
+        event.register(RBMKMenuTypes.OUTGASSER.get(), RBMKOutgasserScreen::new);
     }
 }

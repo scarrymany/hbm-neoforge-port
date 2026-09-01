@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_colored_ext_stairs_sand"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_sand"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_sand"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_sand"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete_ext_sand",
+    "count": 3
+  }
+}

@@ -3,11 +3,21 @@ package com.hbm.inventory.recipes.chem;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
+import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.items.special.BedrockOreGrade;
+import com.hbm.items.special.BedrockOreItems;
+import com.hbm.items.special.BedrockOreOutput;
+import com.hbm.items.special.BedrockOreType;
+import com.hbm.main.MainRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -156,7 +166,11 @@ public final class CentrifugeRecipes {
                 new ItemStack(BilletPowderItems.POWDER_GOLD.get(), 1),
                 new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
 
+        // CE CentrifugeRecipes.java:271 — was a 1-output stub; full 4-out now that niter exists
         RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_NITER.get()), new ItemStack[]{
+                new ItemStack(item("niter"), 3),
+                new ItemStack(item("niter"), 3),
+                new ItemStack(item("niter"), 3),
                 new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
 
         // CE CentrifugeRecipes.java:267-285 remaining crystals whose I/O is registered
@@ -205,6 +219,213 @@ public final class CentrifugeRecipes {
                 new ItemStack(BilletPowderItems.POWDER_IRON.get(), 3),
                 new ItemStack(BilletPowderItems.POWDER_COPPER.get(), 3),
                 new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
+
+        // CE CentrifugeRecipes.java:59 / :89 / :95 / :101 / :125 / :131 / :149 / :155 / :161 / :173
+        // / :185 / :191 / :197 / :203 / :256 / :258 / :270 / :275 / :281-284
+        RECIPES.put(OreDictStack.ofCommonTag("ores/lignite"), stacks(
+                new ItemStack(BilletPowderItems.POWDER_LIGNITE.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_LIGNITE.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_LIGNITE.get(), 2),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_lignite")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_LIGNITE.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_LIGNITE.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_LIGNITE.get(), 2),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(OreDictStack.ofCommonTag("ores/titanium"), stacks(
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_titanium")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(OreDictStack.ofCommonTag("ores/quartz"), stacks(
+                new ItemStack(BilletPowderItems.POWDER_QUARTZ.get()),
+                new ItemStack(BilletPowderItems.POWDER_QUARTZ.get()),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get()),
+                new ItemStack(Items.NETHERRACK)));
+        RECIPES.put(new ComparableStack(block("ore_tungsten")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_TUNGSTEN.get()),
+                new ItemStack(BilletPowderItems.POWDER_TUNGSTEN.get()),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_schrabidium")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_SCHRABIDIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_SCHRABIDIUM.get()),
+                new ItemStack(IngotNuggetItems.NUGGET_SOLINIUM.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_rare")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_DESH_MIX.get()),
+                new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get(), 2),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_thorium")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_THORIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_URANIUM.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_beryllium")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_BERYLLIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_EMERALD.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_fluorite")), stacks(
+                new ItemStack(item("fluorite"), 3),
+                new ItemStack(item("fluorite"), 3),
+                new ItemStack(PlateCrystalWasteItems.GEM_SODALITE.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(block("ore_tikite")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_PLUTONIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_COBALT.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_NIOBIUM.get(), 2),
+                new ItemStack(Items.END_STONE)));
+        RECIPES.put(new ComparableStack(block("block_euphemium_cluster")), stacks(
+                new ItemStack(IngotNuggetItems.NUGGET_EUPHEMIUM.get(), 7),
+                new ItemStack(BilletPowderItems.POWDER_SCHRABIDIUM.get(), 4),
+                new ItemStack(IngotNuggetItems.INGOT_STARMETAL.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_SOLINIUM.get(), 2)));
+        RECIPES.put(new ComparableStack(block("ore_nether_fire")), stacks(
+                new ItemStack(Items.BLAZE_POWDER, 2),
+                new ItemStack(BilletPowderItems.POWDER_FIRE.get(), 2),
+                new ItemStack(IngotNuggetItems.INGOT_PHOSPHORUS.get()),
+                new ItemStack(Items.NETHERRACK)));
+        RECIPES.put(new ComparableStack(block("ore_cobalt")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_COBALT.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get()),
+                new ItemStack(BilletPowderItems.POWDER_COPPER.get()),
+                new ItemStack(Items.GRAVEL)));
+        RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_TEKTITE.get()), stacks(
+                new ItemStack(BilletPowderItems.POWDER_METEORITE_TINY.get()),
+                new ItemStack(BilletPowderItems.POWDER_PALEOGENITE_TINY.get()),
+                new ItemStack(BilletPowderItems.POWDER_METEORITE_TINY.get()),
+                new ItemStack(item("dust"), 6)));
+        RECIPES.put(new ComparableStack(Items.BLAZE_ROD), stacks(
+                new ItemStack(Items.BLAZE_POWDER),
+                new ItemStack(Items.BLAZE_POWDER),
+                new ItemStack(BilletPowderItems.POWDER_FIRE.get()),
+                new ItemStack(BilletPowderItems.POWDER_FIRE.get())));
+        RECIPES.put(new ComparableStack(IngotNuggetItems.INGOT_SCHRARANIUM.get()), stacks(
+                new ItemStack(IngotNuggetItems.NUGGET_SCHRABIDIUM.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_SCHRABIDIUM.get()),
+                new ItemStack(IngotNuggetItems.NUGGET_URANIUM.get(), 3),
+                new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM.get(), 2)));
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_SULFUR.get()), stacks(
+                new ItemStack(item("sulfur"), 4),
+                new ItemStack(item("sulfur"), 4),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get()),
+                new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get())));
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get()), stacks(
+                new ItemStack(item("fluorite"), 4),
+                new ItemStack(item("fluorite"), 4),
+                new ItemStack(PlateCrystalWasteItems.GEM_SODALITE.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get())));
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_PHOSPHORUS.get()), stacks(
+                new ItemStack(BilletPowderItems.POWDER_FIRE.get(), 3),
+                new ItemStack(BilletPowderItems.POWDER_FIRE.get(), 3),
+                new ItemStack(IngotNuggetItems.INGOT_PHOSPHORUS.get(), 2),
+                new ItemStack(Items.BLAZE_POWDER, 2)));
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_TRIXITE.get()), stacks(
+                new ItemStack(BilletPowderItems.POWDER_PLUTONIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_COBALT.get(), 3),
+                new ItemStack(BilletPowderItems.POWDER_NIOBIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_NITAN_MIX.get())));
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_LITHIUM.get()), stacks(
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_QUARTZ.get()),
+                new ItemStack(item("fluorite"))));
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_STARMETAL.get()), stacks(
+                new ItemStack(BilletPowderItems.POWDER_DURA_STEEL.get(), 3),
+                new ItemStack(BilletPowderItems.POWDER_COBALT.get(), 3),
+                new ItemStack(BilletPowderItems.POWDER_ASTATINE.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get(), 5)));
+
+        // CE CentrifugeRecipes.java:220-241 — 16 templates × 6 BedrockOreType
+        for (BedrockOreType type : BedrockOreType.VALUES) {
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.BASE)), stacks(
+                    bedrock(type, BedrockOreGrade.PRIMARY, 1), new ItemStack(Items.GRAVEL)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.BASE_ROASTED)), stacks(
+                    bedrock(type, BedrockOreGrade.PRIMARY, 1), new ItemStack(Items.GRAVEL)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.BASE_WASHED)), stacks(
+                    bedrock(type, BedrockOreGrade.PRIMARY, 1),
+                    bedrock(type, BedrockOreGrade.PRIMARY, 1),
+                    new ItemStack(Items.GRAVEL)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_SULFURIC)), stacks(
+                    bedrock(type, BedrockOreGrade.PRIMARY_NOSULFURIC, 2),
+                    bedrock(type, BedrockOreGrade.SULFURIC_BYPRODUCT, 2)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_SOLVENT)), stacks(
+                    bedrock(type, BedrockOreGrade.PRIMARY_NOSOLVENT, 2),
+                    bedrock(type, BedrockOreGrade.SULFURIC_BYPRODUCT, 2),
+                    bedrock(type, BedrockOreGrade.SOLVENT_BYPRODUCT, 2)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_RAD)), stacks(
+                    bedrock(type, BedrockOreGrade.PRIMARY_NORAD, 2),
+                    bedrock(type, BedrockOreGrade.SULFURIC_BYPRODUCT, 2),
+                    bedrock(type, BedrockOreGrade.SOLVENT_BYPRODUCT, 2),
+                    bedrock(type, BedrockOreGrade.RAD_BYPRODUCT, 2)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY)), stacks(
+                    extract(type.primary1), extract(type.primary2)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_ROASTED)), stacks(
+                    extract(type.primary1), extract(type.primary2)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_NOSULFURIC)), stacks(
+                    extract(type.primary1), extract(type.primary2),
+                    bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_NOSOLVENT)), stacks(
+                    extract(type.primary1), extract(type.primary2),
+                    bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_NORAD)), stacks(
+                    extract(type.primary1), extract(type.primary2),
+                    bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_FIRST)), stacks(
+                    extract(type.primary1), extract(type.primary1),
+                    extract(type.primary2), bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.PRIMARY_SECOND)), stacks(
+                    extract(type.primary1), extract(type.primary2),
+                    extract(type.primary2), bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.SULFURIC_WASHED)), stacks(
+                    extract(type.byproductAcid1), extract(type.byproductAcid2),
+                    extract(type.byproductAcid3), bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.SOLVENT_WASHED)), stacks(
+                    extract(type.byproductSolvent1), extract(type.byproductSolvent2),
+                    extract(type.byproductSolvent3), bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+            RECIPES.put(new ComparableStack(bedrock(type, BedrockOreGrade.RAD_WASHED)), stacks(
+                    extract(type.byproductRad1), extract(type.byproductRad2),
+                    extract(type.byproductRad3), bedrock(type, BedrockOreGrade.CRUMBS, 1)));
+        }
+
+        RECIPES.entrySet().removeIf(e -> {
+            for (ItemStack s : e.getValue()) {
+                if (s == null || s.isEmpty() || s.getItem() == Items.AIR) return true;
+            }
+            return false;
+        });
+    }
+
+    private static ItemStack[] stacks(ItemStack... out) {
+        return out;
+    }
+
+    private static ItemStack bedrock(BedrockOreType type, BedrockOreGrade grade) {
+        return bedrock(type, grade, 1);
+    }
+
+    private static ItemStack bedrock(BedrockOreType type, BedrockOreGrade grade, int n) {
+        return new ItemStack(BedrockOreItems.get(type, grade).get(), n);
+    }
+
+    /** CE {@code ItemBedrockOreNew.extract} — flattened to {@code <mat>_ore_fragment}. */
+    private static ItemStack extract(BedrockOreOutput output) {
+        int count = Math.min((int) Math.ceil(output.amount()), 64);
+        String id = MaterialShapes.FRAGMENT.buildRegistryName(output.material());
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, id));
+        return new ItemStack(item, count);
+    }
+
+    private static Item item(String id) {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, id));
+    }
+
+    private static Block block(String id) {
+        return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, id));
     }
 
     /**

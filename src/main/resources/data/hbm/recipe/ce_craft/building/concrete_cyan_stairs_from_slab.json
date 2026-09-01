@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_cyan_slab"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_colored_stairs_cyan",
+    "count": 4
+  }
+}

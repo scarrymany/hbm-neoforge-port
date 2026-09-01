@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:brick_light"
+    }
+  },
+  "result": {
+    "id": "hbm:brick_light_slab",
+    "count": 6
+  }
+}

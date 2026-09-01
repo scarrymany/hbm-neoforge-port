@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_stairs"
+    },
+    {
+      "item": "hbm:concrete_stairs"
+    },
+    {
+      "item": "hbm:concrete_stairs"
+    },
+    {
+      "item": "hbm:concrete_stairs"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete",
+    "count": 3
+  }
+}

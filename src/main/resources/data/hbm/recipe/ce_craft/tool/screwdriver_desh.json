@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "D"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:ingot_polymer"
+    },
+    "D": {
+      "item": "hbm:ingot_desh"
+    }
+  },
+  "result": {
+    "id": "hbm:screwdriver_desh",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_ext_pink"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_colored_ext_stairs_pink",
+    "count": 8
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_ext_bronze"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_colored_ext_stairs_bronze",
+    "count": 8
+  }
+}

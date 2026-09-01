@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:reinforced_sand_stairs"
+    },
+    {
+      "item": "hbm:reinforced_sand_stairs"
+    },
+    {
+      "item": "hbm:reinforced_sand_stairs"
+    },
+    {
+      "item": "hbm:reinforced_sand_stairs"
+    }
+  ],
+  "result": {
+    "id": "hbm:reinforced_sand",
+    "count": 3
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_light_gray"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_colored_stairs_silver",
+    "count": 8
+  }
+}

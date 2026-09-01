@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:concrete_asbestos"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_asbestos_slab",
+    "count": 6
+  }
+}

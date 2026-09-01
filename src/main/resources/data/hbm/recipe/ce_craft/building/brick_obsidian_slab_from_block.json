@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:brick_obsidian"
+    }
+  },
+  "result": {
+    "id": "hbm:brick_obsidian_slab",
+    "count": 6
+  }
+}

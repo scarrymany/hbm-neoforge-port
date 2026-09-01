@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:hazmat"
+    }
+  },
+  "result": {
+    "id": "hbm:hazmat_cloth",
+    "count": 1
+  }
+}

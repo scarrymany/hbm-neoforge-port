@@ -5,7 +5,9 @@ import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.PlateCrystalWasteItems;
 import com.hbm.items.machine.ItemFELCrystal.EnumWavelengths;
+import com.hbm.items.machine.Phase11ProcessItems;
 import com.hbm.items.special.ItemWasteLong;
+import com.hbm.items.special.ItemWasteShort;
 import com.hbm.items.special.SpecialItems;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.WeightedRandomObject;
@@ -33,8 +35,8 @@ import java.util.Map;
  * {@code mrec-03-silex-misc}, see {@code docs/phase7/mrec_03_silex_misc.md}): CE registers 295
  * recipes total. This class now carries all 13 of CE's pre-loop static entries (uranium/plutonium/
  * americium/schrabidium/australium-ore reprocessing, {@code ore_tikite}/{@code crystal_trixite},
- * the lapis-dye breakdown, and the gravel breakdown) plus 2 of CE's 24 post-loop nuclear-waste-
- * reprocessing entries - preserving CE's exact {@code fluidProduced}/{@code fluidConsumed}/
+ * the lapis-dye breakdown, and the gravel breakdown) plus 12 of CE's 24 post-loop nuclear-waste-
+ * reprocessing entries ({@code nuclear_waste_tiny} unblocked the leftover 10) - preserving CE's exact {@code fluidProduced}/{@code fluidConsumed}/
  * {@code laserStrength}/output-weight numbers for every recipe it does carry.
  * {@code ModItems.sulfur} substitutes {@link PlateCrystalWasteItems#CRYSTAL_SULFUR} (same
  * substitution {@code RefineryRecipes} already documented) and {@code ModItems.fluorite} substitutes
@@ -57,17 +59,8 @@ import java.util.Map;
  *   here since nothing below needs it.</li>
  *   <li>12 of the 24 post-loop waste-reprocessing entries key on
  *   {@code nuclear_waste_long_depleted}/{@code nuclear_waste_short_depleted}, also not registered.</li>
- *   <li><b>Correction to the research report</b>: of the remaining 12 base-(non-depleted)-keyed
- *   post-loop entries the report marked "ready", only 2 (both {@code nuclear_waste_long} keys:
- *   {@code URANIUM235}, {@code URANIUM233}) are actually output-item-clean. The other 10 all output
- *   {@code ModItems.nuclear_waste_tiny} - a <i>third</i>, generic (not per-{@code WasteClass}) waste
- *   item the report's dependency check did not check for. It is a distinct item from
- *   {@code nuclear_waste_long_tiny}/{@code _short_tiny} (CE keeps both a per-class waste-item family
- *   AND a plain unspecified one, confirmed against CE's own {@code ModItems.java:1147-1148}); this
- *   port has only registered the full-size, non-per-class {@code nuclear_waste} (see
- *   {@code com.hbm.items.bomb.NukeCasingItems#NUCLEAR_WASTE}), not the {@code _tiny} variant. Those
- *   10 entries, the {@code fallout} entry (needs {@code dust_tiny}, also unregistered), and the
- *   {@code fluid_icon}(FULLERENE) entry (needs {@code powder_ash}, also unregistered) are left out.</li>
+ *   <li>The 12 depleted-keyed waste rows still need {@code nuclear_waste_*_depleted} + {@code dust_tiny}.
+ *   {@code fallout} needs {@code dust_tiny}. {@code fluid_icon}(FULLERENE) needs {@code powder_ash}.</li>
  *   <li>{@code fluid_icon}(DEATH/VITRIOL/REDMUD) - every ingredient/output item these 3 entries need
  *   <i>is</i> already registered, but reaching them at runtime needs a real fluid-tank-direct
  *   reprocessing path {@link com.hbm.blockentity.machine.chem.SilexBlockEntity} does not have yet
@@ -190,10 +183,7 @@ public final class SILEXRecipes {
                         .addOut(new ItemStack(BilletPowderItems.POWDER_NITAN_MIX.get()), 1)
                         .addOut(new ItemStack(BilletPowderItems.POWDER_SPARK_MIX.get()), 1));
 
-        // Of CE's 24 post-loop nuclear-waste-reprocessing entries (CE lines 474-646), only these 2
-        // are free of every missing-item blocker documented in the class javadoc above (both key on
-        // nuclear_waste_long, which this port has registered; every other base-keyed entry outputs
-        // the unregistered generic nuclear_waste_tiny).
+        // CE lines 474-646: 2 long U235/U233 + 10 leftover non-depleted (tiny waste now registered).
         // CE: recipes.put(new ComparableStack(ModItems.nuclear_waste_long, 1, URANIUM235.ordinal()), ...) - SILEXRecipes.java:474-479
         RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLong(ItemWasteLong.WasteClass.URANIUM235).get()),
                 new SILEXRecipe(900, 100, EnumWavelengths.IR)
@@ -209,6 +199,81 @@ public final class SILEXRecipes {
                         .addOut(new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM.get()), 25)
                         .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU239.get()), 45)
                         .addOut(new ItemStack(IngotNuggetItems.NUGGET_TECHNETIUM.get()), 15));
+
+        // leftover non-depleted waste — nuclear_waste_tiny now exists (Phase11ProcessItems)
+        // CE SILEXRecipes.java:485 / :512 / :528 / :544 / :561 / :576 / :588 / :601 / :616 / :632
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShort(ItemWasteShort.WasteClass.URANIUM235).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU238.get()), 12)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_SR90_TINY.get()), 10)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 10)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 12)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 56));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShort(ItemWasteShort.WasteClass.URANIUM233).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU238.get()), 4)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_SR90_TINY.get()), 12)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 10)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 14)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 60));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShort(ItemWasteShort.WasteClass.PLUTONIUM239).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU240.get()), 10)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 25)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_SR90_TINY.get()), 2)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 6)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 52));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShort(ItemWasteShort.WasteClass.PLUTONIUM240).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 15)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_SR90_TINY.get()), 2)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 7)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 66));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShort(ItemWasteShort.WasteClass.PLUTONIUM241).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.VISIBLE)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_AM241.get()), 25)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_AM242.get()), 35)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_TECHNETIUM.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 3)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 7)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 25));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLong(ItemWasteLong.WasteClass.THORIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U233.get()), 40)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U235.get()), 35)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 25));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLong(ItemWasteLong.WasteClass.NEPTUNIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U238.get()), 15)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU239.get()), 40)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU240.get()), 15)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_TECHNETIUM.get()), 15)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 15));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShort(ItemWasteShort.WasteClass.NEPTUNIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU238.get()), 40)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_SR90_TINY.get()), 7)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 8)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 40));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLong(ItemWasteLong.WasteClass.SCHRABIDIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_SOLINIUM.get()), 25)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_EUPHEMIUM.get()), 18)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_GH336.get()), 16)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_TANTALIUM.get()), 8)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_NEODYMIUM_TINY.get()), 8)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 25));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShort(ItemWasteShort.WasteClass.SCHRABIDIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_PB209.get()), 7)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_AU198.get()), 7)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 5)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 76));
     }
 
     public static SILEXRecipe getOutput(ItemStack stack) {

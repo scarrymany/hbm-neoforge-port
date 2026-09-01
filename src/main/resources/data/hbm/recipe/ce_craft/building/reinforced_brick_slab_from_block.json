@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:reinforced_brick"
+    }
+  },
+  "result": {
+    "id": "hbm:reinforced_brick_slab",
+    "count": 6
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_colored_ext_stairs_hazard"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_hazard"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_hazard"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_hazard"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete_ext_hazard",
+    "count": 3
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:brick_compound_slab"
+    }
+  },
+  "result": {
+    "id": "hbm:brick_compound_stairs",
+    "count": 4
+  }
+}

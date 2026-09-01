@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:reinforced_sand"
+    }
+  },
+  "result": {
+    "id": "hbm:reinforced_sand_slab",
+    "count": 6
+  }
+}

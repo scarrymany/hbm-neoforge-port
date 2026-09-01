@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:mine_ap"
+    },
+    {
+      "item": "hbm:pellet_buckshot"
+    }
+  ],
+  "result": {
+    "id": "hbm:mine_shrap",
+    "count": 1
+  }
+}

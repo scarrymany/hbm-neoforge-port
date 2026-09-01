@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:concrete_colored_ext_stairs_indigo"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_indigo"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_indigo"
+    },
+    {
+      "item": "hbm:concrete_colored_ext_stairs_indigo"
+    }
+  ],
+  "result": {
+    "id": "hbm:concrete_ext_indigo",
+    "count": 3
+  }
+}
