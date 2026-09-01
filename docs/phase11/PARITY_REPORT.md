@@ -6,7 +6,10 @@ is stale. Do not quote Phase 6 as current.
 Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_parity_census.py`
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
-`src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors (pre-test).
+`src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors, `./gradlew build`
+SUCCESS, jar `hbm-0.0.1.jar` **66,829,607** B (~63.73 MB), `./gradlew runServer` **Done (5.769s)** on a
+wiped world (2905 recipes). Spawn 2% → 51% → Done. No recipe parse errors (only expected first-boot
+`server.properties` missing).
 
 ## Top line
 
@@ -14,7 +17,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 |---|---|
 | **Weighted** (Σport / ΣCE) | **75.4%** (5860 / 7767) |
 | **Unweighted** (mean of category %) | **87.7%** |
-| Recipe/loot reachability of port items | (recompute after build) |
+| Recipe/loot reachability of port items | **45.5%** (923 / 2030) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **well below ~90%**. Largest remaining hole is still **machine recipes** (56.3%),
@@ -89,7 +92,8 @@ Assembler skip still **7**. Did **not** re-register `powder_sawdust`, `gem_tanta
 
 ## Recipe-graph reachability (cheap)
 
-Recompute after `./gradlew build`. Prior session: 919 / 2026 (45.4%).
+**45.5%** (923 / 2030). Prior session: 919 / 2026 (45.4%). +4 = the new Dummyable BlockItems
+via `dropSelf` loot (combination / blast / rock mill / annihilator).
 
 ## Next single gap (not this session)
 

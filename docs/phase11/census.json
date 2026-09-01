@@ -1,20 +1,20 @@
 {
-  "weighted_pct": 74.4,
-  "unweighted_pct": 87.2,
+  "weighted_pct": 75.4,
+  "unweighted_pct": 87.7,
   "ce_sum": 7767,
-  "port_sum": 5781,
+  "port_sum": 5860,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2026,
-      "pct": 108.7
+      "port": 2030,
+      "pct": 109.0
     },
     {
       "cat": "blocks",
       "ce": 1169,
-      "port": 768,
-      "pct": 65.7
+      "port": 772,
+      "pct": 66.0
     },
     {
       "cat": "fluids",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1061,
-      "pct": 52.8
+      "port": 1132,
+      "pct": 56.3
     },
     {
       "cat": "advancements",
@@ -59,14 +59,14 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2026,
+      "port": 2030,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
       "ce": 1169,
       "ce_fields": 1169,
       "ce_string_ctors": 290,
-      "port": 768,
+      "port": 772,
       "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
     },
     "fluids": {
@@ -174,7 +174,10 @@
       "port_json": 486,
       "port_java": {
         "AmmoPressRecipes": 60,
+        "AnnihilatorRecipes": 15,
         "ArcWelderRecipes": 47,
+        "BlastFurnaceRecipesNT": 17,
+        "CombinationRecipes": 28,
         "CrucibleRecipes": 14,
         "CrystallizerRecipes": 1,
         "HeatRecipes": 2,
@@ -187,6 +190,7 @@
         "ParticleAcceleratorRecipes": 10,
         "PlasmaForgeRecipes": 35,
         "PyroOvenRecipes": 10,
+        "RockMillRecipes": 11,
         "SolderingRecipes": 26,
         "SolidificationRecipes": 49,
         "CentrifugeRecipes": 69,
@@ -195,7 +199,7 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 29
       },
-      "port": 1061,
+      "port": 1132,
       "by_type": {
         "hbm:assembler": 356,
         "hbm:breeder": 30,
@@ -213,9 +217,9 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2026,
-      "reachable_via_recipe_or_loot": 919,
-      "pct": 45.4
+      "port_items": 2030,
+      "reachable_via_recipe_or_loot": 923,
+      "pct": 45.5
     }
   },
   "recipe_json_total": 1615

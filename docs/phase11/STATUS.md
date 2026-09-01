@@ -5,5 +5,6 @@
 - This session: four Dummyable families — Combination / Blast NT / Rock Mill / Annihilator
   (block + BE + menu + screen + CE recipe table). No stub GUIs.
 - Assembler skip still **7**. Assembler JSON untouched (356).
-- `compileJava` 0 (pre-test). build / runServer pending this commit.
+- `compileJava` 0. `./gradlew build` SUCCESS, jar **66,829,607** B (~63.73 MB). `runServer` **Done (5.769s)**, 2905 recipes.
+- Reachability **45.5%** (923 / 2030).
 - No GitHub Release. `master` untouched.
