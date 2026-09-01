@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:neutron_reflector"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:plate_polymer"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:tungsten_wire"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:biomass_compressed"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:solinium_propellant",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

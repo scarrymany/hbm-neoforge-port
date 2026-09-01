@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:fluid_pack_empty",
+    "count": 1
+  },
+  "duration": 40,
+  "power": 100
+}

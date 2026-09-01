@@ -1,0 +1,65 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:battery_lead_pack"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:weaponsteel_gun_mechanism"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:crate_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:crt_display"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:turret_jeremy",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

@@ -1,0 +1,65 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:missile_generic"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:missile_strong"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "minecraft:orange_dye"
+      },
+      "count": 5
+    },
+    {
+      "item": {
+        "item": "hbm:canister_fuel"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_fiberglass"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "tag": "c:glass_panes"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:missile_shuttle",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

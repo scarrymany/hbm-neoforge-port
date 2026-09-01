@@ -182,6 +182,45 @@ public final class Phase11ProcessItems {
         cladding("cladding_ghiorsium", 0.5);
         cladding("cladding_iron", 0.0);
         cladding("cladding_obsidian", 0.0);
+
+        // CE ModItems.java:1175 / AssemblyMachineRecipes ass.protoreactor
+        control("rod_quad_empty");
+        control("rod_dual_empty");
+        // CE ModItems.java:1135 — LI.ingot() (OreDictManager P_WHITE/LI frames; not ingot_lithium)
+        parts("lithium");
+        // CE ModItems.java:2515-2519 nuke fins
+        parts("fins_flat");
+        parts("fins_small_steel");
+        parts("fins_big_steel");
+        parts("fins_tri_steel");
+        parts("fins_quad_titanium");
+        // CE ModItems.java:2521 / ass.gadget
+        parts("pedestal_steel");
+        // CE ModItems.java:2397-2398 / ass.solinium*
+        nuke1("solinium_igniter");
+        nuke1("solinium_propellant");
+        // CE ModItems.java:417 / ass.emptypackage
+        control("fluid_pack_empty");
+        // CE ModItems.java:2490 / ass.lander
+        parts1("missile_soyuz_lander");
+        // CE ItemAmmoHIMARS.RocketType / AssemblyMachineRecipes.java:767-781
+        weapon1("ammo_himars_small");
+        weapon1("ammo_himars_small_he");
+        weapon1("ammo_himars_small_wp");
+        weapon1("ammo_himars_small_tb");
+        weapon1("ammo_himars_small_mini_nuke");
+        weapon1("ammo_himars_small_lava");
+        weapon1("ammo_himars_large");
+        weapon1("ammo_himars_large_tb");
+        // CE ItemAmmoArty meta 9/10/11 / ass.shell*
+        weapon1("ammo_arty_normal");
+        weapon1("ammo_arty_chlorine");
+        weapon1("ammo_arty_phosgene");
+        weapon1("ammo_arty_mustard");
+        // CE ModItems.java:1360 / ass.capfritz
+        consume("cap_fritz");
+        // CE ItemEnums.EnumSecretType / ass.50bmgbypass — CE tab=null
+        hidden("item_secret_selenium_steel");
     }
 
     private static DeferredItem<Item> parts(String name) {
@@ -237,5 +276,21 @@ public final class Phase11ProcessItems {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemModCladding(new Item.Properties(), rad));
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, item);
         return item;
+    }
+
+    private static DeferredItem<Item> nuke1(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(1)));
+        CreativeTabContents.add(ModCreativeTabs.NUKE, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> weapon1(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(1)));
+        CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> hidden(String name) {
+        return ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
     }
 }

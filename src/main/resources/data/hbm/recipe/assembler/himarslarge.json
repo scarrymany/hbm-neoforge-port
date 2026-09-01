@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:rocket_fuel"
+      },
+      "count": 36
+    },
+    {
+      "item": {
+        "item": "hbm:ball_tatb"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:ammo_himars_large",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

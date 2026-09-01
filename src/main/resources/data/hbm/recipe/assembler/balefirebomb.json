@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:sphere_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:fins_big_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:powder_magic"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller_advanced"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "minecraft:gray_dye"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:nuke_fstbmb",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

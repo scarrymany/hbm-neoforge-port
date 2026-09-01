@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:rocket_fuel"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:thruster_small"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:thruster_medium"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:part_generic_lde"
+      },
+      "count": 32
+    }
+  ],
+  "output": {
+    "id": "hbm:missile_soyuz_normal",
+    "count": 1
+  },
+  "duration": 6000,
+  "power": 100
+}

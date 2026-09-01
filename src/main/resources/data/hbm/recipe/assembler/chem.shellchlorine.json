@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ammo_arty_normal"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:ammo_arty_chlorine",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 1000,
+  "input_fluids": [
+    {
+      "type": "CHLORINE",
+      "fill": 4000
+    }
+  ]
+}

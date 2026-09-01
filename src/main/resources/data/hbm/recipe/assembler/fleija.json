@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:aluminum_shell"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:fins_quad_titanium"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "minecraft:white_dye"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:nuke_fleija",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

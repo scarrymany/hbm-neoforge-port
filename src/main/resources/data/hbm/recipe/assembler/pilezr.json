@@ -1,0 +1,17 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:billet_zirconium"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:pile_rod_mk2_zr",
+    "count": 3
+  },
+  "duration": 40,
+  "power": 200
+}

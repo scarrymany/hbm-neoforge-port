@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:rocket_fuel"
+      },
+      "count": 48
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_phosphorus"
+      },
+      "count": 18
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 48
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 6
+    }
+  ],
+  "output": {
+    "id": "hbm:ammo_himars_small_wp",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

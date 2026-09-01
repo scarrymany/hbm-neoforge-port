@@ -85,9 +85,12 @@ MAT: dict[str, list[str]] = {
     "ANY_TAR": [],
     "ANY_PLASTICEXPLOSIVE": [],
     "ANY_BISMOID": ["bismuth"],
-    "ANY_BISMOIDBRONZE": ["bismuthbronze"],
+    "ANY_BISMOIDBRONZE": ["bismuthbronze", "bismuth_bronze"],
     "TA": ["tantalium", "tantalum"],
     "LI": ["lithium"],
+    "GRAPHITE": ["graphite"],
+    "TH232": ["th232", "thorium"],
+    "P_WHITE": ["phosphorus", "white_phosphorus"],
     "NP237": ["neptunium"],
     "SA327": ["solinium"],
     "B": ["boron"],
@@ -281,6 +284,36 @@ ITEM_MAP = {
     "ModItems.ducttape": "ducttape",
     "ModItems.rod_empty": "rod_empty",
     "ModItems.dysfunctional_reactor": "dysfunctional_reactor",
+    "ModItems.rod_quad_empty": "rod_quad_empty",
+    "ModItems.rod_dual_empty": "rod_dual_empty",
+    "ModItems.lithium": "lithium",
+    "ModItems.fins_flat": "fins_flat",
+    "ModItems.fins_small_steel": "fins_small_steel",
+    "ModItems.fins_big_steel": "fins_big_steel",
+    "ModItems.fins_tri_steel": "fins_tri_steel",
+    "ModItems.fins_quad_titanium": "fins_quad_titanium",
+    "ModItems.pedestal_steel": "pedestal_steel",
+    "ModItems.solinium_igniter": "solinium_igniter",
+    "ModItems.solinium_propellant": "solinium_propellant",
+    "ModItems.fluid_pack_empty": "fluid_pack_empty",
+    "ModItems.fluid_pack_full": "fluid_pack_full",
+    "ModItems.canister_full": "canister_fuel",
+    "ModItems.cap_fritz": "cap_fritz",
+    "ModItems.missile_shuttle": "missile_shuttle",
+    "ModItems.missile_soyuz": "missile_soyuz_normal",
+    "ModItems.missile_soyuz_lander": "missile_soyuz_lander",
+    "ModItems.arc_electrode": "arc_electrode_graphite",
+    "ModBlocks.machine_condenser_powered": "machine_condenser_powered",
+    "ModBlocks.machine_orbus": "machine_orbus",
+    "ModBlocks.pile_brick": "pile_brick",
+    "ModBlocks.nuke_solinium": "nuke_solinium",
+    "ModBlocks.nuke_fstbmb": "nuke_fstbmb",
+    "ModBlocks.turret_arty": "turret_arty",
+    "ModBlocks.turret_himars": "turret_himars",
+    "ModBlocks.barrel_steel": "barrel_steel",
+    "ModBlocks.crate_iron": "crate_iron",
+    "ModBlocks.crate_steel": "crate_steel",
+    "ModBlocks.machine_satlinker": "machine_satlinker",
     "ModItems.spawn_chopper": "chopper",
     "ModItems.rocket_fuel": "rocket_fuel",
     "ModItems.missile_stealth": "missile_stealth",
@@ -434,6 +467,17 @@ CIRCUIT_ENUM = {
     "NUMITRON": "circuit_numitron",
 }
 
+AMMO_ARTY_META = {
+    "0": "ammo_arty_normal",
+    "NORMAL": "ammo_arty_normal",
+    "9": "ammo_arty_chlorine",
+    "CHLORINE": "ammo_arty_chlorine",
+    "10": "ammo_arty_phosgene",
+    "PHOSGENE": "ammo_arty_phosgene",
+    "11": "ammo_arty_mustard",
+    "MUSTARD": "ammo_arty_mustard",
+}
+
 VANILLA_ITEMS = {
     "DIAMOND": "minecraft:diamond",
     "STRING": "minecraft:string",
@@ -502,6 +546,13 @@ KEY_DYES = {
     "KEY_ORANGE": "minecraft:orange_dye",
     "KEY_LIGHTGRAY": "minecraft:light_gray_dye",
     "KEY_LIGHTGREY": "minecraft:light_gray_dye",
+    "KEY_BLUE": "minecraft:blue_dye",
+    "KEY_BROWN": "minecraft:brown_dye",
+    "KEY_CYAN": "minecraft:cyan_dye",
+    "KEY_PURPLE": "minecraft:purple_dye",
+    "KEY_PINK": "minecraft:pink_dye",
+    "KEY_LIME": "minecraft:lime_dye",
+    "KEY_MAGENTA": "minecraft:magenta_dye",
 }
 
 
@@ -543,6 +594,25 @@ def known_ids() -> set[str]:
         computed.add(f"piston_set_{p}")
     for r in ("uranium", "pu239", "plutonium", "source", "boron", "lithium", "detector"):
         computed.add(f"pile_rod_{r}")
+    for r in ("ra226be", "po210be", "zr", "nu", "pu239", "rgp", "waste", "thorium", "thorium_fuel"):
+        computed.add(f"pile_rod_mk2_{r}")
+    for cap in ("nuka", "quantum", "rad", "sparkle", "korl", "fritz"):
+        computed.add(f"block_cap_{cap}")
+    for him in ("small", "small_he", "small_wp", "small_tb", "small_mini_nuke", "small_lava", "large", "large_tb"):
+        computed.add(f"ammo_himars_{him}")
+    computed.update({
+        "rod_quad_empty", "rod_dual_empty", "lithium", "fins_flat", "fins_small_steel",
+        "fins_big_steel", "fins_tri_steel", "fins_quad_titanium", "pedestal_steel",
+        "solinium_igniter", "solinium_propellant", "fluid_pack_empty", "missile_shuttle",
+        "missile_soyuz_lander", "missile_soyuz_normal", "crate_iron", "crate_steel",
+        "barrel_steel", "nugget_euphemium", "ingot_phosphorus", "arc_electrode_graphite",
+        "arc_electrode_lanthanium", "arc_electrode_desh", "arc_electrode_saturnite",
+        "ammo_arty_normal", "ammo_arty_chlorine", "ammo_arty_phosgene", "ammo_arty_mustard",
+        "bmg50_sm", "bmg50_black", "machine_satlinker", "canister_fuel", "cap_fritz",
+        "casing_large_steel", "battery_sc_po210", "item_secret_selenium_steel",
+    })
+    for sc in ("empty", "waste", "ra226", "tc99", "co60", "pu238", "po210", "au198", "pb209", "am241"):
+        computed.add(f"battery_sc_{sc}")
     for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
               "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):
         computed.add(f"pwr_fuel_depleted_{t}")
@@ -776,6 +846,8 @@ def resolve_ore(mat: str, shape: str, n: int, known: set[str]) -> tuple[str, int
             cands.append(tmpl.format(m=tok))
     if mat == "MINGRADE" and shape == "wireFine":
         cands.extend(["mingrade_wire", "red_copper_wire"])
+    if mat == "LI" and shape == "ingot":
+        cands.append("lithium")
     if mat == "IRON" and shape == "ingot":
         return "minecraft:iron_ingot", n
     if mat == "GOLD" and shape == "ingot":
@@ -845,6 +917,27 @@ def resolve_flatten(item_name: str, enum_name: str, n: int, known: set[str]) -> 
             return f"hbm:{cid}", n
         cand = f"part_generic_{enum_name.lower()}"
         return (f"hbm:{cand}", n) if cand in known else None
+    if item_name == "ammo_himars":
+        cand = f"ammo_himars_{en}"
+        return (f"hbm:{cand}", n) if cand in known else None
+    if item_name in ("ammo_standard", "ammo_secret"):
+        cand = en
+        return (f"hbm:{cand}", n) if cand in known else None
+    if item_name == "ammo_arty":
+        cid = AMMO_ARTY_META.get(enum_name) or AMMO_ARTY_META.get(en)
+        return (f"hbm:{cid}", n) if cid and cid in known else None
+    if item_name == "block_cap":
+        cand = f"block_cap_{en}"
+        return (f"hbm:{cand}", n) if cand in known else None
+    if item_name == "battery_sc":
+        cand = f"battery_sc_{en}"
+        return (f"hbm:{cand}", n) if cand in known else None
+    if item_name == "casing":
+        cand = f"casing_{en}"
+        return (f"hbm:{cand}", n) if cand in known else None
+    if item_name == "item_secret":
+        cand = f"item_secret_{en}"
+        return (f"hbm:{cand}", n) if cand in known else None
     return None
 
 
@@ -859,13 +952,21 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
     if m:
         return resolve_flatten(m.group(1), m.group(2), int(m.group(3) or 1), known)
 
+    m = re.search(
+        r"DictFrame\.fromOne\(ModBlocks\.block_cap,\s*(?:[\w.]+\.)?(\w+)(?:,\s*(\d+))?\)",
+        expr,
+    )
+    if m:
+        return resolve_flatten("block_cap", m.group(1), int(m.group(2) or 1), known)
+
     m = re.match(
-        r"new (?:ItemStack|ComparableStack)\(ModItems\.(fluid_barrel_full|fluid_tank_full|cell)\s*,\s*(\d+)\s*,\s*Fluids\.\w+\.getID\(\)\)",
+        r"new (?:ItemStack|ComparableStack)\(ModItems\.(fluid_barrel_full|fluid_tank_full|cell|fluid_pack_full|canister_full)\s*,\s*(\d+)\s*,\s*Fluids\.\w+\.getID\(\)\)",
         expr,
     )
     if m:
         name, n = m.group(1), int(m.group(2))
-        return (f"hbm:{name}", n) if name in known else None
+        mapped = {"canister_full": "canister_fuel"}.get(name, name)
+        return (f"hbm:{mapped}", n) if mapped in known else None
     if "Fluids." in expr or "getDict(" in expr or "inputFluids" in expr:
         return None
     if "OreDictManager.getReflector" in expr:
@@ -1076,7 +1177,7 @@ def write_assembler(known: set[str]) -> tuple[int, int, dict[str, int]]:
             elif "OreDictStack" in fail or "ANY_TAR" in fail or "Fluids." in fail:
                 key = "ore_or_fluid"
             reasons[key] = reasons.get(key, 0) + 1
-            if reasons.get("_samples", 0) < 25:
+            if reasons.get("_samples", 0) < 80:
                 reasons["_samples"] = reasons.get("_samples", 0) + 1
                 print(f"  SKIP {r['name']}: {fail[:140]}")
             skip += 1
@@ -1202,8 +1303,78 @@ def write_shredder(known: set[str]) -> int:
     return n
 
 
+def write_fallback_assets() -> None:
+    """cube_all/block_steel for leftover casings; generated item models when texture exists."""
+    blocks = [
+        "machine_condenser_powered", "machine_orbus", "pile_brick",
+        "nuke_solinium", "nuke_fstbmb", "turret_arty", "turret_himars",
+        "barrel_steel", "machine_satlinker",
+    ]
+    items = [
+        "rod_quad_empty", "rod_dual_empty", "lithium",
+        "fins_flat", "fins_small_steel", "fins_big_steel", "fins_tri_steel", "fins_quad_titanium",
+        "pedestal_steel", "solinium_igniter", "solinium_propellant", "fluid_pack_empty",
+        "missile_soyuz_lander",
+        "ammo_himars_small", "ammo_himars_small_he", "ammo_himars_small_wp", "ammo_himars_small_tb",
+        "ammo_himars_small_mini_nuke", "ammo_himars_small_lava", "ammo_himars_large", "ammo_himars_large_tb",
+        "ammo_arty_normal", "ammo_arty_chlorine", "ammo_arty_phosgene", "ammo_arty_mustard",
+        "cap_fritz", "item_secret_selenium_steel",
+    ]
+    blk_dir = ASSETS / "models" / "block"
+    item_dir = ASSETS / "models" / "item"
+    state_dir = ASSETS / "blockstates"
+    tex_item = ASSETS / "textures" / "item"
+    blk_dir.mkdir(parents=True, exist_ok=True)
+    item_dir.mkdir(parents=True, exist_ok=True)
+    state_dir.mkdir(parents=True, exist_ok=True)
+    for blk in blocks:
+        bm = blk_dir / f"{blk}.json"
+        if not bm.exists():
+            bm.write_text(json.dumps({
+                "parent": "minecraft:block/cube_all",
+                "textures": {"all": "hbm:block/block_steel"},
+            }, indent=2) + "\n")
+        im = item_dir / f"{blk}.json"
+        if not im.exists():
+            im.write_text(json.dumps({"parent": f"hbm:block/{blk}"}, indent=2) + "\n")
+        st = state_dir / f"{blk}.json"
+        if not st.exists():
+            st.write_text(json.dumps({
+                "variants": {"": {"model": f"hbm:block/{blk}"}}
+            }, indent=2) + "\n")
+    aliases = {
+        "ammo_himars_small": ["ammo_himars.small", "ammo_himars_small"],
+        "ammo_himars_small_he": ["ammo_himars.small_he", "ammo_himars_small_he"],
+        "ammo_himars_small_wp": ["ammo_himars.small_wp", "ammo_himars_small_wp"],
+        "ammo_himars_small_tb": ["ammo_himars.small_tb", "ammo_himars_small_tb"],
+        "ammo_himars_small_mini_nuke": ["ammo_himars.small_mini_nuke", "ammo_himars_small_mini_nuke"],
+        "ammo_himars_small_lava": ["ammo_himars.small_lava", "ammo_himars_small_lava"],
+        "ammo_himars_large": ["ammo_himars.large", "ammo_himars_large"],
+        "ammo_himars_large_tb": ["ammo_himars.large_tb", "ammo_himars_large_tb"],
+        "ammo_arty_chlorine": ["ammo_arty.chlorine", "ammo_arty_chlorine"],
+        "ammo_arty_phosgene": ["ammo_arty.phosgene", "ammo_arty_phosgene"],
+        "ammo_arty_mustard": ["ammo_arty.mustard", "ammo_arty_mustard"],
+        "rod_quad_empty": ["rod_quad_empty", "rod.quad_empty"],
+        "rod_dual_empty": ["rod_dual_empty", "rod.dual_empty"],
+    }
+    for name in items:
+        im = item_dir / f"{name}.json"
+        if im.exists():
+            continue
+        layer = name
+        for cand in aliases.get(name, [name]):
+            if (tex_item / f"{cand}.png").exists():
+                layer = cand
+                break
+        im.write_text(json.dumps({
+            "parent": "minecraft:item/generated",
+            "textures": {"layer0": f"hbm:item/{layer}"},
+        }, indent=2) + "\n")
+
+
 def main() -> None:
     write_models()
+    write_fallback_assets()
     patch_lang()
     write_crafting()
     known = known_ids()

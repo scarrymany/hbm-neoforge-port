@@ -1,0 +1,65 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:battery_lithium_pack"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 5
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:weaponsteel_gun_mechanism"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:machine_radar"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:crt_display"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:turret_arty",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

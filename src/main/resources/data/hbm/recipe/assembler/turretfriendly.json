@@ -1,0 +1,59 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:battery_lead_pack"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:gunmetal_gun_mechanism"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:crate_iron"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:crt_display"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:turret_friendly",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

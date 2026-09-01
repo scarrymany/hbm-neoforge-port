@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:rocket_fuel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:ball_tatb"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:gem_volcanic"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 6
+    }
+  ],
+  "output": {
+    "id": "hbm:ammo_himars_small_lava",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

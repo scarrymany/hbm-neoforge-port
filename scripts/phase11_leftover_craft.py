@@ -278,7 +278,26 @@ def recipes() -> list[dict]:
         # ConsumableRecipes.java:73 leftover can_redbomb now that pellet_cluster exists
         shapeless("consumable/can_redbomb", "hbm:can_redbomb", 1,
                   ["hbm:can_empty", "minecraft:potion", "minecraft:sugar", "hbm:pellet_cluster"]),
-        # CraftingManager.java:647 satlinker (block not registered this pass — skip)
+        # CraftingManager.java:647 — machine_satlinker casing now exists (≠ machine_satlink)
+        shaped("machine/machine_satlinker", "hbm:machine_satlinker", 1,
+               ["PSP", "SCS", "PSP"],
+               {
+                   "P": item("hbm:plate_steel"),
+                   "S": item("hbm:ingot_starmetal"),
+                   "C": item("hbm:sat_chip"),
+               }),
+        # PowderRecipes.java:32 clay uncraft
+        shapeless("powder/clay_from_block", "minecraft:clay_ball", 4,
+                  ["minecraft:clay"]),
+        # PowderRecipes.java:64 charcoal flux
+        shapeless("powder/powder_flux_charcoal", "hbm:powder_flux", 1,
+                  ["minecraft:charcoal", "minecraft:sand"]),
+        # PowderRecipes.java:67 lead+sulfur flux
+        shapeless("powder/powder_flux_lead_sulfur", "hbm:powder_flux", 8,
+                  ["hbm:powder_lead", "hbm:sulfur", "minecraft:sand"]),
+        # PowderRecipes.java:69 CA.dust flux
+        shapeless("powder/powder_flux_calcium", "hbm:powder_flux", 12,
+                  ["hbm:powder_calcium", "minecraft:sand"]),
     ]
 
 

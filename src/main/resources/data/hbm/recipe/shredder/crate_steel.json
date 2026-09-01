@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:crate_steel"
+  },
+  "output": {
+    "id": "hbm:powder_steel",
+    "count": 8
+  },
+  "duration": 60
+}

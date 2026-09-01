@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:casing_large_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "tag": "hbm:any_smokeless"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_starmetal"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:bmg50_sm",
+    "count": 6
+  },
+  "duration": 100,
+  "power": 100
+}

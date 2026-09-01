@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:aluminum_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:rocket_fuel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:thruster_small"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller_advanced"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:part_generic_lde"
+      },
+      "count": 12
+    }
+  ],
+  "output": {
+    "id": "hbm:missile_soyuz_lander",
+    "count": 1
+  },
+  "duration": 2400,
+  "power": 100
+}

@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:sphere_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:fins_flat"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:pedestal_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "minecraft:gray_dye"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:nuke_gadget",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

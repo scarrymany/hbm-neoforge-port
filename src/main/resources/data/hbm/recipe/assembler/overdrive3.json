@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:upgrade_overdrive_2"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:upgrade_speed_3"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:upgrade_effect_3"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_bismuth_bronze"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_cft"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_bismoid"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:upgrade_overdrive_3",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

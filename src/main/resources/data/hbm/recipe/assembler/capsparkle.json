@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:cap_sparkle"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:cap_sparkle"
+      },
+      "count": 64
+    }
+  ],
+  "output": {
+    "id": "hbm:block_cap_sparkle",
+    "count": 1
+  },
+  "duration": 10,
+  "power": 100
+}

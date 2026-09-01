@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "tag": "minecraft:planks"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_graphite"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:steel_bolt"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:pile_brick",
+    "count": 1
+  },
+  "duration": 20,
+  "power": 250
+}

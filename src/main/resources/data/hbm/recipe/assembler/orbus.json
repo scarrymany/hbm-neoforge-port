@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_sextuple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:saturnite_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:bscco_dense_wire"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:battery_sc_po210"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_orbus",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

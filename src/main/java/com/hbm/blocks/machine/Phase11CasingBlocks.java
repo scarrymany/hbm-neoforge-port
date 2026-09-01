@@ -71,6 +71,22 @@ public final class Phase11CasingBlocks {
         registerBlock("fusion_coupler", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("watz_element", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("watz_cooler", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:1076 / AssemblyMachineRecipes.java ass.hpcondenser
+        registerBlock("machine_condenser_powered", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:803 / ass.orbus
+        registerBlock("machine_orbus", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:664 / ass.pileblock
+        registerBlock("pile_brick", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:706 / :711 — leftover nuke casings (no TE)
+        registerBlock("nuke_solinium", () -> new BlockBase(MACHINE_PROPS));
+        registerBlock("nuke_fstbmb", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:821-822 — Arty/HIMARS out of TurretBlocks TE scope
+        registerBlock("turret_arty", () -> new BlockBase(MACHINE_PROPS));
+        registerBlock("turret_himars", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:789 / ass.fritz
+        registerBlock("barrel_steel", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:958 / CraftingManager.java:647 (vanilla satlinker, ≠ machine_satlink)
+        registerBlock("machine_satlinker", () -> new BlockBase(MACHINE_PROPS));
     }
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory) {
