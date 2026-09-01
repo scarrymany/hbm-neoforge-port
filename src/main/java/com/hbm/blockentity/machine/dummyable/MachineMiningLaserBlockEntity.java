@@ -11,6 +11,9 @@ import com.hbm.inventory.container.machine.dummyable.MiningLaserMenu;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.recipes.CrystallizerRecipes;
+import com.hbm.inventory.recipes.ProcessingRecipes;
+import com.hbm.inventory.recipes.chem.CentrifugeRecipes;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
@@ -36,6 +39,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -53,8 +59,8 @@ import java.util.Map;
 /**
  * CE {@code TileEntityMachineMiningLaser} (673 lines). Silk touch is not in CE.
  * CE laser does not increment pollution (full-file read).
- * TODO(CE: TileEntityMachineMiningLaser.java:305-342): exclusive crystallizer/centrifuge/shredder/smelter drop rewrite.
- * TODO(CE: TileEntityMachineMiningLaser.java:372-388): upgrade_nullifier scrapItems set — not ported.
+ * Exclusive processors: crystallizer/centrifuge Java tables + shredder JSON + vanilla smelting.
+ * Nullifier uses CE {@code ItemMachineUpgrade.scrapItems}.
  * TODO(CE: RenderLaserMiner.java:18): TESR beam. Do not invent.
  */
 public class MachineMiningLaserBlockEntity extends MachineBaseBlockEntity
@@ -275,7 +281,40 @@ public class MachineMiningLaserBlockEntity extends MachineBaseBlockEntity
         boolean normal = true;
         boolean doesBreak = true;
 
-        // TODO(CE: TileEntityMachineMiningLaser.java:305-342): exclusive processor upgrades.
+        ItemStack asItem = new ItemStack(state.getBlock());
+        if (!asItem.isEmpty()) {
+            if (hasUpgradeItem("upgrade_crystallizer")) {
+                CrystallizerRecipes.CrystallizerRecipe result = CrystallizerRecipes.getOutput(asItem, Fluids.PEROXIDE);
+                if (result == null) result = CrystallizerRecipes.getOutput(asItem, Fluids.SULFURIC_ACID);
+                if (result != null) {
+                    level.addFreshEntity(new ItemEntity(level, targetX + 0.5, targetY + 0.5, targetZ + 0.5, result.output.copy()));
+                    normal = false;
+                }
+            } else if (hasUpgradeItem("upgrade_centrifuge")) {
+                ItemStack[] result = CentrifugeRecipes.getOutput(asItem);
+                if (result != null) {
+                    for (ItemStack sta : result) {
+                        if (sta != null && !sta.isEmpty()) {
+                            level.addFreshEntity(new ItemEntity(level, targetX + 0.5, targetY + 0.5, targetZ + 0.5, sta.copy()));
+                            normal = false;
+                        }
+                    }
+                }
+            } else if (hasUpgradeItem("upgrade_shredder")) {
+                ItemStack result = shredderResult(asItem);
+                Item scrap = hbmItem("scrap");
+                if (!result.isEmpty() && result.getItem() != scrap) {
+                    level.addFreshEntity(new ItemEntity(level, targetX + 0.5, targetY + 0.5, targetZ + 0.5, result.copy()));
+                    normal = false;
+                }
+            } else if (hasUpgradeItem("upgrade_smelter")) {
+                ItemStack result = smeltResult(asItem);
+                if (!result.isEmpty()) {
+                    level.addFreshEntity(new ItemEntity(level, targetX + 0.5, targetY + 0.5, targetZ + 0.5, result.copy()));
+                    normal = false;
+                }
+            }
+        }
 
         if (normal && state.getBlock() instanceof IDrillInteraction in) {
             doesBreak = in.canBreak(level, targetX, targetY, targetZ, state, this);
@@ -317,9 +356,13 @@ public class MachineMiningLaserBlockEntity extends MachineBaseBlockEntity
                 targetX + 0.5 - rangeHor, targetY + 0.5 - rangeVer, targetZ + 0.5 - rangeHor,
                 targetX + 0.5 + rangeHor, targetY + 0.5 + rangeVer, targetZ + 0.5 + rangeHor);
         Item oreOil = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ore_oil"));
+        boolean nullifier = hasUpgradeItem("upgrade_nullifier");
 
         for (ItemEntity item : level.getEntitiesOfClass(ItemEntity.class, box)) {
-            // TODO(CE: TileEntityMachineMiningLaser.java:372-388): nullifier scrapItems.
+            if (nullifier && !item.getItem().isEmpty() && ItemMachineUpgrade.isScrapItem(item.getItem().getItem())) {
+                item.discard();
+                continue;
+            }
             if (!item.getItem().isEmpty() && item.getItem().is(oreOil)) {
                 tank.setTankType(Fluids.OIL);
                 tank.setFill(Math.min(tank.getMaxFill(), tank.getFill() + 500));
@@ -399,6 +442,32 @@ public class MachineMiningLaserBlockEntity extends MachineBaseBlockEntity
 
     public int getProgressScaled(int i) {
         return (int) (clientBreakProgress * i);
+    }
+
+    private ItemStack shredderResult(ItemStack stack) {
+        if (level == null || stack.isEmpty()) return ItemStack.EMPTY;
+        return level.getRecipeManager()
+                .getRecipeFor(ProcessingRecipes.SHREDDER_TYPE.get(), new SingleRecipeInput(stack), level)
+                .map(RecipeHolder::value)
+                .map(recipe -> recipe.getResultItem(level.registryAccess()).copy())
+                .orElse(ItemStack.EMPTY);
+    }
+
+    private ItemStack smeltResult(ItemStack stack) {
+        if (level == null || stack.isEmpty()) return ItemStack.EMPTY;
+        return level.getRecipeManager()
+                .getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(stack), level)
+                .map(holder -> holder.value().assemble(new SingleRecipeInput(stack), level.registryAccess()))
+                .orElse(ItemStack.EMPTY);
+    }
+
+    private boolean hasUpgradeItem(String path) {
+        Item want = hbmItem(path);
+        if (want == Items.AIR) return false;
+        for (int i = 1; i <= 8; i++) {
+            if (inventory.getStackInSlot(i).is(want)) return true;
+        }
+        return false;
     }
 
     private boolean hasUpgradeType(UpgradeType type) {

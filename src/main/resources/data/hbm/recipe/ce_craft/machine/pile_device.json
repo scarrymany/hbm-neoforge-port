@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "CBS"
+  ],
+  "key": {
+    "A": {
+      "item": "hbm:plate_aluminium"
+    },
+    "C": {
+      "item": "hbm:steel_plate_triple"
+    },
+    "B": {
+      "item": "hbm:ingot_boron"
+    },
+    "S": {
+      "item": "hbm:steel_shell"
+    }
+  },
+  "result": {
+    "id": "hbm:pile_device",
+    "count": 1
+  }
+}

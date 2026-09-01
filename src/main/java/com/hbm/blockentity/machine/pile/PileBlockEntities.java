@@ -10,6 +10,9 @@ public final class PileBlockEntities {
 
     public static Supplier<BlockEntityType<PileCoreBlockEntity>> PILE_CORE;
     public static Supplier<BlockEntityType<PileBaseBlockEntity>> PILE_BASE;
+    public static Supplier<BlockEntityType<PileLoaderBlockEntity>> PILE_LOADER;
+    public static Supplier<BlockEntityType<PileVentBlockEntity>> PILE_VENT;
+    public static Supplier<BlockEntityType<PileControlBlockEntity>> PILE_CONTROL;
 
     private PileBlockEntities() {
     }
@@ -23,6 +26,19 @@ public final class PileBlockEntities {
         PILE_BASE = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_pile_base_mk2", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new PileBaseBlockEntity(PILE_BASE.get(), pos, state),
                 PileBlocks.PILE_BLOCK.get()
+        ).build(null));
+        // CE AutoRegister TileEntityPileLoader / Vent / Control.
+        PILE_LOADER = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_pile_loader", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new PileLoaderBlockEntity(PILE_LOADER.get(), pos, state),
+                PileBlocks.PILE_DEVICE.get()
+        ).build(null));
+        PILE_VENT = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_pile_vent", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new PileVentBlockEntity(PILE_VENT.get(), pos, state),
+                PileBlocks.PILE_DEVICE.get()
+        ).build(null));
+        PILE_CONTROL = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_pile_control", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new PileControlBlockEntity(PILE_CONTROL.get(), pos, state),
+                PileBlocks.PILE_DEVICE.get()
         ).build(null));
     }
 }

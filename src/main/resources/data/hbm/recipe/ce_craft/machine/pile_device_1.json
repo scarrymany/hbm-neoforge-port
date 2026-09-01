@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " M ",
+    "ACA",
+    " S "
+  ],
+  "key": {
+    "M": {
+      "item": "hbm:motor"
+    },
+    "A": {
+      "item": "hbm:plate_aluminium"
+    },
+    "C": {
+      "item": "hbm:copper_shell"
+    },
+    "S": {
+      "item": "hbm:steel_plate_triple"
+    }
+  },
+  "result": {
+    "id": "hbm:pile_device_1",
+    "count": 1
+  }
+}
