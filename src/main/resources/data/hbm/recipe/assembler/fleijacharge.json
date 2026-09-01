@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:plate_schrabidium"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:fleija_propellant",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

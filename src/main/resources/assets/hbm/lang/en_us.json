@@ -9331,5 +9331,11 @@
   "item.hbm.oil_tar_paraffin": "Paraffin Wax",
   "container.machineExcavator": "Large Mining Drill",
   "container.paRFC": "RF Cavity",
-  "container.paBeamline": "Beamline"
+  "container.paBeamline": "Beamline",
+  "item.hbm.casing_small": "Small Casing",
+  "item.hbm.casing_large": "Large Casing",
+  "item.hbm.casing_small_steel": "Small Steel Casing",
+  "item.hbm.casing_large_steel": "Large Steel Casing",
+  "item.hbm.casing_shotshell": "Shotshell Casing",
+  "item.hbm.casing_buckshot_advanced": "Advanced Buckshot Casing"
 }

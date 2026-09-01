@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "hbm:ingot_polymer",
+    "hbm:ingot_bakelite"
+  ]
+}

@@ -1,9 +1,9 @@
 # Phase 11 status
 
-- Census: `docs/phase11/PARITY_REPORT.md` — **62.9% weighted / 80.7% unweighted**. Not ≥90%.
-- Machine recipes **483 → 573 (27.6% → 31.5%)**. Blocks **667 → 676 (57.1% → 57.8%)**. Items **1854 → 1897**.
-- This session: solidifier (47 CE) + FEL + excavator + PA parts/detector + ANY_TAR + leftover chem (explosives/solid_fuel/dust/tarsand/tel) + cyclotron `part_*` assembler.
-- Census: CE Solidification `registerRecipe`/`registerSFAuto` + PA `recipes.add`. Port `RECIPES.put`/`RECIPES.add`/`registerSFAuto(Fluids.`.
+- Census: `docs/phase11/PARITY_REPORT.md` — **62.8% weighted / 81.1% unweighted**. Not ≥90%.
+- Machine recipes **573 → 666 (31.5% → 33.2%)**. Blocks **676 → 680 (57.8% → 58.2%)**. Items **1897 → 1910**.
+- This session: leftover assembler (`explosivelenses1`, `fleijacharge`, `fusionplasmaforge`) + chem `uf6`/`meatprocessing`/`hydrogencoke` + AmmoPress/ArcWelder/Soldering/PlasmaForge Java tables + real TE+menu for those four machines + ammo casings / sulfur / niter.
+- Census: CE AmmoPress/ArcWelder/Soldering `recipes.add` + PlasmaForge `this.register((PlasmaForgeRecipe)`. Port `RECIPES.add` on those classes only. No global `recipes.add`.
 - Leftover CE `@AutoRegister` entities: **none missing**.
-- `compileJava` 0. `./gradlew build` SUCCESS, jar **66,437,334** B (~63.36 MB). `runServer` **Done (5.271s)**, 2381 recipes.
+- `compileJava` 0. `./gradlew build` / `runServer` numbers pending this revision.
 - No GitHub Release. `master` untouched.

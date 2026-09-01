@@ -101,6 +101,9 @@ def port_item_ids() -> set[str]:
         "particle_empty", "particle_hydrogen", "particle_copper", "particle_lead",
         "particle_amat", "particle_aschrab", "particle_dark", "particle_higgs",
         "particle_tachyon", "particle_strange", "particle_sparkticle",
+        "sulfur", "niter",
+        "casing_small", "casing_large", "casing_small_steel", "casing_large_steel",
+        "casing_shotshell", "casing_buckshot", "casing_buckshot_advanced",
     }
     for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
               "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):
@@ -278,6 +281,10 @@ def ce_machine_recipe_counts() -> dict[str, int]:
             n += len(re.findall(r'registerSFAuto\([A-Z_]+', text))
         if p.stem == "ParticleAcceleratorRecipes":
             n += len(re.findall(r'recipes\.add\(', text))
+        if p.stem in ("AmmoPressRecipes", "ArcWelderRecipes", "SolderingRecipes"):
+            n += len(re.findall(r'recipes\.add\(', text))
+        if p.stem == "PlasmaForgeRecipes":
+            n += len(re.findall(r'this\.register\(\(PlasmaForgeRecipe\)', text))
         n += len(re.findall(r'registerDefaults', text)) and 0
         n += len(re.findall(r'\.register\(\s*new\s+', text))
         n += len(re.findall(r'addRecipe\(', text))

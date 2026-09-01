@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "hbm:ball_tnt",
+    "hbm:ball_dynamite",
+    "hbm:ball_tatb",
+    "hbm:ingot_c4"
+  ]
+}

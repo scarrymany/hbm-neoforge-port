@@ -46,7 +46,11 @@ import com.hbm.handler.ArmorUtil;
 import com.hbm.handler.HazmatRegistry;
 import com.hbm.hazard.HazardRegistry;
 import com.hbm.inventory.recipes.LiquefactionRecipes;
+import com.hbm.inventory.recipes.AmmoPressRecipes;
+import com.hbm.inventory.recipes.ArcWelderRecipes;
 import com.hbm.inventory.recipes.ParticleAcceleratorRecipes;
+import com.hbm.inventory.recipes.PlasmaForgeRecipes;
+import com.hbm.inventory.recipes.SolderingRecipes;
 import com.hbm.inventory.recipes.PUREXRecipes;
 import com.hbm.inventory.recipes.SolidificationRecipes;
 import com.hbm.inventory.recipes.RefineryRecipes;
@@ -124,6 +128,10 @@ public class CommonEvents {
             LiquefactionRecipes.register();
             SolidificationRecipes.register();
             ParticleAcceleratorRecipes.register();
+            AmmoPressRecipes.register();
+            ArcWelderRecipes.register();
+            SolderingRecipes.register();
+            PlasmaForgeRecipes.register();
             // Phase 4 (fallout_rain_and_effects) - com.hbm.config.FalloutConfigJSON#initDefault()
             // eagerly resolves several DeferredBlock.get() calls (e.g. WastelandVirusBlocks.SELLAFIELD)
             // while building its default block-transform table, so - same reasoning as the recipe

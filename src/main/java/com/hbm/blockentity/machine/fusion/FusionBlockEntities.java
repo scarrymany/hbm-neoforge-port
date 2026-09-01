@@ -20,6 +20,7 @@ public final class FusionBlockEntities {
     public static Supplier<BlockEntityType<IcfControllerBlockEntity>> ICF_CONTROLLER;
     public static Supplier<BlockEntityType<IcfPressBlockEntity>> ICF_PRESS;
     public static Supplier<BlockEntityType<WatzReactorBlockEntity>> WATZ_REACTOR;
+    public static Supplier<BlockEntityType<PlasmaForgeBlockEntity>> FUSION_PLASMA_FORGE;
 
     private FusionBlockEntities() {
     }
@@ -43,6 +44,10 @@ public final class FusionBlockEntities {
         WATZ_REACTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_watz_reactor", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new WatzReactorBlockEntity(WATZ_REACTOR.get(), pos, state),
                 FusionBlocks.WATZ_REACTOR.get()
+        ).build(null));
+        FUSION_PLASMA_FORGE = ModBlocks.BLOCK_ENTITY_TYPES.register("fusion_plasma_forge", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new PlasmaForgeBlockEntity(FUSION_PLASMA_FORGE.get(), pos, state),
+                FusionBlocks.FUSION_PLASMA_FORGE.get()
         ).build(null));
     }
 }

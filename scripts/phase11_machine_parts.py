@@ -67,6 +67,15 @@ MAT: dict[str, list[str]] = {
     "ZR": ["zirconium"],
     "ANY_PLASTIC": ["polymer", "bakelite"],
     "ANY_HARDPLASTIC": ["pc", "polycarbonate", "pvc"],
+    "FIBER": ["fiberglass"],
+    "EUPH": ["euphemium"],
+    "DNT": ["dineutronium"],
+    "AT": ["astatine"],
+    "VOLCANIC": ["volcanic"],
+    "OSMIRIDIUM": ["osmiridium"],
+    "CDALLOY": ["cdalloy"],
+    "ANY_HIGHEXPLOSIVE": [],
+    "ANY_SMOKELESS": [],
     "ANY_RUBBER": ["rubber"],
     "ANY_RESISTANTALLOY": ["tcalloy", "cdalloy"],
     "ANY_CONCRETE": ["concrete_smooth"],
@@ -109,6 +118,7 @@ SHAPE_CANDIDATES = {
     "wireDense": ["{m}_dense_wire", "wire_dense_{m}", "{m}_wire"],
     "bolt": ["{m}_bolt", "bolt_{m}"],
     "dust": ["powder_{m}", "{m}_dust", "dust_{m}"],
+    "gem": ["gem_{m}", "{m}_gem"],
     "nugget": ["nugget_{m}", "{m}_nugget"],
     "billet": ["billet_{m}", "{m}_billet"],
     "any": ["{m}"],
@@ -155,6 +165,13 @@ ITEM_MAP = {
     "ModItems.turbine_titanium": "turbine_titanium",
     "ModItems.flywheel_beryllium": "flywheel_beryllium",
     "ModItems.reactor_core": "reactor_core",
+    "ModItems.upgrade_speed_1": "upgrade_speed_1",
+    "ModItems.upgrade_speed_2": "upgrade_speed_2",
+    "ModItems.upgrade_speed_3": "upgrade_speed_3",
+    "ModItems.upgrade_overdrive_1": "upgrade_overdrive_1",
+    "ModItems.early_explosive_lenses": "early_explosive_lenses",
+    "ModItems.fleija_propellant": "fleija_propellant",
+    "ModBlocks.det_cord": "det_cord",
     "ModItems.canister_empty": "canister_empty",
     "ModItems.hazmat_cloth": "hazmat_cloth",
     "ModItems.asbestos_cloth": "asbestos_cloth",
@@ -264,7 +281,7 @@ def known_ids() -> set[str]:
     helper = re.compile(
         r'(?:registerParts|registerIngot|registerNugget|registerLoreIngot|registerItem|'
         r'registerBlock|registerMachine|registerResource|registerBillet|reg1|'
-        r'registerPowder|registerFuelPowder|ore|reg)\(\s*"([a-z][a-z0-9_]*)"'
+        r'registerPowder|registerFuelPowder|registerUpgrade|ore|reg|parts)\(\s*"([a-z][a-z0-9_]*)"'
     )
     for p in java.rglob("*.java"):
         extra.update(helper.findall(p.read_text(errors="ignore")))
@@ -494,6 +511,14 @@ def resolve_ore(mat: str, shape: str, n: int, known: set[str]) -> tuple[str, int
         if "concrete_smooth" in known:
             return "hbm:concrete_smooth", n
         return None
+    if mat == "ANY_PLASTIC":
+        return "tag:hbm:any_plastic", n
+    if mat == "ANY_HARDPLASTIC":
+        return "tag:hbm:any_hardplastic", n
+    if mat == "ANY_HIGHEXPLOSIVE":
+        return "tag:hbm:any_highexplosive", n
+    if mat == "ANY_SMOKELESS":
+        return "tag:hbm:any_smokeless", n
     tokens = MAT.get(mat)
     if tokens is None:
         tokens = [mat.lower()]

@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_aluminium"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:det_cord"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_saturnite"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 20
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:early_explosive_lenses",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

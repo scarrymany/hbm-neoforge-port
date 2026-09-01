@@ -41,6 +41,7 @@ public final class FusionBlocks {
     public static DeferredBlock<IcfControllerBlock> ICF_CONTROLLER;
     public static DeferredBlock<IcfPressBlock> ICF_PRESS;
     public static DeferredBlock<WatzReactorBlock> WATZ_REACTOR;
+    public static DeferredBlock<PlasmaForgeBlock> FUSION_PLASMA_FORGE;
 
     private FusionBlocks() {
     }
@@ -50,6 +51,7 @@ public final class FusionBlocks {
         ICF_CONTROLLER = registerBlock("machine_icf_controller", () -> new IcfControllerBlock(MACHINE_PROPS));
         ICF_PRESS = registerBlock("machine_icf_press", () -> new IcfPressBlock(MACHINE_PROPS));
         WATZ_REACTOR = registerBlock("machine_watz_reactor", () -> new WatzReactorBlock(MACHINE_PROPS));
+        FUSION_PLASMA_FORGE = registerBlock("fusion_plasma_forge", () -> new PlasmaForgeBlock(MACHINE_PROPS));
 
         FusionBlockEntities.registerAll();
         FusionMenus.registerAll();

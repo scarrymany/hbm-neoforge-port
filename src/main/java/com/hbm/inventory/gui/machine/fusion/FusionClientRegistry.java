@@ -22,5 +22,6 @@ public final class FusionClientRegistry {
         event.register(FusionMenus.ICF_REACTOR.get(), IcfReactorScreen::new);
         event.register(FusionMenus.ICF_PRESS.get(), IcfPressScreen::new);
         event.register(FusionMenus.WATZ_REACTOR.get(), WatzReactorScreen::new);
+        event.register(FusionMenus.FUSION_PLASMA_FORGE.get(), PlasmaForgeScreen::new);
     }
 }

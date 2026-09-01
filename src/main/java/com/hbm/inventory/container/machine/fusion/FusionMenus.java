@@ -2,6 +2,7 @@ package com.hbm.inventory.container.machine.fusion;
 
 import com.hbm.blockentity.machine.fusion.IcfPressBlockEntity;
 import com.hbm.blockentity.machine.fusion.IcfReactorBlockEntity;
+import com.hbm.blockentity.machine.fusion.PlasmaForgeBlockEntity;
 import com.hbm.blockentity.machine.fusion.WatzReactorBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -20,6 +21,7 @@ public final class FusionMenus {
     public static DeferredHolder<MenuType<?>, MenuType<IcfReactorMenu>> ICF_REACTOR;
     public static DeferredHolder<MenuType<?>, MenuType<IcfPressMenu>> ICF_PRESS;
     public static DeferredHolder<MenuType<?>, MenuType<WatzReactorMenu>> WATZ_REACTOR;
+    public static DeferredHolder<MenuType<?>, MenuType<PlasmaForgeMenu>> FUSION_PLASMA_FORGE;
 
     private FusionMenus() {
     }
@@ -31,6 +33,8 @@ public final class FusionMenus {
                 new IcfPressMenu(id, inv, (IcfPressBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         WATZ_REACTOR = reg("machine_watz_reactor", (id, inv, buf) ->
                 new WatzReactorMenu(id, inv, (WatzReactorBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FUSION_PLASMA_FORGE = reg("fusion_plasma_forge", (id, inv, buf) ->
+                new PlasmaForgeMenu(id, inv, (PlasmaForgeBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

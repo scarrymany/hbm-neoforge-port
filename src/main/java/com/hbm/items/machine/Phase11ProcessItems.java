@@ -69,6 +69,17 @@ public final class Phase11ProcessItems {
         PART_CARBON = parts("part_carbon");
         PART_COPPER = parts("part_copper");
         PART_PLUTONIUM = parts("part_plutonium");
+        // CE ModItems.java sulfur / niter dusts (not crystal_*). Gates chem.uf6 / meatprocessing.
+        parts("sulfur");
+        parts("niter");
+        // CE EnumCasingType flatten — AmmoPressRecipes.java:47-59
+        parts("casing_small");
+        parts("casing_large");
+        parts("casing_small_steel");
+        parts("casing_large_steel");
+        parts("casing_shotshell");
+        parts("casing_buckshot");
+        parts("casing_buckshot_advanced");
 
         for (ItemEnums.EnumTarType type : ItemEnums.EnumTarType.VALUES) {
             parts("oil_tar_" + type.name().toLowerCase());

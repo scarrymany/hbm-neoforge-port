@@ -32,8 +32,8 @@ import java.util.List;
  * {@code chem.coltancleaning}/{:293}, {@code chem.coltancrystal}/{:304},
  * explosives {@code chem.cordite}/{:310} {@code chem.rocketfuel}/{:315}
  * {@code chem.dynamite}/{:320} {@code chem.tnt}/{:324} {@code chem.tatb}/{:329}
- * {@code chem.napalm}/{:339}. Still skipped: {@code chem.meatprocessing} (:235 glyphid meat),
- * {@code chem.uf6} (:361 sulfur item).
+ * {@code chem.napalm}/{:339}. Landed leftover: {@code chem.hydrogencoke} (:46),
+ * {@code chem.meatprocessing} (:235), {@code chem.uf6} (:361).
  */
 public final class ChemPlantRecipes {
 
@@ -51,6 +51,13 @@ public final class ChemPlantRecipes {
         // ChemicalPlantRecipes.java:41
         RECIPES.add(new ChemPlantRecipe("chem.hydrogen", 20, 400,
                 new AStack[]{OreDictStack.ofCommonTag("coals")},
+                new FluidStack[]{new FluidStack(Fluids.WATER, 8_000)},
+                new ItemStack[0],
+                new FluidStack(Fluids.HYDROGEN, 500)));
+
+        // :46 ANY_COKE.gem()
+        RECIPES.add(new ChemPlantRecipe("chem.hydrogencoke", 20, 400,
+                new AStack[]{OreDictStack.ofHbmTag("any_coke", 1)},
                 new FluidStack[]{new FluidStack(Fluids.WATER, 8_000)},
                 new ItemStack[0],
                 new FluidStack(Fluids.HYDROGEN, 500)));
@@ -328,6 +335,13 @@ public final class ChemPlantRecipes {
                 new ItemStack[0],
                 new FluidStack(Fluids.ENDERJUICE, 100)));
 
+        // :235 KEY_GLYPHID_MEAT ×3 → sulfur/niter + SALIENT
+        RECIPES.add(new ChemPlantRecipe("chem.meatprocessing", 200, 200,
+                new AStack[]{new ComparableStack(item("glyphid_meat"), 3)},
+                new FluidStack[]{new FluidStack(Fluids.WATER, 1_000)},
+                new ItemStack[]{new ItemStack(item("sulfur"), 4), new ItemStack(item("niter"), 3)},
+                new FluidStack(Fluids.SALIENT, 250)));
+
         // :241 deco_steel / deco_rusty_steel
         RECIPES.add(new ChemPlantRecipe("chem.rustysteel", 40, 100,
                 new AStack[]{new ComparableStack(block("deco_steel"), 8)},
@@ -481,6 +495,13 @@ public final class ChemPlantRecipes {
                 new FluidStack[]{new FluidStack(Fluids.PEROXIDE, 500)},
                 new ItemStack[]{new ItemStack(BilletPowderItems.POWDER_YELLOWCAKE.get())},
                 (FluidStack) null));
+
+        // :361 powder_yellowcake + F.dust ×4 → sulfur ×2 + UF6
+        RECIPES.add(new ChemPlantRecipe("chem.uf6", 100, 500,
+                new AStack[]{new ComparableStack(BilletPowderItems.POWDER_YELLOWCAKE.get()), new ComparableStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get(), 4)},
+                new FluidStack[]{new FluidStack(Fluids.WATER, 1_000)},
+                new ItemStack[]{new ItemStack(item("sulfur"), 2)},
+                new FluidStack(Fluids.UF6, 1_200)));
 
         // :367
         RECIPES.add(new ChemPlantRecipe("chem.puf6", 200, 500,
