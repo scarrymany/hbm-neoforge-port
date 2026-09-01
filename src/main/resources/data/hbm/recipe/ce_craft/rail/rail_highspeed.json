@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S S",
+    "SIS",
+    "S S"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_steel"
+    },
+    "I": {
+      "item": "hbm:plate_iron"
+    }
+  },
+  "result": {
+    "id": "hbm:rail_highspeed",
+    "count": 16
+  }
+}

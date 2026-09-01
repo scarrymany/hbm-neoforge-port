@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "II",
+    "SS",
+    "II"
+  ],
+  "key": {
+    "I": {
+      "tag": "minecraft:planks"
+    },
+    "S": {
+      "item": "hbm:plate_iron"
+    }
+  },
+  "result": {
+    "id": "hbm:door_office",
+    "count": 1
+  }
+}

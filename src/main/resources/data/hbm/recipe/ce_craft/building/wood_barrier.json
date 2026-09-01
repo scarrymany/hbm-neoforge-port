@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SFS",
+    "SFS"
+  ],
+  "key": {
+    "S": {
+      "tag": "minecraft:wooden_slabs"
+    },
+    "F": {
+      "tag": "c:fences/wooden"
+    }
+  },
+  "result": {
+    "id": "hbm:wood_barrier",
+    "count": 8
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    "SDS",
+    " S "
+  ],
+  "key": {
+    "S": {
+      "tag": "hbm:any_plastic"
+    },
+    "D": {
+      "item": "hbm:powder_red_copper"
+    }
+  },
+  "result": {
+    "id": "hbm:record_ss",
+    "count": 1
+  }
+}

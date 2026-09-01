@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "SSS",
+    "BBB"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_steel"
+    },
+    "G": {
+      "item": "hbm:plate_gold"
+    },
+    "S": {
+      "item": "hbm:steel_scaffold"
+    },
+    "B": {
+      "item": "hbm:steel_beam"
+    }
+  },
+  "result": {
+    "id": "hbm:seg_20",
+    "count": 1
+  }
+}

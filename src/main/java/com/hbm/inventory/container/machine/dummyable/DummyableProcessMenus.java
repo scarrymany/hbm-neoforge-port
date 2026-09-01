@@ -24,6 +24,12 @@ import com.hbm.blockentity.machine.dummyable.MachineRadGenBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineTurbofanBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineVacuumDistillBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineWoodBurnerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.FurnaceIronBlockEntity;
+import com.hbm.blockentity.machine.dummyable.FurnaceSteelBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeaterFireboxBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeaterOilburnerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeaterOvenBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineSawmillBlockEntity;
 import com.hbm.blockentity.machine.dummyable.WasteDrumBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -59,6 +65,12 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<RadGenMenu>> MACHINE_RADGEN;
     public static DeferredHolder<MenuType<?>, MenuType<HephaestusMenu>> MACHINE_HEPHAESTUS;
     public static DeferredHolder<MenuType<?>, MenuType<WoodBurnerMenu>> MACHINE_WOOD_BURNER;
+    public static DeferredHolder<MenuType<?>, MenuType<FurnaceIronMenu>> FURNACE_IRON;
+    public static DeferredHolder<MenuType<?>, MenuType<FurnaceSteelMenu>> FURNACE_STEEL;
+    public static DeferredHolder<MenuType<?>, MenuType<FireboxMenu>> HEATER_FIREBOX;
+    public static DeferredHolder<MenuType<?>, MenuType<HeaterOvenMenu>> HEATER_OVEN;
+    public static DeferredHolder<MenuType<?>, MenuType<OilburnerMenu>> HEATER_OILBURNER;
+    public static DeferredHolder<MenuType<?>, MenuType<SawmillMenu>> MACHINE_SAWMILL;
 
     private DummyableProcessMenus() {
     }
@@ -114,6 +126,18 @@ public final class DummyableProcessMenus {
                 new HephaestusMenu(id, inv, (MachineHephaestusBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_WOOD_BURNER = reg("machine_wood_burner", (id, inv, buf) ->
                 new WoodBurnerMenu(id, inv, (MachineWoodBurnerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FURNACE_IRON = reg("furnace_iron", (id, inv, buf) ->
+                new FurnaceIronMenu(id, inv, (FurnaceIronBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FURNACE_STEEL = reg("furnace_steel", (id, inv, buf) ->
+                new FurnaceSteelMenu(id, inv, (FurnaceSteelBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        HEATER_FIREBOX = reg("heater_firebox", (id, inv, buf) ->
+                new FireboxMenu(id, inv, (HeaterFireboxBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        HEATER_OVEN = reg("heater_oven", (id, inv, buf) ->
+                new HeaterOvenMenu(id, inv, (HeaterOvenBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        HEATER_OILBURNER = reg("heater_oilburner", (id, inv, buf) ->
+                new OilburnerMenu(id, inv, (HeaterOilburnerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_SAWMILL = reg("machine_sawmill", (id, inv, buf) ->
+                new SawmillMenu(id, inv, (MachineSawmillBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

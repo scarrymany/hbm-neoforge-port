@@ -33,6 +33,12 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineRadGenBlockEntity>> MACHINE_RADGEN;
     public static Supplier<BlockEntityType<MachineHephaestusBlockEntity>> MACHINE_HEPHAESTUS;
     public static Supplier<BlockEntityType<MachineWoodBurnerBlockEntity>> MACHINE_WOOD_BURNER;
+    public static Supplier<BlockEntityType<FurnaceIronBlockEntity>> FURNACE_IRON;
+    public static Supplier<BlockEntityType<FurnaceSteelBlockEntity>> FURNACE_STEEL;
+    public static Supplier<BlockEntityType<HeaterFireboxBlockEntity>> HEATER_FIREBOX;
+    public static Supplier<BlockEntityType<HeaterOvenBlockEntity>> HEATER_OVEN;
+    public static Supplier<BlockEntityType<HeaterOilburnerBlockEntity>> HEATER_OILBURNER;
+    public static Supplier<BlockEntityType<MachineSawmillBlockEntity>> MACHINE_SAWMILL;
 
     private DummyableProcessBlockEntities() {
     }
@@ -137,6 +143,30 @@ public final class DummyableProcessBlockEntities {
         MACHINE_WOOD_BURNER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_wood_burner", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineWoodBurnerBlockEntity(MACHINE_WOOD_BURNER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_WOOD_BURNER.get()
+        ).build(null));
+        FURNACE_IRON = ModBlocks.BLOCK_ENTITY_TYPES.register("furnace_iron", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new FurnaceIronBlockEntity(FURNACE_IRON.get(), pos, state),
+                DummyableProcessBlocks.FURNACE_IRON.get()
+        ).build(null));
+        FURNACE_STEEL = ModBlocks.BLOCK_ENTITY_TYPES.register("furnace_steel", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new FurnaceSteelBlockEntity(FURNACE_STEEL.get(), pos, state),
+                DummyableProcessBlocks.FURNACE_STEEL.get()
+        ).build(null));
+        HEATER_FIREBOX = ModBlocks.BLOCK_ENTITY_TYPES.register("heater_firebox", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new HeaterFireboxBlockEntity(HEATER_FIREBOX.get(), pos, state),
+                DummyableProcessBlocks.HEATER_FIREBOX.get()
+        ).build(null));
+        HEATER_OVEN = ModBlocks.BLOCK_ENTITY_TYPES.register("heater_oven", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new HeaterOvenBlockEntity(HEATER_OVEN.get(), pos, state),
+                DummyableProcessBlocks.HEATER_OVEN.get()
+        ).build(null));
+        HEATER_OILBURNER = ModBlocks.BLOCK_ENTITY_TYPES.register("heater_oilburner", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new HeaterOilburnerBlockEntity(HEATER_OILBURNER.get(), pos, state),
+                DummyableProcessBlocks.HEATER_OILBURNER.get()
+        ).build(null));
+        MACHINE_SAWMILL = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_sawmill", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineSawmillBlockEntity(MACHINE_SAWMILL.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_SAWMILL.get()
         ).build(null));
     }
 }

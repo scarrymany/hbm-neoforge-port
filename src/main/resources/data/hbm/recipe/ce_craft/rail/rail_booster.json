@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S S",
+    "CIC",
+    "SRS"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_steel"
+    },
+    "I": {
+      "item": "hbm:plate_iron"
+    },
+    "R": {
+      "item": "hbm:ingot_red_copper"
+    },
+    "C": {
+      "item": "hbm:coil_copper"
+    }
+  },
+  "result": {
+    "id": "hbm:rail_booster",
+    "count": 6
+  }
+}

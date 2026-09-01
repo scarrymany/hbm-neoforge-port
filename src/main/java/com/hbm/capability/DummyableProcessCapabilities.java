@@ -157,5 +157,20 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getFluidHandlerCapability(side));
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_WOOD_BURNER.get(),
                 (be, side) -> be.getEnergyStorageCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.FURNACE_IRON.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.FURNACE_STEEL.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.HEATER_FIREBOX.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.HEATER_OVEN.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.HEATER_OILBURNER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.HEATER_OILBURNER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_SAWMILL.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
     }
 }

@@ -681,6 +681,7 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.solarBoiler", "Solar Tower Boiler"); // CE tile.machine_solar_boiler.name (no dedicated CE GUI class - port-added GUI)
         this.add("container.solarMirror", "Heliostat Mirror"); // CE tile.solar_mirror.name (no dedicated CE GUI class - port-added GUI)
         this.add("container.steamEngine", "Steam Engine"); // CE tile.machine_steam_engine.name (no dedicated CE GUI class - port-added GUI)
+        this.add("container.machineSawmill", "Stirling Sawmill"); // CE overlay-only; port-added GUI
         this.add("container.trainTramTrailer", "Tram Trailer"); // no CE source found at all (CE grep turned up nothing for a trailer variant) - hand-authored, consistent with container.trainTram="Electric Flat Bed Tram"
         this.add("container.watz", "Watz Powerplant"); // CE GUIWatz draws no title at all; CE tile.watz.name (distinct from achievement.watz, which is unrelated flavor text)
     }

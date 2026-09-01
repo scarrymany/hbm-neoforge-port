@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "II",
+    "SS",
+    "II"
+  ],
+  "key": {
+    "I": {
+      "item": "hbm:plate_iron"
+    },
+    "S": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:door_metal",
+    "count": 1
+  }
+}

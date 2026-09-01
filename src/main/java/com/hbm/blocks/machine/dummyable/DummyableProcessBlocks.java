@@ -20,7 +20,8 @@ import java.util.function.Supplier;
  * CE furnace_combination / blast / rock mill / annihilator / press / rotary furnace / fraction tower /
  * waste_drum / compressor / coker / catalytic cracker / catalytic reformer / hydrotreater /
  * vacuum distill / radiolysis / flare / epress / pyrooven / arc furnace / exposure /
- * ore slopper / turbofan / radgen / hephaestus / wood burner.
+ * ore slopper / turbofan / radgen / hephaestus / wood burner /
+ * furnace iron / furnace steel / firebox / oven / oilburner / sawmill.
  */
 public final class DummyableProcessBlocks {
 
@@ -52,6 +53,12 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineRadGenBlock> MACHINE_RADGEN;
     public static DeferredBlock<MachineHephaestusBlock> MACHINE_HEPHAESTUS;
     public static DeferredBlock<MachineWoodBurnerBlock> MACHINE_WOOD_BURNER;
+    public static DeferredBlock<FurnaceIronBlock> FURNACE_IRON;
+    public static DeferredBlock<FurnaceSteelBlock> FURNACE_STEEL;
+    public static DeferredBlock<HeaterFireboxBlock> HEATER_FIREBOX;
+    public static DeferredBlock<HeaterOvenBlock> HEATER_OVEN;
+    public static DeferredBlock<HeaterOilburnerBlock> HEATER_OILBURNER;
+    public static DeferredBlock<MachineSawmillBlock> MACHINE_SAWMILL;
 
     private DummyableProcessBlocks() {
     }
@@ -82,6 +89,12 @@ public final class DummyableProcessBlocks {
         MACHINE_RADGEN = registerBlock("machine_radgen", () -> new MachineRadGenBlock(MACHINE_PROPS));
         MACHINE_HEPHAESTUS = registerBlock("machine_hephaestus", () -> new MachineHephaestusBlock(MACHINE_PROPS));
         MACHINE_WOOD_BURNER = registerBlock("machine_wood_burner", () -> new MachineWoodBurnerBlock(MACHINE_PROPS));
+        FURNACE_IRON = registerBlock("furnace_iron", () -> new FurnaceIronBlock(MACHINE_PROPS));
+        FURNACE_STEEL = registerBlock("furnace_steel", () -> new FurnaceSteelBlock(MACHINE_PROPS));
+        HEATER_FIREBOX = registerBlock("heater_firebox", () -> new HeaterFireboxBlock(MACHINE_PROPS));
+        HEATER_OVEN = registerBlock("heater_oven", () -> new HeaterOvenBlock(MACHINE_PROPS));
+        HEATER_OILBURNER = registerBlock("heater_oilburner", () -> new HeaterOilburnerBlock(MACHINE_PROPS));
+        MACHINE_SAWMILL = registerBlock("machine_sawmill", () -> new MachineSawmillBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

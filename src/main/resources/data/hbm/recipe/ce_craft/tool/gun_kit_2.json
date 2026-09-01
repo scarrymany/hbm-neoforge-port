@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:gun_kit_1"
+    },
+    {
+      "item": "hbm:wrench"
+    },
+    {
+      "item": "hbm:ducttape"
+    }
+  ],
+  "result": {
+    "id": "hbm:gun_kit_2",
+    "count": 1
+  }
+}
