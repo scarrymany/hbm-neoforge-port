@@ -9,5 +9,6 @@
 - Vanilla **1895 / 97.2%**. Machine **1682 / 83.7%**. Blocks **946 / 80.9%**.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Weighted ≥99%. Category holes remain (blocks 223, machine 327, vanilla 55). Not content-complete.
+- Verified: `compileJava` 0, `runServer` **Done (4.679s)** / 3943 recipes, port 25566.
 - No new Release (Dummyable wave, not a closed hole family). `v0.0.1-rc2` stays.
 - `master` untouched.
