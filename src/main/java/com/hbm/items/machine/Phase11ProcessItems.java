@@ -19,7 +19,9 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * {@code :1287} {@code pellet_charged}, {@code :1325} {@code oil_tar}/{@code EnumTarType},
  * {@code :1330-1333} {@code solid_fuel*}, {@code :1155} {@code dust}, {@code :1234}/{:1237}
  * cordite/ball_tnt, {@code :2314+} {@code particle_*}, {@code :943} {@code bio_wafer},
- * {@code :1842} {@code upgrade_template}, {@code :2461}/{@code :2492-2535} missile parts.
+ * {@code :1842} {@code upgrade_template}, {@code :2461}/{@code :2492-2535} missile parts,
+ * {@code :1151-1154} scrap family, {@code :1310} {@code pipes_steel},
+ * {@code :1994-2000} debris_* (ShredderRecipes.java:208/:347/:405-410).
  */
 public final class Phase11ProcessItems {
 
@@ -59,6 +61,20 @@ public final class Phase11ProcessItems {
         NUCLEAR_WASTE_TINY = nuke("nuclear_waste_tiny");
         NUCLEAR_WASTE_VITRIFIED = nuke("nuclear_waste_vitrified");
         DUST = parts("dust");
+        // CE ModItems.java:1151-1154 — ShredderRecipes.java:208 / :352 / :360 / :401
+        parts("scrap");
+        parts("scrap_nuclear");
+        parts("scrap_oil");
+        hidden("scrap_plastic");
+        // CE ModItems.java:1310 — ShredderRecipes.java:347
+        parts("pipes_steel");
+        // CE ModItems.java:1994-2000 — ShredderRecipes.java:405-410
+        control("debris_concrete");
+        control("debris_shrapnel");
+        control("debris_exchanger");
+        control("debris_element");
+        control("debris_metal");
+        control("debris_graphite");
         SOLID_FUEL = fuel("solid_fuel", 3200);
         // CE ModItems.java:1291 ItemFuel 4800 — CrystallizerRecipes.java:99
         fuel("coal_infernal", 4800);

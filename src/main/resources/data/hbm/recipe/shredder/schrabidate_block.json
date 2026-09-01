@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:schrabidate_block"
+  },
+  "output": {
+    "id": "hbm:powder_schrabidate",
+    "count": 9
+  },
+  "duration": 60
+}

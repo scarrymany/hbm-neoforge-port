@@ -1,11 +1,11 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "minecraft:player_head"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
-    "count": 1
+    "id": "hbm:biomass",
+    "count": 4
   },
   "duration": 60
 }

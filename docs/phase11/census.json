@@ -1,14 +1,14 @@
 {
-  "weighted_pct": 104.3,
-  "unweighted_pct": 103.2,
+  "weighted_pct": 105.7,
+  "unweighted_pct": 103.8,
   "ce_sum": 7767,
-  "port_sum": 8104,
+  "port_sum": 8209,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2586,
-      "pct": 138.8
+      "port": 2590,
+      "pct": 139.0
     },
     {
       "cat": "blocks",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1815,
-      "pct": 90.3
+      "port": 1916,
+      "pct": 95.4
     },
     {
       "cat": "advancements",
@@ -59,7 +59,7 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2586,
+      "port": 2590,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
@@ -171,7 +171,7 @@
         "SuperComputerRecipes": 14,
         "WasteDrumRecipes": 20
       },
-      "port_json": 758,
+      "port_json": 859,
       "port_java": {
         "AmmoPressRecipes": 88,
         "AnnihilatorRecipes": 15,
@@ -219,7 +219,7 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 95
       },
-      "port": 1815,
+      "port": 1916,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,
@@ -229,7 +229,7 @@
         "hbm:grenade_crafting": 1,
         "hbm:rbmk_fuel_recycle": 1,
         "hbm:scrap_split": 1,
-        "hbm:shredder": 100
+        "hbm:shredder": 201
       }
     },
     "advancements": {
@@ -237,11 +237,11 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2586,
-      "reachable_via_recipe_or_loot": 1559,
+      "port_items": 2590,
+      "reachable_via_recipe_or_loot": 1567,
       "includes_machine_tables": true,
-      "pct": 60.3
+      "pct": 60.5
     }
   },
-  "recipe_json_total": 2656
+  "recipe_json_total": 2757
 }

@@ -36,14 +36,20 @@ import java.util.Optional;
  * {@link #canExtractItem}), 27/28 left/right {@link ItemBlades}, 29 battery.
  * <p>
  * <b>Recipe lookup</b>: {@link ProcessingRecipes#SHREDDER_TYPE} ({@link HbmSimpleRecipe}, JSON-backed -
- * see that class's own javadoc), replacing CE's hardcoded {@code ShredderRecipes} HashMap. One real
- * deviation from CE, documented: CE's {@code getShredderResult} always returns <i>something</i> (a
- * {@code ModItems.scrap} fallback on a miss) - this port has no equivalent generic "scrap" item
- * registered yet (confirmed absent - only material-specific {@code scraps_<material>} items exist),
- * so a no-match item here simply has no recipe ({@link #isItemValidForSlot} rejects it, matching how
- * {@link com.hbm.inventory.recipes.CrystallizerRecipes} already has a real "no recipe" state) rather
- * than silently producing a placeholder item. <b>TODO(items-followup)</b>: swap in a real fallback
- * once a generic scrap item exists.
+ * see that class's own javadoc), replacing CE's hardcoded {@code ShredderRecipes} HashMap.
+ * {@code ModItems.scrap} is registered; the explicit {@code scrap → dust} row is JSON
+ * ({@code ShredderRecipes.java:208}). Miss-fallback still rejects rather than silently emitting
+ * scrap — TODO(CE: ShredderRecipes.java:103-115).
+ * OreDict {@code registerPost} auto-dust is 1.12-integration, not ported —
+ * TODO(CE: ShredderRecipes.java:119-201).
+ * {@code dustLapis} members other than {@code powder_lapis} —
+ * TODO(CE: ShredderRecipes.java:246).
+ * Old {@code ItemBedrockOre} wildcard (not {@code bedrock_ore_new_*}) —
+ * TODO(CE: ShredderRecipes.java:348).
+ * Sellafield LEVEL 1-5 yields (inventory flatten is one BlockItem = CE meta 0) —
+ * TODO(CE: ShredderRecipes.java:353-357).
+ * Bobbleheads (block not registered) — TODO(CE: ShredderRecipes.java:400-402).
+ * GC/AR moon-turf (commented out in CE) — TODO(CE: ShredderRecipes.java:412-423).
  */
 public class MachineShredderBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {

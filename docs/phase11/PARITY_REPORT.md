@@ -8,24 +8,23 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.328s)** on wiped world port 25566, **3946 recipes**.
-No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0.
+`./gradlew runServer` pending this revision (pre-test commit). No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **104.3%** (8104 / 7767) |
-| **Unweighted** (mean of category %) | **103.2%** |
-| Recipe/loot + machine-table reachability | **60.3%** (1559 / 2586) |
+| **Weighted** (Σport / ΣCE) | **105.7%** (8209 / 7767) |
+| **Unweighted** (mean of category %) | **103.8%** |
+| Recipe/loot + machine-table reachability | **60.5%** (1567 / 2590) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 161**, **machine 194**, **vanilla 52**.
-Weighted **104.3%**. Category holes remain. Not content-complete.
+Largest remaining holes: **blocks 161**, **machine 93**, **vanilla 52**.
+Weighted **105.7%**. Category holes remain. Not content-complete.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -33,19 +32,38 @@ Weighted **104.3%**. Category holes remain. Not content-complete.
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2586 | **138.8%** | +`block_slag` BlockItem |
-| Blocks | 1169 | 1008 | **86.2%** | +`block_slag` (CE id; not Mats `slag_block`) |
+| Items (flattened ids) | 1863 | 2590 | **139.0%** | +`scrap`/`scrap_nuclear`/`scrap_oil`/`pipes_steel` (`parts()`). `hidden(scrap_plastic)` + 6 `control(debris_*)` registered, census regex misses those helpers |
+| Blocks | 1169 | 1008 | **86.2%** | unchanged |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950. +3 ducrete CraftingManager rows |
-| Machine recipes | ~2009 | 1815 | **90.3%** | Census regex. ChemPlant unique **72=72** (145 was double-count). Crystallizer unique **303/~309**. Centrifuge 75/78 AE2 skip. |
+| Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950 |
+| Machine recipes | ~2009 | 1916 | **95.4%** | +101 shredder JSON. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201 JSON / 200 inputs** vs CE **177 sites / ~211** expanded. Cyclotron unique **42=42** (regex 43 = helper). Centrifuge 75/78 AE2 skip. |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (ChemPlant verify + Crystallizer)
+## What changed this wave (Shredder + Cyclotron start)
+
+- Family: **Shredder**. Leftover CE `registerDefaults` rows → JSON `data/hbm/recipe/shredder/`
+  (TE already queries `ProcessingRecipes.SHREDDER_TYPE`). **201** files, **200** unique
+  inputs (`quartz.json` + `quartz_item.json` both key `minecraft:quartz` — not triplicated).
+- Registered I/O with existing CE png/lang/models: `scrap`, `scrap_nuclear`, `scrap_oil`,
+  `scrap_plastic` (CE tab=null → hidden), `pipes_steel`, `debris_{concrete,shrapnel,exchanger,element,metal,graphite}`.
+- Fixed `obsidian.json` output to `hbm:gravel_obsidian` (CE `:229`; was vanilla gravel).
+- Wood OreDict loops → 3 tag recipes (`minecraft:logs`/`planks`/`saplings`), not per-wood files.
+- `schrabidate_block` is Mats BLOCK autogen of CE `block_schrabidate` (not a second id).
+- Sellafield flatten: one BlockItem → `scrap_nuclear`×1 (CE `:352` meta 0).
+- Cited skips: `TODO(CE: ShredderRecipes.java:119-201)` registerPost,
+  `:103-115` miss→scrap fallback (scrap exists; TE still rejects no-match),
+  `:246` other `dustLapis`, `:348` old `bedrock_ore`, `:353-357` sellafield LEVEL 1-5,
+  `:400-402` bobbleheads, `:412-423` GC/AR (commented in CE).
+- Cyclotron: **42** unique CE rows now in `CyclotronRecipes` (was 12). Catalysts
+  `part_*` (already registered). Li+gold → `nugget_mercury`. `dustPhosphorus` live
+  member = `powder_fire`.
+
+## Prior wave (ChemPlant verify + Crystallizer)
 
 - ChemPlant: **72 unique `chem.*` names in CE = 72 in port**. Census 145 = `this.register` +
   `.register`. No rows added.

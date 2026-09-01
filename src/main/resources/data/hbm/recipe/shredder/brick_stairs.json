@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "minecraft:brick_stairs"
+  },
+  "output": {
+    "id": "minecraft:clay_ball",
+    "count": 3
+  },
+  "duration": 60
+}

@@ -1,11 +1,11 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "minecraft:green_wool"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
-    "count": 1
+    "id": "minecraft:string",
+    "count": 4
   },
   "duration": 60
 }

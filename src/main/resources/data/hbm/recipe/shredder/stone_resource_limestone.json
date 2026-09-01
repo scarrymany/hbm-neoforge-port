@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:stone_resource_limestone"
+  },
+  "output": {
+    "id": "hbm:powder_limestone",
+    "count": 4
+  },
+  "duration": 60
+}

@@ -1,11 +1,11 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "hbm:boxcar"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
-    "count": 1
+    "id": "hbm:powder_steel",
+    "count": 32
   },
   "duration": 60
 }

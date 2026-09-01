@@ -1,11 +1,11 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "tag": "minecraft:logs"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
-    "count": 1
+    "id": "hbm:powder_sawdust",
+    "count": 4
   },
   "duration": 60
 }

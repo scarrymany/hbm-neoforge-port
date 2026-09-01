@@ -1,10 +1,10 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "hbm:scrap"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
+    "id": "hbm:dust",
     "count": 1
   },
   "duration": 60

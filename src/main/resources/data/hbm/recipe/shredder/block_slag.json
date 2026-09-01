@@ -1,11 +1,11 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "hbm:block_slag"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
-    "count": 1
+    "id": "hbm:powder_cement",
+    "count": 4
   },
   "duration": 60
 }

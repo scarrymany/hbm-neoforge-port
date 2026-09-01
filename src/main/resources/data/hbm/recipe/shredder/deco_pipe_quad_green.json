@@ -1,10 +1,10 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "hbm:deco_pipe_quad_green"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
+    "id": "hbm:powder_steel",
     "count": 1
   },
   "duration": 60

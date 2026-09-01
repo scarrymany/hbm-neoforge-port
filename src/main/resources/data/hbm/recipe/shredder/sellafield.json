@@ -1,10 +1,10 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "hbm:sellafield"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
+    "id": "hbm:scrap_nuclear",
     "count": 1
   },
   "duration": 60

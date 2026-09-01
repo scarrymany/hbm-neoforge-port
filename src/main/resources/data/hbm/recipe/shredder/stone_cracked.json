@@ -1,10 +1,10 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "minecraft:obsidian"
+    "item": "hbm:stone_cracked"
   },
   "output": {
-    "id": "hbm:gravel_obsidian",
+    "id": "hbm:scrap_oil",
     "count": 1
   },
   "duration": 60

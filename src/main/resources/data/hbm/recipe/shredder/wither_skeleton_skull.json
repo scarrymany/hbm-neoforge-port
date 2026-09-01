@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "minecraft:wither_skeleton_skull"
+  },
+  "output": {
+    "id": "hbm:biomass",
+    "count": 4
+  },
+  "duration": 60
+}
