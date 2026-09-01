@@ -95,6 +95,10 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineChungusBlockEntity>> MACHINE_CHUNGUS;
     public static Supplier<BlockEntityType<MachineSatLinkBlockEntity>> MACHINE_SATLINK;
     public static Supplier<BlockEntityType<MachineTeleporterBlockEntity>> MACHINE_TELEPORTER;
+    public static Supplier<BlockEntityType<MachineFluidTankBlockEntity>> MACHINE_FLUIDTANK;
+    public static Supplier<BlockEntityType<MachineBigAssTankBlockEntity>> MACHINE_BIGASSTANK;
+    public static Supplier<BlockEntityType<MachineCompressorCompactBlockEntity>> MACHINE_COMPRESSOR_COMPACT;
+    public static Supplier<BlockEntityType<MachineSatLinkerBlockEntity>> MACHINE_SATLINKER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -464,6 +468,22 @@ public final class DummyableProcessBlockEntities {
         MACHINE_TELEPORTER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_teleporter", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineTeleporterBlockEntity(MACHINE_TELEPORTER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_TELEPORTER.get()
+        ).build(null));
+        MACHINE_FLUIDTANK = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_fluidtank", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineFluidTankBlockEntity(MACHINE_FLUIDTANK.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_FLUIDTANK.get()
+        ).build(null));
+        MACHINE_BIGASSTANK = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_bigasstank", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineBigAssTankBlockEntity(MACHINE_BIGASSTANK.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_BIGASSTANK.get()
+        ).build(null));
+        MACHINE_COMPRESSOR_COMPACT = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_compressor_compact", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineCompressorCompactBlockEntity(MACHINE_COMPRESSOR_COMPACT.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_COMPRESSOR_COMPACT.get()
+        ).build(null));
+        MACHINE_SATLINKER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_satlinker", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineSatLinkerBlockEntity(MACHINE_SATLINKER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_SATLINKER.get()
         ).build(null));
     }
 }

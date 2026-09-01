@@ -67,6 +67,9 @@ import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineForceFieldBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineMiningLaserBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineStrandCasterBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineFluidTankBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineBigAssTankBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineSatLinkerBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -143,6 +146,9 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<MiningLaserMenu>> MACHINE_MINING_LASER;
     public static DeferredHolder<MenuType<?>, MenuType<StrandCasterMenu>> MACHINE_STRAND_CASTER;
     public static DeferredHolder<MenuType<?>, MenuType<ForceFieldMenu>> MACHINE_FORCEFIELD;
+    public static DeferredHolder<MenuType<?>, MenuType<MachineFluidTankMenu>> MACHINE_FLUIDTANK;
+    public static DeferredHolder<MenuType<?>, MenuType<BigAssTankMenu>> MACHINE_BIGASSTANK;
+    public static DeferredHolder<MenuType<?>, MenuType<SatLinkerMenu>> MACHINE_SATLINKER;
 
     private DummyableProcessMenus() {
     }
@@ -282,6 +288,12 @@ public final class DummyableProcessMenus {
                 new StrandCasterMenu(id, inv, (MachineStrandCasterBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_FORCEFIELD = reg("machine_forcefield", (id, inv, buf) ->
                 new ForceFieldMenu(id, inv, (MachineForceFieldBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_FLUIDTANK = reg("machine_fluidtank", (id, inv, buf) ->
+                new MachineFluidTankMenu(id, inv, (MachineFluidTankBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_BIGASSTANK = reg("machine_bigasstank", (id, inv, buf) ->
+                new BigAssTankMenu(id, inv, (MachineBigAssTankBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_SATLINKER = reg("machine_satlinker", (id, inv, buf) ->
+                new SatLinkerMenu(id, inv, (MachineSatLinkerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

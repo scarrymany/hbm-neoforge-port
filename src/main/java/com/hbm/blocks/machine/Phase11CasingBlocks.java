@@ -34,8 +34,7 @@ public final class Phase11CasingBlocks {
         // machine_supercomputer is DummyableProcessBlocks (full TE).
         // machine_arc_furnace is DummyableProcessBlocks (full TE).
         // CE ModBlocks.java:1086-1087 / AssemblyMachineRecipes.java:320-323
-        // machine_compressor is DummyableProcessBlocks (full TE). Compact stays a casing.
-        registerBlock("machine_compressor_compact", () -> new BlockBase(MACHINE_PROPS));
+        // machine_compressor / machine_compressor_compact are DummyableProcessBlocks (live TE).
         // machine_epress is DummyableProcessBlocks (full TE).
         // machine_ore_slopper is DummyableProcessBlocks (full TE).
         // machine_mining_laser is DummyableProcessBlocks (live TE).
@@ -45,8 +44,7 @@ public final class Phase11CasingBlocks {
         registerBlock("machine_chemical_factory", () -> new BlockBase(MACHINE_PROPS));
         // machine_turbofan / machine_hephaestus / machine_radgen are DummyableProcessBlocks (full TEs).
         // machine_pyrooven / machine_exposure_chamber are DummyableProcessBlocks (full TEs).
-        registerBlock("machine_fluidtank", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_bigasstank", () -> new BlockBase(MACHINE_PROPS));
+        // machine_fluidtank / machine_bigasstank are DummyableProcessBlocks (live TE).
         registerBlock("reactor_research", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("reactor_zirnox", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("seal_frame", () -> new BlockBase(MACHINE_PROPS));
@@ -72,8 +70,7 @@ public final class Phase11CasingBlocks {
         registerBlock("turret_arty", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("turret_himars", () -> new BlockBase(MACHINE_PROPS));
         // barrel_steel is DummyableProcessBlocks (live TE).
-        // CE ModBlocks.java:958 / CraftingManager.java:647 (vanilla satlinker, ≠ machine_satlink)
-        registerBlock("machine_satlinker", () -> new BlockBase(MACHINE_PROPS));
+        // machine_satlinker is DummyableProcessBlocks (live TE, missile tab). ≠ machine_satlink.
         // pump_steam / pump_electric / machine_thresher / chimney_* / bm_power_box
         // are DummyableProcessBlocks (live TE). fluid_duct_exhaust is FluidDuctBlocks.
     }

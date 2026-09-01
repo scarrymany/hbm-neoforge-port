@@ -54,6 +54,11 @@
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),
   `machine_deuterium_tower` TODO(CE: AnvilRecipes.java:453-462), flatten holders,
   mold 16–28 TODO(CE: AnvilRecipes.java:626-635).
+- This Dummyable wave: `machine_fluidtank` `{2,0,1,1,2,2}` offset 1 + 256k/mode/GUI
+  `gui_tank.png`; `machine_bigasstank` `{5,0,4,4,4,4}` offset 6 + 16M/barrel GUI
+  `gui_barrel.png`; `machine_compressor_compact` `{2,0,1,1,3,3}` offset 1 reuses
+  compressor menu; `machine_satlinker` 1×1 `gui_sat_linker.png` missile tab.
+  Same CE ids. Cited TODOs (UniNodespace/TESR/OC/leak). No invent.
 - Live machines (CE has TE, **no GUI**): pumps/chimneys Dummyable+BE, thresher,
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.

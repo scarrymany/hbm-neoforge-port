@@ -15,6 +15,7 @@ import com.hbm.blocks.machine.MachineKeyForgeBlock;
 import com.hbm.blocks.machine.MachineMicrowaveBlock;
 import com.hbm.blocks.machine.MachineRtgFurnaceBlock;
 import com.hbm.blocks.generic.BMPowerBoxBlock;
+import com.hbm.blocks.machine.MachineSatLinkerBlock;
 import com.hbm.blocks.machine.MachineTeleLinkerBlock;
 import com.hbm.blocks.machine.MachineForceFieldBlock;
 import com.hbm.blocks.machine.MachineTeleporterBlock;
@@ -49,7 +50,8 @@ import java.util.function.Supplier;
  * conveyor press / mass storage /
  * telelinker / soyuz capsule / filing cabinet /
  * pump steam/electric / chimney brick/industrial / thresher / bm_power_box /
- * mining laser / strand caster / forcefield / chungus / satlink / teleporter.
+ * mining laser / strand caster / forcefield / chungus / satlink / teleporter /
+ * fluidtank / bigasstank / compressor compact / satlinker.
  */
 public final class DummyableProcessBlocks {
 
@@ -158,6 +160,10 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineChungusBlock> MACHINE_CHUNGUS;
     public static DeferredBlock<MachineSatLinkBlock> MACHINE_SATLINK;
     public static DeferredBlock<MachineTeleporterBlock> MACHINE_TELEPORTER;
+    public static DeferredBlock<MachineFluidTankBlock> MACHINE_FLUIDTANK;
+    public static DeferredBlock<MachineBigAssTankBlock> MACHINE_BIGASSTANK;
+    public static DeferredBlock<MachineCompressorCompactBlock> MACHINE_COMPRESSOR_COMPACT;
+    public static DeferredBlock<MachineSatLinkerBlock> MACHINE_SATLINKER;
 
     private DummyableProcessBlocks() {
     }
@@ -284,6 +290,20 @@ public final class DummyableProcessBlocks {
         MACHINE_TELEPORTER = registerBlock("machine_teleporter",
                 () -> new MachineTeleporterBlock(BlockBehaviour.Properties.of()
                         .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // CE ModBlocks.java:800 / :802 / :1087 / :958
+        MACHINE_FLUIDTANK = registerBlock("machine_fluidtank",
+                () -> new MachineFluidTankBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 20.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_BIGASSTANK = registerBlock("machine_bigasstank",
+                () -> new MachineBigAssTankBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_COMPRESSOR_COMPACT = registerBlock("machine_compressor_compact",
+                () -> new MachineCompressorCompactBlock(BlockBehaviour.Properties.of()
+                        .strength(10.0F, 20.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_SATLINKER = registerBlock("machine_satlinker",
+                () -> new MachineSatLinkerBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()),
+                ModCreativeTabs.MISSILE);
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

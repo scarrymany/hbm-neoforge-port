@@ -93,6 +93,48 @@ landmine / NITAN stay accepted.
 
 Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
 
+## This wave (leftover Dummyable casings → live TE)
+
+Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
+
+- **`machine_fluidtank`**: Dummyable `{2,0,1,1,2,2}` offset 1 + extras
+  `placed-dir ±1,±1` (`MachineFluidTank.java:79-143`). META≥12 core TE.
+  6 slots, tank **256000**, mode 0=in / 1=both / 2=out / 3=off.
+  `loadTank(2,3)` / `setType(0,1)` / `unloadTank(4,5)`. Antimatter →
+  explode 5F + `hasExploded`; highly corrosive → `hasExploded`.
+  GUI `gui_tank.png` 176×166 + mode blit 151,34 + bind. Caps item+fluid.
+  Comparator. Sneak+identifier sets type.
+  TODO(CE: TileEntityMachineFluidTank.java:198-235) UniNodespace pipe node;
+  TODO(CE: TileEntityMachineFluidTank.java:70) OC / IControllable / IClimbable / IRepairable;
+  TODO(CE: TileEntityMachineFluidTank.java:253-256) ExplosionVNT.makeAmat;
+  TODO(CE: TileEntityMachineFluidTank.java:263-370) leak/fire/pollute;
+  TODO(CE: MachineFluidTank.java:173-197) onBlockExploded + BombletZeta;
+  TODO(CE: RenderFluidTank.java:1) TESR.
+- **`machine_bigasstank`**: Dummyable `{5,0,4,4,4,4}` offset 6 + 6 XR fills
+  (`MachineBigAssTank.java:48-76`). ≠ `machine_bat9000`. Extends barrel:
+  6 slots, **16_000_000**, mode, `getReceiverSpeed`/`getProviderSpeed`
+  `max(50000,(max-fill)/100)` / `max(50000,fill/100)`. Antimatter destroy
+  + explode 10. ConPos `±dir*7`. Barrel GUI `gui_barrel.png` 176×166
+  (`guiID_barrel`). Caps item+fluid. Comparator. Sneak+identifier.
+  TODO(CE: TileEntityBarrel.java:247-286) UniNodespace buffer;
+  TODO(CE: TileEntityBarrel.java) tilt / floor pollute;
+  TODO(CE: MachineBigAssTank.java:44) ProxyCombo;
+  TODO(CE: RenderBigAssTank.java:1) TESR.
+- **`machine_compressor_compact`**: Dummyable `{2,0,1,1,3,3}` offset 1 + 6
+  extras y+1 (`MachineCompressorCompact.java:30-52`). Subclass of compressor
+  BE; only `getConPos` (6 ports) + client `fanSpin`. Reuses
+  `CompressorMenu`/`CompressorScreen` (CE same GUI). Caps item+fluid+energy.
+  Hardness 10 / 20 (`ModBlocks.java:1087`).
+  TODO(CE: TileEntityMachineCompressorCompact.java:18-29) TESR fan;
+  TODO(CE: MachineCompressorCompact.java:26) ProxyCombo.
+- **`machine_satlinker`**: 1×1 MODEL (`MachineSatLinker.java:19`). ≠
+  `machine_satlink`. 3 slots: copy freq 0→1 if both `ISatChip`; slot 2
+  `rand(100000)` if `!SatelliteSavedData.isFreqTaken`. GUI
+  `gui_sat_linker.png` 176×186 + bind. Missile tab. Caps item.
+
+Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
++ runServer Done + registry/caps/GUI bind. No physical place.
+
 ## Prior wave (leftover Dummyable + CE TE)
 
 Casings → live BEs. Same ids. Mining laser stays accepted.
