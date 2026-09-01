@@ -307,6 +307,12 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getEnergyStorageCapability(side));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_THRESHER.get(),
                 (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_MINING_LASER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_MINING_LASER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_MINING_LASER.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
         // Chimneys consume smoke via IFluidReceiverMK2#transferFluid (empty tanks). No FluidHandler.
         // BMPowerBox is redstone-only. No GUI/caps.
     }

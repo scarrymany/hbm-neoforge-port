@@ -149,6 +149,7 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineChimneyBlock> CHIMNEY_INDUSTRIAL;
     public static DeferredBlock<MachineThresherBlock> MACHINE_THRESHER;
     public static DeferredBlock<BMPowerBoxBlock> BM_POWER_BOX;
+    public static DeferredBlock<MachineMiningLaserBlock> MACHINE_MINING_LASER;
 
     private DummyableProcessBlocks() {
     }
@@ -257,6 +258,10 @@ public final class DummyableProcessBlocks {
         CHIMNEY_INDUSTRIAL = registerBlock("chimney_industrial", () -> new MachineChimneyBlock(MACHINE_PROPS, true));
         MACHINE_THRESHER = registerBlock("machine_thresher", () -> new MachineThresherBlock(MACHINE_PROPS));
         BM_POWER_BOX = registerBlock("bm_power_box", () -> new BMPowerBoxBlock(MACHINE_PROPS));
+        // CE ModBlocks.java:1177 hardness 5 / resistance 100; Dummyable {1,1,1,1,1,1} heightOffset -1
+        MACHINE_MINING_LASER = registerBlock("machine_mining_laser",
+                () -> new MachineMiningLaserBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 100.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

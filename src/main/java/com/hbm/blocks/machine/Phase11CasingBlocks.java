@@ -38,7 +38,7 @@ public final class Phase11CasingBlocks {
         registerBlock("machine_compressor_compact", () -> new BlockBase(MACHINE_PROPS));
         // machine_epress is DummyableProcessBlocks (full TE).
         // machine_ore_slopper is DummyableProcessBlocks (full TE).
-        registerBlock("machine_mining_laser", () -> new BlockBase(MACHINE_PROPS));
+        // machine_mining_laser is DummyableProcessBlocks (live TE).
         // CE ModBlocks.java:1186 / AssemblyMachineRecipes.java:362
         registerBlock("machine_teleporter", () -> new BlockBase(MACHINE_PROPS));
         // CE ModBlocks.java:1238 / AssemblyMachineRecipes.java:367

@@ -89,6 +89,7 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<ChimneyBlockEntity>> CHIMNEY_INDUSTRIAL;
     public static Supplier<BlockEntityType<MachineThresherBlockEntity>> MACHINE_THRESHER;
     public static Supplier<BlockEntityType<BMPowerBoxBlockEntity>> BM_POWER_BOX;
+    public static Supplier<BlockEntityType<MachineMiningLaserBlockEntity>> MACHINE_MINING_LASER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -434,6 +435,10 @@ public final class DummyableProcessBlockEntities {
         BM_POWER_BOX = ModBlocks.BLOCK_ENTITY_TYPES.register("bm_power_box", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new BMPowerBoxBlockEntity(BM_POWER_BOX.get(), pos, state),
                 DummyableProcessBlocks.BM_POWER_BOX.get()
+        ).build(null));
+        MACHINE_MINING_LASER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_mining_laser", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineMiningLaserBlockEntity(MACHINE_MINING_LASER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_MINING_LASER.get()
         ).build(null));
     }
 }

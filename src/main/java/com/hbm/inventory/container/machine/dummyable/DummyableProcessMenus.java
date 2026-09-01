@@ -64,6 +64,7 @@ import com.hbm.blockentity.machine.dummyable.MassStorageBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineTeleLinkerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.SoyuzCapsuleBlockEntity;
 import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineMiningLaserBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -137,6 +138,7 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<TeleLinkerMenu>> MACHINE_TELELINKER;
     public static DeferredHolder<MenuType<?>, MenuType<SoyuzCapsuleMenu>> SOYUZ_CAPSULE;
     public static DeferredHolder<MenuType<?>, MenuType<FileCabinetMenu>> FILING_CABINET;
+    public static DeferredHolder<MenuType<?>, MenuType<MiningLaserMenu>> MACHINE_MINING_LASER;
 
     private DummyableProcessMenus() {
     }
@@ -270,6 +272,8 @@ public final class DummyableProcessMenus {
                 new SoyuzCapsuleMenu(id, inv, (SoyuzCapsuleBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         FILING_CABINET = reg("filing_cabinet", (id, inv, buf) ->
                 new FileCabinetMenu(id, inv, (FilingCabinetBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_MINING_LASER = reg("machine_mining_laser", (id, inv, buf) ->
+                new MiningLaserMenu(id, inv, (MachineMiningLaserBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {
