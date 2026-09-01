@@ -13,6 +13,6 @@
 - Items census **2586** (+`block_slag` BlockItem).
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Weighted ≥99% is a gate. Not content-complete.
-- Verified: `compileJava` 0. `runServer` pending this revision.
-- No new tag: leftover solids live + CE png in jar, client GUI not opened. `v0.0.1-rc2` stays.
+- Verified: `compileJava` 0, `runServer` **Done (5.146s)** / 3946 recipes, port 25566.
+- No new tag: leftover solids live + CE png blit-wired, client GUI not opened. `v0.0.1-rc2` stays.
 - `master` untouched.
