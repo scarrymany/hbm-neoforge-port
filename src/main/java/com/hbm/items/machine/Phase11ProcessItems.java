@@ -97,6 +97,8 @@ public final class Phase11ProcessItems {
         // CE ModItems.java sulfur / niter dusts (not crystal_*). Gates chem.uf6 / meatprocessing.
         parts("sulfur");
         parts("niter");
+        // CE ModItems.java:1339 ItemFuel 1200 — OreEnum.LIGNITE drop
+        fuel("lignite", 1200);
         // CE EnumCasingType flatten — AmmoPressRecipes.java:47-59
         parts("casing_small");
         parts("casing_large");

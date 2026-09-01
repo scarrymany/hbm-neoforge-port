@@ -34,6 +34,10 @@ import java.util.List;
  * Optional {@code input_fluids}/{@code output_fluids} match CE {@code GenericRecipe.inputFluids}/
  * {@code outputFluids} (AssemblyMachineRecipes.java:78-96 — sulfuric acid / lubricant / etc.).
  * {@link FluidStack} now has {@code Codec}/{@code StreamCodec}. Item-only recipes omit the fields.
+ * Remaining CE assembler skips: {@code ass.nitra} ChanceOutput
+ * TODO(CE: AssemblyMachineRecipes.java:1073-1087); commented Mekanism {@code ass.digimemer}
+ * TODO(CE: AssemblyMachineRecipes.java:1100-1113); {@code ass.50bmgbypass} {@code black_diamond}
+ * is {@code ItemModHealth} TODO(CE: AssemblyMachineRecipes.java:936-938).
  * <p>
  * <b>Recipe selection</b>: CE's real assembler picks one recipe by name via a blueprint item + GUI
  * dropdown ({@code TileEntityMachineAssemblyMachine.receiveControl}/{@code assemblerModule.recipe}),

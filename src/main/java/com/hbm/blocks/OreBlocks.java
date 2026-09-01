@@ -9,9 +9,13 @@ import com.hbm.blocks.generic.BlockOutgas;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.BilletPowderItems;
+import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.ModItems;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.main.MainRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -35,23 +39,15 @@ import java.util.function.Supplier;
  * {@code BlockOreBasalt} (5 variants) and {@code BlockBiomeStone} (2 variants) - see
  * {@code docs/phase1/modblocks_generative.md} section 1a.
  * <p>
- * <b>{@link com.hbm.blocks.IOreType} drop-item availability.</b> CE's real ore drops
- * ({@code sulfur}, {@code niter}, {@code fluorite}, {@code lignite}, {@code ingot_asbestos},
- * {@code chunk_ore}, {@code cinnabar}, {@code nugget_zirconium}, {@code oil_tar},
- * {@code ingot_phosphorus}, and the {@code ItemPool}-driven meteorite treasure table) are either not
- * yet ported by any Phase 1 items area, or exist only as package-private fields in
- * {@code com.hbm.items.IngotNuggetItems} not reachable from this package. Rather than invent a
- * public accessor on another area's file (out of this area's edit scope) or guess at a substitute
- * item, every such ore keeps CE's own harvest level/hardness/resistance/xp but registers with a
- * {@code null} {@link com.hbm.blocks.IOreType}, which {@link BlockNTMOre}/{@link BlockDepthOre}
- * already treat as "fall back to the ordinary self-drop" - exactly CE's own behavior for
- * {@code ore_australium}, {@code ore_schrabidium} and {@code ore_depth_borax}, which pass a null ore
- * type for the same reason (no distinct drop item). Every ore whose CE drop item already has a
- * public registry entry in {@link PlateCrystalWasteItems}/{@link BilletPowderItems} (cobalt, coltan,
- * neodymium, alexandrite, nitan, the five ore-cluster crystals, meteorite fragments, the meteor
- * block's plate_dalekanium jackpot, and the basalt gem/molysite variants) is wired to that real item.
- * {@code ore_nether_cobalt} keeps CE's own null oreType (a confirmed CE oversight documented in the
- * research report, preserved rather than "fixed").
+ * <b>{@link com.hbm.blocks.IOreType} drops.</b> CE {@code OreEnum} entries whose flatten
+ * items exist are wired here ({@code sulfur}/{@code niter}/{@code fluorite}/{@code lignite}/
+ * {@code ingot_asbestos}/{@code chunk_ore_rare}/{@code cinnabar}/{@code oil_tar_crude}/
+ * {@code nugget_zirconium}/{@code ingot_phosphorus}+{@code powder_fire}, plus the already-wired
+ * cobalt/coltan/neodymium/alexandrite/nitan/cluster/meteor/basalt-gem paths).
+ * {@code ore_nether_cobalt} keeps CE's own null oreType. {@code ore_gneiss_rare} has no
+ * {@code OreEnum} in CE ({@code ModBlocks.java:371}) — do not invent one.
+ * Fortune on {@link BlockNTMOre#getDrops} stays {@code 0} like the existing cobalt/coltan
+ * path (LootParams fortune not threaded).
  * <p>
  * <b>Harvest level.</b> Modern Minecraft expresses tool-tier requirements as block tags
  * ({@code minecraft:needs_iron_tool}, etc.), not a per-block integer - that tag assignment is a
@@ -112,25 +108,33 @@ public final class OreBlocks {
     private static void registerOverworldOres() {
         ore("ore_thorium", 2, STD_HARDNESS, STD_RESISTANCE, null);
         ore("ore_titanium", 2, STD_HARDNESS, STD_RESISTANCE, null);
-        ore("ore_sulfur", 1, STD_HARDNESS, STD_RESISTANCE, null);
-        ore("ore_niter", 1, STD_HARDNESS, STD_RESISTANCE, null);
+        ore("ore_sulfur", 1, STD_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("sulfur"), OreEnumUtil::base2Rand3Fortune));
+        ore("ore_niter", 1, STD_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("niter"), OreEnumUtil::base1Rand2Fortune));
         ore("ore_copper", 1, STD_HARDNESS, STD_RESISTANCE, null);
         ore("ore_tungsten", 2, STD_HARDNESS, STD_RESISTANCE, null);
         ore("ore_aluminium", 1, STD_HARDNESS, STD_RESISTANCE, null);
-        ore("ore_fluorite", 1, STD_HARDNESS, STD_RESISTANCE, null);
+        ore("ore_fluorite", 1, STD_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("fluorite"), OreEnumUtil::base2Rand3Fortune));
         ore("ore_lead", 2, STD_HARDNESS, STD_RESISTANCE, null);
         ore("ore_beryllium", 2, STD_HARDNESS, 15.0F, null);
-        ore("ore_lignite", 0, STD_HARDNESS, 15.0F, null);
-        ore("ore_asbestos", 1, 6, STD_HARDNESS, 15.0F, null);
-        ore("ore_rare", 2, 12, STD_HARDNESS, STD_RESISTANCE, null);
+        ore("ore_lignite", 0, STD_HARDNESS, 15.0F,
+                oreType(hbmItem("lignite"), OreEnumUtil::vanillaFortune));
+        ore("ore_asbestos", 1, 6, STD_HARDNESS, 15.0F,
+                oreType(() -> IngotNuggetItems.INGOT_ASBESTOS.get(), OreEnumUtil::vanillaFortune));
+        ore("ore_rare", 2, 12, STD_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("chunk_ore_rare"), OreEnumUtil::vanillaFortune));
         ore("ore_cobalt", 3, 15, STD_HARDNESS, STD_RESISTANCE,
                 oreType(() -> PlateCrystalWasteItems.FRAGMENT_COBALT.get(), OreEnumUtil::cobaltAmount));
-        ore("ore_cinnabar", 1, STD_HARDNESS, STD_RESISTANCE, null);
+        ore("ore_cinnabar", 1, STD_HARDNESS, STD_RESISTANCE,
+                oreType(() -> BilletPowderItems.CINNABAR.get(), OreEnumUtil::base1Rand2Fortune));
         ore("ore_coltan", 3, 20, 15.0F, STD_RESISTANCE,
                 oreType(() -> PlateCrystalWasteItems.FRAGMENT_COLTAN.get(), OreEnumUtil::vanillaFortune));
         ore("ore_australium", 4, 100, STD_HARDNESS, STD_RESISTANCE, null);
         ore("ore_schrabidium", 3, 300, SCHRABIDIUM_HARDNESS, SCHRABIDIUM_RESISTANCE, null);
-        ore("ore_oil", 1, STD_HARDNESS, STD_RESISTANCE, null);
+        ore("ore_oil", 1, STD_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("oil_tar_crude"), OreEnumUtil::const1));
         ore("ore_tikite", 4, STD_HARDNESS, STD_RESISTANCE, null);
 
         registerBlock("waste_planks",
@@ -149,7 +153,8 @@ public final class OreBlocks {
         ore("ore_gneiss_iron", 1, GNEISS_HARDNESS, STD_RESISTANCE, null);
         ore("ore_gneiss_gold", 2, GNEISS_HARDNESS, STD_RESISTANCE, null);
         ore("ore_gneiss_copper", 1, GNEISS_HARDNESS, STD_RESISTANCE, null);
-        ore("ore_gneiss_asbestos", 2, GNEISS_HARDNESS, STD_RESISTANCE, null);
+        ore("ore_gneiss_asbestos", 2, GNEISS_HARDNESS, STD_RESISTANCE,
+                oreType(() -> IngotNuggetItems.INGOT_ASBESTOS.get(), OreEnumUtil::vanillaFortune));
         ore("ore_gneiss_lithium", 0, GNEISS_HARDNESS, STD_RESISTANCE, null);
         ore("ore_gneiss_schrabidium", 3, GNEISS_HARDNESS, STD_RESISTANCE, null);
         ore("ore_gneiss_rare", 3, GNEISS_HARDNESS, STD_RESISTANCE, null);
@@ -164,8 +169,13 @@ public final class OreBlocks {
         // preserved verbatim rather than silently improved.
         ore("ore_nether_cobalt", 3, NETHER_HARDNESS, STD_RESISTANCE, null);
         ore("ore_nether_tungsten", 2, NETHER_HARDNESS, STD_RESISTANCE, null);
-        ore("ore_nether_sulfur", 1, NETHER_HARDNESS, STD_RESISTANCE, null);
-        ore("ore_nether_fire", 1, NETHER_HARDNESS, STD_RESISTANCE, null);
+        ore("ore_nether_sulfur", 1, NETHER_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("sulfur"), OreEnumUtil::base2Rand3Fortune));
+        ore("ore_nether_fire", 1, NETHER_HARDNESS, STD_RESISTANCE,
+                oreType((state, rand) -> rand.nextInt(10) == 0
+                        ? new ItemStack(IngotNuggetItems.INGOT_PHOSPHORUS.get())
+                        : new ItemStack(BilletPowderItems.POWDER_FIRE.get()),
+                        OreEnumUtil::vanillaFortune));
         ore("ore_nether_plutonium", 3, NETHER_HARDNESS, STD_RESISTANCE, null);
         ore("ore_nether_schrabidium", 3, SCHRABIDIUM_HARDNESS, SCHRABIDIUM_RESISTANCE, null);
         outgas("ore_nether_uranium", NETHER_HARDNESS, STD_RESISTANCE);
@@ -219,8 +229,10 @@ public final class OreBlocks {
     }
 
     private static void registerDepthOres() {
-        depthOre("ore_depth_cinnabar", null);
-        depthOre("ore_depth_zirconium", null);
+        depthOre("ore_depth_cinnabar",
+                oreType(() -> BilletPowderItems.CINNABAR.get(), OreEnumUtil::base1Rand2Fortune));
+        depthOre("ore_depth_zirconium",
+                oreType(() -> IngotNuggetItems.NUGGET_ZIRCONIUM.get(), OreEnumUtil::base2Rand2Fortune));
         depthOre("ore_depth_borax", null);
         depthOre("ore_alexandrite", oreType(() -> PlateCrystalWasteItems.GEM_ALEXANDRITE.get(), OreEnumUtil::alexandriteAmount));
         depthOre("cluster_depth_iron", oreType(() -> PlateCrystalWasteItems.CRYSTAL_IRON.get(), OreEnumUtil::vanillaFortune));
@@ -236,9 +248,12 @@ public final class OreBlocks {
     }
 
     private static void registerBasalt() {
-        ore("basalt_ore_sulfur", 0, STD_HARDNESS, STD_RESISTANCE, null);
-        ore("basalt_ore_fluorite", 0, STD_HARDNESS, STD_RESISTANCE, null);
-        ore("basalt_ore_asbestos", 0, STD_HARDNESS, STD_RESISTANCE, null);
+        ore("basalt_ore_sulfur", 0, STD_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("sulfur"), OreBlocks::basaltQuantity));
+        ore("basalt_ore_fluorite", 0, STD_HARDNESS, STD_RESISTANCE,
+                oreType(hbmItem("fluorite"), OreBlocks::basaltQuantity));
+        ore("basalt_ore_asbestos", 0, STD_HARDNESS, STD_RESISTANCE,
+                oreType(() -> IngotNuggetItems.INGOT_ASBESTOS.get(), OreBlocks::basaltQuantity));
         ore("basalt_ore_gem", 0, STD_HARDNESS, STD_RESISTANCE,
                 oreType(() -> PlateCrystalWasteItems.GEM_VOLCANIC.get(), OreBlocks::basaltQuantity));
         ore("basalt_ore_molysite", 0, STD_HARDNESS, STD_RESISTANCE,
@@ -321,6 +336,10 @@ public final class OreBlocks {
     private static BlockBehaviour.Properties oreProps(float hardness, float resistance, int harvestLevel) {
         BlockBehaviour.Properties props = BlockBehaviour.Properties.of().strength(hardness, resistance).sound(SoundType.STONE);
         return harvestLevel > 0 ? props.requiresCorrectToolForDrops() : props;
+    }
+
+    private static Supplier<Item> hbmItem(String id) {
+        return () -> BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, id));
     }
 
     private static IOreType oreType(Supplier<Item> drop, IOreType.TriFunction<BlockState, Integer, RandomSource, Integer> quantity) {

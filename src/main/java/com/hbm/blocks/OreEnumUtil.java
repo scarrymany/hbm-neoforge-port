@@ -6,11 +6,8 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * Fortune-aware drop-quantity helper functions used by {@link IOreType} implementations.
  * <p>
- * CE's {@code OreEnumUtil} also carried a 30+ entry {@code OreEnum} implementing {@link IOreType}
- * with drop functions wired to {@code ModItems} fields (and, for a couple of entries, {@code ModBlocks}
- * and {@code ItemPool}). None of those exist yet in the port, so that enum is deliberately not ported
- * here: it is ore content for Phase 1 to add once {@code com.hbm.items.ModItems} exists. Only the
- * pure, dependency-free quantity math survives in this area.
+ * Quantity math only. Drop-item wiring lives on the ore registrations in
+ * {@link OreBlocks} (CE {@code OreEnum} entries whose flatten items now exist).
  */
 public class OreEnumUtil {
 

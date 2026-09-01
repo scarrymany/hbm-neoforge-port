@@ -27,15 +27,11 @@ from phase11_machine_parts import (  # noqa: E402
 OUT = DATA / "recipe" / "assembler"
 FLUIDS_JAVA = REPO / "src" / "main" / "java" / "com" / "hbm" / "inventory" / "fluid" / "Fluids.java"
 
-# Documented leftover skip-7 (PARITY_REPORT). Named here so the log stays honest.
+# Remaining assembler skips (PARITY_REPORT). Fluid-dict four now have JSON.
 SKIP7 = {
-    "ass.hpcondenser",  # Fluids.X.getDict
-    "ass.himarssmalltb",
-    "ass.himarslargetb",
-    "ass.mpw10taint",
-    "ass.nitra",  # ChanceOutput
-    "ass.digimemer",  # commented Mekanism
-    "ass.50bmgbypass",
+    "ass.nitra",  # ChanceOutput — AssemblerRecipe is single ItemStack
+    "ass.digimemer",  # commented Mekanism in CE
+    "ass.50bmgbypass",  # black_diamond is ItemModHealth
 }
 
 

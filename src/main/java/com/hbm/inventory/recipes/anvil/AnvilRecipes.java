@@ -23,6 +23,7 @@ import java.util.List;
  * Rows whose I/O is AIR are skipped — no fake ids. Shell/pipe/stamp/recycle rows land when
  * the flattened autogen / already-registered I/O exists.
  * TODO(CE: AnvilRecipes.java:75-130) hot/mold/cyanide/rename still blocked.
+ * TODO(CE: AnvilRecipes.java:626-635) mold meta 16–28 — do not invent flatten ids.
  */
 public final class AnvilRecipes {
 
@@ -53,8 +54,10 @@ public final class AnvilRecipes {
 
     /**
      * CE {@code :59-73} anvil upgrades (iron/lead × 9 targets) + {@code :96} gunmetal.
-     * SKIP {@code :75-91} hot ({@code AnvilSmithingHotRecipe}), {@code :98-127} mold,
-     * {@code :129-130} cyanide/rename — TODO(CE: AnvilRecipes.java:75-130).
+     * SKIP {@code :75-91} hot ({@code AnvilSmithingHotRecipe}), {@code :98-127} mold
+     * ({@code AnvilSmithingMold} — not ported), {@code :129-130} cyanide/rename —
+     * TODO(CE: AnvilRecipes.java:75-130). Construction mold meta 16–28
+     * TODO(CE: AnvilRecipes.java:626-635) — not flatten-faked.
      * {@code :93} wings_murk and {@code :94} flask_infusion are live (I/O registered;
      * flask is flattened SHIELD, no meta).
      */
@@ -572,6 +575,12 @@ public final class AnvilRecipes {
         recycle(2, cmp("pile_rod_lithium"), out("lithium"), out("cell"));
         recycle(2, cmp("pile_rod_plutonium"), out("billet_pu_mix", 2), out("billet_uranium"), out("plate_iron", 2));
         recycle(2, cmp("pile_rod_pu239"), out("billet_pu239"), out("billet_pu_mix"), out("billet_uranium"), out("plate_iron", 2));
+
+        // CE :880-895 pile_rod meta EnumPileRod — port flatten pile_rod_mk2_*
+        construct(2, stack("pile_rod_mk2_ra226be"), cmp("billet_ra226be", 3));
+        construct(2, stack("pile_rod_mk2_po210be"), cmp("billet_po210be", 3));
+        construct(2, stack("pile_rod_mk2_zr"), cmp("billet_zirconium", 3));
+        construct(2, stack("pile_rod_mk2_nu"), cmp("billet_uranium", 3));
 
         recycle(4, cmp("rbmk_moderator"), out("rbmk_blank"), out("block_graphite", 4));
         recycle(4, cmp("rbmk_absorber"), out("rbmk_blank"), out("ingot_boron", 8));

@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_sextuple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_sextuple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 24
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_condenser_powered",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100,
+  "input_fluids": [
+    {
+      "type": "LUBRICANT",
+      "fill": 4000
+    }
+  ]
+}

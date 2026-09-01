@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_10"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:det_cord"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:powder_magic"
+      },
+      "count": 12
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_warhead_10_taint",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100,
+  "input_fluids": [
+    {
+      "type": "WATZ",
+      "fill": 1000
+    }
+  ]
+}
