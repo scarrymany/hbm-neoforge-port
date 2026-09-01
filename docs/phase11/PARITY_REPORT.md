@@ -7,33 +7,33 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors,
-`./gradlew build` SUCCESS, jar `build/libs/hbm-0.0.1.jar` **67,160,858 B** (~64.05 MB),
-`./gradlew runServer` **Done (8.015s)** on wiped world, **3110 recipes** / 2270 advancements.
+`./gradlew build` SUCCESS, jar `build/libs/hbm-0.0.1.jar` **67,229,301 B** (~64.11 MB),
+`./gradlew runServer` **Done (5.204s)** on wiped world, **3145 recipes** / 2270 advancements.
 No recipe parse errors.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **81.8%** (6356 / 7767) |
-| **Unweighted** (mean of category %) | **90.9%** |
-| Recipe/loot reachability of port items | **47.6%** (972 / 2043) |
+| **Weighted** (Σport / ΣCE) | **82.5%** (6407 / 7767) |
+| **Unweighted** (mean of category %) | **91.2%** |
+| Recipe/loot reachability of port items | **48.2%** (987 / 2049) |
 | CE `@AutoRegister` entities still missing | **none** |
 
-Weighted is **still below ~90%**. Largest remaining hole is still **machine recipes** (69.9%),
-then vanilla crafting (68.4%) and blocks (66.5%).
+Weighted is **still below ~90%**. Largest remaining hole is still **machine recipes** (70.1%),
+then vanilla crafting (70.2%) and blocks (67.0%). Assembler JSON hole is the 90% blocker.
 
 ## Per-category
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2043 | **109.7%** | Phase 10 extract + wood burner BlockItem |
-| Blocks | 1169 | 777 | **66.5%** | +1 `machine_wood_burner`; 4 casings → Dummyable TEs |
+| Items (flattened ids) | 1863 | 2049 | **110.0%** | Phase 10 extract + 6 new BlockItems |
+| Blocks | 1169 | 783 | **67.0%** | +6 Dummyable (`furnace_iron` / `furnace_steel` / `heater_firebox` / `heater_oven` / `heater_oilburner` / `machine_sawmill`) |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 1334 | **68.4%** | CE estimate kept at 1950. +71 leftover JSON this pass |
-| Machine recipes | ~2009 | 1405 | **69.9%** | CE denom unchanged. Port: prior 1362 + slopper 6 + engine 23 + radgen 14 |
+| Vanilla crafting | ~1950 | 1369 | **70.2%** | CE estimate kept at 1950. +35 leftover JSON this pass |
+| Machine recipes | ~2009 | 1409 | **70.1%** | CE denom unchanged. Port: prior 1405 + sawmill 4 |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
@@ -41,43 +41,51 @@ Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%**
 
 ## What changed this session
 
-Previous published snapshot: weighted **80.3%** / unweighted **90.0%**, machine recipes **1362 / ~2009
-(67.8%)**, vanilla **1263 / 1950 (64.8%)**, blocks **776 / 66.4%**.
+Previous published snapshot: weighted **81.8%** / unweighted **90.9%**, machine recipes **1405 / ~2009
+(69.9%)**, vanilla **1334 / 1950 (68.4%)**, blocks **777 / 66.5%**.
 
-### Machine recipes: 1362 → 1405 (67.8% → 69.9%)
+### Machine recipes: 1405 → 1409 (69.9% → 70.1%)
 
-CE denom stayed **2009**. Port +43. No census-method cheat. Assembler JSON **untouched** (356).
+CE denom stayed **2009**. Port +4. No census-method cheat. Assembler JSON **untouched** (356).
 
-Five Dummyable process families (block + BE + menu + screen + CE recipe table). No stub GUIs.
+Six Dummyable process families (block + BE + menu + screen). Only sawmill adds a counted
+`RECIPES.add` table. No stub GUIs.
 
-- **OreSlopperRecipes** 0 → 6 `RECIPES.add` — CE `TileEntityMachineOreSlopper.java:149-197`
-  + JEI `OreSlopperHandler`. `machine_ore_slopper` Dummyable `{3,0,3,3,1,1}` offset 3 + 8 extras.
-  100k HE, water→slop 16k, SPEED/EFFECT via slot scan, `ItemBedrockOreBase` → BASE grades.
-  Animation / entity shred skipped.
-- **EngineRecipes** 0 → 23 `recipes.put` — CE `EngineRecipes.java:16-39`.
-  `machine_turbofan` Dummyable `{2,0,1,1,3,3}` offset 1. TE still gates on
-  `FT_Combustible.FuelGrade.AERO` (CE `TileEntityMachineTurbofan`:182-185). AFTERBURN slot scan.
-  Pollution / particles skipped.
-- **RadGenRecipes** 0 → 14 `recipes.put` — CE `TileEntityMachineRadGen.java:236-251`.
-  `machine_radgen` Dummyable `{2,0,3,2,1,1}` offset 2 + 3 extras. 8 short + 5 long waste
-  + `gem_rad`→diamond. Depleted/tiny leftovers skipped (unregistered).
-- **Hephaestus** — CE `TileEntityMachineHephaestus.java:132-182` (`FT_Heatable` HEATEXCHANGER).
-  Named table `HeatRecipes` already counted. Dummyable `{11,0,1,1,1,1}` offset 1 + 8 extras.
-  CE overlay-only → port adds a live ID+tank+heat menu (not a stub). `volcanic_lava_block` skipped
-  (unregistered); lava / magma / `ore_volcano` heat scan kept.
-- **Wood burner** — CE `TileEntityMachineWoodBurner.java:72-136`. Dummyable `{1,0,1,0,1,0}`
-  offset 0 + 2 extras. **New** block id `machine_wood_burner`. Vanilla `RecipeType.SMELTING`
-  burn time + optional `FT_Flammable` tank. Ash (`powder_ash`) skipped. On/oil via `clickMenuButton`.
+- **Iron furnace** — CE `FurnaceIron` `ModBlocks.java:1251`, `TileEntityFurnaceIron.java:61-116`.
+  Dummyable `{1,0,1,0,1,0}` offset 0. Vanilla `RecipeType.SMELTING`, baseTime 160, SPEED upgrade
+  slot scan. Pollution / particles skipped.
+- **Steel furnace** — CE `FurnaceSteel` `:1252`, `TileEntityFurnaceSteel.java:59-111`.
+  Dummyable `{1,0,1,1,1,1}` offset 1. 3-lane heat smelter, processTime 40_000, maxHeat 100_000,
+  diffusion 0.05 from `IHeatSource` below. Ore bonus / pollution / particles skipped.
+- **Firebox** — CE `HeaterFirebox` `:1245`, `TileEntityFireboxBase.java:50-113`.
+  Dummyable `{0,0,1,1,1,1}` offset 1. 2 fuel slots, baseHeat 100, maxHeat 100_000. Ashpit /
+  pollution / door anim skipped. `ModuleBurnTime` fuel-class mods → vanilla burn time.
+- **Oven** — CE `HeaterOven` `:1246`, `TileEntityHeaterOven.java:26-75`. Same dims. Firebox with
+  baseHeat 500, timeMult 0.125, maxHeat 500_000, plus 50% pull from `IHeatSource` below.
+- **Oilburner** — CE `HeaterOilburner` `:1247`, `TileEntityHeaterOilburner.java:59-103`.
+  Dummyable `{1,0,1,1,1,1}` offset 1 + 5 extras. `FT_Flammable` tank, setting mB/t, maxHeat 100_000.
+  Canister `loadTank` / pollution skipped.
+- **Sawmill** — CE `MachineSawmill` `:1257`, `TileEntitySawmill.java:279-337` / `getRecipes()`
+  `:327-337`. Dummyable `{1,0,1,1,1,1}` offset 1 + 4 extras. **4 `RECIPES.add`**
+  (logs/planks/stickWood/saplings). CE overlay-only → port adds a live 3-slot menu (not a stub).
+  Blade / entity shred / overspeed skipped (`sawblade` unregistered → blade assumed).
+  `powder_sawdust` is a machine byproduct (registered); ban is vanilla-craft *results* only.
 
-### Vanilla crafting: 1263 → 1334 (64.8% → 68.4%)
+Skipped this wave (still Dummyable, not landed): `heater_electric` / `heater_heatex` /
+Stirling ×3 / StorageDrum (unregistered depleted waste) / SuperComputer XR / Autosaw.
+Heaters / steel furnace / sawmill CE crafts are **anvil**, not vanilla (only `furnace_iron`
+`CraftingManager.java:343` is table-craft).
 
-+71 leftover shaped/shapeless from CE `CraftingManager.java:298-509`
-(`scripts/phase11_wave8_crafts.py`). Wood burner / turbine / crates / press / ammo press / mixer /
-solar / anvil / detonators / blades / stamps / building (reinforced/brick/concrete/meteor/tile/steel
-deco) / barbed wire. Did **not** emit `powder_sawdust` / `gem_tantalium` / `coil_tungsten` as
-results. Dropped unregistered ids (siren / microwave / furnace_iron / electrodes / fuse / gneiss /
-spotlights / …). Assembler skip still **7**. Did not rewrite existing assembler JSON.
-runServer recipe count 3039 → **3110** (+71).
+### Vanilla crafting: 1334 → 1369 (68.4% → 70.2%)
+
++35 leftover shaped/shapeless from CE `CraftingManager.java:343` + `:526-728` (reg2)
+(`scripts/phase11_wave9_crafts.py`). `furnace_iron` (dropped last wave as unregistered),
+rails, book_guide, powders, dets/charges/emp, gun kits, doors, wood barrier, records,
+fluid ducts/valves, segs, geiger, containment box, casing bags. Did **not** emit
+`powder_sawdust` / `gem_tantalium` / `coil_tungsten` as results. Dropped unregistered ids
+(sat_dock / flame_* / solid_fuel_presto_* / hev_battery / igniter / key / padlock / tanks /
+sat_chip / …). Assembler skip still **7**. Did not rewrite existing assembler JSON.
+runServer recipe count 3110 → **3145** (+35).
 
 ## Exclusion list (only CE-lacks or deliberate skips)
 
@@ -128,16 +136,21 @@ runServer recipe count 3039 → **3110** (+71).
 - Hephaestus `volcanic_lava_block` — unregistered; CE overlay-only (port has a real menu)
 - Wood burner `powder_ash` — unregistered; `loadTank` canister path not ported
 - Wood burner / slopper / turbofan `UpgradeManagerNT` — slot scan by type/tier instead
+- Iron / steel furnace pollution + particles; steel ore bonus
+- Firebox `ModuleBurnTime` fuel-class mods + ashpit + door anim
+- Oilburner `loadTank` / pollution
+- Sawmill blade / entity shred / overspeed (`sawblade` unregistered → blade assumed)
+- Heaters / steel furnace / sawmill CE crafts are **anvil**, not vanilla
+- `heater_electric` / `heater_heatex` / Stirling ×3 / StorageDrum / SuperComputer / Autosaw — not this wave
 
 ## Recipe-graph reachability (cheap)
 
-**47.6%** (972 / 2043). Prior session: 961 / 2042 (47.1%).
+**48.2%** (987 / 2049). Prior session: 972 / 2043 (47.6%).
 
 ## Next single gap (not this session)
 
-Still machine recipes (leftover getDict assembler + remaining Dummyable TEs after slopper /
-turbofan / radgen / hephaestus / wood burner), vanilla crafting 68.4%. Blocks 66.5%.
-Weighted 81.8% ≠ 90%.
+Still machine recipes (leftover getDict assembler + remaining Dummyable TEs after this heat/furnace
+wave), vanilla crafting 70.2%. Blocks 67.0%. Weighted **82.5% ≠ 90%**.
 
 ## Entities (Phase 9 leftovers)
 
