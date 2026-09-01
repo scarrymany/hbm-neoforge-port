@@ -58,7 +58,13 @@
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.
 - Assembler skip **3** (nitra / digimemer / 50bmgbypass). `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0, `runServer` **Done (6.044s)** / 4052 recipes, port 25566.
-- Honest E2E: MCA 841 chunks. Default Dud miss; forced Dud 70 + Barrel 7+;
-  forced spaceship/satellite needles above. No client.
+- Verified: `compileJava` 0, `runServer` **Done (5.706s)** / 4052 recipes, port 25566.
+- Honest E2E: MCA 841 chunks. Forced `hiveSpawn=1` + `atomStructure=1` on
+  desert seed `1833280291927865410`: hive **57** `glyphid_base` / **56**
+  `glyphid_spawner` / **56** `deco_loot` / **53** wither skull / **5**
+  infested (~1/10). Atom **48** `reinforced_sand` / **48** `barbed_wire` /
+  **10** `yellow_barrel` / **7** `lead_block` / **3** `ore_nether_plutonium`.
+  `nuke_man`/`waste_earth`/`uranium_block` = 0 (write-radius 0 clip).
+  Defaults stay **256** / **500**. No hive/atom far-chunk logs (4 leftover
+  `oil_bubble`). No client.
 - No tag (reachability still ~63%). `master` untouched.

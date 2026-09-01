@@ -9,7 +9,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.785s)** on wiped world port 25566, **4052 recipes**.
+`./gradlew runServer` **Done (5.706s)** on wiped world port 25566, **4052 recipes**.
 No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
@@ -87,6 +87,9 @@ landmine / NITAN stay accepted.
 - **DesertAtom** (`:367-368`): `atomStructure` **0:500**,
   `!hasPrecipitation && temp>=2`. 5162-cell schematic. Height point `(20,0,16)`
   + sandstone/terracotta.
+- Forced 1/1 desert seed `1833280291927865410`, 841 chunks: hive 57
+  `glyphid_base` / 56 `glyphid_spawner` / 5 infested; atom 48
+  `reinforced_sand` / 10 `yellow_barrel` / 7 `lead_block`. Defaults 256/500.
 
 Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
 
