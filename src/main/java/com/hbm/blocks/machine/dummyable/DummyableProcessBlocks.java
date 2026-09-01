@@ -48,7 +48,8 @@ import java.util.function.Supplier;
  * autocrafter / keyforge / di-furnace / RTG di-furnace /
  * conveyor press / mass storage /
  * telelinker / soyuz capsule / filing cabinet /
- * pump steam/electric / chimney brick/industrial / thresher / bm_power_box.
+ * pump steam/electric / chimney brick/industrial / thresher / bm_power_box /
+ * mining laser / strand caster / forcefield / chungus / satlink / teleporter.
  */
 public final class DummyableProcessBlocks {
 

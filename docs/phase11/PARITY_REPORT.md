@@ -9,7 +9,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (6.138s)** on wiped world port 25566, **4051 recipes**.
+`./gradlew runServer` **Done (5.927s)** on wiped world port 25566, **4051 recipes**.
 No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
@@ -45,7 +45,48 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (`machine_mining_laser`)
+## What changed this wave (leftover Dummyable + CE TE)
+
+Casings → live BEs. Same ids. Reachability **63.4% (1656 / 2612)** — census
+does not see TE/GUI. Mining laser stays accepted.
+
+- **`machine_strand_caster`**: Dummyable `{0,0,6,0,1,0}` offset 0 + extra
+  `{2,0,1,0,1,0}` (`MachineStrandCaster.java:48-81`). Live pour via
+  `ICrucibleAcceptor` on extras (META≥6) + `getMetalPourPos`. Flush at 9 casts
+  or 200 ticks. Tanks water/spentsteam 64000. Mold slot 0, out 1–6. GUI
+  `gui_strand_caster.png` 176×214 + `SafeMenuScreens.bind`.
+  TODO(CE: MachineStrandCaster.java:60) ProxyCombo.moltenMetal();
+  TODO(CE: RenderStrandCaster.java:22) TESR.
+- **`machine_forcefield`**: not Dummyable (`MachineForceField.java:24`). 1×1,
+  hardness 5 / resistance 100, missile tab. Live bounce (exclude Player+
+  ItemEntity), HE 1_000_000, baseCon 1000, r16, HP100, `isOn` button 142,34.
+  GUI `gui_field.png` 176×168 + bind. Caps item+energy.
+  TODO(CE: TileEntityForceField.java:436-458) IConfigurableMachine;
+  TODO(CE: RenderMachineForceField.java:20) TESR.
+- **`machine_chungus`**: Dummyable `{3,0,0,3,2,2}` offset 3 + extra fills
+  (`MachineChungus.java:87-108`). TurbineBase 1e9/1e9, eff 0.85,
+  `consumptionPercent()=1D`. Lever on compressor extras when `!operational`.
+  Overlay only — CE has no GUI. Caps fluid+energy.
+  TODO(CE: RenderChungus.java:16) TESR;
+  TODO(CE: TileEntityChungus.java:115-163) client audio/particles;
+  TODO(CE: TileEntityChungus.java:222-280) OC;
+  TODO(CE: TileEntityChungus.java:69-86) IConfigurableMachine;
+  TODO(CE: MachineChungus.java:40) ProxyCombo.
+- **`machine_satlink`**: Dummyable `{6,0,1,0,1,0}` offset 0 + 3 extras.
+  ISatChip sets freq, sky `WORLD_SURFACE<=y`, overlay freq/connected/sat info,
+  IROR setfreq/tx. No GUI. Missile tab. ≠ `machine_satlinker`.
+  TODO(CE: RenderSatLink.java:16) TESR;
+  TODO(CE: TileEntityMachineSatLink.java:201-270) OC;
+  TODO(CE: MachineSatLink.java:41) ProxyCombo.
+- **`machine_teleporter`**: 1×1 MODEL (`MachineTeleporter.java:49`). HE
+  1_000_000_000 / 100_000_000 per teleport, subscribe all sides. Overlay.
+  Target stays null — `ItemTeleLink` not ported
+  TODO(CE: ItemTeleLink.java:38-45).
+
+Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. 1×1 also not
+physically placed. compileJava 0 + runServer Done + registry/caps/GUI bind.
+
+## Prior wave (`machine_mining_laser`)
 
 - Casing `BlockBase` → Dummyable `{1,1,1,1,1,1}` offset 0, `heightOffset -1`,
   CE hardness 5 / resistance 100 (`ModBlocks.java:1177`).
@@ -60,10 +101,6 @@ Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%**
   TODO(CE: RenderLaserMiner.java:18) TESR;
   TODO(CE: MachineMiningLaser.java:35-39) ProxyEnergy/ProxyCombo.
   CE TE has no pollution increment.
-- Reachability **63.4% (1656 / 2612)** — census does not see world interaction.
-- Next leftover Dummyable with a CE TE (not empty cube): `machine_forcefield` /
-  `machine_strand_caster` / `machine_chungus` / `machine_satlink` /
-  `machine_teleporter` still casings.
 
 ## Prior wave (Sellafield worldgen)
 
