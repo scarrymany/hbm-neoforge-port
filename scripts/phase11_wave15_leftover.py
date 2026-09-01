@@ -60,7 +60,7 @@ def recipes():
                        ["###", "###", "###"], {"#": item("hbm:powder_fire")}))
     recs.append(shaped("mineral/bottle_mercury", "hbm:bottle_mercury", 1,
                        ["###", "#B#", "###"],
-                       {"#": item("hbm:ingot_mercury"), "B": item("minecraft:glass_bottle")}))
+                       {"#": item("hbm:nugget_mercury"), "B": item("minecraft:glass_bottle")}))
     # CraftingManager.java:939-940 — port has a single book_guide_book (CE meta split)
     recs.append(shapeless("parts/book_guide_from_potato", "hbm:book_guide_book", 1,
                           ["minecraft:book", "minecraft:potato"]))
