@@ -52,5 +52,36 @@ public final class DummyableProcessCapabilities {
 
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.WASTE_DRUM.get(),
                 (be, side) -> be.getItemHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_COMPRESSOR.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_COMPRESSOR.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_COMPRESSOR.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_COKER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_COKER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_CATALYTIC_CRACKER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_CATALYTIC_CRACKER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_CATALYTIC_REFORMER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_CATALYTIC_REFORMER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_CATALYTIC_REFORMER.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_HYDROTREATER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_HYDROTREATER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_HYDROTREATER.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
     }
 }

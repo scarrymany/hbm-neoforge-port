@@ -36,7 +36,7 @@ public final class Phase11CasingBlocks {
         // CE ModBlocks.java:1219 / AssemblyMachineRecipes.java:258 ass.arcfurnace
         registerBlock("machine_arc_furnace", () -> new BlockBase(MACHINE_PROPS));
         // CE ModBlocks.java:1086-1087 / AssemblyMachineRecipes.java:320-323
-        registerBlock("machine_compressor", () -> new BlockBase(MACHINE_PROPS));
+        // machine_compressor is DummyableProcessBlocks (full TE). Compact stays a casing.
         registerBlock("machine_compressor_compact", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("machine_epress", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("machine_ore_slopper", () -> new BlockBase(MACHINE_PROPS));

@@ -16,6 +16,11 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineRotaryFurnaceBlockEntity>> MACHINE_ROTARY_FURNACE;
     public static Supplier<BlockEntityType<MachineFractionTowerBlockEntity>> MACHINE_FRACTION_TOWER;
     public static Supplier<BlockEntityType<WasteDrumBlockEntity>> WASTE_DRUM;
+    public static Supplier<BlockEntityType<MachineCompressorBlockEntity>> MACHINE_COMPRESSOR;
+    public static Supplier<BlockEntityType<MachineCokerBlockEntity>> MACHINE_COKER;
+    public static Supplier<BlockEntityType<MachineCatalyticCrackerBlockEntity>> MACHINE_CATALYTIC_CRACKER;
+    public static Supplier<BlockEntityType<MachineCatalyticReformerBlockEntity>> MACHINE_CATALYTIC_REFORMER;
+    public static Supplier<BlockEntityType<MachineHydrotreaterBlockEntity>> MACHINE_HYDROTREATER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -52,6 +57,26 @@ public final class DummyableProcessBlockEntities {
         WASTE_DRUM = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_waste_drum", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new WasteDrumBlockEntity(WASTE_DRUM.get(), pos, state),
                 DummyableProcessBlocks.WASTE_DRUM.get()
+        ).build(null));
+        MACHINE_COMPRESSOR = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_compressor", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineCompressorBlockEntity(MACHINE_COMPRESSOR.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_COMPRESSOR.get()
+        ).build(null));
+        MACHINE_COKER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_coker", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineCokerBlockEntity(MACHINE_COKER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_COKER.get()
+        ).build(null));
+        MACHINE_CATALYTIC_CRACKER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_catalytic_cracker", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineCatalyticCrackerBlockEntity(MACHINE_CATALYTIC_CRACKER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CATALYTIC_CRACKER.get()
+        ).build(null));
+        MACHINE_CATALYTIC_REFORMER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_catalytic_reformer", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineCatalyticReformerBlockEntity(MACHINE_CATALYTIC_REFORMER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CATALYTIC_REFORMER.get()
+        ).build(null));
+        MACHINE_HYDROTREATER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_hydrotreater", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineHydrotreaterBlockEntity(MACHINE_HYDROTREATER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_HYDROTREATER.get()
         ).build(null));
     }
 }

@@ -221,6 +221,12 @@ public final class Phase11ProcessItems {
         consume("cap_fritz");
         // CE ItemEnums.EnumSecretType / ass.50bmgbypass — CE tab=null
         hidden("item_secret_selenium_steel");
+
+        // CE ModItems.java:1323 coke flatten + :1211 catalytic_converter (reformer/hydrotreater slot).
+        fuel("coke_coal", 3200);
+        fuel("coke_lignite", 3200);
+        fuel("coke_petroleum", 3200);
+        parts1("catalytic_converter");
     }
 
     private static DeferredItem<Item> parts(String name) {

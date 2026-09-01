@@ -73,13 +73,9 @@ public final class OilChainBlocks {
         MACHINE_FRACKING_TOWER = registerMachine("machine_fracking_tower", () -> new MachineFrackingTowerBlock(MACHINE_PROPS));
         MACHINE_REFINERY = registerMachine("machine_refinery", () -> new MachineRefineryBlock(MACHINE_PROPS));
         // CE AssemblyMachineRecipes.java:281-309 leftover oil-chain outputs. Cube casings so
-        // assembler JSON can emit them; dedicated TEs (flare/coker/cracker/…) are later work.
+        // assembler JSON can emit them. Coker/cracker/reformer/hydrotreater are DummyableProcessBlocks.
         registerMachine("machine_flare", () -> new BlockBase(MACHINE_PROPS));
-        registerMachine("machine_catalytic_cracker", () -> new BlockBase(MACHINE_PROPS));
-        registerMachine("machine_coker", () -> new BlockBase(MACHINE_PROPS));
         registerMachine("machine_vacuum_distill", () -> new BlockBase(MACHINE_PROPS));
-        registerMachine("machine_catalytic_reformer", () -> new BlockBase(MACHINE_PROPS));
-        registerMachine("machine_hydrotreater", () -> new BlockBase(MACHINE_PROPS));
         registerMachine("machine_radiolysis", () -> new BlockBase(MACHINE_PROPS));
 
         ORE_OIL_EMPTY = registerResource("ore_oil_empty", () -> new BlockBase(ORE_EMPTY_PROPS));

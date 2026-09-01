@@ -1,14 +1,14 @@
 {
-  "weighted_pct": 77.3,
-  "unweighted_pct": 88.6,
+  "weighted_pct": 78.3,
+  "unweighted_pct": 89.1,
   "ce_sum": 7767,
-  "port_sum": 6004,
+  "port_sum": 6081,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2034,
-      "pct": 109.2
+      "port": 2039,
+      "pct": 109.4
     },
     {
       "cat": "blocks",
@@ -37,14 +37,14 @@
     {
       "cat": "vanilla_crafting",
       "ce": 1950,
-      "port": 1179,
-      "pct": 60.5
+      "port": 1186,
+      "pct": 60.8
     },
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1218,
-      "pct": 60.6
+      "port": 1283,
+      "pct": 63.9
     },
     {
       "cat": "advancements",
@@ -59,7 +59,7 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2034,
+      "port": 2039,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
@@ -114,10 +114,10 @@
         "addSlabStair": 25,
         "add9or1": 43
       },
-      "port": 1179,
+      "port": 1186,
       "by_type": {
-        "minecraft:crafting_shaped": 591,
-        "minecraft:crafting_shapeless": 447,
+        "minecraft:crafting_shaped": 595,
+        "minecraft:crafting_shapeless": 450,
         "minecraft:smelting": 135
       }
     },
@@ -177,11 +177,15 @@
         "AnnihilatorRecipes": 15,
         "ArcWelderRecipes": 47,
         "BlastFurnaceRecipesNT": 17,
+        "CokerRecipes": 33,
         "CombinationRecipes": 28,
+        "CompressorRecipes": 5,
+        "CrackingRecipes": 12,
         "CrucibleRecipes": 14,
         "CrystallizerRecipes": 1,
         "FractionRecipes": 19,
         "HeatRecipes": 2,
+        "HydrotreatingRecipes": 6,
         "LemegetonRecipes": 37,
         "LiquefactionRecipes": 31,
         "MagicRecipes": 3,
@@ -192,6 +196,7 @@
         "PlasmaForgeRecipes": 35,
         "PressRecipes": 38,
         "PyroOvenRecipes": 10,
+        "ReformingRecipes": 9,
         "RockMillRecipes": 11,
         "RotaryFurnaceRecipes": 12,
         "SolderingRecipes": 26,
@@ -203,7 +208,7 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 29
       },
-      "port": 1218,
+      "port": 1283,
       "by_type": {
         "hbm:assembler": 356,
         "hbm:breeder": 30,
@@ -221,10 +226,10 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2034,
-      "reachable_via_recipe_or_loot": 936,
-      "pct": 46.0
+      "port_items": 2039,
+      "reachable_via_recipe_or_loot": 941,
+      "pct": 46.2
     }
   },
-  "recipe_json_total": 1665
+  "recipe_json_total": 1672
 }

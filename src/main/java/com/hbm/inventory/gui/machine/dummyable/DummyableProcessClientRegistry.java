@@ -23,5 +23,10 @@ public final class DummyableProcessClientRegistry {
         event.register(DummyableProcessMenus.MACHINE_ROTARY_FURNACE.get(), RotaryFurnaceScreen::new);
         event.register(DummyableProcessMenus.MACHINE_FRACTION_TOWER.get(), FractionTowerScreen::new);
         event.register(DummyableProcessMenus.WASTE_DRUM.get(), WasteDrumScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_COMPRESSOR.get(), CompressorScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_COKER.get(), CokerScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_CATALYTIC_CRACKER.get(), CatalyticCrackerScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_CATALYTIC_REFORMER.get(), CatalyticReformerScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_HYDROTREATER.get(), HydrotreaterScreen::new);
     }
 }

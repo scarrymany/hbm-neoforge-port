@@ -17,7 +17,8 @@ import java.util.function.Supplier;
 
 /**
  * Dummyable process machines + waste drum.
- * CE furnace_combination / blast / rock mill / annihilator / press / rotary furnace / fraction tower / waste_drum.
+ * CE furnace_combination / blast / rock mill / annihilator / press / rotary furnace / fraction tower /
+ * waste_drum / compressor / coker / catalytic cracker / catalytic reformer / hydrotreater.
  */
 public final class DummyableProcessBlocks {
 
@@ -32,6 +33,11 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineRotaryFurnaceBlock> MACHINE_ROTARY_FURNACE;
     public static DeferredBlock<MachineFractionTowerBlock> MACHINE_FRACTION_TOWER;
     public static DeferredBlock<WasteDrumBlock> WASTE_DRUM;
+    public static DeferredBlock<MachineCompressorBlock> MACHINE_COMPRESSOR;
+    public static DeferredBlock<MachineCokerBlock> MACHINE_COKER;
+    public static DeferredBlock<MachineCatalyticCrackerBlock> MACHINE_CATALYTIC_CRACKER;
+    public static DeferredBlock<MachineCatalyticReformerBlock> MACHINE_CATALYTIC_REFORMER;
+    public static DeferredBlock<MachineHydrotreaterBlock> MACHINE_HYDROTREATER;
 
     private DummyableProcessBlocks() {
     }
@@ -45,6 +51,11 @@ public final class DummyableProcessBlocks {
         MACHINE_ROTARY_FURNACE = registerBlock("machine_rotary_furnace", () -> new MachineRotaryFurnaceBlock(MACHINE_PROPS));
         MACHINE_FRACTION_TOWER = registerBlock("machine_fraction_tower", () -> new MachineFractionTowerBlock(MACHINE_PROPS));
         WASTE_DRUM = registerBlock("machine_waste_drum", () -> new WasteDrumBlock(MACHINE_PROPS));
+        MACHINE_COMPRESSOR = registerBlock("machine_compressor", () -> new MachineCompressorBlock(MACHINE_PROPS));
+        MACHINE_COKER = registerBlock("machine_coker", () -> new MachineCokerBlock(MACHINE_PROPS));
+        MACHINE_CATALYTIC_CRACKER = registerBlock("machine_catalytic_cracker", () -> new MachineCatalyticCrackerBlock(MACHINE_PROPS));
+        MACHINE_CATALYTIC_REFORMER = registerBlock("machine_catalytic_reformer", () -> new MachineCatalyticReformerBlock(MACHINE_PROPS));
+        MACHINE_HYDROTREATER = registerBlock("machine_hydrotreater", () -> new MachineHydrotreaterBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }
