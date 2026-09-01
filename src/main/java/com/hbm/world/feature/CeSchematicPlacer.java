@@ -111,16 +111,13 @@ public final class CeSchematicPlacer {
 
     /**
      * CE {@code IWorldGenerator} wrote the full wreck. 1.21 {@code WorldGenRegion} rejects
-     * {@code setBlock} outside the generating write-radius (spaceship 12×46 / satellite 25×31).
-     * Fall back to {@code ServerLevel} so neighbor cells actually land.
+     * {@code setBlock} outside the generating write-radius (spaceship 12×46 / satellite 25×31)
+     * and logs {@code Detected setBlock in a far chunk}. Skip those cells — do not
+     * {@code ServerLevel.setBlock} (creates/cascades chunks at forced 1/1).
      */
     private static void setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
-        if (level.setBlock(pos, state, 3)) return;
-        // Never create chunks here — ServerLevel.setBlock on an unloaded column
-        // cascades Feature.place at forced 1/1 and wedges "Preparing level".
-        var server = level.getLevel();
-        if (!server.hasChunk(pos.getX() >> 4, pos.getZ() >> 4)) return;
-        server.setBlock(pos, state, 3);
+        if (!level.hasChunk(pos.getX() >> 4, pos.getZ() >> 4)) return;
+        level.setBlock(pos, state, 3);
     }
 
     private static void fillContainer(WorldGenLevel level, BlockPos pos, RandomSource random, Special special) {
