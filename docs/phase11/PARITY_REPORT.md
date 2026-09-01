@@ -9,16 +9,16 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.927s)** on wiped world port 25566, **4051 recipes**.
+`./gradlew runServer` **Done (5.197s)** on wiped world port 25566, **4052 recipes**.
 No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **106.2%** (8246 / 7767) |
+| **Weighted** (Σport / ΣCE) | **106.2%** (8248 / 7767) |
 | **Unweighted** (mean of category %) | **104.1%** |
-| Recipe/loot + machine-table + ItemPools reachability | **63.4%** (1656 / 2612) |
+| Recipe/loot + machine-table + ItemPools reachability | **63.4%** (1657 / 2613) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
@@ -33,22 +33,48 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2612 | **140.2%** | +`lignite` + `fuel()` helper |
+| Items (flattened ids) | 1863 | 2613 | **140.3%** | +`linker` |
 | Blocks | 1169 | 1015 | **86.8%** | casings now live TE (same ids) |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950 |
+| Vanilla crafting | ~1950 | 1899 | **97.4%** | CE estimate kept at 1950 |
 | Machine recipes | ~2009 | 1924 | **95.8%** | +4 assembler JSON. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201/200**. Cyclotron **42=42**. Anvil unique **122 / 200** `stack("id")` / honest **168 / 200**. Centrifuge 75/78 AE2 skip. |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (leftover Dummyable + CE TE)
+## What changed this wave (ItemTeleLink + landmine/NITAN)
 
-Casings → live BEs. Same ids. Reachability **63.4% (1656 / 2612)** — census
-does not see TE/GUI. Mining laser stays accepted.
+Reachability **63.4% (1657 / 2613)**. strand_caster / forcefield / chungus /
+satlink live TEs stay accepted. No invented biomes / structures.
+
+- **`linker`**: CE `ItemTeleLink` (`ModItems.java:106`). `DETONATOR_POS` =
+  CE NBT `x/y/z`. Click any block → set + `chat.telelink.set`. Sneak on
+  `machine_teleporter` with a saved pos → `target` + `linked=true`, clear NBT,
+  `chat.telelink.linked`. Existing `linker.png` + lang. CE craft
+  `ToolRecipes.java:107` `I I / ICI / GGG` (plate_iron / circuit_advanced /
+  plate_gold). Teleporter TODO dropped.
+- **Landmine** (`HbmWorldGen.java:386-404`): `enableDungeons` + `enableMines`,
+  `minefreq` default **0:64**, `mine_ap` flags `2|16`, `waitingForPlayer=true`.
+  `isFaceSturdy(UP)`. Step `TOP_LAYER_MODIFICATION` — CE `IWorldGenerator` is
+  post-decorate; first wipe at `UNDERGROUND_ORES` had **0/841** (grass overwrite).
+  After fix: **2** `hbm:mine_ap` in 841 spawn chunks.
+- **NITAN** (`HbmWorldGen.java:652-686` / `:744-753`): `enableNITAN` only (not
+  dungeon-gated). 8 coords y=250: `(±10000,250,±10000)` + axes. Air → chest +
+  `POOL_POWDER` × 29. Not generated in spawn (coords 10000).
+- Cited leftover (no port generator): hive 256 `GlyphidHive`; desert-atom
+  0:500 `!canRain && temp>=2`; barrel 0:5000 `temp>1.8`; satellite 0:500
+  `temp<1 || temp>1.8`; spaceship 0:1000; dud 0:500.
+  TODO(CE: HbmWorldGen.java:347-379).
+
+Honest E2E: no client — linker sneak-apply not clicked in-game. compileJava 0
++ runServer Done + recipe + MCA palette scan.
+
+## Prior wave (leftover Dummyable + CE TE)
+
+Casings → live BEs. Same ids. Mining laser stays accepted.
 
 - **`machine_strand_caster`**: Dummyable `{0,0,6,0,1,0}` offset 0 + extra
   `{2,0,1,0,1,0}` (`MachineStrandCaster.java:48-81`). Live pour via
@@ -80,8 +106,7 @@ does not see TE/GUI. Mining laser stays accepted.
   TODO(CE: MachineSatLink.java:41) ProxyCombo.
 - **`machine_teleporter`**: 1×1 MODEL (`MachineTeleporter.java:49`). HE
   1_000_000_000 / 100_000_000 per teleport, subscribe all sides. Overlay.
-  Target stays null — `ItemTeleLink` not ported
-  TODO(CE: ItemTeleLink.java:38-45).
+  (This wave: `ItemTeleLink` now live — see above.)
 
 Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. 1×1 also not
 physically placed. compileJava 0 + runServer Done + registry/caps/GUI bind.
