@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " R ",
+    "ICI",
+    " T "
+  ],
+  "key": {
+    "R": {
+      "item": "hbm:mingrade_wire"
+    },
+    "T": {
+      "item": "hbm:coil_copper_torus"
+    },
+    "I": {
+      "item": "hbm:plate_steel"
+    },
+    "C": {
+      "item": "hbm:coil_copper"
+    }
+  },
+  "result": {
+    "id": "hbm:motor",
+    "count": 2
+  }
+}

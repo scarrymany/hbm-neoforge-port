@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:carbon_wire"
+    }
+  },
+  "result": {
+    "id": "hbm:ingot_graphite",
+    "count": 1
+  }
+}

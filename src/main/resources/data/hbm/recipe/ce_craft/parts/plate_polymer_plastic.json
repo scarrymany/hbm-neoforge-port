@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DD"
+  ],
+  "key": {
+    "D": {
+      "tag": "hbm:any_plastic"
+    }
+  },
+  "result": {
+    "id": "hbm:plate_polymer",
+    "count": 8
+  }
+}

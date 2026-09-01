@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "RRR",
+    " W "
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:plate_polymer"
+    },
+    "R": {
+      "item": "hbm:mingrade_wire"
+    }
+  },
+  "result": {
+    "id": "hbm:red_cable",
+    "count": 16
+  }
+}

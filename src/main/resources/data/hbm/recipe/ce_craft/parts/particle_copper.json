@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:particle_empty"
+    },
+    {
+      "item": "hbm:powder_copper"
+    },
+    {
+      "item": "hbm:pellet_charged"
+    }
+  ],
+  "result": {
+    "id": "hbm:particle_copper",
+    "count": 1
+  }
+}

@@ -32,5 +32,8 @@ public final class DummyableProcessClientRegistry {
         event.register(DummyableProcessMenus.MACHINE_RADIOLYSIS.get(), RadiolysisScreen::new);
         event.register(DummyableProcessMenus.MACHINE_FLARE.get(), GasFlareScreen::new);
         event.register(DummyableProcessMenus.MACHINE_EPRESS.get(), EPressScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_PYROOVEN.get(), PyroOvenScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_ARC_FURNACE.get(), ArcFurnaceScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_EXPOSURE_CHAMBER.get(), ExposureChamberScreen::new);
     }
 }

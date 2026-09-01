@@ -109,5 +109,22 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getItemHandlerCapability(side));
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_EPRESS.get(),
                 (be, side) -> be.getEnergyStorageCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_PYROOVEN.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_PYROOVEN.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_PYROOVEN.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_ARC_FURNACE.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_ARC_FURNACE.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_EXPOSURE_CHAMBER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_EXPOSURE_CHAMBER.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
     }
 }

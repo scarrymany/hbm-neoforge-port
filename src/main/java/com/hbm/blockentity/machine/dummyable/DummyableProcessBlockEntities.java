@@ -25,6 +25,9 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineRadiolysisBlockEntity>> MACHINE_RADIOLYSIS;
     public static Supplier<BlockEntityType<MachineGasFlareBlockEntity>> MACHINE_FLARE;
     public static Supplier<BlockEntityType<MachineEPressBlockEntity>> MACHINE_EPRESS;
+    public static Supplier<BlockEntityType<MachinePyroOvenBlockEntity>> MACHINE_PYROOVEN;
+    public static Supplier<BlockEntityType<MachineArcFurnaceBlockEntity>> MACHINE_ARC_FURNACE;
+    public static Supplier<BlockEntityType<MachineExposureChamberBlockEntity>> MACHINE_EXPOSURE_CHAMBER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -97,6 +100,18 @@ public final class DummyableProcessBlockEntities {
         MACHINE_EPRESS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_epress", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineEPressBlockEntity(MACHINE_EPRESS.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_EPRESS.get()
+        ).build(null));
+        MACHINE_PYROOVEN = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_pyrooven", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachinePyroOvenBlockEntity(MACHINE_PYROOVEN.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_PYROOVEN.get()
+        ).build(null));
+        MACHINE_ARC_FURNACE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_arc_furnace", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineArcFurnaceBlockEntity(MACHINE_ARC_FURNACE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_ARC_FURNACE.get()
+        ).build(null));
+        MACHINE_EXPOSURE_CHAMBER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_exposure_chamber", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineExposureChamberBlockEntity(MACHINE_EXPOSURE_CHAMBER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_EXPOSURE_CHAMBER.get()
         ).build(null));
     }
 }

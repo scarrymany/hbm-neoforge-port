@@ -15,6 +15,9 @@ import com.hbm.blockentity.machine.dummyable.MachineEPressBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineGasFlareBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineHydrotreaterBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineRadiolysisBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineArcFurnaceBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineExposureChamberBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachinePyroOvenBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineVacuumDistillBlockEntity;
 import com.hbm.blockentity.machine.dummyable.WasteDrumBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
@@ -43,6 +46,9 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<RadiolysisMenu>> MACHINE_RADIOLYSIS;
     public static DeferredHolder<MenuType<?>, MenuType<GasFlareMenu>> MACHINE_FLARE;
     public static DeferredHolder<MenuType<?>, MenuType<EPressMenu>> MACHINE_EPRESS;
+    public static DeferredHolder<MenuType<?>, MenuType<PyroOvenMenu>> MACHINE_PYROOVEN;
+    public static DeferredHolder<MenuType<?>, MenuType<ArcFurnaceMenu>> MACHINE_ARC_FURNACE;
+    public static DeferredHolder<MenuType<?>, MenuType<ExposureChamberMenu>> MACHINE_EXPOSURE_CHAMBER;
 
     private DummyableProcessMenus() {
     }
@@ -82,6 +88,12 @@ public final class DummyableProcessMenus {
                 new GasFlareMenu(id, inv, (MachineGasFlareBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_EPRESS = reg("machine_epress", (id, inv, buf) ->
                 new EPressMenu(id, inv, (MachineEPressBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_PYROOVEN = reg("machine_pyrooven", (id, inv, buf) ->
+                new PyroOvenMenu(id, inv, (MachinePyroOvenBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ARC_FURNACE = reg("machine_arc_furnace", (id, inv, buf) ->
+                new ArcFurnaceMenu(id, inv, (MachineArcFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_EXPOSURE_CHAMBER = reg("machine_exposure_chamber", (id, inv, buf) ->
+                new ExposureChamberMenu(id, inv, (MachineExposureChamberBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

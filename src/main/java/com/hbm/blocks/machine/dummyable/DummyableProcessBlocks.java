@@ -19,7 +19,7 @@ import java.util.function.Supplier;
  * Dummyable process machines + waste drum.
  * CE furnace_combination / blast / rock mill / annihilator / press / rotary furnace / fraction tower /
  * waste_drum / compressor / coker / catalytic cracker / catalytic reformer / hydrotreater /
- * vacuum distill / radiolysis / flare / epress.
+ * vacuum distill / radiolysis / flare / epress / pyrooven / arc furnace / exposure.
  */
 public final class DummyableProcessBlocks {
 
@@ -43,6 +43,9 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineRadiolysisBlock> MACHINE_RADIOLYSIS;
     public static DeferredBlock<MachineGasFlareBlock> MACHINE_FLARE;
     public static DeferredBlock<MachineEPressBlock> MACHINE_EPRESS;
+    public static DeferredBlock<MachinePyroOvenBlock> MACHINE_PYROOVEN;
+    public static DeferredBlock<MachineArcFurnaceBlock> MACHINE_ARC_FURNACE;
+    public static DeferredBlock<MachineExposureChamberBlock> MACHINE_EXPOSURE_CHAMBER;
 
     private DummyableProcessBlocks() {
     }
@@ -65,6 +68,9 @@ public final class DummyableProcessBlocks {
         MACHINE_RADIOLYSIS = registerBlock("machine_radiolysis", () -> new MachineRadiolysisBlock(MACHINE_PROPS));
         MACHINE_FLARE = registerBlock("machine_flare", () -> new MachineGasFlareBlock(MACHINE_PROPS));
         MACHINE_EPRESS = registerBlock("machine_epress", () -> new MachineEPressBlock(MACHINE_PROPS));
+        MACHINE_PYROOVEN = registerBlock("machine_pyrooven", () -> new MachinePyroOvenBlock(MACHINE_PROPS));
+        MACHINE_ARC_FURNACE = registerBlock("machine_arc_furnace", () -> new MachineArcFurnaceBlock(MACHINE_PROPS));
+        MACHINE_EXPOSURE_CHAMBER = registerBlock("machine_exposure_chamber", () -> new MachineExposureChamberBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

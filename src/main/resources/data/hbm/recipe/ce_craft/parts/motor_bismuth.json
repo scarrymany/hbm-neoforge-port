@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BCB",
+    "SDS",
+    "BCB"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:nugget_bismuth"
+    },
+    "C": {
+      "item": "hbm:neodymium_dense_wire"
+    },
+    "S": {
+      "item": "hbm:steel_plate_triple"
+    },
+    "D": {
+      "item": "hbm:ingot_dura_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:motor_bismuth",
+    "count": 1
+  }
+}

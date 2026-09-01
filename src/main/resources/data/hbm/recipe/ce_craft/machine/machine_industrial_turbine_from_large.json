@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:machine_large_turbine"
+    }
+  ],
+  "result": {
+    "id": "hbm:machine_industrial_turbine",
+    "count": 1
+  }
+}

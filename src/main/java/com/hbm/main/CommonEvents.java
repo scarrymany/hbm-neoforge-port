@@ -52,18 +52,21 @@ import com.hbm.inventory.recipes.ParticleAcceleratorRecipes;
 import com.hbm.inventory.recipes.PlasmaForgeRecipes;
 import com.hbm.inventory.recipes.SolderingRecipes;
 import com.hbm.inventory.recipes.AnnihilatorRecipes;
+import com.hbm.inventory.recipes.ArcFurnaceRecipes;
 import com.hbm.inventory.recipes.BlastFurnaceRecipesNT;
 import com.hbm.inventory.recipes.CombinationRecipes;
 import com.hbm.inventory.recipes.LemegetonRecipes;
 import com.hbm.inventory.recipes.OutgasserRecipes;
 import com.hbm.inventory.recipes.RockMillRecipes;
 import com.hbm.inventory.recipes.PressRecipes;
+import com.hbm.inventory.recipes.PyroOvenRecipes;
 import com.hbm.inventory.recipes.RotaryFurnaceRecipes;
 import com.hbm.inventory.recipes.WasteDrumRecipes;
 import com.hbm.inventory.recipes.CokerRecipes;
 import com.hbm.inventory.recipes.CompressorRecipes;
 import com.hbm.inventory.recipes.CrackingRecipes;
 import com.hbm.inventory.recipes.FractionRecipes;
+import com.hbm.inventory.recipes.ExposureChamberRecipes;
 import com.hbm.inventory.recipes.FlareRecipes;
 import com.hbm.inventory.recipes.HydrotreatingRecipes;
 import com.hbm.inventory.recipes.RadiolysisRecipes;
@@ -168,6 +171,9 @@ public class CommonEvents {
             VacuumDistillRecipes.register();
             RadiolysisRecipes.register();
             FlareRecipes.register();
+            PyroOvenRecipes.register();
+            ArcFurnaceRecipes.register();
+            ExposureChamberRecipes.register();
             // Phase 4 (fallout_rain_and_effects) - com.hbm.config.FalloutConfigJSON#initDefault()
             // eagerly resolves several DeferredBlock.get() calls (e.g. WastelandVirusBlocks.SELLAFIELD)
             // while building its default block-transform table, so - same reasoning as the recipe
