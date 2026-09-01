@@ -61,6 +61,9 @@ import com.hbm.blockentity.machine.dummyable.MachineDiFurnaceBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineDiFurnaceRtgBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineConveyorPressBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MassStorageBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineTeleLinkerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.SoyuzCapsuleBlockEntity;
+import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -131,6 +134,9 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<DiFurnaceRtgMenu>> MACHINE_DIFURNACE_RTG;
     public static DeferredHolder<MenuType<?>, MenuType<ConveyorPressMenu>> MACHINE_CONVEYOR_PRESS;
     public static DeferredHolder<MenuType<?>, MenuType<MassStorageMenu>> MASS_STORAGE;
+    public static DeferredHolder<MenuType<?>, MenuType<TeleLinkerMenu>> MACHINE_TELELINKER;
+    public static DeferredHolder<MenuType<?>, MenuType<SoyuzCapsuleMenu>> SOYUZ_CAPSULE;
+    public static DeferredHolder<MenuType<?>, MenuType<FileCabinetMenu>> FILING_CABINET;
 
     private DummyableProcessMenus() {
     }
@@ -258,6 +264,12 @@ public final class DummyableProcessMenus {
                 new ConveyorPressMenu(id, inv, (MachineConveyorPressBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MASS_STORAGE = reg("mass_storage", (id, inv, buf) ->
                 new MassStorageMenu(id, inv, (MassStorageBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_TELELINKER = reg("machine_telelinker", (id, inv, buf) ->
+                new TeleLinkerMenu(id, inv, (MachineTeleLinkerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        SOYUZ_CAPSULE = reg("soyuz_capsule", (id, inv, buf) ->
+                new SoyuzCapsuleMenu(id, inv, (SoyuzCapsuleBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FILING_CABINET = reg("filing_cabinet", (id, inv, buf) ->
+                new FileCabinetMenu(id, inv, (FilingCabinetBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

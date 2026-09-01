@@ -293,5 +293,11 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getEnergyStorageCapability(side));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MASS_STORAGE.get(),
                 (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_TELELINKER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.SOYUZ_CAPSULE.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.FILING_CABINET.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
     }
 }

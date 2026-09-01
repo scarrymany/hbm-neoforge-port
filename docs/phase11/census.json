@@ -1,20 +1,20 @@
 {
-  "weighted_pct": 102.3,
-  "unweighted_pct": 102.1,
+  "weighted_pct": 102.4,
+  "unweighted_pct": 102.2,
   "ce_sum": 7767,
-  "port_sum": 7943,
+  "port_sum": 7955,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2565,
-      "pct": 137.7
+      "port": 2571,
+      "pct": 138.0
     },
     {
       "cat": "blocks",
       "ce": 1169,
-      "port": 1001,
-      "pct": 85.6
+      "port": 1007,
+      "pct": 86.1
     },
     {
       "cat": "fluids",
@@ -59,14 +59,14 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2565,
+      "port": 2571,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
       "ce": 1169,
       "ce_fields": 1169,
       "ce_string_ctors": 290,
-      "port": 1001,
+      "port": 1007,
       "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
     },
     "fluids": {
@@ -235,9 +235,9 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2565,
-      "reachable_via_recipe_or_loot": 1342,
-      "pct": 52.3
+      "port_items": 2571,
+      "reachable_via_recipe_or_loot": 1348,
+      "pct": 52.4
     }
   },
   "recipe_json_total": 2656

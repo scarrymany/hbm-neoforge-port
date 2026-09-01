@@ -10,15 +10,20 @@ import com.hbm.blocks.machine.MachineDiFurnaceBlock;
 import com.hbm.blocks.machine.MachineDiFurnaceRtgBlock;
 import com.hbm.blocks.machine.MachineElectricFurnaceBlock;
 import com.hbm.blocks.machine.MachineFunnelBlock;
+import com.hbm.blocks.machine.FilingCabinetBlock;
 import com.hbm.blocks.machine.MachineKeyForgeBlock;
 import com.hbm.blocks.machine.MachineMicrowaveBlock;
 import com.hbm.blocks.machine.MachineRtgFurnaceBlock;
+import com.hbm.blocks.machine.MachineTeleLinkerBlock;
+import com.hbm.blocks.machine.SoyuzCapsuleBlock;
 import com.hbm.blocks.machine.WasteDrumBlock;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.inventory.container.machine.dummyable.DummyableProcessMenus;
 import com.hbm.items.ModItems;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -37,7 +42,8 @@ import java.util.function.Supplier;
  * condenser powered / intake / drain / BAT9000 / deuterium / fan /
  * UF6/PuF6 tanks / funnel / microwave / electric furnace / detector / orbus /
  * autocrafter / keyforge / di-furnace / RTG di-furnace /
- * conveyor press / mass storage.
+ * conveyor press / mass storage /
+ * telelinker / soyuz capsule / filing cabinet.
  */
 public final class DummyableProcessBlocks {
 
@@ -131,6 +137,9 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<com.hbm.blocks.machine.MassStorageBlock> MASS_STORAGE_IRON;
     public static DeferredBlock<com.hbm.blocks.machine.MassStorageBlock> MASS_STORAGE_DESH;
     public static DeferredBlock<com.hbm.blocks.machine.MassStorageBlock> MASS_STORAGE;
+    public static DeferredBlock<MachineTeleLinkerBlock> MACHINE_TELELINKER;
+    public static DeferredBlock<SoyuzCapsuleBlock> SOYUZ_CAPSULE;
+    public static DeferredBlock<FilingCabinetBlock> FILING_CABINET;
 
     private DummyableProcessBlocks() {
     }
@@ -223,13 +232,26 @@ public final class DummyableProcessBlocks {
         MASS_STORAGE_IRON = registerBlock("mass_storage_iron", () -> new com.hbm.blocks.machine.MassStorageBlock(MACHINE_PROPS, 10_000));
         MASS_STORAGE_DESH = registerBlock("mass_storage_desh", () -> new com.hbm.blocks.machine.MassStorageBlock(MACHINE_PROPS, 100_000));
         MASS_STORAGE = registerBlock("mass_storage", () -> new com.hbm.blocks.machine.MassStorageBlock(MACHINE_PROPS, 1_000_000));
+        MACHINE_TELELINKER = registerBlock("machine_telelinker",
+                () -> new MachineTeleLinkerBlock(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()),
+                ModCreativeTabs.NUKE);
+        SOYUZ_CAPSULE = registerBlock("soyuz_capsule",
+                () -> new SoyuzCapsuleBlock(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).noOcclusion().requiresCorrectToolForDrops()),
+                ModCreativeTabs.MISSILE);
+        FILING_CABINET = registerBlock("filing_cabinet",
+                () -> new FilingCabinetBlock(BlockBehaviour.Properties.of().strength(10.0F, 15.0F).sound(SoundType.METAL).noOcclusion().requiresCorrectToolForDrops()),
+                ModCreativeTabs.BLOCKS);
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }
 
     private static <T extends net.minecraft.world.level.block.Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory) {
+        return registerBlock(name, factory, ModCreativeTabs.MACHINE);
+    }
+
+    private static <T extends net.minecraft.world.level.block.Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory, ResourceKey<CreativeModeTab> tab) {
         DeferredBlock<T> block = registerBlockNoTab(name, factory);
-        CreativeTabContents.add(ModCreativeTabs.MACHINE, block);
+        CreativeTabContents.add(tab, block);
         return block;
     }
 

@@ -251,6 +251,16 @@ public final class Phase8Blocks {
         registerBlock("block_white_phosphorus",
                 () -> new BlockHazard(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.STONE)),
                 ModCreativeTabs.BLOCKS);
+        // CE ModBlocks.java:651 / :1052-1053 — leftover cubes, not Mats aliases.
+        registerBlock("block_red_phosphorus",
+                () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.SAND)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("block_corium",
+                () -> new BlockHazard(BlockBehaviour.Properties.of().strength(100.0F, 9000.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.RESOURCE);
+        registerBlock("block_corium_cobble",
+                () -> new BlockOutgas(BlockBehaviour.Properties.of().strength(100.0F, 6000.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.RESOURCE);
         registerBlock("block_au198",
                 () -> new BlockHazard(BlockBehaviour.Properties.of().strength(5.0F, 300.0F).sound(SoundType.METAL)),
                 ModCreativeTabs.BLOCKS);

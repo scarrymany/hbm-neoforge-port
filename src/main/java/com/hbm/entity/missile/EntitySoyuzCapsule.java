@@ -1,5 +1,7 @@
 package com.hbm.entity.missile;
 
+import com.hbm.blockentity.machine.dummyable.SoyuzCapsuleBlockEntity;
+import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
 import com.hbm.entity.projectile.Phase9TailEntityTypes;
 import com.hbm.items.special.SpecialItems;
 import net.minecraft.core.BlockPos;
@@ -7,7 +9,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -15,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * CE {@code com.hbm.entity.missile.EntitySoyuzCapsule} (110 lines) —
  * {@code @AutoRegister(name = "entity_soyuz_capsule", trackingRange = 1000)}.
- * {@code ModBlocks.soyuz_capsule} is not in this port — drops payload + flattened soyuz item instead.
+ * Lands as {@code soyuz_capsule} and writes payload + soyuz item into the TE.
  */
 public class EntitySoyuzCapsule extends Entity {
 
@@ -59,17 +60,21 @@ public class EntitySoyuzCapsule extends Entity {
         if (!this.level().getBlockState(pos).isAir()) {
             this.discard();
             if (!this.level().isClientSide) {
-                for (ItemStack stack : payload) {
-                    if (!stack.isEmpty()) {
-                        this.level().addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY() + 1, this.getZ(), stack.copy()));
+                BlockPos place = pos.above();
+                this.level().setBlock(place, DummyableProcessBlocks.SOYUZ_CAPSULE.get().defaultBlockState(), 3);
+                if (this.level().getBlockEntity(place) instanceof SoyuzCapsuleBlockEntity capsule) {
+                    for (int i = 0; i < payload.length; i++) {
+                        if (!payload[i].isEmpty()) {
+                            capsule.inventory.setStackInSlot(i, payload[i].copy());
+                        }
                     }
+                    ItemStack soyuzItem = switch (soyuz) {
+                        case 1 -> new ItemStack(SpecialItems.MISSILE_SOYUZ_LUNAR.get());
+                        case 2 -> new ItemStack(SpecialItems.MISSILE_SOYUZ_POST_WAR.get());
+                        default -> new ItemStack(SpecialItems.MISSILE_SOYUZ_NORMAL.get());
+                    };
+                    capsule.inventory.setStackInSlot(18, soyuzItem);
                 }
-                ItemStack soyuzItem = switch (soyuz) {
-                    case 1 -> new ItemStack(SpecialItems.MISSILE_SOYUZ_LUNAR.get());
-                    case 2 -> new ItemStack(SpecialItems.MISSILE_SOYUZ_POST_WAR.get());
-                    default -> new ItemStack(SpecialItems.MISSILE_SOYUZ_NORMAL.get());
-                };
-                this.level().addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY() + 1, this.getZ(), soyuzItem));
             }
         }
     }

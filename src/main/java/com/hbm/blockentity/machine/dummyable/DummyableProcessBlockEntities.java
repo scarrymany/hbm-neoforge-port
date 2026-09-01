@@ -80,6 +80,9 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineDiFurnaceRtgBlockEntity>> MACHINE_DIFURNACE_RTG;
     public static Supplier<BlockEntityType<MachineConveyorPressBlockEntity>> MACHINE_CONVEYOR_PRESS;
     public static Supplier<BlockEntityType<MassStorageBlockEntity>> MASS_STORAGE;
+    public static Supplier<BlockEntityType<MachineTeleLinkerBlockEntity>> MACHINE_TELELINKER;
+    public static Supplier<BlockEntityType<SoyuzCapsuleBlockEntity>> SOYUZ_CAPSULE;
+    public static Supplier<BlockEntityType<FilingCabinetBlockEntity>> FILING_CABINET;
 
     private DummyableProcessBlockEntities() {
     }
@@ -389,6 +392,18 @@ public final class DummyableProcessBlockEntities {
                 DummyableProcessBlocks.MASS_STORAGE_IRON.get(),
                 DummyableProcessBlocks.MASS_STORAGE_DESH.get(),
                 DummyableProcessBlocks.MASS_STORAGE.get()
+        ).build(null));
+        MACHINE_TELELINKER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_telelinker", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineTeleLinkerBlockEntity(MACHINE_TELELINKER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_TELELINKER.get()
+        ).build(null));
+        SOYUZ_CAPSULE = ModBlocks.BLOCK_ENTITY_TYPES.register("soyuz_capsule", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new SoyuzCapsuleBlockEntity(SOYUZ_CAPSULE.get(), pos, state),
+                DummyableProcessBlocks.SOYUZ_CAPSULE.get()
+        ).build(null));
+        FILING_CABINET = ModBlocks.BLOCK_ENTITY_TYPES.register("filing_cabinet", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new FilingCabinetBlockEntity(FILING_CABINET.get(), pos, state),
+                DummyableProcessBlocks.FILING_CABINET.get()
         ).build(null));
     }
 }
