@@ -6,7 +6,7 @@
   `this.register` + `.register` double-count. Left ChemPlant alone.
 - Crystallizer unique **303 / ~309** accepted (OreDict/AE2 skips cited).
 - Shredder unique + Cyclotron **42=42** accepted. Cited skips stay.
-- This wave: Dud + Barrel CE structures. `linker` / landmine / NITAN stay
+- This wave: Dud + Barrel + Spaceship + Satellite dish. `linker` / landmine / NITAN stay
   accepted. Reachability **63.4% (1657 / 2613)**.
 - **`linker`**: `ItemTeleLink`. stacksTo(1), CONSUMABLE. `DETONATOR_POS` (CE NBT
   x/y/z). Click = set; sneak on teleporter = `target`+`linked=true`, clear.
@@ -26,10 +26,21 @@
   flow/fog TODO(CE: ToxicBlock.java:26-105)). Default spawn plains: miss.
   Forced 1/1: **7** `crate_steel` / **9** `toxic_block` / **11** sellafield
   chunks. Height = in-chunk column (neighbor min-Y is 0 during Feature).
-- Cited leftover (no generator): hive 256 `GlyphidHive`; desert-atom 0:500
-  `!canRain && temp>=2`; satellite 0:500 `temp<1 || temp>1.8`;
-  spaceship 0:1000 (`Spaceship`+`Spaceship2`, 1108+452). Next, not skip-forever.
-  TODO(CE: HbmWorldGen.java:347-377).
+- **Spaceship** (`Spaceship.java`+`Spaceship2` / `:377`): `enableDungeons`,
+  `spaceshipStructure` **0:1000**, no biome. Corners 13×24 sandstone, `y+=1`.
+  Schematic 1419 cells. `POOL_SPACESHIP`×12 ×4 + `POOL_EXPENSIVE`×12 1/10
+  `gun_vortex`. `hadron_coil_alloy` + `machine_generator` registered with CE
+  assets. `fusion_core` stays the battery item; block id is `fusion_core_block`.
+  Forced 1/1 plains: schematic load + **14** `deco_tungsten` / **8** `pwr_fuelrod`
+  / **1** `hadron_coil_alloy` (write-radius 0 clips overflow cells).
+- **Satellite dish** (`Satellite.java` / `:373-374`, not satlink):
+  `enableDungeons`, **0:500**, `temp<1 || temp>1.8`. Corners 25×31 sandstone.
+  Schematic 2474 cells. Forced 1/1: schematic load + **8** `deco_titanium` /
+  **6** `deco_beryllium` / **1** `tape_recorder`.
+- FEATURES write-radius 0: skip cells outside the generating chunk (do not
+  `ServerLevel.setBlock` — cascades). `ensureCanWrite` itself logs far-chunk.
+- Cited leftover: hive 256 `GlyphidHive`; desert-atom 0:500
+  `!canRain && temp>=2`. TODO(CE: HbmWorldGen.java:347-368).
 - Sellafield crater `radfreq` 1/5000 + ore veins stay accepted.
 - **Anvil unique**: CE **200** vs port **122** `stack("id")`. Honest **168 / 200**.
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),
@@ -39,6 +50,7 @@
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.
 - Assembler skip **3** (nitra / digimemer / 50bmgbypass). `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0, `runServer` **Done (5.785s)** / 4052 recipes, port 25566.
-- Honest E2E: MCA 841 chunks. Default Dud miss; forced Dud 70 + Barrel 7+. No client.
+- Verified: `compileJava` 0, `runServer` **Done (6.044s)** / 4052 recipes, port 25566.
+- Honest E2E: MCA 841 chunks. Default Dud miss; forced Dud 70 + Barrel 7+;
+  forced spaceship/satellite needles above. No client.
 - No tag (reachability still ~63%). `master` untouched.

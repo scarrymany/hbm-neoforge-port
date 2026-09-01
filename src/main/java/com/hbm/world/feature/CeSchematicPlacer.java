@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -116,7 +117,12 @@ public final class CeSchematicPlacer {
      * {@code ServerLevel.setBlock} (creates/cascades chunks at forced 1/1).
      */
     private static void setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
-        if (!level.ensureCanWrite(pos)) return;
+        // FEATURES write-radius is 0. ensureCanWrite logs the far-chunk ERROR
+        // when it returns false — skip silently instead.
+        if (level instanceof WorldGenRegion region) {
+            var center = region.getCenter();
+            if ((pos.getX() >> 4) != center.x || (pos.getZ() >> 4) != center.z) return;
+        }
         level.setBlock(pos, state, 3);
     }
 

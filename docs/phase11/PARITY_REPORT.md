@@ -75,10 +75,14 @@ landmine / NITAN stay accepted.
   registered (still; flow/fog TODO(CE: ToxicBlock.java:26-105)). YellowBarrel
   1-in-3 toxic branch live. Default spawn plains: miss. Forced 1/1:
   **7** `crate_steel` / **9** `toxic_block` / **11** sellafield chunks.
-- Cited leftover (no port generator): hive 256 `GlyphidHive`; desert-atom
-  0:500 `!canRain && temp>=2`; satellite 0:500 `temp<1 || temp>1.8`;
-  spaceship 0:1000 (`Spaceship.java`+`Spaceship2.java`). Next work.
-  TODO(CE: HbmWorldGen.java:347-377).
+- **Spaceship** (`:377`): `enableDungeons`, **0:1000**, no biome, 1419-cell
+  schematic, `y+=1`. Forced 1/1: 14 `deco_tungsten` / 8 `pwr_fuelrod` /
+  1 `hadron_coil_alloy`. `fusion_core` item untouched (`fusion_core_block`).
+- **Satellite dish** (`:373-374`, not satlink): **0:500**, `temp<1||temp>1.8`.
+  Forced 1/1: 8 `deco_titanium` / 6 `deco_beryllium` / 1 `tape_recorder`.
+- FEATURES write-radius 0 clips overflow (no ServerLevel cascade).
+- Cited leftover: hive 256 `GlyphidHive`; desert-atom 0:500
+  `!canRain && temp>=2`. TODO(CE: HbmWorldGen.java:347-368).
 
 Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
 
@@ -148,8 +152,8 @@ physically placed. compileJava 0 + runServer Done + registry/caps/GUI bind.
   Gates `ENABLE_DUNGEON_SPAWN` + `ENABLE_RAD_HOTSPOT_SPAWN`.
   Oil-sand now dungeon-gated (CE `enableDungeons`).
 - Cited: phased chunk-wait TODO(CE: Sellafield.java:20-45); TE never in CE
-  TODO(CE: Sellafield.java:149-155). Landmine/NITAN landed this wave; hive/atom/
-  barrel/satellite/spaceship/dud still TODO(CE: HbmWorldGen.java:347-379).
+  TODO(CE: Sellafield.java:149-155). Landmine/NITAN/dud/barrel/spaceship/
+  satellite dish landed; hive/atom still TODO(CE: HbmWorldGen.java:347-368).
   Basalt ores stay volcanic-fluid (CE has no chunk vein).
 
 ## Prior wave (OreEnum drops + assembler fluids + pile_rod_mk2)
@@ -413,7 +417,7 @@ TODO(CE: AnvilRecipes.java:75-130) / TODO(CE: AnvilRecipes.java:626-635). Do not
 
 Next other family by unique CE vs port (not regex 145-style): Press **41/38**,
 Combination ~done, Exposure done, Liquefaction leftovers landed, Solidification live.
-Assembler skip 3. Leftover CE dungeons (hive/satellite/spaceship/…).
+Assembler skip 3. Leftover CE dungeons (hive/desert-atom).
 Reachability **63.4%** still the owner pain (census misses worldgen). `v0.0.1-rc2` stays.
 Anvil E2E: smithing consume/produce **yes** (menu slots). Construction **yes**
 (`AnvilCraftPacket` + player inv). GUI blit CE `gui_anvil.png`, not gray-box.
