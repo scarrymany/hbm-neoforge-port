@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineTeleporter}. Energy + AABB teleport when target set.
- * TODO(CE: ItemTeleLink.java:38-45): ItemTeleLink not ported — target stays null until that item lands.
+ * {@code target}/{@code linked} written by {@link com.hbm.items.special.ItemTeleLink}.
  */
 public class MachineTeleporterBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE {

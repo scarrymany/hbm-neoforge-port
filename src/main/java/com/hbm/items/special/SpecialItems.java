@@ -504,6 +504,13 @@ public final class SpecialItems {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, PEAS);
     }
 
+    // CE ModItems.java:106 ItemTeleLink("linker").setMaxStackSize(1).setCreativeTab(consumableTab)
+    public static final DeferredItem<ItemTeleLink> LINKER =
+            register("linker", () -> new ItemTeleLink(new Item.Properties().stacksTo(1)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, LINKER);
+    }
+
     // ==================== helpers ====================
 
     private static <T extends Item> DeferredItem<T> register(String name, Supplier<T> factory) {

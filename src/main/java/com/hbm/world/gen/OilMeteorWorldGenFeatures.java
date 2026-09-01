@@ -4,7 +4,9 @@ import com.hbm.main.MainRegistry;
 import com.hbm.world.feature.AntennaFeature;
 import com.hbm.world.feature.BedrockOilDepositFeature;
 import com.hbm.world.feature.BunkerFeature;
+import com.hbm.world.feature.LandmineFeature;
 import com.hbm.world.feature.MeteoriteFeature;
+import com.hbm.world.feature.NitanChestFeature;
 import com.hbm.world.feature.OilBubbleFeature;
 import com.hbm.world.feature.OilSandBubbleFeature;
 import com.hbm.world.feature.RadioFeature;
@@ -27,9 +29,13 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * Registered from {@code MainRegistry}'s constructor via {@link #register(IEventBus)} - see this
  * package's own wiringSnippets (protected file, not edited directly).
  * <p>
- * Leftover CE {@code enableDungeons} structures not in this roster:
- * TODO(CE: HbmWorldGen.java:347-395) hive/desert-atom/barrel/satellite/spaceship/dud/landmine;
- * TODO(CE: HbmWorldGen.java:652) NITAN chest grid ({@code GeneralConfig.ENABLE_NITAN_CHEST_SPAWN} unused).
+ * Leftover CE {@code enableDungeons} structures (no generator in this port):
+ * TODO(CE: HbmWorldGen.java:347-358) hive — {@code GlyphidHive.generate}, {@code hiveSpawn} 256;
+ * TODO(CE: HbmWorldGen.java:367-368) desert-atom — {@code DesertAtom001}, {@code atomStructure} 0:500, {@code !canRain && temp>=2};
+ * TODO(CE: HbmWorldGen.java:370-371) barrel — {@code Barrel}, {@code barrelStructure} 0:5000, {@code temp>1.8};
+ * TODO(CE: HbmWorldGen.java:373-374) satellite dish — {@code Satellite}, {@code satelliteStructure} 0:500, {@code temp<1 || temp>1.8};
+ * TODO(CE: HbmWorldGen.java:377) spaceship — {@code Spaceship}, {@code spaceshipStructure} 0:1000;
+ * TODO(CE: HbmWorldGen.java:379) dud — {@code Dud}, {@code dudStructure} 0:500.
  */
 public final class OilMeteorWorldGenFeatures {
 
@@ -52,6 +58,10 @@ public final class OilMeteorWorldGenFeatures {
             FEATURES.register("radio", () -> new RadioFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, SellafieldFeature> SELLAFIELD =
             FEATURES.register("sellafield", () -> new SellafieldFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, LandmineFeature> LANDMINE =
+            FEATURES.register("landmine", () -> new LandmineFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, NitanChestFeature> NITAN_CHEST =
+            FEATURES.register("nitan_chest", () -> new NitanChestFeature(NoneFeatureConfiguration.CODEC));
 
     private OilMeteorWorldGenFeatures() {
     }

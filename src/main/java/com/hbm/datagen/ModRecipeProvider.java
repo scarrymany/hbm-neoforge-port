@@ -402,6 +402,20 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_rangefinder", has(rangefinder))
                 .save(output, id("tool/designator_range"));
 
+        // ToolRecipes.java:107 linker, "I I","ICI","GGG", I=IRON.plate(), G=GOLD.plate(), C=circuit ADVANCED.
+        Item plateIronForLinker = item("plate_iron");
+        Item plateGoldForLinker = item("plate_gold");
+        Item circuitAdvanced = item("circuit_advanced");
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("linker"))
+                .pattern("I I")
+                .pattern("ICI")
+                .pattern("GGG")
+                .define('I', plateIronForLinker)
+                .define('G', plateGoldForLinker)
+                .define('C', circuitAdvanced)
+                .unlockedBy("has_circuit", has(circuitAdvanced))
+                .save(output, id("tool/linker"));
+
         // Deliberately not ported (see class javadoc for the full reasoning):
         // - elec_sword/_pickaxe/_axe/_shovel, centri_stick, smashing_hammer, chainsaw, matchstick,
         //   carts, lead_gavel, pipe_lead, designator/designator_manual/designator_arty_range and the

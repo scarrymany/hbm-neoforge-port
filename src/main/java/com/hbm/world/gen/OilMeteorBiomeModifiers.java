@@ -49,7 +49,9 @@ public final class OilMeteorBiomeModifiers {
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.ANTENNA),
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.BUNKER),
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.RADIO),
-                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.SELLAFIELD));
+                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.SELLAFIELD),
+                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.LANDMINE),
+                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.NITAN_CHEST));
 
         context.register(ADD_OIL_METEOR_WORLDGEN, new AddFeaturesBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD), HolderSet.direct(features), GenerationStep.Decoration.UNDERGROUND_ORES));

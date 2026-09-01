@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * CE {@code MachineTeleporter} — 1×1, no GUI.
- * TODO(CE: ItemTeleLink.java:38-45): linker item not ported.
+ * Destination is set by {@code hbm:linker} ({@link com.hbm.items.special.ItemTeleLink}).
  */
 public class MachineTeleporterBlock extends BaseEntityBlock implements ILookOverlay {
 

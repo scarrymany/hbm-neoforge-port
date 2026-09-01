@@ -25,6 +25,8 @@ public final class OilMeteorConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> BUNKER = key("bunker");
     public static final ResourceKey<ConfiguredFeature<?, ?>> RADIO = key("radio");
     public static final ResourceKey<ConfiguredFeature<?, ?>> SELLAFIELD = key("sellafield");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> LANDMINE = key("landmine");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> NITAN_CHEST = key("nitan_chest");
 
     private OilMeteorConfiguredFeatures() {
     }
@@ -38,6 +40,8 @@ public final class OilMeteorConfiguredFeatures {
         context.register(BUNKER, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.BUNKER.get(), NoneFeatureConfiguration.INSTANCE));
         context.register(RADIO, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.RADIO.get(), NoneFeatureConfiguration.INSTANCE));
         context.register(SELLAFIELD, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.SELLAFIELD.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(LANDMINE, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.LANDMINE.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(NITAN_CHEST, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.NITAN_CHEST.get(), NoneFeatureConfiguration.INSTANCE));
     }
 
     private static ResourceKey<ConfiguredFeature<?, ?>> key(String path) {

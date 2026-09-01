@@ -95,6 +95,7 @@ public class CompatibilityConfig {
     public static ConfigValue<List<? extends String>> BUNKER_STRUCTURE_RAW;
     public static ConfigValue<List<? extends String>> RADIO_STRUCTURE_RAW;
     public static ConfigValue<List<? extends String>> RADFREQ_RAW;
+    public static ConfigValue<List<? extends String>> MINEFREQ_RAW;
 
     static void init(ModConfigSpec.Builder builder) {
         builder.push("mobs");
@@ -326,6 +327,9 @@ public class CompatibilityConfig {
         RADFREQ_RAW = builder
                 .comment("Spawn a Sellafield radiation hotspot every Nth chunk (1-in-N). [CE CompatibilityConfig.radfreq 03.17_radHotsoptSpawn default 0:5000]")
                 .defineListAllowEmpty("radfreq", () -> List.of("minecraft:overworld=5000"), entry -> entry instanceof String);
+        MINEFREQ_RAW = builder
+                .comment("Spawn an AP landmine every Nth chunk (1-in-N). [CE CompatibilityConfig.minefreq 03.15_landmineSpawn default 0:64]")
+                .defineListAllowEmpty("minefreq", () -> List.of("minecraft:overworld=64"), entry -> entry instanceof String);
 
         builder.pop();
     }
@@ -419,4 +423,5 @@ public class CompatibilityConfig {
     public static Map<String, Integer> bunkerStructure() { return spawnMap(BUNKER_STRUCTURE_RAW); }
     public static Map<String, Integer> radioStructure() { return spawnMap(RADIO_STRUCTURE_RAW); }
     public static Map<String, Integer> radfreq() { return spawnMap(RADFREQ_RAW); }
+    public static Map<String, Integer> minefreq() { return spawnMap(MINEFREQ_RAW); }
 }
