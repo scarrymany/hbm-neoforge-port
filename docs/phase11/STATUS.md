@@ -54,20 +54,21 @@
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),
   `machine_deuterium_tower` TODO(CE: AnvilRecipes.java:453-462), flatten holders,
   mold 16–28 TODO(CE: AnvilRecipes.java:626-635).
-- This Dummyable wave: `reactor_research` `{2,0,0,0,0,0}` offset 0 + 12 plates /
-  maxHeat 50000 / GUI `gui_research_reactor.png` 176×222; `reactor_zirnox`
-  `{1,0,2,2,2,2}` offset 2 + 3 XR + tanks 8000/16000/32000 / maxHeat-Pressure
-  100000 / GUI `gui_zirnox.png` 203×256. Breeding reads `totalFlux`.
-  `rod_zirnox_tritium` registered (CE lithium product). Same CE ids.
-  Cited TODOs (TESR/ProxyCombo/OC/ROR/debris/destroyed/tilt/NumberDisplay).
-  Transformers stay BlockBase. Fusion/watz skipped (huge MB). No invent.
+- This Dummyable wave: `machine_assembly_factory` / `machine_chemical_factory`
+  `{2,0,2,2,2,2}` offset 2 + extras. 4 lanes, `speed*2`/`pow*2`, water cool
+  100→lps. Assembly 60 slots / 4+4×4000; chem 32 slots / 12+12×24000.
+  Same recipe tables as assembly_machine / chemical_plant (distinct blocks).
+  GUI `gui_assembly_factory.png` 256×240 / `gui_chemical_factory.png` 248×216.
+  Cited TODOs (selector/ProxyDyn/TESR/ROR/loadTank overlap). Turrets skipped
+  (time). Fusion/watz skipped. Transformers stay BlockBase. No invent.
+- Prior Dummyable: `reactor_research` / `reactor_zirnox` stay accepted.
 - Live machines (CE has TE, **no GUI**): pumps/chimneys Dummyable+BE, thresher,
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.
 - Assembler skip **3** (nitra / digimemer / 50bmgbypass). `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0, `runServer` **Done (1.692s)** / 4052 recipes, port 25566.
+- Verified: `compileJava` 0, `runServer` **Done (1.915s)** / 4052 recipes, port 25566.
   Dummyable E2E = registry/caps/GUI bind (no client, no physical place).
-  `reactor_research` / `reactor_zirnox` boot with no Exception/ERROR.
+  `machine_assembly_factory` / `machine_chemical_factory` boot with no Exception/ERROR.
 - Honest E2E: MCA 841 chunks. Forced `hiveSpawn=1` + `atomStructure=1` on
   desert seed `1833280291927865410`: hive **57** `glyphid_base` / **56**
   `glyphid_spawner` / **56** `deco_loot` / **53** wither skull / **5**

@@ -96,6 +96,46 @@ Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
 ## This wave (leftover Dummyable casings → live TE)
 
 Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
+≠ already-live `machine_assembly_machine` / `machine_chemical_plant`.
+
+- **`machine_assembly_factory`**: Dummyable `{2,0,2,2,2,2}` offset 2 +
+  perimeter extras `|i|==2|||j|==2` at y + roof extras y+2 along ±rot*2
+  (`MachineAssemblyFactory.java:45-64`). META≥12 core TE. 60 slots,
+  4 lanes (`5+i*14` in / `17+i*14` out), tanks 4+4 @ **4000** + water/lps
+  **4000**. Upgrade then **`speed*2D, pow*2D`**. `canCool` 100 water → 100
+  lps/lane. maxPower `max(power, sum(recipe.power*100), 1_000_000)`.
+  Recipes: port `AssemblerRecipe` / `ProcessingRecipes.ASSEMBLER_TYPE`.
+  GUI `gui_assembly_factory.png` 256×240 + bind. Caps item+fluid+energy.
+  Auto-match per lane.
+  TODO(CE: MachineAssemblyFactory.java:36) ProxyDyn META≥6;
+  TODO(CE: MachineAssemblyFactory.java:72-99) ILookOverlay;
+  TODO(CE: GUIMachineAssemblyFactory.java:62) GUIScreenRecipeSelector;
+  TODO(CE: TileEntityMachineAssemblyFactory.java:213) CE blueprint slot
+  `4+i*7` typo — port uses container `4+i*14`;
+  TODO(CE: RenderAssemblyFactory.java:1) OBJ TESR + AssemfacArm;
+  TODO(CE: TileEntityMachineAssemblyFactory.java:744-763) ROR.
+- **`machine_chemical_factory`**: same Dummyable dims/extras
+  (`MachineChemicalFactory.java:45-64`). 32 slots, 4 lanes
+  (`5+i*7..7` in / `8+i*7..10` out), 12+12 tanks @ **24000** + water/lps
+  **4000**. Same upgrade `*2` + cool. Recipes: `ChemPlantRecipes`.
+  GUI `gui_chemical_factory.png` 248×216 + bind. Caps item+fluid+energy.
+  Same-type out→in 50 mB/tick. Auto-match per lane.
+  TODO(CE: MachineChemicalFactory.java:36) ProxyDyn META≥6;
+  TODO(CE: GUIMachineChemicalFactory.java:63) GUIScreenRecipeSelector;
+  TODO(CE: TileEntityMachineChemicalFactory.java:168-174) `loadTank(10,13)`
+  leftover chem-plant slots — not copied (no canister slots);
+  TODO(CE: RenderChemicalFactory.java:1) OBJ TESR;
+  TODO(CE: TileEntityMachineChemicalFactory.java:525-544) ROR.
+- Fusion / watz skipped (huge MB, no real core TE this wave).
+  `turret_arty` / `turret_himars` skipped (time).
+  `machine_transformer*` stay BlockBase (CE ModBlocks.java:979-982).
+  Leftover later: turret_arty/himars, seal_*, pile_brick, solinium/fstbmb.
+
+Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
++ runServer **Done (1.915s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
+No physical place. No Exception/ERROR.
+
+## Prior wave (reactor_research / reactor_zirnox)
 
 - **`reactor_research`**: Dummyable `{2,0,0,0,0,0}` offset 0
   (`ReactorResearch.java:87-93`). META≥12 core TE. 12 plate slots,
@@ -122,10 +162,7 @@ Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
   TODO(CE: TileEntityReactorZirnox.java:354-431) debris / zirnox_destroyed / waste / ach;
   TODO(CE: TileEntityReactorZirnox.java:508-656) OC + ROR;
   TODO(CE: GUIReactorZirnox.java:99-104) GUIElements gauges.
-- Fusion / watz skipped (huge MB, no real core TE this wave).
-  `machine_transformer*` stay BlockBase (CE ModBlocks.java:979-982).
-  Leftover later: assembly/chemical factory, turret_arty/himars, seal_*,
-  pile_brick, solinium/fstbmb.
+- Fusion / watz skipped (huge MB). Transformers stay BlockBase.
 
 Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
 + runServer **Done (1.692s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
