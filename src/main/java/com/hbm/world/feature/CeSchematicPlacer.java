@@ -17,6 +17,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
@@ -92,27 +93,39 @@ public final class CeSchematicPlacer {
     private static void placeBlock(WorldGenLevel level, BlockPos pos, Block block, Cell cell) {
         if (block == null) return;
         BlockState state = apply(block.defaultBlockState(), cell);
-        level.setBlock(pos, state, 3);
+        setBlockSafe(level, pos, state);
     }
 
     private static void placeChest(WorldGenLevel level, BlockPos pos, RandomSource random, Cell cell) {
         Direction facing = direction(cell.special.facing, Direction.EAST);
-        level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), 3);
+        setBlockSafe(level, pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing));
         fillContainer(level, pos, random, cell.special);
     }
 
     private static void placeCrate(WorldGenLevel level, BlockPos pos, RandomSource random, Cell cell) {
         Block crate = block(cell.blockId);
         if (crate == null) return;
-        level.setBlock(pos, crate.defaultBlockState(), 3);
+        setBlockSafe(level, pos, crate.defaultBlockState());
         fillContainer(level, pos, random, cell.special);
+    }
+
+    /**
+     * CE {@code IWorldGenerator} wrote the full wreck. 1.21 {@code WorldGenRegion} rejects
+     * {@code setBlock} outside the generating write-radius (spaceship 12×46 / satellite 25×31).
+     * Fall back to {@code ServerLevel} so neighbor cells actually land.
+     */
+    private static void setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
+        if (level.setBlock(pos, state, 3)) return;
+        level.getLevel().setBlock(pos, state, 3);
     }
 
     private static void fillContainer(WorldGenLevel level, BlockPos pos, RandomSource random, Special special) {
         ItemPool pool = ItemPool.getPool(special.pool);
         int rolls = special.rolls;
         if (special.rand > 0) rolls = special.base + random.nextInt(special.rand);
-        if (level.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity chest) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be == null) be = level.getLevel().getBlockEntity(pos);
+        if (be instanceof RandomizableContainerBlockEntity chest) {
             int slots = chest.getContainerSize();
             if (slots <= 0) return;
             for (int i = 0; i < rolls; i++) {
@@ -122,7 +135,7 @@ public final class CeSchematicPlacer {
             extraItem(random, special).ifPresent(stack -> chest.setItem(random.nextInt(slots), stack));
             return;
         }
-        if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
+        if (be instanceof CrateBlockEntity crate) {
             var inv = crate.getCheckedInventory();
             int slots = inv.getSlots();
             if (slots <= 0) return;
@@ -156,8 +169,8 @@ public final class CeSchematicPlacer {
                 .setValue(DoorBlock.HINGE, hinge)
                 .setValue(DoorBlock.OPEN, false)
                 .setValue(DoorBlock.POWERED, false);
-        level.setBlock(pos, base.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER), 3);
-        level.setBlock(pos.above(), base.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), 3);
+        setBlockSafe(level, pos, base.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+        setBlockSafe(level, pos.above(), base.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
     }
 
     private static void placeGeiger(WorldGenLevel level, BlockPos pos, Cell cell) {
@@ -166,7 +179,7 @@ public final class CeSchematicPlacer {
         BlockState state = geiger.defaultBlockState();
         Direction facing = direction(cell.special.facing, Direction.SOUTH);
         state = applyFacing(state, facing);
-        level.setBlock(pos, state, 3);
+        setBlockSafe(level, pos, state);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
