@@ -36,6 +36,10 @@ import java.util.function.Supplier;
 public final class Phase8Blocks {
 
     public static Supplier<BlockEntityType<BlockWandLoot.WandLootBlockEntity>> WAND_LOOT_ENTITY_TYPE;
+    public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_GREEN_OFF;
+    public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_GREEN_ON;
+    public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_BLUE_OFF;
+    public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_BLUE_ON;
 
     private Phase8Blocks() {
     }
@@ -50,6 +54,7 @@ public final class Phase8Blocks {
         registerJungleDungeonBricks();
         registerGeiger();
         registerWandLoot();
+        registerTritiumLamps();
         registerBlock("block_electrical_scrap",
                 () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(2.5F, 5.0F).sound(SoundType.METAL)),
                 ModCreativeTabs.BLOCKS);
@@ -92,6 +97,8 @@ public final class Phase8Blocks {
         registerBlock("vinyl_tile_small", () -> new BlockBase(stone(10.0F, 60.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("pink_planks", () -> new BlockBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOD)), null);
         slab("pink_slab", 0.5F, 0.5F);
+        registerBlock("pink_stairs", () -> new BlockGenericStairs(Blocks.STONE.defaultBlockState(),
+                BlockBehaviour.Properties.of().strength(0.5F, 0.5F).sound(SoundType.WOOD)), null);
         registerBlock("frozen_dirt", () -> new BlockHazard(stone(0.5F, 0.5F)), ModCreativeTabs.BLOCKS);
         registerBlock("frozen_planks", () -> new BlockHazard(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOD)), ModCreativeTabs.BLOCKS);
         registerBlock("press_preheater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
@@ -99,6 +106,9 @@ public final class Phase8Blocks {
         registerBlock("sand_gold", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
         registerBlock("sand_lead", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
         registerBlock("sand_quartz", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
+        registerBlock("sand_uranium", () -> new BlockHazardFalling(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.RESOURCE);
+        registerBlock("sand_polonium", () -> new BlockHazardFalling(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.RESOURCE);
+        registerBlock("sand_gold198", () -> new BlockHazardFalling(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.RESOURCE);
         registerBlock("struct_launcher", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MISSILE);
         registerBlock("struct_scaffold", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MISSILE);
         registerBlock("fusion_heater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
@@ -332,6 +342,20 @@ public final class Phase8Blocks {
         registerBlock("geiger",
                 () -> new BlockGeiger(BlockBehaviour.Properties.of().strength(15.0F, 0.25F).sound(SoundType.STONE).noOcclusion()),
                 ModCreativeTabs.MACHINE);
+    }
+
+    /** CE {@code TritiumLamp} — RS on/off pairs, no spotlight beam. */
+    private static void registerTritiumLamps() {
+        BlockBehaviour.Properties glass = BlockBehaviour.Properties.of().strength(3.0F).sound(SoundType.GLASS);
+        BlockBehaviour.Properties glassLit = BlockBehaviour.Properties.of().strength(3.0F).sound(SoundType.GLASS).lightLevel(s -> 15);
+        LAMP_TRITIUM_GREEN_OFF = registerBlock("lamp_tritium_green_off",
+                () -> new TritiumLampBlock(glass, false, () -> LAMP_TRITIUM_GREEN_ON), ModCreativeTabs.BLOCKS);
+        LAMP_TRITIUM_GREEN_ON = registerBlock("lamp_tritium_green_on",
+                () -> new TritiumLampBlock(glassLit, true, () -> LAMP_TRITIUM_GREEN_OFF), null);
+        LAMP_TRITIUM_BLUE_OFF = registerBlock("lamp_tritium_blue_off",
+                () -> new TritiumLampBlock(glass, false, () -> LAMP_TRITIUM_BLUE_ON), ModCreativeTabs.BLOCKS);
+        LAMP_TRITIUM_BLUE_ON = registerBlock("lamp_tritium_blue_on",
+                () -> new TritiumLampBlock(glassLit, true, () -> LAMP_TRITIUM_BLUE_OFF), null);
     }
 
     /** CE {@code BlockWandLoot} / {@code wand_loot} — structure loot marker. */

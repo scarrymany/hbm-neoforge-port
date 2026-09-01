@@ -3,10 +3,14 @@ package com.hbm.blocks.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.FluidBarrelBlock;
+import com.hbm.blocks.machine.MachineAutocrafterBlock;
 import com.hbm.blocks.machine.MachineBrickFurnaceBlock;
 import com.hbm.blocks.machine.MachineDetectorBlock;
+import com.hbm.blocks.machine.MachineDiFurnaceBlock;
+import com.hbm.blocks.machine.MachineDiFurnaceRtgBlock;
 import com.hbm.blocks.machine.MachineElectricFurnaceBlock;
 import com.hbm.blocks.machine.MachineFunnelBlock;
+import com.hbm.blocks.machine.MachineKeyForgeBlock;
 import com.hbm.blocks.machine.MachineMicrowaveBlock;
 import com.hbm.blocks.machine.MachineRtgFurnaceBlock;
 import com.hbm.blocks.machine.WasteDrumBlock;
@@ -31,7 +35,8 @@ import java.util.function.Supplier;
  * furnace iron / furnace steel / firebox / oven / oilburner / sawmill /
  * ashpit / heat boilers / cooling towers / telex / radar screen / siren / condenser /
  * condenser powered / intake / drain / BAT9000 / deuterium / fan /
- * UF6/PuF6 tanks / funnel / microwave / electric furnace / detector / orbus.
+ * UF6/PuF6 tanks / funnel / microwave / electric furnace / detector / orbus /
+ * autocrafter / keyforge / di-furnace / RTG di-furnace.
  */
 public final class DummyableProcessBlocks {
 
@@ -114,6 +119,12 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<FluidBarrelBlock> BARREL_STEEL;
     public static DeferredBlock<FluidBarrelBlock> BARREL_TCALLOY;
     public static DeferredBlock<FluidBarrelBlock> BARREL_ANTIMATTER;
+    public static DeferredBlock<MachineAutocrafterBlock> MACHINE_AUTOCRAFTER;
+    public static DeferredBlock<MachineKeyForgeBlock> MACHINE_KEYFORGE;
+    public static DeferredBlock<MachineDiFurnaceBlock> MACHINE_DIFURNACE_OFF;
+    public static DeferredBlock<MachineDiFurnaceBlock> MACHINE_DIFURNACE_ON;
+    public static DeferredBlock<MachineDiFurnaceRtgBlock> MACHINE_DIFURNACE_RTG_OFF;
+    public static DeferredBlock<MachineDiFurnaceRtgBlock> MACHINE_DIFURNACE_RTG_ON;
 
     private DummyableProcessBlocks() {
     }
@@ -195,6 +206,12 @@ public final class DummyableProcessBlocks {
         BARREL_STEEL = registerBlock("barrel_steel", () -> new FluidBarrelBlock(MACHINE_PROPS, 16_000, FluidBarrelBlock.Kind.STEEL));
         BARREL_TCALLOY = registerBlock("barrel_tcalloy", () -> new FluidBarrelBlock(MACHINE_PROPS, 24_000, FluidBarrelBlock.Kind.TCALLOY));
         BARREL_ANTIMATTER = registerBlock("barrel_antimatter", () -> new FluidBarrelBlock(MACHINE_PROPS, 16_000, FluidBarrelBlock.Kind.ANTIMATTER));
+        MACHINE_AUTOCRAFTER = registerBlock("machine_autocrafter", () -> new MachineAutocrafterBlock(MACHINE_PROPS));
+        MACHINE_KEYFORGE = registerBlock("machine_keyforge", () -> new MachineKeyForgeBlock(MACHINE_PROPS));
+        MACHINE_DIFURNACE_OFF = registerBlock("machine_difurnace_off", () -> new MachineDiFurnaceBlock(MACHINE_PROPS));
+        MACHINE_DIFURNACE_ON = registerBlockNoTab("machine_difurnace_on", () -> new MachineDiFurnaceBlock(MACHINE_PROPS));
+        MACHINE_DIFURNACE_RTG_OFF = registerBlock("machine_difurnace_rtg_off", () -> new MachineDiFurnaceRtgBlock(MACHINE_PROPS));
+        MACHINE_DIFURNACE_RTG_ON = registerBlockNoTab("machine_difurnace_rtg_on", () -> new MachineDiFurnaceRtgBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

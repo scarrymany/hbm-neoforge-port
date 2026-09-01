@@ -71,5 +71,9 @@ public final class DummyableProcessClientRegistry {
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_BRICK_FURNACE, BrickFurnaceScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_RTG_FURNACE, RtgFurnaceScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.FLUID_BARREL, FluidBarrelScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_AUTOCRAFTER, AutocrafterScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_KEYFORGE, KeyForgeScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_DIFURNACE, DiFurnaceScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_DIFURNACE_RTG, DiFurnaceRtgScreen::new);
     }
 }

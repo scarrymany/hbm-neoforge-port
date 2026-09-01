@@ -74,6 +74,10 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineBrickFurnaceBlockEntity>> MACHINE_BRICK_FURNACE;
     public static Supplier<BlockEntityType<MachineRtgFurnaceBlockEntity>> MACHINE_RTG_FURNACE;
     public static Supplier<BlockEntityType<FluidBarrelBlockEntity>> FLUID_BARREL;
+    public static Supplier<BlockEntityType<MachineAutocrafterBlockEntity>> MACHINE_AUTOCRAFTER;
+    public static Supplier<BlockEntityType<MachineKeyForgeBlockEntity>> MACHINE_KEYFORGE;
+    public static Supplier<BlockEntityType<MachineDiFurnaceBlockEntity>> MACHINE_DIFURNACE;
+    public static Supplier<BlockEntityType<MachineDiFurnaceRtgBlockEntity>> MACHINE_DIFURNACE_RTG;
 
     private DummyableProcessBlockEntities() {
     }
@@ -352,6 +356,24 @@ public final class DummyableProcessBlockEntities {
                 DummyableProcessBlocks.BARREL_STEEL.get(),
                 DummyableProcessBlocks.BARREL_TCALLOY.get(),
                 DummyableProcessBlocks.BARREL_ANTIMATTER.get()
+        ).build(null));
+        MACHINE_AUTOCRAFTER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_autocrafter", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineAutocrafterBlockEntity(MACHINE_AUTOCRAFTER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_AUTOCRAFTER.get()
+        ).build(null));
+        MACHINE_KEYFORGE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_keyforge", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineKeyForgeBlockEntity(MACHINE_KEYFORGE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_KEYFORGE.get()
+        ).build(null));
+        MACHINE_DIFURNACE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_difurnace", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineDiFurnaceBlockEntity(MACHINE_DIFURNACE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_DIFURNACE_OFF.get(),
+                DummyableProcessBlocks.MACHINE_DIFURNACE_ON.get()
+        ).build(null));
+        MACHINE_DIFURNACE_RTG = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_difurnace_rtg", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineDiFurnaceRtgBlockEntity(MACHINE_DIFURNACE_RTG.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_DIFURNACE_RTG_OFF.get(),
+                DummyableProcessBlocks.MACHINE_DIFURNACE_RTG_ON.get()
         ).build(null));
     }
 }

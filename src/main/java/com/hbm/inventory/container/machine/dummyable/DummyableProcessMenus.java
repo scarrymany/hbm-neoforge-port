@@ -55,6 +55,10 @@ import com.hbm.blockentity.machine.dummyable.MachineOrbusBlockEntity;
 import com.hbm.blockentity.machine.dummyable.FluidBarrelBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineBrickFurnaceBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineRtgFurnaceBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineAutocrafterBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineKeyForgeBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineDiFurnaceBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineDiFurnaceRtgBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -119,6 +123,10 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<BrickFurnaceMenu>> MACHINE_BRICK_FURNACE;
     public static DeferredHolder<MenuType<?>, MenuType<RtgFurnaceMenu>> MACHINE_RTG_FURNACE;
     public static DeferredHolder<MenuType<?>, MenuType<FluidBarrelMenu>> FLUID_BARREL;
+    public static DeferredHolder<MenuType<?>, MenuType<AutocrafterMenu>> MACHINE_AUTOCRAFTER;
+    public static DeferredHolder<MenuType<?>, MenuType<KeyForgeMenu>> MACHINE_KEYFORGE;
+    public static DeferredHolder<MenuType<?>, MenuType<DiFurnaceMenu>> MACHINE_DIFURNACE;
+    public static DeferredHolder<MenuType<?>, MenuType<DiFurnaceRtgMenu>> MACHINE_DIFURNACE_RTG;
 
     private DummyableProcessMenus() {
     }
@@ -234,6 +242,14 @@ public final class DummyableProcessMenus {
                 new RtgFurnaceMenu(id, inv, (MachineRtgFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         FLUID_BARREL = reg("fluid_barrel", (id, inv, buf) ->
                 new FluidBarrelMenu(id, inv, (FluidBarrelBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_AUTOCRAFTER = reg("machine_autocrafter", (id, inv, buf) ->
+                new AutocrafterMenu(id, inv, (MachineAutocrafterBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_KEYFORGE = reg("machine_keyforge", (id, inv, buf) ->
+                new KeyForgeMenu(id, inv, (MachineKeyForgeBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_DIFURNACE = reg("machine_difurnace", (id, inv, buf) ->
+                new DiFurnaceMenu(id, inv, (MachineDiFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_DIFURNACE_RTG = reg("machine_difurnace_rtg", (id, inv, buf) ->
+                new DiFurnaceRtgMenu(id, inv, (MachineDiFurnaceRtgBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

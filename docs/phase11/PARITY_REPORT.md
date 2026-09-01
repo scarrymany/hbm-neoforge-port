@@ -9,24 +9,23 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (6.206s)** on wiped world port 25566, **3946 recipes**.
-No recipe parse errors. No new tag (Dummyable wave, not a closed ChemPlant/SILEX family). `v0.0.1-rc2` stays.
+`./gradlew runServer` pending (pre-test commit). No new tag (Dummyable wave). `v0.0.1-rc2` stays.
 `runClient` last green: MenuScreens (`gui.png-atlas`). No `MACHINE_CRUCIBLE` NPE.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **101.8%** (7905 / 7767) |
-| **Unweighted** (mean of category %) | **101.8%** |
-| Recipe/loot reachability of port items | **52.7%** (1341 / 2546) |
+| **Weighted** (Σport / ΣCE) | **102.1%** (7933 / 7767) |
+| **Unweighted** (mean of category %) | **102.0%** |
+| Recipe/loot reachability of port items | **52.4%** (1341 / 2560) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 187**, **machine 327**, **vanilla 52**.
-Weighted **101.8%**. Category holes remain. Not content-complete.
+Largest remaining holes: **blocks 173**, **machine 327**, **vanilla 52**.
+Weighted **102.1%**. Category holes remain. Not content-complete.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -34,8 +33,8 @@ Weighted **101.8%**. Category holes remain. Not content-complete.
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2546 | **136.7%** | Extract + already-registered helpers / loops + Dummyable BlockItems |
-| Blocks | 1169 | 982 | **84.0%** | +brick/RTG furnaces + 6 fluid barrels + 8 deco |
+| Items (flattened ids) | 1863 | 2560 | **137.4%** | Extract + already-registered helpers / loops + Dummyable BlockItems |
+| Blocks | 1169 | 996 | **85.2%** | +autocrafter / keyforge / di-furnace / RTG di-furnace + lamps + sands + pink_stairs |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
