@@ -13,7 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -140,6 +139,19 @@ public final class AmmoPressRecipes {
                 null, new ComparableStack(item("ingot_steel"), 1), null, null, new ComparableStack(item("steel_pipe"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("ct_mortar"), 4),
                 null, ((OreDictStack.ofHbmTag("any_highexplosive", 1)).copy(4)), null, null, new ComparableStack(item("steel_pipe"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null));
+        // CE AmmoPressRecipes.java:936+ / :1024 / :1038 — fluid-slot + coil family
+        ComparableStack steelPlate = new ComparableStack(item("plate_steel"));
+        ComparableStack leadPlate = new ComparableStack(item("plate_lead"));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_diesel")),
+                null, steelPlate, null, null, new FluidStack(Fluids.DIESEL, 1_000), null, null, steelPlate, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_gas")),
+                null, steelPlate, null, null, new FluidStack(Fluids.GAS, 1_000), null, null, steelPlate, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_balefire")),
+                null, steelPlate, null, null, new FluidStack(Fluids.BALEFIRE, 1_000), null, null, steelPlate, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("tau_uranium"), 16),
+                null, leadPlate, null, null, new ComparableStack(item("ingot_u238")), null, null, leadPlate, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("coil_tungsten"), 4),
+                null, null, null, null, new ComparableStack(item("ingot_tungsten")), null, null, null, null));
     }
 
     private static Item item(String id) {

@@ -865,7 +865,12 @@ def write_assembler(known: set[str]) -> tuple[int, int, dict[str, int]]:
             skip += 1
             continue
         oid, oc = outs[0]
-        inputs = [{"item": {"item": iid}, "count": c} for iid, c in inns]
+        inputs = []
+        for iid, c in inns:
+            if iid.startswith("tag:"):
+                inputs.append({"item": {"tag": iid[4:]}, "count": c})
+            else:
+                inputs.append({"item": {"item": iid}, "count": c})
         payload = {
             "type": "hbm:assembler",
             "inputs": inputs,

@@ -9,7 +9,7 @@
     },
     {
       "item": {
-        "item": "tag:hbm:any_highexplosive"
+        "tag": "hbm:any_highexplosive"
       },
       "count": 4
     }
