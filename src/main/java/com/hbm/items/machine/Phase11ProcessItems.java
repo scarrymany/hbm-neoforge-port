@@ -83,6 +83,8 @@ public final class Phase11ProcessItems {
         parts("casing_shotshell");
         parts("casing_buckshot");
         parts("casing_buckshot_advanced");
+        // CE ModItems.assembly_nuke — AmmoPressRecipes.java:1061
+        parts("assembly_nuke");
 
         for (ItemEnums.EnumTarType type : ItemEnums.EnumTarType.VALUES) {
             parts("oil_tar_" + type.name().toLowerCase());

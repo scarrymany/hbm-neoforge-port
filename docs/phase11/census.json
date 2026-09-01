@@ -1,14 +1,14 @@
 {
-  "weighted_pct": 103.7,
-  "unweighted_pct": 102.8,
+  "weighted_pct": 104.2,
+  "unweighted_pct": 103.1,
   "ce_sum": 7767,
-  "port_sum": 8057,
+  "port_sum": 8097,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2574,
-      "pct": 138.2
+      "port": 2585,
+      "pct": 138.8
     },
     {
       "cat": "blocks",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1781,
-      "pct": 88.7
+      "port": 1810,
+      "pct": 90.1
     },
     {
       "cat": "advancements",
@@ -59,7 +59,7 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2574,
+      "port": 2585,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
@@ -173,7 +173,7 @@
       },
       "port_json": 758,
       "port_java": {
-        "AmmoPressRecipes": 60,
+        "AmmoPressRecipes": 89,
         "AnnihilatorRecipes": 15,
         "ArcFurnaceRecipes": 25,
         "ArcWelderRecipes": 47,
@@ -219,7 +219,7 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 95
       },
-      "port": 1781,
+      "port": 1810,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,
@@ -237,10 +237,10 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2574,
-      "reachable_via_recipe_or_loot": 1529,
+      "port_items": 2585,
+      "reachable_via_recipe_or_loot": 1552,
       "includes_machine_tables": true,
-      "pct": 59.4
+      "pct": 60.0
     }
   },
   "recipe_json_total": 2656

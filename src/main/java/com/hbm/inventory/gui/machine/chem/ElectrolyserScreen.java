@@ -6,14 +6,18 @@ import com.hbm.packet.toserver.ElectrolyserControlPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * CE {@code GUIElectrolyserFluid} layout (210×204). CE {@code gui_electrolyser_fluid.png} is not
- * in this tree — gray-box stand-in, same as the previous fluid screen.
+ * CE {@code GUIElectrolyserFluid}. Texture is the unmodified CE png
+ * ({@code textures/gui/processing/gui_electrolyser_fluid.png}, 256×256).
  */
 public class ElectrolyserScreen extends GuiInfoContainer<ElectrolyserMenu> {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/processing/gui_electrolyser_fluid.png");
 
     public ElectrolyserScreen(ElectrolyserMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -27,18 +31,25 @@ public class ElectrolyserScreen extends GuiInfoContainer<ElectrolyserMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
-        guiGraphics.fill(x + 8, y + 82, x + 62, y + 94, 0xFF555577);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         var be = this.getMenu().be;
+        int p = (int) (be.getMaxPower() > 0 ? be.getPower() * 89L / be.getMaxPower() : 0);
+        if (p > 0) {
+            guiGraphics.blit(TEXTURE, x + 186, y + 107 - p, 210, 89 - p, 16, p);
+        }
+        if (be.getPower() >= be.usageFluid) {
+            guiGraphics.blit(TEXTURE, x + 190, y + 4, 226, 40, 9, 12);
+        }
+        int max = Math.max(1, be.processFluidTime);
+        int e = be.progressFluid * 41 / max;
+        if (e > 0) {
+            guiGraphics.blit(TEXTURE, x + 62, y + 26, 226, 0, 12, e);
+        }
+
         be.tankIn.renderTank(x + 42, y + 70, 0, 16, 52);
         be.tankOut1.renderTank(x + 96, y + 70, 0, 16, 52);
         be.tankOut2.renderTank(x + 116, y + 70, 0, 16, 52);
-
-        int max = Math.max(1, be.processFluidTime);
-        int e = be.progressFluid * 41 / max;
-        guiGraphics.fill(x + 62, y + 26, x + 74, y + 26 + e, 0xFF44AAEE);
     }
 
     @Override
@@ -50,7 +61,6 @@ public class ElectrolyserScreen extends GuiInfoContainer<ElectrolyserMenu> {
         be.tankOut1.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 96, topPos + 18, 16, 52);
         be.tankOut2.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 116, topPos + 18, 16, 52);
         drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 82, 54, 12, Component.literal("Metal"));
-        guiGraphics.drawString(this.font, "METAL", 16, 84, 0xFFFFFF, false);
     }
 
     @Override

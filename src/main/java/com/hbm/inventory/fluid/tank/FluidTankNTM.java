@@ -3,6 +3,8 @@ package com.hbm.inventory.fluid.tank;
 import com.hbm.capability.NTMFluidCapabilityHandler;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.items.tool.ItemFluidContainerInfinite;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
@@ -21,8 +23,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,11 +45,8 @@ import java.util.List;
  * raw-{@link ByteBuf} wire format) is CE's, translated 1.12.2 Forge types to NeoForge ones. Two
  * deliberate deviations from CE, both scoped narrowly:
  * <ul>
- *   <li>The item-canister loading subsystem ({@code loadTank}/{@code unloadTank}/{@code setType},
- *   CE's {@code IFluidLoadingHandler} chain and {@code IItemFluidIdentifier}) is left out - neither
- *   exists in this port yet, and nothing forward-references it (unlike this class itself, which is
- *   already relied on by {@code NTMFluidHandlerWrapper}). A future item-container package can add
- *   it back as pure addition, since it doesn't touch any field or method below.</li>
+ *   <li>{@code loadTank}/{@code unloadTank}/{@code setType} are now live (CE
+ *   {@code IFluidLoadingHandler} + {@code IItemFluidIdentifier}).</li>
  *   <li>{@code onTypeChanged()} is a documented no-op: CE calls {@code IConnectionAnchors.notifyAnchors},
  *   an interface this port hasn't ported (no multiblock/connection-anchor package exists yet).
  *   {@link #withOwner} is kept so that wiring is a one-line change once it lands.</li>
@@ -75,6 +76,14 @@ public class FluidTankNTM implements Cloneable {
 
     @Nullable
     private BlockEntity owner;
+
+    public static final List<IFluidLoadingHandler> loadingHandlers = new ArrayList<>();
+
+    static {
+        loadingHandlers.add(new FluidLoaderStandard());
+        loadingHandlers.add(new FluidLoaderFillableItem());
+        loadingHandlers.add(new FluidLoaderInfinite());
+    }
 
     public FluidTankNTM(@NotNull FluidType type, int maxFluid) {
         this.type = type;
@@ -164,6 +173,65 @@ public class FluidTankNTM implements Cloneable {
 
     public int getPressure() {
         return pressure;
+    }
+
+    /** CE {@code FluidTankNTM.loadTank} :160-177 — fill this tank from a canister in {@code in}. */
+    public boolean loadTank(int in, int out, IItemHandler slots) {
+        if (slots.getStackInSlot(in).isEmpty()) return false;
+        boolean isInfiniteBarrel = slots.getStackInSlot(in).getItem() instanceof ItemFluidContainerInfinite inf
+                && inf.allowPressure(this.pressure);
+        if (!isInfiniteBarrel && pressure != 0 && !(slots.getStackInSlot(in).getItem() instanceof ItemFluidContainerInfinite)) {
+            return false;
+        }
+        int prev = this.getFill();
+        for (IFluidLoadingHandler handler : loadingHandlers) {
+            if (handler.emptyItem(slots, in, out, this)) {
+                break;
+            }
+        }
+        return this.getFill() > prev;
+    }
+
+    /** CE {@code FluidTankNTM.unloadTank} :180-193 — fill a canister from this tank. */
+    public boolean unloadTank(int in, int out, IItemHandler slots) {
+        if (slots.getStackInSlot(in).isEmpty()) return false;
+        int prev = this.getFill();
+        for (IFluidLoadingHandler handler : loadingHandlers) {
+            if (handler.fillItem(slots, in, out, this)) {
+                break;
+            }
+        }
+        return this.getFill() < prev;
+    }
+
+    public boolean setType(int in, IItemHandler slots) {
+        return setType(in, in, slots);
+    }
+
+    /** CE {@code FluidTankNTM.setType} :207-235 — {@link IItemFluidIdentifier} in {@code in}. */
+    public boolean setType(int in, int out, IItemHandler slots) {
+        ItemStack stack = slots.getStackInSlot(in);
+        if (stack.isEmpty() || !(stack.getItem() instanceof IItemFluidIdentifier id)) return false;
+        net.minecraft.world.level.Level level = owner != null ? owner.getLevel() : null;
+        net.minecraft.core.BlockPos pos = owner != null ? owner.getBlockPos() : net.minecraft.core.BlockPos.ZERO;
+        FluidType newType = id.getType(level, pos, stack);
+        if (in == out) {
+            if (type != newType) {
+                type = newType;
+                fluid = 0;
+                onTypeChanged();
+                return true;
+            }
+        } else if (slots.getStackInSlot(out).isEmpty()) {
+            if (type != newType) {
+                type = newType;
+                slots.insertItem(out, slots.extractItem(in, 1, false), false);
+                fluid = 0;
+                onTypeChanged();
+                return true;
+            }
+        }
+        return false;
     }
 
     public int changeTankSize(int size) {

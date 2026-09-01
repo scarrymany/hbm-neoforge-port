@@ -1,5 +1,6 @@
 package com.hbm.items.machine;
 
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ItemBase;
@@ -20,7 +21,7 @@ import java.util.List;
  * own per-size instantiation - {@code fluid_tank_full}, {@code fluid_tank_lead_full},
  * {@code fluid_barrel_full}, {@code fluid_pack_full}), rather than per fluid.
  */
-public class ItemFluidTank extends ItemBase {
+public class ItemFluidTank extends ItemBase implements IFillableItem {
 
     private final int capacity;
 
@@ -40,10 +41,6 @@ public class ItemFluidTank extends ItemBase {
         return id == null ? null : Fluids.fromID(id);
     }
 
-    public static int getFill(ItemStack stack) {
-        return stack.getOrDefault(MachineDataComponents.FLUID_AMOUNT.get(), 0);
-    }
-
     public static ItemStack fill(ItemStack stack, FluidType type, int amount) {
         stack.set(MachineDataComponents.FLUID_ID.get(), type.getID());
         stack.set(MachineDataComponents.FLUID_AMOUNT.get(), amount);
@@ -55,6 +52,52 @@ public class ItemFluidTank extends ItemBase {
         copy.remove(MachineDataComponents.FLUID_ID.get());
         copy.remove(MachineDataComponents.FLUID_AMOUNT.get());
         return copy;
+    }
+
+    @Override
+    public boolean acceptsFluid(FluidType type, ItemStack stack) {
+        if (type == null || type == Fluids.NONE) return false;
+        FluidType held = getFluidType(stack);
+        return held == null || held == Fluids.NONE || held == type;
+    }
+
+    @Override
+    public int tryFill(FluidType type, int amount, ItemStack stack) {
+        if (!acceptsFluid(type, stack) || amount <= 0) return amount;
+        int fill = getFill(stack);
+        int moved = Math.min(this.capacity - fill, amount);
+        fill(stack, type, fill + moved);
+        return amount - moved;
+    }
+
+    @Override
+    public boolean providesFluid(FluidType type, ItemStack stack) {
+        return type != null && type == getFluidType(stack) && getFill(stack) > 0;
+    }
+
+    @Override
+    public int tryEmpty(FluidType type, int amount, ItemStack stack) {
+        if (!providesFluid(type, stack) || amount <= 0) return 0;
+        int fill = getFill(stack);
+        int moved = Math.min(fill, amount);
+        int left = fill - moved;
+        if (left <= 0) {
+            stack.remove(MachineDataComponents.FLUID_ID.get());
+            stack.remove(MachineDataComponents.FLUID_AMOUNT.get());
+        } else {
+            stack.set(MachineDataComponents.FLUID_AMOUNT.get(), left);
+        }
+        return moved;
+    }
+
+    @Override
+    public FluidType getFirstFluidType(ItemStack stack) {
+        return getFluidType(stack);
+    }
+
+    @Override
+    public int getFill(ItemStack stack) {
+        return stack.getOrDefault(MachineDataComponents.FLUID_AMOUNT.get(), 0);
     }
 
     @Override

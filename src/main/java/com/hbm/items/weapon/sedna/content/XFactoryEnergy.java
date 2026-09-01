@@ -87,6 +87,12 @@ public final class XFactoryEnergy {
     public static Item ITEM_CAPACITOR;
     public static Item ITEM_CAPACITOR_OVERCHARGE;
     public static Item ITEM_CAPACITOR_IR;
+    public static Item ITEM_NUKE_STANDARD;
+    public static Item ITEM_NUKE_DEMO;
+    public static Item ITEM_NUKE_HIGH;
+    public static Item ITEM_NUKE_TOTS;
+    public static Item ITEM_NUKE_HIVE;
+    public static Item ITEM_NUKE_BALEFIRE;
 
     public static final BulletConfig energy_tesla = new BulletConfig("energy_tesla").setItem(() -> ITEM_CAPACITOR)
             .setupDamageClass(DamageClass.ELECTRIC).setBeam().setSpread(0F).setLife(5).setRenderRotations(false).setDoesPenetrate(true)
@@ -112,14 +118,13 @@ public final class XFactoryEnergy {
     public static final BulletConfig energy_emerald_overcharge = energy_las_overcharge.clone("energy_emerald_overcharge").setArmorPiercing(0.5F).setThresholdNegation(15F);
     public static final BulletConfig energy_emerald_ir = energy_las_ir.clone("energy_emerald_ir").setArmorPiercing(0.5F).setThresholdNegation(10F);
 
-    // gun_fatman's mini-nuke rounds - no cased ammo item at all, matches CE's EnumAmmo.NUKE_* having
-    // none either (report: "no cased-ammo item at all").
-    public static final BulletConfig nuke_standard = new BulletConfig("nuke_standard").setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeStandard);
-    public static final BulletConfig nuke_demo = new BulletConfig("nuke_demo").setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeDemo);
-    public static final BulletConfig nuke_high = new BulletConfig("nuke_high").setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeHigh);
-    public static final BulletConfig nuke_tots = new BulletConfig("nuke_tots").setProjectiles(8).setLife(300).setVel(3F).setGrav(0.025).setSpread(0.1F).setDamage(0.35F).setOnImpact(XFactoryEnergy::nukeTinyTot);
-    public static final BulletConfig nuke_hive = new BulletConfig("nuke_hive").setProjectiles(12).setLife(300).setVel(1F).setGrav(0.025).setSpread(0.15F).setDamage(0.25F).setOnImpact(XFactoryEnergy::nukeHive);
-    public static final BulletConfig nuke_balefire = new BulletConfig("nuke_balefire").setDamage(2.5F).setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeBalefire);
+    // gun_fatman mini-nuke rounds — CE XFactoryCatapult.java:154-159 setItem(EnumAmmo.NUKE_*).
+    public static final BulletConfig nuke_standard = new BulletConfig("nuke_standard").setItem(() -> ITEM_NUKE_STANDARD).setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeStandard);
+    public static final BulletConfig nuke_demo = new BulletConfig("nuke_demo").setItem(() -> ITEM_NUKE_DEMO).setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeDemo);
+    public static final BulletConfig nuke_high = new BulletConfig("nuke_high").setItem(() -> ITEM_NUKE_HIGH).setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeHigh);
+    public static final BulletConfig nuke_tots = new BulletConfig("nuke_tots").setItem(() -> ITEM_NUKE_TOTS).setProjectiles(8).setLife(300).setVel(3F).setGrav(0.025).setSpread(0.1F).setDamage(0.35F).setOnImpact(XFactoryEnergy::nukeTinyTot);
+    public static final BulletConfig nuke_hive = new BulletConfig("nuke_hive").setItem(() -> ITEM_NUKE_HIVE).setProjectiles(12).setLife(300).setVel(1F).setGrav(0.025).setSpread(0.15F).setDamage(0.25F).setOnImpact(XFactoryEnergy::nukeHive);
+    public static final BulletConfig nuke_balefire = new BulletConfig("nuke_balefire").setItem(() -> ITEM_NUKE_BALEFIRE).setDamage(2.5F).setLife(300).setVel(3F).setGrav(0.025).setOnImpact(XFactoryEnergy::nukeBalefire);
 
     // ==================== guns ====================
 

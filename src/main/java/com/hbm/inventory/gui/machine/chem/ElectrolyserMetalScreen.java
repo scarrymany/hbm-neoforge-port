@@ -10,14 +10,18 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
- * CE {@code GUIElectrolyserMetal} layout (210×204). CE {@code gui_electrolyser_metal.png} is not
- * in this tree — gray-box stand-in matching the fluid screen.
+ * CE {@code GUIElectrolyserMetal}. Texture is the unmodified CE png
+ * ({@code textures/gui/processing/gui_electrolyser_metal.png}, 256×256).
  */
 public class ElectrolyserMetalScreen extends GuiInfoContainer<ElectrolyserMetalMenu> {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/processing/gui_electrolyser_metal.png");
 
     public ElectrolyserMetalScreen(ElectrolyserMetalMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -31,26 +35,36 @@ public class ElectrolyserMetalScreen extends GuiInfoContainer<ElectrolyserMetalM
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
-        guiGraphics.fill(x + 8, y + 82, x + 62, y + 94, 0xFF775555);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         ElectrolyserBlockEntity be = this.getMenu().be;
-        be.tankAcid.renderTank(x + 36, y + 70, 0, 16, 52);
-        fillStack(guiGraphics, x + 58, y + 18, be.leftStack, be.maxMaterial);
-        fillStack(guiGraphics, x + 96, y + 18, be.rightStack, be.maxMaterial);
+        blitMolten(guiGraphics, x + 58, y, be.leftStack, be.maxMaterial);
+        blitMolten(guiGraphics, x + 96, y, be.rightStack, be.maxMaterial);
+        guiGraphics.setColor(1F, 1F, 1F, 1F);
 
+        int p = (int) (be.getMaxPower() > 0 ? be.getPower() * 89L / be.getMaxPower() : 0);
+        if (p > 0) {
+            guiGraphics.blit(TEXTURE, x + 186, y + 107 - p, 210, 89 - p, 16, p);
+        }
+        if (be.getPower() >= be.usageOre) {
+            guiGraphics.blit(TEXTURE, x + 190, y + 4, 226, 25, 9, 12);
+        }
         int max = Math.max(1, be.processOreTime);
         int o = be.progressOre * 26 / max;
-        guiGraphics.fill(x + 7, y + 71 - o, x + 29, y + 71, 0xFFCC8844);
+        if (o > 0) {
+            guiGraphics.blit(TEXTURE, x + 7, y + 71 - o, 226, 25 - o, 22, o);
+        }
+
+        be.tankAcid.renderTank(x + 36, y + 70, 0, 16, 52);
     }
 
-    private static void fillStack(GuiGraphics guiGraphics, int x, int y, Mats.MaterialStack stack, int max) {
-        guiGraphics.fill(x, y, x + 34, y + 42, 0xFF222222);
+    private void blitMolten(GuiGraphics guiGraphics, int x, int y, Mats.MaterialStack stack, int max) {
         if (stack == null || stack.material == null || stack.amount <= 0) return;
         int h = stack.amount * 42 / Math.max(1, max);
-        int color = 0xFF000000 | stack.material.moltenColor;
-        guiGraphics.fill(x, y + 42 - h, x + 34, y + 42, color);
+        if (h <= 0) return;
+        int color = stack.material.moltenColor;
+        guiGraphics.setColor(((color >> 16) & 0xFF) / 255F, ((color >> 8) & 0xFF) / 255F, (color & 0xFF) / 255F, 1F);
+        guiGraphics.blit(TEXTURE, x, y + 60 - h, 210, 131 - h, 34, h);
     }
 
     @Override
@@ -62,7 +76,6 @@ public class ElectrolyserMetalScreen extends GuiInfoContainer<ElectrolyserMetalM
         stackTip(guiGraphics, mouseX, mouseY, leftPos + 58, topPos + 18, be.leftStack);
         stackTip(guiGraphics, mouseX, mouseY, leftPos + 96, topPos + 18, be.rightStack);
         drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 82, 54, 12, Component.literal("Fluid"));
-        guiGraphics.drawString(this.font, "FLUID", 16, 84, 0xFFFFFF, false);
     }
 
     private void stackTip(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, Mats.MaterialStack stack) {

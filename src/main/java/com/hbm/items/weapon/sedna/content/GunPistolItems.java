@@ -75,6 +75,13 @@ public final class GunPistolItems {
     public static final DeferredItem<Item> P9_JHP = registerAmmo("p9_jhp", () -> { if (XFactory9mm.ITEM_P9_JHP == null) XFactory9mm.ITEM_P9_JHP = new Item(new Item.Properties()); return XFactory9mm.ITEM_P9_JHP; });
     public static final DeferredItem<Item> P9_AP = registerAmmo("p9_ap", () -> { if (XFactory9mm.ITEM_P9_AP == null) XFactory9mm.ITEM_P9_AP = new Item(new Item.Properties()); return XFactory9mm.ITEM_P9_AP; });
 
+    // ==================== .45 ACP ammo (CE XFactory45 / AmmoPressRecipes.java:305-364) ====================
+    public static final DeferredItem<Item> P45_SP = registerAmmo("p45_sp", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> P45_FMJ = registerAmmo("p45_fmj", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> P45_JHP = registerAmmo("p45_jhp", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> P45_AP = registerAmmo("p45_ap", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> P45_DU = registerAmmo("p45_du", () -> new Item(new Item.Properties()));
+
     // ==================== .22LR ammo (4) ====================
     public static final DeferredItem<Item> P22_SP = registerAmmo("p22_sp", () -> { if (XFactory22lr.ITEM_P22_SP == null) XFactory22lr.ITEM_P22_SP = new Item(new Item.Properties()); return XFactory22lr.ITEM_P22_SP; });
     public static final DeferredItem<Item> P22_FMJ = registerAmmo("p22_fmj", () -> { if (XFactory22lr.ITEM_P22_FMJ == null) XFactory22lr.ITEM_P22_FMJ = new Item(new Item.Properties()); return XFactory22lr.ITEM_P22_FMJ; });

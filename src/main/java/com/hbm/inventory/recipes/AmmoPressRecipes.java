@@ -152,6 +152,65 @@ public final class AmmoPressRecipes {
                 null, leadPlate, null, null, new ComparableStack(item("ingot_u238")), null, null, leadPlate, null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("coil_tungsten"), 4),
                 null, null, null, null, new ComparableStack(item("ingot_tungsten")), null, null, null, null));
+        // CE AmmoPressRecipes.java leftover rows after Electrolyser/Mixer wave (p45 / g12_p / g26 / g40 / rockets / napalm / caps / nukes)
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p45_sp"), 8),
+                null, new ComparableStack(item("ingot_lead"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p45_fmj"), 8),
+                null, new ComparableStack(item("ingot_steel"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p45_jhp"), 8),
+                OreDictStack.ofHbmTag("any_plastic", 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p45_ap"), 8),
+                null, new ComparableStack(item("ingot_weaponsteel"), 1), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_small_steel")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p45_du"), 8),
+                null, new ComparableStack(item("ingot_u238"), 1), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_small_steel")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g12_phosphorus"), 6),
+                null, new ComparableStack(item("ingot_phosphorus"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_buckshot_advanced")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g26_flare"), 4),
+                null, new ComparableStack(item("powder_fire"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_large")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g40_he"), 4),
+                null, new ComparableStack(item("ball_dynamite"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_large")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g40_heat"), 4),
+                new ComparableStack(item("plate_copper"), 1), OreDictStack.ofHbmTag("any_highexplosive", 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_large")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g40_inc"), 4),
+                new FluidStack(Fluids.DIESEL, 1_000), new ComparableStack(item("ball_dynamite"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_large")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g40_phosphorus"), 4),
+                new ComparableStack(item("ingot_phosphorus"), 1), OreDictStack.ofHbmTag("any_highexplosive", 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_large")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_he"), 2),
+                null, new ComparableStack(item("ball_dynamite"), 1), null, null, new ComparableStack(item("casing_large")), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_he"), 2),
+                null, new ComparableStack(item("ball_dynamite"), 1), null, null, new ComparableStack(item("casing_large")), null, null, new ComparableStack(item("rocket_fuel")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_heat"), 2),
+                new ComparableStack(item("plate_copper"), 1), OreDictStack.ofHbmTag("any_highexplosive", 1), null, null, new ComparableStack(item("casing_large")), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_heat"), 2),
+                new ComparableStack(item("plate_copper"), 1), OreDictStack.ofHbmTag("any_highexplosive", 1), null, null, new ComparableStack(item("casing_large")), null, null, new ComparableStack(item("rocket_fuel")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_demo"), 2),
+                null, ((OreDictStack.ofHbmTag("any_highexplosive", 1)).copy(2)), null, null, new ComparableStack(item("casing_large")), null, null, new ComparableStack(item("rocket_fuel")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_inc"), 2),
+                new FluidStack(Fluids.DIESEL, 1_000), new ComparableStack(item("ball_dynamite"), 1), null, null, new ComparableStack(item("casing_large")), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_inc"), 2),
+                new FluidStack(Fluids.DIESEL, 1_000), new ComparableStack(item("ball_dynamite"), 1), null, null, new ComparableStack(item("casing_large")), null, null, new ComparableStack(item("rocket_fuel")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_phosphorus"), 2),
+                new ComparableStack(item("ingot_phosphorus"), 1), OreDictStack.ofHbmTag("any_highexplosive", 1), null, null, new ComparableStack(item("casing_large")), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_phosphorus"), 2),
+                new ComparableStack(item("ingot_phosphorus"), 1), OreDictStack.ofHbmTag("any_highexplosive", 1), null, null, new ComparableStack(item("casing_large")), null, null, new ComparableStack(item("rocket_fuel")), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_napalm")),
+                null, steelPlate, null, null, new ComparableStack(item("canister_napalm")), null, null, steelPlate, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("capacitor"), 4),
+                null, OreDictStack.ofHbmTag("any_plastic", 1), null, null, ((new ComparableStack(item("billet_silicon"))).copy(4)), null, null, OreDictStack.ofHbmTag("any_plastic", 1), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("capacitor_overcharge"), 4),
+                null, OreDictStack.ofHbmTag("any_plastic", 1), null, null, ((new ComparableStack(item("billet_silicon"))).copy(6)), null, null, OreDictStack.ofHbmTag("any_plastic", 1), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_standard")),
+                null, new ComparableStack(item("nugget_pu239")), null, null, new ComparableStack(item("assembly_nuke")), null, null, null, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_demo")),
+                null, ((new ComparableStack(item("nugget_pu239"))).copy(2)), null, null, new ComparableStack(item("assembly_nuke")), null, null, null, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_high")),
+                null, ((new ComparableStack(item("nugget_pu239"))).copy(4)), null, null, new ComparableStack(item("assembly_nuke")), null, null, null, null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_tots")),
+                null, ((new ComparableStack(item("nugget_pu239"))).copy(2)), null, null, ((new ComparableStack(item("ball_tatb"))).copy(2)), null, null, steelPlate.copy(4), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_hive")),
+                null, ((OreDictStack.ofHbmTag("any_highexplosive", 1)).copy(8)), null, null, ((new ComparableStack(item("casing_large_steel"))).copy(2)), null, null, steelPlate.copy(4), null));
+        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_balefire")),
+                null, new ComparableStack(item("egg_balefire_shard")), null, null, new ComparableStack(item("assembly_nuke")), null, null, null, null));
     }
 
     private static Item item(String id) {

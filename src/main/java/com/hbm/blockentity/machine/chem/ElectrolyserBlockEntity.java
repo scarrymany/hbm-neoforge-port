@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.chem;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
@@ -20,8 +21,11 @@ import com.hbm.inventory.recipes.ElectrolyserMetalRecipes;
 import com.hbm.inventory.recipes.ElectrolyserMetalRecipes.ElectrolysisMetalRecipe;
 import com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes;
 import com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes.ElectrolysisRecipe;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
+import com.hbm.items.tool.ItemFluidContainerInfinite;
+import com.hbm.capability.NTMFluidCapabilityHandler;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
 import com.hbm.util.CrucibleUtil;
@@ -49,9 +53,8 @@ import java.util.Map;
 
 /**
  * CE {@code TileEntityElectrolyser}: fluid + metal halves, 21 slots, nitric-acid metal cycle,
- * {@link CrucibleUtil#pourFullStack} left/right pour.
- * TODO(CE: TileEntityElectrolyser.java:141-144): {@code setType}/{@code loadTank}/{@code unloadTank}
- * fluid-id / canister slots 3-10 — IItemFluidIdentifier not ported. Do not invent.
+ * {@link CrucibleUtil#pourFullStack} left/right pour, fluid-id/canister I/O
+ * ({@code TileEntityElectrolyser.java:141-144}).
  * TODO(CE: TileEntityMachineSuperComputer.java:186-194): dropdown / ModuleMachineBase — not this machine.
  */
 public class ElectrolyserBlockEntity extends MachineBaseBlockEntity
@@ -108,8 +111,19 @@ public class ElectrolyserBlockEntity extends MachineBaseBlockEntity
     public boolean isItemValidForSlot(int i, ItemStack itemStack) {
         if (i == BATTERY_SLOT) return Library.isBattery(itemStack);
         if (i >= UPGRADE_START && i <= UPGRADE_END) return itemStack.getItem() instanceof ItemMachineUpgrade;
+        if (i == 3) return itemStack.getItem() instanceof IItemFluidIdentifier;
+        if (i == 5 || i == 7 || i == 9) return isFluidCanister(itemStack);
         if (i == CRYSTAL_SLOT) return ElectrolyserMetalRecipes.getRecipe(itemStack) != null;
         return false;
+    }
+
+    /** CE {@code SlotFiltered.fluidHandlerSlot} + {@code IFillableItem} + infinite barrel. */
+    public static boolean isFluidCanister(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (stack.getItem() instanceof IFillableItem) return true;
+        if (stack.getItem() instanceof ItemFluidContainerInfinite) return true;
+        return NTMFluidCapabilityHandler.isNtmFluidContainer(stack.getItem())
+                || NTMFluidCapabilityHandler.isEmptyNtmFluidContainer(stack.getItem());
     }
 
     @Override
@@ -294,6 +308,10 @@ public class ElectrolyserBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+        tankIn.setType(3, 4, inventory);
+        tankIn.loadTank(5, 6, inventory);
+        tankOut1.unloadTank(7, 8, inventory);
+        tankOut2.unloadTank(9, 10, inventory);
 
         if (level.getGameTime() % 20 == 0) {
             for (DirPos dp : getConPos()) {
