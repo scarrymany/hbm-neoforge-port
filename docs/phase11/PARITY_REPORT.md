@@ -9,7 +9,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.081s)** on wiped world port 25566, **4051 recipes**.
+`./gradlew runServer` **Done (6.138s)** on wiped world port 25566, **4051 recipes**.
 No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
@@ -45,7 +45,27 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (Sellafield worldgen)
+## What changed this wave (`machine_mining_laser`)
+
+- Casing `BlockBase` → Dummyable `{1,1,1,1,1,1}` offset 0, `heightOffset -1`,
+  CE hardness 5 / resistance 100 (`ModBlocks.java:1177`).
+- Live TE: 100_000_000 HE, 10_000/cycle, scan/break/fortune, oil 64000,
+  redstone stop, `isOn` button, suck drops, `IDrillInteraction`, sandbags dam.
+  SPEED/EFFECT/FORTUNE/POWER/OVERDRIVE/SCREAM via slot-scan (UpgradeManagerNT
+  not ported). **No silk** — CE has none.
+- Menu + CE `gui_laser_miner.png` (cmp match) + `SafeMenuScreens.bind`.
+- Cited: TODO(CE: TileEntityMachineMiningLaser.java:70) UpgradeManagerNT;
+  TODO(CE: TileEntityMachineMiningLaser.java:305-342) exclusive processors;
+  TODO(CE: TileEntityMachineMiningLaser.java:372-388) nullifier scrapItems;
+  TODO(CE: RenderLaserMiner.java:18) TESR;
+  TODO(CE: MachineMiningLaser.java:35-39) ProxyEnergy/ProxyCombo.
+  CE TE has no pollution increment.
+- Reachability **63.4% (1656 / 2612)** — census does not see world interaction.
+- Next leftover Dummyable with a CE TE (not empty cube): `machine_forcefield` /
+  `machine_strand_caster` / `machine_chungus` / `machine_satlink` /
+  `machine_teleporter` still casings.
+
+## Prior wave (Sellafield worldgen)
 
 - Reachability **63.4% (1656 / 2612)** — census does not see worldgen/`getDrops`.
 - Ordinary veins / nether / depth / oil / meteor **already** CE-numbered in
