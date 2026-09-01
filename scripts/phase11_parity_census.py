@@ -445,6 +445,19 @@ def machine_table_outputs() -> set[str]:
             outs.add("hbm:" + sid)
         for field in add_out_item.findall(text):
             outs.add("hbm:" + field.lower())
+        # Crystallizer ore(...) passes PlateCrystalWasteItems.CRYSTAL_* without new ItemStack(Field).
+        for field in re.findall(
+            r'(?:IngotNuggetItems|BilletPowderItems|PlateCrystalWasteItems|Phase11ProcessItems)\.([A-Z][A-Z0-9_]+)',
+            text,
+        ):
+            outs.add("hbm:" + field.lower())
+        if p.stem == "WasteDrumRecipes":
+            # stack("pwr_fuel_depleted_" + slug) — concat, not a literal.
+            for slug in (
+                "meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
+                "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241",
+            ):
+                outs.add("hbm:pwr_fuel_depleted_" + slug)
         if p.stem == "ElectrolyserMetalRecipes":
             for mat in re.findall(r'Mats\.MAT_([A-Z0-9]+)', text):
                 name = MAT_SCRAP.get(mat)

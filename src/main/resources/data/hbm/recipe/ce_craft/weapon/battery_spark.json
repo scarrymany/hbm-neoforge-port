@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "DSD",
+    "DSD"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:magnetizedtungsten_dense_wire"
+    },
+    "D": {
+      "item": "hbm:plate_dineutronium"
+    },
+    "S": {
+      "item": "hbm:powder_spark_mix"
+    }
+  },
+  "result": {
+    "id": "hbm:battery_spark",
+    "count": 1
+  }
+}

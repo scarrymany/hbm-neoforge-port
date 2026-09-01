@@ -17,21 +17,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import java.util.function.Supplier;
 
 /**
- * Block + {@code BlockItem} registration for Phase 2's ICF/Watz fusion-reactor family - see
- * {@code docs/phase2/machine_fusion_watz.md}. Mirrors {@code ChemIsotopeBlocks}' shape (block-entity
- * registration in the sibling {@link FusionBlockEntities} class, {@link FusionMenus}' {@code MenuType}s
- * triggered from here too) - wiring this family into the game needs exactly one call from
- * {@code ModBlocks.register()}, no other shared file needs a direct edit.
- * <p>
- * <b>Not ported this pass</b>: the hot-fusion tokamak (CE's {@code tileentity/machine/fusion/**},
- * {@code TileEntityFusionTorus} and its six {@code IFusionPowerReceiver} devices) - see this
- * package's own follow-up notes for why (it is built around {@code com.hbm.uninos.networkproviders}'
- * {@code KlystronNetwork}/{@code PlasmaNetwork}, neither of which exist in this port, plus the
- * unported {@code com.hbm.modules.machine.ModuleMachineFusion} processing-loop abstraction - a
- * structurally distinct, much larger system from the ICF/Watz pair this task named). SILEX/FEL
- * (laser isotope separation) are explicitly out of scope per the survey doc's own boundary note and
- * already own their package ({@code com.hbm.blocks.machine.chem}) - this family stays entirely
- * separate from it.
+ * ICF/Watz + live tokamak (CE {@code MachineFusion*}).
  */
 public final class FusionBlocks {
 
@@ -44,6 +30,16 @@ public final class FusionBlocks {
     public static DeferredBlock<WatzReactorBlock> WATZ_REACTOR;
     public static DeferredBlock<PlasmaForgeBlock> FUSION_PLASMA_FORGE;
 
+    public static DeferredBlock<MachineFusionTorusBlock> FUSION_TORUS;
+    public static DeferredBlock<MachineFusionKlystronBlock> FUSION_KLYSTRON;
+    public static DeferredBlock<MachineFusionKlystronCreativeBlock> FUSION_KLYSTRON_CREATIVE;
+    public static DeferredBlock<MachineFusionCollectorBlock> FUSION_COLLECTOR;
+    public static DeferredBlock<MachineFusionBreederBlock> FUSION_BREEDER;
+    public static DeferredBlock<MachineFusionBoilerBlock> FUSION_BOILER;
+    public static DeferredBlock<MachineFusionMHDTBlock> FUSION_MHDT;
+    public static DeferredBlock<MachineFusionCouplerBlock> FUSION_COUPLER;
+    public static DeferredBlock<BlockFusionTorusStruct> STRUCT_TORUS_CORE;
+
     private FusionBlocks() {
     }
 
@@ -54,9 +50,21 @@ public final class FusionBlocks {
         WATZ_REACTOR = registerBlock("machine_watz_reactor", () -> new WatzReactorBlock(MACHINE_PROPS));
         FUSION_PLASMA_FORGE = registerBlock("fusion_plasma_forge", () -> new PlasmaForgeBlock(MACHINE_PROPS));
 
-        // CE ModBlocks.java:1331-1348 / PlasmaForgeRecipes.java:113-237.
-        // Flattened ICF laser metas (EnumICFPart) + ICF component metas 0/1/3 + DFC casings.
-        // Placeable cubes (ICF TE already exists); full laser/DFC multiblock later.
+        FUSION_TORUS = registerBlock("fusion_torus", () -> new MachineFusionTorusBlock(MACHINE_PROPS));
+        FUSION_KLYSTRON = registerBlock("fusion_klystron", () -> new MachineFusionKlystronBlock(MACHINE_PROPS));
+        FUSION_KLYSTRON_CREATIVE = registerBlock("fusion_klystron_creative", () -> new MachineFusionKlystronCreativeBlock(MACHINE_PROPS));
+        FUSION_COLLECTOR = registerBlock("fusion_collector", () -> new MachineFusionCollectorBlock(MACHINE_PROPS));
+        FUSION_BREEDER = registerBlock("fusion_breeder", () -> new MachineFusionBreederBlock(MACHINE_PROPS));
+        FUSION_BOILER = registerBlock("fusion_boiler", () -> new MachineFusionBoilerBlock(MACHINE_PROPS));
+        FUSION_MHDT = registerBlock("fusion_mhdt", () -> new MachineFusionMHDTBlock(MACHINE_PROPS));
+        FUSION_COUPLER = registerBlock("fusion_coupler", () -> new MachineFusionCouplerBlock(MACHINE_PROPS));
+        STRUCT_TORUS_CORE = registerBlock("struct_torus_core", () -> new BlockFusionTorusStruct(MACHINE_PROPS));
+
+        registerBlock("fusion_component_0", () -> new FusionComponentBlock(MACHINE_PROPS));
+        registerCasing("fusion_component_1");
+        registerCasing("fusion_component_2");
+        registerCasing("fusion_component_3");
+
         registerCasing("icf_laser_component_casing");
         registerCasing("icf_laser_component_port");
         registerCasing("icf_laser_component_cell");
@@ -72,12 +80,6 @@ public final class FusionBlocks {
         registerCasing("dfc_receiver");
         registerCasing("dfc_injector");
         registerCasing("dfc_stabilizer");
-        // CE ModBlocks.java:1318-1319 / PlasmaForgeRecipes.java:98 fusionvessel.
-        // Flatten BlockFusionComponent metas 0/2/3 (default / blanket / motor).
-        registerCasing("fusion_torus");
-        registerCasing("fusion_component_0");
-        registerCasing("fusion_component_2");
-        registerCasing("fusion_component_3");
 
         FusionBlockEntities.registerAll();
         FusionMenus.registerAll();

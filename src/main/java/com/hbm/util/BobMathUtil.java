@@ -46,6 +46,13 @@ public class BobMathUtil {
         return Math.min(a, Math.min(b, c));
     }
 
+    /** CE {@code BobMathUtil.min(double...)} — torus power/fuel factor. */
+    public static double min(double... values) {
+        double m = values[0];
+        for (int i = 1; i < values.length; i++) m = Math.min(m, values[i]);
+        return m;
+    }
+
     /** Abbreviated large-number formatting (1.5k/2.3M/...), matching CE's own helper used by ammo/energy HUD text. */
     public static String getShortNumber(long number) {
         if (number < 1000) return String.valueOf(number);

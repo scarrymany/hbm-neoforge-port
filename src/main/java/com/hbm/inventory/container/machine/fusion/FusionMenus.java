@@ -1,5 +1,8 @@
 package com.hbm.inventory.container.machine.fusion;
 
+import com.hbm.blockentity.machine.fusion.FusionBreederBlockEntity;
+import com.hbm.blockentity.machine.fusion.FusionKlystronBlockEntity;
+import com.hbm.blockentity.machine.fusion.FusionTorusBlockEntity;
 import com.hbm.blockentity.machine.fusion.IcfPressBlockEntity;
 import com.hbm.blockentity.machine.fusion.IcfReactorBlockEntity;
 import com.hbm.blockentity.machine.fusion.PlasmaForgeBlockEntity;
@@ -22,6 +25,9 @@ public final class FusionMenus {
     public static DeferredHolder<MenuType<?>, MenuType<IcfPressMenu>> ICF_PRESS;
     public static DeferredHolder<MenuType<?>, MenuType<WatzReactorMenu>> WATZ_REACTOR;
     public static DeferredHolder<MenuType<?>, MenuType<PlasmaForgeMenu>> FUSION_PLASMA_FORGE;
+    public static DeferredHolder<MenuType<?>, MenuType<FusionTorusMenu>> FUSION_TORUS;
+    public static DeferredHolder<MenuType<?>, MenuType<FusionKlystronMenu>> FUSION_KLYSTRON;
+    public static DeferredHolder<MenuType<?>, MenuType<FusionBreederMenu>> FUSION_BREEDER;
 
     private FusionMenus() {
     }
@@ -35,6 +41,12 @@ public final class FusionMenus {
                 new WatzReactorMenu(id, inv, (WatzReactorBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         FUSION_PLASMA_FORGE = reg("fusion_plasma_forge", (id, inv, buf) ->
                 new PlasmaForgeMenu(id, inv, (PlasmaForgeBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FUSION_TORUS = reg("fusion_torus", (id, inv, buf) ->
+                new FusionTorusMenu(id, inv, (FusionTorusBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FUSION_KLYSTRON = reg("fusion_klystron", (id, inv, buf) ->
+                new FusionKlystronMenu(id, inv, (FusionKlystronBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FUSION_BREEDER = reg("fusion_breeder", (id, inv, buf) ->
+                new FusionBreederMenu(id, inv, (FusionBreederBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

@@ -49,6 +49,8 @@ import com.hbm.inventory.recipes.LiquefactionRecipes;
 import com.hbm.inventory.recipes.AmmoPressRecipes;
 import com.hbm.inventory.recipes.ArcWelderRecipes;
 import com.hbm.inventory.recipes.ParticleAcceleratorRecipes;
+import com.hbm.inventory.recipes.FluidBreederRecipes;
+import com.hbm.inventory.recipes.FusionRecipes;
 import com.hbm.inventory.recipes.PlasmaForgeRecipes;
 import com.hbm.inventory.recipes.SolderingRecipes;
 import com.hbm.inventory.recipes.AnnihilatorRecipes;
@@ -163,6 +165,8 @@ public class CommonEvents {
             ArcWelderRecipes.register();
             SolderingRecipes.register();
             PlasmaForgeRecipes.register();
+            FusionRecipes.register();
+            FluidBreederRecipes.register();
             OutgasserRecipes.register();
             LemegetonRecipes.register();
             CombinationRecipes.register();

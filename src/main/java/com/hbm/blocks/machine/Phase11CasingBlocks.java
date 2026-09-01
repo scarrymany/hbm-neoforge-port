@@ -47,17 +47,9 @@ public final class Phase11CasingBlocks {
         // reactor_research / reactor_zirnox are DummyableProcessBlocks (live TE).
         // seal_frame / seal_controller / seal_hatch are SealBlocks (live controller + hatch TE).
         // vitrified_barrel is GenericCrateBlocks (YellowBarrel, idle rad 0.5/5).
-        // TODO(CE: MachineFusionTorus.java:1): fusion_* + struct_torus_core stay BlockBase.
-        // Blocked by KlystronNetwork/PlasmaNetwork/ModuleMachineFusion. Do not stub.
+        // fusion_* + struct_torus_core live in FusionBlocks (tokamak Dummyable + TEs).
         // CE fusion_core is BlockBase.
         // watz_element / watz_cooler are CE BlockBase. machine_watz_reactor already live (FusionBlocks).
-        registerBlock("struct_torus_core", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("fusion_klystron", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("fusion_collector", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("fusion_breeder", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("fusion_boiler", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("fusion_mhdt", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("fusion_coupler", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("watz_element", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("watz_cooler", () -> new BlockBase(MACHINE_PROPS));
         // machine_condenser_powered is DummyableProcessBlocks (live TE).

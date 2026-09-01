@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IRI",
+    "CTC",
+    "IRI"
+  ],
+  "key": {
+    "I": {
+      "item": "hbm:plate_polymer"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "C": {
+      "item": "hbm:mingrade_wire"
+    },
+    "T": {
+      "item": "hbm:coil_tungsten"
+    }
+  },
+  "result": {
+    "id": "hbm:machine_detector",
+    "count": 1
+  }
+}

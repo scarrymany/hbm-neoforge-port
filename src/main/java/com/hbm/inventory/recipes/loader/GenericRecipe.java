@@ -1,5 +1,8 @@
 package com.hbm.inventory.recipes.loader;
 
+import com.hbm.inventory.RecipesCommon;
+import com.hbm.inventory.fluid.FluidStack;
+import com.hbm.inventory.recipes.loader.GenericRecipes.IOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +40,13 @@ public class GenericRecipe {
     protected boolean customLocalization;
     protected ItemStack icon = ItemStack.EMPTY;
     private String[] pools;
+    public RecipesCommon.AStack[] inputItem;
+    public FluidStack[] inputFluid;
+    public IOutput[] outputItem;
+    public FluidStack[] outputFluid;
+    public int duration;
+    public long power;
+    public String autoSwitchGroup;
 
     public GenericRecipe(String name) {
         this.name = name;
@@ -84,6 +94,34 @@ public class GenericRecipe {
     }
 
     /** Registers this recipe under one or more blueprint pools — see {@link GenericRecipes#addToPool}. */
+    public GenericRecipe setDuration(int duration) {
+        this.duration = duration;
+        return this;
+    }
+
+    public GenericRecipe setPower(long power) {
+        this.power = power;
+        return this;
+    }
+
+    public GenericRecipe inputFluids(FluidStack... input) {
+        this.inputFluid = input;
+        return this;
+    }
+
+    public GenericRecipe outputFluids(FluidStack... output) {
+        this.outputFluid = output;
+        return this;
+    }
+
+    public GenericRecipe outputItems(ItemStack... output) {
+        this.outputItem = new IOutput[output.length];
+        for (int i = 0; i < output.length; i++) {
+            this.outputItem[i] = new GenericRecipes.ChanceOutput(output[i]);
+        }
+        return this;
+    }
+
     public GenericRecipe setPools(String... pools) {
         this.pools = pools;
         for (String pool : pools) GenericRecipes.addToPool(pool, this);

@@ -11,6 +11,7 @@ import com.hbm.packet.toclient.RadFogPayload;
 import com.hbm.packet.toclient.SatPanelPayload;
 import com.hbm.packet.toserver.AnvilCraftPacket;
 import com.hbm.packet.toserver.ElectrolyserControlPacket;
+import com.hbm.packet.toserver.FusionControlPacket;
 import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
 import com.hbm.packet.toserver.LaunchPadRustedControlPacket;
@@ -115,5 +116,6 @@ public class HbmNetwork {
         registrar.playToServer(MassStorageControlPacket.TYPE, MassStorageControlPacket.STREAM_CODEC, MassStorageControlPacket::handleServer);
         registrar.playToServer(ElectrolyserControlPacket.TYPE, ElectrolyserControlPacket.STREAM_CODEC, ElectrolyserControlPacket::handleServer);
         registrar.playToServer(AnvilCraftPacket.TYPE, AnvilCraftPacket.STREAM_CODEC, AnvilCraftPacket::handleServer);
+        registrar.playToServer(FusionControlPacket.TYPE, FusionControlPacket.STREAM_CODEC, FusionControlPacket::handleServer);
     }
 }
