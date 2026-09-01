@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B",
+    "B",
+    "B"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:steel_block"
+    }
+  },
+  "result": {
+    "id": "hbm:pipes_steel",
+    "count": 1
+  }
+}

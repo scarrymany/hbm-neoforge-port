@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BPB",
+    "PRP",
+    "BPB"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:steel_bolt"
+    },
+    "P": {
+      "item": "hbm:plate_iron"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "result": {
+    "id": "hbm:fan",
+    "count": 1
+  }
+}

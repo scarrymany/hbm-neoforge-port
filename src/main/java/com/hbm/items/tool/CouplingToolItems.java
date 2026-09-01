@@ -62,6 +62,10 @@ public final class CouplingToolItems {
     public static DeferredItem<ItemKey> KEY_RED;
     public static DeferredItem<ItemKey> KEY_RED_CRACKED;
     public static DeferredItem<ItemLock> LOCK;
+    public static DeferredItem<ItemLock> PADLOCK_RUSTY;
+    public static DeferredItem<ItemLock> PADLOCK;
+    public static DeferredItem<ItemLock> PADLOCK_REINFORCED;
+    public static DeferredItem<ItemLock> PADLOCK_UNBREAKABLE;
     public static DeferredItem<ItemCounterfeitKeys> COUNTERFEIT_KEYS;
     public static DeferredItem<ItemRBMKTool> RBMK_TOOL;
     public static DeferredItem<ItemDyatlov> DYATLOV;
@@ -109,6 +113,11 @@ public final class CouplingToolItems {
         // registrations below make its vault-unlock interaction work with no further changes there.
         KEY_RED_CRACKED = reg("key_red_cracked", () -> new ItemKey(new Item.Properties().stacksTo(1).rarity(Rarity.UNCOMMON)));
         LOCK = reg("lock", () -> new ItemLock(0.1D, new Item.Properties()));
+        // CE ModItems.java:2344-2347 ItemLock lockMod / consumable tab. Models+lang already in tree.
+        PADLOCK_RUSTY = reg("padlock_rusty", () -> new ItemLock(1.0D, new Item.Properties().stacksTo(1)));
+        PADLOCK = reg("padlock", () -> new ItemLock(0.1D, new Item.Properties().stacksTo(1)));
+        PADLOCK_REINFORCED = reg("padlock_reinforced", () -> new ItemLock(0.02D, new Item.Properties().stacksTo(1)));
+        PADLOCK_UNBREAKABLE = reg("padlock_unbreakable", () -> new ItemLock(0.0D, new Item.Properties().stacksTo(1)));
         COUNTERFEIT_KEYS = reg("counterfeit_keys", () -> new ItemCounterfeitKeys(new Item.Properties(), () -> KEY_PIN.get()));
 
         RBMK_TOOL = reg("rbmk_tool", () -> new ItemRBMKTool(new Item.Properties().stacksTo(1)));
@@ -144,6 +153,10 @@ public final class CouplingToolItems {
         CreativeTabContents.add(ModCreativeTabs.CONTROL, KEY_RED);
         CreativeTabContents.add(ModCreativeTabs.CONTROL, KEY_RED_CRACKED);
         CreativeTabContents.add(ModCreativeTabs.CONTROL, LOCK);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, PADLOCK_RUSTY);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, PADLOCK);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, PADLOCK_REINFORCED);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, PADLOCK_UNBREAKABLE);
         CreativeTabContents.add(ModCreativeTabs.CONTROL, COUNTERFEIT_KEYS);
         CreativeTabContents.add(ModCreativeTabs.CONTROL, RBMK_TOOL);
         CreativeTabContents.add(ModCreativeTabs.CONTROL, DYATLOV);
