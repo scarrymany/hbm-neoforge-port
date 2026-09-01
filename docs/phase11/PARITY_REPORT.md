@@ -9,7 +9,8 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` pending (pre-test commit). No new tag (Dummyable wave). `v0.0.1-rc2` stays.
+`./gradlew runServer` **Done (5.630s)** on wiped world port 25566, **3946 recipes**.
+No recipe parse errors. No new tag (Dummyable wave, not a closed ChemPlant/SILEX family). `v0.0.1-rc2` stays.
 `runClient` last green: MenuScreens (`gui.png-atlas`). No `MACHINE_CRUCIBLE` NPE.
 
 ## Top line
