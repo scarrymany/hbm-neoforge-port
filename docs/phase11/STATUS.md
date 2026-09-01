@@ -9,6 +9,6 @@
 - Reachability **59.4%** (1529 / 2574) — JSON/loot + machine-table outputs (not faked).
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Weighted ≥99% is a gate. Not content-complete.
-- Verified: `compileJava` 0. runServer pending this commit.
+- Verified: `compileJava` 0, `runServer` **Done (5.443s)** / 3946 recipes, port 25566. No parse errors.
 - No new tag: SILEX E2E still needs FEL; ElectrolyserMetal pour not ported.
 - `master` untouched.
