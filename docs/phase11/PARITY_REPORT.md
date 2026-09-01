@@ -143,13 +143,32 @@ Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
   TODO(CE: TurretHIMARS.java:25) ProxyCombo;
   TODO(CE: RenderTurretHIMARS.java:1) OBJ TESR;
   TODO(CE: ItemAmmoHIMARS.java:256) volcanic_lava → slag.
-- Fusion / watz skipped (no real core TE this wave).
-  `machine_transformer*` stay BlockBase (CE ModBlocks.java:979-982).
-  Leftover later: seal_*, pile_brick, solinium/fstbmb.
+- Fusion torus / klystron family not stubbed (`KlystronNetwork` /
+  `PlasmaNetwork` / `ModuleMachineFusion`). CE `fusion_core` is BlockBase.
+  `machine_watz_reactor` already live — no second Watz id.
+  `watz_element` / `watz_cooler` / `machine_transformer*` stay BlockBase
+  (CE ModBlocks.java:979-982 / :watz element-cooler).
+  Leftover later: `nuke_solinium` / `nuke_fstbmb`, `vitrified_barrel`.
 
-Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
-+ runServer **Done (1.675s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
-No physical place. No Exception/ERROR. `turret_arty` / `turret_himars`.
+## This wave (seal_* / pile_brick)
+
+- **`seal_controller`**: `BlockSeal` (`BlockSeal.java`). FACING + ACTIVATED.
+  Hardness **10 / 100** (`ModBlocks.java:885`). No own TE. Click / rising
+  RS / `IBomb.explode` toggle frame size **1–6**. Interior = `seal_hatch`.
+- **`seal_hatch`**: `BlockHatch` + `TileEntityHatch` (`tileentity_seal_lid`).
+  Hardness/resistance ∞, creative tab null. Tick: missing controller or
+  `getFrameSize==0` → air.
+- **`seal_frame`**: BlockBase, hardness **10 / 100** (`ModBlocks.java:884`).
+- **`pile_brick`**: `BlockPileBrick` IToolable HAND_DRILL, MIN/MAX **5/15**,
+  flammable 30/5, hardness **5 / 10**. Size scan + CE error strings.
+  TODO(CE: BlockPileBrick.java:94-108) conversion to `pile_block` +
+  `TileEntityPileCore` / `TileEntityPileBaseMK2` — do not stub.
+
+Honest E2E: compileJava 0 + runServer **Done (5.827s)** / 4052 recipes /
+*:25566. RCON size-1 SOUTH: close → hatch + BE controller long; falling
+RS keeps hatch; second pulse → air; break frame → hatch air. `pile_brick`
+places, no TE. No client — click/`IBomb`/HAND_DRILL not physically used.
+No Exception/ERROR.
 
 ## Prior wave (reactor_research / reactor_zirnox)
 

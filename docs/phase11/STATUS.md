@@ -54,20 +54,23 @@
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),
   `machine_deuterium_tower` TODO(CE: AnvilRecipes.java:453-462), flatten holders,
   mold 16–28 TODO(CE: AnvilRecipes.java:626-635).
-- This Dummyable wave: `turret_arty` / `turret_himars` `{1,0,2,1,2,1}` offset 1,
-  hardness 5/600. Live BE aim+fire. Arty 100k HE, V0 50/20, delay 300/40,
-  modes artillery/cannon/manual. HIMARS 1e6 HE, crane reload, 40t, V0 25.
-  Ammo = existing flattened `ammo_arty_*` / `ammo_himars_*` (no invent).
-  Projectiles replace Phase9 `EntityThrownTail` stubs. GUI CE png + bind.
-  OBJ TESR cited skip. Fusion/watz skipped. Factories stay accepted.
-- Prior Dummyable: `reactor_research` / `reactor_zirnox` stay accepted.
+- This wave: `seal_*` + `pile_brick`. Controller FACING+ACTIVATED, frame 1–6,
+  hardness 10/100. Hatch TE `tileentity_seal_lid` ∞/∞, no tab. Frame stays
+  BlockBase. `pile_brick` IToolable HAND_DRILL MIN/MAX 5/15, flammable 30/5;
+  conversion to `pile_block` cited skip (no TileEntityPileCore stub).
+  Fusion torus/klystron not stubbed. `machine_watz_reactor` already live.
+  Transformers stay BlockBase. Turrets/factories stay accepted.
+- Prior Dummyable: `turret_arty` / `turret_himars`, `reactor_research` /
+  `reactor_zirnox` stay accepted.
 - Live machines (CE has TE, **no GUI**): pumps/chimneys Dummyable+BE, thresher,
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.
 - Assembler skip **3** (nitra / digimemer / 50bmgbypass). `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0, `runServer` **Done (1.675s)** / 4052 recipes, port 25566.
-  Dummyable E2E = registry/caps/GUI bind (no client, no physical place).
-  `turret_arty` / `turret_himars` boot with no Exception/ERROR.
+- Verified: `compileJava` 0, `runServer` **Done (5.827s)** / 4052 recipes, port 25566.
+  RCON setblock size-1 SOUTH frame: close hatch + `tileentity_seal_lid`
+  controller long, falling RS keeps hatch, second pulse → air, break frame
+  → hatch air. `pile_brick` places, no TE. No client / no HAND_DRILL.
+  No Exception/ERROR.
 - Honest E2E: MCA 841 chunks. Forced `hiveSpawn=1` + `atomStructure=1` on
   desert seed `1833280291927865410`: hive **57** `glyphid_base` / **56**
   `glyphid_spawner` / **56** `deco_loot` / **53** wither skull / **5**
