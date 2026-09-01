@@ -76,8 +76,7 @@ public final class Phase11CasingBlocks {
         // CE ModBlocks.java:821-822 — Arty/HIMARS out of TurretBlocks TE scope
         registerBlock("turret_arty", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("turret_himars", () -> new BlockBase(MACHINE_PROPS));
-        // CE ModBlocks.java:789 / ass.fritz
-        registerBlock("barrel_steel", () -> new BlockBase(MACHINE_PROPS));
+        // barrel_steel is DummyableProcessBlocks (live TE).
         // CE ModBlocks.java:958 / CraftingManager.java:647 (vanilla satlinker, ≠ machine_satlink)
         registerBlock("machine_satlinker", () -> new BlockBase(MACHINE_PROPS));
     }

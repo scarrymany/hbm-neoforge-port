@@ -91,6 +91,14 @@ public final class Phase8Blocks {
         registerBlock("vinyl_tile_large", () -> new BlockBase(stone(10.0F, 60.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("vinyl_tile_small", () -> new BlockBase(stone(10.0F, 60.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("pink_planks", () -> new BlockBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOD)), null);
+        slab("pink_slab", 0.5F, 0.5F);
+        registerBlock("frozen_dirt", () -> new BlockHazard(stone(0.5F, 0.5F)), ModCreativeTabs.BLOCKS);
+        registerBlock("frozen_planks", () -> new BlockHazard(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOD)), ModCreativeTabs.BLOCKS);
+        registerBlock("press_preheater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        registerBlock("sand_boron", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
+        registerBlock("sand_gold", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
+        registerBlock("sand_lead", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
+        registerBlock("sand_quartz", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
         registerBlock("struct_launcher", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MISSILE);
         registerBlock("struct_scaffold", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MISSILE);
         registerBlock("fusion_heater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);

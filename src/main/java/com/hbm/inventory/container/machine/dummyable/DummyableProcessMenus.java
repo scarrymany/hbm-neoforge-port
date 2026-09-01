@@ -52,6 +52,9 @@ import com.hbm.blockentity.machine.dummyable.MachineElectricFurnaceBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineFunnelBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineMicrowaveBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineOrbusBlockEntity;
+import com.hbm.blockentity.machine.dummyable.FluidBarrelBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineBrickFurnaceBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineRtgFurnaceBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -113,6 +116,9 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<FunnelMenu>> MACHINE_FUNNEL;
     public static DeferredHolder<MenuType<?>, MenuType<MicrowaveMenu>> MACHINE_MICROWAVE;
     public static DeferredHolder<MenuType<?>, MenuType<ElectricFurnaceMenu>> MACHINE_ELECTRIC_FURNACE;
+    public static DeferredHolder<MenuType<?>, MenuType<BrickFurnaceMenu>> MACHINE_BRICK_FURNACE;
+    public static DeferredHolder<MenuType<?>, MenuType<RtgFurnaceMenu>> MACHINE_RTG_FURNACE;
+    public static DeferredHolder<MenuType<?>, MenuType<FluidBarrelMenu>> FLUID_BARREL;
 
     private DummyableProcessMenus() {
     }
@@ -222,6 +228,12 @@ public final class DummyableProcessMenus {
                 new MicrowaveMenu(id, inv, (MachineMicrowaveBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_ELECTRIC_FURNACE = reg("machine_electric_furnace", (id, inv, buf) ->
                 new ElectricFurnaceMenu(id, inv, (MachineElectricFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_BRICK_FURNACE = reg("machine_furnace_brick", (id, inv, buf) ->
+                new BrickFurnaceMenu(id, inv, (MachineBrickFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_RTG_FURNACE = reg("machine_rtg_furnace", (id, inv, buf) ->
+                new RtgFurnaceMenu(id, inv, (MachineRtgFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        FLUID_BARREL = reg("fluid_barrel", (id, inv, buf) ->
+                new FluidBarrelMenu(id, inv, (FluidBarrelBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

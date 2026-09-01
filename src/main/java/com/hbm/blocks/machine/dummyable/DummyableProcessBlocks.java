@@ -2,10 +2,13 @@ package com.hbm.blocks.machine.dummyable;
 
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.machine.FluidBarrelBlock;
+import com.hbm.blocks.machine.MachineBrickFurnaceBlock;
 import com.hbm.blocks.machine.MachineDetectorBlock;
 import com.hbm.blocks.machine.MachineElectricFurnaceBlock;
 import com.hbm.blocks.machine.MachineFunnelBlock;
 import com.hbm.blocks.machine.MachineMicrowaveBlock;
+import com.hbm.blocks.machine.MachineRtgFurnaceBlock;
 import com.hbm.blocks.machine.WasteDrumBlock;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -101,6 +104,16 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineElectricFurnaceBlock> MACHINE_ELECTRIC_FURNACE_ON;
     public static DeferredBlock<MachineDetectorBlock> MACHINE_DETECTOR;
     public static DeferredBlock<MachineOrbusBlock> MACHINE_ORBUS;
+    public static DeferredBlock<MachineBrickFurnaceBlock> MACHINE_FURNACE_BRICK_OFF;
+    public static DeferredBlock<MachineBrickFurnaceBlock> MACHINE_FURNACE_BRICK_ON;
+    public static DeferredBlock<MachineRtgFurnaceBlock> MACHINE_RTG_FURNACE_OFF;
+    public static DeferredBlock<MachineRtgFurnaceBlock> MACHINE_RTG_FURNACE_ON;
+    public static DeferredBlock<FluidBarrelBlock> BARREL_PLASTIC;
+    public static DeferredBlock<FluidBarrelBlock> BARREL_CORRODED;
+    public static DeferredBlock<FluidBarrelBlock> BARREL_IRON;
+    public static DeferredBlock<FluidBarrelBlock> BARREL_STEEL;
+    public static DeferredBlock<FluidBarrelBlock> BARREL_TCALLOY;
+    public static DeferredBlock<FluidBarrelBlock> BARREL_ANTIMATTER;
 
     private DummyableProcessBlocks() {
     }
@@ -172,6 +185,16 @@ public final class DummyableProcessBlocks {
         MACHINE_ELECTRIC_FURNACE_ON = registerBlockNoTab("machine_electric_furnace_on", () -> new MachineElectricFurnaceBlock(MACHINE_PROPS));
         MACHINE_DETECTOR = registerBlock("machine_detector", () -> new MachineDetectorBlock(MACHINE_PROPS));
         MACHINE_ORBUS = registerBlock("machine_orbus", () -> new MachineOrbusBlock(MACHINE_PROPS));
+        MACHINE_FURNACE_BRICK_OFF = registerBlock("machine_furnace_brick_off", () -> new MachineBrickFurnaceBlock(MACHINE_PROPS));
+        MACHINE_FURNACE_BRICK_ON = registerBlockNoTab("machine_furnace_brick_on", () -> new MachineBrickFurnaceBlock(MACHINE_PROPS));
+        MACHINE_RTG_FURNACE_OFF = registerBlock("machine_rtg_furnace_off", () -> new MachineRtgFurnaceBlock(MACHINE_PROPS));
+        MACHINE_RTG_FURNACE_ON = registerBlockNoTab("machine_rtg_furnace_on", () -> new MachineRtgFurnaceBlock(MACHINE_PROPS));
+        BARREL_PLASTIC = registerBlock("barrel_plastic", () -> new FluidBarrelBlock(MACHINE_PROPS, 12_000, FluidBarrelBlock.Kind.PLASTIC));
+        BARREL_CORRODED = registerBlockNoTab("barrel_corroded", () -> new FluidBarrelBlock(MACHINE_PROPS, 6_000, FluidBarrelBlock.Kind.CORRODED));
+        BARREL_IRON = registerBlockNoTab("barrel_iron", () -> new FluidBarrelBlock(MACHINE_PROPS, 8_000, FluidBarrelBlock.Kind.IRON));
+        BARREL_STEEL = registerBlock("barrel_steel", () -> new FluidBarrelBlock(MACHINE_PROPS, 16_000, FluidBarrelBlock.Kind.STEEL));
+        BARREL_TCALLOY = registerBlock("barrel_tcalloy", () -> new FluidBarrelBlock(MACHINE_PROPS, 24_000, FluidBarrelBlock.Kind.TCALLOY));
+        BARREL_ANTIMATTER = registerBlock("barrel_antimatter", () -> new FluidBarrelBlock(MACHINE_PROPS, 16_000, FluidBarrelBlock.Kind.ANTIMATTER));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

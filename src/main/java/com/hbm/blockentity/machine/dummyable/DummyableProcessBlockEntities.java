@@ -71,6 +71,9 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineElectricFurnaceBlockEntity>> MACHINE_ELECTRIC_FURNACE;
     public static Supplier<BlockEntityType<MachineDetectorBlockEntity>> MACHINE_DETECTOR;
     public static Supplier<BlockEntityType<MachineOrbusBlockEntity>> MACHINE_ORBUS;
+    public static Supplier<BlockEntityType<MachineBrickFurnaceBlockEntity>> MACHINE_BRICK_FURNACE;
+    public static Supplier<BlockEntityType<MachineRtgFurnaceBlockEntity>> MACHINE_RTG_FURNACE;
+    public static Supplier<BlockEntityType<FluidBarrelBlockEntity>> FLUID_BARREL;
 
     private DummyableProcessBlockEntities() {
     }
@@ -330,6 +333,25 @@ public final class DummyableProcessBlockEntities {
         MACHINE_ORBUS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_orbus", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineOrbusBlockEntity(MACHINE_ORBUS.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_ORBUS.get()
+        ).build(null));
+        MACHINE_BRICK_FURNACE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_furnace_brick", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineBrickFurnaceBlockEntity(MACHINE_BRICK_FURNACE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_FURNACE_BRICK_OFF.get(),
+                DummyableProcessBlocks.MACHINE_FURNACE_BRICK_ON.get()
+        ).build(null));
+        MACHINE_RTG_FURNACE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_rtg_furnace", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineRtgFurnaceBlockEntity(MACHINE_RTG_FURNACE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_RTG_FURNACE_OFF.get(),
+                DummyableProcessBlocks.MACHINE_RTG_FURNACE_ON.get()
+        ).build(null));
+        FLUID_BARREL = ModBlocks.BLOCK_ENTITY_TYPES.register("fluid_barrel", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new FluidBarrelBlockEntity(FLUID_BARREL.get(), pos, state),
+                DummyableProcessBlocks.BARREL_PLASTIC.get(),
+                DummyableProcessBlocks.BARREL_CORRODED.get(),
+                DummyableProcessBlocks.BARREL_IRON.get(),
+                DummyableProcessBlocks.BARREL_STEEL.get(),
+                DummyableProcessBlocks.BARREL_TCALLOY.get(),
+                DummyableProcessBlocks.BARREL_ANTIMATTER.get()
         ).build(null));
     }
 }
