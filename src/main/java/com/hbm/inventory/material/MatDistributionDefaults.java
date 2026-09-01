@@ -196,13 +196,9 @@ public final class MatDistributionDefaults {
         // below to reconnect. Yields are transcribed here (from CE MatDistribution.java) so
         // reconnecting is a one-line, no-re-derivation change once each item lands.
 
-        // #8: registerEntry(ModItems.blade_titanium, MAT_TITANIUM, INGOT.q(3))
-        // TODO(machine_items area): blade_titanium is a plain CE ItemBase, not registered by
-        // MachineItems.java - see that class's own "out of this area's scope" comment near its
-        // registerBlades() method.
-
-        // #9: registerEntry(ModItems.blade_tungsten, MAT_TUNGSTEN, INGOT.q(3))
-        // TODO(machine_items area): blade_tungsten - same as blade_titanium above.
+        // #8 / #9: CE ItemBase blades, registered by Phase11ProcessItems
+        entry("blade_titanium", MAT_TITANIUM, INGOT.q(3));
+        entry("blade_tungsten", MAT_TUNGSTEN, INGOT.q(3));
 
         // #17: registerEntry(ModItems.pipes_steel, MAT_STEEL, BLOCK.q(3))
         // TODO(machine_items or plumbing area): CE's hand-coded pipes_steel item is not registered

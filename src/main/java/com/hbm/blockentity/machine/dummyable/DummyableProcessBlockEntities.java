@@ -83,6 +83,12 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineTeleLinkerBlockEntity>> MACHINE_TELELINKER;
     public static Supplier<BlockEntityType<SoyuzCapsuleBlockEntity>> SOYUZ_CAPSULE;
     public static Supplier<BlockEntityType<FilingCabinetBlockEntity>> FILING_CABINET;
+    public static Supplier<BlockEntityType<MachinePumpBlockEntity>> PUMP_STEAM;
+    public static Supplier<BlockEntityType<MachinePumpBlockEntity>> PUMP_ELECTRIC;
+    public static Supplier<BlockEntityType<ChimneyBlockEntity>> CHIMNEY_BRICK;
+    public static Supplier<BlockEntityType<ChimneyBlockEntity>> CHIMNEY_INDUSTRIAL;
+    public static Supplier<BlockEntityType<MachineThresherBlockEntity>> MACHINE_THRESHER;
+    public static Supplier<BlockEntityType<BMPowerBoxBlockEntity>> BM_POWER_BOX;
 
     private DummyableProcessBlockEntities() {
     }
@@ -404,6 +410,30 @@ public final class DummyableProcessBlockEntities {
         FILING_CABINET = ModBlocks.BLOCK_ENTITY_TYPES.register("filing_cabinet", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new FilingCabinetBlockEntity(FILING_CABINET.get(), pos, state),
                 DummyableProcessBlocks.FILING_CABINET.get()
+        ).build(null));
+        PUMP_STEAM = ModBlocks.BLOCK_ENTITY_TYPES.register("pump_steam", () -> BlockEntityType.Builder.of(
+                (pos, state) -> MachinePumpBlockEntity.steam(PUMP_STEAM.get(), pos, state),
+                DummyableProcessBlocks.PUMP_STEAM.get()
+        ).build(null));
+        PUMP_ELECTRIC = ModBlocks.BLOCK_ENTITY_TYPES.register("pump_electric", () -> BlockEntityType.Builder.of(
+                (pos, state) -> MachinePumpBlockEntity.electric(PUMP_ELECTRIC.get(), pos, state),
+                DummyableProcessBlocks.PUMP_ELECTRIC.get()
+        ).build(null));
+        CHIMNEY_BRICK = ModBlocks.BLOCK_ENTITY_TYPES.register("chimney_brick", () -> BlockEntityType.Builder.of(
+                (pos, state) -> ChimneyBlockEntity.brick(CHIMNEY_BRICK.get(), pos, state),
+                DummyableProcessBlocks.CHIMNEY_BRICK.get()
+        ).build(null));
+        CHIMNEY_INDUSTRIAL = ModBlocks.BLOCK_ENTITY_TYPES.register("chimney_industrial", () -> BlockEntityType.Builder.of(
+                (pos, state) -> ChimneyBlockEntity.industrial(CHIMNEY_INDUSTRIAL.get(), pos, state),
+                DummyableProcessBlocks.CHIMNEY_INDUSTRIAL.get()
+        ).build(null));
+        MACHINE_THRESHER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_thresher", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineThresherBlockEntity(MACHINE_THRESHER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_THRESHER.get()
+        ).build(null));
+        BM_POWER_BOX = ModBlocks.BLOCK_ENTITY_TYPES.register("bm_power_box", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new BMPowerBoxBlockEntity(BM_POWER_BOX.get(), pos, state),
+                DummyableProcessBlocks.BM_POWER_BOX.get()
         ).build(null));
     }
 }

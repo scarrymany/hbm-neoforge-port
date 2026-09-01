@@ -79,16 +79,8 @@ public final class Phase11CasingBlocks {
         // barrel_steel is DummyableProcessBlocks (live TE).
         // CE ModBlocks.java:958 / CraftingManager.java:647 (vanilla satlinker, ≠ machine_satlink)
         registerBlock("machine_satlinker", () -> new BlockBase(MACHINE_PROPS));
-        // CE AnvilRecipes leftover outputs — blockstates/models already in tree.
-        // CE ModBlocks.java:1241 / :1233 / :1446 / :1166
-        registerBlock("pump_steam", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("pump_electric", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_thresher", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("fluid_duct_exhaust", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("chimney_brick", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("chimney_industrial", () -> new BlockBase(MACHINE_PROPS));
-        // CE ModBlocks.java:1247 — blockstate/model already parent block_steel
-        registerBlock("bm_power_box", () -> new BlockBase(MACHINE_PROPS));
+        // pump_steam / pump_electric / machine_thresher / chimney_* / bm_power_box
+        // are DummyableProcessBlocks (live TE). fluid_duct_exhaust is FluidDuctBlocks.
     }
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory) {

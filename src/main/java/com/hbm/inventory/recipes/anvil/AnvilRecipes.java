@@ -54,8 +54,9 @@ public final class AnvilRecipes {
     /**
      * CE {@code :59-73} anvil upgrades (iron/lead × 9 targets) + {@code :96} gunmetal.
      * SKIP {@code :75-91} hot ({@code AnvilSmithingHotRecipe}), {@code :98-127} mold,
-     * {@code :94} flask infusion meta, {@code :129-130} cyanide/rename —
-     * TODO(CE: AnvilRecipes.java:75-130). {@code :93} wings_murk is live (I/O registered).
+     * {@code :129-130} cyanide/rename — TODO(CE: AnvilRecipes.java:75-130).
+     * {@code :93} wings_murk and {@code :94} flask_infusion are live (I/O registered;
+     * flask is flattened SHIELD, no meta).
      */
     private static void registerSmithing() {
         String[] bases = {"anvil_iron", "anvil_lead"};
@@ -73,6 +74,8 @@ public final class AnvilRecipes {
         smith(1, stack("ingot_gunmetal"), tag("ingots/copper"), tag("ingots/aluminum"));
         // CE :93 — regular smithing, not hot
         smith(1916169, stack("wings_murk"), cmp("wings_limp"), cmp("particle_tachyon"));
+        // CE :94 — ItemFlask flattened to single SHIELD item
+        smith(4, stack("flask_infusion"), cmp("gem_alexandrite"), cmp("bottle_nuka"));
     }
 
     private static void registerConstruction() {
@@ -384,6 +387,14 @@ public final class AnvilRecipes {
                 cmp("steel_shell", 4),
                 tag("plates/copper", 6),
                 cmp("circuit_basic", 2));
+        // :453-462 machine_deuterium_tower — Fluids.SOURGAS.getDict fluid AStack.
+        // Port AStack has no fluid. TODO(CE: AnvilRecipes.java:453-462)
+        // :552-558
+        construct(5, stack("missile_doomsday"),
+                cmp("missile_doomsday_rusted"),
+                OreDictStack.ofHbmTag("any_hardplastic", 8),
+                cmp("aluminum_plate_sextuple", 2),
+                cmp("billet_pu239", 3));
         // :464-480 pylons
         construct(2, stack("red_pylon_large"),
                 cmp("concrete", 2),

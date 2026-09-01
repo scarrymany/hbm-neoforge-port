@@ -2,6 +2,7 @@ package com.hbm.items.gear;
 
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ModItems;
+import com.hbm.items.armor.WingsMurk;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -72,4 +73,11 @@ public final class JetpackItems {
     // only the 20000 capacity carries real behavior.
     public static final DeferredItem<Item> JETPACK_GLIDER = register("jetpack_glider", () ->
             new JetpackGlider(new Item.Properties(), 20000));
+
+    // CE ModItems.java:736-737 — both WingsMurk, CreativeTabs.COMBAT, stacksTo(1).
+    // Client model TODO(CE: WingsMurk.java:27-42).
+    public static final DeferredItem<Item> WINGS_LIMP = register("wings_limp", () ->
+            new WingsMurk(new Item.Properties().stacksTo(1), false));
+    public static final DeferredItem<Item> WINGS_MURK = register("wings_murk", () ->
+            new WingsMurk(new Item.Properties().stacksTo(1), true));
 }

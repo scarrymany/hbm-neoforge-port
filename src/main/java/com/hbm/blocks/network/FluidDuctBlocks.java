@@ -44,6 +44,7 @@ public final class FluidDuctBlocks {
     public static DeferredBlock<FluidDuctStandardBlock> DUCT_STANDARD;
     public static DeferredBlock<FluidDuctBoxBlock> DUCT_BOX;
     public static DeferredBlock<FluidDuctBoxExhaustBlock> DUCT_BOX_EXHAUST;
+    public static DeferredBlock<FluidDuctBoxExhaustBlock> DUCT_EXHAUST;
     public static DeferredBlock<FluidCounterValveBlock> COUNTER_VALVE;
     public static DeferredBlock<FluidValveBlock> VALVE;
     public static DeferredBlock<FluidSwitchBlock> SWITCH;
@@ -59,6 +60,8 @@ public final class FluidDuctBlocks {
         DUCT_STANDARD = registerBlock("fluid_duct_standard", FluidDuctStandardBlock::new);
         DUCT_BOX = registerBlock("fluid_duct_box", FluidDuctBoxBlock::new);
         DUCT_BOX_EXHAUST = registerBlock("fluid_duct_box_exhaust", FluidDuctBoxExhaustBlock::new);
+        // CE id fluid_duct_exhaust — same live exhaust duct as fluid_duct_box_exhaust (prior drift).
+        DUCT_EXHAUST = registerBlock("fluid_duct_exhaust", FluidDuctBoxExhaustBlock::new);
         COUNTER_VALVE = registerBlock("fluid_counter_valve", FluidCounterValveBlock::new);
         VALVE = registerBlock("fluid_valve", FluidValveBlock::new);
         SWITCH = registerBlock("fluid_switch", FluidSwitchBlock::new);

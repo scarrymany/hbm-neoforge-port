@@ -9,6 +9,7 @@ import com.hbm.items.armor.ItemModCladding;
 import com.hbm.items.food.ItemLemon;
 import com.hbm.items.special.ItemConsumable;
 import com.hbm.items.special.ItemFuel;
+import com.hbm.items.special.ItemHot;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -22,8 +23,9 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * {@code :1842} {@code upgrade_template}, {@code :2461}/{@code :2492-2535} missile parts,
  * {@code :1151-1154} scrap family, {@code :1310} {@code pipes_steel},
  * {@code :1994-2000} debris_* (ShredderRecipes.java:208/:347/:405-410),
- * {@code sawblade}/{@code wings_limp}/{@code mold_base}/{@code wings_murk}/
- * {@code deuterium_filter}/{@code egg_glyphid}/{@code flame_pony} (Anvil leftover I/O).
+ * {@code sawblade}/{@code mold_base}/{@code deuterium_filter}/{@code egg_glyphid}/
+ * {@code flame_pony}/{@code blade_titanium}/{@code blade_tungsten}/{@code blade_meteorite}
+ * (Anvil leftover I/O). {@code wings_*} live in {@code JetpackItems} as {@code WingsMurk}.
  */
 public final class Phase11ProcessItems {
 
@@ -184,10 +186,12 @@ public final class Phase11ProcessItems {
         parts("ducttape");
         // CE AnvilRecipes leftover I/O — assets already in tree (tex/model/lang).
         parts("sawblade");
-        parts("wings_limp");
         parts("mold_base");
-        parts1("wings_murk");
         parts("deuterium_filter");
+        // CE ModItems.java:1305 / :1307 ItemBase; :887 ItemHot(200). Mold/hot recipes stay cited.
+        parts("blade_titanium");
+        parts("blade_tungsten");
+        partsHot("blade_meteorite", 200);
         consume("egg_glyphid");
         parts("flame_pony");
         // CE ModItems.java:1173 — syringe_metal_empty input
@@ -265,6 +269,12 @@ public final class Phase11ProcessItems {
 
     private static DeferredItem<Item> parts(String name) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.PARTS, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> partsHot(String name, int maxHeat) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemHot(new Item.Properties(), maxHeat));
         CreativeTabContents.add(ModCreativeTabs.PARTS, item);
         return item;
     }

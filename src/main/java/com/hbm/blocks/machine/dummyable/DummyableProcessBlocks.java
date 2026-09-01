@@ -14,7 +14,9 @@ import com.hbm.blocks.machine.FilingCabinetBlock;
 import com.hbm.blocks.machine.MachineKeyForgeBlock;
 import com.hbm.blocks.machine.MachineMicrowaveBlock;
 import com.hbm.blocks.machine.MachineRtgFurnaceBlock;
+import com.hbm.blocks.generic.BMPowerBoxBlock;
 import com.hbm.blocks.machine.MachineTeleLinkerBlock;
+import com.hbm.blocks.machine.MachineThresherBlock;
 import com.hbm.blocks.machine.SoyuzCapsuleBlock;
 import com.hbm.blocks.machine.WasteDrumBlock;
 import com.hbm.creativetabs.CreativeTabContents;
@@ -43,7 +45,8 @@ import java.util.function.Supplier;
  * UF6/PuF6 tanks / funnel / microwave / electric furnace / detector / orbus /
  * autocrafter / keyforge / di-furnace / RTG di-furnace /
  * conveyor press / mass storage /
- * telelinker / soyuz capsule / filing cabinet.
+ * telelinker / soyuz capsule / filing cabinet /
+ * pump steam/electric / chimney brick/industrial / thresher / bm_power_box.
  */
 public final class DummyableProcessBlocks {
 
@@ -140,6 +143,12 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineTeleLinkerBlock> MACHINE_TELELINKER;
     public static DeferredBlock<SoyuzCapsuleBlock> SOYUZ_CAPSULE;
     public static DeferredBlock<FilingCabinetBlock> FILING_CABINET;
+    public static DeferredBlock<MachinePumpBlock> PUMP_STEAM;
+    public static DeferredBlock<MachinePumpBlock> PUMP_ELECTRIC;
+    public static DeferredBlock<MachineChimneyBlock> CHIMNEY_BRICK;
+    public static DeferredBlock<MachineChimneyBlock> CHIMNEY_INDUSTRIAL;
+    public static DeferredBlock<MachineThresherBlock> MACHINE_THRESHER;
+    public static DeferredBlock<BMPowerBoxBlock> BM_POWER_BOX;
 
     private DummyableProcessBlocks() {
     }
@@ -241,6 +250,13 @@ public final class DummyableProcessBlocks {
         FILING_CABINET = registerBlock("filing_cabinet",
                 () -> new FilingCabinetBlock(BlockBehaviour.Properties.of().strength(10.0F, 15.0F).sound(SoundType.METAL).noOcclusion().requiresCorrectToolForDrops()),
                 ModCreativeTabs.BLOCKS);
+        // CE ModBlocks.java:1241 / :1233 / :1446 / :1166 / :1247 — live TE, no GUI
+        PUMP_STEAM = registerBlock("pump_steam", () -> new MachinePumpBlock(MACHINE_PROPS, false));
+        PUMP_ELECTRIC = registerBlock("pump_electric", () -> new MachinePumpBlock(MACHINE_PROPS, true));
+        CHIMNEY_BRICK = registerBlock("chimney_brick", () -> new MachineChimneyBlock(MACHINE_PROPS, false));
+        CHIMNEY_INDUSTRIAL = registerBlock("chimney_industrial", () -> new MachineChimneyBlock(MACHINE_PROPS, true));
+        MACHINE_THRESHER = registerBlock("machine_thresher", () -> new MachineThresherBlock(MACHINE_PROPS));
+        BM_POWER_BOX = registerBlock("bm_power_box", () -> new BMPowerBoxBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

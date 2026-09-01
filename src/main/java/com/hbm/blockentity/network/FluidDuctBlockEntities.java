@@ -47,7 +47,8 @@ public final class FluidDuctBlockEntities {
 
         BOX_EXHAUST_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("fluid_duct_box_exhaust", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new PipeExhaustBlockEntity(BOX_EXHAUST_TYPE.get(), pos, state),
-                FluidDuctBlocks.DUCT_BOX_EXHAUST.get()
+                FluidDuctBlocks.DUCT_BOX_EXHAUST.get(),
+                FluidDuctBlocks.DUCT_EXHAUST.get()
         ).build(null));
 
         COUNTER_VALVE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("fluid_counter_valve", () -> BlockEntityType.Builder.of(
