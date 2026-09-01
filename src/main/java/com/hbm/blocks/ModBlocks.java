@@ -89,6 +89,7 @@ public final class ModBlocks {
         com.hbm.blocks.machine.CrucibleBlocks.registerAll();
         com.hbm.blocks.generic.BallsSpawnerBlocks.registerAll();
         com.hbm.blocks.machine.SealBlocks.registerAll();
+        com.hbm.blocks.machine.pile.PileBlocks.registerAll();
         com.hbm.blocks.machine.Phase11CasingBlocks.registerAll();
         com.hbm.blocks.machine.dummyable.DummyableProcessBlocks.registerAll();
         BLOCKS.register(modEventBus);

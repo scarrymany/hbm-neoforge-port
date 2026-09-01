@@ -8,6 +8,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.gas.BlockGasBase;
 import com.hbm.inventory.container.machine.dummyable.MiningLaserMenu;
+import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.machine.ItemMachineUpgrade;
@@ -47,11 +48,11 @@ import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * CE {@code TileEntityMachineMiningLaser} (673 lines). Silk touch is not in CE.
  * CE laser does not increment pollution (full-file read).
- * TODO(CE: TileEntityMachineMiningLaser.java:70): UpgradeManagerNT — slot-scan substitute.
  * TODO(CE: TileEntityMachineMiningLaser.java:305-342): exclusive crystallizer/centrifuge/shredder/smelter drop rewrite.
  * TODO(CE: TileEntityMachineMiningLaser.java:372-388): upgrade_nullifier scrapItems set — not ported.
  * TODO(CE: RenderLaserMiner.java:18): TESR beam. Do not invent.
@@ -61,6 +62,15 @@ public class MachineMiningLaserBlockEntity extends MachineBaseBlockEntity
 
     public static final long MAX_POWER = 100_000_000L;
     public static final int CONSUMPTION = 10_000;
+
+    /** CE {@code TileEntityMachineMiningLaser.getValidUpgrades} — SPEED/POWER/EFFECT 12, FORTUNE 3, OVERDRIVE 9. SCREAM is identity-checked separately. */
+    private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(Map.of(
+            UpgradeType.SPEED, 12,
+            UpgradeType.POWER, 12,
+            UpgradeType.EFFECT, 12,
+            UpgradeType.FORTUNE, 3,
+            UpgradeType.OVERDRIVE, 9
+    ));
 
     public final FluidTankNTM tank;
     public long power;
@@ -159,13 +169,14 @@ public class MachineMiningLaserBlockEntity extends MachineBaseBlockEntity
         }
 
         if (isOn && !redstonePowered) {
-            int cycles = 1 + upgradeLevel(UpgradeType.OVERDRIVE);
-            int speed = 1 + Math.min(upgradeLevel(UpgradeType.SPEED), 12);
-            int range = 1 + Math.min(upgradeLevel(UpgradeType.EFFECT) * 2, 24);
-            int fortune = Math.min(upgradeLevel(UpgradeType.FORTUNE), 3);
+            upgradeManager.checkSlots(inventory, 1, 8);
+            int cycles = 1 + upgradeManager.getLevel(UpgradeType.OVERDRIVE);
+            int speed = 1 + Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 12);
+            int range = 1 + Math.min(upgradeManager.getLevel(UpgradeType.EFFECT) * 2, 24);
+            int fortune = Math.min(upgradeManager.getLevel(UpgradeType.FORTUNE), 3);
             int consumption = CONSUMPTION
-                    - (CONSUMPTION * Math.min(upgradeLevel(UpgradeType.POWER), 12) / 16)
-                    + (CONSUMPTION * Math.min(upgradeLevel(UpgradeType.SPEED), 12) / 16);
+                    - (CONSUMPTION * Math.min(upgradeManager.getLevel(UpgradeType.POWER), 12) / 16)
+                    + (CONSUMPTION * Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 12) / 16);
 
             if (hasUpgradeType(UpgradeType.SCREAM)) {
                 cycles *= 4;
@@ -388,17 +399,6 @@ public class MachineMiningLaserBlockEntity extends MachineBaseBlockEntity
 
     public int getProgressScaled(int i) {
         return (int) (clientBreakProgress * i);
-    }
-
-    private int upgradeLevel(UpgradeType type) {
-        int level = 0;
-        for (int i = 1; i <= 8; i++) {
-            ItemStack stack = inventory.getStackInSlot(i);
-            if (stack.getItem() instanceof ItemMachineUpgrade u && u.getType() == type) {
-                level += u.getTier();
-            }
-        }
-        return level;
     }
 
     private boolean hasUpgradeType(UpgradeType type) {

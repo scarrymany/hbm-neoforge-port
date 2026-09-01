@@ -61,9 +61,7 @@ public final class Phase11CasingBlocks {
         registerBlock("watz_cooler", () -> new BlockBase(MACHINE_PROPS));
         // machine_condenser_powered is DummyableProcessBlocks (live TE).
         // machine_orbus is DummyableProcessBlocks (live TE).
-        // CE ModBlocks.java:664 / ass.pileblock — BlockPileBrick IToolable, conversion cited skip.
-        registerBlock("pile_brick", () -> new com.hbm.blocks.machine.pile.BlockPileBrick(
-                BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // pile_brick / pile_block are PileBlocks (live conversion + PileChannel sim).
         // nuke_solinium / nuke_fstbmb are NukeCasingBlocks (live TE).
         // turret_arty / turret_himars are TurretBlocks (live Dummyable TE).
         // barrel_steel is DummyableProcessBlocks (live TE).
