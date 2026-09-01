@@ -19,8 +19,8 @@ import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConf
  * Gates: {@code enableDungeons}. Chance {@code CompatibilityConfig.barrelStructure} default
  * overworld {@code 5000} (CE {@code 0:5000}, {@code 03.13_barrelSpawn}). Biome:
  * {@code getBaseTemperature() > 1.8F} only ({@code HbmWorldGen.java}:370-371) — no invented
- * biome tags. Four corners {@code (0,0) (4,0) (4,6) (0,6)}, Y = min height of those
- * ({@code Barrel.java}:35-57). Schematic loot {@code crate_steel} + {@code POOL_EXPENSIVE}×16.
+ * biome tags. Four corners {@code (0,0) (4,0) (4,6) (0,6)} at the in-chunk height
+ * snap ({@code Barrel.java}:35-57). Schematic loot {@code crate_steel} + {@code POOL_EXPENSIVE}×16.
  */
 public class BarrelFeature extends Feature<NoneFeatureConfiguration> {
 
@@ -40,16 +40,16 @@ public class BarrelFeature extends Feature<NoneFeatureConfiguration> {
         int rate = CompatibilityConfig.forDimension(CompatibilityConfig.barrelStructure(), dimension);
         if (rate <= 0 || random.nextInt(rate) != 0) return false;
 
-        if (level.getBiome(origin).value().getBaseTemperature() <= 1.8F) return false;
-
+        // CE HbmWorldGen.java:342+370 reads biome at chunk center, then rolls xz in-chunk.
         int x = (origin.getX() & ~15) + random.nextInt(16);
         int z = (origin.getZ() & ~15) + random.nextInt(16);
+        if (level.getBiome(new BlockPos(x, origin.getY(), z)).value().getBaseTemperature() <= 1.8F) {
+            return false;
+        }
 
-        int y0 = height(level, x, z);
-        int y1 = height(level, x + 4, z);
-        int y2 = height(level, x + 4, z + 6);
-        int y3 = height(level, x, z + 6);
-        int y = Math.min(Math.min(y0, y1), Math.min(y2, y3));
+        // One in-chunk heightmap read. Min-of-4-neighbors returns 0 on unloaded
+        // columns during Feature decoration (CE IWorldGenerator had neighbors).
+        int y = height(level, x, z);
         if (y <= level.getMinBuildHeight() || y >= level.getMaxBuildHeight()) return false;
 
         BlockPos spawn = new BlockPos(x, y, z);

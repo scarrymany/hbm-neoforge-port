@@ -9,7 +9,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.197s)** on wiped world port 25566, **4052 recipes**.
+`./gradlew runServer` **Done (5.785s)** on wiped world port 25566, **4052 recipes**.
 No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
@@ -24,7 +24,7 @@ No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 154**, **machine 85**, **vanilla 52**.
+Largest remaining holes: **blocks 154**, **machine 85**, **vanilla 51**.
 Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
@@ -34,7 +34,7 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
 | Items (flattened ids) | 1863 | 2613 | **140.3%** | +`linker` |
-| Blocks | 1169 | 1015 | **86.8%** | casings now live TE (same ids) |
+| Blocks | 1169 | 1016 | **86.9%** | +`toxic_block` |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
@@ -45,10 +45,10 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (ItemTeleLink + landmine/NITAN)
+## What changed this wave (Dud + Barrel)
 
-Reachability **63.4% (1657 / 2613)**. strand_caster / forcefield / chungus /
-satlink live TEs stay accepted. No invented biomes / structures.
+Reachability **63.4% (1657 / 2613)**. No invented biomes / chances. `linker` /
+landmine / NITAN stay accepted.
 
 - **`linker`**: CE `ItemTeleLink` (`ModItems.java:106`). `DETONATOR_POS` =
   CE NBT `x/y/z`. Click any block → set + `chat.telelink.set`. Sneak on
@@ -64,13 +64,23 @@ satlink live TEs stay accepted. No invented biomes / structures.
 - **NITAN** (`HbmWorldGen.java:652-686` / `:744-753`): `enableNITAN` only (not
   dungeon-gated). 8 coords y=250: `(±10000,250,±10000)` + axes. Air → chest +
   `POOL_POWDER` × 29. Not generated in spawn (coords 10000).
+- **Dud** (`Dud.java` / `HbmWorldGen.java:379`): `enableDungeons`,
+  `dudStructure` default **0:500**, no biome. `EnumDudType` → four
+  `crashed_bomb_*` flags `2|16`. Sandstone OR spawn. `TOP_LAYER_MODIFICATION`.
+  Default 1/500: **0/841** (λ≈1.7). Forced `dudStructure=1`: **70** duds
+  (23/19/17/11 nuke/conv/salted/balefire).
+- **Barrel** (`Barrel.java` / `:370-371`): `enableDungeons`,
+  `barrelStructure` default **0:5000**, `getBaseTemperature()>1.8F` only.
+  289-cell schematic, `crate_steel` + `POOL_EXPENSIVE`×16. `toxic_block`
+  registered (still; flow/fog TODO(CE: ToxicBlock.java:26-105)). YellowBarrel
+  1-in-3 toxic branch live. Default spawn plains: miss. Forced 1/1:
+  **7** `crate_steel` / **9** `toxic_block` / **11** sellafield chunks.
 - Cited leftover (no port generator): hive 256 `GlyphidHive`; desert-atom
-  0:500 `!canRain && temp>=2`; barrel 0:5000 `temp>1.8`; satellite 0:500
-  `temp<1 || temp>1.8`; spaceship 0:1000; dud 0:500.
-  TODO(CE: HbmWorldGen.java:347-379).
+  0:500 `!canRain && temp>=2`; satellite 0:500 `temp<1 || temp>1.8`;
+  spaceship 0:1000 (`Spaceship.java`+`Spaceship2.java`). Next work.
+  TODO(CE: HbmWorldGen.java:347-377).
 
-Honest E2E: no client — linker sneak-apply not clicked in-game. compileJava 0
-+ runServer Done + recipe + MCA palette scan.
+Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
 
 ## Prior wave (leftover Dummyable + CE TE)
 
@@ -138,8 +148,8 @@ physically placed. compileJava 0 + runServer Done + registry/caps/GUI bind.
   Gates `ENABLE_DUNGEON_SPAWN` + `ENABLE_RAD_HOTSPOT_SPAWN`.
   Oil-sand now dungeon-gated (CE `enableDungeons`).
 - Cited: phased chunk-wait TODO(CE: Sellafield.java:20-45); TE never in CE
-  TODO(CE: Sellafield.java:149-155); leftover dungeons
-  TODO(CE: HbmWorldGen.java:347-395); NITAN TODO(CE: HbmWorldGen.java:652).
+  TODO(CE: Sellafield.java:149-155). Landmine/NITAN landed this wave; hive/atom/
+  barrel/satellite/spaceship/dud still TODO(CE: HbmWorldGen.java:347-379).
   Basalt ores stay volcanic-fluid (CE has no chunk vein).
 
 ## Prior wave (OreEnum drops + assembler fluids + pile_rod_mk2)
