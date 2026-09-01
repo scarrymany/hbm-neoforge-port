@@ -1047,6 +1047,8 @@
   "container.pumpjack": "Станок-качалка",
   "container.radGen": "Радиационный двигатель",
   "container.radar": "Радар",
+  "container.radioTelex": "Радиотелекс",
+  "container.ntmKeypad": "Клавиатура",
   "container.radiobox": "FM передатчик",
   "container.radiolysis": "РИТЭГ и Камера Радиолиза",
   "container.radiorec": "FM радио",
