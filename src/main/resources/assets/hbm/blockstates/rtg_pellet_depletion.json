@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hbm:block/rtg_pellet_depletion"
+    }
+  }
+}

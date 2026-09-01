@@ -1,19 +1,24 @@
 # Leftover texture misses (no CE file)
 
-Census: **1771 items** / **579 blocks** (Java `register`/`reg` + Mats autogen; not lang keys).
-After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
+Census: **2636 items** / **945 blocks** (Java `register`/`reg` + Mats autogen; not lang keys).
+Before this wave: items **245 (9.3%)**, blocks **136 (14.4%)**.
+After remaps: items **151 (5.7%)**, blocks **104 (11.0%)**.
+
+Copied 0 new CE png/model/blockstate/lang files (already in tree). Wired existing CE stems
+(first-`_` flatten, `ore_meteor.*`, `concrete_colored_ext.*`, `crt_*`/`toaster_*`, `tnt_*` faces).
+Did **not** invent or redraw art.
 
 ## Item leftover categories
 
 - 26 — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
 - 1 — debug ammo, no CE inventory png
-- 108 — no CE item png under any remap of existing files
-- 29 — TESR/machine: no inventory png in CE
+- 94 — no CE item png under any remap of existing files
+- 30 — TESR/machine: no inventory png in CE
 
 ## Block leftover categories
 
 - 26 — autogen/storage cube: CE has no cube png for this mat
-- 48 — no CE block png under any remap of existing files
+- 56 — no CE block png under any remap of existing files
 - 4 — TESR/deco: no cube png
 - 18 — TESR/duct: no cube png
 
@@ -39,33 +44,17 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `cart_ntm_semtex` — no CE item png under any remap of existing files
 - `charge` — no CE item png under any remap of existing files
 - `cmbsteel_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
-- `coltan_x` — no CE item png under any remap of existing files
-- `coltan_z` — no CE item png under any remap of existing files
-- `conveyor_wand` — no CE item png under any remap of existing files
-- `conveyor_wand_double` — no CE item png under any remap of existing files
-- `conveyor_wand_express` — no CE item png under any remap of existing files
-- `conveyor_wand_triple` — no CE item png under any remap of existing files
 - `counterfeit_keys` — no CE item png under any remap of existing files
-- `crane_splitter` — no CE item png under any remap of existing files
 - `crashed_bomb_balefire` — no CE item png under any remap of existing files
 - `crashed_bomb_conventional` — no CE item png under any remap of existing files
 - `crashed_bomb_nuke` — no CE item png under any remap of existing files
 - `crashed_bomb_salted` — no CE item png under any remap of existing files
-- `drone_patrol_chunkloading` — no CE item png under any remap of existing files
-- `drone_patrol_express` — no CE item png under any remap of existing files
-- `drone_patrol_express_chunkloading` — no CE item png under any remap of existing files
 - `durasteel_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
 - `dyatlov` — no CE item png under any remap of existing files
 - `emerald_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
-- `fext_foam` — no CE item png under any remap of existing files
 - `fext_sand` — no CE item png under any remap of existing files
 - `fext_water` — no CE item png under any remap of existing files
 - `flask_infusion` — no CE item png under any remap of existing files
-- `fluid_amount` — no CE item png under any remap of existing files
-- `fluid_id` — no CE item png under any remap of existing files
-- `fluid_id_multi` — no CE item png under any remap of existing files
-- `fluid_pressure` — no CE item png under any remap of existing files
-- `fluid_siphon` — no CE item png under any remap of existing files
 - `fmn` — no CE item png under any remap of existing files
 - `fuel_rod_life` — no CE item png under any remap of existing files
 - `gear_bronze` — no CE item png under any remap of existing files
@@ -84,6 +73,7 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `icf_muon` — no CE item png under any remap of existing files
 - `icf_type1` — no CE item png under any remap of existing files
 - `icf_type2` — no CE item png under any remap of existing files
+- `id` — no CE item png under any remap of existing files
 - `jetpack_fuel` — no CE item png under any remap of existing files
 - `jetpack_glider` — no CE item png under any remap of existing files
 - `jetpack_glider_tank` — no CE item png under any remap of existing files
@@ -95,14 +85,13 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `lightstone_bricks_stairs` — no CE item png under any remap of existing files
 - `lightstone_tile_stairs` — no CE item png under any remap of existing files
 - `lock` — no CE item png under any remap of existing files
-- `lox_barrel` — no CE item png under any remap of existing files
 - `machine_assembly_machine` — TESR/machine: no inventory png in CE
 - `machine_chemical_plant` — TESR/machine: no inventory png in CE
 - `machine_combustion_engine` — TESR/machine: no inventory png in CE
-- `machine_crucible` — TESR/machine: no inventory png in CE
 - `machine_crystallizer` — TESR/machine: no inventory png in CE
 - `machine_cyclotron` — TESR/machine: no inventory png in CE
 - `machine_electrolyser` — TESR/machine: no inventory png in CE
+- `machine_fraction_tower` — TESR/machine: no inventory png in CE
 - `machine_gascent` — TESR/machine: no inventory png in CE
 - `machine_icf_controller` — TESR/machine: no inventory png in CE
 - `machine_icf_reactor` — TESR/machine: no inventory png in CE
@@ -114,6 +103,7 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `machine_steam_engine` — TESR/machine: no inventory png in CE
 - `machine_turbine_gas` — TESR/machine: no inventory png in CE
 - `machine_watz_reactor` — TESR/machine: no inventory png in CE
+- `machine_wood_burner` — TESR/machine: no inventory png in CE
 - `mag_states` — no CE item png under any remap of existing files
 - `magnetizedtungsten_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
 - `mold` — no CE item png under any remap of existing files
@@ -131,7 +121,6 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `nuke_tsar` — no CE item png under any remap of existing files
 - `pager_channel` — no CE item png under any remap of existing files
 - `pile_rod_depletion` — no CE item png under any remap of existing files
-- `pink_barrel` — no CE item png under any remap of existing files
 - `plant_reeds` — no CE item png under any remap of existing files
 - `plutonium238_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
 - `plutonium239_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
@@ -155,7 +144,6 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `rbmk_rod_yield` — TESR/machine: no inventory png in CE
 - `red_cable_box` — no CE item png under any remap of existing files
 - `redphosphorus_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
-- `rtg_pellet_depletion` — no CE item png under any remap of existing files
 - `saltpeter_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
 - `sat_freq` — no CE item png under any remap of existing files
 - `sellafield` — no CE item png under any remap of existing files
@@ -165,12 +153,16 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `statue_elb_f` — no CE item png under any remap of existing files
 - `statue_elb_g` — no CE item png under any remap of existing files
 - `statue_elb_w` — no CE item png under any remap of existing files
-- `stone_biome_desert` — no CE item png under any remap of existing files
-- `stone_biome_woodland` — no CE item png under any remap of existing files
+- `stone_resource_asbestos` — no CE item png under any remap of existing files
+- `stone_resource_bauxite` — no CE item png under any remap of existing files
+- `stone_resource_hematite` — no CE item png under any remap of existing files
+- `stone_resource_limestone` — no CE item png under any remap of existing files
+- `stone_resource_malachite` — no CE item png under any remap of existing files
+- `stone_resource_sulfur` — no CE item png under any remap of existing files
 - `tantalum_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
 - `technetium99_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
 - `thorium232_block` — Mats BLOCK autogen: no CE cube/item png (CE used prefix block_<mat>)
-- `tnt_ntm` — no CE item png under any remap of existing files
+- `tileentity_cyber_crab` — no CE item png under any remap of existing files
 - `tool_charge` — no CE item png under any remap of existing files
 - `tool_fuel` — no CE item png under any remap of existing files
 - `turret_names` — no CE item png under any remap of existing files
@@ -212,7 +204,6 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `machine_assembly_machine` — TESR/duct: no cube png
 - `machine_chemical_plant` — TESR/duct: no cube png
 - `machine_combustion_engine` — TESR/duct: no cube png
-- `machine_crucible` — TESR/duct: no cube png
 - `machine_crystallizer` — TESR/duct: no cube png
 - `machine_cyclotron` — TESR/duct: no cube png
 - `machine_electrolyser` — TESR/duct: no cube png
@@ -227,10 +218,13 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `machine_steam_engine` — TESR/duct: no cube png
 - `machine_turbine_gas` — TESR/duct: no cube png
 - `machine_watz_reactor` — TESR/duct: no cube png
+- `machine_wood_burner` — TESR/duct: no cube png
 - `magnetizedtungsten_block` — autogen/storage cube: CE has no cube png for this mat
 - `neodymium_block` — autogen/storage cube: CE has no cube png for this mat
 - `neptunium237_block` — autogen/storage cube: CE has no cube png for this mat
 - `nuke_balefire` — no CE block png under any remap of existing files
+- `pile_device_1` — no CE block png under any remap of existing files
+- `pile_device_2` — no CE block png under any remap of existing files
 - `plant_reeds` — no CE block png under any remap of existing files
 - `plutonium238_block` — autogen/storage cube: CE has no cube png for this mat
 - `plutonium239_block` — autogen/storage cube: CE has no cube png for this mat
@@ -269,10 +263,16 @@ After remaps: items **164 (9.3%)**, blocks **96 (16.6%)**.
 - `statue_elb_f` — no CE block png under any remap of existing files
 - `statue_elb_g` — no CE block png under any remap of existing files
 - `statue_elb_w` — no CE block png under any remap of existing files
+- `stone_resource_asbestos` — no CE block png under any remap of existing files
+- `stone_resource_bauxite` — no CE block png under any remap of existing files
+- `stone_resource_hematite` — no CE block png under any remap of existing files
+- `stone_resource_limestone` — no CE block png under any remap of existing files
+- `stone_resource_malachite` — no CE block png under any remap of existing files
+- `stone_resource_sulfur` — no CE block png under any remap of existing files
 - `tantalum_block` — autogen/storage cube: CE has no cube png for this mat
 - `technetium99_block` — autogen/storage cube: CE has no cube png for this mat
 - `thorium232_block` — autogen/storage cube: CE has no cube png for this mat
-- `tnt_ntm` — no CE block png under any remap of existing files
+- `tileentity_cyber_crab` — no CE block png under any remap of existing files
 - `turret_chekhov` — no CE block png under any remap of existing files
 - `turret_friendly` — no CE block png under any remap of existing files
 - `turret_fritz` — no CE block png under any remap of existing files

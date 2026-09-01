@@ -213,6 +213,12 @@ BLOCK_PNG = all_png("block")
 def extra_item(iid: str) -> str | None:
     if item_tex_exists(iid):
         return iid
+    if "_" in iid:
+        dotted = iid.replace("_", ".", 1)
+        if item_tex_exists(dotted):
+            return dotted
+    if iid.startswith("drone_") and item_tex_exists("drone." + iid[len("drone_") :]):
+        return "drone." + iid[len("drone_") :]
     if "spawn_egg" in iid:
         return "__SPAWN_EGG__"
     # anvils share one CE inventory icon
@@ -363,6 +369,29 @@ def extra_item(iid: str) -> str | None:
 def extra_block(bid: str) -> str | None:
     if block_tex_exists(bid):
         return bid
+    # Flattened CE metadata: lightstone_bricks → lightstone.bricks, platemetal_base → platemetal.base
+    if "_" in bid:
+        dotted = bid.replace("_", ".", 1)
+        if block_tex_exists(dotted):
+            return dotted
+    prefix_map = (
+        ("block_meteor_ore_", "ore_meteor."),
+        ("concrete_ext_", "concrete_colored_ext."),
+        ("deco_crt_", "crt_"),
+        ("deco_toaster_", "toaster_"),
+        ("stone_biome_", "stone_biome."),
+    )
+    for pref, dest in prefix_map:
+        if bid.startswith(pref):
+            cand = dest + bid[len(pref) :]
+            if block_tex_exists(cand):
+                return cand
+    if bid == "concrete_light_gray" and block_tex_exists("concrete_silver"):
+        return "concrete_silver"
+    if bid.startswith("deco_computer_") and block_tex_exists("deco_computer"):
+        return "deco_computer"
+    if bid == "tnt_ntm" and block_tex_exists("tnt_side"):
+        return "tnt_side"
     for suf in ("_stairs", "_slab", "_double_slab", "_wall", "_fence", "_fence_gate", "_layer"):
         if bid.endswith(suf):
             parent = bid[: -len(suf)]
@@ -529,6 +558,10 @@ def main() -> None:
             new_b += 1
             continue
         after_b.append(bid)
+
+    # Block writes also emit item models; drop ids that are playable after that.
+    after_i = [i for i in after_i if not playable_item(i)]
+    after_b = [b for b in after_b if not playable_block(b)]
 
     ni, nb = len(items), len(blocks)
     leftover = {

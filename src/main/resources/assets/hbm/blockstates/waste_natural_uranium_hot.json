@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hbm:block/waste_natural_uranium_hot"
+    }
+  }
+}
