@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "ABA",
+    " A "
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:brick_light"
+    },
+    "A": {
+      "item": "hbm:ingot_asbestos"
+    }
+  },
+  "result": {
+    "id": "hbm:brick_asbestos",
+    "count": 2
+  }
+}

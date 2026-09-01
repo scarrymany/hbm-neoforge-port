@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WIW",
+    "PCP",
+    "WIW"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:copper_wire"
+    },
+    "I": {
+      "tag": "hbm:any_plastic"
+    },
+    "C": {
+      "item": "hbm:circuit_basic"
+    },
+    "P": {
+      "item": "hbm:plate_polymer"
+    }
+  },
+  "result": {
+    "id": "hbm:upgrade_template",
+    "count": 1
+  }
+}

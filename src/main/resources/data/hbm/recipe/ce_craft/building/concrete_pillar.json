@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CBC",
+    "CBC",
+    "CBC"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:concrete_smooth"
+    },
+    "B": {
+      "item": "minecraft:iron_bars"
+    }
+  },
+  "result": {
+    "id": "hbm:concrete_pillar",
+    "count": 6
+  }
+}

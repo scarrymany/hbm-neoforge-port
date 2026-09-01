@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PIP",
+    "GCG",
+    "PMP"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_steel"
+    },
+    "I": {
+      "item": "hbm:ingot_dura_steel"
+    },
+    "G": {
+      "tag": "c:glass_panes"
+    },
+    "C": {
+      "item": "hbm:circuit_vacuum_tube"
+    },
+    "M": {
+      "item": "hbm:motor"
+    }
+  },
+  "result": {
+    "id": "hbm:machine_mixer",
+    "count": 1
+  }
+}

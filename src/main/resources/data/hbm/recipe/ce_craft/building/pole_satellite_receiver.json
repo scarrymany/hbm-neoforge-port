@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SS ",
+    "SCR",
+    "SS "
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_steel"
+    },
+    "C": {
+      "item": "hbm:circuit_vacuum_tube"
+    },
+    "R": {
+      "item": "hbm:copper_wire"
+    }
+  },
+  "result": {
+    "id": "hbm:pole_satellite_receiver",
+    "count": 1
+  }
+}

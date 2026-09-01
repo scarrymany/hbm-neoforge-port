@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TST",
+    "SSS"
+  ],
+  "key": {
+    "T": {
+      "item": "hbm:ingot_tungsten"
+    },
+    "S": {
+      "item": "hbm:ingot_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:tape_recorder",
+    "count": 4
+  }
+}

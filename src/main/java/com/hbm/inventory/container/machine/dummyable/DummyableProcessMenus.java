@@ -18,7 +18,12 @@ import com.hbm.blockentity.machine.dummyable.MachineRadiolysisBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineArcFurnaceBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineExposureChamberBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachinePyroOvenBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineHephaestusBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineOreSlopperBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineRadGenBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineTurbofanBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineVacuumDistillBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineWoodBurnerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.WasteDrumBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -49,6 +54,11 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<PyroOvenMenu>> MACHINE_PYROOVEN;
     public static DeferredHolder<MenuType<?>, MenuType<ArcFurnaceMenu>> MACHINE_ARC_FURNACE;
     public static DeferredHolder<MenuType<?>, MenuType<ExposureChamberMenu>> MACHINE_EXPOSURE_CHAMBER;
+    public static DeferredHolder<MenuType<?>, MenuType<OreSlopperMenu>> MACHINE_ORE_SLOPPER;
+    public static DeferredHolder<MenuType<?>, MenuType<TurbofanMenu>> MACHINE_TURBOFAN;
+    public static DeferredHolder<MenuType<?>, MenuType<RadGenMenu>> MACHINE_RADGEN;
+    public static DeferredHolder<MenuType<?>, MenuType<HephaestusMenu>> MACHINE_HEPHAESTUS;
+    public static DeferredHolder<MenuType<?>, MenuType<WoodBurnerMenu>> MACHINE_WOOD_BURNER;
 
     private DummyableProcessMenus() {
     }
@@ -94,6 +104,16 @@ public final class DummyableProcessMenus {
                 new ArcFurnaceMenu(id, inv, (MachineArcFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_EXPOSURE_CHAMBER = reg("machine_exposure_chamber", (id, inv, buf) ->
                 new ExposureChamberMenu(id, inv, (MachineExposureChamberBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ORE_SLOPPER = reg("machine_ore_slopper", (id, inv, buf) ->
+                new OreSlopperMenu(id, inv, (MachineOreSlopperBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_TURBOFAN = reg("machine_turbofan", (id, inv, buf) ->
+                new TurbofanMenu(id, inv, (MachineTurbofanBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_RADGEN = reg("machine_radgen", (id, inv, buf) ->
+                new RadGenMenu(id, inv, (MachineRadGenBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_HEPHAESTUS = reg("machine_hephaestus", (id, inv, buf) ->
+                new HephaestusMenu(id, inv, (MachineHephaestusBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_WOOD_BURNER = reg("machine_wood_burner", (id, inv, buf) ->
+                new WoodBurnerMenu(id, inv, (MachineWoodBurnerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

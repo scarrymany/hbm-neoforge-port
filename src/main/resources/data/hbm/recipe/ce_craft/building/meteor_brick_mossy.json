@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CCC",
+    "CVC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:meteor_brick"
+    },
+    "V": {
+      "item": "minecraft:vine"
+    }
+  },
+  "result": {
+    "id": "hbm:meteor_brick_mossy",
+    "count": 8
+  }
+}

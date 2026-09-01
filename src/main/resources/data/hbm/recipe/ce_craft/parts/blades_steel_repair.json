@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PIP"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_steel"
+    },
+    "I": {
+      "item": "hbm:blades_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:blades_steel",
+    "count": 1
+  }
+}

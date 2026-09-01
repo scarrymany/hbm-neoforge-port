@@ -35,5 +35,10 @@ public final class DummyableProcessClientRegistry {
         event.register(DummyableProcessMenus.MACHINE_PYROOVEN.get(), PyroOvenScreen::new);
         event.register(DummyableProcessMenus.MACHINE_ARC_FURNACE.get(), ArcFurnaceScreen::new);
         event.register(DummyableProcessMenus.MACHINE_EXPOSURE_CHAMBER.get(), ExposureChamberScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_ORE_SLOPPER.get(), OreSlopperScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_TURBOFAN.get(), TurbofanScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_RADGEN.get(), RadGenScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_HEPHAESTUS.get(), HephaestusScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_WOOD_BURNER.get(), WoodBurnerScreen::new);
     }
 }

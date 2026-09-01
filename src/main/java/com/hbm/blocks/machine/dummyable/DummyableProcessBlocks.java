@@ -19,7 +19,8 @@ import java.util.function.Supplier;
  * Dummyable process machines + waste drum.
  * CE furnace_combination / blast / rock mill / annihilator / press / rotary furnace / fraction tower /
  * waste_drum / compressor / coker / catalytic cracker / catalytic reformer / hydrotreater /
- * vacuum distill / radiolysis / flare / epress / pyrooven / arc furnace / exposure.
+ * vacuum distill / radiolysis / flare / epress / pyrooven / arc furnace / exposure /
+ * ore slopper / turbofan / radgen / hephaestus / wood burner.
  */
 public final class DummyableProcessBlocks {
 
@@ -46,6 +47,11 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachinePyroOvenBlock> MACHINE_PYROOVEN;
     public static DeferredBlock<MachineArcFurnaceBlock> MACHINE_ARC_FURNACE;
     public static DeferredBlock<MachineExposureChamberBlock> MACHINE_EXPOSURE_CHAMBER;
+    public static DeferredBlock<MachineOreSlopperBlock> MACHINE_ORE_SLOPPER;
+    public static DeferredBlock<MachineTurbofanBlock> MACHINE_TURBOFAN;
+    public static DeferredBlock<MachineRadGenBlock> MACHINE_RADGEN;
+    public static DeferredBlock<MachineHephaestusBlock> MACHINE_HEPHAESTUS;
+    public static DeferredBlock<MachineWoodBurnerBlock> MACHINE_WOOD_BURNER;
 
     private DummyableProcessBlocks() {
     }
@@ -71,6 +77,11 @@ public final class DummyableProcessBlocks {
         MACHINE_PYROOVEN = registerBlock("machine_pyrooven", () -> new MachinePyroOvenBlock(MACHINE_PROPS));
         MACHINE_ARC_FURNACE = registerBlock("machine_arc_furnace", () -> new MachineArcFurnaceBlock(MACHINE_PROPS));
         MACHINE_EXPOSURE_CHAMBER = registerBlock("machine_exposure_chamber", () -> new MachineExposureChamberBlock(MACHINE_PROPS));
+        MACHINE_ORE_SLOPPER = registerBlock("machine_ore_slopper", () -> new MachineOreSlopperBlock(MACHINE_PROPS));
+        MACHINE_TURBOFAN = registerBlock("machine_turbofan", () -> new MachineTurbofanBlock(MACHINE_PROPS));
+        MACHINE_RADGEN = registerBlock("machine_radgen", () -> new MachineRadGenBlock(MACHINE_PROPS));
+        MACHINE_HEPHAESTUS = registerBlock("machine_hephaestus", () -> new MachineHephaestusBlock(MACHINE_PROPS));
+        MACHINE_WOOD_BURNER = registerBlock("machine_wood_burner", () -> new MachineWoodBurnerBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

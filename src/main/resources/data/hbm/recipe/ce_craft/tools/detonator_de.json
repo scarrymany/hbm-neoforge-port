@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "T",
+    "D",
+    "T"
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:tnt"
+    },
+    "D": {
+      "item": "hbm:detonator_deadman"
+    }
+  },
+  "result": {
+    "id": "hbm:detonator_de",
+    "count": 1
+  }
+}

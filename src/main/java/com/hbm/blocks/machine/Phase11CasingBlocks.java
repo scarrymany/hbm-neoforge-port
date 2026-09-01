@@ -38,7 +38,7 @@ public final class Phase11CasingBlocks {
         // machine_compressor is DummyableProcessBlocks (full TE). Compact stays a casing.
         registerBlock("machine_compressor_compact", () -> new BlockBase(MACHINE_PROPS));
         // machine_epress is DummyableProcessBlocks (full TE).
-        registerBlock("machine_ore_slopper", () -> new BlockBase(MACHINE_PROPS));
+        // machine_ore_slopper is DummyableProcessBlocks (full TE).
         registerBlock("machine_mining_laser", () -> new BlockBase(MACHINE_PROPS));
         // CE ModBlocks.java:1186 / AssemblyMachineRecipes.java:362
         registerBlock("machine_teleporter", () -> new BlockBase(MACHINE_PROPS));
@@ -48,10 +48,8 @@ public final class Phase11CasingBlocks {
         registerBlock("machine_strand_caster", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("machine_assembly_factory", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("machine_chemical_factory", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_turbofan", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_hephaestus", () -> new BlockBase(MACHINE_PROPS));
+        // machine_turbofan / machine_hephaestus / machine_radgen are DummyableProcessBlocks (full TEs).
         registerBlock("machine_chungus", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_radgen", () -> new BlockBase(MACHINE_PROPS));
         // machine_pyrooven / machine_exposure_chamber are DummyableProcessBlocks (full TEs).
         registerBlock("machine_fluidtank", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("machine_bigasstank", () -> new BlockBase(MACHINE_PROPS));

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:steel_wall",
+    "count": 4
+  }
+}

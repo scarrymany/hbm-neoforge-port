@@ -28,6 +28,11 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachinePyroOvenBlockEntity>> MACHINE_PYROOVEN;
     public static Supplier<BlockEntityType<MachineArcFurnaceBlockEntity>> MACHINE_ARC_FURNACE;
     public static Supplier<BlockEntityType<MachineExposureChamberBlockEntity>> MACHINE_EXPOSURE_CHAMBER;
+    public static Supplier<BlockEntityType<MachineOreSlopperBlockEntity>> MACHINE_ORE_SLOPPER;
+    public static Supplier<BlockEntityType<MachineTurbofanBlockEntity>> MACHINE_TURBOFAN;
+    public static Supplier<BlockEntityType<MachineRadGenBlockEntity>> MACHINE_RADGEN;
+    public static Supplier<BlockEntityType<MachineHephaestusBlockEntity>> MACHINE_HEPHAESTUS;
+    public static Supplier<BlockEntityType<MachineWoodBurnerBlockEntity>> MACHINE_WOOD_BURNER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -112,6 +117,26 @@ public final class DummyableProcessBlockEntities {
         MACHINE_EXPOSURE_CHAMBER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_exposure_chamber", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineExposureChamberBlockEntity(MACHINE_EXPOSURE_CHAMBER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_EXPOSURE_CHAMBER.get()
+        ).build(null));
+        MACHINE_ORE_SLOPPER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_ore_slopper", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineOreSlopperBlockEntity(MACHINE_ORE_SLOPPER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_ORE_SLOPPER.get()
+        ).build(null));
+        MACHINE_TURBOFAN = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_turbofan", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineTurbofanBlockEntity(MACHINE_TURBOFAN.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_TURBOFAN.get()
+        ).build(null));
+        MACHINE_RADGEN = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_radgen", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineRadGenBlockEntity(MACHINE_RADGEN.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_RADGEN.get()
+        ).build(null));
+        MACHINE_HEPHAESTUS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_hephaestus", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineHephaestusBlockEntity(MACHINE_HEPHAESTUS.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_HEPHAESTUS.get()
+        ).build(null));
+        MACHINE_WOOD_BURNER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_wood_burner", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineWoodBurnerBlockEntity(MACHINE_WOOD_BURNER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_WOOD_BURNER.get()
         ).build(null));
     }
 }

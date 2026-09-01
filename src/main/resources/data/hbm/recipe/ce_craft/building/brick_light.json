@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FBF",
+    "BFB",
+    "FBF"
+  ],
+  "key": {
+    "F": {
+      "tag": "c:fences/wooden"
+    },
+    "B": {
+      "item": "minecraft:bricks"
+    }
+  },
+  "result": {
+    "id": "hbm:brick_light",
+    "count": 4
+  }
+}
