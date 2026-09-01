@@ -21,15 +21,17 @@ public class ExcavatorScreen extends GuiInfoContainer<ExcavatorMenu> {
         int y = this.topPos;
         guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
         guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        this.getMenu().be.tank.renderTank(x + 152, y + 72, 0, 16, 32);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         var be = this.getMenu().be;
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 6, 160, 12, be.getPower(), be.getMaxPower());
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 20, 160, 10,
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 6, 140, 12, be.getPower(), be.getMaxPower());
+        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 20, 140, 10,
                 Component.literal(be.drilling ? "Drilling" : "Idle"),
                 Component.literal("Depth index: " + be.depth));
+        be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, this.leftPos + 152, this.topPos + 40, 16, 32);
     }
 }

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "hbm:sand_lead"
+  },
+  "result": {
+    "id": "hbm:glass_lead",
+    "count": 1
+  },
+  "experience": 0.25,
+  "cookingtime": 200
+}

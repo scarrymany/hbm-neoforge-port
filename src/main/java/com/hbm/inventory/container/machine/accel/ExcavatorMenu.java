@@ -6,7 +6,7 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code ContainerMachineExcavator}: drillbit + battery + 9 outputs. */
+/** CE {@code ContainerMachineExcavator}: drillbit + battery + 9 outputs + fluid-ID. */
 public class ExcavatorMenu extends MenuBase<ExcavatorBlockEntity> {
 
     public ExcavatorMenu(int id, Inventory playerInv, ExcavatorBlockEntity be) {
@@ -16,6 +16,7 @@ public class ExcavatorMenu extends MenuBase<ExcavatorBlockEntity> {
         for (int i = 0; i < 9; i++) {
             this.addSlot(new SlotTakeOnly(tile, 2 + i, 8 + (i % 9) * 18, 57));
         }
+        this.addSlot(new SlotNonRetarded(tile, 11, 152, 21));
         playerInv(playerInv, 8, 104);
     }
 }
