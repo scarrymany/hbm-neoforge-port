@@ -12,15 +12,15 @@ public class CentrifugeMenu extends MenuBase<CentrifugeBlockEntity> {
     public CentrifugeMenu(int id, Inventory playerInv, CentrifugeBlockEntity be) {
         super(ChemIsotopeMenus.CENTRIFUGE.get(), id, be);
 
-        this.addSlot(new SlotNonRetarded(tile, 0, 44, 40));
-        this.addSlot(new SlotNonRetarded(tile, 1, 44, 68));
-        this.addSlot(new SlotTakeOnly(tile, 2, 116, 21));
-        this.addSlot(new SlotTakeOnly(tile, 3, 116, 39));
-        this.addSlot(new SlotTakeOnly(tile, 4, 116, 57));
-        this.addSlot(new SlotTakeOnly(tile, 5, 116, 75));
-        this.addSlot(new SlotNonRetarded(tile, 6, 152, 21));
-        this.addSlot(new SlotNonRetarded(tile, 7, 152, 39));
+        this.addSlot(new SlotNonRetarded(tile, 0, 44, 57));
+        this.addSlot(new SlotNonRetarded(tile, 1, 8, 57));
+        this.addSlot(new SlotTakeOnly(tile, 2, 70, 57));
+        this.addSlot(new SlotTakeOnly(tile, 3, 90, 57));
+        this.addSlot(new SlotTakeOnly(tile, 4, 110, 57));
+        this.addSlot(new SlotTakeOnly(tile, 5, 130, 57));
+        this.addSlot(new SlotNonRetarded(tile, 6, 156, 31));
+        this.addSlot(new SlotNonRetarded(tile, 7, 156, 49));
 
-        playerInv(playerInv, 8, 116);
+        playerInv(playerInv, 11, 107);
     }
 }

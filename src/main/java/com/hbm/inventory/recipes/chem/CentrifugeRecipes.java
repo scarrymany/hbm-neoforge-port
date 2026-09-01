@@ -6,6 +6,7 @@ import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.IngotNuggetItems;
+import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.PlateCrystalWasteItems;
 import com.hbm.items.special.BedrockOreGrade;
 import com.hbm.items.special.BedrockOreItems;
@@ -27,17 +28,7 @@ import java.util.Map;
  * centrifuge - see {@code docs/phase2/machines_chemical_isotope.md}'s table distinguishing it from
  * the real isotope-separation "gas centrifuge", {@link GasCentrifugeRecipes}). A flat
  * {@code HashMap<AStack, ItemStack[]>} keyed by input, up to 4 outputs, exactly like CE.
- * <p>
- * <b>Scope trim</b> (documented, same shape as {@code RefineryRecipes}'s own precedent): CE registers
- * ~50 recipes, many keyed against items/blocks this port has not registered yet
- * ({@code ItemBedrockOreNew}, {@code chunk_ore}, several rare-earth/schrabidium ores) or against
- * 1.12 OreDictionary string names with no confirmed modern tag equivalent in this port yet. This
- * class ports a representative real subset - the common-ore washing recipes plus the crystal-to-powder
- * breakdown recipes - using only items already confirmed present in this port
- * ({@link BilletPowderItems}/{@link IngotNuggetItems}/{@link PlateCrystalWasteItems}), preserving
- * CE's exact output quantities for every recipe it does carry. Vanilla ore blocks are matched via
- * NeoForge's common {@code c:ores/*} tags ({@link OreDictStack#ofCommonTag}) rather than CE's 1.12
- * OreDictionary strings, per {@code RecipesCommon}'s own documented tag-based replacement.
+ * Vanilla ores use {@code c:ores/*}; HBM-only ores use the CE block id. AE2 certus is a cited skip.
  */
 public final class CentrifugeRecipes {
 
@@ -104,7 +95,7 @@ public final class CentrifugeRecipes {
         RECIPES.put(OreDictStack.ofCommonTag("ores/redstone"), new ItemStack[]{
                 new ItemStack(Items.REDSTONE, 3),
                 new ItemStack(Items.REDSTONE, 3),
-                new ItemStack(BilletPowderItems.POWDER_COBALT.get(), 1),
+                new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get(), 1),
                 new ItemStack(Items.GRAVEL, 1)});
 
         RECIPES.put(OreDictStack.ofCommonTag("ores/coal"), new ItemStack[]{
@@ -129,12 +120,14 @@ public final class CentrifugeRecipes {
         RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_GOLD.get()), new ItemStack[]{
                 new ItemStack(BilletPowderItems.POWDER_GOLD.get(), 2),
                 new ItemStack(BilletPowderItems.POWDER_GOLD.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get(), 1),
                 new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get(), 1)});
 
         RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_REDSTONE.get()), new ItemStack[]{
                 new ItemStack(Items.REDSTONE, 3),
                 new ItemStack(Items.REDSTONE, 3),
-                new ItemStack(Items.REDSTONE, 3)});
+                new ItemStack(Items.REDSTONE, 3),
+                new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get(), 3)});
 
         RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_LAPIS.get()), new ItemStack[]{
                 new ItemStack(BilletPowderItems.POWDER_LAPIS.get(), 4),
@@ -339,6 +332,44 @@ public final class CentrifugeRecipes {
                 new ItemStack(BilletPowderItems.POWDER_COBALT.get(), 3),
                 new ItemStack(BilletPowderItems.POWDER_ASTATINE.get(), 2),
                 new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get(), 5)));
+
+        // CE CentrifugeRecipes.java:47-51
+        RECIPES.put(new ComparableStack(item("chunk_ore_rare")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_COBALT_TINY.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_BORON_TINY.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_NIOBIUM_TINY.get(), 2),
+                new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get(), 3)));
+        // CE CentrifugeRecipes.java:113-117 — AL.ore() → ore_aluminium (no vanilla aluminum)
+        RECIPES.put(new ComparableStack(block("ore_aluminium")), stacks(
+                new ItemStack(item("chunk_ore_cryolite"), 2),
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get()),
+                new ItemStack(Items.GRAVEL)));
+        // CE CentrifugeRecipes.java:137-141 — PU.ore() is ore_nether_plutonium, not ore_plutonium
+        RECIPES.put(new ComparableStack(block("ore_nether_plutonium")), stacks(
+                new ItemStack(BilletPowderItems.POWDER_PLUTONIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_PLUTONIUM.get()),
+                new ItemStack(IngotNuggetItems.NUGGET_POLONIUM.get(), 3),
+                new ItemStack(Items.GRAVEL)));
+        // CE CentrifugeRecipes.java:209-213 — block_slag, not Mats slag_block
+        RECIPES.put(new ComparableStack(block("block_slag")), stacks(
+                new ItemStack(Items.GRAVEL),
+                new ItemStack(BilletPowderItems.POWDER_FIRE.get()),
+                new ItemStack(BilletPowderItems.POWDER_CALCIUM.get()),
+                new ItemStack(item("dust"))));
+        // CE CentrifugeRecipes.java:215-218
+        RECIPES.put(new ComparableStack(BilletPowderItems.powderAsh(EnumAshType.COAL).get()), stacks(
+                new ItemStack(BilletPowderItems.POWDER_COAL_TINY.get(), 2),
+                new ItemStack(BilletPowderItems.POWDER_BORON_TINY.get()),
+                new ItemStack(BilletPowderItems.DUST_TINY.get(), 6)));
+        // CE CentrifugeRecipes.java:274
+        RECIPES.put(new ComparableStack(PlateCrystalWasteItems.CRYSTAL_ALUMINIUM.get()), stacks(
+                new ItemStack(item("chunk_ore_cryolite"), 3),
+                new ItemStack(BilletPowderItems.POWDER_TITANIUM.get()),
+                new ItemStack(BilletPowderItems.POWDER_IRON.get()),
+                new ItemStack(BilletPowderItems.POWDER_LITHIUM_TINY.get())));
+        // TODO(CE: CentrifugeRecipes.java:243-254): oreCertusQuartz / crystalCertusQuartz is AE2
+        // OreDict. No AE2 on this loader. Do not invent a certus stand-in.
 
         // CE CentrifugeRecipes.java:220-241 — 16 templates × 6 BedrockOreType
         for (BedrockOreType type : BedrockOreType.VALUES) {

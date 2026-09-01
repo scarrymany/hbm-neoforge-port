@@ -1,20 +1,20 @@
 {
-  "weighted_pct": 104.2,
-  "unweighted_pct": 103.1,
+  "weighted_pct": 104.3,
+  "unweighted_pct": 103.2,
   "ce_sum": 7767,
-  "port_sum": 8096,
+  "port_sum": 8104,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2585,
+      "port": 2586,
       "pct": 138.8
     },
     {
       "cat": "blocks",
       "ce": 1169,
-      "port": 1007,
-      "pct": 86.1
+      "port": 1008,
+      "pct": 86.2
     },
     {
       "cat": "fluids",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1809,
-      "pct": 90.0
+      "port": 1815,
+      "pct": 90.3
     },
     {
       "cat": "advancements",
@@ -59,14 +59,14 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2585,
+      "port": 2586,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
       "ce": 1169,
       "ce_fields": 1169,
       "ce_string_ctors": 290,
-      "port": 1007,
+      "port": 1008,
       "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
     },
     "fluids": {
@@ -213,13 +213,13 @@
         "SuperComputerRecipes": 7,
         "VacuumDistillRecipes": 2,
         "WasteDrumRecipes": 17,
-        "CentrifugeRecipes": 69,
+        "CentrifugeRecipes": 75,
         "ChemPlantRecipes": 72,
         "CyclotronRecipes": 1,
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 95
       },
-      "port": 1809,
+      "port": 1815,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,
@@ -237,7 +237,7 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2585,
+      "port_items": 2586,
       "reachable_via_recipe_or_loot": 1552,
       "includes_machine_tables": true,
       "pct": 60.0

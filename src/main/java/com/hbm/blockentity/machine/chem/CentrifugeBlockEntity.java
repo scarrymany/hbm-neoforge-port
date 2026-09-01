@@ -93,7 +93,7 @@ public class CentrifugeBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean canExtractItem(int i, ItemStack itemStack, int amount) {
-        return i > BATTERY_SLOT;
+        return i >= OUTPUT_START && i <= OUTPUT_END;
     }
 
     public int getCentrifugeProgressScaled(int i) {

@@ -139,7 +139,9 @@ public final class AmmoPressRecipes {
                 null, new ComparableStack(item("ingot_steel"), 1), null, null, new ComparableStack(item("steel_pipe"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("ct_mortar"), 4),
                 null, ((OreDictStack.ofHbmTag("any_highexplosive", 1)).copy(4)), null, null, new ComparableStack(item("steel_pipe"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null));
-        // CE AmmoPressRecipes.java:936+ / :1024 / :1038 — fluid-slot + coil family
+        // TODO(CE: AmmoPressRecipes.java:936+ / :1024 / :1038): flame_* / g40_inc / rocket_inc
+        // use FluidStack in the 9-slot grid. CE TileEntityMachineAmmoPress has no tank — keep
+        // table-only. Do not invent a tank.
         ComparableStack steelPlate = new ComparableStack(item("plate_steel"));
         ComparableStack leadPlate = new ComparableStack(item("plate_lead"));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_diesel")),

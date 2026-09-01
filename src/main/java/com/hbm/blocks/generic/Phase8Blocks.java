@@ -236,6 +236,11 @@ public final class Phase8Blocks {
         registerBlock("block_scrap",
                 () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(2.5F, 5.0F).sound(SoundType.GRAVEL)),
                 ModCreativeTabs.BLOCKS);
+        // CE ModBlocks.java:624 BlockMeta("block_slag","block_slag_broken"). Recipe key is the
+        // unbroken id. Do not reuse Mats autogen slag_block (different id).
+        registerBlock("block_slag",
+                () -> new BlockBase(stone(5.0F, 10.0F)),
+                ModCreativeTabs.BLOCKS);
         BlockBehaviour.Properties waste = BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL);
         registerBlock("block_waste_painted", () -> new BlockNuclearWaste(waste), ModCreativeTabs.BLOCKS);
         registerBlock("block_waste_vitrified", () -> new BlockNuclearWaste(waste), ModCreativeTabs.BLOCKS);

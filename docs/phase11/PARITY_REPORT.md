@@ -8,24 +8,23 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.608s)** on wiped world port 25566, **3946 recipes**.
-No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0.
+`runServer` pending this revision (wiped world, port 25566). No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **104.2%** (8096 / 7767) |
-| **Unweighted** (mean of category %) | **103.1%** |
-| Recipe/loot + machine-table reachability | **60.0%** (1552 / 2585) |
+| **Weighted** (Σport / ΣCE) | **104.3%** (8104 / 7767) |
+| **Unweighted** (mean of category %) | **103.2%** |
+| Recipe/loot + machine-table reachability | **60.0%** (1552 / 2586) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 162**, **machine 200**, **vanilla 52**.
-Weighted **104.2%**. Category holes remain. Not content-complete.
+Largest remaining holes: **blocks 161**, **machine 194**, **vanilla 52**.
+Weighted **104.3%**. Category holes remain. Not content-complete.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -33,19 +32,35 @@ Weighted **104.2%**. Category holes remain. Not content-complete.
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2585 | **138.8%** | +p45×5 +nuke×6 +`assembly_nuke` |
-| Blocks | 1169 | 1007 | **86.1%** | unchanged this wave |
+| Items (flattened ids) | 1863 | 2586 | **138.8%** | +`block_slag` BlockItem |
+| Blocks | 1169 | 1008 | **86.2%** | +`block_slag` (CE id; not Mats `slag_block`) |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950. +3 ducrete CraftingManager rows |
-| Machine recipes | ~2009 | 1809 | **90.0%** | AmmoPress 88 (CE registerDefaults 89; NUKE_BALEFIRE BlockItem collision). ElectrolyserMetal 21/23. SILEX 95/96 DRX skipped. ChemPlant 72/72 |
+| Machine recipes | ~2009 | 1815 | **90.3%** | Centrifuge **75/78** (AE2 + `addRecipe`/`readRecipe` census). AmmoPress 88. ElectrolyserMetal 21/23. SILEX 95/96 DRX skipped. ChemPlant 72/145 |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (103.7% → 104.2%, 8096 / 7767)
+## What changed this wave (104.2% → 104.3%, 8104 / 7767)
+
+- Family: **Centrifuge** leftover rows now in the existing machine table (BE already calls
+  `CentrifugeRecipes.getOutput`). Added `chunk_ore_rare`, `ore_aluminium`, `ore_nether_plutonium`,
+  `block_slag`, `powder_ash_coal`, `crystal_aluminium`. Mercury outputs restored on redstone /
+  `crystal_gold` / `crystal_redstone` (CE `ingot_mercury` id = `nugget_mercury`).
+- Registered `block_slag` with CE texture/model (not `slag_block`, not orphan `block_slag_0`).
+  Chunk-ore item models point at existing CE `chunk_ore.*` pngs.
+- CE `gui_centrifuge.png` already in jar; screen blit-wired (power 37px + 4 progress columns).
+  Menu slots match `ContainerCentrifuge` (44/57 in, 8/57 batt, 70/90/110/130 out, 156 upgrades,
+  player 11/107). Gray-box gone.
+- AE2 `oreCertusQuartz` skip: `TODO(CE: CentrifugeRecipes.java:243-254)`.
+- AmmoPress fluid-slot leftover stays cited: `TODO(CE: AmmoPressRecipes.java:936+)`. CE TE has no tank.
+- SuperComputer dropdown still skip — `ModuleMachineBase` class missing.
+- SILEX DRX stays cited skip.
+
+## Prior wave (103.7% → 104.2%, 8096 / 7767)
 
 - CE `gui_electrolyser_fluid.png` / `gui_electrolyser_metal.png` already in jar; screens blit CE UVs
   (power / progress / molten tint / power-ok). Gray-box gone.
@@ -54,8 +69,6 @@ Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%**
 - Family: **AmmoPress** (next after Electrolyser/Mixer). 28 leftover `registerDefaults` rows
   (NUKE_BALEFIRE skipped — item id collides with bomb BlockItem). Registered `p45_*`,
   `nuke_standard/demo/high/tots/hive`, `assembly_nuke` with existing CE textures/lang. No invent.
-- SuperComputer dropdown still skip — `ModuleMachineBase` class missing.
-- SILEX DRX stays cited skip.
 
 ## Prior waves (86.8% → 96.4%, 7489 / 7767)
 
@@ -163,17 +176,18 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**60.0%** (1552 / 2585). JSON/loot + Java machine-table **outputs** (`new ItemStack` / `stack("` /
+**60.0%** (1552 / 2586). JSON/loot + Java machine-table **outputs** (`new ItemStack` / `stack("` /
 ElectrolyserMetal scraps / AmmoPress outputs). Inputs are not counted. Not flattened extras.
+New centrifuge outputs were already reachable items.
 
 ## Next single gap
 
-Blocks **86.1%** (162 missing). Machine leftover **~200** (assembler skip 7, Centrifuge 69/78,
-AmmoPress NUKE_BALEFIRE). Vanilla leftover **52**. Weighted **104.2%**. `v0.0.1-rc2` stays.
-Electrolyser E2E: CE png blit + pour/slots + fluid-id/canister yes (client GUI not runServer-tested).
-AmmoPress E2E: solid leftover rows yes (press already ticks the table). Fluid-slot rows
-(G40_INC / ROCKET_INC diesel + existing FLAME_*) stay table-only — press has no tank.
-NUKE_BALEFIRE ammo not registered (BlockItem collision).
+Blocks **86.2%** (161 missing). Machine leftover **~194** (ChemPlant **72/145**, assembler skip 7,
+AmmoPress NUKE_BALEFIRE, ElectrolyserMetal 21/23). Vanilla leftover **52**. Weighted **104.3%**.
+`v0.0.1-rc2` stays.
+Centrifuge E2E: leftover solids **yes** (table + existing BE `getOutput`). `block_slag` **yes**
+(registered + placeable). AE2 certus **no**. GUI blit **wired**, client not opened.
+AmmoPress fluid-slot rows stay table-only — CE TE has no tank.
 
 ## Entities (Phase 9 leftovers)
 
