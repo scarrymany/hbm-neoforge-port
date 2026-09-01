@@ -26,5 +26,6 @@ public final class ChemIsotopeClientRegistry {
         SafeMenuScreens.bind(event, ChemIsotopeMenus.CYCLOTRON, CyclotronScreen::new);
         SafeMenuScreens.bind(event, ChemIsotopeMenus.CHEM_PLANT, ChemPlantScreen::new);
         SafeMenuScreens.bind(event, ChemIsotopeMenus.ELECTROLYSER, ElectrolyserScreen::new);
+        SafeMenuScreens.bind(event, ChemIsotopeMenus.ELECTROLYSER_METAL, ElectrolyserMetalScreen::new);
     }
 }

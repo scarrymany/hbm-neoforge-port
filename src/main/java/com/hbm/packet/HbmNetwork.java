@@ -9,6 +9,7 @@ import com.hbm.packet.toclient.HbmEffectPacket;
 import com.hbm.packet.toclient.NukeExplosionRemovalSyncPacket;
 import com.hbm.packet.toclient.RadFogPayload;
 import com.hbm.packet.toclient.SatPanelPayload;
+import com.hbm.packet.toserver.ElectrolyserControlPacket;
 import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
 import com.hbm.packet.toserver.LaunchPadRustedControlPacket;
@@ -111,5 +112,6 @@ public class HbmNetwork {
         registrar.playToServer(LaunchPadRustedControlPacket.TYPE, LaunchPadRustedControlPacket.STREAM_CODEC, LaunchPadRustedControlPacket::handleServer);
 
         registrar.playToServer(MassStorageControlPacket.TYPE, MassStorageControlPacket.STREAM_CODEC, MassStorageControlPacket::handleServer);
+        registrar.playToServer(ElectrolyserControlPacket.TYPE, ElectrolyserControlPacket.STREAM_CODEC, ElectrolyserControlPacket::handleServer);
     }
 }

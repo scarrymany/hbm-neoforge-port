@@ -26,6 +26,7 @@ public final class ChemIsotopeMenus {
     public static DeferredHolder<MenuType<?>, MenuType<CyclotronMenu>> CYCLOTRON;
     public static DeferredHolder<MenuType<?>, MenuType<ChemPlantMenu>> CHEM_PLANT;
     public static DeferredHolder<MenuType<?>, MenuType<ElectrolyserMenu>> ELECTROLYSER;
+    public static DeferredHolder<MenuType<?>, MenuType<ElectrolyserMetalMenu>> ELECTROLYSER_METAL;
 
     private ChemIsotopeMenus() {
     }
@@ -43,6 +44,8 @@ public final class ChemIsotopeMenus {
                 new ChemPlantMenu(id, inv, (ChemPlantBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         ELECTROLYSER = reg("machine_electrolyser", (id, inv, buf) ->
                 new ElectrolyserMenu(id, inv, (ElectrolyserBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        ELECTROLYSER_METAL = reg("machine_electrolyser_metal", (id, inv, buf) ->
+                new ElectrolyserMetalMenu(id, inv, (ElectrolyserBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

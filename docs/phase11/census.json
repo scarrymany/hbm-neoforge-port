@@ -2,7 +2,7 @@
   "weighted_pct": 103.7,
   "unweighted_pct": 102.8,
   "ce_sum": 7767,
-  "port_sum": 8053,
+  "port_sum": 8057,
   "rows": [
     {
       "cat": "items",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1777,
-      "pct": 88.5
+      "port": 1781,
+      "pct": 88.7
     },
     {
       "cat": "advancements",
@@ -184,7 +184,7 @@
         "CrackingRecipes": 12,
         "CrucibleRecipes": 14,
         "CrystallizerRecipes": 1,
-        "ElectrolyserMetalRecipes": 17,
+        "ElectrolyserMetalRecipes": 21,
         "EngineRecipes": 23,
         "ExposureChamberRecipes": 4,
         "FractionRecipes": 19,
@@ -219,7 +219,7 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 95
       },
-      "port": 1777,
+      "port": 1781,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,

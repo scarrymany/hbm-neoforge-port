@@ -8,15 +8,14 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.443s)** on wiped world port 25566, **3946 recipes**.
-No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0.
+runServer pending this revision (pre-test commit).
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **103.7%** (8053 / 7767) |
+| **Weighted** (Σport / ΣCE) | **103.7%** (8057 / 7767) |
 | **Unweighted** (mean of category %) | **102.8%** |
 | Recipe/loot + machine-table reachability | **59.4%** (1529 / 2574) |
 | CE `@AutoRegister` entities still missing | **none** |
@@ -39,7 +38,7 @@ Weighted **103.7%**. Category holes remain. Not content-complete.
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950. +3 ducrete CraftingManager rows |
-| Machine recipes | ~2009 | 1777 | **88.5%** | SILEX 95/96 (pellet+fluid_icon, DRX skipped) + ElectrolyserMetal 17/23. ChemPlant 72/72 |
+| Machine recipes | ~2009 | 1781 | **88.7%** | ElectrolyserMetal 21/23 (aluminium + 3 bedrock put sites). SILEX 95/96 DRX skipped. ChemPlant 72/72 |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
@@ -77,9 +76,9 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ### Unchanged this wave
 
-- Machine **1707 → 1777 / 88.5%**. SILEX 42→95 (`ComparableStack.meta` pellet loop + fluid_icon).
-  ElectrolyserMetal crystal 17. Mixer COLLOID/FULLERENE/LYE/BITUMEN (census still 1 `register` site).
-  Cited leftovers: SILEX DRX `:417-431` (`undefined`), SuperComputer dropdown, Electrolyser pour.
+- Machine **1777 → 1781 / 88.7%**. ElectrolyserMetal 17→21 (aluminium + bedrock loop).
+  Metal half wired: 21 slots, acid tank, pour, dual GUI. Mixer leftovers already landed.
+  Cited leftovers: SILEX DRX `:417-431` (`undefined`), SuperComputer dropdown.
 - Blocks **790 / 67.6%**. No dummy blocks.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Client NPE fix (`CrucibleBlocks.registerAll` + `SafeMenuScreens`) from prior HEAD.
@@ -94,7 +93,9 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 - Assembler expensive-mode `inputItemsEx` legs — dropped (same as prior assembler ports)
 - PA recipe `#10` SBD.ingot() — no schrabidate INGOT autogen
 - Texture misses with no CE file — documented, no invented art
-- ElectrolyserMetal crystal table landed (17). Pour/ore slots still TODO. `crystal_aluminium` + bedrock loop skipped.
+- ElectrolyserMetal crystal + bedrock loop landed (21/23). CE GUI pngs missing (gray-box).
+  Fluid-id / canister slots 3-10 still TODO(CE: TileEntityElectrolyser.java:141-144).
+  `chunk_ore_*` registered; CE has no `chunk_ore*.png` — no invented art.
 - PUREX chance-output / ICF / vitrification / naquadria — missing I/O
 - Full Albion beam physics — detector runs the recipe table locally
 - AmmoPress fluid-slot recipes (FLAME_*) — stored, not consumed (no tank on the press)
@@ -153,8 +154,8 @@ ElectrolyserMetal scraps). Inputs are not counted. Not flattened extras.
 
 ## Next single gap
 
-Blocks **86.1%** (162 missing). Machine leftover **~232** (ElectrolyserMetal bedrock/aluminium,
-assembler skip 7, other families). Vanilla leftover **52**. Weighted **103.7%**. `v0.0.1-rc2` stays.
+Blocks **86.1%** (162 missing). Machine leftover **~228** (assembler skip 7, other families).
+Vanilla leftover **52**. Weighted **103.7%**. `v0.0.1-rc2` stays. Electrolyser E2E: pour+slots yes.
 
 ## Entities (Phase 9 leftovers)
 

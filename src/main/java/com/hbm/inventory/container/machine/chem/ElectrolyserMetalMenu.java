@@ -9,21 +9,22 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * CE {@code ContainerElectrolyserFluid}: battery / upgrades / byproducts 11-13.
- * TODO(CE: ContainerElectrolyserFluid.java:42-50): fluid-id + canister slots 3-10.
- */
-public class ElectrolyserMenu extends MenuBase<ElectrolyserBlockEntity> {
+/** CE {@code ContainerElectrolyserMetal}: battery, upgrades, crystal 14, outputs 15-20. */
+public class ElectrolyserMetalMenu extends MenuBase<ElectrolyserBlockEntity> {
 
-    public ElectrolyserMenu(int id, Inventory playerInv, ElectrolyserBlockEntity be) {
-        super(ChemIsotopeMenus.ELECTROLYSER.get(), id, be);
+    public ElectrolyserMetalMenu(int id, Inventory playerInv, ElectrolyserBlockEntity be) {
+        super(ChemIsotopeMenus.ELECTROLYSER_METAL.get(), id, be);
 
         this.addSlot(new SlotNonRetarded(tile, 0, 186, 109));
         this.addSlot(new SlotNonRetarded(tile, 1, 186, 140));
         this.addSlot(new SlotNonRetarded(tile, 2, 186, 158));
-        this.addSlot(new SlotTakeOnly(tile, 11, 154, 18));
-        this.addSlot(new SlotTakeOnly(tile, 12, 154, 36));
-        this.addSlot(new SlotTakeOnly(tile, 13, 154, 54));
+        this.addSlot(new SlotNonRetarded(tile, 14, 10, 22));
+        this.addSlot(new SlotTakeOnly(tile, 15, 136, 18));
+        this.addSlot(new SlotTakeOnly(tile, 16, 154, 18));
+        this.addSlot(new SlotTakeOnly(tile, 17, 136, 36));
+        this.addSlot(new SlotTakeOnly(tile, 18, 154, 36));
+        this.addSlot(new SlotTakeOnly(tile, 19, 136, 54));
+        this.addSlot(new SlotTakeOnly(tile, 20, 154, 54));
 
         playerInv(playerInv, 8, 122);
     }
