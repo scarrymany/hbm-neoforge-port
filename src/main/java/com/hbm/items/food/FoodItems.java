@@ -7,6 +7,7 @@ import com.hbm.items.ModItems;
 import com.hbm.items.machine.ItemChemicalDye;
 import com.hbm.items.special.ItemSimpleConsumable;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.potion.HbmPotionEffects;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -95,6 +96,7 @@ public final class FoodItems {
         registerEnergy();
         registerPill();
         registerIv();
+        registerRadaway();
         registerCanteen();
     }
 
@@ -390,6 +392,9 @@ public final class FoodItems {
     public static DeferredItem<Item> IV_BLOOD;
     public static DeferredItem<Item> IV_XP_EMPTY;
     public static DeferredItem<Item> IV_XP;
+    public static DeferredItem<Item> RADAWAY;
+    public static DeferredItem<Item> RADAWAY_STRONG;
+    public static DeferredItem<Item> RADAWAY_FLUSH;
 
     private static void registerIv() {
         IV_EMPTY = tab(reg("iv_empty", () -> new ItemSimpleConsumable(props()).setUseActionServer((stack, user) -> {
@@ -415,6 +420,25 @@ public final class FoodItems {
             ItemSimpleConsumable.giveSoundAndDecrement(stack, user, SoundEvents.EXPERIENCE_ORB_PICKUP,
                     new ItemStack(IV_XP_EMPTY.get()));
             user.giveExperiencePoints(100);
+        })));
+    }
+
+    /** CE {@code ModItems} radaway / radaway_strong / radaway_flush — assets + ItemSimpleConsumable. */
+    private static void registerRadaway() {
+        RADAWAY = tab(reg("radaway", () -> new ItemSimpleConsumable(props()).setUseActionServer((stack, user) -> {
+            ItemSimpleConsumable.giveSoundAndDecrement(stack, user, HBMSoundHandler.radawayUse.get(),
+                    new ItemStack(IV_EMPTY.get()));
+            ItemSimpleConsumable.addPotionEffect(user, new MobEffectInstance(HbmPotionEffects.RADAWAY, 200, 24));
+        })));
+        RADAWAY_STRONG = tab(reg("radaway_strong", () -> new ItemSimpleConsumable(props()).setUseActionServer((stack, user) -> {
+            ItemSimpleConsumable.giveSoundAndDecrement(stack, user, HBMSoundHandler.radawayUse.get(),
+                    new ItemStack(IV_EMPTY.get()));
+            ItemSimpleConsumable.addPotionEffect(user, new MobEffectInstance(HbmPotionEffects.RADAWAY, 100, 99));
+        })));
+        RADAWAY_FLUSH = tab(reg("radaway_flush", () -> new ItemSimpleConsumable(props()).setUseActionServer((stack, user) -> {
+            ItemSimpleConsumable.giveSoundAndDecrement(stack, user, HBMSoundHandler.radawayUse.get(),
+                    new ItemStack(IV_EMPTY.get()));
+            ItemSimpleConsumable.addPotionEffect(user, new MobEffectInstance(HbmPotionEffects.RADAWAY, 50, 399));
         })));
     }
 

@@ -600,12 +600,13 @@ def main() -> None:
     hbm_crafting = sum(v for k, v in by_type.items() if k.startswith("hbm:") and k.split(":")[-1] in {
         "grenade_crafting", "rbmk_fuel_recycle", "scrap_split",
         "container_upgrade_crate_desh", "container_upgrade_crate_tungsten",
-        "container_upgrade_safe", "fluid_container_crafting",
+        "container_upgrade_safe", "fluid_container_crafting", "breeding_rod_tritium_cell",
     })
     machine_json = sum(v for k, v in by_type.items() if k.startswith("hbm:") and k not in {
         "hbm:grenade_crafting", "hbm:rbmk_fuel_recycle", "hbm:scrap_split",
         "hbm:container_upgrade_crate_desh", "hbm:container_upgrade_crate_tungsten",
         "hbm:container_upgrade_safe", "hbm:fluid_container_crafting",
+        "hbm:breeding_rod_tritium_cell",
     } and not k.startswith("minecraft:"))
     # leftover minecraft types already in vanilla_json
     other_json = sum(v for k, v in by_type.items() if k not in VANILLA_TYPES and not k.startswith("hbm:"))

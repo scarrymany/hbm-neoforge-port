@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rod_dual_empty"
+    },
+    {
+      "item": "hbm:ingot_lead"
+    },
+    {
+      "item": "hbm:nugget_lead"
+    },
+    {
+      "item": "hbm:nugget_lead"
+    },
+    {
+      "item": "hbm:nugget_lead"
+    }
+  ],
+  "result": {
+    "id": "hbm:rod_dual_lead",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rod_dual_empty"
+    },
+    {
+      "item": "hbm:billet_neptunium"
+    },
+    {
+      "item": "hbm:billet_neptunium"
+    }
+  ],
+  "result": {
+    "id": "hbm:rod_dual_np237",
+    "count": 1
+  }
+}

@@ -30,15 +30,7 @@ import java.util.List;
  * meta} is dropped entirely per {@link ItemPool}'s own class javadoc - no numeric discriminator is
  * needed, just the real item reference, confirmed present for every one of CE's 9 ammo entries by name.
  * <p>
- * <b>3 of CE's 8 {@code POOL_SUPPLIES} entries are skipped</b> (not silently - see the inline comments
- * below): {@code syringe_metal_stimpak}, {@code med_bag}, and {@code radaway} (the drinkable item, as
- * opposed to {@code HbmPotionEffects.RADAWAY}, the {@code MobEffect} it would apply) are not registered
- * anywhere in this port yet (confirmed by repo-wide grep - {@code com.hbm.items.special.
- * ItemConsumable}, the shared base class all three would extend, is never instantiated anywhere). This
- * is a genuine gap in the two research reports' own "all confirmed present" claim for this pool,
- * discovered while actually building this file - flagged explicitly rather than silently ported around
- * or invented. The other 5 supply entries, all 8 weapon entries, and all 9 ammo entries are ported with
- * CE's exact weights/counts.
+ * All 8 CE {@code POOL_SUPPLIES} entries are present (stimpak / med_bag / radaway now registered).
  */
 public final class ItemPoolsC130 {
 
@@ -54,16 +46,14 @@ public final class ItemPoolsC130 {
         ItemPool supplies = new ItemPool(POOL_SUPPLIES);
         supplies.pool.addAll(List.of(
                 ItemPool.entry(FoodItems.DEFINITELYFOOD.get(), 3, 10, 25),
-                // SKIPPED: CE weighted(ModItems.syringe_metal_stimpak, 0, 1, 3, 10) - not registered
-                // anywhere in this port yet (ItemConsumable is never instantiated) - see class javadoc.
                 ItemPool.entry(FoodItems.PILL_IODINE.get(), 1, 2, 2),
                 ItemPool.entry(fullDieselCanister(), 1, 4, 5),
                 ItemPool.entry(PowerGenBlocks.MACHINE_DIESEL.get(), 1, 1, 1),
                 ItemPool.entry(ToolItems.GEIGER_COUNTER.get(), 1, 1, 2)
-                // SKIPPED: CE weighted(ModItems.med_bag, 0, 1, 1, 3) - not registered, see class javadoc.
-                // SKIPPED: CE weighted(ModItems.radaway, 0, 1, 5, 10) - not registered (only the
-                // HbmPotionEffects.RADAWAY MobEffect exists, not the drinkable item), see class javadoc.
         ));
+        ItemPoolLookups.add(supplies, "syringe_metal_stimpak", 1, 3, 10);
+        ItemPoolLookups.add(supplies, "med_bag", 1, 1, 3);
+        ItemPoolLookups.add(supplies, "radaway", 1, 5, 10);
 
         ItemPool weapons = new ItemPool(POOL_WEAPONS);
         weapons.pool.addAll(List.of(
