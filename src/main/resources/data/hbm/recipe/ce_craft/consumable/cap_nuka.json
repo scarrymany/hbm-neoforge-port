@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    "I I"
+  ],
+  "key": {
+    "I": {
+      "item": "hbm:plate_aluminium"
+    }
+  },
+  "result": {
+    "id": "hbm:cap_nuka",
+    "count": 8
+  }
+}

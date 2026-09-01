@@ -36,5 +36,21 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getItemHandlerCapability(side));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_ANNIHILATOR.get(),
                 (be, side) -> be.getFluidHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_PRESS.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_ROTARY_FURNACE.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_ROTARY_FURNACE.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_FRACTION_TOWER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_FRACTION_TOWER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.WASTE_DRUM.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
     }
 }

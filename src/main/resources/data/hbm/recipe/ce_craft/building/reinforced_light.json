@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "GLG",
+    " G "
+  ],
+  "key": {
+    "G": {
+      "item": "hbm:reinforced_glass"
+    },
+    "L": {
+      "item": "minecraft:redstone_lamp"
+    }
+  },
+  "result": {
+    "id": "hbm:reinforced_lamp_off",
+    "count": 1
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "tag": "c:leaves"
+    },
+    {
+      "item": "hbm:powder_sawdust"
+    }
+  ],
+  "result": {
+    "id": "hbm:biomass",
+    "count": 1
+  }
+}

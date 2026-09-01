@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B B",
+    " B ",
+    "B B"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:barbed_wire"
+    }
+  },
+  "result": {
+    "id": "hbm:barbed_wire_fire",
+    "count": 8
+  }
+}

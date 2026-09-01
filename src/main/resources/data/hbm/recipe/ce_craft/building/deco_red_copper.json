@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "S S",
+    "SSS"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_red_copper"
+    }
+  },
+  "result": {
+    "id": "hbm:deco_red_copper",
+    "count": 8
+  }
+}

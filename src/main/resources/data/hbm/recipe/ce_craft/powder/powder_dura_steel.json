@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_steel"
+    },
+    {
+      "item": "hbm:powder_tungsten"
+    }
+  ],
+  "result": {
+    "id": "hbm:powder_dura_steel",
+    "count": 2
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_rare"
+    },
+    {
+      "item": "hbm:nugget_mercury"
+    },
+    {
+      "item": "minecraft:redstone"
+    }
+  ],
+  "result": {
+    "id": "hbm:powder_desh_mix",
+    "count": 1
+  }
+}

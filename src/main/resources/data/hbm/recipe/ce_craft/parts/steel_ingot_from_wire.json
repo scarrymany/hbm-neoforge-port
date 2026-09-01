@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:steel_wire"
+    }
+  },
+  "result": {
+    "id": "hbm:ingot_steel",
+    "count": 1
+  }
+}

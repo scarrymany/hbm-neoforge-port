@@ -19,5 +19,9 @@ public final class DummyableProcessClientRegistry {
         event.register(DummyableProcessMenus.MACHINE_BLAST_FURNACE.get(), BlastFurnaceScreen::new);
         event.register(DummyableProcessMenus.MACHINE_ROCK_MILL.get(), RockMillScreen::new);
         event.register(DummyableProcessMenus.MACHINE_ANNIHILATOR.get(), AnnihilatorScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_PRESS.get(), PressScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_ROTARY_FURNACE.get(), RotaryFurnaceScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_FRACTION_TOWER.get(), FractionTowerScreen::new);
+        event.register(DummyableProcessMenus.WASTE_DRUM.get(), WasteDrumScreen::new);
     }
 }

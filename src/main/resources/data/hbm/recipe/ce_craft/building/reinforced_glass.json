@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GPG",
+    "P P",
+    "GPG"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "P": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:reinforced_glass",
+    "count": 4
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:lightstone_tiles"
+    }
+  },
+  "result": {
+    "id": "hbm:lightstone_bricks",
+    "count": 4
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS",
+    "CMC",
+    "SBS"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:plate_steel"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "C": {
+      "item": "hbm:circuit_aluminium"
+    },
+    "M": {
+      "item": "minecraft:compass"
+    },
+    "B": {
+      "item": "minecraft:stone_button"
+    }
+  },
+  "result": {
+    "id": "hbm:geiger_counter",
+    "count": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:stone_depth_nether"
+    }
+  },
+  "result": {
+    "id": "hbm:depth_nether_brick",
+    "count": 4
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WW",
+    "SS",
+    "WW"
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:white_wool"
+    },
+    "S": {
+      "item": "minecraft:sand"
+    }
+  },
+  "result": {
+    "id": "hbm:sandbags",
+    "count": 4
+  }
+}

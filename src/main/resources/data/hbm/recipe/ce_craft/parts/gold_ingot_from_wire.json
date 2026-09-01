@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:gold_wire"
+    }
+  },
+  "result": {
+    "id": "minecraft:gold_ingot",
+    "count": 1
+  }
+}

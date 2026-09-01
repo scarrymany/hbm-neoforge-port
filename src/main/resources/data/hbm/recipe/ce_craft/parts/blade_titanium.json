@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "P",
+    "P"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_titanium"
+    }
+  },
+  "result": {
+    "id": "hbm:blade_titanium",
+    "count": 2
+  }
+}

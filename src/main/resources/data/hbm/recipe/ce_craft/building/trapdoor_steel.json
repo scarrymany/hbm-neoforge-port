@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:trapdoor_steel",
+    "count": 2
+  }
+}

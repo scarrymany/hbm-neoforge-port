@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SS",
+    "PP"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_steel"
+    },
+    "P": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:steel_roof",
+    "count": 4
+  }
+}

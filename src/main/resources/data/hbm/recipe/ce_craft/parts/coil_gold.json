@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "W W",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:gold_wire"
+    }
+  },
+  "result": {
+    "id": "hbm:coil_gold",
+    "count": 1
+  }
+}

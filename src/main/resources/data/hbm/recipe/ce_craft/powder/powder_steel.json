@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_iron"
+    },
+    {
+      "item": "hbm:powder_coal"
+    }
+  ],
+  "result": {
+    "id": "hbm:powder_steel",
+    "count": 1
+  }
+}

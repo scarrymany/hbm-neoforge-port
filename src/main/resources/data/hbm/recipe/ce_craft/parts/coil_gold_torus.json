@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "C C",
+    " C "
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:coil_gold"
+    }
+  },
+  "result": {
+    "id": "hbm:coil_gold_torus",
+    "count": 2
+  }
+}
