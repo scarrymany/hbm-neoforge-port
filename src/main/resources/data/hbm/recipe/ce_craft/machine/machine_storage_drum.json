@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LLL",
+    "L#L",
+    "LLL"
+  ],
+  "key": {
+    "L": {
+      "item": "hbm:plate_lead"
+    },
+    "#": {
+      "item": "hbm:tank_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:machine_storage_drum",
+    "count": 1
+  }
+}

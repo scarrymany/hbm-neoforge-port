@@ -1,20 +1,20 @@
 {
-  "weighted_pct": 82.5,
-  "unweighted_pct": 91.2,
+  "weighted_pct": 86.8,
+  "unweighted_pct": 93.3,
   "ce_sum": 7767,
-  "port_sum": 6407,
+  "port_sum": 6741,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2049,
-      "pct": 110.0
+      "port": 2056,
+      "pct": 110.4
     },
     {
       "cat": "blocks",
       "ce": 1169,
-      "port": 783,
-      "pct": 67.0
+      "port": 790,
+      "pct": 67.6
     },
     {
       "cat": "fluids",
@@ -37,14 +37,14 @@
     {
       "cat": "vanilla_crafting",
       "ce": 1950,
-      "port": 1369,
-      "pct": 70.2
+      "port": 1416,
+      "pct": 72.6
     },
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1409,
-      "pct": 70.1
+      "port": 1682,
+      "pct": 83.7
     },
     {
       "cat": "advancements",
@@ -59,14 +59,14 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2049,
+      "port": 2056,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
       "ce": 1169,
       "ce_fields": 1169,
       "ce_string_ctors": 290,
-      "port": 783,
+      "port": 790,
       "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
     },
     "fluids": {
@@ -114,10 +114,10 @@
         "addSlabStair": 25,
         "add9or1": 43
       },
-      "port": 1369,
+      "port": 1416,
       "by_type": {
-        "minecraft:crafting_shaped": 748,
-        "minecraft:crafting_shapeless": 480,
+        "minecraft:crafting_shaped": 794,
+        "minecraft:crafting_shapeless": 481,
         "minecraft:smelting": 135
       }
     },
@@ -171,7 +171,7 @@
         "SuperComputerRecipes": 14,
         "WasteDrumRecipes": 20
       },
-      "port_json": 486,
+      "port_json": 758,
       "port_java": {
         "AmmoPressRecipes": 60,
         "AnnihilatorRecipes": 15,
@@ -208,6 +208,7 @@
         "SawmillRecipes": 4,
         "SolderingRecipes": 26,
         "SolidificationRecipes": 49,
+        "StorageDrumRecipes": 1,
         "VacuumDistillRecipes": 2,
         "WasteDrumRecipes": 17,
         "CentrifugeRecipes": 69,
@@ -216,9 +217,9 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 29
       },
-      "port": 1409,
+      "port": 1682,
       "by_type": {
-        "hbm:assembler": 356,
+        "hbm:assembler": 628,
         "hbm:breeder": 30,
         "hbm:container_upgrade_crate_desh": 1,
         "hbm:container_upgrade_crate_tungsten": 1,
@@ -234,10 +235,10 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2049,
-      "reachable_via_recipe_or_loot": 987,
-      "pct": 48.2
+      "port_items": 2056,
+      "reachable_via_recipe_or_loot": 1010,
+      "pct": 49.1
     }
   },
-  "recipe_json_total": 1855
+  "recipe_json_total": 2174
 }

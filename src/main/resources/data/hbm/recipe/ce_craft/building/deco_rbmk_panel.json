@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "R"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_steel"
+    },
+    "R": {
+      "item": "hbm:deco_rbmk"
+    }
+  },
+  "result": {
+    "id": "hbm:deco_rbmk_panel",
+    "count": 1
+  }
+}

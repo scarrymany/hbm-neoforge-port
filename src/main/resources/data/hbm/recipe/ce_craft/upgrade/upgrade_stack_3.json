@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "PUP",
+    " C "
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:circuit_chip"
+    },
+    "P": {
+      "item": "hbm:part_generic_piston_electric"
+    },
+    "U": {
+      "item": "hbm:upgrade_stack_2"
+    }
+  },
+  "result": {
+    "id": "hbm:upgrade_stack_3",
+    "count": 1
+  }
+}

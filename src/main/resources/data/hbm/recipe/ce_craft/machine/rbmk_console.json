@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "DGD",
+    "DCD"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:ingot_boron"
+    },
+    "D": {
+      "item": "hbm:deco_rbmk"
+    },
+    "G": {
+      "tag": "c:glass_panes"
+    },
+    "C": {
+      "item": "hbm:circuit_analog"
+    }
+  },
+  "result": {
+    "id": "hbm:rbmk_console",
+    "count": 1
+  }
+}

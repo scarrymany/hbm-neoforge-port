@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ingot_dura_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:durasteel_bolt",
+    "count": 16
+  }
+}

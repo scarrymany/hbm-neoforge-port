@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "C",
+    "R",
+    "D"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:circuit_advanced"
+    },
+    "R": {
+      "item": "hbm:rbmk_control"
+    },
+    "D": {
+      "item": "hbm:crt_display"
+    }
+  },
+  "result": {
+    "id": "hbm:rbmk_control_auto",
+    "count": 1
+  }
+}

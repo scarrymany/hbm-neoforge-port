@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CIC",
+    "PRP",
+    "CIC"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:copper_pipe"
+    },
+    "P": {
+      "item": "hbm:steel_shell"
+    },
+    "R": {
+      "item": "hbm:rbmk_blank"
+    },
+    "I": {
+      "tag": "hbm:any_plastic"
+    }
+  },
+  "result": {
+    "id": "hbm:rbmk_heater",
+    "count": 1
+  }
+}
