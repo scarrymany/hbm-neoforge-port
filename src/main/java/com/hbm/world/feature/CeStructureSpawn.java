@@ -17,12 +17,10 @@ public final class CeStructureSpawn {
     }
 
     public static boolean locationIsValidSpawn(WorldGenLevel level, BlockPos airPos, boolean sandstone) {
-        if (isValidColumn(level, airPos, sandstone)) return true;
-        // Spaceship 13×24 / satellite 25×31 corners leave the WorldGenRegion.
-        // CE IWorldGenerator saw populated neighbors; Feature decoration does not.
-        var server = level.getLevel();
-        if (!server.hasChunk(airPos.getX() >> 4, airPos.getZ() >> 4)) return false;
-        return isValidColumn(server, airPos, sandstone);
+        // Only the WorldGenRegion. ServerLevel.getBlockState during FEATURES
+        // pulls neighbor protochunks and cascades at forced 1/1.
+        if (!level.hasChunk(airPos.getX() >> 4, airPos.getZ() >> 4)) return false;
+        return isValidColumn(level, airPos, sandstone);
     }
 
     private static boolean isValidColumn(BlockGetter level, BlockPos airPos, boolean sandstone) {

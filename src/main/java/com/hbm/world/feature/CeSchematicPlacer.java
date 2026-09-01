@@ -116,7 +116,7 @@ public final class CeSchematicPlacer {
      * {@code ServerLevel.setBlock} (creates/cascades chunks at forced 1/1).
      */
     private static void setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
-        if (!level.hasChunk(pos.getX() >> 4, pos.getZ() >> 4)) return;
+        if (!level.ensureCanWrite(pos)) return;
         level.setBlock(pos, state, 3);
     }
 
