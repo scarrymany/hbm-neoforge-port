@@ -21,6 +21,6 @@
   `lignite` gem, `lead_block` → LEAD 900. coal/wood tar remaps untouched.
 - Vanilla **1898 / 97.3%**. Machine census **1920 / 95.6%** (regex).
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0. `runServer` this wave after push.
+- Verified: `compileJava` 0, `runServer` **Done (6.015s)** / 4047 recipes (anvil is Java table, not JSON), port 25566.
 - No tag (reachability still ~62%, not a jump that justifies a playtest jar).
   `master` untouched.
