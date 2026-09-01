@@ -5,5 +5,5 @@
 - This session: leftover assembler (`explosivelenses1`, `fleijacharge`, `fusionplasmaforge`) + chem `uf6`/`meatprocessing`/`hydrogencoke` + AmmoPress/ArcWelder/Soldering/PlasmaForge Java tables + real TE+menu for those four machines + ammo casings / sulfur / niter.
 - Census: CE AmmoPress/ArcWelder/Soldering `recipes.add` + PlasmaForge `this.register((PlasmaForgeRecipe)`. Port `RECIPES.add` on those classes only. No global `recipes.add`.
 - Leftover CE `@AutoRegister` entities: **none missing**.
-- `compileJava` 0. `./gradlew build` / `runServer` numbers pending this revision.
+- `compileJava` 0. `./gradlew build` SUCCESS, jar **66,501,428** B (~63.42 MB). `runServer` **Done (5.583s)**, 2385 recipes.
 - No GitHub Release. `master` untouched.
