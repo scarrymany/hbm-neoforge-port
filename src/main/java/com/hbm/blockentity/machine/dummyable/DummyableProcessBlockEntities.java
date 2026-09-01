@@ -21,6 +21,10 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineCatalyticCrackerBlockEntity>> MACHINE_CATALYTIC_CRACKER;
     public static Supplier<BlockEntityType<MachineCatalyticReformerBlockEntity>> MACHINE_CATALYTIC_REFORMER;
     public static Supplier<BlockEntityType<MachineHydrotreaterBlockEntity>> MACHINE_HYDROTREATER;
+    public static Supplier<BlockEntityType<MachineVacuumDistillBlockEntity>> MACHINE_VACUUM_DISTILL;
+    public static Supplier<BlockEntityType<MachineRadiolysisBlockEntity>> MACHINE_RADIOLYSIS;
+    public static Supplier<BlockEntityType<MachineGasFlareBlockEntity>> MACHINE_FLARE;
+    public static Supplier<BlockEntityType<MachineEPressBlockEntity>> MACHINE_EPRESS;
 
     private DummyableProcessBlockEntities() {
     }
@@ -77,6 +81,22 @@ public final class DummyableProcessBlockEntities {
         MACHINE_HYDROTREATER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_hydrotreater", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineHydrotreaterBlockEntity(MACHINE_HYDROTREATER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_HYDROTREATER.get()
+        ).build(null));
+        MACHINE_VACUUM_DISTILL = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_vacuum_distill", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineVacuumDistillBlockEntity(MACHINE_VACUUM_DISTILL.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_VACUUM_DISTILL.get()
+        ).build(null));
+        MACHINE_RADIOLYSIS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_radiolysis", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineRadiolysisBlockEntity(MACHINE_RADIOLYSIS.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_RADIOLYSIS.get()
+        ).build(null));
+        MACHINE_FLARE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_flare", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineGasFlareBlockEntity(MACHINE_FLARE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_FLARE.get()
+        ).build(null));
+        MACHINE_EPRESS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_epress", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineEPressBlockEntity(MACHINE_EPRESS.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_EPRESS.get()
         ).build(null));
     }
 }

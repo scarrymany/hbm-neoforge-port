@@ -64,8 +64,11 @@ import com.hbm.inventory.recipes.CokerRecipes;
 import com.hbm.inventory.recipes.CompressorRecipes;
 import com.hbm.inventory.recipes.CrackingRecipes;
 import com.hbm.inventory.recipes.FractionRecipes;
+import com.hbm.inventory.recipes.FlareRecipes;
 import com.hbm.inventory.recipes.HydrotreatingRecipes;
+import com.hbm.inventory.recipes.RadiolysisRecipes;
 import com.hbm.inventory.recipes.ReformingRecipes;
+import com.hbm.inventory.recipes.VacuumDistillRecipes;
 import com.hbm.inventory.recipes.PUREXRecipes;
 import com.hbm.inventory.recipes.SolidificationRecipes;
 import com.hbm.inventory.recipes.RefineryRecipes;
@@ -162,6 +165,9 @@ public class CommonEvents {
             CrackingRecipes.register();
             ReformingRecipes.register();
             HydrotreatingRecipes.register();
+            VacuumDistillRecipes.register();
+            RadiolysisRecipes.register();
+            FlareRecipes.register();
             // Phase 4 (fallout_rain_and_effects) - com.hbm.config.FalloutConfigJSON#initDefault()
             // eagerly resolves several DeferredBlock.get() calls (e.g. WastelandVirusBlocks.SELLAFIELD)
             // while building its default block-transform table, so - same reasoning as the recipe

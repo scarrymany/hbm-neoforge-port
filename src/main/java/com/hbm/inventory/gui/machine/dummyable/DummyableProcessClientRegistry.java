@@ -28,5 +28,9 @@ public final class DummyableProcessClientRegistry {
         event.register(DummyableProcessMenus.MACHINE_CATALYTIC_CRACKER.get(), CatalyticCrackerScreen::new);
         event.register(DummyableProcessMenus.MACHINE_CATALYTIC_REFORMER.get(), CatalyticReformerScreen::new);
         event.register(DummyableProcessMenus.MACHINE_HYDROTREATER.get(), HydrotreaterScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_VACUUM_DISTILL.get(), VacuumDistillScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_RADIOLYSIS.get(), RadiolysisScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_FLARE.get(), GasFlareScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_EPRESS.get(), EPressScreen::new);
     }
 }

@@ -11,7 +11,11 @@ import com.hbm.blockentity.machine.dummyable.MachineCatalyticCrackerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineCatalyticReformerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineCokerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineCompressorBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineEPressBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineGasFlareBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineHydrotreaterBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineRadiolysisBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineVacuumDistillBlockEntity;
 import com.hbm.blockentity.machine.dummyable.WasteDrumBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -35,6 +39,10 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<CatalyticCrackerMenu>> MACHINE_CATALYTIC_CRACKER;
     public static DeferredHolder<MenuType<?>, MenuType<CatalyticReformerMenu>> MACHINE_CATALYTIC_REFORMER;
     public static DeferredHolder<MenuType<?>, MenuType<HydrotreaterMenu>> MACHINE_HYDROTREATER;
+    public static DeferredHolder<MenuType<?>, MenuType<VacuumDistillMenu>> MACHINE_VACUUM_DISTILL;
+    public static DeferredHolder<MenuType<?>, MenuType<RadiolysisMenu>> MACHINE_RADIOLYSIS;
+    public static DeferredHolder<MenuType<?>, MenuType<GasFlareMenu>> MACHINE_FLARE;
+    public static DeferredHolder<MenuType<?>, MenuType<EPressMenu>> MACHINE_EPRESS;
 
     private DummyableProcessMenus() {
     }
@@ -66,6 +74,14 @@ public final class DummyableProcessMenus {
                 new CatalyticReformerMenu(id, inv, (MachineCatalyticReformerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_HYDROTREATER = reg("machine_hydrotreater", (id, inv, buf) ->
                 new HydrotreaterMenu(id, inv, (MachineHydrotreaterBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_VACUUM_DISTILL = reg("machine_vacuum_distill", (id, inv, buf) ->
+                new VacuumDistillMenu(id, inv, (MachineVacuumDistillBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_RADIOLYSIS = reg("machine_radiolysis", (id, inv, buf) ->
+                new RadiolysisMenu(id, inv, (MachineRadiolysisBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_FLARE = reg("machine_flare", (id, inv, buf) ->
+                new GasFlareMenu(id, inv, (MachineGasFlareBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_EPRESS = reg("machine_epress", (id, inv, buf) ->
+                new EPressMenu(id, inv, (MachineEPressBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

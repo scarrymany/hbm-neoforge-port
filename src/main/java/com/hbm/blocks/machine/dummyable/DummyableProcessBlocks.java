@@ -18,7 +18,8 @@ import java.util.function.Supplier;
 /**
  * Dummyable process machines + waste drum.
  * CE furnace_combination / blast / rock mill / annihilator / press / rotary furnace / fraction tower /
- * waste_drum / compressor / coker / catalytic cracker / catalytic reformer / hydrotreater.
+ * waste_drum / compressor / coker / catalytic cracker / catalytic reformer / hydrotreater /
+ * vacuum distill / radiolysis / flare / epress.
  */
 public final class DummyableProcessBlocks {
 
@@ -38,6 +39,10 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineCatalyticCrackerBlock> MACHINE_CATALYTIC_CRACKER;
     public static DeferredBlock<MachineCatalyticReformerBlock> MACHINE_CATALYTIC_REFORMER;
     public static DeferredBlock<MachineHydrotreaterBlock> MACHINE_HYDROTREATER;
+    public static DeferredBlock<MachineVacuumDistillBlock> MACHINE_VACUUM_DISTILL;
+    public static DeferredBlock<MachineRadiolysisBlock> MACHINE_RADIOLYSIS;
+    public static DeferredBlock<MachineGasFlareBlock> MACHINE_FLARE;
+    public static DeferredBlock<MachineEPressBlock> MACHINE_EPRESS;
 
     private DummyableProcessBlocks() {
     }
@@ -56,6 +61,10 @@ public final class DummyableProcessBlocks {
         MACHINE_CATALYTIC_CRACKER = registerBlock("machine_catalytic_cracker", () -> new MachineCatalyticCrackerBlock(MACHINE_PROPS));
         MACHINE_CATALYTIC_REFORMER = registerBlock("machine_catalytic_reformer", () -> new MachineCatalyticReformerBlock(MACHINE_PROPS));
         MACHINE_HYDROTREATER = registerBlock("machine_hydrotreater", () -> new MachineHydrotreaterBlock(MACHINE_PROPS));
+        MACHINE_VACUUM_DISTILL = registerBlock("machine_vacuum_distill", () -> new MachineVacuumDistillBlock(MACHINE_PROPS));
+        MACHINE_RADIOLYSIS = registerBlock("machine_radiolysis", () -> new MachineRadiolysisBlock(MACHINE_PROPS));
+        MACHINE_FLARE = registerBlock("machine_flare", () -> new MachineGasFlareBlock(MACHINE_PROPS));
+        MACHINE_EPRESS = registerBlock("machine_epress", () -> new MachineEPressBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }
