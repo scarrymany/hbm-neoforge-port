@@ -81,5 +81,7 @@ public final class DummyableProcessClientRegistry {
         SafeMenuScreens.bind(event, DummyableProcessMenus.SOYUZ_CAPSULE, SoyuzCapsuleScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.FILING_CABINET, FileCabinetScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_MINING_LASER, MiningLaserScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_STRAND_CASTER, StrandCasterScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_FORCEFIELD, ForceFieldScreen::new);
     }
 }

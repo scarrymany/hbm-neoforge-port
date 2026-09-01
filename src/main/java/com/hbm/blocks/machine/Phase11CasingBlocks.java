@@ -39,16 +39,11 @@ public final class Phase11CasingBlocks {
         // machine_epress is DummyableProcessBlocks (full TE).
         // machine_ore_slopper is DummyableProcessBlocks (full TE).
         // machine_mining_laser is DummyableProcessBlocks (live TE).
-        // CE ModBlocks.java:1186 / AssemblyMachineRecipes.java:362
-        registerBlock("machine_teleporter", () -> new BlockBase(MACHINE_PROPS));
-        // CE ModBlocks.java:1238 / AssemblyMachineRecipes.java:367
-        registerBlock("machine_satlink", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_forcefield", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_strand_caster", () -> new BlockBase(MACHINE_PROPS));
+        // machine_teleporter / machine_satlink / machine_forcefield / machine_strand_caster /
+        // machine_chungus are DummyableProcessBlocks (live TE).
         registerBlock("machine_assembly_factory", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("machine_chemical_factory", () -> new BlockBase(MACHINE_PROPS));
         // machine_turbofan / machine_hephaestus / machine_radgen are DummyableProcessBlocks (full TEs).
-        registerBlock("machine_chungus", () -> new BlockBase(MACHINE_PROPS));
         // machine_pyrooven / machine_exposure_chamber are DummyableProcessBlocks (full TEs).
         registerBlock("machine_fluidtank", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("machine_bigasstank", () -> new BlockBase(MACHINE_PROPS));

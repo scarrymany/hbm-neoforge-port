@@ -90,6 +90,11 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineThresherBlockEntity>> MACHINE_THRESHER;
     public static Supplier<BlockEntityType<BMPowerBoxBlockEntity>> BM_POWER_BOX;
     public static Supplier<BlockEntityType<MachineMiningLaserBlockEntity>> MACHINE_MINING_LASER;
+    public static Supplier<BlockEntityType<MachineStrandCasterBlockEntity>> MACHINE_STRAND_CASTER;
+    public static Supplier<BlockEntityType<MachineForceFieldBlockEntity>> MACHINE_FORCEFIELD;
+    public static Supplier<BlockEntityType<MachineChungusBlockEntity>> MACHINE_CHUNGUS;
+    public static Supplier<BlockEntityType<MachineSatLinkBlockEntity>> MACHINE_SATLINK;
+    public static Supplier<BlockEntityType<MachineTeleporterBlockEntity>> MACHINE_TELEPORTER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -439,6 +444,26 @@ public final class DummyableProcessBlockEntities {
         MACHINE_MINING_LASER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_mining_laser", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineMiningLaserBlockEntity(MACHINE_MINING_LASER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_MINING_LASER.get()
+        ).build(null));
+        MACHINE_STRAND_CASTER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_strand_caster", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineStrandCasterBlockEntity(MACHINE_STRAND_CASTER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_STRAND_CASTER.get()
+        ).build(null));
+        MACHINE_FORCEFIELD = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_forcefield", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineForceFieldBlockEntity(MACHINE_FORCEFIELD.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_FORCEFIELD.get()
+        ).build(null));
+        MACHINE_CHUNGUS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_chungus", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineChungusBlockEntity(MACHINE_CHUNGUS.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CHUNGUS.get()
+        ).build(null));
+        MACHINE_SATLINK = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_satlink", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineSatLinkBlockEntity(MACHINE_SATLINK.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_SATLINK.get()
+        ).build(null));
+        MACHINE_TELEPORTER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_teleporter", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineTeleporterBlockEntity(MACHINE_TELEPORTER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_TELEPORTER.get()
         ).build(null));
     }
 }

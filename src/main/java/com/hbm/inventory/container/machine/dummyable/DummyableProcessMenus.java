@@ -64,7 +64,9 @@ import com.hbm.blockentity.machine.dummyable.MassStorageBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineTeleLinkerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.SoyuzCapsuleBlockEntity;
 import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineForceFieldBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineMiningLaserBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineStrandCasterBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -139,6 +141,8 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<SoyuzCapsuleMenu>> SOYUZ_CAPSULE;
     public static DeferredHolder<MenuType<?>, MenuType<FileCabinetMenu>> FILING_CABINET;
     public static DeferredHolder<MenuType<?>, MenuType<MiningLaserMenu>> MACHINE_MINING_LASER;
+    public static DeferredHolder<MenuType<?>, MenuType<StrandCasterMenu>> MACHINE_STRAND_CASTER;
+    public static DeferredHolder<MenuType<?>, MenuType<ForceFieldMenu>> MACHINE_FORCEFIELD;
 
     private DummyableProcessMenus() {
     }
@@ -274,6 +278,10 @@ public final class DummyableProcessMenus {
                 new FileCabinetMenu(id, inv, (FilingCabinetBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_MINING_LASER = reg("machine_mining_laser", (id, inv, buf) ->
                 new MiningLaserMenu(id, inv, (MachineMiningLaserBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_STRAND_CASTER = reg("machine_strand_caster", (id, inv, buf) ->
+                new StrandCasterMenu(id, inv, (MachineStrandCasterBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_FORCEFIELD = reg("machine_forcefield", (id, inv, buf) ->
+                new ForceFieldMenu(id, inv, (MachineForceFieldBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

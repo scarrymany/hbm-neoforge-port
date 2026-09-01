@@ -16,6 +16,8 @@ import com.hbm.blocks.machine.MachineMicrowaveBlock;
 import com.hbm.blocks.machine.MachineRtgFurnaceBlock;
 import com.hbm.blocks.generic.BMPowerBoxBlock;
 import com.hbm.blocks.machine.MachineTeleLinkerBlock;
+import com.hbm.blocks.machine.MachineForceFieldBlock;
+import com.hbm.blocks.machine.MachineTeleporterBlock;
 import com.hbm.blocks.machine.MachineThresherBlock;
 import com.hbm.blocks.machine.SoyuzCapsuleBlock;
 import com.hbm.blocks.machine.WasteDrumBlock;
@@ -150,6 +152,11 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineThresherBlock> MACHINE_THRESHER;
     public static DeferredBlock<BMPowerBoxBlock> BM_POWER_BOX;
     public static DeferredBlock<MachineMiningLaserBlock> MACHINE_MINING_LASER;
+    public static DeferredBlock<MachineStrandCasterBlock> MACHINE_STRAND_CASTER;
+    public static DeferredBlock<MachineForceFieldBlock> MACHINE_FORCEFIELD;
+    public static DeferredBlock<MachineChungusBlock> MACHINE_CHUNGUS;
+    public static DeferredBlock<MachineSatLinkBlock> MACHINE_SATLINK;
+    public static DeferredBlock<MachineTeleporterBlock> MACHINE_TELEPORTER;
 
     private DummyableProcessBlocks() {
     }
@@ -262,6 +269,20 @@ public final class DummyableProcessBlocks {
         MACHINE_MINING_LASER = registerBlock("machine_mining_laser",
                 () -> new MachineMiningLaserBlock(BlockBehaviour.Properties.of()
                         .strength(5.0F, 100.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // CE ModBlocks.java:1067 / :1191 / :1074 / :1238 / :1186
+        MACHINE_STRAND_CASTER = registerBlock("machine_strand_caster", () -> new MachineStrandCasterBlock(MACHINE_PROPS));
+        MACHINE_FORCEFIELD = registerBlock("machine_forcefield",
+                () -> new MachineForceFieldBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 100.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()),
+                ModCreativeTabs.MISSILE);
+        MACHINE_CHUNGUS = registerBlock("machine_chungus", () -> new MachineChungusBlock(MACHINE_PROPS));
+        MACHINE_SATLINK = registerBlock("machine_satlink",
+                () -> new MachineSatLinkBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()),
+                ModCreativeTabs.MISSILE);
+        MACHINE_TELEPORTER = registerBlock("machine_teleporter",
+                () -> new MachineTeleporterBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }
