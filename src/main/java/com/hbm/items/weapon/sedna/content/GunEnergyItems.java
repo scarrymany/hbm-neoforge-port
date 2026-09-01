@@ -46,7 +46,8 @@ public final class GunEnergyItems {
     public static final DeferredItem<Item> NUKE_HIGH = registerAmmo("nuke_high", () -> { if (XFactoryEnergy.ITEM_NUKE_HIGH == null) XFactoryEnergy.ITEM_NUKE_HIGH = new Item(new Item.Properties()); return XFactoryEnergy.ITEM_NUKE_HIGH; });
     public static final DeferredItem<Item> NUKE_TOTS = registerAmmo("nuke_tots", () -> { if (XFactoryEnergy.ITEM_NUKE_TOTS == null) XFactoryEnergy.ITEM_NUKE_TOTS = new Item(new Item.Properties()); return XFactoryEnergy.ITEM_NUKE_TOTS; });
     public static final DeferredItem<Item> NUKE_HIVE = registerAmmo("nuke_hive", () -> { if (XFactoryEnergy.ITEM_NUKE_HIVE == null) XFactoryEnergy.ITEM_NUKE_HIVE = new Item(new Item.Properties()); return XFactoryEnergy.ITEM_NUKE_HIVE; });
-    public static final DeferredItem<Item> NUKE_BALEFIRE = registerAmmo("nuke_balefire", () -> { if (XFactoryEnergy.ITEM_NUKE_BALEFIRE == null) XFactoryEnergy.ITEM_NUKE_BALEFIRE = new Item(new Item.Properties()); return XFactoryEnergy.ITEM_NUKE_BALEFIRE; });
+    // TODO(CE: AmmoPressRecipes.java:1124-1135 / XFactoryCatapult.java:159): NUKE_BALEFIRE ammo
+    // item id collides with NukeCasingBlocks.nuke_balefire BlockItem. Do not invent a second id.
 
     // ==================== folly ammo (secret, 2) ====================
     public static final DeferredItem<Item> FOLLY_SM = registerAmmoHidden("folly_sm", () -> { if (XFactoryFolly.ITEM_FOLLY_SM == null) XFactoryFolly.ITEM_FOLLY_SM = new Item(new Item.Properties()); return XFactoryFolly.ITEM_FOLLY_SM; });

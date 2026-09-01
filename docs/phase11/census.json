@@ -2,7 +2,7 @@
   "weighted_pct": 104.2,
   "unweighted_pct": 103.1,
   "ce_sum": 7767,
-  "port_sum": 8097,
+  "port_sum": 8096,
   "rows": [
     {
       "cat": "items",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1810,
-      "pct": 90.1
+      "port": 1809,
+      "pct": 90.0
     },
     {
       "cat": "advancements",
@@ -173,7 +173,7 @@
       },
       "port_json": 758,
       "port_java": {
-        "AmmoPressRecipes": 89,
+        "AmmoPressRecipes": 88,
         "AnnihilatorRecipes": 15,
         "ArcFurnaceRecipes": 25,
         "ArcWelderRecipes": 47,
@@ -219,7 +219,7 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 95
       },
-      "port": 1810,
+      "port": 1809,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,

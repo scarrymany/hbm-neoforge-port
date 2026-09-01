@@ -209,8 +209,8 @@ public final class AmmoPressRecipes {
                 null, ((new ComparableStack(item("nugget_pu239"))).copy(2)), null, null, ((new ComparableStack(item("ball_tatb"))).copy(2)), null, null, steelPlate.copy(4), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_hive")),
                 null, ((OreDictStack.ofHbmTag("any_highexplosive", 1)).copy(8)), null, null, ((new ComparableStack(item("casing_large_steel"))).copy(2)), null, null, steelPlate.copy(4), null));
-        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("nuke_balefire")),
-                null, new ComparableStack(item("egg_balefire_shard")), null, null, new ComparableStack(item("assembly_nuke")), null, null, null, null));
+        // TODO(CE: AmmoPressRecipes.java:1124-1135): NUKE_BALEFIRE output id collides with
+        // NukeCasingBlocks.nuke_balefire BlockItem. Do not invent a second id.
     }
 
     private static Item item(String id) {

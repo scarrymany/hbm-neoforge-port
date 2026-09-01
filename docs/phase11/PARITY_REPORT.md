@@ -16,7 +16,7 @@ No new tag yet. `v0.0.1-rc2` stays.
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **104.2%** (8097 / 7767) |
+| **Weighted** (Σport / ΣCE) | **104.2%** (8096 / 7767) |
 | **Unweighted** (mean of category %) | **103.1%** |
 | Recipe/loot + machine-table reachability | **60.0%** (1552 / 2585) |
 | CE `@AutoRegister` entities still missing | **none** |
@@ -24,7 +24,7 @@ No new tag yet. `v0.0.1-rc2` stays.
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 162**, **machine 199**, **vanilla 52**.
+Largest remaining holes: **blocks 162**, **machine 200**, **vanilla 52**.
 Weighted **104.2%**. Category holes remain. Not content-complete.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
@@ -39,20 +39,21 @@ Weighted **104.2%**. Category holes remain. Not content-complete.
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950. +3 ducrete CraftingManager rows |
-| Machine recipes | ~2009 | 1810 | **90.1%** | AmmoPress 89 (CE registerDefaults). ElectrolyserMetal 21/23. SILEX 95/96 DRX skipped. ChemPlant 72/72 |
+| Machine recipes | ~2009 | 1809 | **90.0%** | AmmoPress 88 (CE registerDefaults 89; NUKE_BALEFIRE BlockItem collision). ElectrolyserMetal 21/23. SILEX 95/96 DRX skipped. ChemPlant 72/72 |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (103.7% → 104.2%, 8097 / 7767)
+## What changed this wave (103.7% → 104.2%, 8096 / 7767)
 
 - CE `gui_electrolyser_fluid.png` / `gui_electrolyser_metal.png` already in jar; screens blit CE UVs
   (power / progress / molten tint / power-ok). Gray-box gone.
 - Electrolyser fluid-id + canister I/O: `FluidTankNTM.setType`/`loadTank`/`unloadTank` + loaders
   (`FluidLoaderStandard` / `FillableItem` / `Infinite`). Slots 3-10 CE coords.
-- Family: **AmmoPress** (next after Electrolyser/Mixer). 29 leftover `registerDefaults` rows.
-  Registered `p45_*`, `nuke_*`, `assembly_nuke` with existing CE textures/lang. No invent.
+- Family: **AmmoPress** (next after Electrolyser/Mixer). 28 leftover `registerDefaults` rows
+  (NUKE_BALEFIRE skipped — item id collides with bomb BlockItem). Registered `p45_*`,
+  `nuke_standard/demo/high/tots/hive`, `assembly_nuke` with existing CE textures/lang. No invent.
 - SuperComputer dropdown still skip — `ModuleMachineBase` class missing.
 - SILEX DRX stays cited skip.
 
@@ -88,8 +89,9 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ### Unchanged this wave
 
-- Machine **1781 → 1810 / 90.1%**. AmmoPress 60→89 (`registerDefaults` complete; census
-  CE 91 includes JSON `recipes.add` helper, not a row). ElectrolyserMetal 21/23.
+- Machine **1781 → 1809 / 90.0%**. AmmoPress 60→88. CE `registerDefaults` 89; NUKE_BALEFIRE
+  skipped (`nuke_balefire` BlockItem collision, no invented id). Census CE 91 includes
+  JSON `recipes.add` helper. ElectrolyserMetal 21/23.
   Cited leftovers: SILEX DRX `:417-431` (`undefined`), SuperComputer dropdown.
 - Blocks **790 / 67.6%**. No dummy blocks.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
@@ -166,11 +168,12 @@ ElectrolyserMetal scraps / AmmoPress outputs). Inputs are not counted. Not flatt
 
 ## Next single gap
 
-Blocks **86.1%** (162 missing). Machine leftover **~199** (assembler skip 7, Centrifuge 69/78).
-Vanilla leftover **52**. Weighted **104.2%**. `v0.0.1-rc2` stays.
+Blocks **86.1%** (162 missing). Machine leftover **~200** (assembler skip 7, Centrifuge 69/78,
+AmmoPress NUKE_BALEFIRE). Vanilla leftover **52**. Weighted **104.2%**. `v0.0.1-rc2` stays.
 Electrolyser E2E: CE png blit + pour/slots + fluid-id/canister yes (client GUI not runServer-tested).
 AmmoPress E2E: solid leftover rows yes (press already ticks the table). Fluid-slot rows
 (G40_INC / ROCKET_INC diesel + existing FLAME_*) stay table-only — press has no tank.
+NUKE_BALEFIRE ammo not registered (BlockItem collision).
 
 ## Entities (Phase 9 leftovers)
 

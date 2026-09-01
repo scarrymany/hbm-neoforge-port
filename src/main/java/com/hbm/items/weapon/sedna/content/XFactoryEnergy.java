@@ -92,6 +92,7 @@ public final class XFactoryEnergy {
     public static Item ITEM_NUKE_HIGH;
     public static Item ITEM_NUKE_TOTS;
     public static Item ITEM_NUKE_HIVE;
+    /** Unregistered: item id collides with {@code NukeCasingBlocks.nuke_balefire} BlockItem. */
     public static Item ITEM_NUKE_BALEFIRE;
 
     public static final BulletConfig energy_tesla = new BulletConfig("energy_tesla").setItem(() -> ITEM_CAPACITOR)
