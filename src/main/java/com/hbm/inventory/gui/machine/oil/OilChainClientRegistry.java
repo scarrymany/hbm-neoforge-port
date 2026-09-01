@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.oil;
 
 import com.hbm.inventory.container.machine.oil.OilChainMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -25,7 +26,7 @@ public final class OilChainClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(OilChainMenus.MACHINE_OIL_WELL.get(), MachineOilWellScreen::new);
-        event.register(OilChainMenus.MACHINE_REFINERY.get(), MachineRefineryScreen::new);
+        SafeMenuScreens.bind(event, OilChainMenus.MACHINE_OIL_WELL, MachineOilWellScreen::new);
+        SafeMenuScreens.bind(event, OilChainMenus.MACHINE_REFINERY, MachineRefineryScreen::new);
     }
 }

@@ -6,6 +6,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 import com.hbm.blockentity.machine.rbmk.RBMKBlockEntities;
@@ -89,7 +90,7 @@ public class ClientModRegistry {
      * confirmed-real NeoForge counterpart to {@code com.hbm.inventory.container.ModMenuTypes}'
      * server/common-safe {@code DeferredRegister} - see Neo Edition's real
      * {@code CommonEvents.registerScreens} (cross-checked for API shape only) for the identical
-     * {@code event.register(SOME_MENU_TYPE.get(), SomeScreen::new)} pattern every future Phase 2
+     * {@code SafeMenuScreens.bind(event, SOME_MENU_TYPE, SomeScreen::new)} pattern every future Phase 2
      * machine Menu+Screen pair should add a line to here - the storage-machines package below is the
      * first concrete set (see {@code docs/phase2/machines_storage.md}).
      */
@@ -97,9 +98,9 @@ public class ClientModRegistry {
     public static void registerScreens(RegisterMenuScreensEvent event) {
         // Phase 2 storage-machines package (see docs/phase2/machines_storage.md) - first concrete
         // entries following this method's own original template comment.
-        event.register(ModMenuTypes.CRATE.get(), CrateScreen::new);
-        event.register(ModMenuTypes.BATTERY.get(), BatteryScreen::new);
-        event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
-        event.register(ModMenuTypes.LEMEGETON.get(), LemegetonScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRATE, CrateScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.BATTERY, BatteryScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.FLUID_TANK, FluidTankScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.LEMEGETON, LemegetonScreen::new);
     }
 }

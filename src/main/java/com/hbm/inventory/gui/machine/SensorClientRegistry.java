@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine;
 
 import com.hbm.inventory.container.machine.SensorMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -15,6 +16,6 @@ public final class SensorClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(SensorMenus.MACHINE_RADAR.get(), RadarScreen::new);
+        SafeMenuScreens.bind(event, SensorMenus.MACHINE_RADAR, RadarScreen::new);
     }
 }

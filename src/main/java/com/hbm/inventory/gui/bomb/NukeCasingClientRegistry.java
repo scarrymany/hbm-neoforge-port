@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.bomb;
 
 import com.hbm.inventory.container.bomb.NukeCasingMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -25,15 +26,15 @@ public final class NukeCasingClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(NukeCasingMenus.NUKE_BOY.get(), NukeBoyScreen::new);
-        event.register(NukeCasingMenus.NUKE_GADGET.get(), NukeGadgetScreen::new);
-        event.register(NukeCasingMenus.NUKE_MAN.get(), NukeManScreen::new);
-        event.register(NukeCasingMenus.NUKE_MIKE.get(), NukeMikeScreen::new);
-        event.register(NukeCasingMenus.NUKE_TSAR.get(), NukeTsarScreen::new);
-        event.register(NukeCasingMenus.NUKE_N2.get(), NukeN2Screen::new);
-        event.register(NukeCasingMenus.NUKE_PROTOTYPE.get(), NukePrototypeScreen::new);
-        event.register(NukeCasingMenus.NUKE_FLEIJA.get(), NukeFleijaScreen::new);
-        event.register(NukeCasingMenus.NUKE_BALEFIRE.get(), NukeBalefireScreen::new);
-        event.register(NukeCasingMenus.NUKE_CUSTOM.get(), NukeCustomScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_BOY, NukeBoyScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_GADGET, NukeGadgetScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_MAN, NukeManScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_MIKE, NukeMikeScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_TSAR, NukeTsarScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_N2, NukeN2Screen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_PROTOTYPE, NukePrototypeScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_FLEIJA, NukeFleijaScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_BALEFIRE, NukeBalefireScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_CUSTOM, NukeCustomScreen::new);
     }
 }

@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine;
 
 import com.hbm.inventory.container.machine.ProcessingMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -24,9 +25,9 @@ public final class ProcessingClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(ProcessingMenus.MACHINE_SHREDDER.get(), MachineShredderScreen::new);
-        event.register(ProcessingMenus.MACHINE_ASSEMBLER.get(), MachineAssemblyMachineScreen::new);
-        event.register(ProcessingMenus.MACHINE_CRYSTALLIZER.get(), MachineCrystallizerScreen::new);
-        event.register(ProcessingMenus.MACHINE_MIXER.get(), MachineMixerScreen::new);
+        SafeMenuScreens.bind(event, ProcessingMenus.MACHINE_SHREDDER, MachineShredderScreen::new);
+        SafeMenuScreens.bind(event, ProcessingMenus.MACHINE_ASSEMBLER, MachineAssemblyMachineScreen::new);
+        SafeMenuScreens.bind(event, ProcessingMenus.MACHINE_CRYSTALLIZER, MachineCrystallizerScreen::new);
+        SafeMenuScreens.bind(event, ProcessingMenus.MACHINE_MIXER, MachineMixerScreen::new);
     }
 }

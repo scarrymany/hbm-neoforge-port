@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.reprocess;
 
 import com.hbm.inventory.container.machine.reprocess.ReprocessMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -15,8 +16,8 @@ public final class ReprocessClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(ReprocessMenus.MACHINE_PUREX.get(), PurexScreen::new);
-        event.register(ReprocessMenus.MACHINE_LIQUEFACTOR.get(), LiquefactorScreen::new);
-        event.register(ReprocessMenus.MACHINE_SOLIDIFIER.get(), SolidifierScreen::new);
+        SafeMenuScreens.bind(event, ReprocessMenus.MACHINE_PUREX, PurexScreen::new);
+        SafeMenuScreens.bind(event, ReprocessMenus.MACHINE_LIQUEFACTOR, LiquefactorScreen::new);
+        SafeMenuScreens.bind(event, ReprocessMenus.MACHINE_SOLIDIFIER, SolidifierScreen::new);
     }
 }

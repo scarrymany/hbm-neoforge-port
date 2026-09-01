@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine;
 
 import com.hbm.inventory.container.machine.CrucibleMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -24,6 +25,6 @@ public final class CrucibleClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(CrucibleMenus.MACHINE_CRUCIBLE.get(), MachineCrucibleScreen::new);
+        SafeMenuScreens.bind(event, CrucibleMenus.MACHINE_CRUCIBLE, MachineCrucibleScreen::new);
     }
 }

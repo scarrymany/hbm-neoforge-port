@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.turret;
 
 import com.hbm.inventory.container.turret.TurretMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -24,6 +25,6 @@ public final class TurretClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(TurretMenus.TURRET.get(), TurretScreen::new);
+        SafeMenuScreens.bind(event, TurretMenus.TURRET, TurretScreen::new);
     }
 }

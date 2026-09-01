@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.rbmk;
 
 import com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -27,13 +28,13 @@ public final class RBMKClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(RBMKMenuTypes.ROD.get(), RBMKRodScreen::new);
-        event.register(RBMKMenuTypes.CONTROL.get(), RBMKControlScreen::new);
-        event.register(RBMKMenuTypes.CONTROL_AUTO.get(), RBMKControlAutoScreen::new);
-        event.register(RBMKMenuTypes.STORAGE.get(), RBMKStorageScreen::new);
-        event.register(RBMKMenuTypes.BOILER.get(), RBMKBoilerScreen::new);
-        event.register(RBMKMenuTypes.CONSOLE.get(), RBMKConsoleScreen::new);
-        event.register(RBMKMenuTypes.AUTOLOADER.get(), RBMKAutoloaderScreen::new);
-        event.register(RBMKMenuTypes.OUTGASSER.get(), RBMKOutgasserScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.ROD, RBMKRodScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.CONTROL, RBMKControlScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.CONTROL_AUTO, RBMKControlAutoScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.STORAGE, RBMKStorageScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.BOILER, RBMKBoilerScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.CONSOLE, RBMKConsoleScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.AUTOLOADER, RBMKAutoloaderScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.OUTGASSER, RBMKOutgasserScreen::new);
     }
 }

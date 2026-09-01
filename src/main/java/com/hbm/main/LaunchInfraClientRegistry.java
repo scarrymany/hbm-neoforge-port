@@ -7,12 +7,13 @@ import com.hbm.inventory.gui.LaunchpadSoyuzScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 /**
  * Client-side {@link net.minecraft.world.inventory.MenuType}-to-{@code Screen} binding for
  * {@code docs/phase3/missile_launch_infra.md}'s three GUIs, following the exact
- * {@code event.register(MENU_TYPE.get(), Screen::new)} shape {@code com.hbm.main.ClientModRegistry}
+ * {@code SafeMenuScreens.bind(event, MENU_TYPE, Screen::new)} shape {@code com.hbm.main.ClientModRegistry}
  * already established (see that class's own javadoc). Kept as its own, separate
  * {@code @EventBusSubscriber} class per this package's own task brief (avoids concurrent-edit
  * collisions on the shared {@code ClientModRegistry} class during this wave) - NeoForge's
@@ -30,8 +31,8 @@ public final class LaunchInfraClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(ModMenuTypes.LAUNCH_PAD.get(), LaunchPadScreen::new);
-        event.register(ModMenuTypes.LAUNCH_PAD_RUSTED.get(), LaunchPadRustedScreen::new);
-        event.register(ModMenuTypes.LAUNCHPAD_SOYUZ.get(), LaunchpadSoyuzScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.LAUNCH_PAD, LaunchPadScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.LAUNCH_PAD_RUSTED, LaunchPadRustedScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.LAUNCHPAD_SOYUZ, LaunchpadSoyuzScreen::new);
     }
 }

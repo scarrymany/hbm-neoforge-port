@@ -8,12 +8,13 @@ import com.hbm.inventory.gui.train.TrainCargoTramTrailerScreen;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 /**
  * Client-side {@link net.minecraft.world.inventory.MenuType}-to-{@code Screen} binding for Phase 4's
  * {@code entities_vehicles_aircraft} rail/minecart cargo menus - the same
- * {@code event.register(MENU_TYPE.get(), Screen::new)} shape {@code com.hbm.main.ClientModRegistry}/
+ * {@code SafeMenuScreens.bind(event, MENU_TYPE, Screen::new)} shape {@code com.hbm.main.ClientModRegistry}/
  * {@code com.hbm.main.LaunchInfraClientRegistry} already established (see either class's own javadoc),
  * kept as its own separate {@code @EventBusSubscriber} class for the same reason
  * {@code LaunchInfraClientRegistry} gives: avoids concurrent-edit collisions on the shared
@@ -45,9 +46,9 @@ public final class VehicleCargoClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(ModMenuTypes.TRAIN_CARGO_TRAM.get(), TrainCargoTramScreen::new);
-        event.register(ModMenuTypes.TRAIN_CARGO_TRAM_TRAILER.get(), TrainCargoTramTrailerScreen::new);
-        event.register(ModMenuTypes.CART_CRATE.get(), MinecartCrateScreen::new);
-        event.register(ModMenuTypes.CART_DESTROYER.get(), MinecartDestroyerScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.TRAIN_CARGO_TRAM, TrainCargoTramScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.TRAIN_CARGO_TRAM_TRAILER, TrainCargoTramTrailerScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CART_CRATE, MinecartCrateScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CART_DESTROYER, MinecartDestroyerScreen::new);
     }
 }

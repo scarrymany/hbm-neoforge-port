@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.fusion;
 
 import com.hbm.inventory.container.machine.fusion.FusionMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -19,9 +20,9 @@ public final class FusionClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(FusionMenus.ICF_REACTOR.get(), IcfReactorScreen::new);
-        event.register(FusionMenus.ICF_PRESS.get(), IcfPressScreen::new);
-        event.register(FusionMenus.WATZ_REACTOR.get(), WatzReactorScreen::new);
-        event.register(FusionMenus.FUSION_PLASMA_FORGE.get(), PlasmaForgeScreen::new);
+        SafeMenuScreens.bind(event, FusionMenus.ICF_REACTOR, IcfReactorScreen::new);
+        SafeMenuScreens.bind(event, FusionMenus.ICF_PRESS, IcfPressScreen::new);
+        SafeMenuScreens.bind(event, FusionMenus.WATZ_REACTOR, WatzReactorScreen::new);
+        SafeMenuScreens.bind(event, FusionMenus.FUSION_PLASMA_FORGE, PlasmaForgeScreen::new);
     }
 }

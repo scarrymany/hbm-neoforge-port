@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine;
 
 import com.hbm.inventory.container.machine.PWRMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -24,7 +25,7 @@ public final class PWRClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(PWRMenus.PWR_CONTROLLER.get(), PWRControllerScreen::new);
-        event.register(PWRMenus.REACTOR_BREEDING.get(), MachineReactorBreedingScreen::new);
+        SafeMenuScreens.bind(event, PWRMenus.PWR_CONTROLLER, PWRControllerScreen::new);
+        SafeMenuScreens.bind(event, PWRMenus.REACTOR_BREEDING, MachineReactorBreedingScreen::new);
     }
 }

@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.dummyable;
 
 import com.hbm.inventory.container.machine.dummyable.DummyableProcessMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -15,36 +16,42 @@ public final class DummyableProcessClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(DummyableProcessMenus.FURNACE_COMBINATION.get(), FurnaceCombinationScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_BLAST_FURNACE.get(), BlastFurnaceScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_ROCK_MILL.get(), RockMillScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_ANNIHILATOR.get(), AnnihilatorScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_PRESS.get(), PressScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_ROTARY_FURNACE.get(), RotaryFurnaceScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_FRACTION_TOWER.get(), FractionTowerScreen::new);
-        event.register(DummyableProcessMenus.WASTE_DRUM.get(), WasteDrumScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_COMPRESSOR.get(), CompressorScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_COKER.get(), CokerScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_CATALYTIC_CRACKER.get(), CatalyticCrackerScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_CATALYTIC_REFORMER.get(), CatalyticReformerScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_HYDROTREATER.get(), HydrotreaterScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_VACUUM_DISTILL.get(), VacuumDistillScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_RADIOLYSIS.get(), RadiolysisScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_FLARE.get(), GasFlareScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_EPRESS.get(), EPressScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_PYROOVEN.get(), PyroOvenScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_ARC_FURNACE.get(), ArcFurnaceScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_EXPOSURE_CHAMBER.get(), ExposureChamberScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_ORE_SLOPPER.get(), OreSlopperScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_TURBOFAN.get(), TurbofanScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_RADGEN.get(), RadGenScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_HEPHAESTUS.get(), HephaestusScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_WOOD_BURNER.get(), WoodBurnerScreen::new);
-        event.register(DummyableProcessMenus.FURNACE_IRON.get(), FurnaceIronScreen::new);
-        event.register(DummyableProcessMenus.FURNACE_STEEL.get(), FurnaceSteelScreen::new);
-        event.register(DummyableProcessMenus.HEATER_FIREBOX.get(), FireboxScreen::new);
-        event.register(DummyableProcessMenus.HEATER_OVEN.get(), HeaterOvenScreen::new);
-        event.register(DummyableProcessMenus.HEATER_OILBURNER.get(), OilburnerScreen::new);
-        event.register(DummyableProcessMenus.MACHINE_SAWMILL.get(), SawmillScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.FURNACE_COMBINATION, FurnaceCombinationScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_BLAST_FURNACE, BlastFurnaceScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_ROCK_MILL, RockMillScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_ANNIHILATOR, AnnihilatorScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_PRESS, PressScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_ROTARY_FURNACE, RotaryFurnaceScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_FRACTION_TOWER, FractionTowerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.WASTE_DRUM, WasteDrumScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_COMPRESSOR, CompressorScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_COKER, CokerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_CATALYTIC_CRACKER, CatalyticCrackerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_CATALYTIC_REFORMER, CatalyticReformerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_HYDROTREATER, HydrotreaterScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_VACUUM_DISTILL, VacuumDistillScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_RADIOLYSIS, RadiolysisScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_FLARE, GasFlareScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_EPRESS, EPressScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_PYROOVEN, PyroOvenScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_ARC_FURNACE, ArcFurnaceScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_EXPOSURE_CHAMBER, ExposureChamberScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_ORE_SLOPPER, OreSlopperScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_TURBOFAN, TurbofanScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_RADGEN, RadGenScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_HEPHAESTUS, HephaestusScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_WOOD_BURNER, WoodBurnerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.FURNACE_IRON, FurnaceIronScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.FURNACE_STEEL, FurnaceSteelScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.HEATER_FIREBOX, FireboxScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.HEATER_OVEN, HeaterOvenScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.HEATER_OILBURNER, OilburnerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_SAWMILL, SawmillScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.HEATER_ELECTRIC, HeaterElectricScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.HEATER_HEATEX, HeaterHeatexScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_STIRLING, StirlingScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_STORAGE_DRUM, StorageDrumScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_SUPERCOMPUTER, SuperComputerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_AUTOSAW, AutosawScreen::new);
     }
 }

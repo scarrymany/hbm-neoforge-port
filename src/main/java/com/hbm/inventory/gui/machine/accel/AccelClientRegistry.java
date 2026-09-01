@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.accel;
 
 import com.hbm.inventory.container.machine.accel.AccelMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -15,9 +16,9 @@ public final class AccelClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(AccelMenus.MACHINE_FEL.get(), FelScreen::new);
-        event.register(AccelMenus.MACHINE_EXCAVATOR.get(), ExcavatorScreen::new);
-        event.register(AccelMenus.PA_PART.get(), PaPartScreen::new);
-        event.register(AccelMenus.PA_DETECTOR.get(), PaDetectorScreen::new);
+        SafeMenuScreens.bind(event, AccelMenus.MACHINE_FEL, FelScreen::new);
+        SafeMenuScreens.bind(event, AccelMenus.MACHINE_EXCAVATOR, ExcavatorScreen::new);
+        SafeMenuScreens.bind(event, AccelMenus.PA_PART, PaPartScreen::new);
+        SafeMenuScreens.bind(event, AccelMenus.PA_DETECTOR, PaDetectorScreen::new);
     }
 }

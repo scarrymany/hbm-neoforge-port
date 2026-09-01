@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine;
 
 import com.hbm.inventory.container.machine.PowerGenMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -29,11 +30,11 @@ public final class PowerGenClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(PowerGenMenus.MACHINE_RTG.get(), MachineRTGScreen::new);
-        event.register(PowerGenMenus.MACHINE_DIESEL.get(), MachineDieselScreen::new);
-        event.register(PowerGenMenus.COMBUSTION_ENGINE.get(), MachineCombustionEngineScreen::new);
-        event.register(PowerGenMenus.MACHINE_TURBINE.get(), MachineTurbineScreen::new);
-        event.register(PowerGenMenus.MACHINE_LARGE_TURBINE.get(), MachineLargeTurbineScreen::new);
-        event.register(PowerGenMenus.MACHINE_TURBINE_GAS.get(), MachineTurbineGasScreen::new);
+        SafeMenuScreens.bind(event, PowerGenMenus.MACHINE_RTG, MachineRTGScreen::new);
+        SafeMenuScreens.bind(event, PowerGenMenus.MACHINE_DIESEL, MachineDieselScreen::new);
+        SafeMenuScreens.bind(event, PowerGenMenus.COMBUSTION_ENGINE, MachineCombustionEngineScreen::new);
+        SafeMenuScreens.bind(event, PowerGenMenus.MACHINE_TURBINE, MachineTurbineScreen::new);
+        SafeMenuScreens.bind(event, PowerGenMenus.MACHINE_LARGE_TURBINE, MachineLargeTurbineScreen::new);
+        SafeMenuScreens.bind(event, PowerGenMenus.MACHINE_TURBINE_GAS, MachineTurbineGasScreen::new);
     }
 }

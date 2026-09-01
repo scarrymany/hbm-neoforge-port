@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.chem;
 
 import com.hbm.inventory.container.machine.chem.ChemIsotopeMenus;
+import com.hbm.inventory.gui.SafeMenuScreens;
 import com.hbm.main.MainRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -19,11 +20,11 @@ public final class ChemIsotopeClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(ChemIsotopeMenus.CENTRIFUGE.get(), CentrifugeScreen::new);
-        event.register(ChemIsotopeMenus.GAS_CENTRIFUGE.get(), GasCentrifugeScreen::new);
-        event.register(ChemIsotopeMenus.SILEX.get(), SilexScreen::new);
-        event.register(ChemIsotopeMenus.CYCLOTRON.get(), CyclotronScreen::new);
-        event.register(ChemIsotopeMenus.CHEM_PLANT.get(), ChemPlantScreen::new);
-        event.register(ChemIsotopeMenus.ELECTROLYSER.get(), ElectrolyserScreen::new);
+        SafeMenuScreens.bind(event, ChemIsotopeMenus.CENTRIFUGE, CentrifugeScreen::new);
+        SafeMenuScreens.bind(event, ChemIsotopeMenus.GAS_CENTRIFUGE, GasCentrifugeScreen::new);
+        SafeMenuScreens.bind(event, ChemIsotopeMenus.SILEX, SilexScreen::new);
+        SafeMenuScreens.bind(event, ChemIsotopeMenus.CYCLOTRON, CyclotronScreen::new);
+        SafeMenuScreens.bind(event, ChemIsotopeMenus.CHEM_PLANT, ChemPlantScreen::new);
+        SafeMenuScreens.bind(event, ChemIsotopeMenus.ELECTROLYSER, ElectrolyserScreen::new);
     }
 }
