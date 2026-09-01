@@ -9,11 +9,10 @@
 - Vanilla **1898 / 97.3%**. Machine **1809 / 90.0%** (AmmoPress 88; NUKE_BALEFIRE id collides
   with `nuke_balefire` BlockItem). ElectrolyserMetal 21/23. Blocks **1007 / 86.1%**.
 - Reachability **60.0%** (1552 / 2585).
-- Items census **2585** (+p45×5 +nuke×6 +`assembly_nuke`).
+- Items census **2585** (+p45×5 +nuke×5 +`assembly_nuke`; nuke_balefire BlockItem already counted).
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Weighted ≥99% is a gate. Not content-complete.
-- Verified: `compileJava` 0. `runServer` pending this commit.
-- No new tag this wave unless runServer Done **and** AmmoPress solids playable (they are).
-  User gate: CE png in jar (yes) + another major table playable (AmmoPress solids yes).
-  Still no Release unless that gate is confirmed post-runServer.
+- Verified: `compileJava` 0, `runServer` **Done (5.608s)** / 3946 recipes, port 25566.
+- No new tag: CE pngs in jar + AmmoPress solids playable, but client blit not opened and
+  NUKE_BALEFIRE ammo still cited. `v0.0.1-rc2` stays.
 - `master` untouched.
