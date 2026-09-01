@@ -39,6 +39,12 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<HeaterOvenBlockEntity>> HEATER_OVEN;
     public static Supplier<BlockEntityType<HeaterOilburnerBlockEntity>> HEATER_OILBURNER;
     public static Supplier<BlockEntityType<MachineSawmillBlockEntity>> MACHINE_SAWMILL;
+    public static Supplier<BlockEntityType<HeaterElectricBlockEntity>> HEATER_ELECTRIC;
+    public static Supplier<BlockEntityType<HeaterHeatexBlockEntity>> HEATER_HEATEX;
+    public static Supplier<BlockEntityType<MachineStirlingBlockEntity>> MACHINE_STIRLING;
+    public static Supplier<BlockEntityType<StorageDrumBlockEntity>> MACHINE_STORAGE_DRUM;
+    public static Supplier<BlockEntityType<MachineSuperComputerBlockEntity>> MACHINE_SUPERCOMPUTER;
+    public static Supplier<BlockEntityType<MachineAutosawBlockEntity>> MACHINE_AUTOSAW;
 
     private DummyableProcessBlockEntities() {
     }
@@ -167,6 +173,32 @@ public final class DummyableProcessBlockEntities {
         MACHINE_SAWMILL = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_sawmill", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineSawmillBlockEntity(MACHINE_SAWMILL.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_SAWMILL.get()
+        ).build(null));
+        HEATER_ELECTRIC = ModBlocks.BLOCK_ENTITY_TYPES.register("heater_electric", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new HeaterElectricBlockEntity(HEATER_ELECTRIC.get(), pos, state),
+                DummyableProcessBlocks.HEATER_ELECTRIC.get()
+        ).build(null));
+        HEATER_HEATEX = ModBlocks.BLOCK_ENTITY_TYPES.register("heater_heatex", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new HeaterHeatexBlockEntity(HEATER_HEATEX.get(), pos, state),
+                DummyableProcessBlocks.HEATER_HEATEX.get()
+        ).build(null));
+        MACHINE_STIRLING = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_stirling", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineStirlingBlockEntity(MACHINE_STIRLING.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_STIRLING.get(),
+                DummyableProcessBlocks.MACHINE_STIRLING_STEEL.get(),
+                DummyableProcessBlocks.MACHINE_STIRLING_CREATIVE.get()
+        ).build(null));
+        MACHINE_STORAGE_DRUM = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_storage_drum", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new StorageDrumBlockEntity(MACHINE_STORAGE_DRUM.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_STORAGE_DRUM.get()
+        ).build(null));
+        MACHINE_SUPERCOMPUTER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_supercomputer", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineSuperComputerBlockEntity(MACHINE_SUPERCOMPUTER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_SUPERCOMPUTER.get()
+        ).build(null));
+        MACHINE_AUTOSAW = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_autosaw", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineAutosawBlockEntity(MACHINE_AUTOSAW.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_AUTOSAW.get()
         ).build(null));
     }
 }

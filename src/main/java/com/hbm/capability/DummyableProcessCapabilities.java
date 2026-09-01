@@ -172,5 +172,28 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getFluidHandlerCapability(side));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_SAWMILL.get(),
                 (be, side) -> be.getItemHandlerCapability(side));
+
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.HEATER_ELECTRIC.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.HEATER_HEATEX.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.HEATER_HEATEX.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_STIRLING.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_STORAGE_DRUM.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_STORAGE_DRUM.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_SUPERCOMPUTER.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_SUPERCOMPUTER.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_SUPERCOMPUTER.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_AUTOSAW.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_AUTOSAW.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
     }
 }

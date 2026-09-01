@@ -59,6 +59,14 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<HeaterOvenBlock> HEATER_OVEN;
     public static DeferredBlock<HeaterOilburnerBlock> HEATER_OILBURNER;
     public static DeferredBlock<MachineSawmillBlock> MACHINE_SAWMILL;
+    public static DeferredBlock<HeaterElectricBlock> HEATER_ELECTRIC;
+    public static DeferredBlock<HeaterHeatexBlock> HEATER_HEATEX;
+    public static DeferredBlock<MachineStirlingBlock> MACHINE_STIRLING;
+    public static DeferredBlock<MachineStirlingBlock> MACHINE_STIRLING_STEEL;
+    public static DeferredBlock<MachineStirlingBlock> MACHINE_STIRLING_CREATIVE;
+    public static DeferredBlock<com.hbm.blocks.machine.StorageDrumBlock> MACHINE_STORAGE_DRUM;
+    public static DeferredBlock<MachineSuperComputerBlock> MACHINE_SUPERCOMPUTER;
+    public static DeferredBlock<com.hbm.blocks.machine.MachineAutosawBlock> MACHINE_AUTOSAW;
 
     private DummyableProcessBlocks() {
     }
@@ -95,6 +103,14 @@ public final class DummyableProcessBlocks {
         HEATER_OVEN = registerBlock("heater_oven", () -> new HeaterOvenBlock(MACHINE_PROPS));
         HEATER_OILBURNER = registerBlock("heater_oilburner", () -> new HeaterOilburnerBlock(MACHINE_PROPS));
         MACHINE_SAWMILL = registerBlock("machine_sawmill", () -> new MachineSawmillBlock(MACHINE_PROPS));
+        HEATER_ELECTRIC = registerBlock("heater_electric", () -> new HeaterElectricBlock(MACHINE_PROPS));
+        HEATER_HEATEX = registerBlock("heater_heatex", () -> new HeaterHeatexBlock(MACHINE_PROPS));
+        MACHINE_STIRLING = registerBlock("machine_stirling", () -> new MachineStirlingBlock(MACHINE_PROPS));
+        MACHINE_STIRLING_STEEL = registerBlock("machine_stirling_steel", () -> new MachineStirlingBlock(MACHINE_PROPS));
+        MACHINE_STIRLING_CREATIVE = registerBlock("machine_stirling_creative", () -> new MachineStirlingBlock(MACHINE_PROPS));
+        MACHINE_STORAGE_DRUM = registerBlock("machine_storage_drum", () -> new com.hbm.blocks.machine.StorageDrumBlock(MACHINE_PROPS));
+        MACHINE_SUPERCOMPUTER = registerBlock("machine_supercomputer", () -> new MachineSuperComputerBlock(MACHINE_PROPS));
+        MACHINE_AUTOSAW = registerBlock("machine_autosaw", () -> new com.hbm.blocks.machine.MachineAutosawBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

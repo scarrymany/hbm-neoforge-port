@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:fluid_pack_empty"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:fluid_pack_full",
+    "count": 1
+  },
+  "duration": 40,
+  "power": 100,
+  "input_fluids": [
+    {
+      "type": "LIGHTOIL_DS",
+      "fill": 32000
+    }
+  ]
+}

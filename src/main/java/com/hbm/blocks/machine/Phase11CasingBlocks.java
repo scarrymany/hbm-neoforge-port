@@ -31,8 +31,7 @@ public final class Phase11CasingBlocks {
     }
 
     public static void registerAll() {
-        // CE ModBlocks.java:1232 / AssemblyMachineRecipes.java:248 ass.sal9000
-        registerBlock("machine_supercomputer", () -> new BlockBase(MACHINE_PROPS));
+        // machine_supercomputer is DummyableProcessBlocks (full TE).
         // machine_arc_furnace is DummyableProcessBlocks (full TE).
         // CE ModBlocks.java:1086-1087 / AssemblyMachineRecipes.java:320-323
         // machine_compressor is DummyableProcessBlocks (full TE). Compact stays a casing.

@@ -29,7 +29,13 @@ import com.hbm.blockentity.machine.dummyable.FurnaceSteelBlockEntity;
 import com.hbm.blockentity.machine.dummyable.HeaterFireboxBlockEntity;
 import com.hbm.blockentity.machine.dummyable.HeaterOilburnerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.HeaterOvenBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeaterElectricBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeaterHeatexBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineAutosawBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineSawmillBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineSuperComputerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.StorageDrumBlockEntity;
 import com.hbm.blockentity.machine.dummyable.WasteDrumBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -71,6 +77,12 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<HeaterOvenMenu>> HEATER_OVEN;
     public static DeferredHolder<MenuType<?>, MenuType<OilburnerMenu>> HEATER_OILBURNER;
     public static DeferredHolder<MenuType<?>, MenuType<SawmillMenu>> MACHINE_SAWMILL;
+    public static DeferredHolder<MenuType<?>, MenuType<HeaterElectricMenu>> HEATER_ELECTRIC;
+    public static DeferredHolder<MenuType<?>, MenuType<HeaterHeatexMenu>> HEATER_HEATEX;
+    public static DeferredHolder<MenuType<?>, MenuType<StirlingMenu>> MACHINE_STIRLING;
+    public static DeferredHolder<MenuType<?>, MenuType<StorageDrumMenu>> MACHINE_STORAGE_DRUM;
+    public static DeferredHolder<MenuType<?>, MenuType<SuperComputerMenu>> MACHINE_SUPERCOMPUTER;
+    public static DeferredHolder<MenuType<?>, MenuType<AutosawMenu>> MACHINE_AUTOSAW;
 
     private DummyableProcessMenus() {
     }
@@ -138,6 +150,18 @@ public final class DummyableProcessMenus {
                 new OilburnerMenu(id, inv, (HeaterOilburnerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_SAWMILL = reg("machine_sawmill", (id, inv, buf) ->
                 new SawmillMenu(id, inv, (MachineSawmillBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        HEATER_ELECTRIC = reg("heater_electric", (id, inv, buf) ->
+                new HeaterElectricMenu(id, inv, (HeaterElectricBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        HEATER_HEATEX = reg("heater_heatex", (id, inv, buf) ->
+                new HeaterHeatexMenu(id, inv, (HeaterHeatexBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_STIRLING = reg("machine_stirling", (id, inv, buf) ->
+                new StirlingMenu(id, inv, (MachineStirlingBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_STORAGE_DRUM = reg("machine_storage_drum", (id, inv, buf) ->
+                new StorageDrumMenu(id, inv, (StorageDrumBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_SUPERCOMPUTER = reg("machine_supercomputer", (id, inv, buf) ->
+                new SuperComputerMenu(id, inv, (MachineSuperComputerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_AUTOSAW = reg("machine_autosaw", (id, inv, buf) ->
+                new AutosawMenu(id, inv, (MachineAutosawBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

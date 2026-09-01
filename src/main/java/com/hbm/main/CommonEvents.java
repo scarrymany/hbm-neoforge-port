@@ -72,6 +72,7 @@ import com.hbm.inventory.recipes.HeatRecipes;
 import com.hbm.inventory.recipes.OreSlopperRecipes;
 import com.hbm.inventory.recipes.RadGenRecipes;
 import com.hbm.inventory.recipes.SawmillRecipes;
+import com.hbm.inventory.recipes.StorageDrumRecipes;
 import com.hbm.inventory.recipes.FlareRecipes;
 import com.hbm.inventory.recipes.HydrotreatingRecipes;
 import com.hbm.inventory.recipes.RadiolysisRecipes;
@@ -183,6 +184,7 @@ public class CommonEvents {
             EngineRecipes.register();
             RadGenRecipes.register();
             SawmillRecipes.register();
+            StorageDrumRecipes.register();
             HeatRecipes.registerDefaults();
             // Phase 4 (fallout_rain_and_effects) - com.hbm.config.FalloutConfigJSON#initDefault()
             // eagerly resolves several DeferredBlock.get() calls (e.g. WastelandVirusBlocks.SELLAFIELD)
