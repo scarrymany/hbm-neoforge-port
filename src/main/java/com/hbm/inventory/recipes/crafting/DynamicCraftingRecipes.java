@@ -63,6 +63,10 @@ public final class DynamicCraftingRecipes {
             HbmRecipes.RECIPE_SERIALIZERS.register("breeding_rod_tritium_cell",
                     () -> BreedingRodTritiumCellRecipe.Serializer.INSTANCE);
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<EmptyCellCraftingRecipe>> EMPTY_CELL_CRAFTING_SERIALIZER =
+            HbmRecipes.RECIPE_SERIALIZERS.register("empty_cell_crafting",
+                    () -> EmptyCellCraftingRecipe.Serializer.INSTANCE);
+
     /** No-op - see class javadoc. Forces this class's static fields (and therefore the registrations above) to run. */
     public static void bootstrap() {
     }

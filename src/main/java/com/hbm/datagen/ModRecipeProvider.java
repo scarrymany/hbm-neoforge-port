@@ -2101,10 +2101,9 @@ public class ModRecipeProvider extends RecipeProvider {
         // - All 99 breeding-rod (addBreedingRod/LEAD/LITHIUM/TRITIUM) recipes: rod_empty/
         //   rod_dual_empty/rod_quad_empty are not registered anywhere - a bootstrapping gap (the
         //   housing-craft recipe's own output is the missing item), matching the research report.
-        // - pile_rod_lithium: needs ingot_lithium, not registered anywhere in this port (only
-        //   powder_lithium/powder_lithium_tiny exist - correction to the research report, which
-        //   assumed LI.ingot() resolved). pile_rod_detector: needs circuit(VACUUM_TUBE) + motor,
-        //   neither registered (matches the research report).
+        // - pile_rod_lithium / syringe_empty / mike_deut deuterium pack: empty-cell match lives in
+        //   EmptyCellCraftingRecipe (vanilla {"item":"hbm:cell"} also matches filled).
+        //   pile_rod_detector is ce_craft/rods JSON (circuit_vacuum_tube + motor + ingot_boron).
         // - The 3 TRITIUM breeding-rod "unload to filled cell" recipes (RodRecipes.java:61-63): the
         //   result is a hbm:cell carrying a fluid-id data component
         //   (com.hbm.items.special.ItemCell.getFullCell), which a plain ShapedRecipeBuilder/

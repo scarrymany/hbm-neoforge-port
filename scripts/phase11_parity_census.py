@@ -113,6 +113,8 @@ def port_item_ids() -> set[str]:
         "warhead_nuclear", "warhead_mirv", "warhead_volcano",
         "sat_base", "sat_head_mapper", "sat_head_scanner", "sat_head_radar",
         "sat_head_laser", "sat_head_resonator", "photo_panel", "ballistite",
+        "pile_rod_uranium", "pile_rod_pu239", "pile_rod_plutonium", "pile_rod_source",
+        "pile_rod_boron", "pile_rod_lithium", "pile_rod_detector",
     }
     for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
               "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):
@@ -601,12 +603,13 @@ def main() -> None:
         "grenade_crafting", "rbmk_fuel_recycle", "scrap_split",
         "container_upgrade_crate_desh", "container_upgrade_crate_tungsten",
         "container_upgrade_safe", "fluid_container_crafting", "breeding_rod_tritium_cell",
+        "empty_cell_crafting",
     })
     machine_json = sum(v for k, v in by_type.items() if k.startswith("hbm:") and k not in {
         "hbm:grenade_crafting", "hbm:rbmk_fuel_recycle", "hbm:scrap_split",
         "hbm:container_upgrade_crate_desh", "hbm:container_upgrade_crate_tungsten",
         "hbm:container_upgrade_safe", "hbm:fluid_container_crafting",
-        "hbm:breeding_rod_tritium_cell",
+        "hbm:breeding_rod_tritium_cell", "hbm:empty_cell_crafting",
     } and not k.startswith("minecraft:"))
     # leftover minecraft types already in vanilla_json
     other_json = sum(v for k, v in by_type.items() if k not in VANILLA_TYPES and not k.startswith("hbm:"))

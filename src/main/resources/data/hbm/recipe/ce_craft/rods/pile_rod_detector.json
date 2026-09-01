@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " B ",
+    "CM ",
+    " B "
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:ingot_boron"
+    },
+    "C": {
+      "item": "hbm:circuit_vacuum_tube"
+    },
+    "M": {
+      "item": "hbm:motor"
+    }
+  },
+  "result": {
+    "id": "hbm:pile_rod_detector",
+    "count": 1
+  }
+}
