@@ -9,9 +9,8 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.375s)** on wiped world port 25566, **4051 recipes**
-(+4 assembler JSON; anvil is Java table). No recipe parse errors. No new tag.
-`v0.0.1-rc2` stays.
+`./gradlew runServer` **Done (5.081s)** on wiped world port 25566, **4051 recipes**.
+No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
@@ -46,7 +45,22 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (OreEnum drops + assembler fluids + pile_rod_mk2)
+## What changed this wave (Sellafield worldgen)
+
+- Reachability **63.4% (1656 / 2612)** — census does not see worldgen/`getDrops`.
+- Ordinary veins / nether / depth / oil / meteor **already** CE-numbered in
+  `add_overworld_ores` / nether / `add_oil_meteor_worldgen`. No invented biomes.
+- Landed CE **Sellafield** crater (`HbmWorldGen.java:321-334` / `:382-384`):
+  `radfreq` overworld **1-in-5000**, r=`rand(15)+10` (1/50 → 50), depth `r*0.35`,
+  rings LEVEL 4→0 + slaked, core LEVEL 5. Temp ≥ 1.0, not ocean.
+  Gates `ENABLE_DUNGEON_SPAWN` + `ENABLE_RAD_HOTSPOT_SPAWN`.
+  Oil-sand now dungeon-gated (CE `enableDungeons`).
+- Cited: phased chunk-wait TODO(CE: Sellafield.java:20-45); TE never in CE
+  TODO(CE: Sellafield.java:149-155); leftover dungeons
+  TODO(CE: HbmWorldGen.java:347-395); NITAN TODO(CE: HbmWorldGen.java:652).
+  Basalt ores stay volcanic-fluid (CE has no chunk vein).
+
+## Prior wave (OreEnum drops + assembler fluids + pile_rod_mk2)
 
 - Reachability **63.3% → 63.4%** (1649 / 2607 → 1656 / 2612). Items **2607 → 2612**.
 - Flatten-holders **already flattened** — no dummy `circuit`/`shell`/`pipe`/`wire_fine`/
@@ -307,7 +321,8 @@ TODO(CE: AnvilRecipes.java:75-130) / TODO(CE: AnvilRecipes.java:626-635). Do not
 
 Next other family by unique CE vs port (not regex 145-style): Press **41/38**,
 Combination ~done, Exposure done, Liquefaction leftovers landed, Solidification live.
-Assembler skip 3. Reachability **63.4%** still the owner pain. `v0.0.1-rc2` stays.
+Assembler skip 3. Leftover CE dungeons (hive/satellite/spaceship/…).
+Reachability **63.4%** still the owner pain (census misses worldgen). `v0.0.1-rc2` stays.
 Anvil E2E: smithing consume/produce **yes** (menu slots). Construction **yes**
 (`AnvilCraftPacket` + player inv). GUI blit CE `gui_anvil.png`, not gray-box.
 
