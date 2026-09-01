@@ -3,6 +3,8 @@ package com.hbm.blocks.generic;
 import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.BlockFallingBase;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blockentity.machine.CyberCrabBlockEntity;
+import com.hbm.blocks.machine.BlockCybercrab;
 import com.hbm.blocks.machine.NTMAnvil;
 import com.hbm.inventory.container.AnvilMenus;
 import com.hbm.blocks.machine.RailBooster;
@@ -37,6 +39,8 @@ import java.util.function.Supplier;
 public final class Phase8Blocks {
 
     public static Supplier<BlockEntityType<BlockWandLoot.WandLootBlockEntity>> WAND_LOOT_ENTITY_TYPE;
+    public static Supplier<BlockEntityType<CyberCrabBlockEntity>> METEOR_SPAWNER_ENTITY_TYPE;
+    public static DeferredBlock<BlockCybercrab> METEOR_SPAWNER;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_GREEN_OFF;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_GREEN_ON;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_BLUE_OFF;
@@ -128,8 +132,7 @@ public final class Phase8Blocks {
         registerBlock("structure_anchor", () -> new BlockBase(BlockBehaviour.Properties.of().strength(2.5F, 10.0F).sound(SoundType.METAL)), null);
     }
 
-    /** CE ModBlocks.java:398-405 — meteor dungeon brick family. {@code meteor_spawner} is a cube here
-     *  (CE {@code BlockCybercrab} entity spawn is Phase 9). */
+    /** CE ModBlocks.java:398-405 — meteor dungeon brick family. {@code meteor_spawner} is {@link BlockCybercrab}. */
     private static void registerMeteorBricks() {
         BlockBehaviour.Properties meteor = stone(15.0F, 360.0F);
         registerBlock("meteor_polished", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
@@ -137,7 +140,13 @@ public final class Phase8Blocks {
         registerBlock("meteor_brick_mossy", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
         registerBlock("meteor_brick_cracked", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
         registerBlock("meteor_brick_chiseled", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
-        registerBlock("meteor_spawner", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
+        // Dedicated Properties — do not mutate the shared meteor instance (brick loot).
+        METEOR_SPAWNER = registerBlock("meteor_spawner",
+                () -> new BlockCybercrab(stone(15.0F, 360.0F).noLootTable()), ModCreativeTabs.BLOCKS);
+        METEOR_SPAWNER_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_cyber_crab",
+                () -> BlockEntityType.Builder.of(
+                        (pos, state) -> new CyberCrabBlockEntity(METEOR_SPAWNER_ENTITY_TYPE.get(), pos, state),
+                        METEOR_SPAWNER.get()).build(null));
         registerBlock("meteor_battery", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
     }
 

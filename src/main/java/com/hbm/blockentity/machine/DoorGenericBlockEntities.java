@@ -15,6 +15,8 @@ public final class DoorGenericBlockEntities {
     public static Supplier<BlockEntityType<DoorGenericBlockEntity>> DOOR_GENERIC;
     public static Supplier<BlockEntityType<BlastDoorBlockEntity>> BLAST_DOOR;
     public static Supplier<BlockEntityType<DummyBlockEntity>> DUMMY_BLAST;
+    public static Supplier<BlockEntityType<SlidingBlastDoorBlockEntity>> SLIDING_BLAST_DOOR;
+    public static Supplier<BlockEntityType<SlidingBlastDoorKeypadBlockEntity>> SLIDING_BLAST_KEYPAD;
 
     private DoorGenericBlockEntities() {
     }
@@ -49,6 +51,19 @@ public final class DoorGenericBlockEntities {
                 BlockEntityType.Builder.of(
                         (pos, state) -> new DummyBlockEntity(DUMMY_BLAST.get(), pos, state),
                         GenericBlocks.DUMMY_BLOCK_BLAST.get()
+                ).build(null));
+
+        SLIDING_BLAST_DOOR = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_sliding_blast_door", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new SlidingBlastDoorBlockEntity(SLIDING_BLAST_DOOR.get(), pos, state),
+                        GenericBlocks.SLIDING_BLAST_DOOR_LEGACY.get(),
+                        GenericBlocks.SLIDING_BLAST_DOOR_2.get()
+                ).build(null));
+
+        SLIDING_BLAST_KEYPAD = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_sliding_blast_door_keypad", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new SlidingBlastDoorKeypadBlockEntity(SLIDING_BLAST_KEYPAD.get(), pos, state),
+                        GenericBlocks.SLIDING_BLAST_DOOR_KEYPAD.get()
                 ).build(null));
     }
 }

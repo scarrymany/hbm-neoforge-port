@@ -5,6 +5,7 @@ import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.BlockEnums;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.BlastDoor;
+import com.hbm.blocks.machine.BlockSlidingBlastDoor;
 import com.hbm.blocks.machine.DummyBlockBlast;
 import com.hbm.tileentity.DoorDecl;
 import com.hbm.creativetabs.CreativeTabContents;
@@ -73,6 +74,9 @@ public final class GenericBlocks {
     public static DeferredBlock<BlockDoorGeneric> SILO_HATCH_LARGE;
     public static DeferredBlock<BlockDoorGeneric> TRANSITION_SEAL;
     public static DeferredBlock<DummyBlockBlast> DUMMY_BLOCK_BLAST;
+    public static DeferredBlock<BlockSlidingBlastDoor> SLIDING_BLAST_DOOR_LEGACY;
+    public static DeferredBlock<BlockSlidingBlastDoor> SLIDING_BLAST_DOOR_2;
+    public static DeferredBlock<BlockSlidingBlastDoor> SLIDING_BLAST_DOOR_KEYPAD;
 
     private GenericBlocks() {
     }
@@ -303,8 +307,11 @@ public final class GenericBlocks {
         BLAST_DOOR = registerBlock("blast_door", () -> new BlastDoor(doorProps(250.0F, 1000.0F)), ModCreativeTabs.MACHINE);
         FIRE_DOOR = registerBlock("fire_door", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.FIRE_DOOR, true), ModCreativeTabs.MACHINE);
         SLIDING_BLAST_DOOR = registerBlock("sliding_blast_door", () -> new BlockDoorGeneric(doorProps(150.0F, 750.0F), DoorDecl.SLIDE_DOOR, false), ModCreativeTabs.MACHINE);
-        // TODO(CE: ModBlocks.java:893): BlockSlidingBlastDoor TESR/keypad — not BlockDoorGeneric.
-        registerBlock("sliding_blast_door_legacy", () -> new BlockBase(doorProps(150.0F, 750.0F)), ModCreativeTabs.MACHINE);
+        SLIDING_BLAST_DOOR_LEGACY = registerBlock("sliding_blast_door_legacy", () -> new BlockSlidingBlastDoor(doorProps(150.0F, 750.0F)), ModCreativeTabs.MACHINE);
+        SLIDING_BLAST_DOOR_2 = registerBlock("sliding_blast_door_2", () -> new BlockSlidingBlastDoor(doorProps(150.0F, 750.0F)), ModCreativeTabs.MACHINE);
+        SLIDING_BLAST_DOOR_KEYPAD = registerBlock("sliding_blast_door_keypad", () -> new BlockSlidingBlastDoor(doorProps(150.0F, 750.0F)), null);
+        // TODO(CE: ModBlocks.java:913 / KeypadTest.java:1): keypad_test not registered.
+        // Blocked by Keypad / KeypadClient / IKeypadHandler. Do not invent a dead cube.
         LARGE_VEHICLE_DOOR = registerBlock("large_vehicle_door", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.LARGE_VEHICLE_DOOR, true), ModCreativeTabs.MACHINE);
         WATER_DOOR = registerBlock("water_door", () -> new BlockDoorGeneric(doorProps(50.0F, 500.0F), DoorDecl.WATER_DOOR, false), ModCreativeTabs.MACHINE);
         QE_CONTAINMENT = registerBlock("qe_containment", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.QE_CONTAINMENT, true), ModCreativeTabs.MACHINE);

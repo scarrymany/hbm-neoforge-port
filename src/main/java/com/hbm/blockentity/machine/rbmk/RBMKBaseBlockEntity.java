@@ -47,6 +47,8 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
     private static final IRBMKMeltdownHandler MELTDOWN_HANDLER = RBMKBaseBlockEntity::runMeltdown;
 
     public double heat = 20.0D;
+    /** CE {@code TileEntityRBMKBase.diag} — skip super NBT when flushing DODD. */
+    public boolean diag;
 
     protected RBMKBaseBlockEntity[] neighborCache = new RBMKBaseBlockEntity[4];
 
@@ -271,8 +273,17 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+        if (!diag) {
+            super.saveAdditional(tag, registries);
+        }
         tag.putDouble("heat", this.heat);
+    }
+
+    /** CE {@code TileEntityRBMKBase.getDiagData}. */
+    public void getDiagData(CompoundTag nbt, HolderLookup.Provider registries) {
+        diag = true;
+        saveAdditional(nbt, registries);
+        diag = false;
     }
 
     @Override

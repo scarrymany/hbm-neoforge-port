@@ -29,7 +29,8 @@ import java.util.List;
  * confirmed API shape, not merely inferred).
  * <p>
  * Wired by {@code com.hbm.render.hud.LookOverlayDispatcher} — CE
- * {@code ModEventHandlerClient.java:839-865} (CROSSHAIRS + {@code DODD_RBMK_DIAGNOSTIC}).
+ * {@code ModEventHandlerClient.java:839-865} (CROSSHAIRS + {@code DODD_RBMK_DIAGNOSTIC}),
+ * including {@code TileEntityRBMKBase.diagnosticPrintHook}.
  */
 public interface ILookOverlay {
 

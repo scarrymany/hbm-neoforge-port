@@ -96,6 +96,8 @@ public final class StorageMachineBlocks {
         BATTERY_SCHRABIDIUM = registerBattery("machine_schrabidium_battery", 25_000_000_000L);
         BATTERY_DINEUTRONIUM = registerBattery("machine_dineutronium_battery", 1_000_000_000_000L);
         // CE ModBlocks.java:970 / PlasmaForgeRecipes.java:176 ass.fensusan. Casing only.
+        // TODO(CE: MachineBatteryREDD.java:1 / TileEntityBatteryREDD.java:1): Dummyable {9,0,2,2,4,4}
+        // + live TE. Do not invent energy/GUI here.
         registerBlock("machine_battery_redd", () -> new BlockBase(batteryProps().sound(SoundType.METAL)),
                 ModCreativeTabs.MACHINE);
     }

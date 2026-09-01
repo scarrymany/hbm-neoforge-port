@@ -49,6 +49,8 @@ public final class ProcessingBlocks {
         MACHINE_CRYSTALLIZER = registerBlock("machine_crystallizer", () -> new MachineCrystallizerBlock(MACHINE_PROPS));
         MACHINE_MIXER = registerBlock("machine_mixer", () -> new MachineMixerBlock(MACHINE_PROPS));
         // CE ModBlocks.java:1057 / AssemblyMachineRecipes.java:245 ass.precass. Casing only.
+        // TODO(CE: MachinePrecAss.java:1 / TileEntityMachinePrecAss.java:1): AE2-gated assembler TE.
+        // Blocked by AE2 + assembler GUI. Do not invent.
         registerBlock("machine_precass", () -> new BlockBase(MACHINE_PROPS));
 
         com.hbm.blockentity.machine.ProcessingBlockEntities.registerAll();
