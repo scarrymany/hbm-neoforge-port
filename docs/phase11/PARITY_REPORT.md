@@ -27,7 +27,8 @@ Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
 Largest remaining holes: **blocks 232**, **machine 327**, **vanilla 84**.
 Weighted **100.2%** (over CE denom from flattened already-registered loops). Category holes remain.
-90% playtest: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
+99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
+90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
 ## Per-category
 

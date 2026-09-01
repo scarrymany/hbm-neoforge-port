@@ -8,5 +8,7 @@
 - Vanilla **1866 / 95.7%**. Machine **1682 / 83.7%**. Blocks **937 / 80.2%**.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Weighted ≥99%. Category holes remain (blocks 232, machine 327, vanilla 84). Not content-complete.
-- Verified: `compileJava` 0, `runServer` **Done (5.126s)** / 3914 recipes, port 25566. Tag `v0.0.1-rc2`.
+- Verified: `compileJava` 0, `runServer` **Done (5.126s)** / 3914 recipes, port 25566.
+- Tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
+  (`edbaf27a`, jar 68,714,261 B, SHA-256 `b24e3724962ed07cc60af683954eb5585213e528bf856feff61b3da17762545a`).
 - `master` untouched.
