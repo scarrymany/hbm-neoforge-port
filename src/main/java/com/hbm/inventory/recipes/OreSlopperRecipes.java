@@ -26,9 +26,16 @@ public final class OreSlopperRecipes {
         if (registered) return;
         registered = true;
         // CE TileEntityMachineOreSlopper.java:149-151 / :180-181 — one BASE stack per type
-        for (BedrockOreType type : BedrockOreType.VALUES) {
-            RECIPES.add(new OreSlopperRecipe(type, new ItemStack(BedrockOreItems.get(type, BedrockOreGrade.BASE).get())));
-        }
+        RECIPES.add(slop(BedrockOreType.LIGHT_METAL));
+        RECIPES.add(slop(BedrockOreType.HEAVY_METAL));
+        RECIPES.add(slop(BedrockOreType.RARE_EARTH));
+        RECIPES.add(slop(BedrockOreType.ACTINIDE));
+        RECIPES.add(slop(BedrockOreType.NON_METAL));
+        RECIPES.add(slop(BedrockOreType.CRYSTALLINE));
+    }
+
+    private static OreSlopperRecipe slop(BedrockOreType type) {
+        return new OreSlopperRecipe(type, new ItemStack(BedrockOreItems.get(type, BedrockOreGrade.BASE).get()));
     }
 
     public static List<OreSlopperRecipe> getAll() {

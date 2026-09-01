@@ -31,19 +31,40 @@ public final class RadGenRecipes {
         if (registered) return;
         registered = true;
         // CE TileEntityMachineRadGen.java:241-246 — waste families, no depleted output
-        for (ItemWasteShort.WasteClass waste : ItemWasteShort.WasteClass.VALUES) {
-            recipes.put(new ComparableStack(SpecialItems.nuclearWasteShort(waste).get()),
-                    new RadGenFuel(1500, 30 * 60 * 20, ItemStack.EMPTY));
-        }
-        for (ItemWasteLong.WasteClass waste : ItemWasteLong.WasteClass.VALUES) {
-            recipes.put(new ComparableStack(SpecialItems.nuclearWasteLong(waste).get()),
-                    new RadGenFuel(500, 2 * 60 * 60 * 20, ItemStack.EMPTY));
-        }
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.URANIUM233), shortFuel());
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.URANIUM235), shortFuel());
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.NEPTUNIUM), shortFuel());
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.PLUTONIUM239), shortFuel());
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.PLUTONIUM240), shortFuel());
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.PLUTONIUM241), shortFuel());
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.AMERICIUM242), shortFuel());
+        recipes.put(shortWaste(ItemWasteShort.WasteClass.SCHRABIDIUM), shortFuel());
+        recipes.put(longWaste(ItemWasteLong.WasteClass.THORIUM), longFuel());
+        recipes.put(longWaste(ItemWasteLong.WasteClass.URANIUM233), longFuel());
+        recipes.put(longWaste(ItemWasteLong.WasteClass.URANIUM235), longFuel());
+        recipes.put(longWaste(ItemWasteLong.WasteClass.NEPTUNIUM), longFuel());
+        recipes.put(longWaste(ItemWasteLong.WasteClass.SCHRABIDIUM), longFuel());
         // CE :250 gem_rad → diamond
         Item gem = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "gem_rad"));
         if (gem != Items.AIR) {
             recipes.put(new ComparableStack(gem), new RadGenFuel(25_000, 30 * 60 * 20, new ItemStack(Items.DIAMOND)));
         }
+    }
+
+    private static ComparableStack shortWaste(ItemWasteShort.WasteClass waste) {
+        return new ComparableStack(SpecialItems.nuclearWasteShort(waste).get());
+    }
+
+    private static ComparableStack longWaste(ItemWasteLong.WasteClass waste) {
+        return new ComparableStack(SpecialItems.nuclearWasteLong(waste).get());
+    }
+
+    private static RadGenFuel shortFuel() {
+        return new RadGenFuel(1500, 30 * 60 * 20, ItemStack.EMPTY);
+    }
+
+    private static RadGenFuel longFuel() {
+        return new RadGenFuel(500, 2 * 60 * 60 * 20, ItemStack.EMPTY);
     }
 
     public static RadGenFuel getFuel(ItemStack stack) {
