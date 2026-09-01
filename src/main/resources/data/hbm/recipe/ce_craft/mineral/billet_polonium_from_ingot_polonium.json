@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ingot_polonium"
+    }
+  },
+  "result": {
+    "id": "hbm:billet_polonium",
+    "count": 3
+  }
+}

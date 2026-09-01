@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_niobium"
+    }
+  ],
+  "result": {
+    "id": "hbm:powder_niobium_tiny",
+    "count": 9
+  }
+}

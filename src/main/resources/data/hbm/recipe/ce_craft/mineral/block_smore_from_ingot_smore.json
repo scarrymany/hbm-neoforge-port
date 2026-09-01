@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ingot_smore"
+    }
+  },
+  "result": {
+    "id": "hbm:block_smore",
+    "count": 1
+  }
+}

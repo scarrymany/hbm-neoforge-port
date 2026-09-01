@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:bottle_empty"
+    },
+    {
+      "item": "minecraft:potion"
+    },
+    {
+      "item": "minecraft:sugar"
+    },
+    {
+      "item": "hbm:powder_coal"
+    }
+  ],
+  "result": {
+    "id": "hbm:bottle_nuka",
+    "count": 1
+  }
+}

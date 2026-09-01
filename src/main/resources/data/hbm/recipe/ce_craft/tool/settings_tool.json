@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "PCP",
+    "III"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_iron"
+    },
+    "C": {
+      "item": "hbm:circuit_analog"
+    },
+    "I": {
+      "item": "hbm:plate_polymer"
+    }
+  },
+  "result": {
+    "id": "hbm:settings_tool",
+    "count": 1
+  }
+}

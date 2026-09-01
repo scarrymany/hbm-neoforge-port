@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:block_fiberglass"
+    }
+  ],
+  "result": {
+    "id": "hbm:ingot_fiberglass",
+    "count": 9
+  }
+}

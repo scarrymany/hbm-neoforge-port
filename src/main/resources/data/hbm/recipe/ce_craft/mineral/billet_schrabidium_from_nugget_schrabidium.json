@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:nugget_schrabidium"
+    }
+  },
+  "result": {
+    "id": "hbm:billet_schrabidium",
+    "count": 1
+  }
+}

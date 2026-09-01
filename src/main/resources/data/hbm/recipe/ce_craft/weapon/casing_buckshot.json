@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "C"
+  ],
+  "key": {
+    "P": {
+      "tag": "hbm:any_plastic"
+    },
+    "C": {
+      "item": "hbm:casing_large"
+    }
+  },
+  "result": {
+    "id": "hbm:casing_buckshot",
+    "count": 2
+  }
+}

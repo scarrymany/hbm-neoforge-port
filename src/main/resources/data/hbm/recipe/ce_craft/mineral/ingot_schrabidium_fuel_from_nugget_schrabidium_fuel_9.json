@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:nugget_schrabidium_fuel"
+    }
+  },
+  "result": {
+    "id": "hbm:ingot_schrabidium_fuel",
+    "count": 1
+  }
+}

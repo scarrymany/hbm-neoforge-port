@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "O",
+    "P"
+  ],
+  "key": {
+    "O": {
+      "item": "minecraft:potato"
+    },
+    "P": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:canteen_vodka",
+    "count": 1
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:powder_lithium_tiny"
+    }
+  },
+  "result": {
+    "id": "hbm:powder_lithium",
+    "count": 1
+  }
+}

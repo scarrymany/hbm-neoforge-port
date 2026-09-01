@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:ingot_sr90"
+    }
+  ],
+  "result": {
+    "id": "hbm:nugget_sr90",
+    "count": 9
+  }
+}

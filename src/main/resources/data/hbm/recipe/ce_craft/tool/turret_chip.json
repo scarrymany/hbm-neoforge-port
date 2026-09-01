@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "CPC",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:gold_wire"
+    },
+    "P": {
+      "tag": "hbm:any_plastic"
+    },
+    "C": {
+      "item": "hbm:circuit_advanced"
+    }
+  },
+  "result": {
+    "id": "hbm:turret_chip",
+    "count": 1
+  }
+}

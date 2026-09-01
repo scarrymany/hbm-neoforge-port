@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:powder_yellowcake"
+    }
+  },
+  "result": {
+    "id": "hbm:block_yellowcake",
+    "count": 1
+  }
+}

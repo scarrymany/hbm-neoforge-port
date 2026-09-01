@@ -34,6 +34,8 @@ HELPERS = re.compile(
     r'(?:ITEMS\.register|BLOCKS\.register|registerIngot|registerNugget|registerLoreIngot|'
     r'registerItem|registerGun|registerAmmo(?:Hidden)?|registerBlockItem|registerBlock|'
     r'registerUpgrade(?:Stack)?|registerPlainBattery|registerFelCrystal|'
+    r'registerBillet|registerPowder|registerFuelPowder|registerParts|registerWaste|'
+    r'registerRtgPellet|registerResource|'
     r'registerUpgrade|tab\([^,]+,\s*reg|'
     r'\breg|parts1|parts)\(\s*"([a-z][a-z0-9_]*)"'
 )

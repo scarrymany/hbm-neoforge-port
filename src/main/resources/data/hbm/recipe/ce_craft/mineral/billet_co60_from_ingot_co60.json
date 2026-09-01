@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ingot_co60"
+    }
+  },
+  "result": {
+    "id": "hbm:billet_co60",
+    "count": 3
+  }
+}

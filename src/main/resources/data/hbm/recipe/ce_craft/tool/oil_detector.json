@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "W I",
+    "WCI",
+    "PPP"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:gold_wire"
+    },
+    "I": {
+      "item": "hbm:ingot_copper"
+    },
+    "C": {
+      "item": "hbm:circuit_analog"
+    },
+    "P": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:oil_detector",
+    "count": 1
+  }
+}

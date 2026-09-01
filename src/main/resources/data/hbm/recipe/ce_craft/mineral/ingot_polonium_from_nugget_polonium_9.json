@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:nugget_polonium"
+    }
+  },
+  "result": {
+    "id": "hbm:ingot_polonium",
+    "count": 1
+  }
+}

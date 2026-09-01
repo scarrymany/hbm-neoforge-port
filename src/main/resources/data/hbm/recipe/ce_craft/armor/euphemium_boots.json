@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "E E",
+    "E E"
+  ],
+  "key": {
+    "E": {
+      "item": "hbm:plate_euphemium"
+    }
+  },
+  "result": {
+    "id": "hbm:euphemium_boots",
+    "count": 1
+  }
+}

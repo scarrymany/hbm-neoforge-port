@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:billet_actinium"
+    },
+    {
+      "item": "hbm:billet_actinium"
+    },
+    {
+      "item": "hbm:billet_actinium"
+    },
+    {
+      "item": "hbm:plate_iron"
+    }
+  ],
+  "result": {
+    "id": "hbm:pellet_rtg_actinium",
+    "count": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:nugget_bismuth"
+    }
+  },
+  "result": {
+    "id": "hbm:billet_bismuth",
+    "count": 1
+  }
+}

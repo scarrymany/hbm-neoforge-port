@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SWS",
+    " G ",
+    "PCP"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:gold_wire"
+    },
+    "P": {
+      "tag": "hbm:any_plastic"
+    },
+    "C": {
+      "item": "hbm:circuit_advanced"
+    },
+    "S": {
+      "item": "hbm:plate_steel"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "id": "hbm:survey_scanner",
+    "count": 1
+  }
+}

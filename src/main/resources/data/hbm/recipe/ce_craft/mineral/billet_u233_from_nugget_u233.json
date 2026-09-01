@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:nugget_u233"
+    }
+  },
+  "result": {
+    "id": "hbm:billet_u233",
+    "count": 1
+  }
+}

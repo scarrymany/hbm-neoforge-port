@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:powder_coal_tiny"
+    }
+  },
+  "result": {
+    "id": "hbm:powder_coal",
+    "count": 1
+  }
+}

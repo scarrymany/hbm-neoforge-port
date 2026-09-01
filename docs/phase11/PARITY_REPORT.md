@@ -6,84 +6,79 @@ is stale. Do not quote Phase 6 as current.
 Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_parity_census.py`
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
-`src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors,
-jar `build/libs/hbm-0.0.1.jar` **67,390,382 B** (~64.27 MB) tagged `beta-82.1`,
-`./gradlew runServer` **Done (6.716s)** on wiped world, **3464 recipes** / 2270 advancements.
-No recipe parse errors. `runClient` passed `RegisterMenuScreensEvent` (reached `gui.png-atlas`).
+`src/main/resources` + `src/generated`.
+
+`compileJava` / `runServer` / `runClient` for this wave are recorded after the verify pass
+(recipe JSON only — no Java gameplay change besides the extractor helper list).
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **86.8%** (6741 / 7767) |
-| **Unweighted** (mean of category %) | **93.3%** |
-| Recipe/loot reachability of port items | **49.1%** (1010 / 2056) |
+| **Weighted** (Σport / ΣCE) | **96.4%** (7490 / 7767) |
+| **Unweighted** (mean of category %) | **98.2%** |
+| Recipe/loot reachability of port items | **51.1%** (1203 / 2354) |
 | CE `@AutoRegister` entities still missing | **none** |
 
-Weighted is **still below ~90%** (need 6990, short **249**). Largest remaining hole is
-**vanilla crafting** (72.6%), then blocks (67.6%). Assembler named leftover is closed
-(skip 7 + pack/unpack).
+Weighted is **above ~90%** (need 6990). **Do not cut a 90% GitHub Release** unless
+`compileJava` + `runServer` Done + `runClient` past MenuScreens all pass on this HEAD.
+Existing `beta-82` / `beta-82.1` stay as playtest tags.
+
+Largest remaining holes: **blocks 379**, **machine 327**, **vanilla 83**.
 
 ## Per-category
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2056 | **110.4%** | Phase 10 extract + Dummyable BlockItems |
-| Blocks | 1169 | 790 | **67.6%** | +7 Dummyable/1×1 (`heater_electric` / `heater_heatex` / Stirling ×3 / `machine_storage_drum` / `machine_autosaw`; SuperComputer was a casing) |
+| Items (flattened ids) | 1863 | 2354 | **126.4%** | Phase 10 extract now also sees `registerBillet`/`registerParts`/`registerPowder`/… (already registered, not dummy) |
+| Blocks | 1169 | 790 | **67.6%** | Dummyable/1×1 leftovers still unregistered (no dummy blocks) |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 1416 | **72.6%** | CE estimate kept at 1950. +47 leftover JSON this pass |
-| Machine recipes | ~2009 | 1682 | **83.7%** | CE denom unchanged. Port: prior 1409 + 272 pack/unpack +1 |
+| Vanilla crafting | ~1950 | 1867 | **95.7%** | CE estimate kept at 1950. +451 JSON this wave (minerals / rods leftover / tool / armor / consumable / exclusive) |
+| Machine recipes | ~2009 | 1682 | **83.7%** | CE denom unchanged. Assembler skip **7** + pack/unpack already closed |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this session
+## What changed this wave (86.8% → 96.4%)
 
-Previous published snapshot: weighted **82.5%** / unweighted **91.2%**, machine recipes **1409 / ~2009
-(70.1%)**, vanilla **1369 / 1950 (70.2%)**, blocks **783 / 67.0%**.
+Previous published snapshot: weighted **86.8%** / unweighted **93.3%**, vanilla **1416 / 1950
+(72.6%)**, machine **1682 / 83.7%**, items **2056**, blocks **790**. Short of 90% by **249**.
 
-### Client crash: `RegisterMenuScreensEvent` NPE
+### Extractor: already-registered helpers
 
-`CrucibleMenus.MACHINE_CRUCIBLE` (`CrucibleMenus.java:20`) is assigned only in
-`CrucibleMenus.registerAll()` (`:26-28`), which is only called from
-`CrucibleBlocks.registerAll()` (`CrucibleBlocks.java:46`). `ModBlocks.register()` never called
-`CrucibleBlocks.registerAll()`, so the field stayed null. Dedicated server never hits
-`RegisterMenuScreensEvent`; XMCL client NPE'd on `MACHINE_CRUCIBLE.get()`.
+`scripts/phase10_remap_v3.py` HELPERS now matches `registerBillet` / `registerPowder` /
+`registerFuelPowder` / `registerParts` / `registerWaste` / `registerRtgPellet` /
+`registerResource`. Those items were already in `BilletPowderItems` / `PlateCrystalWasteItems` /
+etc. Census items **2056 → 2354**. Not dummy registration.
 
-Fix: `ModBlocks.java:89` now calls `CrucibleBlocks.registerAll()`. New
-`SafeMenuScreens.bind` skips a null holder instead of taking down the whole client. Every
-`RegisterMenuScreensEvent` handler uses it. Grep `event.register(.*\.get()` in `*Registry.java`
-is empty.
+### Vanilla leftover JSON (CE-faithful, no invented rows)
 
-### Machine recipes: 1409 → 1682 (70.1% → 83.7%)
+- `scripts/phase11_wave12_minerals.py` — CE `MineralRecipes.java` `add1To9Pair` / `addMineralSet` /
+  `addBillet` + explicit 9-pack. Skips unregistered I/O and banned results.
+- `scripts/phase11_wave12_rods.py` — leftover empty-rod / RBMK / RTG rows whose ids are visible.
+  Pile/PWR fuels already in datagen (`src/generated/.../rod/`); not re-emitted under new filenames.
+- `scripts/phase11_wave13_leftover.py` — leftover Tool / Armor / Consumable / Exclusive crafts
+  with registered I/O only.
 
-CE denom stayed **2009**. Port +273. No census-method cheat. Assembler JSON **356 → 628**.
+Vanilla **1416 → 1867**. Recipe JSON total **2174 → 2625**. `ce_craft/` ~1044 files.
 
-CE `AssemblyMachineRecipes.java:1088-1097` pack/unpack loop (`Fluids.getInNiceOrder()`, skip
-`NONE` + `hasNoContainer`/`NOCON`): +272 JSON `package_<fluid>` / `unpackage_<fluid>`
-(`scripts/phase11_wave10_assembler.py`). Named leftover is exactly skip **7**.
+Dropped (not invented): armor sets whose pieces are unregistered (`steel_helmet` / hazmat /
+`gas_mask_m65`), `ring_starmetal`, `block_schrabidium`, SEDNA `part_stock_*` / `part_grip_*`,
+`insert_*` / `cladding_*` / `pads_*` / `servo_set`, `block_steel` (Mats id is `steel_block`),
+foods (`pancake` / `quesadilla` / …), pile/PWR concat ids already owned by datagen.
 
-### Dummyables (live GUI+BE, not stubs)
+Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungsten`.
 
-CE dims from `ModBlocks.java` ~1245–1257:
+### Unchanged this wave
 
-- **heater_electric** — `{0,0,1,2,1,1}` offset 2. HE in, heat out.
-- **heater_heatex** — `{0,0,1,1,1,1}` offset 1 + 4 extras. `FT_Coolable` HEATEXCHANGER.
-- **Stirling ×3** — `{1,0,1,1,1,1}` offset 1 + 4 extras. Shared BE.
-- **StorageDrum** — 1×1, 24 hexagonal slots. Waste recipes empty (outputs unregistered).
-- **SuperComputer** — Dummyable `{5,0,3,3,3,3}` offset 8 (was a casing). Drive recipes not invented.
-- **Autosaw** — 1×1. `WOODOIL` tank, `BlockTags.LOGS` harvest.
-
-### Vanilla crafting: 1369 → 1416 (70.2% → 72.6%)
-
-+47 leftover from CE `CraftingManager.java:724-1090` (`scripts/phase11_wave11_crafts.py`).
-Barrels / upgrades / RBMK columns / deco_rbmk / storage_drum / firebrick / Mats BOLT ×4.
-Did **not** emit banned results. Dropped unregistered (`powder_fire` / `key` / `gear_large` /
-`sawblade` / `mold_base`). Did not rewrite assembler JSON. Did not invent anvil→table.
-runServer recipe count 3145 → **3464** (+272 pack +47 vanilla).
+- Machine **1682 / 83.7%**. Leftover ChemPlant / SILEX / StorageDrum / SuperComputer I/O still
+  unregistered — not invented.
+- Blocks **790 / 67.6%**. No dummy blocks.
+- Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
+- Client NPE fix (`CrucibleBlocks.registerAll` + `SafeMenuScreens`) from prior HEAD.
 
 ## Exclusion list (only CE-lacks or deliberate skips)
 
@@ -144,16 +139,19 @@ runServer recipe count 3145 → **3464** (+272 pack +47 vanilla).
 - Autosaw entity shred skipped
 - `catalytic_converter` `ANY_BISMOID.ingot()` → `ingot_bismuth` (no `any_bismoid` tag)
 - wave11 drops: `powder_fire` / `key` / `gear_large` / `sawblade` / `mold_base` unregistered
+- wave13 drops: unregistered armor pieces / SEDNA parts / inserts / claddings / foods / `block_steel`
 - fluid-NBT / `OreDictionary.WILDCARD` / LBSM-gated / commented CE crafts skipped
 
 ## Recipe-graph reachability (cheap)
 
-**49.1%** (1010 / 2056). Prior published: 987 / 2049 (48.2%).
+**51.1%** (1203 / 2354). Prior published: 1010 / 2056 (49.1%).
 
-## Next single gap (not 90%)
+## Next single gap
 
-Vanilla leftover after `:1090` + unregistered-result crafts. Blocks 67.6%. Remaining machine
-hole ~327 (other Java tables, not assembler named rows). Weighted **86.8% ≠ 90%**.
+Blocks **67.6%** (379 missing — real Dummyable / deco / machine casings, not dummy regs).
+Machine leftover **~327** (ChemPlant / SILEX / StorageDrum / SuperComputer I/O unregistered).
+Vanilla leftover **83** (unregistered I/O only). Weighted **96.4%** on paper; 90% Release
+still gated on compile + runServer Done + runClient past MenuScreens.
 
 ## Entities (Phase 9 leftovers)
 

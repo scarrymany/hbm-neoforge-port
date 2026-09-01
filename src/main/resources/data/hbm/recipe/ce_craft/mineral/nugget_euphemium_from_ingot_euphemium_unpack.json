@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:ingot_euphemium"
+    }
+  ],
+  "result": {
+    "id": "hbm:nugget_euphemium",
+    "count": 9
+  }
+}

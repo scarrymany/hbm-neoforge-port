@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "P"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_aluminium"
+    }
+  },
+  "result": {
+    "id": "hbm:can_empty",
+    "count": 1
+  }
+}

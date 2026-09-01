@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:nugget_plutonium_fuel"
+    }
+  },
+  "result": {
+    "id": "hbm:billet_plutonium_fuel",
+    "count": 1
+  }
+}

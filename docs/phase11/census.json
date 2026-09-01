@@ -1,14 +1,14 @@
 {
-  "weighted_pct": 86.8,
-  "unweighted_pct": 93.3,
+  "weighted_pct": 96.4,
+  "unweighted_pct": 98.2,
   "ce_sum": 7767,
-  "port_sum": 6741,
+  "port_sum": 7490,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2056,
-      "pct": 110.4
+      "port": 2354,
+      "pct": 126.4
     },
     {
       "cat": "blocks",
@@ -37,8 +37,8 @@
     {
       "cat": "vanilla_crafting",
       "ce": 1950,
-      "port": 1416,
-      "pct": 72.6
+      "port": 1867,
+      "pct": 95.7
     },
     {
       "cat": "machine_recipes",
@@ -59,7 +59,7 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2056,
+      "port": 2354,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
@@ -114,10 +114,10 @@
         "addSlabStair": 25,
         "add9or1": 43
       },
-      "port": 1416,
+      "port": 1867,
       "by_type": {
-        "minecraft:crafting_shaped": 794,
-        "minecraft:crafting_shapeless": 481,
+        "minecraft:crafting_shaped": 1008,
+        "minecraft:crafting_shapeless": 718,
         "minecraft:smelting": 135
       }
     },
@@ -235,10 +235,10 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2056,
-      "reachable_via_recipe_or_loot": 1010,
-      "pct": 49.1
+      "port_items": 2354,
+      "reachable_via_recipe_or_loot": 1203,
+      "pct": 51.1
     }
   },
-  "recipe_json_total": 2174
+  "recipe_json_total": 2625
 }

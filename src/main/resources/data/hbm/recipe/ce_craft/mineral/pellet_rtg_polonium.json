@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:billet_polonium"
+    },
+    {
+      "item": "hbm:billet_polonium"
+    },
+    {
+      "item": "hbm:billet_polonium"
+    },
+    {
+      "item": "hbm:plate_iron"
+    }
+  ],
+  "result": {
+    "id": "hbm:pellet_rtg_polonium",
+    "count": 1
+  }
+}

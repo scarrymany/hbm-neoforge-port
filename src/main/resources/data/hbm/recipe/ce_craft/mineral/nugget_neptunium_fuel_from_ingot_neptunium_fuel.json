@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:ingot_neptunium_fuel"
+    }
+  ],
+  "result": {
+    "id": "hbm:nugget_neptunium_fuel",
+    "count": 9
+  }
+}

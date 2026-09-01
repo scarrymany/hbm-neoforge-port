@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:dust"
+    }
+  },
+  "result": {
+    "id": "hbm:block_scrap",
+    "count": 1
+  }
+}

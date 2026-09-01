@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "##"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:ingot_neptunium_fuel"
+    }
+  },
+  "result": {
+    "id": "hbm:billet_neptunium_fuel",
+    "count": 3
+  }
+}

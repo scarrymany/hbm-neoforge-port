@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:fallout"
+    }
+  },
+  "result": {
+    "id": "hbm:block_fallout",
+    "count": 1
+  }
+}

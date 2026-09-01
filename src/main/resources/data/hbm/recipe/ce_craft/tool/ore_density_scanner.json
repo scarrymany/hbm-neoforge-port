@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "VVV",
+    "CSC",
+    "GGG"
+  ],
+  "key": {
+    "V": {
+      "item": "hbm:circuit_vacuum_tube"
+    },
+    "C": {
+      "item": "hbm:circuit_capacitor"
+    },
+    "S": {
+      "item": "hbm:circuit_controller_chassis"
+    },
+    "G": {
+      "item": "hbm:plate_gold"
+    }
+  },
+  "result": {
+    "id": "hbm:ore_density_scanner",
+    "count": 1
+  }
+}

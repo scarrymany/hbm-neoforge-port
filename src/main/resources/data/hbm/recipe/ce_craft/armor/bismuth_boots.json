@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "W W",
+    "P P"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:gold_wire"
+    },
+    "P": {
+      "item": "hbm:plate_bismuth"
+    }
+  },
+  "result": {
+    "id": "hbm:bismuth_boots",
+    "count": 1
+  }
+}
