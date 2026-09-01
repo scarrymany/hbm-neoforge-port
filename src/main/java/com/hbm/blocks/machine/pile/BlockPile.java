@@ -93,31 +93,44 @@ public class BlockPile extends BaseEntityBlock implements IToolable, ILookOverla
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock()) && !PileCoreBlockEntity.meltingDown && !level.isClientSide) {
-            breakPile(level, pos, state);
+            breakPile(level, pos, newState);
         }
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     /**
-     * CE {@code BlockPile.breakBlock} body. Guarded against re-entry when this method
-     * itself {@code setBlock}s {@code pile_brick}.
+     * CE {@code BlockPile.breakBlock}: revert to {@code pile_brick} + {@code core.destroy()}.
+     * 1.21 {@code setBlock(air)} writes air *after* {@code onRemove}, so same-pos brick
+     * must be queued via {@code server.execute} or the outer write clobbers it.
      */
-    public static void breakPile(Level level, BlockPos pos, BlockState state) {
+    public static void breakPile(Level level, BlockPos pos) {
+        breakPile(level, pos, level.getBlockState(pos));
+    }
+
+    public static void breakPile(Level level, BlockPos pos, BlockState newState) {
         if (reverting || PileCoreBlockEntity.meltingDown || level.isClientSide) return;
         reverting = true;
         try {
             BlockEntity tile = level.getBlockEntity(pos);
+            boolean placeBrick = true;
+            PileCoreBlockEntity core = null;
             if (tile instanceof PileBaseBlockEntity pile) {
-                level.removeBlockEntity(pos);
-                if (pile.coreY >= 0) {
+                placeBrick = pile.coreY >= 0;
+                core = pile.getCore();
+            }
+            if (placeBrick && !newState.is(PileBlocks.PILE_BRICK.get())) {
+                BlockPos frozen = pos.immutable();
+                if (level.getServer() != null) {
+                    level.getServer().execute(() -> {
+                        if (!level.getBlockState(frozen).is(PileBlocks.PILE_BRICK.get())) {
+                            level.setBlock(frozen, PileBlocks.PILE_BRICK.get().defaultBlockState(), 3);
+                        }
+                    });
+                } else {
                     level.setBlock(pos, PileBlocks.PILE_BRICK.get().defaultBlockState(), 3);
                 }
-                PileCoreBlockEntity core = pile.getCore();
-                if (core != null && !core.isRemoved()) core.destroy();
-            } else {
-                level.removeBlockEntity(pos);
-                level.setBlock(pos, PileBlocks.PILE_BRICK.get().defaultBlockState(), 3);
             }
+            if (core != null && !core.isRemoved()) core.destroy();
         } finally {
             reverting = false;
         }

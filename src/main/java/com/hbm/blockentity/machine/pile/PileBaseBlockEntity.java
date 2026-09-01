@@ -2,7 +2,7 @@ package com.hbm.blockentity.machine.pile;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
-import com.hbm.blocks.machine.pile.BlockPile;
+import com.hbm.blocks.machine.pile.PileBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -40,7 +40,7 @@ public class PileBaseBlockEntity extends LoadedBaseBlockEntity implements ITicka
         PileCoreBlockEntity controller = getCore();
         BlockPos corePos = new BlockPos(coreX, coreY, coreZ);
         if ((controller == null || controller.isRemoved()) && level.isLoaded(corePos)) {
-            BlockPile.breakPile(level, worldPosition, getBlockState());
+            level.setBlock(worldPosition, PileBlocks.PILE_BRICK.get().defaultBlockState(), 3);
         }
     }
 
