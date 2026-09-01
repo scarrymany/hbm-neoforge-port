@@ -8,23 +8,22 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`.
 
-Verified this wave: `compileJava` 0 errors (UP-TO-DATE),
-jar `build/libs/hbm-neoforge-CE-fork-by-scarrymany-0.0.1-beta.jar` **68,697,039 B**,
-`./gradlew runServer` **Done (5.037s)** on wiped world port 25566, **3914 recipes** / 2270 advancements.
-No recipe parse errors. `runClient` passed MenuScreens (reached `gui.png-atlas`). No `MACHINE_CRUCIBLE` NPE.
+Verified this wave: `compileJava` 0,
+`./gradlew runServer` **Done (5.126s)** on wiped world port 25566, **3914 recipes**.
+No recipe parse errors. Tag `v0.0.1-rc2` (do not overwrite `v0.0.1-rc1`).
+`runClient` last green: MenuScreens (`gui.png-atlas`). No `MACHINE_CRUCIBLE` NPE.
 
 ## Top line
 
 | | |
 |---|---|
 | **Weighted** (Σport / ΣCE) | **100.2%** (7783 / 7767) |
-| **Unweighted** (mean of category %) | **100.4%** |
-| Recipe/loot reachability of port items | **51.1%** (1203 / 2354) |
+| **Unweighted** (mean of category %) | **100.8%** |
+| Recipe/loot reachability of port items | **53.1%** (1329 / 2501) |
 | CE `@AutoRegister` entities still missing | **none** |
 
-Weighted is **above ~90%** (need 6990). All three 90% Release gates passed on this HEAD
-(`compileJava` + `runServer` Done + `runClient` past MenuScreens). Tag not cut.
-Existing `beta-82` / `beta-82.1` stay as playtest tags.
+Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
+Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
 Largest remaining holes: **blocks 232**, **machine 327**, **vanilla 84**.
 Weighted **100.2%** (over CE denom from flattened already-registered loops). Category holes remain.
@@ -148,13 +147,13 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**52.3%** (1274 / 2435). Prior: 1203 / 2354 (51.1%).
+**53.1%** (1329 / 2501). Prior: 1274 / 2435 (52.3%).
 
 ## Next single gap
 
 Blocks **80.2%** (232 missing — Dummyable/deco leftover, not dummy regs).
 Machine leftover **~327** (ChemPlant / SILEX / StorageDrum / SuperComputer I/O unregistered).
-Vanilla leftover **84**. Weighted **100.2%**. rc1 stays. 99%+ tag after runServer.
+Vanilla leftover **84**. Weighted **100.2%**. Tag `v0.0.1-rc2`.
 
 ## Entities (Phase 9 leftovers)
 
