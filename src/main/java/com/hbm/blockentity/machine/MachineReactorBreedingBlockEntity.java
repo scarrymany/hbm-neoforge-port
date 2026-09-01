@@ -2,6 +2,9 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blockentity.machine.dummyable.ReactorResearchBlockEntity;
+import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
 import com.hbm.inventory.container.machine.MachineReactorBreedingMenu;
 import com.hbm.inventory.recipes.machine.BreederRecipe;
 import com.hbm.inventory.recipes.machine.BreederRecipes;
@@ -31,19 +34,9 @@ import java.util.Optional;
  * transmuted rod out slot 1) driven entirely by an external "flux" number and a fixed
  * input-&gt;output lookup table - see {@link BreederRecipe} for that table's JSON-ported shape.
  *
- * <h2>Flux source is a documented dead end for now</h2>
- * CE's {@code getInteractions()} scans the four horizontal neighbours for
- * {@code ModBlocks.reactor_research} and reads {@code TileEntityReactorResearch.totalFlux} off
- * whatever pile-reactor core that block's own {@code findCore} resolves to. Per
- * {@code docs/phase2/reactors_breeding_pwr.md}'s Deferred scope, CE's classic pile-reactor family
- * ({@code com.hbm.tileentity.machine.pile.*}, ~12 files: {@code TileEntityPileBase}/{@code PileCore}/
- * {@code PileSource}/{@code ReactorResearch}/{@code TileEntityReactorResearch}/etc) has no owning
- * Phase 2 research package yet and does not exist anywhere in this port (grepped, zero hits for any
- * of those class names) - that report's own explicit recommendation: "the machine block itself can
- * still be ported and will compile/place fine without it, it just won't ever produce output."
- * {@link #getInteractions()} is therefore a documented no-op below: {@link #flux} always resolves to
- * 0, so {@link #canProcess} is always false and this machine is a fully wired, GUI-complete, inert
- * shell until a future "classic pile reactor" package lands and revisits this one method.
+ * Flux comes from a live {@code reactor_research} core
+ * ({@link ReactorResearchBlockEntity#totalFlux}) on the four horizontal neighbours, matching
+ * CE {@code TileEntityMachineReactorBreeding.getInteractions} :92-111.
  */
 public class MachineReactorBreedingBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -87,8 +80,17 @@ public class MachineReactorBreedingBlockEntity extends MachineBaseBlockEntity im
         networkPackNT(20);
     }
 
-    /** Documented no-op - see class javadoc "Flux source is a documented dead end for now". */
+    /** CE {@code TileEntityMachineReactorBreeding.getInteractions} :92-111. */
     private void getInteractions() {
+        if (level == null) return;
+        for (Direction dir : Direction.Plane.HORIZONTAL) {
+            BlockPos neighbor = worldPosition.relative(dir);
+            if (level.getBlockState(neighbor).getBlock() != DummyableProcessBlocks.REACTOR_RESEARCH.get()) continue;
+            BlockPos core = ((BlockDummyable) DummyableProcessBlocks.REACTOR_RESEARCH.get()).findCore(level, neighbor);
+            if (core != null && level.getBlockEntity(core) instanceof ReactorResearchBlockEntity reactor) {
+                this.flux += reactor.totalFlux;
+            }
+        }
     }
 
     private Optional<BreederRecipe> findRecipe() {

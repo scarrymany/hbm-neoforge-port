@@ -86,5 +86,7 @@ public final class DummyableProcessClientRegistry {
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_FLUIDTANK, MachineFluidTankScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_BIGASSTANK, BigAssTankScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_SATLINKER, SatLinkerScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.REACTOR_RESEARCH, ReactorResearchScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.REACTOR_ZIRNOX, ReactorZirnoxScreen::new);
     }
 }

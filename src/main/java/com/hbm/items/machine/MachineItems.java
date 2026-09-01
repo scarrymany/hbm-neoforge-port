@@ -7,6 +7,7 @@ import com.hbm.inventory.material.NTMMaterial;
 import com.hbm.items.ItemEnums.EnumCircuitType;
 import com.hbm.items.ItemEnums.EnumExpensiveType;
 import com.hbm.items.ItemEnums.EnumPartType;
+import com.hbm.items.ItemBase;
 import com.hbm.items.ModItems;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
@@ -62,6 +63,8 @@ public final class MachineItems {
     public static final Map<ItemPistons.EnumPistonType, DeferredItem<Item>> PISTONS = new EnumMap<>(ItemPistons.EnumPistonType.class);
 
     public static DeferredItem<Item> PLATE_FUEL_U233, PLATE_FUEL_U235, PLATE_FUEL_MOX, PLATE_FUEL_PU239, PLATE_FUEL_SA326, PLATE_FUEL_RA226BE, PLATE_FUEL_PU238BE;
+    /** CE {@code ModItems.rod_zirnox_tritium} — lithium ZIRNOX depletion product. */
+    public static DeferredItem<Item> ROD_ZIRNOX_TRITIUM;
     public static DeferredItem<Item> PELLET_RTG, PELLET_RTG_RADIUM, PELLET_RTG_WEAK, PELLET_RTG_STRONTIUM, PELLET_RTG_COBALT, PELLET_RTG_ACTINIUM,
             PELLET_RTG_POLONIUM, PELLET_RTG_LEAD, PELLET_RTG_GOLD, PELLET_RTG_AMERICIUM, PELLET_RTG_BALEFIRE;
 
@@ -689,6 +692,8 @@ public final class MachineItems {
             ZIRNOX_RODS_DEPLETED.put(type, item);
             tab(ModCreativeTabs.CONTROL, item);
         }
+        ROD_ZIRNOX_TRITIUM = reg("rod_zirnox_tritium", () -> new ItemBase(props().stacksTo(1)));
+        tab(ModCreativeTabs.CONTROL, ROD_ZIRNOX_TRITIUM);
     }
 
     // ==================== shared helpers ====================

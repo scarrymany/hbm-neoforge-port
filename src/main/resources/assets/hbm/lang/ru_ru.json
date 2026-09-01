@@ -8329,6 +8329,8 @@
   "block.hbm.reactor_element": "Реакторная камера",
   "block.hbm.reactor_hatch": "Люк доступа реактора",
   "block.hbm.reactor_inserter": "Автоматический заправщик реактора",
+  "block.hbm.reactor_research": "Исследовательский реактор",
+  "block.hbm.reactor_zirnox": "Ядерный реактор Цирнокс",
   "block.hbm.rebar": "Арматура",
   "block.hbm.red_barrel": "Взрывная бочка",
   "block.hbm.red_cable": "Провод из красной меди",

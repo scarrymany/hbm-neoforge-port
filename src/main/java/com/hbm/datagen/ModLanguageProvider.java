@@ -381,6 +381,8 @@ public class ModLanguageProvider extends LanguageProvider {
         m.put("machine_mixer", "Industrial Mixer");
         m.put("machine_powerrtg", "PT Isotope Cell");
         m.put("machine_reactor_breeding", "Breeding Reactor");
+        m.put("reactor_research", "Research Reactor"); // CE tile.machine_reactor_small_new.name
+        m.put("reactor_zirnox", "ZIRNOX Nuclear Reactor"); // CE tile.machine_zirnox.name
         m.put("machine_rtg_grey", "RT Generator");
         m.put("machine_shredder", "Shredder");
         m.put("machine_silex", "Laser Isotope Separation Chamber (SILEX)");
@@ -658,6 +660,8 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.rbmkRod", "RBMK Fuel Rod");
         this.add("container.rbmkStorage", "RBMK Storage Column");
         this.add("container.reactorBreeding", "Breeding Reactor");
+        this.add("container.reactorResearch", "Research Reactor");
+        this.add("container.zirnox", "ZIRNOX Nuclear Reactor");
         this.add("container.rtg", "RT Generator");
         this.add("container.trainTram", "Electric Flat Bed Tram");
         this.add("container.turbinegas", "Combined Cycle Gas Turbine");

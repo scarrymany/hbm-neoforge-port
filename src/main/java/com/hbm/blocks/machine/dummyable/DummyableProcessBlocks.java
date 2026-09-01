@@ -51,7 +51,8 @@ import java.util.function.Supplier;
  * telelinker / soyuz capsule / filing cabinet /
  * pump steam/electric / chimney brick/industrial / thresher / bm_power_box /
  * mining laser / strand caster / forcefield / chungus / satlink / teleporter /
- * fluidtank / bigasstank / compressor compact / satlinker.
+ * fluidtank / bigasstank / compressor compact / satlinker /
+ * reactor_research / reactor_zirnox.
  */
 public final class DummyableProcessBlocks {
 
@@ -164,6 +165,8 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineBigAssTankBlock> MACHINE_BIGASSTANK;
     public static DeferredBlock<MachineCompressorCompactBlock> MACHINE_COMPRESSOR_COMPACT;
     public static DeferredBlock<MachineSatLinkerBlock> MACHINE_SATLINKER;
+    public static DeferredBlock<ReactorResearchBlock> REACTOR_RESEARCH;
+    public static DeferredBlock<ReactorZirnoxBlock> REACTOR_ZIRNOX;
 
     private DummyableProcessBlocks() {
     }
@@ -304,6 +307,14 @@ public final class DummyableProcessBlocks {
                 () -> new MachineSatLinkerBlock(BlockBehaviour.Properties.of()
                         .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()),
                 ModCreativeTabs.MISSILE);
+        // CE ModBlocks.java:990 hardness 5 / resistance 10; Dummyable {2,0,0,0,0,0}
+        REACTOR_RESEARCH = registerBlock("reactor_research",
+                () -> new ReactorResearchBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // CE ModBlocks.java:995 hardness 5 / resistance 100; Dummyable {1,0,2,2,2,2} offset 2
+        REACTOR_ZIRNOX = registerBlock("reactor_zirnox",
+                () -> new ReactorZirnoxBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 100.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

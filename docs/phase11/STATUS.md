@@ -54,11 +54,13 @@
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),
   `machine_deuterium_tower` TODO(CE: AnvilRecipes.java:453-462), flatten holders,
   mold 16–28 TODO(CE: AnvilRecipes.java:626-635).
-- This Dummyable wave: `machine_fluidtank` `{2,0,1,1,2,2}` offset 1 + 256k/mode/GUI
-  `gui_tank.png`; `machine_bigasstank` `{5,0,4,4,4,4}` offset 6 + 16M/barrel GUI
-  `gui_barrel.png`; `machine_compressor_compact` `{2,0,1,1,3,3}` offset 1 reuses
-  compressor menu; `machine_satlinker` 1×1 `gui_sat_linker.png` missile tab.
-  Same CE ids. Cited TODOs (UniNodespace/TESR/OC/leak). No invent.
+- This Dummyable wave: `reactor_research` `{2,0,0,0,0,0}` offset 0 + 12 plates /
+  maxHeat 50000 / GUI `gui_research_reactor.png` 176×222; `reactor_zirnox`
+  `{1,0,2,2,2,2}` offset 2 + 3 XR + tanks 8000/16000/32000 / maxHeat-Pressure
+  100000 / GUI `gui_zirnox.png` 203×256. Breeding reads `totalFlux`.
+  `rod_zirnox_tritium` registered (CE lithium product). Same CE ids.
+  Cited TODOs (TESR/ProxyCombo/OC/ROR/debris/destroyed/tilt/NumberDisplay).
+  Transformers stay BlockBase. Fusion/watz skipped (huge MB). No invent.
 - Live machines (CE has TE, **no GUI**): pumps/chimneys Dummyable+BE, thresher,
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.

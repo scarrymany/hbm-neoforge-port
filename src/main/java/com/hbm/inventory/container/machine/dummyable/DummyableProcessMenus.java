@@ -70,6 +70,8 @@ import com.hbm.blockentity.machine.dummyable.MachineStrandCasterBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineFluidTankBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineBigAssTankBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineSatLinkerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.ReactorResearchBlockEntity;
+import com.hbm.blockentity.machine.dummyable.ReactorZirnoxBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -149,6 +151,8 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<MachineFluidTankMenu>> MACHINE_FLUIDTANK;
     public static DeferredHolder<MenuType<?>, MenuType<BigAssTankMenu>> MACHINE_BIGASSTANK;
     public static DeferredHolder<MenuType<?>, MenuType<SatLinkerMenu>> MACHINE_SATLINKER;
+    public static DeferredHolder<MenuType<?>, MenuType<ReactorResearchMenu>> REACTOR_RESEARCH;
+    public static DeferredHolder<MenuType<?>, MenuType<ReactorZirnoxMenu>> REACTOR_ZIRNOX;
 
     private DummyableProcessMenus() {
     }
@@ -294,6 +298,10 @@ public final class DummyableProcessMenus {
                 new BigAssTankMenu(id, inv, (MachineBigAssTankBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_SATLINKER = reg("machine_satlinker", (id, inv, buf) ->
                 new SatLinkerMenu(id, inv, (MachineSatLinkerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        REACTOR_RESEARCH = reg("reactor_research", (id, inv, buf) ->
+                new ReactorResearchMenu(id, inv, (ReactorResearchBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        REACTOR_ZIRNOX = reg("reactor_zirnox", (id, inv, buf) ->
+                new ReactorZirnoxMenu(id, inv, (ReactorZirnoxBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

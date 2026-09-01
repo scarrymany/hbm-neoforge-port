@@ -99,6 +99,8 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineBigAssTankBlockEntity>> MACHINE_BIGASSTANK;
     public static Supplier<BlockEntityType<MachineCompressorCompactBlockEntity>> MACHINE_COMPRESSOR_COMPACT;
     public static Supplier<BlockEntityType<MachineSatLinkerBlockEntity>> MACHINE_SATLINKER;
+    public static Supplier<BlockEntityType<ReactorResearchBlockEntity>> REACTOR_RESEARCH;
+    public static Supplier<BlockEntityType<ReactorZirnoxBlockEntity>> REACTOR_ZIRNOX;
 
     private DummyableProcessBlockEntities() {
     }
@@ -484,6 +486,14 @@ public final class DummyableProcessBlockEntities {
         MACHINE_SATLINKER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_satlinker", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineSatLinkerBlockEntity(MACHINE_SATLINKER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_SATLINKER.get()
+        ).build(null));
+        REACTOR_RESEARCH = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_small_reactor", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new ReactorResearchBlockEntity(REACTOR_RESEARCH.get(), pos, state),
+                DummyableProcessBlocks.REACTOR_RESEARCH.get()
+        ).build(null));
+        REACTOR_ZIRNOX = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_zirnox", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new ReactorZirnoxBlockEntity(REACTOR_ZIRNOX.get(), pos, state),
+                DummyableProcessBlocks.REACTOR_ZIRNOX.get()
         ).build(null));
     }
 }

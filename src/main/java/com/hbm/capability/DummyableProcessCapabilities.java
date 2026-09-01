@@ -343,6 +343,12 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getEnergyStorageCapability(side));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_SATLINKER.get(),
                 (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.REACTOR_RESEARCH.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.REACTOR_ZIRNOX.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, DummyableProcessBlockEntities.REACTOR_ZIRNOX.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
         // Chimneys consume smoke via IFluidReceiverMK2#transferFluid (empty tanks). No FluidHandler.
         // BMPowerBox is redstone-only. No GUI/caps.
         // satlink: no item/fluid/energy in CE.

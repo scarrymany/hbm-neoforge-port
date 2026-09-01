@@ -8468,6 +8468,8 @@
   "block.hbm.reactor_element": "Reactor Chamber",
   "block.hbm.reactor_hatch": "Reactor Access Hatch",
   "block.hbm.reactor_inserter": "Reactor Fuel Inserter",
+  "block.hbm.reactor_research": "Research Reactor",
+  "block.hbm.reactor_zirnox": "ZIRNOX Nuclear Reactor",
   "block.hbm.rebar": "Rebar",
   "block.hbm.red_barrel": "Explosive Barrel",
   "block.hbm.red_cable": "Red Copper Cable",

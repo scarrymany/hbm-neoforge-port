@@ -97,6 +97,38 @@ Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
 
 Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
 
+- **`reactor_research`**: Dummyable `{2,0,0,0,0,0}` offset 0
+  (`ReactorResearch.java:87-93`). META≥12 core TE. 12 plate slots,
+  maxHeat **50000**, rod speed **0.04**, water cool `heat*0.07*water/12`,
+  explode **18.0F** + deco_steel/corium/deco_steel, rad
+  `heat/max*50` / 25000 (unshielded). Fuel map 7 plates → `_hot` waste
+  (CE meta 1). GUI `gui_research_reactor.png` 176×222 + bind. Caps item.
+  Breeding `getInteractions` reads `totalFlux`. Sensor marks core pos.
+  TODO(CE: ReactorResearch.java:36) ProxyCombo;
+  TODO(CE: RenderSmallReactor.java:16) TESR;
+  TODO(CE: TileEntityReactorResearch.java:420-478) OC;
+  TODO(CE: GUIReactorResearch.java:29) NumberDisplay 7-seg;
+  TODO(CE: TileEntityReactorResearch.java:232) block_lead/desh.
+- **`reactor_zirnox`**: Dummyable `{1,0,2,2,2,2}` offset 2 + XR
+  `{4,-2,1,1,1,1}` / `{4,-2,0,0,2,-2}` / `{4,-2,0,0,-2,2}` + 5 extras
+  (`ReactorZirnox.java:58-89`). 28 slots, tanks SHS **8000** / CO2
+  **16000** / water **32000**, maxHeat/Pressure **100000**. Steam gen
+  `(heat-10256)/maxHeat * min(CO2/14000,1) * 25 * 7.5`. Vent −1000 CO2.
+  Redstone forces on / falling edge off. GUI `gui_zirnox.png` 203×256.
+  Caps item+fluid. Meltdown: explode 12F + rad 50/15000.
+  TODO(CE: ReactorZirnox.java:33) ProxyCombo;
+  TODO(CE: StaticTesrBakedModels.java:315) OBJ TESR;
+  TODO(CE: TileEntityReactorZirnox.java:229) tilt / IConnectionAnchors;
+  TODO(CE: TileEntityReactorZirnox.java:354-431) debris / zirnox_destroyed / waste / ach;
+  TODO(CE: TileEntityReactorZirnox.java:508-656) OC + ROR;
+  TODO(CE: GUIReactorZirnox.java:99-104) GUIElements gauges.
+- Fusion / watz skipped (huge MB, no real core TE this wave).
+  `machine_transformer*` stay BlockBase (CE ModBlocks.java:979-982).
+  Leftover later: assembly/chemical factory, turret_arty/himars, seal_*,
+  pile_brick, solinium/fstbmb.
+
+## Prior wave (fluidtank / bigasstank / compact / satlinker)
+
 - **`machine_fluidtank`**: Dummyable `{2,0,1,1,2,2}` offset 1 + extras
   `placed-dir ±1,±1` (`MachineFluidTank.java:79-143`). META≥12 core TE.
   6 slots, tank **256000**, mode 0=in / 1=both / 2=out / 3=off.

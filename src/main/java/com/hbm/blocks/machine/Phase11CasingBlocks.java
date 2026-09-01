@@ -45,8 +45,7 @@ public final class Phase11CasingBlocks {
         // machine_turbofan / machine_hephaestus / machine_radgen are DummyableProcessBlocks (full TEs).
         // machine_pyrooven / machine_exposure_chamber are DummyableProcessBlocks (full TEs).
         // machine_fluidtank / machine_bigasstank are DummyableProcessBlocks (live TE).
-        registerBlock("reactor_research", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("reactor_zirnox", () -> new BlockBase(MACHINE_PROPS));
+        // reactor_research / reactor_zirnox are DummyableProcessBlocks (live TE).
         registerBlock("seal_frame", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("seal_controller", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("vitrified_barrel", () -> new BlockBase(MACHINE_PROPS));
