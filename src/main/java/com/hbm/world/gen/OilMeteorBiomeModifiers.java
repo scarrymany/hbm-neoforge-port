@@ -33,6 +33,8 @@ import java.util.List;
 public final class OilMeteorBiomeModifiers {
 
     public static final ResourceKey<BiomeModifier> ADD_OIL_METEOR_WORLDGEN = key("add_oil_meteor_worldgen");
+    /** Landmine after vegetal so grass/trees do not overwrite the 1-block mine (CE {@code IWorldGenerator} is post-decorate). */
+    public static final ResourceKey<BiomeModifier> ADD_LANDMINE_WORLDGEN = key("add_landmine_worldgen");
 
     private OilMeteorBiomeModifiers() {
     }
@@ -50,11 +52,14 @@ public final class OilMeteorBiomeModifiers {
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.BUNKER),
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.RADIO),
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.SELLAFIELD),
-                placedFeatures.getOrThrow(OilMeteorPlacedFeatures.LANDMINE),
                 placedFeatures.getOrThrow(OilMeteorPlacedFeatures.NITAN_CHEST));
 
         context.register(ADD_OIL_METEOR_WORLDGEN, new AddFeaturesBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD), HolderSet.direct(features), GenerationStep.Decoration.UNDERGROUND_ORES));
+        context.register(ADD_LANDMINE_WORLDGEN, new AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(List.of(placedFeatures.getOrThrow(OilMeteorPlacedFeatures.LANDMINE))),
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
     }
 
     private static ResourceKey<BiomeModifier> key(String path) {

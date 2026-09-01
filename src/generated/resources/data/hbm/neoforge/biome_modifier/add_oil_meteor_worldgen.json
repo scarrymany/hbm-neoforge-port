@@ -10,7 +10,6 @@
     "hbm:bunker",
     "hbm:radio",
     "hbm:sellafield",
-    "hbm:landmine",
     "hbm:nitan_chest"
   ],
   "step": "underground_ores"

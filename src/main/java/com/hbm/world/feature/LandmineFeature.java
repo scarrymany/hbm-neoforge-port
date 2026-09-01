@@ -53,7 +53,9 @@ public class LandmineFeature extends Feature<NoneFeatureConfiguration> {
 
         int x = (origin.getX() & ~15) + random.nextInt(16);
         int z = (origin.getZ() & ~15) + random.nextInt(16);
-        int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
+        // CE 1.12 getHeight = opaque column + 1 (plants ignored). WORLD_SURFACE includes grass
+        // and would fail isFaceSturdy / get overwritten in UNDERGROUND_ORES.
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
         BlockPos pos = new BlockPos(x, y, z);
         BlockPos below = pos.below();
         BlockState ground = level.getBlockState(below);
