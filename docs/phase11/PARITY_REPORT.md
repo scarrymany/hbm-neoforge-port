@@ -17,8 +17,8 @@ No recipe parse errors. `runClient` passed MenuScreens (reached `gui.png-atlas`)
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **96.4%** (7489 / 7767) |
-| **Unweighted** (mean of category %) | **98.2%** |
+| **Weighted** (Σport / ΣCE) | **97.3%** (7561 / 7767) |
+| **Unweighted** (mean of category %) | **98.9%** |
 | Recipe/loot reachability of port items | **51.1%** (1203 / 2354) |
 | CE `@AutoRegister` entities still missing | **none** |
 
@@ -26,14 +26,16 @@ Weighted is **above ~90%** (need 6990). All three 90% Release gates passed on th
 (`compileJava` + `runServer` Done + `runClient` past MenuScreens). Tag not cut.
 Existing `beta-82` / `beta-82.1` stay as playtest tags.
 
-Largest remaining holes: **blocks 379**, **machine 327**, **vanilla 84**.
+Largest remaining holes: **blocks 343**, **machine 327**, **vanilla 84**.
+90% playtest: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
+Not 99%.
 
 ## Per-category
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
 | Items (flattened ids) | 1863 | 2354 | **126.4%** | Phase 10 extract now also sees `registerBillet`/`registerParts`/`registerPowder`/… (already registered, not dummy) |
-| Blocks | 1169 | 790 | **67.6%** | Dummyable/1×1 leftovers still unregistered (no dummy blocks) |
+| Blocks | 1169 | 826 | **70.7%** | +`fraction_spacer` / `lantern` / pylon transformers; extractor now sees `deco_pipe_*` + CRT/toaster/computer |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
@@ -150,10 +152,9 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Next single gap
 
-Blocks **67.6%** (379 missing — real Dummyable / deco / machine casings, not dummy regs).
+Blocks **70.7%** (343 missing — Dummyable/deco leftover, not dummy regs).
 Machine leftover **~327** (ChemPlant / SILEX / StorageDrum / SuperComputer I/O unregistered).
-Vanilla leftover **84** (unregistered I/O only). Weighted **96.4%** on paper; 90% Release
-still gated on compile + runServer Done + runClient past MenuScreens.
+Vanilla leftover **84**. Weighted **97.3%**. rc1 cut at 96.4% HEAD `2ff128a6`. Not 99%.
 
 ## Entities (Phase 9 leftovers)
 

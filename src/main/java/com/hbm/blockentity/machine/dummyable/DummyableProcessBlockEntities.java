@@ -45,6 +45,7 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<StorageDrumBlockEntity>> MACHINE_STORAGE_DRUM;
     public static Supplier<BlockEntityType<MachineSuperComputerBlockEntity>> MACHINE_SUPERCOMPUTER;
     public static Supplier<BlockEntityType<MachineAutosawBlockEntity>> MACHINE_AUTOSAW;
+    public static Supplier<BlockEntityType<FractionSpacerBlockEntity>> FRACTION_SPACER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -199,6 +200,10 @@ public final class DummyableProcessBlockEntities {
         MACHINE_AUTOSAW = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_autosaw", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineAutosawBlockEntity(MACHINE_AUTOSAW.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_AUTOSAW.get()
+        ).build(null));
+        FRACTION_SPACER = ModBlocks.BLOCK_ENTITY_TYPES.register("fraction_spacer", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new FractionSpacerBlockEntity(FRACTION_SPACER.get(), pos, state),
+                DummyableProcessBlocks.FRACTION_SPACER.get()
         ).build(null));
     }
 }

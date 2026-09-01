@@ -67,6 +67,7 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<com.hbm.blocks.machine.StorageDrumBlock> MACHINE_STORAGE_DRUM;
     public static DeferredBlock<MachineSuperComputerBlock> MACHINE_SUPERCOMPUTER;
     public static DeferredBlock<com.hbm.blocks.machine.MachineAutosawBlock> MACHINE_AUTOSAW;
+    public static DeferredBlock<FractionSpacerBlock> FRACTION_SPACER;
 
     private DummyableProcessBlocks() {
     }
@@ -111,6 +112,7 @@ public final class DummyableProcessBlocks {
         MACHINE_STORAGE_DRUM = registerBlock("machine_storage_drum", () -> new com.hbm.blocks.machine.StorageDrumBlock(MACHINE_PROPS));
         MACHINE_SUPERCOMPUTER = registerBlock("machine_supercomputer", () -> new MachineSuperComputerBlock(MACHINE_PROPS));
         MACHINE_AUTOSAW = registerBlock("machine_autosaw", () -> new com.hbm.blocks.machine.MachineAutosawBlock(MACHINE_PROPS));
+        FRACTION_SPACER = registerBlock("fraction_spacer", () -> new FractionSpacerBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

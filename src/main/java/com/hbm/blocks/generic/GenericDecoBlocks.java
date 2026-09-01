@@ -42,6 +42,7 @@ public final class GenericDecoBlocks {
     private static final float UNBREAKABLE_RESISTANCE = 3_600_000.0F;
 
     public static Supplier<BlockEntityType<DecoBlockAlt.StatuePulseBlockEntity>> STATUE_PULSE_ENTITY_TYPE;
+    public static Supplier<BlockEntityType<LanternBlockEntity>> LANTERN_ENTITY_TYPE;
 
     private GenericDecoBlocks() {
     }
@@ -60,6 +61,7 @@ public final class GenericDecoBlocks {
         registerWriting();
         registerHevBattery();
         registerWand();
+        registerLantern();
     }
 
     private static void registerDecoBlocks() {
@@ -197,6 +199,15 @@ public final class GenericDecoBlocks {
     private static void registerHevBattery() {
         registerBlock("hev_battery_block", () -> new HEVBattery(BlockBehaviour.Properties.of().strength(15.0F, 0.25F).sound(SoundType.METAL)),
                 ModCreativeTabs.MACHINE);
+    }
+
+    private static void registerLantern() {
+        // CE ModBlocks.java:281 — BlockLantern Dummyable {4,0,0,0,0,0}, blinds glyphids.
+        DeferredBlock<BlockLantern> lantern = registerBlock("lantern",
+                () -> new BlockLantern(deco15Props().lightLevel(state -> 15).noOcclusion()),
+                ModCreativeTabs.BLOCKS);
+        LANTERN_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("lantern",
+                () -> BlockEntityType.Builder.of(LanternBlockEntity::new, lantern.get()).build(null));
     }
 
     private static void registerWand() {

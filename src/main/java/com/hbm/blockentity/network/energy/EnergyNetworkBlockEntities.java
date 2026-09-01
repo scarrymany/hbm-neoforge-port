@@ -56,7 +56,8 @@ public final class EnergyNetworkBlockEntities {
 
         PYLON_MEDIUM = ModBlocks.BLOCK_ENTITY_TYPES.register("red_pylon_medium", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new PylonMediumBlockEntity(PYLON_MEDIUM.get(), pos, state),
-                EnergyNetworkBlocks.RED_PYLON_MEDIUM_WOOD.get(), EnergyNetworkBlocks.RED_PYLON_MEDIUM_STEEL.get()
+                EnergyNetworkBlocks.RED_PYLON_MEDIUM_WOOD.get(), EnergyNetworkBlocks.RED_PYLON_MEDIUM_STEEL.get(),
+                EnergyNetworkBlocks.RED_PYLON_MEDIUM_TRANSFORMER.get(), EnergyNetworkBlocks.RED_PYLON_STEEL_TRANSFORMER.get()
         ).build(null));
 
         SUBSTATION = ModBlocks.BLOCK_ENTITY_TYPES.register("substation", () -> BlockEntityType.Builder.of(

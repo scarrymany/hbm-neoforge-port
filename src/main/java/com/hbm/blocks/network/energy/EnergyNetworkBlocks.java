@@ -53,6 +53,8 @@ public final class EnergyNetworkBlocks {
     public static DeferredBlock<PylonLargeBlock> RED_PYLON_LARGE;
     public static DeferredBlock<PylonMediumBlock> RED_PYLON_MEDIUM_WOOD;
     public static DeferredBlock<PylonMediumBlock> RED_PYLON_MEDIUM_STEEL;
+    public static DeferredBlock<PylonMediumBlock> RED_PYLON_MEDIUM_TRANSFORMER;
+    public static DeferredBlock<PylonMediumBlock> RED_PYLON_STEEL_TRANSFORMER;
     public static DeferredBlock<SubstationBlock> SUBSTATION;
 
     private EnergyNetworkBlocks() {
@@ -73,6 +75,9 @@ public final class EnergyNetworkBlocks {
         RED_PYLON_LARGE = registerBlock("red_pylon_large", () -> new PylonLargeBlock(PYLON_PROPS));
         RED_PYLON_MEDIUM_WOOD = registerBlock("red_pylon_medium_wood", () -> new PylonMediumBlock(PYLON_PROPS));
         RED_PYLON_MEDIUM_STEEL = registerBlock("red_pylon_medium_steel", () -> new PylonMediumBlock(PYLON_PROPS));
+        // CE ModBlocks.java:778 / :780 — same PylonMedium class, CE registry ids (not field names).
+        RED_PYLON_MEDIUM_TRANSFORMER = registerBlock("red_pylon_medium_transformer", () -> new PylonMediumBlock(PYLON_PROPS));
+        RED_PYLON_STEEL_TRANSFORMER = registerBlock("red_pylon_steel_transformer", () -> new PylonMediumBlock(PYLON_PROPS));
         SUBSTATION = registerBlock("substation", () -> new SubstationBlock(CABLE_PROPS));
 
         com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities.registerAll();

@@ -66,6 +66,28 @@ def extract_all_ids() -> tuple[set[str], set[str]]:
             items |= found
         if in_items:
             items |= found
+    # deco_pipe_* loop (string array in GenericBlocks.registerPipes — already registered)
+    pipes = JAVA / "blocks" / "generic" / "GenericBlocks.java"
+    if pipes.exists():
+        for name in re.findall(r'"(deco_pipe[a-z0-9_]*)"', pipes.read_text(errors="ignore")):
+            blocks.add(name)
+            items.add(name)
+    # deco_crt_ / deco_toaster_ / deco_computer_ concatenated from BlockEnums
+    enums_deco = (JAVA / "blocks" / "BlockEnums.java").read_text(errors="ignore") if (JAVA / "blocks" / "BlockEnums.java").exists() else ""
+    for pref, enum_name in (
+        ("deco_crt_", "DecoCRTEnum"),
+        ("deco_toaster_", "DecoToasterEnum"),
+        ("deco_computer_", "DecoComputerEnum"),
+    ):
+        m = re.search(rf"enum {enum_name} \{{(.*?)\}}", enums_deco, flags=re.S)
+        if not m:
+            continue
+        for n in re.findall(r"\b([A-Z][A-Z0-9_]+)\b", m.group(1)):
+            if n in {"VALUES"}:
+                continue
+            bid = pref + n.lower()
+            blocks.add(bid)
+            items.add(bid)
     # PlantBlocks / glyph loops
     enums = (JAVA / "blocks" / "PlantEnums.java").read_text(errors="ignore")
     for pref, enum_name in (
