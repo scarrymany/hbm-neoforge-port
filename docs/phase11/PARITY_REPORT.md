@@ -7,21 +7,21 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors,
-`./gradlew build` SUCCESS, jar `build/libs/hbm-0.0.1.jar` **67,003,709 B** (~63.90 MB),
-`./gradlew runServer` **Done (5.441s)** on wiped world, **2962 recipes** / 2270 advancements.
+`./gradlew build` SUCCESS, jar `build/libs/hbm-0.0.1.jar` **67,078,243 B** (~63.97 MB),
+`./gradlew runServer` **Done (5.740s)** on wiped world, **3039 recipes** / 2270 advancements.
 No recipe parse errors.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **78.5%** (6099 / 7767) |
-| **Unweighted** (mean of category %) | **89.2%** |
-| Recipe/loot reachability of port items | **46.2%** (944 / 2042) |
+| **Weighted** (Σport / ΣCE) | **80.3%** (6240 / 7767) |
+| **Unweighted** (mean of category %) | **90.0%** |
+| Recipe/loot reachability of port items | **47.1%** (961 / 2042) |
 | CE `@AutoRegister` entities still missing | **none** |
 
-Weighted is **well below ~90%**. Largest remaining hole is still **machine recipes** (64.6%),
-then vanilla crafting (60.8%) and blocks (66.4%).
+Weighted is **still below ~90%**. Largest remaining hole is still **machine recipes** (67.8%),
+then vanilla crafting (64.8%) and blocks (66.4%).
 
 ## Per-category
 
@@ -32,8 +32,8 @@ then vanilla crafting (60.8%) and blocks (66.4%).
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 1186 | **60.8%** | CE estimate kept at 1950. No new leftover JSON this pass |
-| Machine recipes | ~2009 | 1298 | **64.6%** | CE denom unchanged. Port: prior 1283 + VacuumDistill 2 + Radiolysis 13 |
+| Vanilla crafting | ~1950 | 1263 | **64.8%** | CE estimate kept at 1950. +77 leftover JSON this pass |
+| Machine recipes | ~2009 | 1362 | **67.8%** | CE denom unchanged. Port: prior 1298 + PyroOven Δ + ArcFurnace 25 + Exposure 4 |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
@@ -41,31 +41,40 @@ Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%**
 
 ## What changed this session
 
-Previous published snapshot: weighted **78.3%** / unweighted **89.1%**, machine recipes **1283 / ~2009
-(63.9%)**, vanilla **1186 / 1950 (60.8%)**, blocks **776 / 66.4%**.
+Previous published snapshot: weighted **78.5%** / unweighted **89.2%**, machine recipes **1298 / ~2009
+(64.6%)**, vanilla **1186 / 1950 (60.8%)**, blocks **776 / 66.4%**.
 
-### Machine recipes: 1283 → 1298 (63.9% → 64.6%)
+### Machine recipes: 1298 → 1362 (64.6% → 67.8%)
 
-CE denom stayed **2009**. Port +15. No census-method cheat. Assembler JSON **untouched** (356).
+CE denom stayed **2009**. Port +64. No census-method cheat. Assembler JSON **untouched** (356).
 
-Four Dummyable oil/chem families (block + BE + menu + screen + CE recipe table). No stub GUIs.
+Three Dummyable process families (block + BE + menu + screen + CE recipe table). No stub GUIs.
 
-- **VacuumDistillRecipes** 0 → 2 `recipes.put` — CE `RefineryRecipes.java:116-127`
-  (`vacuum.put`, census-invisible). `machine_vacuum_distill` Dummyable `{8,0,1,1,1,1}` offset 1
-  + 4 back-corner extras. 10k HE / 100 mB, input @ PU2, 5 tanks. Canister unload skipped.
-- **RadiolysisRecipes** 0 → 13 `recipes.put` — CE `RadiolysisRecipes.java:50,60` (WATER +
-  `putAll(CrackingRecipes)`). `machine_radiolysis` Dummyable `{2,0,1,1,1,1}` offset 1 + 4
-  core-side extras. RTG heat ×10 HE, crack 100 mB when heat&gt;100. Sterilize/`ntmContagion` skipped.
-- **FlareRecipes** — CE has **no recipe map** (`TileEntityMachineGasFlare.java:150-201` is
-  trait-driven). `machine_flare` Dummyable `{11,0,1,1,1,1}` offset 1 + 4 core-side extras.
-  Vent 50 mB/t / burn 10 mB/t, valve+ignition via `clickMenuButton`. Pollution/particles/tilt skipped.
-- **EPress** — shared `PressRecipes` (already counted). `machine_epress` Dummyable `{2,0,0,0,0,0}`
-  offset 0. 100 HE/t, 200 progress, SPEED upgrade via slot scan (`UpgradeManagerNT` not ported).
+- **PyroOvenRecipes** ~10 → 45 `RECIPES.add` — CE `PyroOvenRecipes.java:36-124`.
+  `machine_pyrooven` Dummyable `{2,0,3,3,2,2}` offset 3 + 5 side extras + roof extra.
+  10M HE / 10k base, 2×24k tanks, SPEED/POWER/OVERDRIVE via slot scan. Solid-fuel family
+  unblocked (`solid_fuel` / `solid_fuel_bf`). Tar→soot skipped (`powder_ash` unregistered).
+  Pollution / audio / particles skipped.
+- **ArcFurnaceRecipes** 0 → 25 `.register(new` — CE `ArcFurnaceRecipes.java:41-115`
+  (hand-written silica/glass/borax + 12 bedrock sites + material×shape loop).
+  `machine_arc_furnace` Dummyable `{4,0,2,2,2,2}` offset 2 + XR `{4,0,3,-2,1,1}` + 6 extras.
+  2.5M HE, liquid toggle via `clickMenuButton`, SPEED upgrade, `CrucibleUtil.pourFullStack`.
+  `sand_quartz` gated (item unregistered). Vanilla furnace autogen skipped (RecipeManager
+  not available at commonSetup). Lid animation / pollution / particles skipped.
+- **ExposureChamberRecipes** 0 → 4 `RECIPES.add` — CE `ExposureChamberRecipes.java:54-65`.
+  `machine_exposure_chamber` Dummyable `{4,0,2,2,2,2}` offset 2 + XR beam + 5 extras.
+  200t / 10k HE, 8 saved particles, SPEED/POWER/OVERDRIVE via slot scan. Cheap path only
+  (no expensive-mode DEGENERATE_MATTER). Concrete items, not ore tags (schrabidate INGOT
+  autogen missing).
 
-### Vanilla crafting: unchanged 1186 / 60.8%
+### Vanilla crafting: 1186 → 1263 (60.8% → 64.8%)
 
-No leftover JSON this pass. Did **not** emit `powder_sawdust` / `gem_tantalium` / `coil_tungsten`.
-Assembler skip still **7**. Did not rewrite existing assembler JSON.
++77 leftover shaped/shapeless from CE `CraftingManager` leftovers (`scripts/phase11_wave7_crafts.py`).
+Biomass flatten, coils, circuits, particles, pylons/cables, motors, `plate_polymer` flatten,
+cloth, cells/canisters, a few tools/weapon parts. Did **not** emit `powder_sawdust` /
+`gem_tantalium` / `coil_tungsten` as results. Dropped unregistered ids (radio torch family,
+shimmer tools, some blades/rings, …). Assembler skip still **7**. Did not rewrite existing
+assembler JSON. runServer recipe count 2962 → **3039** (+77).
 
 ## Exclusion list (only CE-lacks or deliberate skips)
 
@@ -104,15 +113,21 @@ Assembler skip still **7**. Did not rewrite existing assembler JSON.
 - Radiolysis sterilize (`ntmContagion` NBT) — not ported; slots exist
 - Flare pollution / particles / entity fire / tilt — skipped
 - Flare / EPress `UpgradeManagerNT` — slot scan by `ItemMachineUpgrade` type/tier instead
+- PyroOven tar→soot — `powder_ash` unregistered
+- PyroOven / arc furnace pollution / audio / particles / lid animation — skipped
+- Arc furnace vanilla furnace autogen — RecipeManager not available at commonSetup
+- Arc furnace `sand_quartz` → `glass_quartz` — `sand_quartz` unregistered
+- Exposure expensive-mode DEGENERATE_MATTER — cheap path only
+- Pyro / arc / exposure `UpgradeManagerNT` — slot scan by `ItemMachineUpgrade` type/tier
 
 ## Recipe-graph reachability (cheap)
 
-**46.2%** (944 / 2042). Prior session: 941 / 2039 (46.2%).
+**47.1%** (961 / 2042). Prior session: 944 / 2042 (46.2%).
 
 ## Next single gap (not this session)
 
-Still machine recipes (leftover getDict assembler + remaining Dummyable TEs: pyrooven /
-arc furnace / exposure / …), vanilla crafting 60.8%. Blocks 66.4%. Weighted 78.5% ≠ 90%.
+Still machine recipes (leftover getDict assembler + remaining Dummyable TEs after pyrooven /
+arc furnace / exposure), vanilla crafting 64.8%. Blocks 66.4%. Weighted 80.3% ≠ 90%.
 
 ## Entities (Phase 9 leftovers)
 
