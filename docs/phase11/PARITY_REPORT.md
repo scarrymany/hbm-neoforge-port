@@ -7,91 +7,98 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors, `./gradlew build`
-SUCCESS, jar `hbm-0.0.1.jar` **66,526,731** B (~63.45 MB), `./gradlew runServer` **Done (5.525s)** on a
-wiped world (2417 recipes). Spawn 2% → 51% → Done. No duplicate ids, no leftover `tag:` JSON parse
-errors. `hbm:oil_bubble` still logs `setBlock in a far chunk` (no deadlock).
+SUCCESS, jar `hbm-0.0.1.jar` **66,541,112** B (~63.46 MB), `./gradlew runServer` **Done (5.620s)** on a
+wiped world (2446 recipes, was 2417). Spawn 2% → 51% → Done. No duplicate ids, no leftover `tag:` JSON
+parse errors. `hbm:oil_bubble` still logs `setBlock in a far chunk` (no deadlock).
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **65.0%** (5046 / 7767) |
-| **Unweighted** (mean of category %) | **82.3%** |
-| Recipe/loot reachability of port items | **41.4%** (806 / 1949) |
+| **Weighted** (Σport / ΣCE) | **65.8%** (5108 / 7767) |
+| **Unweighted** (mean of category %) | **82.7%** |
+| Recipe/loot reachability of port items | **41.8%** (821 / 1963) |
 | CE `@AutoRegister` entities still missing | **none** |
 
-Weighted is **well below ~90%**. Largest remaining hole is still **machine recipes** (38.0%, was 33.2%),
-then vanilla crafting (42.2%) and blocks (61.1%).
+Weighted is **well below ~90%**. Largest remaining hole is still **machine recipes** (39.1%, was 38.0%),
+then vanilla crafting (43.0%) and blocks (61.9%).
 
 ## Per-category
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 1949 | **104.6%** | Phase 10 extract + `parts`/`parts1` + flatten extras |
-| Blocks | 1169 | 714 | **61.1%** | extract + helpers + leftover doors / oil-chain cubes / ICF+DFC casings |
+| Items (flattened ids) | 1863 | 1963 | **105.4%** | Phase 10 extract + `parts`/`parts1` + flatten extras |
+| Blocks | 1169 | 724 | **61.9%** | extract + helpers + fusion/precass/transformer casings |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 823 | **42.2%** | CE estimate kept at 1950 |
-| Machine recipes | ~2009 | 763 | **38.0%** | CE denom unchanged. Port: 182 assembler + 92 shredder + 30 breeder JSON + Java `RECIPES.add`/`RECIPES.put`/`registerSFAuto` |
+| Vanilla crafting | ~1950 | 838 | **43.0%** | CE estimate kept at 1950 |
+| Machine recipes | ~2009 | 786 | **39.1%** | CE denom unchanged. Port: 196 assembler + 92 shredder + 30 breeder JSON + Java `RECIPES.add`/`RECIPES.put`/`registerSFAuto` |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this session (gate items + leftover assembler + ICF/DFC)
+## What changed this session (sats + PlasmaForge leftovers + leftover assembler/vanilla)
 
-Previous published snapshot: weighted **62.8%** / unweighted **81.1%**, machine recipes **666 / ~2009
-(33.2%)**, blocks **680 / 1169 (58.2%)**, items **1910 / 1863 (102.5%)**, reachability **785 / 1910
-(41.1%)**.
+Previous published snapshot: weighted **65.0%** / unweighted **82.3%**, machine recipes **763 / ~2009
+(38.0%)**, blocks **714 / 1169 (61.1%)**, items **1949 / 1863 (104.6%)**, vanilla **823 / 1950 (42.2%)**,
+reachability **806 / 1949 (41.4%)**.
 
-### Machine recipes: 666 → 763 (33.2% → 38.0%)
+### Machine recipes: 763 → 786 (38.0% → 39.1%)
 
-CE denom stayed **2009**. Port +97 (assembler JSON + Java tables). No census-method cheat.
+CE denom stayed **2009**. Port +23 (14 assembler JSON + 9 Java). No census-method cheat.
 
-JSON: assembler **150 → 182** leftover doors / oil-chain / warheads / cyclotron (`AssemblyMachineRecipes.java:189-214`
-doors, `:281-309` oil, `:459` cyclotron, `:811-819` warheads). Slugs lowercase. Existing assembler
-JSON not overwritten (generator circuit-count flatten is lossy). Tags emit as
-`{"item":{"tag":"hbm:any_plastic"}}` — first boot dropped 6 files that used `"item":"tag:hbm:…"`.
-Shredder 92, breeder 30 unchanged. Machine JSON total 304.
+JSON: assembler **182 → 196**. New leftovers (`AssemblyMachineRecipes.java:245` `ass.precass`;
+`:569-578` fusion component flatten 0/2/3; `:683` `ass.exobomb` → existing `therm_exo`;
+`:793-798` warheadinc; `:969-1009` sat_base + 5 sat heads). Slugs lowercase. Existing assembler
+JSON not overwritten. Circuit-count flatten fixed (`circuit, N, EnumCircuitType`) for new files.
+`fluid_barrel_full` + `Fluids.X.getID()` no longer early-returns as fluid. Tags still
+`{"item":{"tag":"hbm:…"}}`. Shredder 92, breeder 30 unchanged. Machine JSON total 318.
 
 Java:
 
 | Class | Now | Notes |
 |---|---:|---|
-| ArcWelderRecipes | 42 | CE `ArcWelderRecipes.java:59-65` neutron_reflector; `:166-215` thrusters/tanks; `:217-364` 18 missiles. 5 satellites still blocked (`sat_base` / `sat_head_*`) |
-| SolderingRecipes | 26 | CE complete (no 528/LBSM). `upgrade_template` family `:192-282` (MINGRADE.dust → `powder_red_copper`). Glowstone = `Items.GLOWSTONE_DUST`. + 5+5 first/second upgrades `:284-329` |
-| PlasmaForgeRecipes | 31 | CE `PlasmaForgeRecipes.java:113-237` ICF laser flatten + component metas 0/1/3 + DFC five. Skipped fusionvessel / schrabhammer / fensusan / gerald. `icf_controller` → existing `machine_icf_controller` |
-| AmmoPressRecipes | 60 | 55 generated + 5 hand (`flame_diesel`/`gas`/`balefire`, `tau_uranium`, `coil_tungsten` — CE `:936+`/`:1024`/`:1038`). Did not re-add a second `coil_ferrouranium` (already generated) |
+| ArcWelderRecipes | 47 | CE complete. `:366-400` EnumSatType flatten → existing `sat_mapper`/`scanner`/`radar`/`laser`/`resonator` |
+| SolderingRecipes | 26 | CE complete (no 528/LBSM). Unchanged |
+| PlasmaForgeRecipes | 35 | CE complete. `:98` fusionvessel → `fusion_torus` + `fusion_component_{0,2,3}`; `:161` schrabhammer → `schrabidium_hammer` + `schrabidium_block` (suffix-first, not `block_schrabidium`); `:176` fensusan → `machine_battery_redd`; `:202` gerald → `sat_gerald`. Multi-input (11–12 stacks) counted; TE still 6 slots |
+| AmmoPressRecipes | 60 | Unchanged. Did not re-add a second `coil_tungsten` |
 | others | ~304 | chem/solidifier/PA/PUREX/liquefaction/centrifuge/… unchanged |
 
-### Blocks: 680 → 714 (58.2% → 61.1%)
+### Vanilla crafting: 823 → 838 (42.2% → 43.0%)
 
-Casings only (no new TE) unless noted. Cubes reuse `block_steel`.
+Table-driven leftover CE crafts in `data/hbm/recipe/ce_craft/` (not ModRecipeProvider Java).
+`scripts/phase11_leftover_craft.py`.
 
-- Doors — CE `AssemblyMachineRecipes.java:189-214`: `sliding_blast_door_legacy`, `large_vehicle_door`,
-  `water_door`, `qe_containment`, `qe_sliding_door`, `round_airlock_door`, `secure_access_door`,
-  `sliding_seal_door`, `cargo_door`, `silo_hatch`, `silo_hatch_large`, `transition_seal`
-- Oil leftovers — CE `:281-309`: `machine_flare`, `machine_catalytic_cracker`, `machine_coker`,
-  `machine_vacuum_distill`, `machine_catalytic_reformer`, `machine_hydrotreater`, `machine_radiolysis`
-- ICF/DFC — CE `ModBlocks.java:1331-1348` / `PlasmaForgeRecipes.java:113-237` / `EnumICFPart`
-  CASING/PORT/CELL/EMITTER/CAPACITOR/TURBO: `icf_laser_component_*`, `icf_component_0/1/3`,
-  `struct_icf_core`, `dfc_{core,emitter,receiver,injector,stabilizer}`
+- PowderRecipes.java:25 / :29-30 / :40-41 / :72 — `ballistite`, `powder_semtex_mix` (both legs),
+  gunpowder from niter+sulfur, `powder_fertilizer` (niter/sulfur now exist)
+- ConsumableRecipes.java:73 / :77 / :130 — `can_smart`, `can_overcharge`, `xanax` (non-LBSM)
+- CraftingManager.java:646 / :650 / :660-661 / :691-692 — `photo_panel`, `sat_chip`,
+  `machine_transformer`, `machine_transformer_dnt`, sliding-blast-door legacy convert
 
-ICF TE already existed. Full laser/DFC multiblock later. Extra machine casings with existing TEs
-already had blocks — nothing cheap left there.
+Skipped fluids / chem-set / ItemScraps / LBSM. Did not overwrite generated `powder/` files.
+
+### Blocks: 714 → 724 (61.1% → 61.9%)
+
+Casings only (no new TE). Cubes reuse `block_steel` except transformers (existing cube_bottom_top).
+
+- Fusion — CE `ModBlocks.java:1318-1319` / `PlasmaForgeRecipes.java:98`: `fusion_torus`,
+  `fusion_component_0/2/3` (BlockFusionComponent metas 0/2/3)
+- Precass — CE `:1057` / `AssemblyMachineRecipes.java:245`: `machine_precass`
+- FEnSU — CE `:970` / PlasmaForge `:176`: `machine_battery_redd`
+- Transformers — CE `:979-982` BlockBase: `machine_transformer`, `_20`, `_dnt`, `_dnt_20`
 
 ### Items that unblocked recipes
 
-CE `ModItems.java:1842` `upgrade_template`; `:1861` `neutron_reflector`; `:2461` / `:2492-2535`
-missile parts (`missile_assembly`, thruster/tank s/m/l, 12 conventional warheads + nuclear/mirv/volcano).
+CE `ModItems.java:1302` / `:2525-2529` — `sat_base`, `sat_head_{mapper,scanner,radar,laser,resonator}`.
+`:1301` `photo_panel`. PowderRecipes.java:25 `ballistite`. `any_smokeless` tag now includes ballistite.
 
 Did **not** re-register `powder_sawdust`, `gem_tantalium`, or a second `coil_tungsten`.
 
-Reachability **785/1910 → 806/1949 (41.4%)**. Item count rose because `parts`/`parts1` now hit
-`extract_all_ids` plus the new BlockItems.
+Reachability **806/1949 → 821/1963 (41.8%)**.
 
-No invented art (machine cubes reuse `block_steel`).
+No invented art.
 
 ## Exclusion list (only CE-lacks or deliberate skips)
 
@@ -107,20 +114,20 @@ No invented art (machine cubes reuse `block_steel`).
 - PUREX chance-output / ICF / vitrification / naquadria — missing I/O
 - Full Albion beam physics — detector runs the recipe table locally
 - AmmoPress fluid-slot recipes (FLAME_*) — stored, not consumed (no tank on the press)
-- ArcWelder 5 satellites (`sat_base` / `sat_head_*`) — items missing
-- PlasmaForge fusionvessel / schrabhammer / fensusan / gerald — items missing
-- Assembler `machine_precass` — still missing
-- Circuit counts on some leftover assembler rows still flatten to ×1 unless hand-fixed
+- PlasmaForge late-game recipes with 11–12 item stacks — counted, TE still 6 slots
+- Assembler `satelliterelay` — `thruster_nuclear` missing
+- ~169 leftover assembler still skipped (missing blocks / ore-or-fluid / unresolved)
+- Older leftover assembler rows may still have circuit flatten ×1 (new files this pass are correct)
 
 ## Recipe-graph reachability (cheap)
 
-806 / 1949 port item ids appear as a recipe `result`/`output` or loot `item`/`name`. Not a survival
-walk from dirt. Treat 41.4% as a ceiling-ish lower bound on “registered but dead.”
+821 / 1963 port item ids appear as a recipe `result`/`output` or loot `item`/`name`. Not a survival
+walk from dirt. Treat 41.8% as a ceiling-ish lower bound on “registered but dead.”
 
 ## Next single gap (not this session)
 
-Still machine recipes: leftover assembler (`machine_precass` / more skipped 180-ish), ArcWelder
-satellites, PlasmaForge late-game tools, vanilla crafting 42.2%. Blocks 61.1%.
+Still machine recipes: leftover assembler (~169 skipped — `machine_arc_furnace` / `machine_supercomputer`
+/ compressors / satlink / teleporter / …), vanilla crafting 43.0%. Blocks 61.9%. Weighted 65.8% ≠ 90%.
 
 ## Entities (Phase 9 leftovers)
 

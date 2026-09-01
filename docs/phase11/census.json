@@ -1,20 +1,20 @@
 {
-  "weighted_pct": 62.8,
-  "unweighted_pct": 81.1,
+  "weighted_pct": 65.8,
+  "unweighted_pct": 82.7,
   "ce_sum": 7767,
-  "port_sum": 4876,
+  "port_sum": 5108,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 1910,
-      "pct": 102.5
+      "port": 1963,
+      "pct": 105.4
     },
     {
       "cat": "blocks",
       "ce": 1169,
-      "port": 680,
-      "pct": 58.2
+      "port": 724,
+      "pct": 61.9
     },
     {
       "cat": "fluids",
@@ -37,14 +37,14 @@
     {
       "cat": "vanilla_crafting",
       "ce": 1950,
-      "port": 823,
-      "pct": 42.2
+      "port": 838,
+      "pct": 43.0
     },
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 666,
-      "pct": 33.2
+      "port": 786,
+      "pct": 39.1
     },
     {
       "cat": "advancements",
@@ -59,14 +59,14 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 1910,
+      "port": 1963,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
       "ce": 1169,
       "ce_fields": 1169,
       "ce_string_ctors": 290,
-      "port": 680,
+      "port": 724,
       "method": "phase10 extract_all_ids + ore()/stair/slab helpers"
     },
     "fluids": {
@@ -114,10 +114,10 @@
         "addSlabStair": 25,
         "add9or1": 43
       },
-      "port": 823,
+      "port": 838,
       "by_type": {
-        "minecraft:crafting_shaped": 371,
-        "minecraft:crafting_shapeless": 323,
+        "minecraft:crafting_shaped": 375,
+        "minecraft:crafting_shapeless": 334,
         "minecraft:smelting": 123
       }
     },
@@ -171,10 +171,10 @@
         "SuperComputerRecipes": 14,
         "WasteDrumRecipes": 20
       },
-      "port_json": 272,
+      "port_json": 318,
       "port_java": {
-        "AmmoPressRecipes": 61,
-        "ArcWelderRecipes": 13,
+        "AmmoPressRecipes": 60,
+        "ArcWelderRecipes": 47,
         "CrucibleRecipes": 14,
         "CrystallizerRecipes": 1,
         "HeatRecipes": 2,
@@ -183,9 +183,9 @@
         "MixerRecipes": 1,
         "PUREXRecipes": 51,
         "ParticleAcceleratorRecipes": 10,
-        "PlasmaForgeRecipes": 11,
+        "PlasmaForgeRecipes": 35,
         "PyroOvenRecipes": 10,
-        "SolderingRecipes": 9,
+        "SolderingRecipes": 26,
         "SolidificationRecipes": 49,
         "CentrifugeRecipes": 29,
         "ChemPlantRecipes": 72,
@@ -193,9 +193,9 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 19
       },
-      "port": 666,
+      "port": 786,
       "by_type": {
-        "hbm:assembler": 150,
+        "hbm:assembler": 196,
         "hbm:breeder": 30,
         "hbm:container_upgrade_crate_desh": 1,
         "hbm:container_upgrade_crate_tungsten": 1,
@@ -211,10 +211,10 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 1910,
-      "reachable_via_recipe_or_loot": 785,
-      "pct": 41.1
+      "port_items": 1963,
+      "reachable_via_recipe_or_loot": 821,
+      "pct": 41.8
     }
   },
-  "recipe_json_total": 1095
+  "recipe_json_total": 1156
 }
