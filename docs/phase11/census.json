@@ -2,7 +2,7 @@
   "weighted_pct": 96.4,
   "unweighted_pct": 98.2,
   "ce_sum": 7767,
-  "port_sum": 7490,
+  "port_sum": 7489,
   "rows": [
     {
       "cat": "items",
@@ -37,7 +37,7 @@
     {
       "cat": "vanilla_crafting",
       "ce": 1950,
-      "port": 1867,
+      "port": 1866,
       "pct": 95.7
     },
     {
@@ -114,9 +114,9 @@
         "addSlabStair": 25,
         "add9or1": 43
       },
-      "port": 1867,
+      "port": 1866,
       "by_type": {
-        "minecraft:crafting_shaped": 1008,
+        "minecraft:crafting_shaped": 1007,
         "minecraft:crafting_shapeless": 718,
         "minecraft:smelting": 135
       }
@@ -236,9 +236,9 @@
     },
     "reachability": {
       "port_items": 2354,
-      "reachable_via_recipe_or_loot": 1203,
+      "reachable_via_recipe_or_loot": 1202,
       "pct": 51.1
     }
   },
-  "recipe_json_total": 2625
+  "recipe_json_total": 2624
 }

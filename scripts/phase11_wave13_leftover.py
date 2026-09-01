@@ -12,7 +12,11 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 OUT = REPO / "src/main/resources/data/hbm/recipe/ce_craft"
-SKIP_RESULTS = {"powder_sawdust", "gem_tantalium", "coil_tungsten"}
+SKIP_RESULTS = {
+    "powder_sawdust", "gem_tantalium", "coil_tungsten",
+    # DataComponentType id in HbmDataComponents — not an item
+    "gas_mask_filter",
+}
 
 
 def shaped(path, result, count, pattern, key):

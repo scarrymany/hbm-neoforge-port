@@ -15,7 +15,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **96.4%** (7490 / 7767) |
+| **Weighted** (Σport / ΣCE) | **96.4%** (7489 / 7767) |
 | **Unweighted** (mean of category %) | **98.2%** |
 | Recipe/loot reachability of port items | **51.1%** (1203 / 2354) |
 | CE `@AutoRegister` entities still missing | **none** |
@@ -24,7 +24,7 @@ Weighted is **above ~90%** (need 6990). **Do not cut a 90% GitHub Release** unle
 `compileJava` + `runServer` Done + `runClient` past MenuScreens all pass on this HEAD.
 Existing `beta-82` / `beta-82.1` stay as playtest tags.
 
-Largest remaining holes: **blocks 379**, **machine 327**, **vanilla 83**.
+Largest remaining holes: **blocks 379**, **machine 327**, **vanilla 84**.
 
 ## Per-category
 
@@ -35,14 +35,14 @@ Largest remaining holes: **blocks 379**, **machine 327**, **vanilla 83**.
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 1867 | **95.7%** | CE estimate kept at 1950. +451 JSON this wave (minerals / rods leftover / tool / armor / consumable / exclusive) |
+| Vanilla crafting | ~1950 | 1866 | **95.7%** | CE estimate kept at 1950. +450 JSON this wave (minerals / rods leftover / tool / armor / consumable / exclusive) |
 | Machine recipes | ~2009 | 1682 | **83.7%** | CE denom unchanged. Assembler skip **7** + pack/unpack already closed |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (86.8% → 96.4%)
+## What changed this wave (86.8% → 96.4%, 7489 / 7767)
 
 Previous published snapshot: weighted **86.8%** / unweighted **93.3%**, vanilla **1416 / 1950
 (72.6%)**, machine **1682 / 83.7%**, items **2056**, blocks **790**. Short of 90% by **249**.
@@ -63,7 +63,7 @@ etc. Census items **2056 → 2354**. Not dummy registration.
 - `scripts/phase11_wave13_leftover.py` — leftover Tool / Armor / Consumable / Exclusive crafts
   with registered I/O only.
 
-Vanilla **1416 → 1867**. Recipe JSON total **2174 → 2625**. `ce_craft/` ~1044 files.
+Vanilla **1416 → 1866**. Recipe JSON total **2174 → 2624**. Dropped `gas_mask_filter` (DataComponent id, not an item).
 
 Dropped (not invented): armor sets whose pieces are unregistered (`steel_helmet` / hazmat /
 `gas_mask_m65`), `ring_starmetal`, `block_schrabidium`, SEDNA `part_stock_*` / `part_grip_*`,
