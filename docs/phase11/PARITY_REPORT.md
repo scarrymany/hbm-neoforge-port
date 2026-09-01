@@ -148,7 +148,7 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**51.1%** (1203 / 2354). Prior published: 1010 / 2056 (49.1%).
+**52.3%** (1274 / 2435). Prior: 1203 / 2354 (51.1%).
 
 ## Next single gap
 
