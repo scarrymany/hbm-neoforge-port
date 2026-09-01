@@ -14,11 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * signatures confirmed against the Neo Edition reference's own equivalent {@code FlammableBlock}
  * (same shape, same override signatures) rather than guessed at.
  * <p>
- * <b>No concrete instance is registered from this area.</b> CE itself never constructs a
- * {@code BlockFlammable} anywhere in its own {@code ModBlocks} (confirmed by searching the upstream
- * CE source tree) - it exists in CE only as reusable infrastructure for a fuel/combustible block a
- * future content pass might add. Kept compiled here for the same reason and matching the same
- * precedent as {@link BlockOreMeta}/{@link BlockGenericSlab}.
+ * Concrete CE instance: {@code pile_brick} ({@code BlockPileBrick}, encouragement 30 / flammability 5).
  */
 public class BlockFlammable extends Block {
 

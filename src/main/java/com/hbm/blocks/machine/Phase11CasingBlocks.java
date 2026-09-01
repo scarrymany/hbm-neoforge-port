@@ -45,9 +45,11 @@ public final class Phase11CasingBlocks {
         // machine_pyrooven / machine_exposure_chamber are DummyableProcessBlocks (full TEs).
         // machine_fluidtank / machine_bigasstank are DummyableProcessBlocks (live TE).
         // reactor_research / reactor_zirnox are DummyableProcessBlocks (live TE).
-        registerBlock("seal_frame", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("seal_controller", () -> new BlockBase(MACHINE_PROPS));
+        // seal_frame / seal_controller / seal_hatch are SealBlocks (live controller + hatch TE).
         registerBlock("vitrified_barrel", () -> new BlockBase(MACHINE_PROPS));
+        // fusion_* peripherals + struct_torus_core stay BlockBase — TileEntityFusionTorus needs
+        // KlystronNetwork/PlasmaNetwork/ModuleMachineFusion. Do not stub. CE fusion_core is BlockBase.
+        // watz_element / watz_cooler are CE BlockBase. machine_watz_reactor already live (FusionBlocks).
         registerBlock("struct_torus_core", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("fusion_klystron", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("fusion_collector", () -> new BlockBase(MACHINE_PROPS));
@@ -59,8 +61,9 @@ public final class Phase11CasingBlocks {
         registerBlock("watz_cooler", () -> new BlockBase(MACHINE_PROPS));
         // machine_condenser_powered is DummyableProcessBlocks (live TE).
         // machine_orbus is DummyableProcessBlocks (live TE).
-        // CE ModBlocks.java:664 / ass.pileblock
-        registerBlock("pile_brick", () -> new BlockBase(MACHINE_PROPS));
+        // CE ModBlocks.java:664 / ass.pileblock — BlockPileBrick IToolable, conversion cited skip.
+        registerBlock("pile_brick", () -> new com.hbm.blocks.machine.pile.BlockPileBrick(
+                BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
         // CE ModBlocks.java:706 / :711 — leftover nuke casings (no TE)
         registerBlock("nuke_solinium", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("nuke_fstbmb", () -> new BlockBase(MACHINE_PROPS));
