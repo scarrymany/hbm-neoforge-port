@@ -148,8 +148,8 @@ Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
   Leftover later: seal_*, pile_brick, solinium/fstbmb.
 
 Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
-+ runServer **Done (1.915s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
-No physical place. No Exception/ERROR.
++ runServer **Done (1.675s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
+No physical place. No Exception/ERROR. `turret_arty` / `turret_himars`.
 
 ## Prior wave (reactor_research / reactor_zirnox)
 
