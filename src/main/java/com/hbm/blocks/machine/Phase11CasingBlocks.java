@@ -46,7 +46,7 @@ public final class Phase11CasingBlocks {
         // machine_fluidtank / machine_bigasstank are DummyableProcessBlocks (live TE).
         // reactor_research / reactor_zirnox are DummyableProcessBlocks (live TE).
         // seal_frame / seal_controller / seal_hatch are SealBlocks (live controller + hatch TE).
-        registerBlock("vitrified_barrel", () -> new BlockBase(MACHINE_PROPS));
+        // vitrified_barrel is GenericCrateBlocks (YellowBarrel, idle rad 0.5/5).
         // fusion_* peripherals + struct_torus_core stay BlockBase — TileEntityFusionTorus needs
         // KlystronNetwork/PlasmaNetwork/ModuleMachineFusion. Do not stub. CE fusion_core is BlockBase.
         // watz_element / watz_cooler are CE BlockBase. machine_watz_reactor already live (FusionBlocks).
@@ -64,9 +64,7 @@ public final class Phase11CasingBlocks {
         // CE ModBlocks.java:664 / ass.pileblock — BlockPileBrick IToolable, conversion cited skip.
         registerBlock("pile_brick", () -> new com.hbm.blocks.machine.pile.BlockPileBrick(
                 BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
-        // CE ModBlocks.java:706 / :711 — leftover nuke casings (no TE)
-        registerBlock("nuke_solinium", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("nuke_fstbmb", () -> new BlockBase(MACHINE_PROPS));
+        // nuke_solinium / nuke_fstbmb are NukeCasingBlocks (live TE).
         // turret_arty / turret_himars are TurretBlocks (live Dummyable TE).
         // barrel_steel is DummyableProcessBlocks (live TE).
         // machine_satlinker is DummyableProcessBlocks (live TE, missile tab). ≠ machine_satlink.

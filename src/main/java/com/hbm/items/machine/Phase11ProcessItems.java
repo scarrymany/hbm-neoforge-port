@@ -52,6 +52,8 @@ public final class Phase11ProcessItems {
     public static DeferredItem<Item> PART_CARBON;
     public static DeferredItem<Item> PART_COPPER;
     public static DeferredItem<Item> PART_PLUTONIUM;
+    public static DeferredItem<Item> SOLINIUM_IGNITER;
+    public static DeferredItem<Item> SOLINIUM_PROPELLANT;
 
     private Phase11ProcessItems() {
     }
@@ -238,8 +240,8 @@ public final class Phase11ProcessItems {
         // CE ModItems.java:2521 / ass.gadget
         parts("pedestal_steel");
         // CE ModItems.java:2397-2398 / ass.solinium*
-        nuke1("solinium_igniter");
-        nuke1("solinium_propellant");
+        SOLINIUM_IGNITER = nuke1("solinium_igniter");
+        SOLINIUM_PROPELLANT = nuke1("solinium_propellant");
         // CE ModItems.java:417 / ass.emptypackage
         control("fluid_pack_empty");
         // CE ModItems.java:2490 / ass.lander

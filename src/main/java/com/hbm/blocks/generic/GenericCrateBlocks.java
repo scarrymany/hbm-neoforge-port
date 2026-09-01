@@ -26,8 +26,8 @@ import java.util.function.Supplier;
  * table-driven-{@code registerAll()} shape.
  * <p>
  * <b>{@code BaseBarrel} / {@link RedBarrel} / {@link YellowBarrel}.</b> CE never registers a plain
- * {@code BaseBarrel} — only Red/Pink/LOX/Taint ({@code RedBarrel}) and {@code yellow_barrel}.
- * Phase 8 registers those CE ids (nuke tab, 0.5F/2.5F) plus the Phase-1 placeholder {@code barrel}.
+ * {@code BaseBarrel} — only Red/Pink/LOX/Taint ({@code RedBarrel}) and
+ * {@code yellow_barrel}/{@code vitrified_barrel} ({@code YellowBarrel}).
  * <p>
  * <b>{@link BlockCrate}/{@link BlockAmmoCrate}/{@link BlockCanCrate}/{@link BlockJungleCrate}'s empty
  * loot pools.</b> Each of those classes' own javadoc already documents why their drop pools are wired
@@ -96,6 +96,7 @@ public final class GenericCrateBlocks {
     public static DeferredBlock<RedBarrel> LOX_BARREL;
     public static DeferredBlock<RedBarrel> TAINT_BARREL;
     public static DeferredBlock<YellowBarrel> YELLOW_BARREL;
+    public static DeferredBlock<YellowBarrel> VITRIFIED_BARREL;
 
     private static DeferredBlock<BlockSupplyCrate> CRATE_SUPPLY;
     private static DeferredBlock<BlockCrate> CRATE_STANDARD;
@@ -122,6 +123,8 @@ public final class GenericCrateBlocks {
         LOX_BARREL = registerBlock("lox_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.LOX), ModCreativeTabs.NUKE);
         TAINT_BARREL = registerBlock("taint_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.TAINT), ModCreativeTabs.NUKE);
         YELLOW_BARREL = registerBlock("yellow_barrel", () -> new YellowBarrel(barrelProps()), ModCreativeTabs.NUKE);
+        // CE ModBlocks.java:752 — same YellowBarrel class, idle rad 0.5/5 (see YellowBarrel.tick).
+        VITRIFIED_BARREL = registerBlock("vitrified_barrel", () -> new YellowBarrel(barrelProps()), ModCreativeTabs.NUKE);
     }
 
     private static void registerCrates() {

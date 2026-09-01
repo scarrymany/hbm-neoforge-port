@@ -32,6 +32,7 @@ public final class NukeCasingBlockEntities {
     public static Supplier<BlockEntityType<NukePrototypeBlockEntity>> NUKE_PROTOTYPE;
     public static Supplier<BlockEntityType<NukeFleijaBlockEntity>> NUKE_FLEIJA;
     public static Supplier<BlockEntityType<NukeBalefireBlockEntity>> NUKE_BALEFIRE;
+    public static Supplier<BlockEntityType<NukeSoliniumBlockEntity>> NUKE_SOLINIUM;
     public static Supplier<BlockEntityType<NukeCustomBlockEntity>> NUKE_CUSTOM;
     public static Supplier<BlockEntityType<CrashedBombBlockEntity>> CRASHED_BOMB;
 
@@ -79,9 +80,15 @@ public final class NukeCasingBlockEntities {
                 NukeCasingBlocks.NUKE_FLEIJA.get()
         ).build(null));
 
+        // CE TileMappings: "tileentity_nuke_fstbmb". Keep nuke_balefire — already live flatten id.
         NUKE_BALEFIRE = ModBlocks.BLOCK_ENTITY_TYPES.register("nuke_balefire", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new NukeBalefireBlockEntity(NUKE_BALEFIRE.get(), pos, state),
-                NukeCasingBlocks.NUKE_BALEFIRE.get()
+                NukeCasingBlocks.NUKE_BALEFIRE.get(), NukeCasingBlocks.NUKE_FSTBMB.get()
+        ).build(null));
+
+        NUKE_SOLINIUM = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_nuke_solinium", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new NukeSoliniumBlockEntity(NUKE_SOLINIUM.get(), pos, state),
+                NukeCasingBlocks.NUKE_SOLINIUM.get()
         ).build(null));
 
         NUKE_CUSTOM = ModBlocks.BLOCK_ENTITY_TYPES.register("nuke_custom", () -> BlockEntityType.Builder.of(

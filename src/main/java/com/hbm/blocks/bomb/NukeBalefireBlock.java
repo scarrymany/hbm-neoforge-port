@@ -9,13 +9,19 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Ported from CE's {@code NukeBalefire} (128 lines, read in full) - unlike the other 8 casings this
@@ -70,5 +76,12 @@ public class NukeBalefireBlock extends NukeCasingBlockBase {
             ModContext.DETONATOR_CONTEXT.remove();
         }
         return BombReturnCode.DETONATED;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("trait.balefirebomb").withStyle(ChatFormatting.GREEN));
+        tooltip.add(Component.literal(" ").append(
+                Component.translatable("desc.radius", 250).withStyle(ChatFormatting.YELLOW)));
     }
 }
