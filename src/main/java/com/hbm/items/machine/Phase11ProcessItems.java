@@ -25,7 +25,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * {@code :1994-2000} debris_* (ShredderRecipes.java:208/:347/:405-410),
  * {@code sawblade}/{@code mold_base}/{@code deuterium_filter}/{@code egg_glyphid}/
  * {@code flame_pony}/{@code blade_titanium}/{@code blade_tungsten}/{@code blade_meteorite}
- * (Anvil leftover I/O). {@code wings_*} live in {@code JetpackItems} as {@code WingsMurk}.
+ * (Anvil leftover I/O). {@code lignite} CE {@code ItemFuel} 1200 ({@code ModItems.java:1339}).
+ * {@code wings_*} live in {@code JetpackItems} as {@code WingsMurk}.
  */
 public final class Phase11ProcessItems {
 

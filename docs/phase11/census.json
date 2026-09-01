@@ -1,14 +1,14 @@
 {
-  "weighted_pct": 106.1,
-  "unweighted_pct": 104.0,
+  "weighted_pct": 106.2,
+  "unweighted_pct": 104.1,
   "ce_sum": 7767,
-  "port_sum": 8237,
+  "port_sum": 8246,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2607,
-      "pct": 139.9
+      "port": 2612,
+      "pct": 140.2
     },
     {
       "cat": "blocks",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1920,
-      "pct": 95.6
+      "port": 1924,
+      "pct": 95.8
     },
     {
       "cat": "advancements",
@@ -59,7 +59,7 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2607,
+      "port": 2612,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
@@ -171,7 +171,7 @@
         "SuperComputerRecipes": 14,
         "WasteDrumRecipes": 20
       },
-      "port_json": 859,
+      "port_json": 863,
       "port_java": {
         "AmmoPressRecipes": 88,
         "AnnihilatorRecipes": 15,
@@ -219,9 +219,9 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 95
       },
-      "port": 1920,
+      "port": 1924,
       "by_type": {
-        "hbm:assembler": 628,
+        "hbm:assembler": 632,
         "hbm:breeder": 30,
         "hbm:container_upgrade_crate_desh": 1,
         "hbm:container_upgrade_crate_tungsten": 1,
@@ -237,11 +237,11 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2607,
-      "reachable_via_recipe_or_loot": 1649,
+      "port_items": 2612,
+      "reachable_via_recipe_or_loot": 1656,
       "includes_machine_tables": true,
-      "pct": 63.3
+      "pct": 63.4
     }
   },
-  "recipe_json_total": 2757
+  "recipe_json_total": 2761
 }

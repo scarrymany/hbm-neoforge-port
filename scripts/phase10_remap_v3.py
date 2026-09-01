@@ -37,7 +37,7 @@ HELPERS = re.compile(
     r'registerBillet|registerPowder|registerFuelPowder|registerParts|registerWaste|'
     r'registerRtgPellet|registerResource|'
     r'registerUpgrade|tab\([^,]+,\s*reg|'
-    r'\breg|parts1|partsHot|parts)\(\s*"([a-z][a-z0-9_]*)"'
+    r'\breg|parts1|partsHot|parts|fuel)\(\s*"([a-z][a-z0-9_]*)"'
 )
 ANY_REG = re.compile(r'\.register\(\s*"([a-z][a-z0-9_]*)"')
 BARE_REG = re.compile(r'(?<![A-Za-z])register\(\s*"([a-z][a-z0-9_]*)"')

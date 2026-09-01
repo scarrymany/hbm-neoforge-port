@@ -4,29 +4,29 @@
 is stale. Do not quote Phase 6 as current.
 
 Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_parity_census.py`
-(item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
+(item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1`/`fuel` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.609s)** on wiped world port 25566, **4047 recipes**
-(anvil is Java table, not JSON — count unchanged). No recipe parse errors. No new tag.
+`./gradlew runServer` **Done (5.375s)** on wiped world port 25566, **4051 recipes**
+(+4 assembler JSON; anvil is Java table). No recipe parse errors. No new tag.
 `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **106.1%** (8237 / 7767) |
-| **Unweighted** (mean of category %) | **104.0%** |
-| Recipe/loot + machine-table + ItemPools reachability | **63.3%** (1649 / 2607) |
+| **Weighted** (Σport / ΣCE) | **106.2%** (8246 / 7767) |
+| **Unweighted** (mean of category %) | **104.1%** |
+| Recipe/loot + machine-table + ItemPools reachability | **63.4%** (1656 / 2612) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 154**, **machine 89**, **vanilla 52**.
-Weighted **106.1%**. Reachability **63.3%** — still the owner pain. Not a tag.
+Largest remaining holes: **blocks 154**, **machine 85**, **vanilla 52**.
+Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -34,19 +34,41 @@ Weighted **106.1%**. Reachability **63.3%** — still the owner pain. Not a tag.
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2607 | **140.0%** | +`blade_titanium`/`blade_tungsten`/`blade_meteorite` |
+| Items (flattened ids) | 1863 | 2612 | **140.2%** | +`lignite` + `fuel()` helper |
 | Blocks | 1169 | 1015 | **86.8%** | casings now live TE (same ids) |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950 |
-| Machine recipes | ~2009 | 1920 | **95.6%** | +anvil Java table. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201/200**. Cyclotron **42=42**. Anvil unique **118 / 200** `stack("id")` / honest **168 / 200**. Centrifuge 75/78 AE2 skip. |
+| Machine recipes | ~2009 | 1924 | **95.8%** | +4 assembler JSON. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201/200**. Cyclotron **42=42**. Anvil unique **122 / 200** `stack("id")` / honest **168 / 200**. Centrifuge 75/78 AE2 skip. |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (live casings + WingsMurk + 2 Anvil rows)
+## What changed this wave (OreEnum drops + assembler fluids + pile_rod_mk2)
+
+- Reachability **63.3% → 63.4%** (1649 / 2607 → 1656 / 2612). Items **2607 → 2612**.
+- Flatten-holders **already flattened** — no dummy `circuit`/`shell`/`pipe`/`wire_fine`/
+  `plate_welded`/`gear_large`/`battery_sc`/`pile_rod`/`mold` ids. No mold meta 16–28
+  TODO(CE: AnvilRecipes.java:626-635). Anvil construct `pile_rod_mk2_{ra226be,po210be,zr,nu}`
+  CE `:880-895`. Unique **118 → 122**. Honest **168 / 200**.
+- Assembler SKIP7: **4 landed** (`hpcondenser` / `himarssmalltb` / `himarslargetb` /
+  `mpw10taint`) via live `input_fluids`. **3 cited**:
+  `ass.nitra` ChanceOutput TODO(CE: AssemblyMachineRecipes.java:1073-1087),
+  `ass.digimemer` commented Mekanism TODO(CE: AssemblyMachineRecipes.java:1100-1113),
+  `ass.50bmgbypass` `black_diamond` ItemModHealth TODO(CE: AssemblyMachineRecipes.java:936-938).
+- CE `OreEnum` / `BlockOreBasalt` drops wired (items exist): sulfur / niter / fluorite /
+  lignite / asbestos / chunk_ore_rare / cinnabar / oil_tar_crude / nugget_zirconium /
+  phosphorus-nether (`ingot_phosphorus` 1/10 else `powder_fire`). Matching loot JSON
+  (census). `getDrops` is the live path; fortune stays `0` like cobalt/coltan.
+  `ore_nether_cobalt` / `ore_gneiss_rare` stay CE-null.
+- `lignite` = CE `ItemFuel` 1200 (`ModItems.java:1339`). Model copied; **no CE png**
+  (do not invent art). Lang already in tree.
+- Cited stays: hot/mold/cyanide/rename, deuterium tower fluid AStack, chimney ashpit,
+  thresher arm/shred, BMPowerBox control panel, wings client model.
+
+## Prior wave (live casings + WingsMurk + 2 Anvil rows)
 
 - Reachability **63.3% → 63.3%** (1648 / 2604 → 1649 / 2607). Items **2604 → 2607**.
 - Distinct leftover I/O with CE assets: `blade_titanium`/`blade_tungsten` ItemBase,
@@ -202,7 +224,7 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
   JSON `recipes.add` helper. ElectrolyserMetal 21/23.
   Cited leftovers: SILEX DRX `:417-431` (`undefined`), SuperComputer dropdown.
 - Blocks **790 / 67.6%**. No dummy blocks.
-- Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
+- Assembler skip **3** (fluid-dict four landed this wave). `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Client NPE fix (`CrucibleBlocks.registerAll` + `SafeMenuScreens`) from prior HEAD.
 
 ## Exclusion list (only CE-lacks or deliberate skips)
@@ -222,9 +244,8 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 - Full Albion beam physics — detector runs the recipe table locally
 - AmmoPress fluid-slot recipes (FLAME_*) — stored, not consumed (no tank on the press)
 - PlasmaForge late-game recipes with 11–12 item stacks — counted, TE still 6 slots
-- Assembler leftover skip **7**: `Fluids.X.getDict` ore stacks (hpcondenser / himars TB ×2 / mpw10taint),
-  `ass.nitra` ChanceOutput, `ass.digimemer` (commented Mekanism in CE), `ass.50bmgbypass`
-  (`black_diamond` is `ItemModHealth`, not a dummy)
+- Assembler leftover skip **3**: `ass.nitra` ChanceOutput, `ass.digimemer` (commented Mekanism in CE), `ass.50bmgbypass`
+  (`black_diamond` is `ItemModHealth`, not a dummy). Fluid-dict four now have JSON.
 - Combination coke/briquette/powder_ash item flatten — put sites present, AIR filtered
 - Blast `meteorite_sword_*` — items missing, row dropped after register
 - RockMill AE2 module / blueprint cycling — auto-detect instead
@@ -279,14 +300,14 @@ Before this wave: **62.4%** (1615 / 2590). +27 items / +6 blocks from leftover a
 
 ## Next single gap
 
-**Anvil** unique leftover: CE **200** vs port **116** `stack("id")` / honest **166 / 200**.
-Remaining 34 wait on hot/mold (`AnvilSmithingHotRecipe` / `AnvilSmithingMold` + mold meta
-16–28), flask infusion meta, `machine_deuterium_tower` fluid AStack, flatten holders.
-TODO(CE: AnvilRecipes.java:75-130). Do not invent.
+**Anvil** unique leftover: CE **200** vs port **122** `stack("id")` / honest **168 / 200**.
+Remaining 32 wait on hot/mold (`AnvilSmithingHotRecipe` / `AnvilSmithingMold` + mold meta
+16–28), `machine_deuterium_tower` fluid AStack, flatten holders.
+TODO(CE: AnvilRecipes.java:75-130) / TODO(CE: AnvilRecipes.java:626-635). Do not invent.
 
 Next other family by unique CE vs port (not regex 145-style): Press **41/38**,
 Combination ~done, Exposure done, Liquefaction leftovers landed, Solidification live.
-Assembler skip 7. `v0.0.1-rc2` stays.
+Assembler skip 3. Reachability **63.4%** still the owner pain. `v0.0.1-rc2` stays.
 Anvil E2E: smithing consume/produce **yes** (menu slots). Construction **yes**
 (`AnvilCraftPacket` + player inv). GUI blit CE `gui_anvil.png`, not gray-box.
 
