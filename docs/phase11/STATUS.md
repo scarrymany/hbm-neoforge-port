@@ -10,6 +10,6 @@
 - Reachability **52.4%** (1348 / 2574) — JSON/loot only; machine tables not in that graph.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Weighted ≥99% is a gate. Not content-complete.
-- Verified: `compileJava` 0. runServer pending this commit.
+- Verified: `compileJava` 0, `runServer` **Done (5.303s)** / 3946 recipes, port 25566. No parse errors.
 - No new Release unless ChemPlant table actually runs (it already does — no tag).
 - `master` untouched.
