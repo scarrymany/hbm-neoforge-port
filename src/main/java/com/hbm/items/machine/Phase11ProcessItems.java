@@ -10,6 +10,7 @@ import com.hbm.items.food.ItemLemon;
 import com.hbm.items.special.ItemConsumable;
 import com.hbm.items.special.ItemFuel;
 import com.hbm.items.special.ItemHot;
+import com.hbm.items.weapon.ItemArtyShell;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -255,11 +256,19 @@ public final class Phase11ProcessItems {
         weapon1("ammo_himars_small_lava");
         weapon1("ammo_himars_large");
         weapon1("ammo_himars_large_tb");
-        // CE ItemAmmoArty meta 9/10/11 / ass.shell*
-        weapon1("ammo_arty_normal");
-        weapon1("ammo_arty_chlorine");
-        weapon1("ammo_arty_phosgene");
-        weapon1("ammo_arty_mustard");
+        // CE ItemAmmoArty metas 0–11 / WeaponRecipes.java:240-248
+        weaponArty("ammo_arty_normal");
+        weaponArty("ammo_arty_classic");
+        weaponArty("ammo_arty_he");
+        weaponArty("ammo_arty_mini_nuke");
+        weaponArty("ammo_arty_nuke");
+        weaponArty("ammo_arty_phosphorus");
+        weaponArty("ammo_arty_mini_nuke_multi");
+        weaponArty("ammo_arty_phosphorus_multi");
+        weaponArty("ammo_arty_cargo");
+        weaponArty("ammo_arty_chlorine");
+        weaponArty("ammo_arty_phosgene");
+        weaponArty("ammo_arty_mustard");
         // CE ModItems.java:1360 / ass.capfritz
         consume("cap_fritz");
         // CE ItemEnums.EnumSecretType / ass.50bmgbypass — CE tab=null
@@ -341,6 +350,12 @@ public final class Phase11ProcessItems {
 
     private static DeferredItem<Item> weapon1(String name) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(1)));
+        CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> weaponArty(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemArtyShell(new Item.Properties().stacksTo(1)));
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }

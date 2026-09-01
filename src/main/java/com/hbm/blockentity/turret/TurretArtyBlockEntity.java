@@ -177,6 +177,9 @@ public class TurretArtyBlockEntity extends TurretBaseArtilleryBlockEntity {
         proj.shoot(vec.x, vec.y, vec.z, (float) getV0(), 0.0F);
         proj.setTarget(tPos.x, tPos.y, tPos.z);
         proj.setType(ArtilleryAmmo.typeOfArty(type.getItem()));
+        if (ArtilleryAmmo.typeOfArty(type.getItem()) == ArtilleryAmmo.ARTY_CARGO) {
+            proj.setCargo(ArtilleryAmmo.getCargo(type, level.registryAccess()));
+        }
         if (mode != MODE_CANNON) proj.setWhistle(true);
         level.addFreshEntity(proj);
         casingDelay = casingDelay();

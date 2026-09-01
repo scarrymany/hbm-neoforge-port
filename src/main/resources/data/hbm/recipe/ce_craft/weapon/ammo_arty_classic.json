@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " D ",
+    "DSD",
+    " D "
+  ],
+  "key": {
+    "D": {
+      "item": "hbm:ball_dynamite"
+    },
+    "S": {
+      "item": "hbm:ammo_arty_normal"
+    }
+  },
+  "result": {
+    "id": "hbm:ammo_arty_classic",
+    "count": 1
+  }
+}

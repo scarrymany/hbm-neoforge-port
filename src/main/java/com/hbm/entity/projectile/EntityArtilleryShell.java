@@ -10,7 +10,11 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
@@ -20,7 +24,6 @@ import net.minecraft.world.phys.Vec3;
 /**
  * CE {@code EntityArtilleryShell}. Course-corrects toward {@code target*} then detonates via {@link ArtilleryAmmo}.
  * TODO(CE: EntityArtilleryShell.java:240-293): ForgeChunkManager ticket — {@link IChunkLoader} stand-in.
- * TODO(CE: EntityArtilleryShell.java:353-366): cargo interact / stuck-in-block.
  * TODO(CE: RenderArtilleryShell — none dedicated): OBJ TESR stays empty this wave.
  */
 public class EntityArtilleryShell extends EntityThrowableNT implements IChunkLoader, IRadarDetectable {
@@ -33,6 +36,7 @@ public class EntityArtilleryShell extends EntityThrowableNT implements IChunkLoa
     private double targetZ;
     private boolean shouldWhistle;
     private boolean didWhistle;
+    private ItemStack cargo = ItemStack.EMPTY;
     private ChunkPos loadedChunkPos = new ChunkPos(0, 0);
 
     public EntityArtilleryShell(EntityType<? extends EntityArtilleryShell> type, Level level) {
@@ -118,6 +122,7 @@ public class EntityArtilleryShell extends EntityThrowableNT implements IChunkLoa
         super.tick();
 
         if (!level().isClientSide) {
+            ArtilleryAmmo.onShellUpdate(this);
             if (!didWhistle && shouldWhistle) {
                 Vec3 motion = getDeltaMovement();
                 double speed = Math.sqrt(motion.x * motion.x + motion.z * motion.z);
@@ -170,6 +175,34 @@ public class EntityArtilleryShell extends EntityThrowableNT implements IChunkLoa
         return true;
     }
 
+    public void setCargo(ItemStack stack) {
+        this.cargo = stack == null ? ItemStack.EMPTY : stack;
+    }
+
+    public ItemStack getCargo() {
+        return cargo;
+    }
+
+    /** CE {@code processInitialInteract} :354-365. */
+    @Override
+    public InteractionResult interact(Player player, InteractionHand hand) {
+        if (!level().isClientSide && !isRemoved()) {
+            if (!cargo.isEmpty()) {
+                if (!player.getInventory().add(cargo.copy())) {
+                    player.drop(cargo.copy(), false);
+                }
+                cargo = ItemStack.EMPTY;
+            }
+            discard();
+        }
+        return InteractionResult.sidedSuccess(level().isClientSide);
+    }
+
+    @Override
+    protected int groundDespawn() {
+        return cargo.isEmpty() ? 1200 : 0;
+    }
+
     @Override
     public RadarTargetType getTargetType() {
         return RadarTargetType.ARTILLERY;
@@ -194,6 +227,9 @@ public class EntityArtilleryShell extends EntityThrowableNT implements IChunkLoa
         tag.putDouble("targetX", targetX);
         tag.putDouble("targetY", targetY);
         tag.putDouble("targetZ", targetZ);
+        if (!cargo.isEmpty()) {
+            tag.put("cargo", cargo.save(registryAccess()));
+        }
     }
 
     @Override
@@ -205,5 +241,8 @@ public class EntityArtilleryShell extends EntityThrowableNT implements IChunkLoa
         targetX = tag.getDouble("targetX");
         targetY = tag.getDouble("targetY");
         targetZ = tag.getDouble("targetZ");
+        cargo = tag.contains("cargo")
+                ? ItemStack.parseOptional(registryAccess(), tag.getCompound("cargo"))
+                : ItemStack.EMPTY;
     }
 }
