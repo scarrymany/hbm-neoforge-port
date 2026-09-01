@@ -55,6 +55,8 @@ public final class OilMeteorPlacedFeatures {
     public static final ResourceKey<PlacedFeature> BARREL = key("barrel");
     public static final ResourceKey<PlacedFeature> SPACESHIP = key("spaceship");
     public static final ResourceKey<PlacedFeature> SATELLITE = key("satellite");
+    public static final ResourceKey<PlacedFeature> GLYPHID_HIVE = key("glyphid_hive");
+    public static final ResourceKey<PlacedFeature> DESERT_ATOM = key("desert_atom");
 
     private OilMeteorPlacedFeatures() {
     }
@@ -76,6 +78,8 @@ public final class OilMeteorPlacedFeatures {
         register(context, BARREL, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.BARREL), SURFACE_MODIFIERS);
         register(context, SPACESHIP, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.SPACESHIP), SURFACE_MODIFIERS);
         register(context, SATELLITE, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.SATELLITE), SURFACE_MODIFIERS);
+        register(context, GLYPHID_HIVE, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.GLYPHID_HIVE), SURFACE_MODIFIERS);
+        register(context, DESERT_ATOM, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.DESERT_ATOM), SURFACE_MODIFIERS);
     }
 
     private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,

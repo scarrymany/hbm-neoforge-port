@@ -39,6 +39,8 @@ public final class OilMeteorBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_DUD_BARREL_WORLDGEN = key("add_dud_barrel_worldgen");
     /** Spaceship wreck + satellite dish after vegetal — CE {@code IWorldGenerator} post-decorate. */
     public static final ResourceKey<BiomeModifier> ADD_SPACESHIP_SATELLITE_WORLDGEN = key("add_spaceship_satellite_worldgen");
+    /** Glyphid hive + desert atom after vegetal — CE {@code IWorldGenerator} post-decorate. */
+    public static final ResourceKey<BiomeModifier> ADD_HIVE_ATOM_WORLDGEN = key("add_hive_atom_worldgen");
 
     private OilMeteorBiomeModifiers() {
     }
@@ -75,6 +77,12 @@ public final class OilMeteorBiomeModifiers {
                 HolderSet.direct(List.of(
                         placedFeatures.getOrThrow(OilMeteorPlacedFeatures.SPACESHIP),
                         placedFeatures.getOrThrow(OilMeteorPlacedFeatures.SATELLITE))),
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
+        context.register(ADD_HIVE_ATOM_WORLDGEN, new AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(List.of(
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.GLYPHID_HIVE),
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.DESERT_ATOM))),
                 GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
     }
 

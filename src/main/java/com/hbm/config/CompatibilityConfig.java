@@ -100,6 +100,7 @@ public class CompatibilityConfig {
     public static ConfigValue<List<? extends String>> BARREL_STRUCTURE_RAW;
     public static ConfigValue<List<? extends String>> SPACESHIP_STRUCTURE_RAW;
     public static ConfigValue<List<? extends String>> SATELLITE_STRUCTURE_RAW;
+    public static ConfigValue<List<? extends String>> ATOM_STRUCTURE_RAW;
 
     static void init(ModConfigSpec.Builder builder) {
         builder.push("mobs");
@@ -346,6 +347,9 @@ public class CompatibilityConfig {
         SATELLITE_STRUCTURE_RAW = builder
                 .comment("Spawns CE's Satellite dish every Nth chunk (1-in-N chance). [CE CompatibilityConfig.satelliteStructure 03.07_satelliteSpawn default 0:500]")
                 .defineListAllowEmpty("satelliteStructure", () -> List.of("minecraft:overworld=500"), entry -> entry instanceof String);
+        ATOM_STRUCTURE_RAW = builder
+                .comment("Spawns CE's DesertAtom power plant every Nth chunk (1-in-N chance). [CE CompatibilityConfig.atomStructure 03.03_atomSpawn default 0:500]")
+                .defineListAllowEmpty("atomStructure", () -> List.of("minecraft:overworld=500"), entry -> entry instanceof String);
 
         builder.pop();
     }
@@ -444,4 +448,5 @@ public class CompatibilityConfig {
     public static Map<String, Integer> barrelStructure() { return spawnMap(BARREL_STRUCTURE_RAW); }
     public static Map<String, Integer> spaceshipStructure() { return spawnMap(SPACESHIP_STRUCTURE_RAW); }
     public static Map<String, Integer> satelliteStructure() { return spawnMap(SATELLITE_STRUCTURE_RAW); }
+    public static Map<String, Integer> atomStructure() { return spawnMap(ATOM_STRUCTURE_RAW); }
 }

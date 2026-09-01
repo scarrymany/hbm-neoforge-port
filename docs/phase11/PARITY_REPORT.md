@@ -81,8 +81,12 @@ landmine / NITAN stay accepted.
 - **Satellite dish** (`:373-374`, not satlink): **0:500**, `temp<1||temp>1.8`.
   Forced 1/1: 8 `deco_titanium` / 6 `deco_beryllium` / 1 `tape_recorder`.
 - FEATURES write-radius 0 clips overflow (no ServerLevel cascade).
-- Cited leftover: hive 256 `GlyphidHive`; desert-atom 0:500
-  `!canRain && temp>=2`. TODO(CE: HbmWorldGen.java:347-368).
+  Same Spaceship/Satellite skip — do not invent a write cascade.
+- **GlyphidHive** (`:347-358`): `enableHives`, overworld, `hiveSpawn` **256**.
+  Schematic 11×5×11. `glyphid_spawner` + glyphid entities. 1/10 infected.
+- **DesertAtom** (`:367-368`): `atomStructure` **0:500**,
+  `!hasPrecipitation && temp>=2`. 5162-cell schematic. Height point `(20,0,16)`
+  + sandstone/terracotta.
 
 Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
 

@@ -111,19 +111,28 @@ public final class CeSchematicPlacer {
     }
 
     /**
+     * Public write used by hive/atom (and {@link #place}). FEATURES write-radius is 0 —
+     * skip cells outside the generating chunk. Do not {@code ServerLevel.setBlock}.
+     */
+    public static boolean setBlockInRegion(WorldGenLevel level, BlockPos pos, BlockState state) {
+        return setBlockSafe(level, pos, state);
+    }
+
+    /**
      * CE {@code IWorldGenerator} wrote the full wreck. 1.21 {@code WorldGenRegion} rejects
      * {@code setBlock} outside the generating write-radius (spaceship 12×46 / satellite 25×31)
      * and logs {@code Detected setBlock in a far chunk}. Skip those cells — do not
      * {@code ServerLevel.setBlock} (creates/cascades chunks at forced 1/1).
      */
-    private static void setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
+    private static boolean setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
         // FEATURES write-radius is 0. ensureCanWrite logs the far-chunk ERROR
         // when it returns false — skip silently instead.
         if (level instanceof WorldGenRegion region) {
             var center = region.getCenter();
-            if ((pos.getX() >> 4) != center.x || (pos.getZ() >> 4) != center.z) return;
+            if ((pos.getX() >> 4) != center.x || (pos.getZ() >> 4) != center.z) return false;
         }
         level.setBlock(pos, state, 3);
+        return true;
     }
 
     private static void fillContainer(WorldGenLevel level, BlockPos pos, RandomSource random, Special special) {

@@ -1,5 +1,6 @@
 package com.hbm.explosion.vanillant.standard;
 
+import com.hbm.blocks.generic.PlantBlocks;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.interfaces.IBlockAllocator;
 import com.hbm.interfaces.Untested;
@@ -74,11 +75,8 @@ public class BlockAllocatorGlyphidDig implements IBlockAllocator {
 
                             if (!state.isAir()) {
                                 float blockResistance = state.getBlock().getExplosionResistance();
-                                // forward reference: com.hbm.blocks.ModBlocks.glyphid_spawner - not registered in
-                                // this port (no Glyphid creature content exists yet). CE's own veto
-                                // ("never dig through the spawner block") is a no-op until that block exists;
-                                // the resistance-budget check above still applies faithfully in the meantime.
-                                if (this.maximum < blockResistance) {
+                                // CE: never dig through ModBlocks.glyphid_spawner (BlockAllocatorGlyphidDig.java:67)
+                                if (this.maximum < blockResistance || state.is(PlantBlocks.GLYPHID_SPAWNER.get())) {
                                     break;
                                 }
                             }

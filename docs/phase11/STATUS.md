@@ -6,7 +6,7 @@
   `this.register` + `.register` double-count. Left ChemPlant alone.
 - Crystallizer unique **303 / ~309** accepted (OreDict/AE2 skips cited).
 - Shredder unique + Cyclotron **42=42** accepted. Cited skips stay.
-- This wave: Dud + Barrel + Spaceship + Satellite dish. `linker` / landmine / NITAN stay
+- This wave: GlyphidHive 1/256 + DesertAtom 0:500. Dud/Barrel/Spaceship/Satellite stay
   accepted. Reachability **63.4% (1657 / 2613)**.
 - **`linker`**: `ItemTeleLink`. stacksTo(1), CONSUMABLE. `DETONATOR_POS` (CE NBT
   x/y/z). Click = set; sneak on teleporter = `target`+`linked=true`, clear.
@@ -39,8 +39,16 @@
   **6** `deco_beryllium` / **1** `tape_recorder`.
 - FEATURES write-radius 0: skip cells outside the generating chunk (do not
   `ServerLevel.setBlock` — cascades). `ensureCanWrite` itself logs far-chunk.
-- Cited leftover: hive 256 `GlyphidHive`; desert-atom 0:500
-  `!canRain && temp>=2`. TODO(CE: HbmWorldGen.java:347-368).
+  Same skip as Spaceship/Satellite 1.21 — no invented ServerLevel cascade.
+- **GlyphidHive** (`GlyphidHive.java` / `HbmWorldGen.java:347-358`):
+  `enableDungeons`+`enableHives`, overworld, `hiveSpawn` **256**. `y =
+  getTopSolidOrLiquidBlock+1`, `k=3..-1` first full cube. 1/10 infected,
+  worldgen loot=true. Schematic 11×5×11. `glyphid_spawner` + TE swarm
+  (all 9 glyphid entity types already registered). Piles
+  `POOL_PILE_BONES` / `POOL_PILE_HIVE`.
+- **DesertAtom** (`DesertAtom001-3` / `:367-368`): `enableDungeons`,
+  `atomStructure` **0:500**, `!hasPrecipitation && temp>=2`. Height/spawn
+  at offset `(20,0,16)` + sandstone + terracotta. Schematic 5162 cells.
 - Sellafield crater `radfreq` 1/5000 + ore veins stay accepted.
 - **Anvil unique**: CE **200** vs port **122** `stack("id")`. Honest **168 / 200**.
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),

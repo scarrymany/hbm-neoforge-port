@@ -17,26 +17,40 @@ public final class CeStructureSpawn {
     }
 
     public static boolean locationIsValidSpawn(WorldGenLevel level, BlockPos airPos, boolean sandstone) {
+        return locationIsValidSpawn(level, airPos, sandstone, false);
+    }
+
+    /**
+     * {@code sandstone} = Dud/Barrel/Bunker/Spaceship/Satellite extra.
+     * {@code terracotta} = DesertAtom {@code HARDENED_CLAY}/{@code STAINED_HARDENED_CLAY}
+     * ({@code DesertAtom001.java}:73-75).
+     */
+    public static boolean locationIsValidSpawn(WorldGenLevel level, BlockPos airPos, boolean sandstone, boolean terracotta) {
         // Only the WorldGenRegion. ServerLevel.getBlockState during FEATURES
         // pulls neighbor protochunks and cascades at forced 1/1.
         if (!level.hasChunk(airPos.getX() >> 4, airPos.getZ() >> 4)) return false;
-        return isValidColumn(level, airPos, sandstone);
+        return isValidColumn(level, airPos, sandstone, terracotta);
     }
 
-    private static boolean isValidColumn(BlockGetter level, BlockPos airPos, boolean sandstone) {
+    private static boolean isValidColumn(BlockGetter level, BlockPos airPos, boolean sandstone, boolean terracotta) {
         if (!level.getBlockState(airPos).isAir()) return false;
         BlockState ground = level.getBlockState(airPos.below());
-        if (isValidSpawnBlock(ground, sandstone)) return true;
+        if (isValidSpawnBlock(ground, sandstone, terracotta)) return true;
         BlockState below = level.getBlockState(airPos.below(2));
-        if (ground.is(Blocks.SNOW) && isValidSpawnBlock(below, sandstone)) return true;
+        if (ground.is(Blocks.SNOW) && isValidSpawnBlock(below, sandstone, terracotta)) return true;
         return (ground.is(BlockTags.REPLACEABLE) || ground.is(BlockTags.SMALL_FLOWERS) || ground.is(BlockTags.SAPLINGS))
-                && isValidSpawnBlock(below, sandstone);
+                && isValidSpawnBlock(below, sandstone, terracotta);
     }
 
     public static boolean isValidSpawnBlock(BlockState state, boolean sandstone) {
+        return isValidSpawnBlock(state, sandstone, false);
+    }
+
+    public static boolean isValidSpawnBlock(BlockState state, boolean sandstone, boolean terracotta) {
         boolean base = state.is(Blocks.GRASS_BLOCK) || state.is(Blocks.DIRT) || state.is(BlockTags.DIRT)
                 || state.is(Blocks.STONE) || state.is(Blocks.SAND) || state.is(Blocks.RED_SAND);
         if (base) return true;
-        return sandstone && (state.is(Blocks.SANDSTONE) || state.is(Blocks.RED_SANDSTONE));
+        if (sandstone && (state.is(Blocks.SANDSTONE) || state.is(Blocks.RED_SANDSTONE))) return true;
+        return terracotta && (state.is(Blocks.TERRACOTTA) || state.is(BlockTags.TERRACOTTA));
     }
 }
