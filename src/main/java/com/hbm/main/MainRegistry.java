@@ -66,7 +66,7 @@ public class MainRegistry {
     public static File configHbmDir;
 
     public MainRegistry(IEventBus modEventBus, ModContainer modContainer) {
-        logger.info("HBM's Nuclear Tech - Community Edition (NeoForge port) initializing");
+        logger.info("HBM CE NeoForge (fork by scarrymany) initializing");
 
         proxy = FMLLoader.getDist().isClient() ? new ClientProxy() : new ServerProxy();
 

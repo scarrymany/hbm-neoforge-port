@@ -59,7 +59,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 public class ClientModRegistry {
 
     public ClientModRegistry(ModContainer modContainer) {
-        MainRegistry.logger.info("HBM's Nuclear Tech - Community Edition (NeoForge port) client bootstrap initializing");
+        MainRegistry.logger.info("HBM CE NeoForge (fork by scarrymany) client bootstrap initializing");
     }
 
     @SubscribeEvent

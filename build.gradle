@@ -9,7 +9,7 @@ version = mod_version
 group = mod_group
 
 base {
-    archivesName = mod_id
+    archivesName = 'hbm-neoforge-CE-fork-by-scarrymany'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -99,6 +99,9 @@ tasks.withType(ProcessResources).configureEach {
             mod_license             : mod_license,
             mod_version             : mod_version,
             mod_authors             : mod_authors,
+            mod_credits             : mod_credits,
+            mod_display_url         : mod_display_url,
+            mod_issue_url           : mod_issue_url,
     ]
 
     duplicatesStrategy = DuplicatesStrategy.WARN

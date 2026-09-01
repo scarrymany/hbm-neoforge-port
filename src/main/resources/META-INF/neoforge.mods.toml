@@ -1,18 +1,18 @@
 modLoader="javafml"
-
 loaderVersion="${loader_version_range}"
-
 license="${mod_license}"
-
-displayURL="https://github.com/Warfactory-Official/Hbm-s-Nuclear-Tech-CE"
-issueTrackerURL="https://github.com/Warfactory-Official/Hbm-s-Nuclear-Tech-CE/issues"
+displayURL="${mod_display_url}"
+issueTrackerURL="${mod_issue_url}"
 
 [[mods]]
     modId="${mod_id}"
     version="${mod_version}"
     displayName="${mod_name}"
-    logoFile="logo.png"
+    displayURL="${mod_display_url}"
+    logoFile="hbm_logo.png"
+    logoBlur=false
     authors="${mod_authors}"
+    credits="${mod_credits}"
     description='''${mod_description}'''
 
 [[dependencies.${mod_id}]]
