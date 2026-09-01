@@ -43,6 +43,9 @@ public final class TurretCapabilities {
 
         registerEnergyAndItems(event, TurretBlockEntities.FRITZ.get());
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, TurretBlockEntities.FRITZ.get(), (be, side) -> be.getFluidHandlerCapability(side));
+
+        registerEnergyAndItems(event, TurretBlockEntities.ARTY.get());
+        registerEnergyAndItems(event, TurretBlockEntities.HIMARS.get());
     }
 
     private static <T extends com.hbm.blockentity.turret.TurretBaseBlockEntity> void registerEnergyAndItems(

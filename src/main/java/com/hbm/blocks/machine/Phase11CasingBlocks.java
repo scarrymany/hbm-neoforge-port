@@ -64,9 +64,7 @@ public final class Phase11CasingBlocks {
         // CE ModBlocks.java:706 / :711 — leftover nuke casings (no TE)
         registerBlock("nuke_solinium", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("nuke_fstbmb", () -> new BlockBase(MACHINE_PROPS));
-        // CE ModBlocks.java:821-822 — Arty/HIMARS out of TurretBlocks TE scope
-        registerBlock("turret_arty", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("turret_himars", () -> new BlockBase(MACHINE_PROPS));
+        // turret_arty / turret_himars are TurretBlocks (live Dummyable TE).
         // barrel_steel is DummyableProcessBlocks (live TE).
         // machine_satlinker is DummyableProcessBlocks (live TE, missile tab). ≠ machine_satlink.
         // pump_steam / pump_electric / machine_thresher / chimney_* / bm_power_box

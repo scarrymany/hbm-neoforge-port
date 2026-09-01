@@ -126,10 +126,26 @@ Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
   leftover chem-plant slots — not copied (no canister slots);
   TODO(CE: RenderChemicalFactory.java:1) OBJ TESR;
   TODO(CE: TileEntityMachineChemicalFactory.java:525-544) ROR.
-- Fusion / watz skipped (huge MB, no real core TE this wave).
-  `turret_arty` / `turret_himars` skipped (time).
+- **`turret_arty`**: Dummyable `{1,0,2,1,2,1}` offset 1
+  (`TurretArty.java:30-36`). META≥12 core TE. 11 slots (0 chip, 1–9 ammo,
+  10 battery). maxPower **100000**. Modes ARTILLERY/CANNON/MANUAL. Range
+  3000/250, grace 250/32, V0 50/20, delay 300/40, elevation 90, barrel 9,
+  height 3. Fires `EntityArtilleryShell` + existing `ammo_arty_normal`/
+  `chlorine`/`phosgene`/`mustard`. GUI `gui_turret_arty.png` 176×222 + bind.
+  TODO(CE: TurretArty.java:26) ProxyCombo;
+  TODO(CE: RenderTurretArty.java:1) OBJ TESR;
+  TODO(CE: ItemAmmoArty.java:54-67) missing 8 shell metas not invented.
+- **`turret_himars`**: same Dummyable dims (`TurretHIMARS.java:29-35`).
+  maxPower **1_000_000**. AUTO/MANUAL, crane ±0.0125, fire 40t, V0 25,
+  range 5000, grace 250, height 5, barrel 0.5. Reload pack → 6 or 1.
+  Fires `EntityArtilleryRocket` + existing 8 `ammo_himars_*`.
+  GUI `gui_turret_himars.png` 176×222 + bind.
+  TODO(CE: TurretHIMARS.java:25) ProxyCombo;
+  TODO(CE: RenderTurretHIMARS.java:1) OBJ TESR;
+  TODO(CE: ItemAmmoHIMARS.java:256) volcanic_lava → slag.
+- Fusion / watz skipped (no real core TE this wave).
   `machine_transformer*` stay BlockBase (CE ModBlocks.java:979-982).
-  Leftover later: turret_arty/himars, seal_*, pile_brick, solinium/fstbmb.
+  Leftover later: seal_*, pile_brick, solinium/fstbmb.
 
 Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
 + runServer **Done (1.915s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.

@@ -15,9 +15,8 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import java.util.function.Supplier;
 
 /**
- * Block + {@code BlockItem} registration for this turret package's 11 in-scope concrete turrets
- * (13 in CE minus the out-of-scope Arty/HIMARS artillery/missile pair - see
- * {@code docs/phase3/turret_system.md}). Mirrors {@code PowerGenBlocks}' shape: block-entity-type
+ * Block + {@code BlockItem} registration for this turret package's 13 CE turrets
+ * (11 NT + Arty/HIMARS Dummyable artillery). Mirrors {@code PowerGenBlocks}' shape: block-entity-type
  * registration lives in the sibling {@link TurretBlockEntities} class, and
  * {@link TurretMenus}' {@code MenuType} is triggered from this class's {@link #registerAll()} too,
  * so wiring this whole family into the game needs exactly one call from {@code ModBlocks.register()}
@@ -45,6 +44,8 @@ public final class TurretBlocks {
     public static DeferredBlock<TurretFritzBlock> TURRET_FRITZ;
     public static DeferredBlock<TurretMaxwellBlock> TURRET_MAXWELL;
     public static DeferredBlock<TurretTauonBlock> TURRET_TAUON;
+    public static DeferredBlock<TurretArtyBlock> TURRET_ARTY;
+    public static DeferredBlock<TurretHIMARSBlock> TURRET_HIMARS;
 
     private TurretBlocks() {
     }
@@ -61,6 +62,11 @@ public final class TurretBlocks {
         TURRET_FRITZ = registerBlock("turret_fritz", () -> new TurretFritzBlock(TURRET_PROPS));
         TURRET_MAXWELL = registerBlock("turret_maxwell", () -> new TurretMaxwellBlock(TURRET_PROPS));
         TURRET_TAUON = registerBlock("turret_tauon", () -> new TurretTauonBlock(TURRET_PROPS));
+        // CE ModBlocks.java:821-822 hardness 5 / resistance 600; Dummyable {1,0,2,1,2,1} offset 1
+        TURRET_ARTY = registerBlock("turret_arty", () -> new TurretArtyBlock(BlockBehaviour.Properties.of()
+                .strength(5.0F, 600.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        TURRET_HIMARS = registerBlock("turret_himars", () -> new TurretHIMARSBlock(BlockBehaviour.Properties.of()
+                .strength(5.0F, 600.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
 
         TurretBlockEntities.registerAll();
         TurretMenus.registerAll();

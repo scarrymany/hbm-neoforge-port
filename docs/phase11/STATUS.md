@@ -54,13 +54,12 @@
   Leftover **32**: hot/mold/cyanide/rename TODO(CE: AnvilRecipes.java:75-130),
   `machine_deuterium_tower` TODO(CE: AnvilRecipes.java:453-462), flatten holders,
   mold 16–28 TODO(CE: AnvilRecipes.java:626-635).
-- This Dummyable wave: `machine_assembly_factory` / `machine_chemical_factory`
-  `{2,0,2,2,2,2}` offset 2 + extras. 4 lanes, `speed*2`/`pow*2`, water cool
-  100→lps. Assembly 60 slots / 4+4×4000; chem 32 slots / 12+12×24000.
-  Same recipe tables as assembly_machine / chemical_plant (distinct blocks).
-  GUI `gui_assembly_factory.png` 256×240 / `gui_chemical_factory.png` 248×216.
-  Cited TODOs (selector/ProxyDyn/TESR/ROR/loadTank overlap). Turrets skipped
-  (time). Fusion/watz skipped. Transformers stay BlockBase. No invent.
+- This Dummyable wave: `turret_arty` / `turret_himars` `{1,0,2,1,2,1}` offset 1,
+  hardness 5/600. Live BE aim+fire. Arty 100k HE, V0 50/20, delay 300/40,
+  modes artillery/cannon/manual. HIMARS 1e6 HE, crane reload, 40t, V0 25.
+  Ammo = existing flattened `ammo_arty_*` / `ammo_himars_*` (no invent).
+  Projectiles replace Phase9 `EntityThrownTail` stubs. GUI CE png + bind.
+  OBJ TESR cited skip. Fusion/watz skipped. Factories stay accepted.
 - Prior Dummyable: `reactor_research` / `reactor_zirnox` stay accepted.
 - Live machines (CE has TE, **no GUI**): pumps/chimneys Dummyable+BE, thresher,
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.

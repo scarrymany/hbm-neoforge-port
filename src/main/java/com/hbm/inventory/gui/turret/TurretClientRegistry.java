@@ -25,6 +25,12 @@ public final class TurretClientRegistry {
 
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        SafeMenuScreens.bind(event, TurretMenus.TURRET, TurretScreen::new);
+        SafeMenuScreens.bind(event, TurretMenus.TURRET, (id, inv, title) -> {
+            if (id.be instanceof com.hbm.blockentity.turret.TurretArtyBlockEntity
+                    || id.be instanceof com.hbm.blockentity.turret.TurretHIMARSBlockEntity) {
+                return new TurretArtilleryScreen(id, inv, title);
+            }
+            return new TurretScreen(id, inv, title);
+        });
     }
 }

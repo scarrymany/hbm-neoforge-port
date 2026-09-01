@@ -64,9 +64,7 @@ import java.util.List;
  * whoever builds that helper once ammo lists exist to feed it - see the report's decision 5).
  * <b>Not ported</b>: the {@code stattrak} kill-tally bar and per-category lit/unlit icon overlays
  * (survey Headline 1) - both are texture-dependent cosmetic details with no functional gap, left for
- * the asset-copy pass. <b>Not ported</b>: {@code GUITurretArty}/{@code GUITurretHIMARS}'s firing-mode
- * toggle - blocked on those two turret types not existing server-side yet (survey's Blocked/deferred
- * section; not a screen-side gap).
+ * the asset-copy pass. Arty/HIMARS mode toggle lives on {@link TurretArtilleryScreen}.
  */
 public class TurretScreen extends GuiInfoContainer<TurretMenu> {
 

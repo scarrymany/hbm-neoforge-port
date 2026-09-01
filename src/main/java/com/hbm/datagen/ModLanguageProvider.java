@@ -678,6 +678,8 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.turretRichard", "Richard");
         this.add("container.turretSentry", "Brown");
         this.add("container.turretTauon", "Tauon");
+        this.add("container.turretArty", "Greg");
+        this.add("container.turretHIMARS", "Henry");
 
         // ---- key-drift: resolved via a per-machine CE grep, not a verbatim container.* match ----
         this.add("container.assemblyMachine", "Assembly Machine (Legacy)"); // CE GUIMachineAssemblyMachine draws tile.machine_assembler.name directly, not a container.* key

@@ -72,8 +72,7 @@ import java.util.List;
  *   <li>Casing-ejection/muzzle-flash VFX ({@code CasingEjector}, {@code SpentCasing},
  *   {@code AuxParticlePacketNT}) - shared gun-VFX substrate every hand-held gun also needs, not
  *   turret-specific; {@link #spawnCasing()} is a documented no-op until that package lands.</li>
- *   <li>{@code TileEntityTurretBaseArtillery}/Arty/HIMARS - a separate, much larger
- *   missile/radar dependency chain, explicitly excluded from this package.</li>
+ *   <li>OpenComputers / ROR on artillery — cited skip on {@code TurretBaseArtilleryBlockEntity}.</li>
  * </ul>
  */
 public abstract class TurretBaseBlockEntity extends MachineBaseBlockEntity

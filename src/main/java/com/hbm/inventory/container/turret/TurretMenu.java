@@ -29,6 +29,7 @@ public class TurretMenu extends MenuBase<TurretBaseBlockEntity> {
     public static final int BUTTON_TARGET_ANIMALS = 2;
     public static final int BUTTON_TARGET_MOBS = 3;
     public static final int BUTTON_TARGET_MACHINES = 4;
+    public static final int BUTTON_MODE = 5;
     public static final int BUTTON_TOGGLE_BLACKLIST = 6;
 
     public TurretMenu(int id, Inventory playerInv, TurretBaseBlockEntity be) {
@@ -62,7 +63,7 @@ public class TurretMenu extends MenuBase<TurretBaseBlockEntity> {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         switch (id) {
-            case BUTTON_TOGGLE_ON, BUTTON_TARGET_PLAYERS, BUTTON_TARGET_ANIMALS, BUTTON_TARGET_MOBS, BUTTON_TARGET_MACHINES, BUTTON_TOGGLE_BLACKLIST -> {
+            case BUTTON_TOGGLE_ON, BUTTON_TARGET_PLAYERS, BUTTON_TARGET_ANIMALS, BUTTON_TARGET_MOBS, BUTTON_TARGET_MACHINES, BUTTON_MODE, BUTTON_TOGGLE_BLACKLIST -> {
                 be.handleButtonPacket(0, id);
                 return true;
             }
