@@ -63,7 +63,8 @@
   `bm_power_box`, `fluid_duct_exhaust`. WingsMurk flight.
 - Vanilla **1899 / 97.4%**. Machine census **1924 / 95.8%**.
 - Assembler skip **3** (nitra / digimemer / 50bmgbypass). `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0, `runServer` **Done (5.706s)** / 4052 recipes, port 25566.
+- Verified: `compileJava` 0, `runServer` **Done (5.751s)** / 4052 recipes, port 25566.
+  Dummyable E2E = registry/caps/GUI bind (no client, no physical place).
 - Honest E2E: MCA 841 chunks. Forced `hiveSpawn=1` + `atomStructure=1` on
   desert seed `1833280291927865410`: hive **57** `glyphid_base` / **56**
   `glyphid_spawner` / **56** `deco_loot` / **53** wither skull / **5**

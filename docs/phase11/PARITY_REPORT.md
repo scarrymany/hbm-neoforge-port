@@ -9,8 +9,8 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.706s)** on wiped world port 25566, **4052 recipes**.
-No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+`./gradlew runServer` **Done (5.751s)** on wiped world port 25566, **4052 recipes**.
+No recipe parse errors. No Exception/ERROR. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
@@ -133,7 +133,8 @@ Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
   `gui_sat_linker.png` 176×186 + bind. Missile tab. Caps item.
 
 Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
-+ runServer Done + registry/caps/GUI bind. No physical place.
++ runServer **Done (5.751s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
+No physical place. No Exception/ERROR.
 
 ## Prior wave (leftover Dummyable + CE TE)
 
