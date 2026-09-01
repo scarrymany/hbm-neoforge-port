@@ -47,7 +47,7 @@ public class ItemCanister extends ItemBase implements IFillableItem {
         return id == null ? null : Fluids.fromID(id);
     }
 
-    public static int getFill(ItemStack stack) {
+    public static int fillOf(ItemStack stack) {
         return stack.getOrDefault(MachineDataComponents.FLUID_AMOUNT.get(), 0);
     }
 
@@ -70,7 +70,7 @@ public class ItemCanister extends ItemBase implements IFillableItem {
             return amount;
         }
 
-        int fill = getFill(stack);
+        int fill = fillOf(stack);
         int toFill = Math.min(amount, this.capacity - fill);
         if (toFill <= 0) {
             return amount;
@@ -83,13 +83,13 @@ public class ItemCanister extends ItemBase implements IFillableItem {
 
     @Override
     public boolean providesFluid(FluidType type, ItemStack stack) {
-        return type != null && type == getFluidType(stack) && getFill(stack) > 0;
+        return type != null && type == getFluidType(stack) && fillOf(stack) > 0;
     }
 
     @Override
     public int tryEmpty(FluidType type, int amount, ItemStack stack) {
         if (!providesFluid(type, stack) || amount <= 0) return 0;
-        int fill = getFill(stack);
+        int fill = fillOf(stack);
         int moved = Math.min(fill, amount);
         int leftover = tryEmpty(moved, stack);
         return moved - leftover;
@@ -102,12 +102,12 @@ public class ItemCanister extends ItemBase implements IFillableItem {
 
     @Override
     public int getFill(ItemStack stack) {
-        return ItemCanister.getFill(stack);
+        return fillOf(stack);
     }
 
     /** @return the leftover amount that could not be drained. */
     public int tryEmpty(int amount, ItemStack stack) {
-        int fill = getFill(stack);
+        int fill = fillOf(stack);
         int toDrain = Math.min(amount, fill);
         if (toDrain <= 0) {
             return amount;
@@ -135,7 +135,7 @@ public class ItemCanister extends ItemBase implements IFillableItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         FluidType type = getFluidType(stack);
-        int fill = getFill(stack);
+        int fill = fillOf(stack);
         tooltip.add(Component.literal(fill + "/" + this.capacity + " mB"));
         if (type != null && type != Fluids.NONE) {
             tooltip.add(type.getLocalizedName());

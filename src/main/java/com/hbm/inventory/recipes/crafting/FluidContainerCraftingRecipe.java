@@ -100,7 +100,8 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
         if (want == Items.AIR) return false;
         ItemStack stack = at(in, x, y);
         if (stack.getItem() != want) return false;
-        return ItemFluidTank.getFluidType(stack) == type && ItemFluidTank.getFill(stack) >= amount;
+        if (!(stack.getItem() instanceof ItemFluidTank tank)) return false;
+        return ItemFluidTank.getFluidType(stack) == type && tank.getFill(stack) >= amount;
     }
 
     private static boolean itemAt(CraftingInput in, int x, int y, String id) {
