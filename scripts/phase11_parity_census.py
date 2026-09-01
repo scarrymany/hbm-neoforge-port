@@ -513,6 +513,12 @@ def fluid_container_outputs() -> set[str]:
         "hbm:particle_hydrogen",
         "hbm:particle_amat",
         "hbm:particle_aschrab",
+        "hbm:red_barrel",
+        "hbm:pink_barrel",
+        "hbm:lox_barrel",
+        "hbm:iv_blood",
+        "hbm:iv_xp",
+        "hbm:rod_zirnox_tritium",
     }
 
 
