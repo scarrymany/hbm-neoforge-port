@@ -74,13 +74,11 @@ import java.util.Set;
  * is a follow-up of a different shape than this registry (a component-reading wrapper, not this
  * item-swapping one) - registering them here would be actively wrong, not just incomplete, so they are
  * intentionally left out rather than mis-registered. CE's remaining static entries
- * ({@code bottle_mercury}/{@code ingot_mercury}, the red/pink/lox-barrel-to-{@code tank_steel} set,
- * {@code rod_zirnox_tritium}, {@code particle_hydrogen}/{@code particle_amat}/{@code particle_aschrab},
- * {@code iv_blood}/{@code iv_xp}) reference items that do not exist anywhere in this port yet in any
- * form (confirmed by search) - CE's exact calls are preserved below as commented-out reference code so
- * a future item-family port can reactivate them verbatim once those items land, matching the
- * "commented-out, not deleted" precedent CE's own {@code register()} already sets for its vanilla
- * bucket/bottle block (superseded by the capability wrapper, per CE's own {@code mlbv} comment).
+ * ({@code bottle_mercury}/{@code nugget_mercury} are live; the red/pink/lox-barrel-to-{@code tank_steel}
+ * set, {@code rod_zirnox_tritium}, {@code iv_blood}/{@code iv_xp}) reference items that do not exist
+ * in a compatible shape yet - CE's exact calls stay commented-out so a future item-family port can
+ * reactivate them verbatim. {@code particle_hydrogen}/{@code particle_amat}/{@code particle_aschrab}
+ * + {@code particle_empty} are registered one-item-one-fluid (Phase11ProcessItems), same as CE.
  * <p>
  * Four of CE's entries <em>are</em> faithfully portable today, because their underlying items are
  * real, already-registered, and keep the classic "one plain item = one fixed fluid" shape CE assumed:
@@ -149,11 +147,10 @@ public class FluidContainerRegistry {
         // fillable-tritium-load variant).
         // registerContainer(new FluidContainer(new ItemStack(ModItems.rod_zirnox_tritium), new ItemStack(ModItems.rod_zirnox_empty), Fluids.TRITIUM, 2000));
 
-        // Particles: needs ModItems.particle_hydrogen/particle_amat/particle_aschrab/particle_empty,
-        // none of which exist in this port yet (particle_muon/particle_digamma are unrelated items).
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.particle_hydrogen), new ItemStack(ModItems.particle_empty), Fluids.HYDROGEN, 1000));
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.particle_amat), new ItemStack(ModItems.particle_empty), Fluids.AMAT, 1000));
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.particle_aschrab), new ItemStack(ModItems.particle_empty), Fluids.ASCHRAB, 1000));
+        // CE :61-63 — one-item-one-fluid particles (items exist in Phase11ProcessItems).
+        registerParticle("particle_hydrogen", Fluids.HYDROGEN);
+        registerParticle("particle_amat", Fluids.AMAT);
+        registerParticle("particle_aschrab", Fluids.ASCHRAB);
 
         // IVs: needs ModItems.iv_blood/iv_empty/iv_xp/iv_xp_empty, none of which exist in this port yet.
         // registerContainer(new FluidContainer(new ItemStack(ModItems.iv_blood), new ItemStack(ModItems.iv_empty), Fluids.BLOOD, 100));
@@ -289,6 +286,13 @@ public class FluidContainerRegistry {
     /** Lazily resolves a {@code hbm:}-namespaced item by registry path (same idiom as {@code OilDrillBaseBlockEntity#resolve}). */
     private static Item resolveItem(String path) {
         return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+    }
+
+    private static void registerParticle(String full, FluidType type) {
+        Item fullItem = resolveItem(full);
+        Item emptyItem = resolveItem("particle_empty");
+        if (fullItem == Items.AIR || emptyItem == Items.AIR) return;
+        registerContainer(new FluidContainer(new ItemStack(fullItem), new ItemStack(emptyItem), type, 1000));
     }
 
     /** Lazily resolves a {@code hbm:}-namespaced block by registry path (same idiom as {@code OilDrillBaseBlockEntity#resolve}). */

@@ -1,5 +1,6 @@
 package com.hbm.items.tool;
 
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ItemBase;
@@ -22,13 +23,11 @@ import java.util.List;
  * port for the same underlying shape (a fillable container that displays whatever fluid it holds) -
  * this class stores its fluid type and fill level as the shared
  * {@link MachineDataComponents#FLUID_ID}/{@link MachineDataComponents#FLUID_AMOUNT} components
- * instead, with one registered item per canister capacity rather than per fluid. Actual filling from
- * pipes/tanks is not wired up: CE resolved that through {@code FluidContainerRegistry}, which -
- * same as {@code ItemFluidTank}'s own javadoc already documents - has not been ported yet. The
- * {@link #tryFill}/{@link #tryEmpty} methods below are the seam a future fluid-item-network port
- * should call into.
+ * instead, with one registered item per canister capacity rather than per fluid. Fill/drain goes
+ * through {@link IFillableItem} (same as {@link com.hbm.items.machine.ItemFluidTank}) — registering
+ * this component-item in {@code FluidContainerRegistry} would be one-item-one-fluid and wrong.
  */
-public class ItemCanister extends ItemBase {
+public class ItemCanister extends ItemBase implements IFillableItem {
 
     private final int capacity;
 
@@ -52,7 +51,15 @@ public class ItemCanister extends ItemBase {
         return stack.getOrDefault(MachineDataComponents.FLUID_AMOUNT.get(), 0);
     }
 
+    @Override
+    public boolean acceptsFluid(FluidType type, ItemStack stack) {
+        if (type == null || type == Fluids.NONE || type.isAntimatter()) return false;
+        FluidType current = getFluidType(stack);
+        return current == null || current == Fluids.NONE || current == type;
+    }
+
     /** @return the leftover amount that could not be accepted. */
+    @Override
     public int tryFill(FluidType type, int amount, ItemStack stack) {
         if (amount <= 0 || type == null || type == Fluids.NONE || type.isAntimatter()) {
             return amount;
@@ -72,6 +79,30 @@ public class ItemCanister extends ItemBase {
         stack.set(MachineDataComponents.FLUID_ID.get(), type.getID());
         stack.set(MachineDataComponents.FLUID_AMOUNT.get(), fill + toFill);
         return amount - toFill;
+    }
+
+    @Override
+    public boolean providesFluid(FluidType type, ItemStack stack) {
+        return type != null && type == getFluidType(stack) && getFill(stack) > 0;
+    }
+
+    @Override
+    public int tryEmpty(FluidType type, int amount, ItemStack stack) {
+        if (!providesFluid(type, stack) || amount <= 0) return 0;
+        int fill = getFill(stack);
+        int moved = Math.min(fill, amount);
+        int leftover = tryEmpty(moved, stack);
+        return moved - leftover;
+    }
+
+    @Override
+    public FluidType getFirstFluidType(ItemStack stack) {
+        return getFluidType(stack);
+    }
+
+    @Override
+    public int getFill(ItemStack stack) {
+        return ItemCanister.getFill(stack);
     }
 
     /** @return the leftover amount that could not be drained. */

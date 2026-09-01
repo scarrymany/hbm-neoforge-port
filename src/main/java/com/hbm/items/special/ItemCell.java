@@ -1,5 +1,6 @@
 package com.hbm.items.special;
 
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import net.minecraft.ChatFormatting;
@@ -29,10 +30,54 @@ import java.util.List;
  * Phase 1, see docs/phase1/items_special.md finding 4's sibling systems). The tooltip warning for
  * both fluids is kept, since it carries no such dependency.
  */
-public class ItemCell extends Item {
+public class ItemCell extends Item implements IFillableItem {
+
+    /** CE {@code EnumCell} whitelist — 1000 mB, all-or-nothing like FluidContainerRegistry. */
+    public static final int CAPACITY = 1000;
 
     public ItemCell(Properties properties) {
         super(properties);
+    }
+
+    /** Runtime identity — Fluids fields are assigned in {@code Fluids.register()}, not class-init. */
+    private static boolean allowed(FluidType type) {
+        return type == Fluids.UF6 || type == Fluids.PUF6 || type == Fluids.AMAT
+                || type == Fluids.DEUTERIUM || type == Fluids.TRITIUM
+                || type == Fluids.SAS3 || type == Fluids.ASCHRAB;
+    }
+
+    @Override
+    public boolean acceptsFluid(FluidType type, ItemStack stack) {
+        return isEmptyCell(stack) && allowed(type);
+    }
+
+    @Override
+    public int tryFill(FluidType type, int amount, ItemStack stack) {
+        if (!acceptsFluid(type, stack) || amount < CAPACITY) return amount;
+        stack.set(SpecialItemComponents.CELL_FLUID_ID.get(), type.getID());
+        return amount - CAPACITY;
+    }
+
+    @Override
+    public boolean providesFluid(FluidType type, ItemStack stack) {
+        return type != null && getFluidType(stack) == type;
+    }
+
+    @Override
+    public int tryEmpty(FluidType type, int amount, ItemStack stack) {
+        if (!providesFluid(type, stack) || amount < CAPACITY) return 0;
+        stack.remove(SpecialItemComponents.CELL_FLUID_ID.get());
+        return CAPACITY;
+    }
+
+    @Override
+    public FluidType getFirstFluidType(ItemStack stack) {
+        return getFluidType(stack);
+    }
+
+    @Override
+    public int getFill(ItemStack stack) {
+        return isEmptyCell(stack) ? 0 : CAPACITY;
     }
 
     public static boolean isEmptyCell(ItemStack stack) {

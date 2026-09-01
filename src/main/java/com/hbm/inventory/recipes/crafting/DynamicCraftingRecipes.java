@@ -55,6 +55,10 @@ public final class DynamicCraftingRecipes {
             HbmRecipes.RECIPE_SERIALIZERS.register("container_upgrade_safe",
                     () -> new ContainerUpgradeRecipe.Serializer(ContainerUpgradeRecipe.SAFE));
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<FluidContainerCraftingRecipe>> FLUID_CONTAINER_CRAFTING_SERIALIZER =
+            HbmRecipes.RECIPE_SERIALIZERS.register("fluid_container_crafting",
+                    () -> FluidContainerCraftingRecipe.Serializer.INSTANCE);
+
     /** No-op - see class javadoc. Forces this class's static fields (and therefore the registrations above) to run. */
     public static void bootstrap() {
     }

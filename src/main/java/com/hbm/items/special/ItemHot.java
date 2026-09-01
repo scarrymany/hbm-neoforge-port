@@ -35,6 +35,15 @@ public class ItemHot extends Item {
     }
 
     public ItemStack heatUp(ItemStack stack, double fraction) {
+        return heatUpStatic(stack, fraction);
+    }
+
+    /** CE static {@code ItemHot.heatUp(stack, fraction)} — used by anvil hot smithing. */
+    public static ItemStack heatUp(ItemStack stack, double fraction) {
+        return heatUpStatic(stack, fraction);
+    }
+
+    private static ItemStack heatUpStatic(ItemStack stack, double fraction) {
         if (!(stack.getItem() instanceof ItemHot hot)) {
             return stack;
         }

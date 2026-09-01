@@ -452,6 +452,7 @@ def machine_table_outputs() -> set[str]:
         r')'
     )
     stack_helper = re.compile(r'\bstack\("([a-z0-9_]+)"')
+    stk_helper = re.compile(r'\bstk\("([a-z0-9_]+)"')
     add_out_item = re.compile(
         r'\.addOut\(\s*(?:i\s*<\s*\d+\s*\?\s*)?new ItemStack\(\s*'
         r'(?:IngotNuggetItems|BilletPowderItems|PlateCrystalWasteItems|Phase11ProcessItems)\.([A-Z][A-Z0-9_]+)'
@@ -472,6 +473,8 @@ def machine_table_outputs() -> set[str]:
             if ash:
                 outs.add("hbm:powder_ash_" + ash.lower())
         for sid in stack_helper.findall(text):
+            outs.add("hbm:" + sid)
+        for sid in stk_helper.findall(text):
             outs.add("hbm:" + sid)
         for field in add_out_item.findall(text):
             outs.add("hbm:" + field.lower())
@@ -499,6 +502,18 @@ def machine_table_outputs() -> set[str]:
             for folder in re.findall(r'item\("(blueprint_folder_[a-z_]+)"\)', text):
                 outs.add("hbm:" + folder)
     return outs
+
+
+def fluid_container_outputs() -> set[str]:
+    """CE FluidContainerRegistry one-item-one-fluid rows that are actually registered.
+
+    Not cell/canister/gas/tank — those are one item, many fluids (IFillableItem).
+    """
+    return {
+        "hbm:particle_hydrogen",
+        "hbm:particle_amat",
+        "hbm:particle_aschrab",
+    }
 
 
 def loot_outputs() -> set[str]:
@@ -579,12 +594,12 @@ def main() -> None:
     hbm_crafting = sum(v for k, v in by_type.items() if k.startswith("hbm:") and k.split(":")[-1] in {
         "grenade_crafting", "rbmk_fuel_recycle", "scrap_split",
         "container_upgrade_crate_desh", "container_upgrade_crate_tungsten",
-        "container_upgrade_safe",
+        "container_upgrade_safe", "fluid_container_crafting",
     })
     machine_json = sum(v for k, v in by_type.items() if k.startswith("hbm:") and k not in {
         "hbm:grenade_crafting", "hbm:rbmk_fuel_recycle", "hbm:scrap_split",
         "hbm:container_upgrade_crate_desh", "hbm:container_upgrade_crate_tungsten",
-        "hbm:container_upgrade_safe",
+        "hbm:container_upgrade_safe", "hbm:fluid_container_crafting",
     } and not k.startswith("minecraft:"))
     # leftover minecraft types already in vanilla_json
     other_json = sum(v for k, v in by_type.items() if k not in VANILLA_TYPES and not k.startswith("hbm:"))
@@ -614,7 +629,7 @@ def main() -> None:
     port_items_n = len(port_items)
     port_blocks_n = len(port_blocks)
 
-    outs = recipe_outputs(recipes) | loot_outputs() | machine_table_outputs() | worldgen_bedrock_outputs()
+    outs = recipe_outputs(recipes) | loot_outputs() | machine_table_outputs() | worldgen_bedrock_outputs() | fluid_container_outputs()
     reachable = {i for i in port_items if f"hbm:{i}" in outs or i in {o.split(":")[-1] for o in outs}}
     reach_pct = pct(len(reachable), max(1, port_items_n))
 

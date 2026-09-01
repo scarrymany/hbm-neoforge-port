@@ -1,5 +1,6 @@
 package com.hbm.items.tool;
 
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ItemBase;
@@ -22,7 +23,7 @@ import java.util.List;
  * instead). Unlike {@link ItemCanister}, CE hardcoded this container's capacity to 1000mB rather
  * than taking it as a constructor argument, so this class does the same.
  */
-public class ItemGasCanister extends ItemBase {
+public class ItemGasCanister extends ItemBase implements IFillableItem {
 
     public static final int CAPACITY = 1000;
 
@@ -41,7 +42,15 @@ public class ItemGasCanister extends ItemBase {
         return stack.getOrDefault(MachineDataComponents.FLUID_AMOUNT.get(), 0);
     }
 
+    @Override
+    public boolean acceptsFluid(FluidType type, ItemStack stack) {
+        if (type == null || type == Fluids.NONE || type.isAntimatter()) return false;
+        FluidType current = getFluidType(stack);
+        return current == null || current == Fluids.NONE || current == type;
+    }
+
     /** @return the leftover amount that could not be accepted. */
+    @Override
     public int tryFill(FluidType type, int amount, ItemStack stack) {
         if (amount <= 0 || type == null || type == Fluids.NONE || type.isAntimatter()) {
             return amount;
@@ -61,6 +70,30 @@ public class ItemGasCanister extends ItemBase {
         stack.set(MachineDataComponents.FLUID_ID.get(), type.getID());
         stack.set(MachineDataComponents.FLUID_AMOUNT.get(), fill + toFill);
         return amount - toFill;
+    }
+
+    @Override
+    public boolean providesFluid(FluidType type, ItemStack stack) {
+        return type != null && type == getFluidType(stack) && getFill(stack) > 0;
+    }
+
+    @Override
+    public int tryEmpty(FluidType type, int amount, ItemStack stack) {
+        if (!providesFluid(type, stack) || amount <= 0) return 0;
+        int fill = getFill(stack);
+        int moved = Math.min(fill, amount);
+        int leftover = tryEmpty(moved, stack);
+        return moved - leftover;
+    }
+
+    @Override
+    public FluidType getFirstFluidType(ItemStack stack) {
+        return getFluidType(stack);
+    }
+
+    @Override
+    public int getFill(ItemStack stack) {
+        return ItemGasCanister.getFill(stack);
     }
 
     /** @return the leftover amount that could not be drained. */

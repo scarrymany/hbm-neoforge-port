@@ -6,6 +6,7 @@ import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.NTMMaterial;
+import com.hbm.items.machine.ItemMold;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -22,8 +23,12 @@ import java.util.List;
  * CE {@code AnvilRecipes.java}. Smithing {@code :59-131} + construction {@code :140+}.
  * Rows whose I/O is AIR are skipped — no fake ids. Shell/pipe/stamp/recycle rows land when
  * the flattened autogen / already-registered I/O exists.
- * TODO(CE: AnvilRecipes.java:75-130) hot/mold/cyanide/rename still blocked.
- * TODO(CE: AnvilRecipes.java:626-635) mold meta 16–28 — do not invent flatten ids.
+ * Ported: 8 {@link AnvilSmithingHotRecipe} (meteorite + cobalt decoration) + 18
+ * {@link AnvilSmithingMold} + 9 mold-construction rows ({@code :626-635}).
+ * TODO(CE: AnvilRecipes.java:75-80) 9 dusted-steel + chainsteel — {@code ingot_steel_dusted_*} is a
+ * plain {@code Item}, not {@code ItemHotDusted}. Do not invent.
+ * TODO(CE: AnvilRecipes.java:84) {@code meteorite_sword_reforged} — sword chain not registered.
+ * TODO(CE: AnvilRecipes.java:129-130) cyanide/rename.
  */
 public final class AnvilRecipes {
 
@@ -53,13 +58,9 @@ public final class AnvilRecipes {
     }
 
     /**
-     * CE {@code :59-73} anvil upgrades (iron/lead × 9 targets) + {@code :96} gunmetal.
-     * SKIP {@code :75-91} hot ({@code AnvilSmithingHotRecipe}), {@code :98-127} mold
-     * ({@code AnvilSmithingMold} — not ported), {@code :129-130} cyanide/rename —
-     * TODO(CE: AnvilRecipes.java:75-130). Construction mold meta 16–28
-     * TODO(CE: AnvilRecipes.java:626-635) — not flatten-faked.
-     * {@code :93} wings_murk and {@code :94} flask_infusion are live (I/O registered;
-     * flask is flattened SHIELD, no meta).
+     * CE {@code :59-127} anvil upgrades + gunmetal + hot (I/O that exists) + mold smithing.
+     * {@code :93} wings_murk and {@code :94} flask_infusion are live (flask flattened SHIELD).
+     * SKIP {@code :75-80} dusted/chainsteel, {@code :84} meteorite sword, {@code :129-130} cyanide/rename.
      */
     private static void registerSmithing() {
         String[] bases = {"anvil_iron", "anvil_lead"};
@@ -79,6 +80,41 @@ public final class AnvilRecipes {
         smith(1916169, stack("wings_murk"), cmp("wings_limp"), cmp("particle_tachyon"));
         // CE :94 — ItemFlask flattened to single SHIELD item
         smith(4, stack("flask_infusion"), cmp("gem_alexandrite"), cmp("bottle_nuka"));
+
+        // CE :82-91 — meteorite hot + cobalt decoration. Skip cyanide/rename and sword/dusted.
+        smithHot(3, "ingot_meteorite", "ingot_meteorite", "ingot_meteorite_forged");
+        smithHot(3, "ingot_meteorite_forged", "ingot_meteorite_forged", "blade_meteorite");
+        smithHot(3, "cobalt_sword", "ingot_meteorite", "cobalt_decorated_sword");
+        smithHot(3, "cobalt_pickaxe", "ingot_meteorite", "cobalt_decorated_pickaxe");
+        smithHot(3, "cobalt_axe", "ingot_meteorite", "cobalt_decorated_axe");
+        smithHot(3, "cobalt_shovel", "ingot_meteorite", "cobalt_decorated_shovel");
+        smithHot(3, "cobalt_hoe", "ingot_meteorite", "cobalt_decorated_hoe");
+
+        // CE :98-127 — mold smithing. Output is mold + MOLD_ID, not a flatten item.
+        moldSmith(0, tag("nuggets/gold"), "nugget", 1);
+        moldSmith(1, tag("billets/uranium"), "billet", 1);
+        moldSmith(2, tag("ingots/iron"), "ingot", 1);
+        moldSmith(3, tag("plates/iron"), "plate", 1);
+        moldSmith(19, tag("plates_triple/iron"), "plateTriple", 1);
+        moldSmith(15, tag("plates_triple/iron", 3), "plateTriple", 3);
+        moldSmith(4, tag("wires/copper"), "wireFine", 1);
+        moldSmith(5, cmp("blade_titanium"), new ItemStack[]{stack("blade_titanium"), stack("blade_tungsten")});
+        moldSmith(6, cmp("blades_steel"), new ItemStack[]{stack("blades_steel"), stack("blades_titanium")});
+        moldSmith(7, cmp("stamp_iron_flat"), new ItemStack[]{
+                stack("stamp_stone_flat"),
+                stack("stamp_iron_flat"),
+                stack("stamp_steel_flat"),
+                stack("stamp_titanium_flat"),
+                stack("stamp_obsidian_flat")
+        });
+        moldSmith(8, tag("shells/steel"), "shell", 1);
+        moldSmith(9, tag("pipes/steel"), "ntmpipe", 1);
+        moldSmith(10, tag("ingots/iron", 9), "ingot", 9);
+        moldSmith(11, tag("plates/iron", 9), "plate", 9);
+        moldSmith(12, tag("storage_blocks/iron"), "block", 1);
+        moldSmith(13, cmp("pipes_steel"), new ItemStack[]{stack("pipes_steel")});
+        moldSmith(20, tag("dense_wires/red_copper"), "wireDense", 1);
+        moldSmith(21, tag("dense_wires/red_copper", 9), "wireDense", 9);
     }
 
     private static void registerConstruction() {
@@ -476,6 +512,18 @@ public final class AnvilRecipes {
         construct(2, stack("stamp_50"), cmp("stamp_iron_flat"), tag("ingots/gunmetal", 2));
         construct(4, stack("stamp_desh_9"), cmp("stamp_desh_flat"), tag("ingots/weaponsteel", 4));
         construct(4, stack("stamp_desh_50"), cmp("stamp_desh_flat"), tag("ingots/weaponsteel", 4));
+
+        // CE :626-635 — mold construction (output = mold with MOLD_ID).
+        // 16/17 are CE construction-only ids (c9/c50), not in ItemMold.MOLDS foundry list.
+        construct(1, moldStack(16), cmp("mold_base"), tag("ingots/iron", 2));
+        construct(1, moldStack(17), cmp("mold_base"), tag("ingots/iron", 2));
+        construct(2, moldStack(22), cmp("mold_base"), tag("ingots/steel", 4));
+        construct(2, moldStack(23), cmp("mold_base"), tag("ingots/steel", 4));
+        construct(2, moldStack(24), cmp("mold_base"), tag("ingots/steel", 4));
+        construct(2, moldStack(25), cmp("mold_base"), tag("ingots/steel", 4));
+        construct(2, moldStack(26), cmp("mold_base"), tag("ingots/steel", 4));
+        construct(2, moldStack(27), cmp("mold_base"), tag("ingots/steel", 4));
+        construct(2, moldStack(28), cmp("mold_base"), tag("ingots/steel", 4));
     }
 
     /** CE {@code registerConstructionRecycling} :640+ — only rows whose I/O exists. */
@@ -631,6 +679,37 @@ public final class AnvilRecipes {
     private static void smith(int tier, ItemStack out, AStack left, AStack right) {
         if (empty(out) || empty(left) || empty(right)) return;
         SMITHING.add(new AnvilSmithingRecipe(tier, out, left, right));
+    }
+
+    private static void smithHot(int tier, String left, String right, String out) {
+        ItemStack o = stack(out);
+        AStack l = cmp(left);
+        AStack r = cmp(right);
+        if (empty(o) || empty(l) || empty(r)) return;
+        SMITHING.add(new AnvilSmithingHotRecipe(tier, o, l, r));
+    }
+
+    private static void moldSmith(int meta, AStack demo, String prefix, int prefixCount) {
+        if (item("mold") == Items.AIR || item("mold_base") == Items.AIR) return;
+        SMITHING.add(new AnvilSmithingMold(meta, demo, prefix, prefixCount));
+    }
+
+    private static void moldSmith(int meta, AStack demo, ItemStack[] matches) {
+        if (item("mold") == Items.AIR || item("mold_base") == Items.AIR) return;
+        boolean any = false;
+        for (ItemStack s : matches) {
+            if (!empty(s)) any = true;
+        }
+        if (!any) return;
+        SMITHING.add(new AnvilSmithingMold(meta, demo, matches));
+    }
+
+    private static ItemStack moldStack(int id) {
+        Item mold = item("mold");
+        if (mold == Items.AIR) return ItemStack.EMPTY;
+        ItemStack stack = new ItemStack(mold);
+        ItemMold.setMoldId(stack, id);
+        return stack;
     }
 
     private static void construct(int tier, ItemStack out, AStack... in) {
