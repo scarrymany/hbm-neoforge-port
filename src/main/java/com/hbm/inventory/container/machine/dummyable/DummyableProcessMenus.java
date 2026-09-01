@@ -1,0 +1,38 @@
+package com.hbm.inventory.container.machine.dummyable;
+
+import com.hbm.blockentity.machine.dummyable.FurnaceCombinationBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineAnnihilatorBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineBlastFurnaceBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineRockMillBlockEntity;
+import com.hbm.inventory.container.ModMenuTypes;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.network.IContainerFactory;
+import net.neoforged.neoforge.registries.DeferredHolder;
+
+public final class DummyableProcessMenus {
+
+    public static DeferredHolder<MenuType<?>, MenuType<FurnaceCombinationMenu>> FURNACE_COMBINATION;
+    public static DeferredHolder<MenuType<?>, MenuType<BlastFurnaceMenu>> MACHINE_BLAST_FURNACE;
+    public static DeferredHolder<MenuType<?>, MenuType<RockMillMenu>> MACHINE_ROCK_MILL;
+    public static DeferredHolder<MenuType<?>, MenuType<AnnihilatorMenu>> MACHINE_ANNIHILATOR;
+
+    private DummyableProcessMenus() {
+    }
+
+    public static void registerAll() {
+        FURNACE_COMBINATION = reg("furnace_combination", (id, inv, buf) ->
+                new FurnaceCombinationMenu(id, inv, (FurnaceCombinationBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_BLAST_FURNACE = reg("machine_blast_furnace", (id, inv, buf) ->
+                new BlastFurnaceMenu(id, inv, (MachineBlastFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ROCK_MILL = reg("machine_rock_mill", (id, inv, buf) ->
+                new RockMillMenu(id, inv, (MachineRockMillBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ANNIHILATOR = reg("machine_annihilator", (id, inv, buf) ->
+                new AnnihilatorMenu(id, inv, (MachineAnnihilatorBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+    }
+
+    private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {
+        return ModMenuTypes.MENU_TYPES.register(name, () -> IMenuTypeExtension.create(factory));
+    }
+}

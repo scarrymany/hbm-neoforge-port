@@ -1,0 +1,203 @@
+package com.hbm.blockentity.machine.dummyable;
+
+import com.hbm.api.fluidmk2.IFluidStandardSenderMK2;
+import com.hbm.api.tile.IHeatSource;
+import com.hbm.blockentity.ITickableBE;
+import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.inventory.container.machine.dummyable.FurnaceCombinationMenu;
+import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.recipes.CombinationRecipes;
+import com.hbm.inventory.recipes.CombinationRecipes.CombinationRecipe;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
+/**
+ * CE {@code TileEntityFurnaceCombination}: heat-driven, processTime 20_000, maxHeat 100_000.
+ */
+public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
+        implements IFluidStandardSenderMK2, ITickableBE, MenuProvider {
+
+    public static final int PROCESS_TIME = 20_000;
+    public static final int MAX_HEAT = 100_000;
+    public static final double DIFFUSION = 0.25D;
+
+    public static final int SLOT_IN = 0;
+    public static final int SLOT_OUT = 1;
+
+    public final FluidTankNTM tank;
+    public boolean wasOn;
+    public int progress;
+    public int heat;
+
+    public FurnaceCombinationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state, 4, true, false);
+        this.tank = new FluidTankNTM(Fluids.NONE, 24_000).withOwner(this);
+    }
+
+    @Override
+    protected Component getDefaultName() {
+        return Component.translatable("container.furnaceCombination");
+    }
+
+    @Override
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        return slot == SLOT_IN && CombinationRecipes.getOutput(stack) != null;
+    }
+
+    @Override
+    public boolean canExtractItem(int slot, ItemStack stack, int amount) {
+        return slot == SLOT_OUT;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        return new int[]{SLOT_IN, SLOT_OUT};
+    }
+
+    @Override
+    public void updateEntity() {
+        if (level == null || level.isClientSide) return;
+
+        tryPullHeat();
+        if (level.getGameTime() % 20 == 0) {
+            for (Direction dir : Direction.Plane.HORIZONTAL) {
+                Direction rot = dir.getClockWise();
+                for (int y = 0; y <= 1; y++) {
+                    for (int j = -1; j <= 1; j++) {
+                        BlockPos p = worldPosition.relative(dir, 2).relative(rot, j).above(y);
+                        if (tank.getFill() > 0) tryProvide(tank, level, p, dir);
+                    }
+                }
+            }
+            for (int x = -1; x <= 1; x++) {
+                for (int z = -1; z <= 1; z++) {
+                    if (tank.getFill() > 0) {
+                        tryProvide(tank, level, worldPosition.offset(x, 2, z), Direction.UP);
+                    }
+                }
+            }
+        }
+
+        wasOn = false;
+        if (canSmelt()) {
+            int burn = heat / 100;
+            if (burn > 0) {
+                wasOn = true;
+                progress += burn;
+                heat -= burn;
+                if (progress >= PROCESS_TIME) {
+                    progress -= PROCESS_TIME;
+                    CombinationRecipe rec = CombinationRecipes.getOutput(inventory.getStackInSlot(SLOT_IN));
+                    if (rec != null) {
+                        if (!rec.output.isEmpty()) inventory.insertItem(SLOT_OUT, rec.output.copy(), false);
+                        if (rec.fluid != null) {
+                            if (tank.getTankType() != rec.fluid.type) tank.setTankType(rec.fluid.type);
+                            tank.setFill(tank.getFill() + rec.fluid.fill);
+                        }
+                        inventory.extractItem(SLOT_IN, 1, false);
+                    }
+                }
+                AABB box = new AABB(worldPosition.getX() - 0.5, worldPosition.getY() + 2, worldPosition.getZ() - 0.5,
+                        worldPosition.getX() + 1.5, worldPosition.getY() + 4, worldPosition.getZ() + 1.5);
+                for (Entity e : level.getEntitiesOfClass(Entity.class, box)) e.igniteForSeconds(5);
+            }
+        } else {
+            progress = 0;
+        }
+        dataChanged();
+        networkPackMK2(50);
+    }
+
+    private boolean canSmelt() {
+        ItemStack in = inventory.getStackInSlot(SLOT_IN);
+        if (in.isEmpty()) return false;
+        CombinationRecipe rec = CombinationRecipes.getOutput(in);
+        if (rec == null || rec.output.isEmpty()) return false;
+        if (!inventory.insertItem(SLOT_OUT, rec.output.copy(), true).isEmpty()) return false;
+        if (rec.fluid != null) {
+            if (tank.getTankType() != rec.fluid.type && tank.getFill() > 0) return false;
+            return tank.getTankType() != rec.fluid.type || tank.getFill() + rec.fluid.fill <= tank.getMaxFill();
+        }
+        return true;
+    }
+
+    private void tryPullHeat() {
+        if (heat >= MAX_HEAT) return;
+        if (level.getBlockEntity(worldPosition.below()) instanceof IHeatSource source) {
+            int diff = source.getHeatStored() - heat;
+            if (diff > 0) {
+                diff = (int) Math.ceil(diff * DIFFUSION);
+                source.useUpHeat(diff);
+                heat = Math.min(heat + diff, MAX_HEAT);
+                return;
+            }
+        }
+        heat = Math.max(heat - Math.max(heat / 1000, 1), 0);
+    }
+
+    @Override
+    public @NotNull List<FluidTankNTM> getSendingTanks() {
+        return List.of(tank);
+    }
+
+    @Override
+    public @NotNull List<FluidTankNTM> getAllTanks() {
+        return List.of(tank);
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        tank.writeToNBT(tag, "tank");
+        tag.putInt("prog", progress);
+        tag.putInt("heat", heat);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        tank.readFromNBT(tag, "tank");
+        progress = tag.getInt("prog");
+        heat = tag.getInt("heat");
+    }
+
+    @Override
+    public void serialize(RegistryFriendlyByteBuf buf) {
+        super.serialize(buf);
+        buf.writeBoolean(wasOn);
+        buf.writeInt(heat);
+        buf.writeInt(progress);
+        tank.serialize(buf);
+    }
+
+    @Override
+    public void deserialize(RegistryFriendlyByteBuf buf) {
+        super.deserialize(buf);
+        wasOn = buf.readBoolean();
+        heat = buf.readInt();
+        progress = buf.readInt();
+        tank.deserialize(buf);
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+        return new FurnaceCombinationMenu(id, inv, this);
+    }
+}

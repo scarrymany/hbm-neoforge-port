@@ -1,0 +1,23 @@
+package com.hbm.inventory.gui.machine.dummyable;
+
+import com.hbm.inventory.container.machine.dummyable.DummyableProcessMenus;
+import com.hbm.main.MainRegistry;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+
+@EventBusSubscriber(modid = MainRegistry.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
+public final class DummyableProcessClientRegistry {
+
+    private DummyableProcessClientRegistry() {
+    }
+
+    @SubscribeEvent
+    public static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(DummyableProcessMenus.FURNACE_COMBINATION.get(), FurnaceCombinationScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_BLAST_FURNACE.get(), BlastFurnaceScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_ROCK_MILL.get(), RockMillScreen::new);
+        event.register(DummyableProcessMenus.MACHINE_ANNIHILATOR.get(), AnnihilatorScreen::new);
+    }
+}
