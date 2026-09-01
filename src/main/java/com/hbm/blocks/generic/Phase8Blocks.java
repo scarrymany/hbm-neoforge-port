@@ -96,6 +96,9 @@ public final class Phase8Blocks {
         registerBlock("fusion_heater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("fusion_hatch", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("fusion_core_block", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        // CE ModBlocks.java:811-812 — leftover cubes (BlockBakeBase → BlockBase, no TE).
+        registerBlock("cm_flux", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        registerBlock("cm_heat", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         // CE ModBlocks.java:61 — structure palette marker, no creative tab.
         registerBlock("structure_anchor", () -> new BlockBase(BlockBehaviour.Properties.of().strength(2.5F, 10.0F).sound(SoundType.METAL)), null);
     }
@@ -200,6 +203,9 @@ public final class Phase8Blocks {
         registerBlock("brick_dungeon_tile", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("brick_dungeon_circle", () -> new BlockBase(stone(15.0F, 360.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("brick_fire", () -> new BlockBase(stone(10.0F, 10.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_jungle_lava", () -> new BlockHazard(stone(15.0F, 360.0F).lightLevel(s -> 5)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_jungle_ooze", () -> new BlockHazard(stone(15.0F, 360.0F).lightLevel(s -> 5)), ModCreativeTabs.BLOCKS);
+        registerBlock("brick_jungle_mystic", () -> new BlockHazard(stone(15.0F, 360.0F).lightLevel(s -> 5)), ModCreativeTabs.BLOCKS);
         stair("brick_fire_stairs", 15.0F, 35.0F);
     }
 

@@ -64,6 +64,13 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<DeuteriumExtractorBlockEntity>> MACHINE_DEUTERIUM_EXTRACTOR;
     public static Supplier<BlockEntityType<DeuteriumExtractorBlockEntity>> MACHINE_DEUTERIUM_TOWER;
     public static Supplier<BlockEntityType<MachineFanBlockEntity>> FAN;
+    public static Supplier<BlockEntityType<HexTankBlockEntity>> MACHINE_UF6_TANK;
+    public static Supplier<BlockEntityType<HexTankBlockEntity>> MACHINE_PUF6_TANK;
+    public static Supplier<BlockEntityType<MachineFunnelBlockEntity>> MACHINE_FUNNEL;
+    public static Supplier<BlockEntityType<MachineMicrowaveBlockEntity>> MACHINE_MICROWAVE;
+    public static Supplier<BlockEntityType<MachineElectricFurnaceBlockEntity>> MACHINE_ELECTRIC_FURNACE;
+    public static Supplier<BlockEntityType<MachineDetectorBlockEntity>> MACHINE_DETECTOR;
+    public static Supplier<BlockEntityType<MachineOrbusBlockEntity>> MACHINE_ORBUS;
 
     private DummyableProcessBlockEntities() {
     }
@@ -294,6 +301,35 @@ public final class DummyableProcessBlockEntities {
         FAN = ModBlocks.BLOCK_ENTITY_TYPES.register("fan", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineFanBlockEntity(FAN.get(), pos, state),
                 DummyableProcessBlocks.FAN.get()
+        ).build(null));
+        MACHINE_UF6_TANK = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_uf6_tank", () -> BlockEntityType.Builder.of(
+                (pos, state) -> HexTankBlockEntity.uf6(MACHINE_UF6_TANK.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_UF6_TANK.get()
+        ).build(null));
+        MACHINE_PUF6_TANK = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_puf6_tank", () -> BlockEntityType.Builder.of(
+                (pos, state) -> HexTankBlockEntity.puf6(MACHINE_PUF6_TANK.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_PUF6_TANK.get()
+        ).build(null));
+        MACHINE_FUNNEL = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_funnel", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineFunnelBlockEntity(MACHINE_FUNNEL.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_FUNNEL.get()
+        ).build(null));
+        MACHINE_MICROWAVE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_microwave", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineMicrowaveBlockEntity(MACHINE_MICROWAVE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_MICROWAVE.get()
+        ).build(null));
+        MACHINE_ELECTRIC_FURNACE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_electric_furnace", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineElectricFurnaceBlockEntity(MACHINE_ELECTRIC_FURNACE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_ELECTRIC_FURNACE_OFF.get(),
+                DummyableProcessBlocks.MACHINE_ELECTRIC_FURNACE_ON.get()
+        ).build(null));
+        MACHINE_DETECTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_detector", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineDetectorBlockEntity(MACHINE_DETECTOR.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_DETECTOR.get()
+        ).build(null));
+        MACHINE_ORBUS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_orbus", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineOrbusBlockEntity(MACHINE_ORBUS.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_ORBUS.get()
         ).build(null));
     }
 }

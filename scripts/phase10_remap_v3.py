@@ -32,7 +32,7 @@ from phase10_alias_and_lang import (  # type: ignore
 LEGAL = re.compile(r"^[a-z][a-z0-9_]*$")
 HELPERS = re.compile(
     r'(?:ITEMS\.register|BLOCKS\.register|registerIngot|registerNugget|registerLoreIngot|'
-    r'registerItem|registerGun|registerAmmo(?:Hidden)?|registerBlockItem|registerBlock|'
+    r'registerItem|registerGun|registerAmmo(?:Hidden)?|registerBlockItem|registerBlockNoTab|registerBlock|'
     r'registerUpgrade(?:Stack)?|registerPlainBattery|registerFelCrystal|'
     r'registerBillet|registerPowder|registerFuelPowder|registerParts|registerWaste|'
     r'registerRtgPellet|registerResource|'

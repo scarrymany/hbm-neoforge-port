@@ -47,6 +47,11 @@ import com.hbm.blockentity.machine.dummyable.MachineSirenBlockEntity;
 import com.hbm.blockentity.machine.dummyable.RadarScreenBlockEntity;
 import com.hbm.blockentity.machine.dummyable.RadioTelexBlockEntity;
 import com.hbm.blockentity.machine.dummyable.WasteDrumBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HexTankBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineElectricFurnaceBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineFunnelBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineMicrowaveBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineOrbusBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -103,6 +108,11 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<DrainMenu>> MACHINE_DRAIN;
     public static DeferredHolder<MenuType<?>, MenuType<BAT9000Menu>> MACHINE_BAT9000;
     public static DeferredHolder<MenuType<?>, MenuType<DeuteriumMenu>> MACHINE_DEUTERIUM;
+    public static DeferredHolder<MenuType<?>, MenuType<HexTankMenu>> HEX_TANK;
+    public static DeferredHolder<MenuType<?>, MenuType<OrbusMenu>> MACHINE_ORBUS;
+    public static DeferredHolder<MenuType<?>, MenuType<FunnelMenu>> MACHINE_FUNNEL;
+    public static DeferredHolder<MenuType<?>, MenuType<MicrowaveMenu>> MACHINE_MICROWAVE;
+    public static DeferredHolder<MenuType<?>, MenuType<ElectricFurnaceMenu>> MACHINE_ELECTRIC_FURNACE;
 
     private DummyableProcessMenus() {
     }
@@ -202,6 +212,16 @@ public final class DummyableProcessMenus {
                 new BAT9000Menu(id, inv, (MachineBAT9000BlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_DEUTERIUM = reg("machine_deuterium", (id, inv, buf) ->
                 new DeuteriumMenu(id, inv, (DeuteriumExtractorBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        HEX_TANK = reg("hex_tank", (id, inv, buf) ->
+                new HexTankMenu(id, inv, (HexTankBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ORBUS = reg("machine_orbus", (id, inv, buf) ->
+                new OrbusMenu(id, inv, (MachineOrbusBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_FUNNEL = reg("machine_funnel", (id, inv, buf) ->
+                new FunnelMenu(id, inv, (MachineFunnelBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_MICROWAVE = reg("machine_microwave", (id, inv, buf) ->
+                new MicrowaveMenu(id, inv, (MachineMicrowaveBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ELECTRIC_FURNACE = reg("machine_electric_furnace", (id, inv, buf) ->
+                new ElectricFurnaceMenu(id, inv, (MachineElectricFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

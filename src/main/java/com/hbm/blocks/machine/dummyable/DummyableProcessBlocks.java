@@ -2,6 +2,10 @@ package com.hbm.blocks.machine.dummyable;
 
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.machine.MachineDetectorBlock;
+import com.hbm.blocks.machine.MachineElectricFurnaceBlock;
+import com.hbm.blocks.machine.MachineFunnelBlock;
+import com.hbm.blocks.machine.MachineMicrowaveBlock;
 import com.hbm.blocks.machine.WasteDrumBlock;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -23,7 +27,8 @@ import java.util.function.Supplier;
  * ore slopper / turbofan / radgen / hephaestus / wood burner /
  * furnace iron / furnace steel / firebox / oven / oilburner / sawmill /
  * ashpit / heat boilers / cooling towers / telex / radar screen / siren / condenser /
- * condenser powered / intake / drain / BAT9000 / deuterium / fan.
+ * condenser powered / intake / drain / BAT9000 / deuterium / fan /
+ * UF6/PuF6 tanks / funnel / microwave / electric furnace / detector / orbus.
  */
 public final class DummyableProcessBlocks {
 
@@ -88,6 +93,14 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<com.hbm.blocks.machine.MachineDeuteriumExtractorBlock> MACHINE_DEUTERIUM_EXTRACTOR;
     public static DeferredBlock<MachineDeuteriumTowerBlock> MACHINE_DEUTERIUM_TOWER;
     public static DeferredBlock<com.hbm.blocks.machine.MachineFanBlock> FAN;
+    public static DeferredBlock<MachineHexTankBlock> MACHINE_UF6_TANK;
+    public static DeferredBlock<MachineHexTankBlock> MACHINE_PUF6_TANK;
+    public static DeferredBlock<MachineFunnelBlock> MACHINE_FUNNEL;
+    public static DeferredBlock<MachineMicrowaveBlock> MACHINE_MICROWAVE;
+    public static DeferredBlock<MachineElectricFurnaceBlock> MACHINE_ELECTRIC_FURNACE_OFF;
+    public static DeferredBlock<MachineElectricFurnaceBlock> MACHINE_ELECTRIC_FURNACE_ON;
+    public static DeferredBlock<MachineDetectorBlock> MACHINE_DETECTOR;
+    public static DeferredBlock<MachineOrbusBlock> MACHINE_ORBUS;
 
     private DummyableProcessBlocks() {
     }
@@ -151,14 +164,27 @@ public final class DummyableProcessBlocks {
         MACHINE_DEUTERIUM_EXTRACTOR = registerBlock("machine_deuterium_extractor", () -> new com.hbm.blocks.machine.MachineDeuteriumExtractorBlock(MACHINE_PROPS));
         MACHINE_DEUTERIUM_TOWER = registerBlock("machine_deuterium_tower", () -> new MachineDeuteriumTowerBlock(MACHINE_PROPS));
         FAN = registerBlock("fan", () -> new com.hbm.blocks.machine.MachineFanBlock(MACHINE_PROPS));
+        MACHINE_UF6_TANK = registerBlock("machine_uf6_tank", () -> new MachineHexTankBlock(MACHINE_PROPS, false));
+        MACHINE_PUF6_TANK = registerBlock("machine_puf6_tank", () -> new MachineHexTankBlock(MACHINE_PROPS, true));
+        MACHINE_FUNNEL = registerBlock("machine_funnel", () -> new MachineFunnelBlock(MACHINE_PROPS));
+        MACHINE_MICROWAVE = registerBlock("machine_microwave", () -> new MachineMicrowaveBlock(MACHINE_PROPS));
+        MACHINE_ELECTRIC_FURNACE_OFF = registerBlock("machine_electric_furnace_off", () -> new MachineElectricFurnaceBlock(MACHINE_PROPS));
+        MACHINE_ELECTRIC_FURNACE_ON = registerBlockNoTab("machine_electric_furnace_on", () -> new MachineElectricFurnaceBlock(MACHINE_PROPS));
+        MACHINE_DETECTOR = registerBlock("machine_detector", () -> new MachineDetectorBlock(MACHINE_PROPS));
+        MACHINE_ORBUS = registerBlock("machine_orbus", () -> new MachineOrbusBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }
 
     private static <T extends net.minecraft.world.level.block.Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory) {
+        DeferredBlock<T> block = registerBlockNoTab(name, factory);
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, block);
+        return block;
+    }
+
+    private static <T extends net.minecraft.world.level.block.Block> DeferredBlock<T> registerBlockNoTab(String name, Supplier<T> factory) {
         DeferredBlock<T> block = ModBlocks.BLOCKS.register(name, factory);
         ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
-        CreativeTabContents.add(ModCreativeTabs.MACHINE, block);
         return block;
     }
 }
