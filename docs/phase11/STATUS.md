@@ -12,7 +12,6 @@
 - Items census **2574** (chunk_ore loop not unrolled in extract_all_ids; runtime +4).
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Weighted ≥99% is a gate. Not content-complete.
-- Verified: `compileJava` 0. runServer pending this revision.
-- No new tag: metal half is playable (pour/slots), but CE GUI pngs are still missing;
-  no Release this wave unless asked.
+- Verified: `compileJava` 0, `runServer` **Done (5.068s)** / 3946 recipes, port 25566.
+- No new tag: metal half is playable (pour/slots). CE GUI pngs still missing. No Release.
 - `master` untouched.
