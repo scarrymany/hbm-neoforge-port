@@ -5,6 +5,7 @@
 - This session: Compressor / Coker / Catalytic cracker / Catalytic reformer / Hydrotreater
   (block + BE + menu + screen + CE recipe table). No stub GUIs. +7 leftover vanilla JSON.
 - Assembler skip still **7**. Assembler JSON untouched (356).
-- `compileJava` 0. `build` / `runServer` pending this snapshot.
+- `compileJava` 0. `build` SUCCESS, jar **66,960,892 B** (~63.86 MB).
+- `runServer` **Done (4.923s)** wiped world, **2962 recipes** / 2270 advancements. No parse errors.
 - Reachability **46.2%** (941 / 2039).
 - No GitHub Release. `master` untouched.

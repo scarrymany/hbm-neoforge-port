@@ -6,8 +6,10 @@ is stale. Do not quote Phase 6 as current.
 Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_parity_census.py`
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
-`src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors (build /
-`runServer` pending after this snapshot).
+`src/main/resources` + `src/generated`. Verified this session: `compileJava` 0 errors,
+`./gradlew build` SUCCESS, jar `build/libs/hbm-0.0.1.jar` **66,960,892 B** (~63.86 MB),
+`./gradlew runServer` **Done (4.923s)** on wiped world, **2962 recipes** / 2270 advancements
+(prior session 2955 recipes / Done 5.216s — +7 leftover JSON). No recipe parse errors.
 
 ## Top line
 
