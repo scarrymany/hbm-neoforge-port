@@ -8,9 +8,10 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0.
-`./gradlew runServer` pending this commit (anvil is Java table, not JSON).
-No new tag. `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0,
+`./gradlew runServer` **Done (5.072s)** on wiped world port 25566, **4047 recipes**
+(anvil is Java table, not JSON — count unchanged). No recipe parse errors. No new tag.
+`v0.0.1-rc2` stays.
 
 ## Top line
 

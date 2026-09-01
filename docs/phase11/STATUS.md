@@ -18,5 +18,5 @@
   (`circuit`/`shell`/`pipe`/`wire_fine`/`plate_welded`/`gear_large`/`battery_sc`/`pile_rod`/`mold`).
 - Vanilla **1898 / 97.3%**. Machine census **1920 / 95.6%** (regex; anvil is Java table).
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0. `runServer` pending this commit.
+- Verified: `compileJava` 0, `runServer` **Done (5.072s)** / 4047 recipes (anvil is Java table, not JSON), port 25566.
 - No tag (reachability still ~63%). `master` untouched.
