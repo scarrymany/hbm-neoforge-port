@@ -88,6 +88,21 @@ def extract_all_ids() -> tuple[set[str], set[str]]:
             bid = pref + n.lower()
             blocks.add(bid)
             items.add(bid)
+    # concrete_* / concrete_ext_* / concrete_super_* / scaffold_* loops (already registered)
+    dyes = ("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
+            "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black")
+    for d in dyes:
+        blocks.add(f"concrete_{d}")
+        items.add(f"concrete_{d}")
+    for t in ("machine", "machine_stripe", "indigo", "purple", "pink", "hazard", "sand", "bronze"):
+        blocks.add(f"concrete_ext_{t}")
+        items.add(f"concrete_ext_{t}")
+    for i in range(16):
+        blocks.add(f"concrete_super_{i}")
+        items.add(f"concrete_super_{i}")
+    for s in ("scaffold_steel", "scaffold_red", "scaffold_white", "scaffold_yellow"):
+        blocks.add(s)
+        items.add(s)
     # PlantBlocks / glyph loops
     enums = (JAVA / "blocks" / "PlantEnums.java").read_text(errors="ignore")
     for pref, enum_name in (

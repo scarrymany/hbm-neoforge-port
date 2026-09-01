@@ -46,6 +46,8 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineSuperComputerBlockEntity>> MACHINE_SUPERCOMPUTER;
     public static Supplier<BlockEntityType<MachineAutosawBlockEntity>> MACHINE_AUTOSAW;
     public static Supplier<BlockEntityType<FractionSpacerBlockEntity>> FRACTION_SPACER;
+    public static Supplier<BlockEntityType<WatzPumpBlockEntity>> WATZ_PUMP;
+    public static Supplier<BlockEntityType<VendingMachineBlockEntity>> VENDING_MACHINE;
 
     private DummyableProcessBlockEntities() {
     }
@@ -204,6 +206,14 @@ public final class DummyableProcessBlockEntities {
         FRACTION_SPACER = ModBlocks.BLOCK_ENTITY_TYPES.register("fraction_spacer", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new FractionSpacerBlockEntity(FRACTION_SPACER.get(), pos, state),
                 DummyableProcessBlocks.FRACTION_SPACER.get()
+        ).build(null));
+        WATZ_PUMP = ModBlocks.BLOCK_ENTITY_TYPES.register("watz_pump", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new WatzPumpBlockEntity(WATZ_PUMP.get(), pos, state),
+                DummyableProcessBlocks.WATZ_PUMP.get()
+        ).build(null));
+        VENDING_MACHINE = ModBlocks.BLOCK_ENTITY_TYPES.register("vending_machine", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new VendingMachineBlockEntity(VENDING_MACHINE.get(), pos, state),
+                DummyableProcessBlocks.VENDING_MACHINE.get()
         ).build(null));
     }
 }

@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "hbm:block/boat"
+      "model": "hbm:block/watz_pump"
     }
   }
 }

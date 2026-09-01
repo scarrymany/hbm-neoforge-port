@@ -43,6 +43,7 @@ public final class GenericDecoBlocks {
 
     public static Supplier<BlockEntityType<DecoBlockAlt.StatuePulseBlockEntity>> STATUE_PULSE_ENTITY_TYPE;
     public static Supplier<BlockEntityType<LanternBlockEntity>> LANTERN_ENTITY_TYPE;
+    public static Supplier<BlockEntityType<LanternBehemothBlockEntity>> LANTERN_BEHEMOTH_ENTITY_TYPE;
 
     private GenericDecoBlocks() {
     }
@@ -78,6 +79,9 @@ public final class GenericDecoBlocks {
         registerBlock("deco_sat_laser", () -> new DecoBlock(satProps(), DecoBlock.Shape.PLAIN), ModCreativeTabs.BLOCKS);
         registerBlock("deco_sat_foeq", () -> new DecoBlock(satProps(), DecoBlock.Shape.PLAIN), ModCreativeTabs.BLOCKS);
         registerBlock("deco_sat_resonator", () -> new DecoBlock(satProps(), DecoBlock.Shape.PLAIN), ModCreativeTabs.BLOCKS);
+        // CE ModBlocks.java:1515 / :1517 — unused 1.7 leftovers, still registered cubes.
+        registerBlock("boxcar", () -> new DecoBlock(deco15Props(), DecoBlock.Shape.PLAIN), ModCreativeTabs.BLOCKS);
+        registerBlock("boat", () -> new DecoBlock(deco15Props(), DecoBlock.Shape.PLAIN), ModCreativeTabs.BLOCKS);
     }
 
     private static void registerDecoBlockAlt() {
@@ -208,6 +212,11 @@ public final class GenericDecoBlocks {
                 ModCreativeTabs.BLOCKS);
         LANTERN_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("lantern",
                 () -> BlockEntityType.Builder.of(LanternBlockEntity::new, lantern.get()).build(null));
+        DeferredBlock<BlockLanternBehemoth> behemoth = registerBlock("lantern_behemoth",
+                () -> new BlockLanternBehemoth(deco15Props().lightLevel(state -> 15).noOcclusion()),
+                ModCreativeTabs.BLOCKS);
+        LANTERN_BEHEMOTH_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("lantern_behemoth",
+                () -> BlockEntityType.Builder.of(LanternBehemothBlockEntity::new, behemoth.get()).build(null));
     }
 
     private static void registerWand() {
