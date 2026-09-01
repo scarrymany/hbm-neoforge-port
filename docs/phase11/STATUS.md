@@ -1,7 +1,7 @@
 # Phase 11 status
 
-- Census: `docs/phase11/PARITY_REPORT.md` — **65.8% weighted / 82.7% unweighted**. Not ≥90%.
-- Machine recipes **763 → 786 (38.0% → 39.1%)**. Vanilla **823 → 838 (42.2% → 43.0%)**. Blocks **714 → 724 (61.1% → 61.9%)**. Items **1949 → 1963**.
-- This session: ArcWelder sats 47/47; PlasmaForge 35/35 leftovers; assembler precass/sat parts/fusion components; table-driven `ce_craft/` leftover CE vanilla.
-- `compileJava` 0. `./gradlew build` SUCCESS, jar **66,541,112** B (~63.46 MB). `runServer` **Done (5.620s)**, 2446 recipes.
+- Census: `docs/phase11/PARITY_REPORT.md` — **68.6% weighted / 84.3% unweighted**. Not ≥90%.
+- Machine recipes **786 → 901 (39.1% → 44.8%)**. Vanilla **838 → 861 (43.0% → 44.2%)**. Blocks **724 → 759 (61.9% → 64.9%)**. Items **1963 → 2009**.
+- This session: leftover assembler casings + `thruster_nuclear` / `fluorite` / syringes / cladding. Assembler skip **169 → 58**. Assembler JSON **196 → 305**.
+- `compileJava` 0. `./gradlew build` SUCCESS, jar **66,611,238** B (~63.53 MB). `runServer` **Done (5.093s)**, 2584 recipes.
 - No GitHub Release. `master` untouched.
