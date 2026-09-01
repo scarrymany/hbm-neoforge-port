@@ -94,6 +94,7 @@ public class CompatibilityConfig {
     public static ConfigValue<List<? extends String>> ANTENNA_STRUCTURE_RAW;
     public static ConfigValue<List<? extends String>> BUNKER_STRUCTURE_RAW;
     public static ConfigValue<List<? extends String>> RADIO_STRUCTURE_RAW;
+    public static ConfigValue<List<? extends String>> RADFREQ_RAW;
 
     static void init(ModConfigSpec.Builder builder) {
         builder.push("mobs");
@@ -322,6 +323,9 @@ public class CompatibilityConfig {
         RADIO_STRUCTURE_RAW = builder
                 .comment("Spawns CE's Radio station (Radio01+Radio02) every Nth chunk (1-in-N chance). [CE CompatibilityConfig.radioStructure default 0:1000]")
                 .defineListAllowEmpty("radioStructure", () -> List.of("minecraft:overworld=1000"), entry -> entry instanceof String);
+        RADFREQ_RAW = builder
+                .comment("Spawn a Sellafield radiation hotspot every Nth chunk (1-in-N). [CE CompatibilityConfig.radfreq 03.17_radHotsoptSpawn default 0:5000]")
+                .defineListAllowEmpty("radfreq", () -> List.of("minecraft:overworld=5000"), entry -> entry instanceof String);
 
         builder.pop();
     }
@@ -414,4 +418,5 @@ public class CompatibilityConfig {
     public static Map<String, Integer> antennaStructure() { return spawnMap(ANTENNA_STRUCTURE_RAW); }
     public static Map<String, Integer> bunkerStructure() { return spawnMap(BUNKER_STRUCTURE_RAW); }
     public static Map<String, Integer> radioStructure() { return spawnMap(RADIO_STRUCTURE_RAW); }
+    public static Map<String, Integer> radfreq() { return spawnMap(RADFREQ_RAW); }
 }

@@ -8,7 +8,8 @@
     "hbm:meteorite",
     "hbm:antenna",
     "hbm:bunker",
-    "hbm:radio"
+    "hbm:radio",
+    "hbm:sellafield"
   ],
   "step": "underground_ores"
 }

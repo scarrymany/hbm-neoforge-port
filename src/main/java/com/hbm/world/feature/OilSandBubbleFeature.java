@@ -1,5 +1,6 @@
 package com.hbm.world.feature;
 
+import com.hbm.config.GeneralConfig;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
@@ -43,6 +44,8 @@ public class OilSandBubbleFeature extends Feature<NoneFeatureConfiguration> {
         WorldGenLevel level = context.level();
         BlockPos origin = context.origin();
         RandomSource random = context.random();
+
+        if (!GeneralConfig.ENABLE_DUNGEON_SPAWN.get()) return false;
 
         Biome biome = level.getBiome(origin).value();
         boolean hotAndDry = biome.getBaseTemperature() >= 1.8F && biome.getPrecipitationAt(origin) == Biome.Precipitation.NONE;

@@ -8,6 +8,7 @@ import com.hbm.world.feature.MeteoriteFeature;
 import com.hbm.world.feature.OilBubbleFeature;
 import com.hbm.world.feature.OilSandBubbleFeature;
 import com.hbm.world.feature.RadioFeature;
+import com.hbm.world.feature.SellafieldFeature;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -25,6 +26,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * <p>
  * Registered from {@code MainRegistry}'s constructor via {@link #register(IEventBus)} - see this
  * package's own wiringSnippets (protected file, not edited directly).
+ * <p>
+ * Leftover CE {@code enableDungeons} structures not in this roster:
+ * TODO(CE: HbmWorldGen.java:347-395) hive/desert-atom/barrel/satellite/spaceship/dud/landmine;
+ * TODO(CE: HbmWorldGen.java:652) NITAN chest grid ({@code GeneralConfig.ENABLE_NITAN_CHEST_SPAWN} unused).
  */
 public final class OilMeteorWorldGenFeatures {
 
@@ -45,6 +50,8 @@ public final class OilMeteorWorldGenFeatures {
             FEATURES.register("bunker", () -> new BunkerFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, RadioFeature> RADIO =
             FEATURES.register("radio", () -> new RadioFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, SellafieldFeature> SELLAFIELD =
+            FEATURES.register("sellafield", () -> new SellafieldFeature(NoneFeatureConfiguration.CODEC));
 
     private OilMeteorWorldGenFeatures() {
     }
