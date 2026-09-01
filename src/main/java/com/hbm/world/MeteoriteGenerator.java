@@ -50,9 +50,9 @@ import java.util.Set;
  * <b>The {@code allowSpecials} 300-roll branch is ported in full for forward compatibility with the
  * future {@code EntityMeteor} caller</b>, even though it is dead code for this package's own feature
  * (which always passes {@code allowSpecials=false}). Two of its thirteen outcomes reference CE blocks
- * not yet registered anywhere in this port - {@code toxic_block} (case 8, "large nuclear meteorite")
- * and a taint block carrying CE's {@code BlockTaint.TAINTAGE} property (case 10, "tainted
- * meteorite") - confirmed absent by repo-wide grep. Both degrade gracefully (the rest of that case's
+ * not yet registered anywhere in this port - a taint block carrying CE's {@code BlockTaint.TAINTAGE}
+ * property (case 10, "tainted meteorite") - confirmed absent by repo-wide grep. That case degrades
+ * gracefully (the rest of that case's
  * shape still generates; only the missing block's own placement is skipped) rather than throwing or
  * silently substituting a different block; see this package's own knownGaps for the exact scope of
  * what remains once those blocks land elsewhere. CE's switch also has no {@code case 11} (and no
@@ -139,9 +139,7 @@ public final class MeteoriteGenerator {
                     return;
                 }
                 case 8 -> {
-                    // Large nuclear meteorite. toxic_block is not registered anywhere in this port
-                    // yet (confirmed absent by grep) - the treasure shell still generates; only the
-                    // inner toxic core is skipped until that block lands elsewhere.
+                    // Large nuclear meteorite. Inner core is hbm:toxic_block (now registered).
                     sphere7x7(ctx, x, y, z, List.of(block("block_meteor_treasure")));
                     Block toxic = block("toxic_block");
                     if (toxic != null) sphere5x5(ctx, x, y, z, List.of(toxic));

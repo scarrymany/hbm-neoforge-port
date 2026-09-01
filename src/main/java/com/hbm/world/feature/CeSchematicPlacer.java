@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hbm.blockentity.machine.CrateBlockEntity;
+import com.hbm.blocks.generic.BlockSellafield;
 import com.hbm.itempool.ItemPool;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
@@ -170,6 +171,10 @@ public final class CeSchematicPlacer {
         if (cell.open != null && state.hasProperty(TrapDoorBlock.OPEN)) {
             state = state.setValue(TrapDoorBlock.OPEN, cell.open);
         }
+        if (cell.level != null && state.hasProperty(BlockSellafield.LEVEL)) {
+            int lv = Math.max(0, Math.min(5, cell.level));
+            state = state.setValue(BlockSellafield.LEVEL, lv);
+        }
         return state;
     }
 
@@ -222,12 +227,14 @@ public final class CeSchematicPlacer {
                 String facing = null;
                 String half = null;
                 Boolean open = null;
+                Integer level = null;
                 Special special = null;
                 if (rec.size() > 4) {
                     JsonObject extra = rec.get(4).getAsJsonObject();
                     if (extra.has("f")) facing = extra.get("f").getAsString();
                     if (extra.has("h")) half = extra.get("h").getAsString();
                     if (extra.has("o")) open = extra.get("o").getAsBoolean();
+                    if (extra.has("l")) level = extra.get("l").getAsInt();
                     if (extra.has("s")) {
                         JsonObject s = extra.getAsJsonObject("s");
                         special = new Special(
@@ -240,7 +247,7 @@ public final class CeSchematicPlacer {
                                 s.has("hinge") ? s.get("hinge").getAsString() : "left");
                     }
                 }
-                cells.add(new Cell(x, y, z, id, facing, half, open, special));
+                cells.add(new Cell(x, y, z, id, facing, half, open, level, special));
             }
             MainRegistry.logger.info("Loaded CE schematic {} ({} cells)", name, cells.size());
             return new Schematic(cells);
@@ -252,7 +259,7 @@ public final class CeSchematicPlacer {
     private record Schematic(List<Cell> cells) {
     }
 
-    private record Cell(int x, int y, int z, String blockId, String facing, String half, Boolean open, Special special) {
+    private record Cell(int x, int y, int z, String blockId, String facing, String half, Boolean open, Integer level, Special special) {
     }
 
     private record Special(String type, String pool, int rolls, int rand, int base, String facing, String hinge) {

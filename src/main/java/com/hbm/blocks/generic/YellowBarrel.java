@@ -13,8 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * CE {@code blocks/generic/YellowBarrel.java}.
  * <p>
- * {@code toxic_block} (1-in-3 explode replacement) is a fluid block not registered in this port —
- * that branch falls through to the 18.0F blast so the barrel never silently vanishes.
+ * {@code toxic_block} 1-in-3 explode replacement is live ({@link WastelandVirusBlocks#TOXIC_BLOCK}).
  * {@code ChunkRadiationManager} tick + detonation rad match CE (5/75 idle, 35/1500 on explode).
  */
 public class YellowBarrel extends BaseBarrel {
@@ -30,8 +29,10 @@ public class YellowBarrel extends BaseBarrel {
     }
 
     public void explode(Level level, int x, int y, int z) {
-        // CE: 1-in-3 places toxic_block; else createExplosion(..., 18.0F, smoking=true)
-        if (level.getRandom().nextInt(3) != 0) {
+        // CE YellowBarrel.java: 1-in-3 places toxic_block; else createExplosion(..., 18.0F)
+        if (level.getRandom().nextInt(3) == 0) {
+            level.setBlock(new BlockPos(x, y, z), WastelandVirusBlocks.TOXIC_BLOCK.get().defaultBlockState(), 3);
+        } else {
             level.explode(null, x, y, z, 18.0F, false, Level.ExplosionInteraction.TNT);
         }
         ExplosionNukeGeneric.waste(level, x, y, z, 35);

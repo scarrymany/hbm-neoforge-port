@@ -35,6 +35,8 @@ public final class OilMeteorBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_OIL_METEOR_WORLDGEN = key("add_oil_meteor_worldgen");
     /** Landmine after vegetal so grass/trees do not overwrite the 1-block mine (CE {@code IWorldGenerator} is post-decorate). */
     public static final ResourceKey<BiomeModifier> ADD_LANDMINE_WORLDGEN = key("add_landmine_worldgen");
+    /** Dud + waste barrel after vegetal — 1-block dud / surface tower, same CE post-decorate step. */
+    public static final ResourceKey<BiomeModifier> ADD_DUD_BARREL_WORLDGEN = key("add_dud_barrel_worldgen");
 
     private OilMeteorBiomeModifiers() {
     }
@@ -59,6 +61,12 @@ public final class OilMeteorBiomeModifiers {
         context.register(ADD_LANDMINE_WORLDGEN, new AddFeaturesBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
                 HolderSet.direct(List.of(placedFeatures.getOrThrow(OilMeteorPlacedFeatures.LANDMINE))),
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
+        context.register(ADD_DUD_BARREL_WORLDGEN, new AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(List.of(
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.DUD),
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.BARREL))),
                 GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
     }
 

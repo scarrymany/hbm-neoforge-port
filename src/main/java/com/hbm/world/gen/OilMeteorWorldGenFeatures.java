@@ -2,8 +2,10 @@ package com.hbm.world.gen;
 
 import com.hbm.main.MainRegistry;
 import com.hbm.world.feature.AntennaFeature;
+import com.hbm.world.feature.BarrelFeature;
 import com.hbm.world.feature.BedrockOilDepositFeature;
 import com.hbm.world.feature.BunkerFeature;
+import com.hbm.world.feature.DudFeature;
 import com.hbm.world.feature.LandmineFeature;
 import com.hbm.world.feature.MeteoriteFeature;
 import com.hbm.world.feature.NitanChestFeature;
@@ -32,10 +34,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * Leftover CE {@code enableDungeons} structures (no generator in this port):
  * TODO(CE: HbmWorldGen.java:347-358) hive — {@code GlyphidHive.generate}, {@code hiveSpawn} 256;
  * TODO(CE: HbmWorldGen.java:367-368) desert-atom — {@code DesertAtom001}, {@code atomStructure} 0:500, {@code !canRain && temp>=2};
- * TODO(CE: HbmWorldGen.java:370-371) barrel — {@code Barrel}, {@code barrelStructure} 0:5000, {@code temp>1.8};
  * TODO(CE: HbmWorldGen.java:373-374) satellite dish — {@code Satellite}, {@code satelliteStructure} 0:500, {@code temp<1 || temp>1.8};
- * TODO(CE: HbmWorldGen.java:377) spaceship — {@code Spaceship}, {@code spaceshipStructure} 0:1000;
- * TODO(CE: HbmWorldGen.java:379) dud — {@code Dud}, {@code dudStructure} 0:500.
+ * TODO(CE: HbmWorldGen.java:377) spaceship — {@code Spaceship}, {@code spaceshipStructure} 0:1000.
  */
 public final class OilMeteorWorldGenFeatures {
 
@@ -62,6 +62,10 @@ public final class OilMeteorWorldGenFeatures {
             FEATURES.register("landmine", () -> new LandmineFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, NitanChestFeature> NITAN_CHEST =
             FEATURES.register("nitan_chest", () -> new NitanChestFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, DudFeature> DUD =
+            FEATURES.register("dud", () -> new DudFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, BarrelFeature> BARREL =
+            FEATURES.register("barrel", () -> new BarrelFeature(NoneFeatureConfiguration.CODEC));
 
     private OilMeteorWorldGenFeatures() {
     }
