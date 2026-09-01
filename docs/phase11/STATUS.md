@@ -5,6 +5,7 @@
 - This session: Vacuum distill / Radiolysis / Gas flare / EPress
   (block + BE + menu + screen + CE recipe table). No stub GUIs.
 - Assembler skip still **7**. Assembler JSON untouched (356).
-- `compileJava` 0. `build` / `runServer` pending this snapshot.
+- `compileJava` 0. `build` SUCCESS, jar **67,003,709 B** (~63.90 MB).
+- `runServer` **Done (5.441s)** wiped world, **2962 recipes** / 2270 advancements. No parse errors.
 - Reachability **46.2%** (944 / 2042).
 - No GitHub Release. `master` untouched.
