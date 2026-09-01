@@ -52,7 +52,8 @@ import java.util.function.Supplier;
  * pump steam/electric / chimney brick/industrial / thresher / bm_power_box /
  * mining laser / strand caster / forcefield / chungus / satlink / teleporter /
  * fluidtank / bigasstank / compressor compact / satlinker /
- * reactor_research / reactor_zirnox.
+ * reactor_research / reactor_zirnox /
+ * assembly factory / chemical factory.
  */
 public final class DummyableProcessBlocks {
 
@@ -167,6 +168,8 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineSatLinkerBlock> MACHINE_SATLINKER;
     public static DeferredBlock<ReactorResearchBlock> REACTOR_RESEARCH;
     public static DeferredBlock<ReactorZirnoxBlock> REACTOR_ZIRNOX;
+    public static DeferredBlock<MachineAssemblyFactoryBlock> MACHINE_ASSEMBLY_FACTORY;
+    public static DeferredBlock<MachineChemicalFactoryBlock> MACHINE_CHEMICAL_FACTORY;
 
     private DummyableProcessBlocks() {
     }
@@ -315,6 +318,13 @@ public final class DummyableProcessBlocks {
         REACTOR_ZIRNOX = registerBlock("reactor_zirnox",
                 () -> new ReactorZirnoxBlock(BlockBehaviour.Properties.of()
                         .strength(5.0F, 100.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // CE ModBlocks.java:1056 / :1064 hardness 5 / resistance 30; Dummyable {2,0,2,2,2,2} offset 2
+        MACHINE_ASSEMBLY_FACTORY = registerBlock("machine_assembly_factory",
+                () -> new MachineAssemblyFactoryBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 30.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_CHEMICAL_FACTORY = registerBlock("machine_chemical_factory",
+                () -> new MachineChemicalFactoryBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 30.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

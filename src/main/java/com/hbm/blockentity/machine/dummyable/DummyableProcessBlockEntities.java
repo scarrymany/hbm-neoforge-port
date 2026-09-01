@@ -101,6 +101,8 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineSatLinkerBlockEntity>> MACHINE_SATLINKER;
     public static Supplier<BlockEntityType<ReactorResearchBlockEntity>> REACTOR_RESEARCH;
     public static Supplier<BlockEntityType<ReactorZirnoxBlockEntity>> REACTOR_ZIRNOX;
+    public static Supplier<BlockEntityType<MachineAssemblyFactoryBlockEntity>> MACHINE_ASSEMBLY_FACTORY;
+    public static Supplier<BlockEntityType<MachineChemicalFactoryBlockEntity>> MACHINE_CHEMICAL_FACTORY;
 
     private DummyableProcessBlockEntities() {
     }
@@ -494,6 +496,14 @@ public final class DummyableProcessBlockEntities {
         REACTOR_ZIRNOX = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_zirnox", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new ReactorZirnoxBlockEntity(REACTOR_ZIRNOX.get(), pos, state),
                 DummyableProcessBlocks.REACTOR_ZIRNOX.get()
+        ).build(null));
+        MACHINE_ASSEMBLY_FACTORY = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_assembly_factory", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineAssemblyFactoryBlockEntity(MACHINE_ASSEMBLY_FACTORY.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_ASSEMBLY_FACTORY.get()
+        ).build(null));
+        MACHINE_CHEMICAL_FACTORY = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_chemical_factory", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineChemicalFactoryBlockEntity(MACHINE_CHEMICAL_FACTORY.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CHEMICAL_FACTORY.get()
         ).build(null));
     }
 }

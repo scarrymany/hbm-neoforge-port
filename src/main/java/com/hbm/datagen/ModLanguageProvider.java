@@ -366,8 +366,10 @@ public class ModLanguageProvider extends LanguageProvider {
         m.put("corium_block", "Corium");
         m.put("launchpad_soyuz", "Soyuz Launch Pad");
         m.put("machine_assembly_machine", "Assembly Machine");
+        m.put("machine_assembly_factory", "Assembly Factory");
         m.put("machine_centrifuge", "Centrifuge");
         m.put("machine_chemical_plant", "Chemical Plant");
+        m.put("machine_chemical_factory", "Chemical Factory");
         m.put("machine_combustion_engine", "Industrial Combustion Engine");
         m.put("machine_crystallizer", "Ore Acidizer");
         m.put("machine_cyclotron", "Cyclotron");
@@ -629,6 +631,8 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.launchPadRusted", "Launch Pad");
         this.add("container.launchpadSoyuz", "Soyuz Launch Pad");
         this.add("container.machineChemicalPlant", "Chemical Plant");
+        this.add("container.machineAssemblyFactory", "Assembly Factory");
+        this.add("container.machineChemicalFactory", "Chemical Factory");
         this.add("container.machineDiesel", "Diesel Generator");
         this.add("container.machineElectrolyser", "Electrolysis Machine");
         this.add("container.machineICF", "ICF");

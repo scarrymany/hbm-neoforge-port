@@ -40,8 +40,7 @@ public final class Phase11CasingBlocks {
         // machine_mining_laser is DummyableProcessBlocks (live TE).
         // machine_teleporter / machine_satlink / machine_forcefield / machine_strand_caster /
         // machine_chungus are DummyableProcessBlocks (live TE).
-        registerBlock("machine_assembly_factory", () -> new BlockBase(MACHINE_PROPS));
-        registerBlock("machine_chemical_factory", () -> new BlockBase(MACHINE_PROPS));
+        // machine_assembly_factory / machine_chemical_factory are DummyableProcessBlocks (live TE).
         // machine_turbofan / machine_hephaestus / machine_radgen are DummyableProcessBlocks (full TEs).
         // machine_pyrooven / machine_exposure_chamber are DummyableProcessBlocks (full TEs).
         // machine_fluidtank / machine_bigasstank are DummyableProcessBlocks (live TE).
