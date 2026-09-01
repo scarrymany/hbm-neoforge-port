@@ -81,9 +81,6 @@ def recipes() -> list[dict]:
     recs.append(shaped("building/steel_roof", "hbm:steel_roof", 4,
                        ["SS", "PP"],
                        {"S": item("hbm:ingot_steel"), "P": item("hbm:plate_steel")}))
-    recs.append(shaped("building/rebar", "hbm:rebar", 8,
-                       ["S S", " S ", "S S"],
-                       {"S": item("hbm:steel_beam")}))
     recs.append(shaped("building/sandbags", "hbm:sandbags", 4,
                        ["WW", "SS", "WW"],
                        {"W": item("minecraft:white_wool"), "S": item("minecraft:sand")}))
@@ -93,10 +90,6 @@ def recipes() -> list[dict]:
     recs.append(shaped("building/barbed_wire_fire", "hbm:barbed_wire_fire", 8,
                        ["B B", " B ", "B B"],
                        {"B": item("hbm:barbed_wire")}))
-    recs.append(shaped("building/gneiss_brick", "hbm:gneiss_brick", 4,
-                       ["##", "##"], {"#": item("hbm:stone_gneiss")}))
-    recs.append(shaped("building/gneiss_tiles", "hbm:gneiss_tile", 4,
-                       ["##", "##"], {"#": item("hbm:gneiss_brick")}))
     recs.append(shaped("building/depth_nether_brick", "hbm:depth_nether_brick", 4,
                        ["##", "##"], {"#": item("hbm:stone_depth_nether")}))
     recs.append(shaped("building/depth_nether_tiles", "hbm:depth_nether_tiles", 4,
@@ -139,13 +132,6 @@ def recipes() -> list[dict]:
     recs.append(shaped("weapon/sphere_steel", "hbm:sphere_steel", 1,
                        [" P ", "P P", " P "],
                        {"P": item("hbm:plate_steel")}))
-    recs.append(shaped("parts/turbine_titanium", "hbm:turbine_titanium", 1,
-                       ["BBB", "BIB", "BBB"],
-                       {"B": item("hbm:blade_titanium"), "I": item("hbm:ingot_titanium")}))
-    recs.append(shaped("parts/blade_titanium", "hbm:blade_titanium", 2,
-                       ["P", "P", "P"],
-                       {"P": item("hbm:plate_titanium")}))
-
     # CraftingManager.java:205-212 coils (skip coil_tungsten)
     recs.append(shaped("parts/coil_gold", "hbm:coil_gold", 1,
                        ["WWW", "W W", "WWW"],
@@ -156,9 +142,6 @@ def recipes() -> list[dict]:
     recs.append(shaped("parts/coil_copper_torus", "hbm:coil_copper_torus", 2,
                        [" C ", "C C", " C "],
                        {"C": item("hbm:coil_copper")}))
-    recs.append(shaped("parts/coil_advanced_torus", "hbm:coil_advanced_torus", 2,
-                       [" C ", "C C", " C "],
-                       {"C": item("hbm:coil_advanced")}))
     recs.append(shaped("parts/coil_magnetized_tungsten", "hbm:coil_magnetized_tungsten", 1,
                        ["WWW", "W W", "WWW"],
                        {"W": item("hbm:magnetizedtungsten_wire")}))
@@ -189,12 +172,6 @@ def recipes() -> list[dict]:
                        ["SSS", "S S", "SSS"],
                        {"S": item("hbm:ingot_red_copper")}))
 
-    # CraftingManager.java:122-133 lightstone family (flattened ids)
-    recs.append(shaped("building/lightstone_tiles", "hbm:lightstone_tiles", 4,
-                       ["##", "##"], {"#": item("hbm:lightstone")}))
-    recs.append(shaped("building/lightstone_bricks", "hbm:lightstone_bricks", 4,
-                       ["##", "##"], {"#": item("hbm:lightstone_tiles")}))
-
     # SmeltingRecipes.java:117-129 leftovers
     recs.append(smelt("smelting/powder_iron", "minecraft:iron_ingot", "hbm:powder_iron"))
     recs.append(smelt("smelting/powder_gold", "minecraft:gold_ingot", "hbm:powder_gold"))
@@ -210,19 +187,8 @@ def recipes() -> list[dict]:
                           ["hbm:powder_iron", "hbm:powder_coal"]))
     recs.append(shapeless("powder/powder_red_copper", "hbm:powder_red_copper", 2,
                           ["hbm:powder_copper", "minecraft:redstone"]))
-    recs.append(shapeless("powder/powder_advanced_alloy", "hbm:powder_advanced_alloy", 4,
-                          ["hbm:powder_steel", "hbm:powder_steel", "hbm:powder_red_copper", "hbm:powder_red_copper"]))
     recs.append(shapeless("powder/powder_dura_steel", "hbm:powder_dura_steel", 2,
                           ["hbm:powder_steel", "hbm:powder_tungsten"]))
-    recs.append(shapeless("powder/powder_desh_mix", "hbm:powder_desh_mix", 1,
-                          ["hbm:powder_rare", "hbm:nugget_mercury", "minecraft:redstone"]))
-
-    # ToolRecipes.java:113-117 geiger
-    recs.append(shaped("tool/geiger_counter", "hbm:geiger_counter", 1,
-                       ["SGS", "CMC", "SBS"],
-                       {"S": item("hbm:plate_steel"), "G": item("minecraft:glass"),
-                        "C": item("hbm:circuit_aluminium"), "M": item("minecraft:compass"),
-                        "B": item("minecraft:stone_button")}))
 
     # ConsumableRecipes bottles (no fluid)
     recs.append(shapeless("consumable/canteen_13", "hbm:canteen_13", 1,
