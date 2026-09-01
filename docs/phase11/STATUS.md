@@ -2,17 +2,17 @@
 
 - Census: `docs/phase11/PARITY_REPORT.md` — **104.3% weighted / 103.2% unweighted** (8104 / 7767).
 - Published baseline: **100.2%** (7783 / 7767) @ `91e6763a` / `v0.0.1-rc2`.
-- This wave: Centrifuge leftover rows live in existing machine (`getOutput` already ticks).
-  Registered `block_slag` (CE id, not `slag_block`). Wired CE `gui_centrifuge.png` blit + CE
-  `ContainerCentrifuge` slot coords (182×189). AE2 certus cited skip. AmmoPress fluid-slot
-  leftover stays cited — CE TE has no tank. SuperComputer dropdown still TODO
-  (no ModuleMachineBase). DRX stays cited skip.
-- Vanilla **1898 / 97.3%**. Machine **1815 / 90.3%** (Centrifuge **75/78**; AE2 + helper/readRecipe
-  census). ElectrolyserMetal 21/23. Blocks **1008 / 86.2%**.
-- Reachability **60.0%** (1552 / 2586).
-- Items census **2586** (+`block_slag` BlockItem).
+- ChemPlant **72 unique CE names = 72 unique port names**. Census 145 is
+  `this.register` + `.register` double-count. Left ChemPlant alone.
+- This wave: Crystallizer leftover rows live in existing machine. Registered
+  `coal_infernal` (CE `ItemFuel` 4800, existing png/lang). GUI
+  `gui_crystallizer_alt.png` blit-wired (176×204). Fluid-id slots stay cited trim.
+- Unique Crystallizer: CE ~309 (57 flat + 222 bedrock + 18 dye + 12 post; 3 OreDict
+  compat gated). Port **303**. Skips: `LI.ore`, malachite scrap, mustardwillow,
+  AE2 / P_WHITE.dust / CINNABAR.dust.
+- Vanilla **1898 / 97.3%**. Machine census **1815 / 90.3%** (helper `register(` not
+  counted — do not chase). Reachability **60.3%** (1559 / 2586).
+- Centrifuge **75/78** accepted. AE2 stays cited. AmmoPress fluid-slot stays cited.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Weighted ≥99% is a gate. Not content-complete.
-- Verified: `compileJava` 0, `runServer` **Done (5.146s)** / 3946 recipes, port 25566.
-- No new tag: leftover solids live + CE png blit-wired, client GUI not opened. `v0.0.1-rc2` stays.
-- `master` untouched.
+- Verified: `compileJava` 0. `runServer` pending this revision.
+- No tag. `master` untouched.

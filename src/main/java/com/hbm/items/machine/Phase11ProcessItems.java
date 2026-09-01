@@ -60,6 +60,8 @@ public final class Phase11ProcessItems {
         NUCLEAR_WASTE_VITRIFIED = nuke("nuclear_waste_vitrified");
         DUST = parts("dust");
         SOLID_FUEL = fuel("solid_fuel", 3200);
+        // CE ModItems.java:1291 ItemFuel 4800 — CrystallizerRecipes.java:99
+        fuel("coal_infernal", 4800);
         SOLID_FUEL_BF = parts("solid_fuel_bf");
         CORDITE = parts("cordite");
         BALL_TNT = parts("ball_tnt");

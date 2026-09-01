@@ -238,9 +238,9 @@
     },
     "reachability": {
       "port_items": 2586,
-      "reachable_via_recipe_or_loot": 1552,
+      "reachable_via_recipe_or_loot": 1559,
       "includes_machine_tables": true,
-      "pct": 60.0
+      "pct": 60.3
     }
   },
   "recipe_json_total": 2656

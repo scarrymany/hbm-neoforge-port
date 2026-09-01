@@ -8,9 +8,8 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.146s)** on wiped world port 25566, **3946 recipes**.
-No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0.
+`runServer` pending this revision (wiped world, port 25566). No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
@@ -18,7 +17,7 @@ No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 |---|---|
 | **Weighted** (Σport / ΣCE) | **104.3%** (8104 / 7767) |
 | **Unweighted** (mean of category %) | **103.2%** |
-| Recipe/loot + machine-table reachability | **60.0%** (1552 / 2586) |
+| Recipe/loot + machine-table reachability | **60.3%** (1559 / 2586) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
@@ -39,13 +38,26 @@ Weighted **104.3%**. Category holes remain. Not content-complete.
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950. +3 ducrete CraftingManager rows |
-| Machine recipes | ~2009 | 1815 | **90.3%** | Centrifuge **75/78** (AE2 + `addRecipe`/`readRecipe` census). AmmoPress 88. ElectrolyserMetal 21/23. SILEX 95/96 DRX skipped. ChemPlant 72/145 |
+| Machine recipes | ~2009 | 1815 | **90.3%** | Census regex. ChemPlant unique **72=72** (145 was double-count). Crystallizer unique **303/~309**. Centrifuge 75/78 AE2 skip. |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (104.2% → 104.3%, 8104 / 7767)
+## What changed this wave (ChemPlant verify + Crystallizer)
+
+- ChemPlant: **72 unique `chem.*` names in CE = 72 in port**. Census 145 = `this.register` +
+  `.register`. No rows added.
+- Family: **Crystallizer** leftover live (`MachineCrystallizerBlockEntity.getOutput`). Unique
+  **303 / ~309**. Bedrock wash loop 222, dye loop 18, leftover ores/utilities. Registered
+  `coal_infernal` (CE fuel 4800, existing png/lang).
+- Skips cited: `TODO(CE: CrystallizerRecipes.java:75)` LI.ore, `:79` malachite scrap,
+  `:103` mustardwillow, `:199-216` AE2 / P_WHITE.dust / CINNABAR.dust.
+- CE `gui_crystallizer_alt.png` blit-wired 176×204. Fluid-id slots stay
+  `TODO(CE: ContainerCrystallizer.java:38-42)`.
+- Centrifuge 75/78 + AE2 skip unchanged.
+
+## Prior wave (104.2% → 104.3%, 8104 / 7767)
 
 - Family: **Centrifuge** leftover rows now in the existing machine table (BE already calls
   `CentrifugeRecipes.getOutput`). Added `chunk_ore_rare`, `ore_aluminium`, `ore_nether_plutonium`,
@@ -177,18 +189,15 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**60.0%** (1552 / 2586). JSON/loot + Java machine-table **outputs** (`new ItemStack` / `stack("` /
-ElectrolyserMetal scraps / AmmoPress outputs). Inputs are not counted. Not flattened extras.
-New centrifuge outputs were already reachable items.
+**60.3%** (1559 / 2586). JSON/loot + Java machine-table **outputs**. Inputs not counted.
 
 ## Next single gap
 
-Blocks **86.2%** (161 missing). Machine leftover **~194** (ChemPlant **72/145**, assembler skip 7,
-AmmoPress NUKE_BALEFIRE, ElectrolyserMetal 21/23). Vanilla leftover **52**. Weighted **104.3%**.
-`v0.0.1-rc2` stays.
-Centrifuge E2E: leftover solids **yes** (table + existing BE `getOutput`). `block_slag` **yes**
-(registered + placeable). AE2 certus **no**. GUI blit **wired**, client not opened.
-AmmoPress fluid-slot rows stay table-only — CE TE has no tank.
+Blocks **86.2%** (161 missing). Next real recipe family after Crystallizer: **Shredder**
+`registerDefaults` ~223 vs ~99 JSON, or **Cyclotron** 43 vs 12. Anvil 236 table-only (no GUI).
+Assembler skip 7. `v0.0.1-rc2` stays.
+Crystallizer E2E: leftover solids/bedrock **yes**. GUI blit **wired**, client not opened.
+Fluid-id slots still trimmed. ChemPlant unique complete.
 
 ## Entities (Phase 9 leftovers)
 
