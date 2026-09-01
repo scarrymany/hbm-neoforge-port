@@ -6,7 +6,9 @@
 - Items **2056 → 2354**: extractor now sees already-registered `registerBillet` / `registerParts` / etc. Not dummy items.
 - This wave: CE leftover crafts from `MineralRecipes` / `RodRecipes` / Tool / Armor / Consumable / Exclusive. No invented recipes.
 - Assembler skip still **7**. Assembler JSON **628**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- `compileJava` / `runServer` / `runClient` — re-verify this wave (recipe JSON only + census scripts).
+- `compileJava` 0 (UP-TO-DATE). jar **68,697,039 B**.
+- `runServer` **Done (5.037s)** wiped world, port **25566**, **3914 recipes** / 2270 advancements. No parse errors (dropped `gas_mask_filter` DataComponent false-id).
+- `runClient` passed MenuScreens (reached `gui.png-atlas`). No `MACHINE_CRUCIBLE` NPE. OpenAL/ALSA fail is env-only.
 - Reachability **51.1%** (1203 / 2354).
-- Prerelease playtest still `beta-82.1`. No 90% GitHub Release until compile + runServer Done + runClient past MenuScreens.
+- Prerelease playtest still `beta-82.1`. Gates for a 90% Release all passed this HEAD; tag not cut (ask if you want it).
 - `master` untouched.

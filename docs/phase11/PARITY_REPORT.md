@@ -8,8 +8,10 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`.
 
-`compileJava` / `runServer` / `runClient` for this wave are recorded after the verify pass
-(recipe JSON only — no Java gameplay change besides the extractor helper list).
+Verified this wave: `compileJava` 0 errors (UP-TO-DATE),
+jar `build/libs/hbm-neoforge-CE-fork-by-scarrymany-0.0.1-beta.jar` **68,697,039 B**,
+`./gradlew runServer` **Done (5.037s)** on wiped world port 25566, **3914 recipes** / 2270 advancements.
+No recipe parse errors. `runClient` passed MenuScreens (reached `gui.png-atlas`). No `MACHINE_CRUCIBLE` NPE.
 
 ## Top line
 
@@ -20,8 +22,8 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 | Recipe/loot reachability of port items | **51.1%** (1203 / 2354) |
 | CE `@AutoRegister` entities still missing | **none** |
 
-Weighted is **above ~90%** (need 6990). **Do not cut a 90% GitHub Release** unless
-`compileJava` + `runServer` Done + `runClient` past MenuScreens all pass on this HEAD.
+Weighted is **above ~90%** (need 6990). All three 90% Release gates passed on this HEAD
+(`compileJava` + `runServer` Done + `runClient` past MenuScreens). Tag not cut.
 Existing `beta-82` / `beta-82.1` stay as playtest tags.
 
 Largest remaining holes: **blocks 379**, **machine 327**, **vanilla 84**.
@@ -150,7 +152,7 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 Blocks **67.6%** (379 missing — real Dummyable / deco / machine casings, not dummy regs).
 Machine leftover **~327** (ChemPlant / SILEX / StorageDrum / SuperComputer I/O unregistered).
-Vanilla leftover **83** (unregistered I/O only). Weighted **96.4%** on paper; 90% Release
+Vanilla leftover **84** (unregistered I/O only). Weighted **96.4%** on paper; 90% Release
 still gated on compile + runServer Done + runClient past MenuScreens.
 
 ## Entities (Phase 9 leftovers)
