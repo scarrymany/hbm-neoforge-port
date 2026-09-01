@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "hbm:lightstone_tile_slab"
+    }
+  },
+  "result": {
+    "id": "hbm:lightstone_tile_stairs",
+    "count": 4
+  }
+}

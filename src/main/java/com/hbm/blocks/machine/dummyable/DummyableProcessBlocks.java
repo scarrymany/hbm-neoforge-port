@@ -21,7 +21,8 @@ import java.util.function.Supplier;
  * waste_drum / compressor / coker / catalytic cracker / catalytic reformer / hydrotreater /
  * vacuum distill / radiolysis / flare / epress / pyrooven / arc furnace / exposure /
  * ore slopper / turbofan / radgen / hephaestus / wood burner /
- * furnace iron / furnace steel / firebox / oven / oilburner / sawmill.
+ * furnace iron / furnace steel / firebox / oven / oilburner / sawmill /
+ * ashpit / heat boilers / cooling towers / telex / radar screen / siren / condenser.
  */
 public final class DummyableProcessBlocks {
 
@@ -70,6 +71,15 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<FractionSpacerBlock> FRACTION_SPACER;
     public static DeferredBlock<WatzPumpBlock> WATZ_PUMP;
     public static DeferredBlock<VendingMachineBlock> VENDING_MACHINE;
+    public static DeferredBlock<MachineAshpitBlock> MACHINE_ASHPIT;
+    public static DeferredBlock<HeatBoilerBlock> HEAT_BOILER;
+    public static DeferredBlock<HeatBoilerIndustrialBlock> MACHINE_INDUSTRIAL_BOILER;
+    public static DeferredBlock<MachineTowerSmallBlock> MACHINE_TOWER_SMALL;
+    public static DeferredBlock<MachineTowerLargeBlock> MACHINE_TOWER_LARGE;
+    public static DeferredBlock<RadioTelexBlock> RADIO_TELEX;
+    public static DeferredBlock<RadarScreenBlock> RADAR_SCREEN;
+    public static DeferredBlock<com.hbm.blocks.machine.MachineSirenBlock> MACHINE_SIREN;
+    public static DeferredBlock<com.hbm.blocks.machine.MachineCondenserBlock> MACHINE_CONDENSER;
 
     private DummyableProcessBlocks() {
     }
@@ -117,6 +127,15 @@ public final class DummyableProcessBlocks {
         FRACTION_SPACER = registerBlock("fraction_spacer", () -> new FractionSpacerBlock(MACHINE_PROPS));
         WATZ_PUMP = registerBlock("watz_pump", () -> new WatzPumpBlock(MACHINE_PROPS));
         VENDING_MACHINE = registerBlock("vending_machine", () -> new VendingMachineBlock(MACHINE_PROPS));
+        MACHINE_ASHPIT = registerBlock("machine_ashpit", () -> new MachineAshpitBlock(MACHINE_PROPS));
+        HEAT_BOILER = registerBlock("heat_boiler", () -> new HeatBoilerBlock(MACHINE_PROPS));
+        MACHINE_INDUSTRIAL_BOILER = registerBlock("machine_industrial_boiler", () -> new HeatBoilerIndustrialBlock(MACHINE_PROPS));
+        MACHINE_TOWER_SMALL = registerBlock("machine_tower_small", () -> new MachineTowerSmallBlock(MACHINE_PROPS));
+        MACHINE_TOWER_LARGE = registerBlock("machine_tower_large", () -> new MachineTowerLargeBlock(MACHINE_PROPS));
+        RADIO_TELEX = registerBlock("radio_telex", () -> new RadioTelexBlock(MACHINE_PROPS));
+        RADAR_SCREEN = registerBlock("radar_screen", () -> new RadarScreenBlock(MACHINE_PROPS));
+        MACHINE_SIREN = registerBlock("machine_siren", () -> new com.hbm.blocks.machine.MachineSirenBlock(MACHINE_PROPS));
+        MACHINE_CONDENSER = registerBlock("machine_condenser", () -> new com.hbm.blocks.machine.MachineCondenserBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

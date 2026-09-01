@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "R"
+  ],
+  "key": {
+    "R": {
+      "item": "hbm:deco_rbmk_panel"
+    }
+  },
+  "result": {
+    "id": "hbm:deco_rbmk_panel_slab",
+    "count": 8
+  }
+}

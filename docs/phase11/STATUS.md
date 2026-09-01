@@ -1,14 +1,13 @@
 # Phase 11 status
 
-- Census: `docs/phase11/PARITY_REPORT.md` — **100.2% weighted / 100.8% unweighted** (7783 / 7767).
-- Published baseline this request: **98.5%** (7651 / 7767). Need 7689 for 99%.
-- This wave: leftover CE cubes (`gneiss_*` / vinyl / pink_planks / struct_* / fusion casings) + extractor flatten
-  for already-registered platemetal / ladders / lightstone / coke / caps / stone_resource / stalagmites / meteor ore.
+- Census: `docs/phase11/PARITY_REPORT.md` — **100.8% weighted / 101.1% unweighted** (7830 / 7767).
+- Published baseline this request: **100.2%** (7783 / 7767) @ `91e6763a` / `v0.0.1-rc2`.
+- This wave: live Dummyables (`machine_ashpit`, `heat_boiler`, `machine_industrial_boiler`,
+  `machine_tower_small`/`large`, `radio_telex`, `radar_screen`) + cubes (`machine_siren`,
+  `machine_condenser`) + 29 leftover CE vanilla crafts with registered I/O.
 - ChemPlant / SILEX / StorageDrum / SuperComputer leftover I/O still absent — not invented.
-- Vanilla **1866 / 95.7%**. Machine **1682 / 83.7%**. Blocks **937 / 80.2%**.
+- Vanilla **1895 / 97.2%**. Machine **1682 / 83.7%**. Blocks **946 / 80.9%**.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Weighted ≥99%. Category holes remain (blocks 232, machine 327, vanilla 84). Not content-complete.
-- Verified: `compileJava` 0, `runServer` **Done (5.126s)** / 3914 recipes, port 25566.
-- Tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
-  (`edbaf27a`, jar 68,714,261 B, SHA-256 `b24e3724962ed07cc60af683954eb5585213e528bf856feff61b3da17762545a`).
+- Weighted ≥99%. Category holes remain (blocks 223, machine 327, vanilla 55). Not content-complete.
+- No new Release (Dummyable wave, not a closed hole family). `v0.0.1-rc2` stays.
 - `master` untouched.

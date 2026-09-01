@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "hbm:crystal_fluorite"
+  },
+  "result": {
+    "id": "hbm:fluorite",
+    "count": 6
+  },
+  "experience": 0.1,
+  "cookingtime": 200
+}

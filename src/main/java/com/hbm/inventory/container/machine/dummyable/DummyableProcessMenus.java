@@ -36,6 +36,12 @@ import com.hbm.blockentity.machine.dummyable.MachineSawmillBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineSuperComputerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.StorageDrumBlockEntity;
+import com.hbm.blockentity.machine.dummyable.CondenserBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineAshpitBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineSirenBlockEntity;
+import com.hbm.blockentity.machine.dummyable.RadarScreenBlockEntity;
+import com.hbm.blockentity.machine.dummyable.RadioTelexBlockEntity;
 import com.hbm.blockentity.machine.dummyable.WasteDrumBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -83,6 +89,12 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<StorageDrumMenu>> MACHINE_STORAGE_DRUM;
     public static DeferredHolder<MenuType<?>, MenuType<SuperComputerMenu>> MACHINE_SUPERCOMPUTER;
     public static DeferredHolder<MenuType<?>, MenuType<AutosawMenu>> MACHINE_AUTOSAW;
+    public static DeferredHolder<MenuType<?>, MenuType<AshpitMenu>> MACHINE_ASHPIT;
+    public static DeferredHolder<MenuType<?>, MenuType<HeatBoilerMenu>> HEAT_BOILER;
+    public static DeferredHolder<MenuType<?>, MenuType<CondenserMenu>> MACHINE_CONDENSER;
+    public static DeferredHolder<MenuType<?>, MenuType<SirenMenu>> MACHINE_SIREN;
+    public static DeferredHolder<MenuType<?>, MenuType<RadioTelexMenu>> RADIO_TELEX;
+    public static DeferredHolder<MenuType<?>, MenuType<RadarScreenMenu>> RADAR_SCREEN;
 
     private DummyableProcessMenus() {
     }
@@ -162,6 +174,18 @@ public final class DummyableProcessMenus {
                 new SuperComputerMenu(id, inv, (MachineSuperComputerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_AUTOSAW = reg("machine_autosaw", (id, inv, buf) ->
                 new AutosawMenu(id, inv, (MachineAutosawBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ASHPIT = reg("machine_ashpit", (id, inv, buf) ->
+                new AshpitMenu(id, inv, (MachineAshpitBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        HEAT_BOILER = reg("heat_boiler", (id, inv, buf) ->
+                new HeatBoilerMenu(id, inv, (HeatBoilerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_CONDENSER = reg("machine_condenser", (id, inv, buf) ->
+                new CondenserMenu(id, inv, (CondenserBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_SIREN = reg("machine_siren", (id, inv, buf) ->
+                new SirenMenu(id, inv, (MachineSirenBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        RADIO_TELEX = reg("radio_telex", (id, inv, buf) ->
+                new RadioTelexMenu(id, inv, (RadioTelexBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        RADAR_SCREEN = reg("radar_screen", (id, inv, buf) ->
+                new RadarScreenMenu(id, inv, (RadarScreenBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

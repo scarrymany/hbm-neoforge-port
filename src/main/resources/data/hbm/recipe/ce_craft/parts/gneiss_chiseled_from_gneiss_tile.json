@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:gneiss_tile"
+    }
+  ],
+  "result": {
+    "id": "hbm:gneiss_chiseled",
+    "count": 1
+  }
+}

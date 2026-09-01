@@ -8,25 +8,24 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.126s)** on wiped world port 25566, **3914 recipes**.
-No recipe parse errors. Tag `v0.0.1-rc2` (do not overwrite `v0.0.1-rc1`).
+Verified this wave: `compileJava` 0. `runServer` pending after push.
+No new tag (Dummyable wave, not a closed ChemPlant/SILEX family). `v0.0.1-rc2` stays.
 `runClient` last green: MenuScreens (`gui.png-atlas`). No `MACHINE_CRUCIBLE` NPE.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **100.2%** (7783 / 7767) |
-| **Unweighted** (mean of category %) | **100.8%** |
-| Recipe/loot reachability of port items | **53.1%** (1329 / 2501) |
+| **Weighted** (Σport / ΣCE) | **100.8%** (7830 / 7767) |
+| **Unweighted** (mean of category %) | **101.1%** |
+| Recipe/loot reachability of port items | **53.4%** (1341 / 2510) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 232**, **machine 327**, **vanilla 84**.
-Weighted **100.2%** (over CE denom from flattened already-registered loops). Category holes remain.
+Largest remaining holes: **blocks 223**, **machine 327**, **vanilla 55**.
+Weighted **100.8%**. Category holes remain. Not content-complete.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -34,12 +33,12 @@ Weighted **100.2%** (over CE denom from flattened already-registered loops). Cat
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2501 | **134.2%** | Extract + already-registered helpers / loops |
-| Blocks | 1169 | 937 | **80.2%** | +gneiss/vinyl/pink/struct/fusion cubes; flatten platemetal/ladders/lightstone/coke/caps |
+| Items (flattened ids) | 1863 | 2510 | **134.7%** | Extract + already-registered helpers / loops + Dummyable BlockItems |
+| Blocks | 1169 | 946 | **80.9%** | +ashpit/boilers/towers/telex/radar/siren/condenser |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
-| Vanilla crafting | ~1950 | 1866 | **95.7%** | CE estimate kept at 1950. +450 JSON this wave (minerals / rods leftover / tool / armor / consumable / exclusive) |
+| Vanilla crafting | ~1950 | 1895 | **97.2%** | CE estimate kept at 1950. +29 leftover CraftingManager / Consumable / Smelting rows |
 | Machine recipes | ~2009 | 1682 | **83.7%** | CE denom unchanged. Assembler skip **7** + pack/unpack already closed |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
@@ -148,13 +147,13 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**53.1%** (1329 / 2501). Prior: 1274 / 2435 (52.3%).
+**53.4%** (1341 / 2510). Prior: 1329 / 2501 (53.1%).
 
 ## Next single gap
 
-Blocks **80.2%** (232 missing — Dummyable/deco leftover, not dummy regs).
+Blocks **80.9%** (223 missing — Dummyable/deco leftover, not dummy regs).
 Machine leftover **~327** (ChemPlant / SILEX / StorageDrum / SuperComputer I/O unregistered).
-Vanilla leftover **84**. Weighted **100.2%**. Tag `v0.0.1-rc2`.
+Vanilla leftover **55**. Weighted **100.8%**. `v0.0.1-rc2` stays (no new tag).
 
 ## Entities (Phase 9 leftovers)
 

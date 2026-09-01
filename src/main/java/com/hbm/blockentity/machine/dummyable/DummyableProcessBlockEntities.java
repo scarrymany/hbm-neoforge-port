@@ -48,6 +48,15 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<FractionSpacerBlockEntity>> FRACTION_SPACER;
     public static Supplier<BlockEntityType<WatzPumpBlockEntity>> WATZ_PUMP;
     public static Supplier<BlockEntityType<VendingMachineBlockEntity>> VENDING_MACHINE;
+    public static Supplier<BlockEntityType<MachineAshpitBlockEntity>> MACHINE_ASHPIT;
+    public static Supplier<BlockEntityType<HeatBoilerBlockEntity>> HEAT_BOILER;
+    public static Supplier<BlockEntityType<HeatBoilerBlockEntity>> MACHINE_INDUSTRIAL_BOILER;
+    public static Supplier<BlockEntityType<CondenserBlockEntity>> MACHINE_TOWER_SMALL;
+    public static Supplier<BlockEntityType<CondenserBlockEntity>> MACHINE_TOWER_LARGE;
+    public static Supplier<BlockEntityType<RadioTelexBlockEntity>> RADIO_TELEX;
+    public static Supplier<BlockEntityType<RadarScreenBlockEntity>> RADAR_SCREEN;
+    public static Supplier<BlockEntityType<MachineSirenBlockEntity>> MACHINE_SIREN;
+    public static Supplier<BlockEntityType<CondenserBlockEntity>> MACHINE_CONDENSER;
 
     private DummyableProcessBlockEntities() {
     }
@@ -214,6 +223,42 @@ public final class DummyableProcessBlockEntities {
         VENDING_MACHINE = ModBlocks.BLOCK_ENTITY_TYPES.register("vending_machine", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new VendingMachineBlockEntity(VENDING_MACHINE.get(), pos, state),
                 DummyableProcessBlocks.VENDING_MACHINE.get()
+        ).build(null));
+        MACHINE_ASHPIT = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_ashpit", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineAshpitBlockEntity(MACHINE_ASHPIT.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_ASHPIT.get()
+        ).build(null));
+        HEAT_BOILER = ModBlocks.BLOCK_ENTITY_TYPES.register("heat_boiler", () -> BlockEntityType.Builder.of(
+                (pos, state) -> HeatBoilerBlockEntity.small(HEAT_BOILER.get(), pos, state),
+                DummyableProcessBlocks.HEAT_BOILER.get()
+        ).build(null));
+        MACHINE_INDUSTRIAL_BOILER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_industrial_boiler", () -> BlockEntityType.Builder.of(
+                (pos, state) -> HeatBoilerBlockEntity.industrial(MACHINE_INDUSTRIAL_BOILER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_INDUSTRIAL_BOILER.get()
+        ).build(null));
+        MACHINE_TOWER_SMALL = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_tower_small", () -> BlockEntityType.Builder.of(
+                (pos, state) -> CondenserBlockEntity.towerSmall(MACHINE_TOWER_SMALL.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_TOWER_SMALL.get()
+        ).build(null));
+        MACHINE_TOWER_LARGE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_tower_large", () -> BlockEntityType.Builder.of(
+                (pos, state) -> CondenserBlockEntity.towerLarge(MACHINE_TOWER_LARGE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_TOWER_LARGE.get()
+        ).build(null));
+        RADIO_TELEX = ModBlocks.BLOCK_ENTITY_TYPES.register("radio_telex", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new RadioTelexBlockEntity(RADIO_TELEX.get(), pos, state),
+                DummyableProcessBlocks.RADIO_TELEX.get()
+        ).build(null));
+        RADAR_SCREEN = ModBlocks.BLOCK_ENTITY_TYPES.register("radar_screen", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new RadarScreenBlockEntity(RADAR_SCREEN.get(), pos, state),
+                DummyableProcessBlocks.RADAR_SCREEN.get()
+        ).build(null));
+        MACHINE_SIREN = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_siren", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineSirenBlockEntity(MACHINE_SIREN.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_SIREN.get()
+        ).build(null));
+        MACHINE_CONDENSER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_condenser", () -> BlockEntityType.Builder.of(
+                (pos, state) -> CondenserBlockEntity.cube(MACHINE_CONDENSER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CONDENSER.get()
         ).build(null));
     }
 }
