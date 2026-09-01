@@ -1,7 +1,5 @@
 {
   "variants": {
-    "": {
-      "model": "hbm:block/machine_deuterium_extractor"
-    }
+    "": { "model": "hbm:block/machine_deuterium_extractor" }
   }
 }

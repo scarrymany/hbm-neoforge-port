@@ -48,7 +48,11 @@ public class CondenserBlockEntity extends MachineBaseBlockEntity
     }
 
     public CondenserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int inCap, int outCap) {
-        super(type, pos, state, 1, true, false);
+        this(type, pos, state, inCap, outCap, false);
+    }
+
+    public CondenserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int inCap, int outCap, boolean energy) {
+        super(type, pos, state, 1, true, energy);
         this.input = new FluidTankNTM(Fluids.SPENTSTEAM, inCap).withOwner(this);
         this.output = new FluidTankNTM(Fluids.WATER, outCap).withOwner(this);
     }
@@ -74,10 +78,11 @@ public class CondenserBlockEntity extends MachineBaseBlockEntity
 
         if (waterTimer > 0) waterTimer--;
         int convert = Math.min(input.getFill(), output.getMaxFill() - output.getFill());
-        if (convert > 0) {
+        if (convert > 0 && extraCondition(convert)) {
             input.setFill(input.getFill() - convert);
             output.setFill(output.getFill() + convert);
             waterTimer = 20;
+            postConvert(convert);
         }
 
         if (level.getGameTime() % 20 == 0) {
@@ -89,6 +94,13 @@ public class CondenserBlockEntity extends MachineBaseBlockEntity
 
         dataChanged();
         networkPackMK2(50);
+    }
+
+    protected boolean extraCondition(int convert) {
+        return true;
+    }
+
+    protected void postConvert(int convert) {
     }
 
     @Override

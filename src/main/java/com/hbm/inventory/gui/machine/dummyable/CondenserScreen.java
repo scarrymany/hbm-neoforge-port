@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui.machine.dummyable;
 
 import com.hbm.blockentity.machine.dummyable.CondenserBlockEntity;
+import com.hbm.blockentity.machine.dummyable.CondenserPoweredBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.CondenserMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,6 +27,11 @@ public class CondenserScreen extends GuiInfoContainer<CondenserMenu> {
         CondenserBlockEntity be = this.getMenu().be;
         be.input.renderTank(x + 62, y + 70, 0, 16, 52);
         be.output.renderTank(x + 98, y + 70, 0, 16, 52);
+        if (be instanceof CondenserPoweredBlockEntity powered) {
+            long max = Math.max(1L, powered.getMaxPower());
+            int ph = (int) (powered.power * 52L / max);
+            guiGraphics.fill(x + 26, y + 70 - ph, x + 42, y + 70, 0xFF44CCFF);
+        }
     }
 
     @Override
@@ -34,5 +40,9 @@ public class CondenserScreen extends GuiInfoContainer<CondenserMenu> {
         CondenserBlockEntity be = this.getMenu().be;
         be.input.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 62, topPos + 18, 16, 52);
         be.output.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 98, topPos + 18, 16, 52);
+        if (be instanceof CondenserPoweredBlockEntity powered) {
+            drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 26, topPos + 18, 16, 52,
+                    Component.literal(powered.power + " / " + powered.getMaxPower() + " HE"));
+        }
     }
 }

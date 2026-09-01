@@ -1,7 +1,5 @@
 {
   "variants": {
-    "": {
-      "model": "hbm:block/structure_anchor"
-    }
+    "": { "model": "hbm:block/structure_anchor" }
   }
 }

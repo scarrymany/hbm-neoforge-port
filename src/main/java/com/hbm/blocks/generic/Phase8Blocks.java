@@ -96,6 +96,8 @@ public final class Phase8Blocks {
         registerBlock("fusion_heater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("fusion_hatch", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("fusion_core_block", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        // CE ModBlocks.java:61 — structure palette marker, no creative tab.
+        registerBlock("structure_anchor", () -> new BlockBase(BlockBehaviour.Properties.of().strength(2.5F, 10.0F).sound(SoundType.METAL)), null);
     }
 
     /** CE ModBlocks.java:398-405 — meteor dungeon brick family. {@code meteor_spawner} is a cube here

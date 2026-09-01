@@ -66,8 +66,7 @@ public final class Phase11CasingBlocks {
         registerBlock("fusion_coupler", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("watz_element", () -> new BlockBase(MACHINE_PROPS));
         registerBlock("watz_cooler", () -> new BlockBase(MACHINE_PROPS));
-        // CE ModBlocks.java:1076 / AssemblyMachineRecipes.java ass.hpcondenser
-        registerBlock("machine_condenser_powered", () -> new BlockBase(MACHINE_PROPS));
+        // machine_condenser_powered is DummyableProcessBlocks (live TE).
         // CE ModBlocks.java:803 / ass.orbus
         registerBlock("machine_orbus", () -> new BlockBase(MACHINE_PROPS));
         // CE ModBlocks.java:664 / ass.pileblock

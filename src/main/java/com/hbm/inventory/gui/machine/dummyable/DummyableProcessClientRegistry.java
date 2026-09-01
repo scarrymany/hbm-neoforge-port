@@ -59,5 +59,9 @@ public final class DummyableProcessClientRegistry {
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_SIREN, SirenScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.RADIO_TELEX, RadioTelexScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.RADAR_SCREEN, RadarScreenScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_INTAKE, IntakeScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_DRAIN, DrainScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_BAT9000, BAT9000Screen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_DEUTERIUM, DeuteriumScreen::new);
     }
 }

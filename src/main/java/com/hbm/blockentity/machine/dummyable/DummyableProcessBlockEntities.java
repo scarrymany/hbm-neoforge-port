@@ -57,6 +57,13 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<RadarScreenBlockEntity>> RADAR_SCREEN;
     public static Supplier<BlockEntityType<MachineSirenBlockEntity>> MACHINE_SIREN;
     public static Supplier<BlockEntityType<CondenserBlockEntity>> MACHINE_CONDENSER;
+    public static Supplier<BlockEntityType<CondenserPoweredBlockEntity>> MACHINE_CONDENSER_POWERED;
+    public static Supplier<BlockEntityType<MachineIntakeBlockEntity>> MACHINE_INTAKE;
+    public static Supplier<BlockEntityType<MachineDrainBlockEntity>> MACHINE_DRAIN;
+    public static Supplier<BlockEntityType<MachineBAT9000BlockEntity>> MACHINE_BAT9000;
+    public static Supplier<BlockEntityType<DeuteriumExtractorBlockEntity>> MACHINE_DEUTERIUM_EXTRACTOR;
+    public static Supplier<BlockEntityType<DeuteriumExtractorBlockEntity>> MACHINE_DEUTERIUM_TOWER;
+    public static Supplier<BlockEntityType<MachineFanBlockEntity>> FAN;
 
     private DummyableProcessBlockEntities() {
     }
@@ -259,6 +266,34 @@ public final class DummyableProcessBlockEntities {
         MACHINE_CONDENSER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_condenser", () -> BlockEntityType.Builder.of(
                 (pos, state) -> CondenserBlockEntity.cube(MACHINE_CONDENSER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_CONDENSER.get()
+        ).build(null));
+        MACHINE_CONDENSER_POWERED = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_condenser_powered", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new CondenserPoweredBlockEntity(MACHINE_CONDENSER_POWERED.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CONDENSER_POWERED.get()
+        ).build(null));
+        MACHINE_INTAKE = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_intake", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineIntakeBlockEntity(MACHINE_INTAKE.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_INTAKE.get()
+        ).build(null));
+        MACHINE_DRAIN = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_drain", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineDrainBlockEntity(MACHINE_DRAIN.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_DRAIN.get()
+        ).build(null));
+        MACHINE_BAT9000 = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_bat9000", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineBAT9000BlockEntity(MACHINE_BAT9000.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_BAT9000.get()
+        ).build(null));
+        MACHINE_DEUTERIUM_EXTRACTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_deuterium_extractor", () -> BlockEntityType.Builder.of(
+                (pos, state) -> DeuteriumExtractorBlockEntity.cube(MACHINE_DEUTERIUM_EXTRACTOR.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_DEUTERIUM_EXTRACTOR.get()
+        ).build(null));
+        MACHINE_DEUTERIUM_TOWER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_deuterium_tower", () -> BlockEntityType.Builder.of(
+                (pos, state) -> DeuteriumExtractorBlockEntity.tower(MACHINE_DEUTERIUM_TOWER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_DEUTERIUM_TOWER.get()
+        ).build(null));
+        FAN = ModBlocks.BLOCK_ENTITY_TYPES.register("fan", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineFanBlockEntity(FAN.get(), pos, state),
+                DummyableProcessBlocks.FAN.get()
         ).build(null));
     }
 }

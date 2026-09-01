@@ -22,7 +22,8 @@ import java.util.function.Supplier;
  * vacuum distill / radiolysis / flare / epress / pyrooven / arc furnace / exposure /
  * ore slopper / turbofan / radgen / hephaestus / wood burner /
  * furnace iron / furnace steel / firebox / oven / oilburner / sawmill /
- * ashpit / heat boilers / cooling towers / telex / radar screen / siren / condenser.
+ * ashpit / heat boilers / cooling towers / telex / radar screen / siren / condenser /
+ * condenser powered / intake / drain / BAT9000 / deuterium / fan.
  */
 public final class DummyableProcessBlocks {
 
@@ -80,6 +81,13 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<RadarScreenBlock> RADAR_SCREEN;
     public static DeferredBlock<com.hbm.blocks.machine.MachineSirenBlock> MACHINE_SIREN;
     public static DeferredBlock<com.hbm.blocks.machine.MachineCondenserBlock> MACHINE_CONDENSER;
+    public static DeferredBlock<MachineCondenserPoweredBlock> MACHINE_CONDENSER_POWERED;
+    public static DeferredBlock<MachineIntakeBlock> MACHINE_INTAKE;
+    public static DeferredBlock<MachineDrainBlock> MACHINE_DRAIN;
+    public static DeferredBlock<MachineBAT9000Block> MACHINE_BAT9000;
+    public static DeferredBlock<com.hbm.blocks.machine.MachineDeuteriumExtractorBlock> MACHINE_DEUTERIUM_EXTRACTOR;
+    public static DeferredBlock<MachineDeuteriumTowerBlock> MACHINE_DEUTERIUM_TOWER;
+    public static DeferredBlock<com.hbm.blocks.machine.MachineFanBlock> FAN;
 
     private DummyableProcessBlocks() {
     }
@@ -136,6 +144,13 @@ public final class DummyableProcessBlocks {
         RADAR_SCREEN = registerBlock("radar_screen", () -> new RadarScreenBlock(MACHINE_PROPS));
         MACHINE_SIREN = registerBlock("machine_siren", () -> new com.hbm.blocks.machine.MachineSirenBlock(MACHINE_PROPS));
         MACHINE_CONDENSER = registerBlock("machine_condenser", () -> new com.hbm.blocks.machine.MachineCondenserBlock(MACHINE_PROPS));
+        MACHINE_CONDENSER_POWERED = registerBlock("machine_condenser_powered", () -> new MachineCondenserPoweredBlock(MACHINE_PROPS));
+        MACHINE_INTAKE = registerBlock("machine_intake", () -> new MachineIntakeBlock(MACHINE_PROPS));
+        MACHINE_DRAIN = registerBlock("machine_drain", () -> new MachineDrainBlock(MACHINE_PROPS));
+        MACHINE_BAT9000 = registerBlock("machine_bat9000", () -> new MachineBAT9000Block(MACHINE_PROPS));
+        MACHINE_DEUTERIUM_EXTRACTOR = registerBlock("machine_deuterium_extractor", () -> new com.hbm.blocks.machine.MachineDeuteriumExtractorBlock(MACHINE_PROPS));
+        MACHINE_DEUTERIUM_TOWER = registerBlock("machine_deuterium_tower", () -> new MachineDeuteriumTowerBlock(MACHINE_PROPS));
+        FAN = registerBlock("fan", () -> new com.hbm.blocks.machine.MachineFanBlock(MACHINE_PROPS));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

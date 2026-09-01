@@ -37,6 +37,10 @@ import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineSuperComputerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.StorageDrumBlockEntity;
 import com.hbm.blockentity.machine.dummyable.CondenserBlockEntity;
+import com.hbm.blockentity.machine.dummyable.DeuteriumExtractorBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineBAT9000BlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineDrainBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineIntakeBlockEntity;
 import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineAshpitBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineSirenBlockEntity;
@@ -95,6 +99,10 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<SirenMenu>> MACHINE_SIREN;
     public static DeferredHolder<MenuType<?>, MenuType<RadioTelexMenu>> RADIO_TELEX;
     public static DeferredHolder<MenuType<?>, MenuType<RadarScreenMenu>> RADAR_SCREEN;
+    public static DeferredHolder<MenuType<?>, MenuType<IntakeMenu>> MACHINE_INTAKE;
+    public static DeferredHolder<MenuType<?>, MenuType<DrainMenu>> MACHINE_DRAIN;
+    public static DeferredHolder<MenuType<?>, MenuType<BAT9000Menu>> MACHINE_BAT9000;
+    public static DeferredHolder<MenuType<?>, MenuType<DeuteriumMenu>> MACHINE_DEUTERIUM;
 
     private DummyableProcessMenus() {
     }
@@ -186,6 +194,14 @@ public final class DummyableProcessMenus {
                 new RadioTelexMenu(id, inv, (RadioTelexBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         RADAR_SCREEN = reg("radar_screen", (id, inv, buf) ->
                 new RadarScreenMenu(id, inv, (RadarScreenBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_INTAKE = reg("machine_intake", (id, inv, buf) ->
+                new IntakeMenu(id, inv, (MachineIntakeBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_DRAIN = reg("machine_drain", (id, inv, buf) ->
+                new DrainMenu(id, inv, (MachineDrainBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_BAT9000 = reg("machine_bat9000", (id, inv, buf) ->
+                new BAT9000Menu(id, inv, (MachineBAT9000BlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_DEUTERIUM = reg("machine_deuterium", (id, inv, buf) ->
+                new DeuteriumMenu(id, inv, (DeuteriumExtractorBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

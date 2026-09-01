@@ -8605,6 +8605,7 @@
   "block.hbm.stone_resource.sulfur": "Sulfurous Stone",
   "block.hbm.stones_slab.lightstone.1": "Lightstone Tile Slab",
   "block.hbm.stones_slab.lightstone.2": "Lightstone Brick Slab",
+  "block.hbm.structure_anchor": "Structure Anchor",
   "block.hbm.struct_icf_core": "Inertial Confinement Fusion Reactor Core Component",
   "block.hbm.struct_iter_core": "Fusion Reactor Core Component",
   "block.hbm.struct_launcher": "Launch Pad Component Block",
