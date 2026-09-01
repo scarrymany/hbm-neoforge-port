@@ -1,6 +1,7 @@
 package com.hbm.blocks.machine;
 
 import com.hbm.blockentity.machine.CrateBlockEntity.CrateType;
+import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -94,6 +95,9 @@ public final class StorageMachineBlocks {
         BATTERY_LITHIUM = registerBattery("machine_lithium_battery", 50_000_000L);
         BATTERY_SCHRABIDIUM = registerBattery("machine_schrabidium_battery", 25_000_000_000L);
         BATTERY_DINEUTRONIUM = registerBattery("machine_dineutronium_battery", 1_000_000_000_000L);
+        // CE ModBlocks.java:970 / PlasmaForgeRecipes.java:176 ass.fensusan. Casing only.
+        registerBlock("machine_battery_redd", () -> new BlockBase(batteryProps().sound(SoundType.METAL)),
+                ModCreativeTabs.MACHINE);
     }
 
     /** All five grades: {@code setCreativeTab(null)} in CE itself - see class javadoc. */

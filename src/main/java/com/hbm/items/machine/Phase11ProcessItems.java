@@ -123,6 +123,19 @@ public final class Phase11ProcessItems {
         parts("warhead_nuclear");
         parts("warhead_mirv");
         parts("warhead_volcano");
+
+        // CE ModItems.java:1302 / :2525-2529 — ArcWelderRecipes.java:366-400 satellite heads.
+        // Finished sats already live as sat_mapper/scanner/radar/laser/resonator (MachineItems).
+        parts("sat_base");
+        parts("sat_head_mapper");
+        parts("sat_head_scanner");
+        parts("sat_head_radar");
+        parts("sat_head_laser");
+        parts("sat_head_resonator");
+        // CE ModItems.java:1301 — AssemblyMachineRecipes.java:969 sat_base input
+        parts("photo_panel");
+        // CE ModItems.java (ballistite) — PowderRecipes.java:25 leftover vanilla craft
+        parts("ballistite");
     }
 
     private static DeferredItem<Item> parts(String name) {

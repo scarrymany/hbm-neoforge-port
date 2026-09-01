@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_starmetal"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 48
+    },
+    {
+      "item": {
+        "item": "hbm:crystal_xen"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:sat_head_resonator",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

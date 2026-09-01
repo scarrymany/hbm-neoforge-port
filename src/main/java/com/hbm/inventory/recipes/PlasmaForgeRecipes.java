@@ -62,6 +62,35 @@ public final class PlasmaForgeRecipes {
         RECIPES.add(new PlasmaForgeRecipe("plsm.dfcreceiver", 50000000L, 1200, 10000000L, new ItemStack(item("dfc_receiver"), 1), new FluidStack(Fluids.STELLAR_FLUX, 4000), new ComparableStack(item("osmiridium_plate_sextuple"), 16), new ComparableStack(item("starmetal_plate_triple"), 16), new ComparableStack(item("circuit_controller_quantum"), 1)));
         RECIPES.add(new PlasmaForgeRecipe("plsm.dfcinjector", 50000000L, 1200, 10000000L, new ItemStack(item("dfc_injector"), 1), new FluidStack(Fluids.STELLAR_FLUX, 4000), new ComparableStack(item("osmiridium_plate_sextuple"), 16), new ComparableStack(item("saturnite_plate_triple"), 16), new ComparableStack(item("circuit_controller_advanced"), 1)));
         RECIPES.add(new PlasmaForgeRecipe("plsm.dfcstabilizer", 50000000L, 1200, 10000000L, new ItemStack(item("dfc_stabilizer"), 1), new FluidStack(Fluids.STELLAR_FLUX, 4000), new ComparableStack(item("osmiridium_plate_sextuple"), 16), new ComparableStack(item("schrabidate_dense_wire"), 16), new ComparableStack(item("circuit_controller_quantum"), 1)));
+        // CE PlasmaForgeRecipes.java:98 / :161 / :176 / :202
+        RECIPES.add(new PlasmaForgeRecipe("plsm.fusionvessel", 3000000L, 1200, 2000000L, new ItemStack(item("fusion_torus"), 1), null,
+                new ComparableStack(item("fusion_component_0"), 64), new ComparableStack(item("fusion_component_0"), 64),
+                new ComparableStack(item("fusion_component_0"), 64), new ComparableStack(item("fusion_component_0"), 64),
+                new ComparableStack(item("fusion_component_0"), 64), new ComparableStack(item("fusion_component_0"), 64),
+                new ComparableStack(item("fusion_component_3"), 64), new ComparableStack(item("fusion_component_3"), 64),
+                new ComparableStack(item("fusion_component_3"), 64), new ComparableStack(item("fusion_component_2"), 64),
+                new ComparableStack(item("fusion_component_2"), 64), new ComparableStack(item("circuit_quantum"), 4)));
+        RECIPES.add(new PlasmaForgeRecipe("plsm.schrabhammer", 25000000L, 6000, 10000000L, new ItemStack(item("schrabidium_hammer"), 1), null,
+                new ComparableStack(item("schrabidium_block"), 35), new ComparableStack(item("billet_yharonite"), 64),
+                new ComparableStack(item("billet_yharonite"), 64), new ComparableStack(item("coin_ufo"), 1),
+                new ComparableStack(item("fragment_meteorite"), 64), new ComparableStack(item("fragment_meteorite"), 64),
+                new ComparableStack(item("fragment_meteorite"), 64), new ComparableStack(item("fragment_meteorite"), 64),
+                new ComparableStack(item("fragment_meteorite"), 64), new ComparableStack(item("fragment_meteorite"), 64),
+                new ComparableStack(item("fragment_meteorite"), 64), new ComparableStack(item("fragment_meteorite"), 64)));
+        RECIPES.add(new PlasmaForgeRecipe("ass.fensusan", 50000000L, 6000, 50000000L, new ItemStack(item("machine_battery_redd"), 1), null,
+                new ComparableStack(item("ingot_electronium"), 64), new ComparableStack(item("battery_quantum_pack"), 1),
+                new ComparableStack(item("osmiridium_plate_sextuple"), 64), new ComparableStack(item("osmiridium_plate_sextuple"), 64),
+                new ComparableStack(item("bismuthbronze_plate_triple"), 64), new ComparableStack(item("cmbsteel_plate_triple"), 32),
+                new ComparableStack(item("magnetizedtungsten_dense_wire"), 32), new ComparableStack(item("plate_dineutronium"), 64),
+                new ComparableStack(item("powder_magic"), 64), new ComparableStack(item("ingot_u238m2"), 1),
+                new ComparableStack(item("ingot_cft"), 64), new ComparableStack(item("ingot_cft"), 64)));
+        RECIPES.add(new PlasmaForgeRecipe("plsm.gerald", 25000000L, 12000, 50000000L, new ItemStack(item("sat_gerald"), 1), null,
+                new ComparableStack(item("schrabidate_plate_triple"), 64), new ComparableStack(item("schrabidate_plate_triple"), 64),
+                new ComparableStack(item("bscco_dense_wire"), 64), new ComparableStack(item("bscco_dense_wire"), 64),
+                new ComparableStack(item("det_nuke"), 64), new ComparableStack(item("part_generic_hde"), 64),
+                new ComparableStack(item("part_generic_hde"), 64), new ComparableStack(item("part_generic_hde"), 64),
+                new ComparableStack(item("part_generic_hde"), 64), new ComparableStack(item("circuit_controller_quantum"), 64),
+                new ComparableStack(item("coin_ufo"), 1)));
     }
 
     private static Item item(String id) {

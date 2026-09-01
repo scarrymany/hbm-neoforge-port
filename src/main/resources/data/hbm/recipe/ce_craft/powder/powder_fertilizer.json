@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:powder_calcium"
+    },
+    {
+      "item": "hbm:powder_fire"
+    },
+    {
+      "item": "hbm:niter"
+    },
+    {
+      "item": "hbm:sulfur"
+    }
+  ],
+  "result": {
+    "id": "hbm:powder_fertilizer",
+    "count": 4
+  }
+}

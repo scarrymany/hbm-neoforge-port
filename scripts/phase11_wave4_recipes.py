@@ -65,6 +65,13 @@ EXTRA_KNOWN = {
     "cargo_door", "silo_hatch", "silo_hatch_large", "transition_seal", "emp_bomb",
     "ingot_euphemium", "ingot_dineutronium", "powder_astatine", "gem_volcanic",
     "ingot_osmiridium", "ingot_pc", "ingot_pvc", "ingot_bakelite", "ingot_polymer",
+    "sat_base", "sat_head_mapper", "sat_head_scanner", "sat_head_radar",
+    "sat_head_laser", "sat_head_resonator", "photo_panel", "ballistite",
+    "fusion_torus", "fusion_component_0", "fusion_component_2", "fusion_component_3",
+    "machine_precass", "machine_battery_redd",
+    "machine_transformer", "machine_transformer_20",
+    "machine_transformer_dnt", "machine_transformer_dnt_20",
+    "schrabidium_hammer", "sat_gerald", "fluid_barrel_full",
 }
 
 
@@ -125,6 +132,16 @@ def resolve_more(expr: str, kn: set[str]) -> tuple[str, int] | None:
     if m:
         from phase11_machine_parts import ICF_COMPONENT_META
         cid = ICF_COMPONENT_META.get(m.group(2))
+        return (f"hbm:{cid}", int(m.group(1))) if cid and cid in kn else None
+    m = re.search(r"ModBlocks\.fusion_component\s*,\s*(\d+)\s*,\s*(\d+)", expr)
+    if m:
+        from phase11_machine_parts import FUSION_COMPONENT_META
+        cid = FUSION_COMPONENT_META.get(m.group(2))
+        return (f"hbm:{cid}", int(m.group(1))) if cid and cid in kn else None
+    m = re.search(r"ModItems\.satellite\s*,\s*(\d+)\s*,\s*EnumSatType\.(\w+)", expr)
+    if m:
+        from phase11_machine_parts import SAT_TYPE
+        cid = SAT_TYPE.get(m.group(2))
         return (f"hbm:{cid}", int(m.group(1))) if cid and cid in kn else None
     hit = resolve_stack(expr, kn)
     if hit:
@@ -760,6 +777,8 @@ def assets() -> None:
         "casing_small", "casing_large", "casing_small_steel", "casing_large_steel",
         "casing_shotshell", "casing_buckshot", "casing_buckshot_advanced",
         "upgrade_template", "neutron_reflector", "missile_assembly",
+        "sat_base", "sat_head_mapper", "sat_head_scanner", "sat_head_radar",
+        "sat_head_laser", "sat_head_resonator", "photo_panel", "ballistite",
         "thruster_small", "thruster_medium", "thruster_large",
         "fuel_tank_small", "fuel_tank_medium", "fuel_tank_large",
         "warhead_generic_small", "warhead_incendiary_small", "warhead_cluster_small", "warhead_buster_small",
@@ -807,17 +826,25 @@ def assets() -> None:
         "sliding_blast_door_legacy", "large_vehicle_door", "water_door", "qe_containment",
         "qe_sliding_door", "round_airlock_door", "secure_access_door", "sliding_seal_door",
         "cargo_door", "silo_hatch", "silo_hatch_large", "transition_seal",
+        "fusion_torus", "fusion_component_0", "fusion_component_2", "fusion_component_3",
+        "machine_precass", "machine_battery_redd",
     ):
         (ASSETS / "models" / "block").mkdir(parents=True, exist_ok=True)
         (ASSETS / "blockstates").mkdir(parents=True, exist_ok=True)
-        (ASSETS / "models" / "block" / f"{blk}.json").write_text(json.dumps({
-            "parent": "minecraft:block/cube_all",
-            "textures": {"all": "hbm:block/block_steel"},
-        }, indent=2) + "\n")
-        (models / f"{blk}.json").write_text(json.dumps({"parent": f"hbm:block/{blk}"}, indent=2) + "\n")
-        (ASSETS / "blockstates" / f"{blk}.json").write_text(json.dumps({
-            "variants": {"": {"model": f"hbm:block/{blk}"}}
-        }, indent=2) + "\n")
+        blk_model = ASSETS / "models" / "block" / f"{blk}.json"
+        if not blk_model.exists():
+            blk_model.write_text(json.dumps({
+                "parent": "minecraft:block/cube_all",
+                "textures": {"all": "hbm:block/block_steel"},
+            }, indent=2) + "\n")
+        item_model = models / f"{blk}.json"
+        if not item_model.exists():
+            item_model.write_text(json.dumps({"parent": f"hbm:block/{blk}"}, indent=2) + "\n")
+        state = ASSETS / "blockstates" / f"{blk}.json"
+        if not state.exists():
+            state.write_text(json.dumps({
+                "variants": {"": {"model": f"hbm:block/{blk}"}}
+            }, indent=2) + "\n")
     lang = ASSETS / "lang" / "en_us.json"
     gen = REPO / "src" / "generated" / "resources" / "assets" / "hbm" / "lang" / "en_us.json"
     extra = {
@@ -878,6 +905,10 @@ def ammo_press_craft() -> None:
 def main() -> None:
     kn = known()
     assets()
+    if "--no-java" in sys.argv:
+        ok, skip, reasons = write_assembler(kn)
+        print(f"assembler written={ok} skipped={skip} {reasons}")
+        return
     ammo_press_craft()
     a = gen_ammo(kn)
     w = gen_arc(kn)

@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:plate_desh"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:glass_quartz"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:sat_head_mapper",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "CIC",
+    "WWW"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:mingrade_wire"
+    },
+    "C": {
+      "item": "hbm:circuit_advanced"
+    },
+    "I": {
+      "tag": "hbm:any_plastic"
+    }
+  },
+  "result": {
+    "id": "hbm:sat_chip",
+    "count": 1
+  }
+}

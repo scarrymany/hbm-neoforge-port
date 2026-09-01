@@ -106,6 +106,13 @@ MAT: dict[str, list[str]] = {
     "SR": ["strontium"],
     "CS137": ["caesium137", "cs137"],
     "U238": ["uranium238", "u238"],
+    "KNO": ["niter"],
+    "S": ["sulfur"],
+    "I": ["iodine"],
+    "F": ["fluorite"],
+    "BR": ["bromine"],
+    "CA": ["calcium"],
+    "P_RED": ["fire"],
     "KEY_RED": [],
 }
 
@@ -124,6 +131,7 @@ SHAPE_CANDIDATES = {
     "gem": ["gem_{m}", "{m}_gem"],
     "nugget": ["nugget_{m}", "{m}_nugget"],
     "billet": ["billet_{m}", "{m}_billet"],
+    "block": ["{m}_block", "block_{m}"],
     "any": ["{m}"],
 }
 
@@ -247,6 +255,25 @@ ITEM_MAP = {
     "ModBlocks.machine_purex": "machine_purex",
     "ModBlocks.machine_liquefactor": "machine_liquefactor",
     "ModItems.pellet_charged": "pellet_charged",
+    "ModItems.sat_base": "sat_base",
+    "ModItems.sat_head_mapper": "sat_head_mapper",
+    "ModItems.sat_head_scanner": "sat_head_scanner",
+    "ModItems.sat_head_radar": "sat_head_radar",
+    "ModItems.sat_head_laser": "sat_head_laser",
+    "ModItems.sat_head_resonator": "sat_head_resonator",
+    "ModItems.photo_panel": "photo_panel",
+    "ModItems.ballistite": "ballistite",
+    "ModItems.sat_gerald": "sat_gerald",
+    "ModItems.sat_chip": "sat_chip",
+    "ModItems.schrabidium_hammer": "schrabidium_hammer",
+    "ModItems.fluid_barrel_full": "fluid_barrel_full",
+    "ModBlocks.fusion_torus": "fusion_torus",
+    "ModBlocks.machine_precass": "machine_precass",
+    "ModBlocks.machine_battery_redd": "machine_battery_redd",
+    "ModBlocks.machine_transformer": "machine_transformer",
+    "ModBlocks.machine_transformer_20": "machine_transformer_20",
+    "ModBlocks.machine_transformer_dnt": "machine_transformer_dnt",
+    "ModBlocks.machine_transformer_dnt_20": "machine_transformer_dnt_20",
     "ModItems.biomass": "biomass",
     "ModItems.biomass_compressed": "biomass_compressed",
     "ModItems.nuclear_waste_tiny": "nuclear_waste_tiny",
@@ -338,6 +365,21 @@ ICF_COMPONENT_META = {
     "0": "icf_component_0",
     "1": "icf_component_1",
     "3": "icf_component_3",
+}
+
+FUSION_COMPONENT_META = {
+    "0": "fusion_component_0",
+    "2": "fusion_component_2",
+    "3": "fusion_component_3",
+}
+
+SAT_TYPE = {
+    "SPY": "sat_mapper",
+    "SCANNER": "sat_scanner",
+    "RADAR": "sat_radar",
+    "DEATH_RAY": "sat_laser",
+    "XENIUM_RESONATOR": "sat_resonator",
+    "RELAY": "sat_relay",
 }
 
 KEY_DYES = {
@@ -615,6 +657,16 @@ def resolve_ore(mat: str, shape: str, n: int, known: set[str]) -> tuple[str, int
         return "minecraft:gold_ingot", n
     if mat == "DIAMOND" and shape == "dust":
         cands.extend(["powder_diamond", "diamond_dust"])
+    if mat == "S" and shape == "dust":
+        cands.extend(["sulfur", "powder_sulfur"])
+    if mat == "KNO" and shape == "dust":
+        cands.extend(["niter", "powder_niter"])
+    if mat == "NETHERQUARTZ" and shape == "dust":
+        cands.extend(["powder_quartz", "powder_nether_quartz"])
+    if mat == "COAL" and shape == "gem":
+        return "minecraft:coal", n
+    if mat == "P_RED" and shape == "dust":
+        cands.extend(["powder_fire", "powder_red_phosphorus"])
     hit = _first_known(cands, known)
     return (f"hbm:{hit}", n) if hit else None
 
@@ -682,6 +734,13 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
     if m:
         return resolve_flatten(m.group(1), m.group(2), int(m.group(3) or 1), known)
 
+    m = re.match(
+        r"new (?:ItemStack|ComparableStack)\(ModItems\.(fluid_barrel_full|fluid_tank_full|cell)\s*,\s*(\d+)\s*,\s*Fluids\.\w+\.getID\(\)\)",
+        expr,
+    )
+    if m:
+        name, n = m.group(1), int(m.group(2))
+        return (f"hbm:{name}", n) if name in known else None
     if "Fluids." in expr or "getDict(" in expr or "inputFluids" in expr:
         return None
     if "OreDictManager.getReflector" in expr:
@@ -697,9 +756,13 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
     m = re.search(r"EnumCircuitType\.(\w+)", expr)
     if m and ("circuit" in expr or "DictFrame.fromOne" in expr):
         n = 1
-        nm = re.search(r",\s*(\d+)\s*\)\s*$", expr)
+        nm = re.search(r"circuit\s*,\s*(\d+)\s*,", expr)
         if nm:
             n = int(nm.group(1))
+        else:
+            nm = re.search(r",\s*(\d+)\s*\)\s*$", expr)
+            if nm:
+                n = int(nm.group(1))
         cid = CIRCUIT_ENUM.get(m.group(1))
         if cid and cid in known:
             return f"hbm:{cid}", n
@@ -721,7 +784,21 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
         if src == "ModBlocks" and name == "icf_component":
             cid = ICF_COMPONENT_META.get(en)
             return (f"hbm:{cid}", n) if cid and cid in known else None
+        if src == "ModBlocks" and name == "fusion_component":
+            cid = FUSION_COMPONENT_META.get(en)
+            return (f"hbm:{cid}", n) if cid and cid in known else None
+        if src == "ModItems" and name == "satellite":
+            cid = SAT_TYPE.get(en)
+            return (f"hbm:{cid}", n) if cid and cid in known else None
         return None
+
+    m = re.match(
+        r"new (?:ItemStack|ComparableStack)\(ModItems\.(fluid_barrel_full|fluid_tank_full|cell)\s*,\s*(\d+)\s*,\s*Fluids\.\w+\.getID\(\)\)",
+        expr,
+    )
+    if m:
+        name, n = m.group(1), int(m.group(2))
+        return (f"hbm:{name}", n) if name in known else None
 
     m = re.match(
         r"new (?:ItemStack|ComparableStack)\((ModBlocks|ModItems|Blocks|Items)\.(\w+)(?:,\s*(\d+))?\)",

@@ -72,6 +72,11 @@ public final class PowerGenBlocks {
         MACHINE_TURBINE_GAS = registerBlock("machine_turbine_gas", () -> new MachineTurbineGasBlock(MACHINE_PROPS));
         MACHINE_SOLAR_BOILER = registerBlock("machine_solar_boiler", () -> new MachineSolarBoilerBlock(MACHINE_PROPS));
         SOLAR_MIRROR = registerBlock("solar_mirror", () -> new SolarMirrorBlock(MIRROR_PROPS));
+        // CE ModBlocks.java:979 — BlockBase transformer casings (assembler leftover).
+        registerBlock("machine_transformer", () -> new com.hbm.blocks.BlockBase(MACHINE_PROPS));
+        registerBlock("machine_transformer_20", () -> new com.hbm.blocks.BlockBase(MACHINE_PROPS));
+        registerBlock("machine_transformer_dnt", () -> new com.hbm.blocks.BlockBase(MACHINE_PROPS));
+        registerBlock("machine_transformer_dnt_20", () -> new com.hbm.blocks.BlockBase(MACHINE_PROPS));
 
         com.hbm.blockentity.machine.PowerGenBlockEntities.registerAll();
         PowerGenMenus.registerAll();

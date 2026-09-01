@@ -1,5 +1,6 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -47,6 +48,8 @@ public final class ProcessingBlocks {
         MACHINE_ASSEMBLER = registerBlock("machine_assembly_machine", () -> new MachineAssemblyMachineBlock(MACHINE_PROPS));
         MACHINE_CRYSTALLIZER = registerBlock("machine_crystallizer", () -> new MachineCrystallizerBlock(MACHINE_PROPS));
         MACHINE_MIXER = registerBlock("machine_mixer", () -> new MachineMixerBlock(MACHINE_PROPS));
+        // CE ModBlocks.java:1057 / AssemblyMachineRecipes.java:245 ass.precass. Casing only.
+        registerBlock("machine_precass", () -> new BlockBase(MACHINE_PROPS));
 
         com.hbm.blockentity.machine.ProcessingBlockEntities.registerAll();
         ProcessingMenus.registerAll();

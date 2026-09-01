@@ -72,6 +72,12 @@ public final class FusionBlocks {
         registerCasing("dfc_receiver");
         registerCasing("dfc_injector");
         registerCasing("dfc_stabilizer");
+        // CE ModBlocks.java:1318-1319 / PlasmaForgeRecipes.java:98 fusionvessel.
+        // Flatten BlockFusionComponent metas 0/2/3 (default / blanket / motor).
+        registerCasing("fusion_torus");
+        registerCasing("fusion_component_0");
+        registerCasing("fusion_component_2");
+        registerCasing("fusion_component_3");
 
         FusionBlockEntities.registerAll();
         FusionMenus.registerAll();

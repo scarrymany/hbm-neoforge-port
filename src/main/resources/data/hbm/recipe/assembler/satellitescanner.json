@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_desh"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:magnetron"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:sat_head_scanner",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

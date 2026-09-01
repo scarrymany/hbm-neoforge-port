@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_zirconium"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_capacitor_board"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_precass",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

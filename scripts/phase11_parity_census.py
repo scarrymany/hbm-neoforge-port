@@ -111,6 +111,8 @@ def port_item_ids() -> set[str]:
         "warhead_generic_medium", "warhead_incendiary_medium", "warhead_cluster_medium", "warhead_buster_medium",
         "warhead_generic_large", "warhead_incendiary_large", "warhead_cluster_large", "warhead_buster_large",
         "warhead_nuclear", "warhead_mirv", "warhead_volcano",
+        "sat_base", "sat_head_mapper", "sat_head_scanner", "sat_head_radar",
+        "sat_head_laser", "sat_head_resonator", "photo_panel", "ballistite",
     }
     for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
               "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):

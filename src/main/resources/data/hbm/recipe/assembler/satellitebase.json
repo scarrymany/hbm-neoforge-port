@@ -1,0 +1,65 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:thruster_medium"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:part_generic_lde"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_desh"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:fluid_barrel_full"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:photo_panel"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:battery_lithium_pack"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:sat_base",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

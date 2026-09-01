@@ -72,6 +72,12 @@ public final class ArcWelderRecipes {
         RECIPES.add(new ArcWelderRecipe(new ItemStack(item("missile_nuclear"), 1), 600, 50000L, new ComparableStack(item("warhead_nuclear"), 1), new ComparableStack(item("fuel_tank_large"), 1), new ComparableStack(item("thruster_large"), 3)));
         RECIPES.add(new ArcWelderRecipe(new ItemStack(item("missile_nuclear_cluster"), 1), 600, 50000L, new ComparableStack(item("warhead_mirv"), 1), new ComparableStack(item("fuel_tank_large"), 1), new ComparableStack(item("thruster_large"), 3)));
         RECIPES.add(new ArcWelderRecipe(new ItemStack(item("missile_volcano"), 1), 600, 50000L, new ComparableStack(item("warhead_volcano"), 1), new ComparableStack(item("fuel_tank_large"), 1), new ComparableStack(item("thruster_large"), 3)));
+        // CE ArcWelderRecipes.java:366-400 — EnumSatType flatten to existing sat_* chips
+        RECIPES.add(new ArcWelderRecipe(new ItemStack(item("sat_mapper"), 1), 600, 10000L, new ComparableStack(item("sat_base"), 1), new ComparableStack(item("sat_head_mapper"), 1)));
+        RECIPES.add(new ArcWelderRecipe(new ItemStack(item("sat_scanner"), 1), 600, 10000L, new ComparableStack(item("sat_base"), 1), new ComparableStack(item("sat_head_scanner"), 1)));
+        RECIPES.add(new ArcWelderRecipe(new ItemStack(item("sat_radar"), 1), 600, 10000L, new ComparableStack(item("sat_base"), 1), new ComparableStack(item("sat_head_radar"), 1)));
+        RECIPES.add(new ArcWelderRecipe(new ItemStack(item("sat_laser"), 1), 600, 50000L, new ComparableStack(item("sat_base"), 1), new ComparableStack(item("sat_head_laser"), 1)));
+        RECIPES.add(new ArcWelderRecipe(new ItemStack(item("sat_resonator"), 1), 600, 50000L, new ComparableStack(item("sat_base"), 1), new ComparableStack(item("sat_head_resonator"), 1)));
     }
 
     private static Item item(String id) {

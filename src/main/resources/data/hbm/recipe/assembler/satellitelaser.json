@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_triple"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller_advanced"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_capacitor_board"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:crystal_diamond"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:glass_quartz"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:sat_head_laser",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

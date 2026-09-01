@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:sliding_blast_door"
+    }
+  ],
+  "result": {
+    "id": "hbm:sliding_blast_door_legacy",
+    "count": 1
+  }
+}

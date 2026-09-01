@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "MDM",
+    "SCS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "item": "hbm:ingot_red_copper"
+    },
+    "M": {
+      "item": "hbm:coil_copper"
+    },
+    "C": {
+      "item": "hbm:circuit_capacitor"
+    }
+  },
+  "result": {
+    "id": "hbm:machine_transformer",
+    "count": 1
+  }
+}

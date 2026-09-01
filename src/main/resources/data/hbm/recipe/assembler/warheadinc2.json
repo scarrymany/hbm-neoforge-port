@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:warhead_generic_medium"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:powder_fire"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:warhead_incendiary_medium",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

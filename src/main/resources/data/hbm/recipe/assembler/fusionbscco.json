@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:bscco_dense_wire"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:copper_pipe"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:fusion_component_0",
+    "count": 2
+  },
+  "duration": 100,
+  "power": 100
+}

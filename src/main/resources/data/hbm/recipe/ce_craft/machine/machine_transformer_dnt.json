@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SDS",
+    "MCM",
+    "MCM"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_starmetal"
+    },
+    "D": {
+      "item": "hbm:ingot_desh"
+    },
+    "M": {
+      "item": "hbm:magnetizedtungsten_dense_wire"
+    },
+    "C": {
+      "item": "hbm:circuit_bismoid"
+    }
+  },
+  "result": {
+    "id": "hbm:machine_transformer_dnt",
+    "count": 1
+  }
+}
