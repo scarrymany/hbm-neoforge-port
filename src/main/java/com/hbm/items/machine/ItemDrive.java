@@ -1,15 +1,31 @@
 package com.hbm.items.machine;
 
-/**
- * Not an item - a bare enum namespace CE used to share drive-content identity between whatever
- * class actually implements the satellite/data-drive item (in {@code items.special}, per the
- * items_machine research report) and its consumers. Ported verbatim; the real drive item class,
- * when it lands in {@code items.special}, should reference {@link EnumDriveType} from here rather
- * than duplicating it.
- */
-public class ItemDrive {
+import net.minecraft.world.item.Item;
 
-    private ItemDrive() {}
+import java.util.Locale;
+
+/**
+ * CE {@code ItemDrive} / {@code EnumDriveType}. One registry id per type
+ * ({@code drive_flash_empty} … {@code drive_klaus}); display name stays the CE
+ * {@code item.hbm.drive.<type>} lang key.
+ */
+public class ItemDrive extends Item {
+
+    private final EnumDriveType type;
+
+    public ItemDrive(EnumDriveType type, Properties properties) {
+        super(properties);
+        this.type = type;
+    }
+
+    public EnumDriveType getDriveType() {
+        return type;
+    }
+
+    @Override
+    public String getDescriptionId() {
+        return "item.hbm.drive." + type.name().toLowerCase(Locale.ROOT);
+    }
 
     public enum EnumDriveType {
         FLASH_EMPTY,

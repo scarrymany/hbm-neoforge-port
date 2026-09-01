@@ -5,9 +5,13 @@ import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.container.machine.dummyable.SuperComputerMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.recipes.SuperComputerRecipes;
+import com.hbm.inventory.recipes.SuperComputerRecipes.ChanceOut;
+import com.hbm.inventory.recipes.SuperComputerRecipes.SuperComputerRecipe;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
@@ -29,8 +33,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * CE {@code TileEntityMachineSuperComputer} — 8 slots, 2×4k tanks, 100k HE buffer.
- * Drive/blueprint GenericRecipe table skipped (EnumDriveType items unregistered).
+ * CE {@code TileEntityMachineSuperComputer} — 8 slots, 2×4k tanks (grow to recipe×2), 100k HE.
+ * Recipe picker GUI ({@code IControlReceiver} / {@code ModuleMachineSuperComputer}) is not ported —
+ * auto-match like ChemPlant so the CE table actually runs.
+ * TODO(CE: com.hbm.tileentity.machine.TileEntityMachineSuperComputer.java:186-194):
+ * recipe dropdown setRecipe(selection) — blocked by ModuleMachineBase. Do not invent.
  */
 public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -40,6 +47,9 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
     public final FluidTankNTM input;
     public final FluidTankNTM output;
     public long power;
+    public long maxPower = MAX_POWER;
+    public int progress;
+    public boolean didProcess;
 
     public MachineSuperComputerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 8, true, true);
@@ -74,7 +84,17 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
+        SuperComputerRecipes.register();
+
+        SuperComputerRecipe recipe = findRecipe();
+        if (recipe != null) {
+            this.maxPower = Math.max(Math.max(power, recipe.power * 100), MAX_POWER);
+            resizeTanks(recipe);
+        } else {
+            this.maxPower = Math.max(power, MAX_POWER);
+        }
+
+        power = Library.chargeTEFromItems(inventory, 0, power, maxPower);
 
         ItemStack id = inventory.getStackInSlot(1);
         if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
@@ -91,8 +111,107 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
             if (output.getFill() > 0) tryProvide(output, level, pos);
         }
 
+        didProcess = false;
+        if (recipe != null && power >= recipe.power && hasOutputSpace(recipe)) {
+            power -= recipe.power;
+            progress++;
+            if (progress >= recipe.duration) {
+                process(recipe);
+                progress = 0;
+                didProcess = true;
+            }
+        } else {
+            progress = 0;
+        }
+
         dataChanged();
         networkPackMK2(25);
+    }
+
+    private SuperComputerRecipe findRecipe() {
+        SuperComputerRecipe best = null;
+        for (SuperComputerRecipe recipe : SuperComputerRecipes.RECIPES) {
+            if (!matchesItems(recipe) || !matchesFluid(recipe)) continue;
+            if (best == null || recipe.inputItems.length > best.inputItems.length) best = recipe;
+        }
+        return best;
+    }
+
+    private boolean matchesItems(SuperComputerRecipe recipe) {
+        boolean[] used = new boolean[3];
+        for (AStack key : recipe.inputItems) {
+            boolean found = false;
+            for (int i = 0; i < 3; i++) {
+                if (used[i]) continue;
+                if (key.matchesRecipe(inventory.getStackInSlot(2 + i), false)) {
+                    used[i] = true;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return false;
+        }
+        return true;
+    }
+
+    private boolean matchesFluid(SuperComputerRecipe recipe) {
+        if (recipe.inputFluid == null) return true;
+        return input.getTankType() == recipe.inputFluid.type && input.getFill() >= recipe.inputFluid.fill;
+    }
+
+    private boolean hasOutputSpace(SuperComputerRecipe recipe) {
+        ItemStack sample = recipe.outputChoices.length == 0 ? ItemStack.EMPTY : recipe.outputChoices[0].stack();
+        if (!sample.isEmpty() && !inventory.insertItem(5, sample, true).isEmpty()) return false;
+        if (recipe.outputFluid != null) {
+            if (output.getTankType() != Fluids.NONE && output.getTankType() != recipe.outputFluid.type) return false;
+            if (output.getFill() + recipe.outputFluid.fill > output.getMaxFill()) return false;
+        }
+        return true;
+    }
+
+    private void process(SuperComputerRecipe recipe) {
+        boolean[] used = new boolean[3];
+        for (AStack key : recipe.inputItems) {
+            for (int i = 0; i < 3; i++) {
+                if (used[i]) continue;
+                if (key.matchesRecipe(inventory.getStackInSlot(2 + i), false)) {
+                    inventory.extractItem(2 + i, key.count(), false);
+                    used[i] = true;
+                    break;
+                }
+            }
+        }
+        if (recipe.inputFluid != null) {
+            input.setFill(input.getFill() - recipe.inputFluid.fill);
+        }
+        ItemStack out = roll(recipe);
+        if (!out.isEmpty()) inventory.insertItem(5, out.copy(), false);
+        if (recipe.outputFluid != null) {
+            output.setTankType(recipe.outputFluid.type);
+            output.setFill(output.getFill() + recipe.outputFluid.fill);
+        }
+    }
+
+    private ItemStack roll(SuperComputerRecipe recipe) {
+        if (recipe.outputChoices.length == 0) return ItemStack.EMPTY;
+        int total = 0;
+        for (ChanceOut c : recipe.outputChoices) total += c.weight();
+        int pick = level.random.nextInt(Math.max(1, total));
+        for (ChanceOut c : recipe.outputChoices) {
+            pick -= c.weight();
+            if (pick < 0) return c.stack();
+        }
+        return recipe.outputChoices[0].stack();
+    }
+
+    private void resizeTanks(SuperComputerRecipe recipe) {
+        if (recipe.inputFluid != null) {
+            input.changeTankSize(Math.max(Math.max(input.getFill(), recipe.inputFluid.fill * 2), 4_000));
+            if (input.getFill() == 0) input.setTankType(recipe.inputFluid.type);
+        }
+        if (recipe.outputFluid != null) {
+            output.changeTankSize(Math.max(Math.max(output.getFill(), recipe.outputFluid.fill * 2), 4_000));
+        }
     }
 
     public DirPos[] getConPos() {
@@ -124,7 +243,7 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return MAX_POWER;
+        return maxPower;
     }
 
     @Override
@@ -146,6 +265,8 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
+        tag.putLong("maxPower", maxPower);
+        tag.putInt("progress", progress);
         input.writeToNBT(tag, "in");
         output.writeToNBT(tag, "out");
     }
@@ -154,6 +275,9 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
+        maxPower = tag.getLong("maxPower");
+        if (maxPower <= 0) maxPower = MAX_POWER;
+        progress = tag.getInt("progress");
         input.readFromNBT(tag, "in");
         output.readFromNBT(tag, "out");
     }
@@ -162,6 +286,9 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeLong(power);
+        buf.writeLong(maxPower);
+        buf.writeInt(progress);
+        buf.writeBoolean(didProcess);
         input.serialize(buf);
         output.serialize(buf);
     }
@@ -170,6 +297,9 @@ public class MachineSuperComputerBlockEntity extends MachineBaseBlockEntity
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         power = buf.readLong();
+        maxPower = buf.readLong();
+        progress = buf.readInt();
+        didProcess = buf.readBoolean();
         input.deserialize(buf);
         output.deserialize(buf);
     }

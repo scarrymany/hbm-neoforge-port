@@ -1,6 +1,12 @@
 package com.hbm.inventory.recipes;
 
+import com.hbm.config.VersatileConfig;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
+import com.hbm.items.BilletPowderItems;
+import com.hbm.items.IngotNuggetItems;
+import com.hbm.items.special.ItemWasteLong;
+import com.hbm.items.special.ItemWasteShort;
+import com.hbm.items.special.SpecialItems;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -12,8 +18,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * CE {@code StorageDrumRecipes.java}:20-58. Only rows whose I/O ids exist.
- * Long/short depleted siblings are unregistered → those CE rows stay skipped.
+ * CE {@code StorageDrumRecipes.java}:20-58. Explicit {@code recipes.put} per waste class
+ * (CE loops 5 long + 8 short + 2 mercury).
  */
 public final class StorageDrumRecipes {
 
@@ -31,9 +37,35 @@ public final class StorageDrumRecipes {
         if (registered) return;
         registered = true;
 
-        // CE :56-57 — only if both ends exist (bottle_mercury / ingot_mercury are missing)
-        putIfBoth("ingot_au198", "bottle_mercury", 2160, 500, 500);
-        putIfBoth("nugget_au198", "ingot_mercury", 216, 50, 50);
+        int longChance = VersatileConfig.getLongDecayChance();
+        int shortChance = VersatileConfig.getShortDecayChance();
+
+        for (ItemWasteLong.WasteClass waste : ItemWasteLong.WasteClass.VALUES) {
+            recipes.put(new ComparableStack(SpecialItems.nuclearWasteLong(waste).get()),
+                    new WasteData(new ItemStack(SpecialItems.nuclearWasteLongDepleted(waste).get()),
+                            longChance, waste.liquid, waste.gas));
+            recipes.put(new ComparableStack(SpecialItems.nuclearWasteLongTiny(waste).get()),
+                    new WasteData(new ItemStack(SpecialItems.nuclearWasteLongDepletedTiny(waste).get()),
+                            (int) (longChance * 0.1), (int) (waste.liquid * 0.1), (int) (waste.gas * 0.1)));
+        }
+
+        for (ItemWasteShort.WasteClass waste : ItemWasteShort.WasteClass.VALUES) {
+            recipes.put(new ComparableStack(SpecialItems.nuclearWasteShort(waste).get()),
+                    new WasteData(new ItemStack(SpecialItems.nuclearWasteShortDepleted(waste).get()),
+                            shortChance, waste.liquid, waste.gas));
+            recipes.put(new ComparableStack(SpecialItems.nuclearWasteShortTiny(waste).get()),
+                    new WasteData(new ItemStack(SpecialItems.nuclearWasteShortDepletedTiny(waste).get()),
+                            (int) (shortChance * 0.1), (int) (waste.liquid * 0.1), (int) (waste.gas * 0.1)));
+        }
+
+        // CE :56 — ModItems.ingot_au198 → bottle_mercury
+        recipes.put(new ComparableStack(IngotNuggetItems.INGOT_AU198.get()),
+                new WasteData(new ItemStack(BilletPowderItems.BOTTLE_MERCURY.get()),
+                        (int) (shortChance * 0.01), 500, 500));
+        // CE :57 — nugget_au198 → ModItems.ingot_mercury (registry id nugget_mercury)
+        recipes.put(new ComparableStack(IngotNuggetItems.NUGGET_AU198.get()),
+                new WasteData(new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get()),
+                        (int) (shortChance * 0.001), 50, 50));
 
         recipes.entrySet().removeIf(e -> e.getValue().output.isEmpty()
                 || e.getValue().output.getItem() == Items.AIR
@@ -51,13 +83,7 @@ public final class StorageDrumRecipes {
         return getWaste(in) != null;
     }
 
-    private static void putIfBoth(String inId, String outId, int chance, int liquid, int gas) {
-        Item in = item(inId);
-        Item out = item(outId);
-        if (in == Items.AIR || out == Items.AIR) return;
-        recipes.put(new ComparableStack(in), new WasteData(new ItemStack(out), chance, liquid, gas));
-    }
-
+    @SuppressWarnings("unused")
     private static Item item(String id) {
         return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, id));
     }

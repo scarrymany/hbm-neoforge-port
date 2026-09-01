@@ -141,10 +141,8 @@ public class FluidContainerRegistry {
         // registerContainer(new FluidContainer(new ItemStack(ModBlocks.pink_barrel), new ItemStack(ModItems.tank_steel), Fluids.KEROSENE, 10000));
         // registerContainer(new FluidContainer(new ItemStack(ModBlocks.lox_barrel), new ItemStack(ModItems.tank_steel), Fluids.OXYGEN, 10000));
 
-        // Mercury bottle/ingot: needs ModItems.bottle_mercury/ingot_mercury, neither of which exist in
-        // this port yet (only the unrelated nugget_mercury/nugget_mercury_tiny drop items do).
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.bottle_mercury), new ItemStack(Items.GLASS_BOTTLE), Fluids.MERCURY, 1000));
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.ingot_mercury), null, Fluids.MERCURY, 125));
+        registerContainer(new FluidContainer(new ItemStack(resolveItem("bottle_mercury")), new ItemStack(Items.GLASS_BOTTLE), Fluids.MERCURY, 1000));
+        registerContainer(new FluidContainer(new ItemStack(resolveItem("nugget_mercury")), null, Fluids.MERCURY, 125));
 
         // Zirnox tritium fuel rod: needs ModItems.rod_zirnox_tritium/rod_zirnox_empty. This port's
         // MachineItems only has rod_zirnox_<type>/rod_zirnox_depleted_<type> (a different family, no

@@ -1,14 +1,14 @@
 {
-  "weighted_pct": 102.4,
-  "unweighted_pct": 102.2,
+  "weighted_pct": 102.8,
+  "unweighted_pct": 102.4,
   "ce_sum": 7767,
-  "port_sum": 7955,
+  "port_sum": 7983,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2571,
-      "pct": 138.0
+      "port": 2574,
+      "pct": 138.2
     },
     {
       "cat": "blocks",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1682,
-      "pct": 83.7
+      "port": 1707,
+      "pct": 85.0
     },
     {
       "cat": "advancements",
@@ -59,7 +59,7 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2571,
+      "port": 2574,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
@@ -208,16 +208,17 @@
         "SawmillRecipes": 4,
         "SolderingRecipes": 26,
         "SolidificationRecipes": 49,
-        "StorageDrumRecipes": 1,
+        "StorageDrumRecipes": 6,
+        "SuperComputerRecipes": 7,
         "VacuumDistillRecipes": 2,
         "WasteDrumRecipes": 17,
         "CentrifugeRecipes": 69,
         "ChemPlantRecipes": 72,
         "CyclotronRecipes": 1,
         "ElectrolyserFluidRecipes": 7,
-        "SILEXRecipes": 29
+        "SILEXRecipes": 42
       },
-      "port": 1682,
+      "port": 1707,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,
@@ -235,7 +236,7 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2571,
+      "port_items": 2574,
       "reachable_via_recipe_or_loot": 1348,
       "pct": 52.4
     }

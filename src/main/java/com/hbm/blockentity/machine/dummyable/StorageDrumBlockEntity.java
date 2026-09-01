@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityStorageDrum.java}:38- — 24 slots, WASTEFLUID/WASTEGAS 16k.
- * Depleted-waste I/O unregistered → only rows with live ids convert.
+ * Long/short waste siblings + mercury I/O registered — CE table is live.
  */
 public class StorageDrumBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardSenderMK2, ITickableBE, MenuProvider {

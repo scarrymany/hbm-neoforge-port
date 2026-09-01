@@ -19,6 +19,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +60,7 @@ import java.util.Map;
  *   here since nothing below needs it.</li>
  *   <li>12 of the 24 post-loop waste-reprocessing entries key on
  *   {@code nuclear_waste_long_depleted}/{@code nuclear_waste_short_depleted}, also not registered.</li>
- *   <li>The 12 depleted-keyed waste rows still need {@code nuclear_waste_*_depleted} + {@code dust_tiny}.
- *   {@code fallout} needs {@code dust_tiny}. {@code fluid_icon}(FULLERENE) needs {@code powder_ash}.</li>
+ *   <li>Depleted waste + {@code fallout} + {@code dust_tiny} are registered this wave.</li>
  *   <li>{@code fluid_icon}(DEATH/VITRIOL/REDMUD) - every ingredient/output item these 3 entries need
  *   <i>is</i> already registered, but reaching them at runtime needs a real fluid-tank-direct
  *   reprocessing path {@link com.hbm.blockentity.machine.chem.SilexBlockEntity} does not have yet
@@ -78,6 +78,7 @@ import java.util.Map;
 public final class SILEXRecipes {
 
     public static final Map<ComparableStack, SILEXRecipe> RECIPES = new LinkedHashMap<>();
+    private static final Map<Item, Item> TINY_WASTE = new HashMap<>();
 
     private static boolean registered = false;
 
@@ -274,11 +275,134 @@ public final class SILEXRecipes {
                         .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 5)
                         .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 5)
                         .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 76));
+
+        // CE SILEXRecipes.java:480-646 depleted keys — I/O now registered
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLongDepleted(ItemWasteLong.WasteClass.URANIUM235).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 65)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 20)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 15));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShortDepleted(ItemWasteShort.WasteClass.URANIUM235).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 10)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 32)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 22)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U238.get()), 5)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 15)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 16));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLongDepleted(ItemWasteLong.WasteClass.URANIUM233).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 60)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 25)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 15));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShortDepleted(ItemWasteShort.WasteClass.URANIUM233).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 12)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 34)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 13)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U238.get()), 2)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 10)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 29));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShortDepleted(ItemWasteShort.WasteClass.PLUTONIUM239).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 2)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 16)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 40)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U238.get()), 3)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 39));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShortDepleted(ItemWasteShort.WasteClass.PLUTONIUM240).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 2)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 22)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 20)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 17)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U238.get()), 3)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 36));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShortDepleted(ItemWasteShort.WasteClass.PLUTONIUM241).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.VISIBLE)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 60)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 20)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 15)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 5));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLongDepleted(ItemWasteLong.WasteClass.THORIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 35)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 40)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 15)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 10));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLongDepleted(ItemWasteLong.WasteClass.NEPTUNIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U238.get()), 16)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 55)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 20)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 9));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShortDepleted(ItemWasteShort.WasteClass.NEPTUNIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 7)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 29)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_U238.get()), 2)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 45)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 17));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteLongDepleted(ItemWasteLong.WasteClass.SCHRABIDIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_SOLINIUM.get()), 20)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_EUPHEMIUM.get()), 18)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_GH336.get()), 15)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_TANTALIUM.get()), 8)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_NEODYMIUM_TINY.get()), 8)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 31));
+        RECIPES.put(new ComparableStack(SpecialItems.nuclearWasteShortDepleted(ItemWasteShort.WasteClass.SCHRABIDIUM).get()),
+                new SILEXRecipe(900, 100, EnumWavelengths.IR)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 7)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get()), 12)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CERIUM_TINY.get()), 14)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_LANTHANIUM_TINY.get()), 15)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 20)
+                        .addOut(new ItemStack(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get()), 32));
+
+        // CE SILEXRecipes.java:648-655
+        RECIPES.put(new ComparableStack(hbmBlock("fallout")),
+                new SILEXRecipe(900, 100, EnumWavelengths.VISIBLE)
+                        .addOut(new ItemStack(BilletPowderItems.DUST_TINY.get()), 90)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_CO60.get()), 2)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_SR90_TINY.get()), 3)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_I131_TINY.get()), 1)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 3)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_AU198.get()), 1));
+
+        // TODO(CE: com.hbm.inventory.recipes.SILEXRecipes.java:117-472): RBMK pellet loop keys
+        // pellet meta 0-4 / 5-9 (xenon). Port ComparableStack dropped meta; MachineDataComponents.RBMK_PELLET_STAGE
+        // exists but shipping one recipe for all stages is unfaithful. Do not invent. Blocked by NbtComparableStack.
+        // TODO(CE: com.hbm.inventory.recipes.SILEXRecipes.java:96-115): fluid_icon DEATH/VITRIOL/REDMUD —
+        // same fluid_icon item, need NbtComparableStack ignoring fill + SILEX tank-direct path. Do not invent.
+        // TODO(CE: com.hbm.inventory.recipes.SILEXRecipes.java:664): fluid_icon FULLERENE → powder_ash FULLERENE.
+        // powder_ash_fullerene is registered; blocked by the same fluid_icon key. Do not invent.
+
+        for (ItemWasteLong.WasteClass c : ItemWasteLong.WasteClass.VALUES) {
+            TINY_WASTE.put(SpecialItems.nuclearWasteLongTiny(c).get(), SpecialItems.nuclearWasteLong(c).get());
+            TINY_WASTE.put(SpecialItems.nuclearWasteLongDepletedTiny(c).get(), SpecialItems.nuclearWasteLongDepleted(c).get());
+        }
+        for (ItemWasteShort.WasteClass c : ItemWasteShort.WasteClass.VALUES) {
+            TINY_WASTE.put(SpecialItems.nuclearWasteShortTiny(c).get(), SpecialItems.nuclearWasteShort(c).get());
+            TINY_WASTE.put(SpecialItems.nuclearWasteShortDepletedTiny(c).get(), SpecialItems.nuclearWasteShortDepleted(c).get());
+        }
     }
 
     public static SILEXRecipe getOutput(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return null;
-        return RECIPES.get(new ComparableStack(stack).makeSingular());
+        register();
+        ComparableStack key = new ComparableStack(stack).makeSingular();
+        SILEXRecipe direct = RECIPES.get(key);
+        if (direct != null) return direct;
+        // CE SILEXRecipes.java:707-721 tinyWasteTranslation
+        Item full = TINY_WASTE.get(stack.getItem());
+        if (full == null) return null;
+        SILEXRecipe result = getOutput(new ItemStack(full));
+        if (result == null) return null;
+        int fluidProduced = (result.fluidProduced / 900) * 100;
+        SILEXRecipe tiny = new SILEXRecipe(fluidProduced, result.fluidConsumed, result.laserStrength);
+        tiny.outputs.addAll(result.outputs);
+        return tiny;
     }
 
     /**

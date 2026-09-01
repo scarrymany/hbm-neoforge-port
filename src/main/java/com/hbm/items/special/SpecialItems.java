@@ -270,19 +270,27 @@ public final class SpecialItems {
         public static final ScrapType[] VALUES = values();
     }
 
-    // ==================== ItemWasteLong / ItemWasteShort (task-scoped families) ====================
-    // Per this area's task text ("ItemWasteLong (5 variants), ItemWasteShort (8 variants)"), only
-    // the base nuclear_waste_long/nuclear_waste_short fields are flattened here - CE's six sibling
-    // fields (_tiny, _depleted, _depleted_tiny for each) are a distinct open question, see this
-    // area's final report.
+    // ==================== ItemWasteLong / ItemWasteShort (CE 4 fields × class, flattened) ====================
+    // CE: nuclear_waste_long / _tiny / _depleted / _depleted_tiny (5 WasteClass)
+    //     nuclear_waste_short / _tiny / _depleted / _depleted_tiny (8 WasteClass)
+    // StorageDrum + SILEX I/O. Texture is the CE family png; class is tooltip-only.
 
     private static final java.util.Map<WasteClass, DeferredItem<ItemWasteLong>> NUCLEAR_WASTE_LONG = new java.util.EnumMap<>(WasteClass.class);
+    private static final java.util.Map<WasteClass, DeferredItem<ItemWasteLong>> NUCLEAR_WASTE_LONG_TINY = new java.util.EnumMap<>(WasteClass.class);
+    private static final java.util.Map<WasteClass, DeferredItem<ItemWasteLong>> NUCLEAR_WASTE_LONG_DEPLETED = new java.util.EnumMap<>(WasteClass.class);
+    private static final java.util.Map<WasteClass, DeferredItem<ItemWasteLong>> NUCLEAR_WASTE_LONG_DEPLETED_TINY = new java.util.EnumMap<>(WasteClass.class);
 
     static {
         for (WasteClass wasteClass : WasteClass.VALUES) {
-            String id = "nuclear_waste_long_" + wasteClass.name().toLowerCase(Locale.ROOT);
-            DeferredItem<ItemWasteLong> item = registerParts(id, () -> new ItemWasteLong(new Item.Properties(), wasteClass));
-            NUCLEAR_WASTE_LONG.put(wasteClass, item);
+            String suffix = wasteClass.name().toLowerCase(Locale.ROOT);
+            NUCLEAR_WASTE_LONG.put(wasteClass, registerParts("nuclear_waste_long_" + suffix,
+                    () -> new ItemWasteLong(new Item.Properties(), wasteClass, ItemWasteLong.WasteForm.BASE)));
+            NUCLEAR_WASTE_LONG_TINY.put(wasteClass, registerParts("nuclear_waste_long_tiny_" + suffix,
+                    () -> new ItemWasteLong(new Item.Properties(), wasteClass, ItemWasteLong.WasteForm.TINY)));
+            NUCLEAR_WASTE_LONG_DEPLETED.put(wasteClass, registerParts("nuclear_waste_long_depleted_" + suffix,
+                    () -> new ItemWasteLong(new Item.Properties(), wasteClass, ItemWasteLong.WasteForm.DEPLETED)));
+            NUCLEAR_WASTE_LONG_DEPLETED_TINY.put(wasteClass, registerParts("nuclear_waste_long_depleted_tiny_" + suffix,
+                    () -> new ItemWasteLong(new Item.Properties(), wasteClass, ItemWasteLong.WasteForm.DEPLETED_TINY)));
         }
     }
 
@@ -290,19 +298,55 @@ public final class SpecialItems {
         return NUCLEAR_WASTE_LONG.get(wasteClass);
     }
 
+    public static DeferredItem<ItemWasteLong> nuclearWasteLongTiny(WasteClass wasteClass) {
+        return NUCLEAR_WASTE_LONG_TINY.get(wasteClass);
+    }
+
+    public static DeferredItem<ItemWasteLong> nuclearWasteLongDepleted(WasteClass wasteClass) {
+        return NUCLEAR_WASTE_LONG_DEPLETED.get(wasteClass);
+    }
+
+    public static DeferredItem<ItemWasteLong> nuclearWasteLongDepletedTiny(WasteClass wasteClass) {
+        return NUCLEAR_WASTE_LONG_DEPLETED_TINY.get(wasteClass);
+    }
+
     private static final java.util.Map<ItemWasteShort.WasteClass, DeferredItem<ItemWasteShort>> NUCLEAR_WASTE_SHORT =
+            new java.util.EnumMap<>(ItemWasteShort.WasteClass.class);
+    private static final java.util.Map<ItemWasteShort.WasteClass, DeferredItem<ItemWasteShort>> NUCLEAR_WASTE_SHORT_TINY =
+            new java.util.EnumMap<>(ItemWasteShort.WasteClass.class);
+    private static final java.util.Map<ItemWasteShort.WasteClass, DeferredItem<ItemWasteShort>> NUCLEAR_WASTE_SHORT_DEPLETED =
+            new java.util.EnumMap<>(ItemWasteShort.WasteClass.class);
+    private static final java.util.Map<ItemWasteShort.WasteClass, DeferredItem<ItemWasteShort>> NUCLEAR_WASTE_SHORT_DEPLETED_TINY =
             new java.util.EnumMap<>(ItemWasteShort.WasteClass.class);
 
     static {
         for (ItemWasteShort.WasteClass wasteClass : ItemWasteShort.WasteClass.VALUES) {
-            String id = "nuclear_waste_short_" + wasteClass.name().toLowerCase(Locale.ROOT);
-            DeferredItem<ItemWasteShort> item = registerParts(id, () -> new ItemWasteShort(new Item.Properties(), wasteClass));
-            NUCLEAR_WASTE_SHORT.put(wasteClass, item);
+            String suffix = wasteClass.name().toLowerCase(Locale.ROOT);
+            NUCLEAR_WASTE_SHORT.put(wasteClass, registerParts("nuclear_waste_short_" + suffix,
+                    () -> new ItemWasteShort(new Item.Properties(), wasteClass, ItemWasteShort.WasteForm.BASE)));
+            NUCLEAR_WASTE_SHORT_TINY.put(wasteClass, registerParts("nuclear_waste_short_tiny_" + suffix,
+                    () -> new ItemWasteShort(new Item.Properties(), wasteClass, ItemWasteShort.WasteForm.TINY)));
+            NUCLEAR_WASTE_SHORT_DEPLETED.put(wasteClass, registerParts("nuclear_waste_short_depleted_" + suffix,
+                    () -> new ItemWasteShort(new Item.Properties(), wasteClass, ItemWasteShort.WasteForm.DEPLETED)));
+            NUCLEAR_WASTE_SHORT_DEPLETED_TINY.put(wasteClass, registerParts("nuclear_waste_short_depleted_tiny_" + suffix,
+                    () -> new ItemWasteShort(new Item.Properties(), wasteClass, ItemWasteShort.WasteForm.DEPLETED_TINY)));
         }
     }
 
     public static DeferredItem<ItemWasteShort> nuclearWasteShort(ItemWasteShort.WasteClass wasteClass) {
         return NUCLEAR_WASTE_SHORT.get(wasteClass);
+    }
+
+    public static DeferredItem<ItemWasteShort> nuclearWasteShortTiny(ItemWasteShort.WasteClass wasteClass) {
+        return NUCLEAR_WASTE_SHORT_TINY.get(wasteClass);
+    }
+
+    public static DeferredItem<ItemWasteShort> nuclearWasteShortDepleted(ItemWasteShort.WasteClass wasteClass) {
+        return NUCLEAR_WASTE_SHORT_DEPLETED.get(wasteClass);
+    }
+
+    public static DeferredItem<ItemWasteShort> nuclearWasteShortDepletedTiny(ItemWasteShort.WasteClass wasteClass) {
+        return NUCLEAR_WASTE_SHORT_DEPLETED_TINY.get(wasteClass);
     }
 
     // ==================== ItemSiegeCoin (9 flattened variants) ====================

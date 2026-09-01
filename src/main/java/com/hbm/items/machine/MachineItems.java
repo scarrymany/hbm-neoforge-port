@@ -78,11 +78,14 @@ public final class MachineItems {
     public static DeferredItem<Item> SPHERE_STEEL, FLYWHEEL_BERYLLIUM, REACTOR_CORE;
     public static DeferredItem<Item> HAZMAT_CLOTH, HAZMAT_CLOTH_RED, HAZMAT_CLOTH_GREY, ASBESTOS_CLOTH, FILTER_COAL;
 
+    public static final Map<ItemDrive.EnumDriveType, DeferredItem<Item>> DRIVES = new EnumMap<>(ItemDrive.EnumDriveType.class);
+
     public static void registerAll() {
         registerArcElectrodes();
         registerBatteries();
         registerBlades();
         registerBlueprints();
+        registerDrives();
         registerBreedingRods();
         registerCapacitorAndCassette();
         registerCatalysts();
@@ -245,6 +248,15 @@ public final class MachineItems {
 
         for (ItemBlueprintFolder.Kind kind : ItemBlueprintFolder.Kind.values()) {
             tab(ModCreativeTabs.TEMPLATE, reg("blueprint_folder_" + lower(kind.name()), () -> new ItemBlueprintFolder(kind, props())));
+        }
+    }
+
+    /** CE {@code ModItems.drive} {@code ItemEnumMulti<EnumDriveType>} flattened. SuperComputer I/O. */
+    private static void registerDrives() {
+        for (ItemDrive.EnumDriveType type : ItemDrive.EnumDriveType.VALUES) {
+            DeferredItem<Item> item = tab(ModCreativeTabs.CONTROL,
+                    reg("drive_" + lower(type.name()), () -> new ItemDrive(type, props())));
+            DRIVES.put(type, item);
         }
     }
 

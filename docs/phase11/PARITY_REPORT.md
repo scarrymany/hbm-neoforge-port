@@ -6,26 +6,25 @@ is stale. Do not quote Phase 6 as current.
 Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_parity_census.py`
 (item/block ids via Phase 10 `extract_all_ids` — Java `register`/`reg`/`parts`/`parts1` + Mats autogen
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
-`src/main/resources` + `src/generated`.
+`src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.637s)** on wiped world port 25566, **3946 recipes**.
-No recipe parse errors. No new tag (Dummyable wave). `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0. runServer recorded after this commit.
+No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **102.4%** (7955 / 7767) |
-| **Unweighted** (mean of category %) | **102.2%** |
-| Recipe/loot reachability of port items | **52.4%** (1348 / 2571) |
+| **Weighted** (Σport / ΣCE) | **102.8%** (7983 / 7767) |
+| **Unweighted** (mean of category %) | **102.4%** |
+| Recipe/loot reachability of port items | **52.4%** (1348 / 2574) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 162**, **machine 327**, **vanilla 52**.
-Weighted **102.4%**. Category holes remain. Not content-complete.
+Largest remaining holes: **blocks 162**, **machine 302**, **vanilla 52**.
+Weighted **102.8%**. Category holes remain. Not content-complete.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -33,13 +32,13 @@ Weighted **102.4%**. Category holes remain. Not content-complete.
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2571 | **138.0%** | Extract + already-registered helpers / loops + Dummyable BlockItems |
-| Blocks | 1169 | 1007 | **86.1%** | +telelinker / soyuz_capsule / filing_cabinet + leftover cubes ×3 |
+| Items (flattened ids) | 1863 | 2574 | **138.2%** | +bottle_mercury / dust_tiny / cinnabar (loop waste/ash/drive not flatten extras) |
+| Blocks | 1169 | 1007 | **86.1%** | unchanged this wave |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950. +3 ducrete CraftingManager rows |
-| Machine recipes | ~2009 | 1682 | **83.7%** | CE denom unchanged. Assembler skip **7** + pack/unpack already closed |
+| Machine recipes | ~2009 | 1707 | **85.0%** | +SILEX depleted/fallout + StorageDrum + SuperComputer. ChemPlant 72/72 (CE 145 double-count) |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
@@ -77,8 +76,9 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ### Unchanged this wave
 
-- Machine **1682 / 83.7%**. Leftover ChemPlant / SILEX / StorageDrum / SuperComputer I/O still
-  unregistered — not invented.
+- Machine **1682 → 1707 / 85.0%**. ChemPlant 72/72 already live. SILEX +13 depleted/fallout.
+  StorageDrum CE table live (census 6 sites / runtime 28). SuperComputer 18 runtime / census 7 sites.
+  Cited leftovers: SILEX RBMK pellet loop `:117-472`, fluid_icon `:96-115`/`:664`.
 - Blocks **790 / 67.6%**. No dummy blocks.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Client NPE fix (`CrucibleBlocks.registerAll` + `SafeMenuScreens`) from prior HEAD.
@@ -105,7 +105,8 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 - Blast `meteorite_sword_*` — items missing, row dropped after register
 - RockMill AE2 module / blueprint cycling — auto-detect instead
 - Annihilator 528 gate — table registered unconditionally (same CE lines)
-- SILEX depleted waste / RBMK pellet loop — items missing
+- SILEX RBMK pellet loop — TODO(CE: SILEXRecipes.java:117-472) NbtComparableStack / stage meta
+- SILEX fluid_icon DEATH/VITRIOL/REDMUD/FULLERENE — TODO(CE: SILEXRecipes.java:96-115, :664)
 - Press meteorite sword / briquette / page_of — AIR filtered
 - Rotary `ModuleBurnTime` heat mods — vanilla burn/2
 - WasteDrum RBMK rod heat path — `ItemRBMKRod.updateHeat` not in this port
@@ -120,7 +121,7 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 - Radiolysis sterilize (`ntmContagion` NBT) — not ported; slots exist
 - Flare pollution / particles / entity fire / tilt — skipped
 - Flare / EPress `UpgradeManagerNT` — slot scan by `ItemMachineUpgrade` type/tier instead
-- PyroOven tar→soot — `powder_ash` unregistered
+- PyroOven tar→soot — `powder_ash_*` now registered; row still skipped pending wire-up
 - PyroOven / arc furnace pollution / audio / particles / lid animation — skipped
 - Arc furnace vanilla furnace autogen — RecipeManager not available at commonSetup
 - Arc furnace `sand_quartz` → `glass_quartz` — `sand_quartz` unregistered
@@ -130,15 +131,15 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 - Turbofan pollution / particles — skipped
 - Radgen depleted/tiny leftovers — items unregistered
 - Hephaestus `volcanic_lava_block` — unregistered; CE overlay-only (port has a real menu)
-- Wood burner `powder_ash` — unregistered; `loadTank` canister path not ported
+- Wood burner `powder_ash_*` registered; ash emit + `loadTank` canister path not ported
 - Wood burner / slopper / turbofan `UpgradeManagerNT` — slot scan by type/tier instead
 - Iron / steel furnace pollution + particles; steel ore bonus
 - Firebox `ModuleBurnTime` fuel-class mods + ashpit + door anim
 - Oilburner `loadTank` / pollution
 - Sawmill blade / entity shred / overspeed (`sawblade` unregistered → blade assumed)
 - Heaters / steel furnace / sawmill CE crafts are **anvil**, not vanilla
-- StorageDrum waste table empty (depleted-waste outputs unregistered)
-- SuperComputer drive/`EnumDriveType` recipes not invented
+- SuperComputer CE recipe dropdown (`IControlReceiver` / ModuleMachineBase) — auto-match instead
+  TODO(CE: TileEntityMachineSuperComputer.java:186-194)
 - Autosaw entity shred skipped
 - `catalytic_converter` `ANY_BISMOID.ingot()` → `ingot_bismuth` (no `any_bismoid` tag)
 - wave11 drops: `powder_fire` / `key` / `gear_large` / `sawblade` / `mold_base` unregistered
@@ -147,13 +148,13 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**52.4%** (1348 / 2571). Prior: 1342 / 2565 (52.3%).
+**52.4%** (1348 / 2574). JSON/loot only — machine tables (ChemPlant/SILEX/StorageDrum/SuperComputer)
+do not feed this graph.
 
 ## Next single gap
 
-Blocks **86.1%** (162 missing — Dummyable/deco leftover, not dummy regs).
-Machine leftover **~327** (ChemPlant / SILEX / StorageDrum / SuperComputer I/O unregistered).
-Vanilla leftover **52**. Weighted **102.4%**. `v0.0.1-rc2` stays (no new tag).
+Blocks **86.1%** (162 missing). Machine leftover **~302** (SILEX RBMK loop + fluid_icon + assembler
+skip 7 + other families). Vanilla leftover **52**. Weighted **102.8%**. `v0.0.1-rc2` stays (no new tag).
 
 ## Entities (Phase 9 leftovers)
 

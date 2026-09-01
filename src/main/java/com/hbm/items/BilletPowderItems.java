@@ -3,6 +3,7 @@ package com.hbm.items;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.food.ItemLemon;
+import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.special.ItemFuel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -70,12 +71,10 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * carrying a {@link FoodProperties} component built by {@link #registerCementPowder} rather than a
  * separate 1.12-style food-item class.
  * <p>
- * {@code powder_ash} ({@code ItemEnumMulti<EnumAshType>}, 6 metadata variants: WOOD, COAL, MISC,
- * FLY, SOOT, FULLERENE) is deliberately NOT registered here - it is a metadata-driven-multi item
- * (see the generative report section 2), a different generative mechanism than this hardcoded
- * family, and needs post-flattening expansion into 6 distinct registry entries under whatever
- * naming the area owning {@code ItemEnumMulti} flattening settles on. Registering it here under a
- * guessed name would risk colliding with that area's own naming decision.
+ * {@code powder_ash} ({@code ItemEnumMulti<EnumAshType>}) is flattened here as
+ * {@code powder_ash_wood}/{@code _coal}/{@code _misc}/{@code _fly}/{@code _soot}/{@code _fullerene}.
+ * {@code dust_tiny}, {@code bottle_mercury}, {@code cinnabar} (CE {@code ModItems.cinnabar}, the
+ * CINNABAR.gem() ore-dict target) are registered here for StorageDrum / SILEX / SuperComputer I/O.
  */
 public final class BilletPowderItems {
 
@@ -230,7 +229,28 @@ public final class BilletPowderItems {
     public static final DeferredItem<Item> POWDER_METEORITE_TINY = registerPowder("powder_meteorite_tiny");
     public static final DeferredItem<Item> POWDER_FLUX = registerPowder("powder_flux");
     public static final DeferredItem<Item> POWDER_FERTILIZER = registerFertilizerPowder("powder_fertilizer");
-    // CE registers powder_ash (ItemEnumMulti<EnumAshType>) here; intentionally excluded, see class javadoc.
+    public static final DeferredItem<Item> DUST_TINY = registerResource("dust_tiny");
+    public static final DeferredItem<Item> BOTTLE_MERCURY = registerResource("bottle_mercury");
+    /** CE {@code ModItems.cinnabar} — CINNABAR.gem() / CINNABAR.crystal() ore-dict target. */
+    public static final DeferredItem<Item> CINNABAR = registerResource("cinnabar");
+    public static final java.util.Map<EnumAshType, DeferredItem<Item>> POWDER_ASH = new java.util.EnumMap<>(EnumAshType.class);
+    static {
+        for (EnumAshType type : EnumAshType.VALUES) {
+            EnumAshType ash = type;
+            String id = "powder_ash_" + ash.name().toLowerCase(java.util.Locale.ROOT);
+            DeferredItem<Item> item = ModItems.ITEMS.register(id, () -> new Item(new Item.Properties()) {
+                @Override
+                public String getDescriptionId() {
+                    return "item.hbm.powder_ash." + ash.name().toLowerCase(java.util.Locale.ROOT);
+                }
+            });
+            CreativeTabContents.add(ModCreativeTabs.PARTS, item);
+            POWDER_ASH.put(type, item);
+        }
+    }
+    public static DeferredItem<Item> powderAsh(EnumAshType type) {
+        return POWDER_ASH.get(type);
+    }
     // CE's ItemCustomLore("powder_power", "powder_energy_alt") texture-path override is a datagen
     // concern (see docs/phase1/moditems_generative.md section 1 notes on .aot() overrides), not a
     // registration-id one; the registry id below stays "powder_power" either way.

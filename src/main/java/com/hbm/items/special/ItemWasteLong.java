@@ -18,15 +18,43 @@ import java.util.List;
  */
 public class ItemWasteLong extends Item {
 
+    public enum WasteForm {
+        BASE("item.hbm.nuclear_waste_long"),
+        TINY("item.hbm.nuclear_waste_long_tiny"),
+        DEPLETED("item.hbm.nuclear_waste_long_depleted"),
+        DEPLETED_TINY("item.hbm.nuclear_waste_long_depleted_tiny");
+
+        public final String descriptionId;
+
+        WasteForm(String descriptionId) {
+            this.descriptionId = descriptionId;
+        }
+    }
+
     private final WasteClass wasteClass;
+    private final WasteForm form;
 
     public ItemWasteLong(Properties properties, WasteClass wasteClass) {
+        this(properties, wasteClass, WasteForm.BASE);
+    }
+
+    public ItemWasteLong(Properties properties, WasteClass wasteClass, WasteForm form) {
         super(properties);
         this.wasteClass = wasteClass;
+        this.form = form;
     }
 
     public WasteClass getWasteClass() {
         return wasteClass;
+    }
+
+    public WasteForm getForm() {
+        return form;
+    }
+
+    @Override
+    public String getDescriptionId() {
+        return form.descriptionId;
     }
 
     @Override
