@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:magnetizedtungsten_wire"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "minecraft:green_dye"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:nuke_n2",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

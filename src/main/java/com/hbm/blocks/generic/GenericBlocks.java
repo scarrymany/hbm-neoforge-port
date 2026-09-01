@@ -285,6 +285,19 @@ public final class GenericBlocks {
         registerBlock("blast_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
         registerBlock("fire_door", () -> new BlockBase(BlockBehaviour.Properties.of().strength(10.0F, 1500.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("sliding_blast_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        // CE AssemblyMachineRecipes.java:189-214 leftover door outputs (casings only, TE later).
+        registerBlock("sliding_blast_door_legacy", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("large_vehicle_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("water_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("qe_containment", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("qe_sliding_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("round_airlock_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("secure_access_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("sliding_seal_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("cargo_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("silo_hatch", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("silo_hatch_large", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+        registerBlock("transition_seal", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
     }
 
     /** CE's twelve registrations; only {@code ladder_red_top} sets {@code capTop}. */

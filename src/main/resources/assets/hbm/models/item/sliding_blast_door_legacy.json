@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "hbm:block/sliding_blast_door"
-  }
+  "parent": "hbm:block/sliding_blast_door_legacy"
 }

@@ -35,7 +35,7 @@ HELPERS = re.compile(
     r'registerItem|registerGun|registerAmmo(?:Hidden)?|registerBlockItem|registerBlock|'
     r'registerUpgrade(?:Stack)?|registerPlainBattery|registerFelCrystal|'
     r'registerUpgrade|tab\([^,]+,\s*reg|'
-    r'\breg)\(\s*"([a-z][a-z0-9_]*)"'
+    r'\breg|parts1|parts)\(\s*"([a-z][a-z0-9_]*)"'
 )
 ANY_REG = re.compile(r'\.register\(\s*"([a-z][a-z0-9_]*)"')
 BARE_REG = re.compile(r'(?<![A-Za-z])register\(\s*"([a-z][a-z0-9_]*)"')

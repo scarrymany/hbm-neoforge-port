@@ -9328,5 +9328,12 @@
   "item.hbm.casing_small_steel": "Small Steel Casing",
   "item.hbm.casing_large_steel": "Large Steel Casing",
   "item.hbm.casing_shotshell": "Shotshell Casing",
-  "item.hbm.casing_buckshot_advanced": "Advanced Buckshot Casing"
+  "item.hbm.casing_buckshot_advanced": "Advanced Buckshot Casing",
+  "block.hbm.icf_laser_component_casing": "ICF Laser Casing",
+  "block.hbm.icf_laser_component_port": "ICF Laser Port",
+  "block.hbm.icf_laser_component_cell": "ICF Laser Cell",
+  "block.hbm.icf_laser_component_emitter": "ICF Laser Flash Tube",
+  "block.hbm.icf_laser_component_capacitor": "ICF Laser Capacitor",
+  "block.hbm.icf_laser_component_turbo": "ICF Laser Turbocharger",
+  "block.hbm.sliding_blast_door_legacy": "Sliding Blast Door (Legacy)"
 }

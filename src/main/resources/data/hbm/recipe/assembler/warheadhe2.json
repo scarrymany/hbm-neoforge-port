@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "tag:hbm:any_highexplosive"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:warhead_generic_medium",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

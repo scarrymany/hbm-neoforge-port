@@ -104,6 +104,13 @@ def port_item_ids() -> set[str]:
         "sulfur", "niter",
         "casing_small", "casing_large", "casing_small_steel", "casing_large_steel",
         "casing_shotshell", "casing_buckshot", "casing_buckshot_advanced",
+        "upgrade_template", "neutron_reflector", "missile_assembly",
+        "thruster_small", "thruster_medium", "thruster_large",
+        "fuel_tank_small", "fuel_tank_medium", "fuel_tank_large",
+        "warhead_generic_small", "warhead_incendiary_small", "warhead_cluster_small", "warhead_buster_small",
+        "warhead_generic_medium", "warhead_incendiary_medium", "warhead_cluster_medium", "warhead_buster_medium",
+        "warhead_generic_large", "warhead_incendiary_large", "warhead_cluster_large", "warhead_buster_large",
+        "warhead_nuclear", "warhead_mirv", "warhead_volcano",
     }
     for t in ("meu", "heu233", "heu235", "men", "hen237", "mox", "mep", "hep239", "hep241",
               "mea", "hea242", "hes326", "hes327", "bfb_am_mix", "bfb_pu241"):
@@ -118,7 +125,7 @@ def port_block_ids() -> set[str]:
     _items, blocks = extract_all_ids()
     extra = set()
     helper = re.compile(
-        r'(?:registerBlock|registerMachine|registerResource|ore|outgas|stair|slab)\(\s*"([a-z][a-z0-9_]*)"'
+        r'(?:registerBlock|registerMachine|registerResource|registerCasing|ore|outgas|stair|slab)\(\s*"([a-z][a-z0-9_]*)"'
     )
     for p in java_files(PORT_JAVA / "blocks"):
         extra.update(helper.findall(read(p)))

@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_lead"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_triple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:thermo_element"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_radiolysis",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

@@ -1,6 +1,7 @@
 package com.hbm.blocks.machine.fusion;
 
 import com.hbm.blockentity.machine.fusion.FusionBlockEntities;
+import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -53,8 +54,31 @@ public final class FusionBlocks {
         WATZ_REACTOR = registerBlock("machine_watz_reactor", () -> new WatzReactorBlock(MACHINE_PROPS));
         FUSION_PLASMA_FORGE = registerBlock("fusion_plasma_forge", () -> new PlasmaForgeBlock(MACHINE_PROPS));
 
+        // CE ModBlocks.java:1331-1348 / PlasmaForgeRecipes.java:113-237.
+        // Flattened ICF laser metas (EnumICFPart) + ICF component metas 0/1/3 + DFC casings.
+        // Placeable cubes (ICF TE already exists); full laser/DFC multiblock later.
+        registerCasing("icf_laser_component_casing");
+        registerCasing("icf_laser_component_port");
+        registerCasing("icf_laser_component_cell");
+        registerCasing("icf_laser_component_emitter");
+        registerCasing("icf_laser_component_capacitor");
+        registerCasing("icf_laser_component_turbo");
+        registerCasing("icf_component_0");
+        registerCasing("icf_component_1");
+        registerCasing("icf_component_3");
+        registerCasing("struct_icf_core");
+        registerCasing("dfc_core");
+        registerCasing("dfc_emitter");
+        registerCasing("dfc_receiver");
+        registerCasing("dfc_injector");
+        registerCasing("dfc_stabilizer");
+
         FusionBlockEntities.registerAll();
         FusionMenus.registerAll();
+    }
+
+    private static DeferredBlock<BlockBase> registerCasing(String name) {
+        return registerBlock(name, () -> new BlockBase(MACHINE_PROPS));
     }
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory) {

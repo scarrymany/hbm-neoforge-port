@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hbm:block/icf_laser_component_port"
+    }
+  }
+}

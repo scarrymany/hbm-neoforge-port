@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:cordite"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_iron"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_aluminium"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:mingrade_wire"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:boy_propellant",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

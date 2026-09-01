@@ -53,7 +53,9 @@ MAT: dict[str, list[str]] = {
     "STEEL": ["steel"],
     "CU": ["copper"],
     "TI": ["titanium"],
-    "AL": ["aluminium", "aluminum"],
+    "AL": ["aluminum", "aluminium"],
+    "ND": ["neodymium"],
+    "SBD": ["schrabidate"],
     "PB": ["lead"],
     "GOLD": ["gold"],
     "IRON": ["iron"],
@@ -78,6 +80,7 @@ MAT: dict[str, list[str]] = {
     "ANY_SMOKELESS": [],
     "ANY_RUBBER": ["rubber"],
     "ANY_RESISTANTALLOY": ["tcalloy", "cdalloy"],
+    "WC": ["tungsten_carbide"],
     "ANY_CONCRETE": ["concrete_smooth"],
     "ANY_TAR": [],
     "ANY_BISMOID": ["bismuth"],
@@ -188,6 +191,57 @@ ITEM_MAP = {
     "ModBlocks.blast_door": "blast_door",
     "ModBlocks.fire_door": "fire_door",
     "ModBlocks.sliding_blast_door": "sliding_blast_door",
+    "ModBlocks.sliding_blast_door_legacy": "sliding_blast_door_legacy",
+    "ModBlocks.large_vehicle_door": "large_vehicle_door",
+    "ModBlocks.water_door": "water_door",
+    "ModBlocks.qe_containment": "qe_containment",
+    "ModBlocks.qe_sliding_door": "qe_sliding_door",
+    "ModBlocks.round_airlock_door": "round_airlock_door",
+    "ModBlocks.secure_access_door": "secure_access_door",
+    "ModBlocks.sliding_seal_door": "sliding_seal_door",
+    "ModBlocks.cargo_door": "cargo_door",
+    "ModBlocks.silo_hatch": "silo_hatch",
+    "ModBlocks.silo_hatch_large": "silo_hatch_large",
+    "ModBlocks.transition_seal": "transition_seal",
+    "ModBlocks.machine_flare": "machine_flare",
+    "ModBlocks.machine_catalytic_cracker": "machine_catalytic_cracker",
+    "ModBlocks.machine_coker": "machine_coker",
+    "ModBlocks.machine_vacuum_distill": "machine_vacuum_distill",
+    "ModBlocks.machine_catalytic_reformer": "machine_catalytic_reformer",
+    "ModBlocks.machine_hydrotreater": "machine_hydrotreater",
+    "ModBlocks.machine_radiolysis": "machine_radiolysis",
+    "ModBlocks.icf_controller": "machine_icf_controller",
+    "ModBlocks.struct_icf_core": "struct_icf_core",
+    "ModBlocks.dfc_core": "dfc_core",
+    "ModBlocks.dfc_emitter": "dfc_emitter",
+    "ModBlocks.dfc_receiver": "dfc_receiver",
+    "ModBlocks.dfc_injector": "dfc_injector",
+    "ModBlocks.dfc_stabilizer": "dfc_stabilizer",
+    "ModBlocks.emp_bomb": "emp_bomb",
+    "ModItems.upgrade_template": "upgrade_template",
+    "ModItems.neutron_reflector": "neutron_reflector",
+    "ModItems.missile_assembly": "missile_assembly",
+    "ModItems.thruster_small": "thruster_small",
+    "ModItems.thruster_medium": "thruster_medium",
+    "ModItems.thruster_large": "thruster_large",
+    "ModItems.fuel_tank_small": "fuel_tank_small",
+    "ModItems.fuel_tank_medium": "fuel_tank_medium",
+    "ModItems.fuel_tank_large": "fuel_tank_large",
+    "ModItems.warhead_generic_small": "warhead_generic_small",
+    "ModItems.warhead_incendiary_small": "warhead_incendiary_small",
+    "ModItems.warhead_cluster_small": "warhead_cluster_small",
+    "ModItems.warhead_buster_small": "warhead_buster_small",
+    "ModItems.warhead_generic_medium": "warhead_generic_medium",
+    "ModItems.warhead_incendiary_medium": "warhead_incendiary_medium",
+    "ModItems.warhead_cluster_medium": "warhead_cluster_medium",
+    "ModItems.warhead_buster_medium": "warhead_buster_medium",
+    "ModItems.warhead_generic_large": "warhead_generic_large",
+    "ModItems.warhead_incendiary_large": "warhead_incendiary_large",
+    "ModItems.warhead_cluster_large": "warhead_cluster_large",
+    "ModItems.warhead_buster_large": "warhead_buster_large",
+    "ModItems.warhead_nuclear": "warhead_nuclear",
+    "ModItems.warhead_mirv": "warhead_mirv",
+    "ModItems.warhead_volcano": "warhead_volcano",
     "ModBlocks.machine_radar": "machine_radar",
     "ModBlocks.machine_radar_large": "machine_radar_large",
     "ModBlocks.machine_purex": "machine_purex",
@@ -268,6 +322,32 @@ VANILLA_BLOCKS = {
     "CRAFTING_TABLE": "minecraft:crafting_table",
     "IRON_BLOCK": "minecraft:iron_block",
     "GOLD_BLOCK": "minecraft:gold_block",
+    "GLASS": "minecraft:glass",
+}
+
+ICF_LASER_ENUM = {
+    "CASING": "icf_laser_component_casing",
+    "PORT": "icf_laser_component_port",
+    "CELL": "icf_laser_component_cell",
+    "EMITTER": "icf_laser_component_emitter",
+    "CAPACITOR": "icf_laser_component_capacitor",
+    "TURBO": "icf_laser_component_turbo",
+}
+
+ICF_COMPONENT_META = {
+    "0": "icf_component_0",
+    "1": "icf_component_1",
+    "3": "icf_component_3",
+}
+
+KEY_DYES = {
+    "KEY_RED": "minecraft:red_dye",
+    "KEY_YELLOW": "minecraft:yellow_dye",
+    "KEY_GREEN": "minecraft:green_dye",
+    "KEY_BLACK": "minecraft:black_dye",
+    "KEY_WHITE": "minecraft:white_dye",
+    "KEY_GRAY": "minecraft:gray_dye",
+    "KEY_GREY": "minecraft:gray_dye",
 }
 
 
@@ -281,7 +361,7 @@ def known_ids() -> set[str]:
     helper = re.compile(
         r'(?:registerParts|registerIngot|registerNugget|registerLoreIngot|registerItem|'
         r'registerBlock|registerMachine|registerResource|registerBillet|reg1|'
-        r'registerPowder|registerFuelPowder|registerUpgrade|ore|reg|parts)\(\s*"([a-z][a-z0-9_]*)"'
+        r'registerPowder|registerFuelPowder|registerUpgrade|registerCasing|ore|reg|parts1|parts)\(\s*"([a-z][a-z0-9_]*)"'
     )
     for p in java.rglob("*.java"):
         extra.update(helper.findall(p.read_text(errors="ignore")))
@@ -505,8 +585,8 @@ def _first_known(cands: list[str], known: set[str]) -> str | None:
 
 
 def resolve_ore(mat: str, shape: str, n: int, known: set[str]) -> tuple[str, int] | None:
-    if mat == "KEY_RED":
-        return "minecraft:redstone", n
+    if mat in KEY_DYES:
+        return KEY_DYES[mat], n
     if mat == "ANY_CONCRETE":
         if "concrete_smooth" in known:
             return "hbm:concrete_smooth", n
@@ -605,9 +685,13 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
     if "Fluids." in expr or "getDict(" in expr or "inputFluids" in expr:
         return None
     if "OreDictManager.getReflector" in expr:
+        n = 1
+        nm = re.search(r",\s*(\d+)\s*\)\s*$", expr)
+        if nm:
+            n = int(nm.group(1))
         for cand in ("neutron_reflector", "plate_paa"):
             if cand in known:
-                return f"hbm:{cand}", 1
+                return f"hbm:{cand}", n
         return None
 
     m = re.search(r"EnumCircuitType\.(\w+)", expr)
@@ -631,6 +715,12 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
             flat = resolve_flatten(name, en, n, known)
             if flat:
                 return flat
+        if src == "ModBlocks" and name == "icf_laser_component":
+            cid = ICF_LASER_ENUM.get(en)
+            return (f"hbm:{cid}", n) if cid and cid in known else None
+        if src == "ModBlocks" and name == "icf_component":
+            cid = ICF_COMPONENT_META.get(en)
+            return (f"hbm:{cid}", n) if cid and cid in known else None
         return None
 
     m = re.match(
@@ -643,6 +733,14 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
     m = re.match(r"new OreDictStack\((\w+)\.(\w+)\(\)(?:,\s*(\d+))?\)", expr)
     if m:
         return resolve_ore(m.group(1), m.group(2), int(m.group(3) or 1), known)
+
+    m = re.match(r'new OreDictStack\("dustGlowstone"(?:,\s*(\d+))?\)', expr)
+    if m:
+        return "minecraft:glowstone_dust", int(m.group(1) or 1)
+
+    m = re.match(r"new OreDictStack\((KEY_\w+)(?:,\s*(\d+))?\)", expr)
+    if m and m.group(1) in KEY_DYES:
+        return KEY_DYES[m.group(1)], int(m.group(2) or 1)
 
     m = re.match(r"new ComparableStack\((ModItems|ModBlocks)\.(\w+)(?:,\s*(\d+))?\)", expr)
     if m:
@@ -793,6 +891,11 @@ def write_assembler(known: set[str]) -> tuple[int, int, dict[str, int]]:
             payload["output_fluids"] = fluids
         slug = r["name"].replace("ass.", "").lower()
         path = out_dir / f"{slug}.json"
+        # Never overwrite a hand-tuned leftover; generator circuit-count flatten is lossy.
+        if path.exists():
+            reasons["exists"] = reasons.get("exists", 0) + 1
+            ok += 1
+            continue
         path.write_text(json.dumps(payload, indent=2) + "\n")
         ok += 1
     return ok, skip, reasons

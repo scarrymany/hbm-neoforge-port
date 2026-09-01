@@ -22,10 +22,11 @@ ASSETS = REPO / "src" / "main" / "resources" / "assets" / "hbm"
 
 MATS_MAP = {
     "MAT_STEEL": "steel", "MAT_IRON": "iron", "MAT_COPPER": "copper", "MAT_TITANIUM": "titanium",
-    "MAT_ALUMINIUM": "aluminium", "MAT_ALUMINUM": "aluminium", "MAT_ZIRCONIUM": "zirconium",
+    "MAT_ALUMINIUM": "aluminum", "MAT_ALUMINUM": "aluminum", "MAT_ZIRCONIUM": "zirconium",
     "MAT_TCALLOY": "tcalloy", "MAT_MINGRADE": "mingrade", "MAT_GOLD": "gold",
     "MAT_TUNGSTEN": "tungsten", "MAT_DESH": "desh", "MAT_DURA": "dura_steel",
-    "MAT_CMB": "cmb_steel", "MAT_BSCCO": "bscco", "MAT_SCHRABIDIUM": "schrabidium",
+    "MAT_CMB": "cmbsteel", "MAT_BSCCO": "bscco", "MAT_SCHRABIDIUM": "schrabidium",
+    "MAT_CDALLOY": "cdalloy", "MAT_OSMIRIDIUM": "osmiridium",
 }
 
 EXTRA_KNOWN = {
@@ -33,8 +34,35 @@ EXTRA_KNOWN = {
     "casing_small", "casing_large", "casing_small_steel", "casing_large_steel",
     "casing_shotshell", "casing_buckshot", "casing_buckshot_advanced",
     "machine_ammo_press", "machine_arc_welder", "machine_soldering_station", "fusion_plasma_forge",
-    "upgrade_speed_1", "upgrade_speed_2", "upgrade_speed_3", "upgrade_overdrive_1",
+    "upgrade_template", "upgrade_speed_1", "upgrade_speed_2", "upgrade_speed_3",
+    "upgrade_effect_1", "upgrade_effect_2", "upgrade_effect_3",
+    "upgrade_power_1", "upgrade_power_2", "upgrade_power_3",
+    "upgrade_fortune_1", "upgrade_fortune_2", "upgrade_fortune_3",
+    "upgrade_afterburn_1", "upgrade_afterburn_2", "upgrade_afterburn_3",
+    "upgrade_radius", "upgrade_health", "upgrade_overdrive_1",
     "early_explosive_lenses", "fleija_propellant", "det_cord", "ingot_fiberglass",
+    "neutron_reflector", "missile_assembly",
+    "thruster_small", "thruster_medium", "thruster_large",
+    "fuel_tank_small", "fuel_tank_medium", "fuel_tank_large",
+    "warhead_generic_small", "warhead_incendiary_small", "warhead_cluster_small", "warhead_buster_small",
+    "warhead_generic_medium", "warhead_incendiary_medium", "warhead_cluster_medium", "warhead_buster_medium",
+    "warhead_generic_large", "warhead_incendiary_large", "warhead_cluster_large", "warhead_buster_large",
+    "warhead_nuclear", "warhead_mirv", "warhead_volcano",
+    "missile_anti_ballistic", "missile_generic", "missile_incendiary", "missile_cluster",
+    "missile_buster", "missile_decoy", "missile_strong", "missile_incendiary_strong",
+    "missile_cluster_strong", "missile_buster_strong", "missile_emp_strong",
+    "missile_burst", "missile_inferno", "missile_rain", "missile_drill",
+    "missile_nuclear", "missile_nuclear_cluster", "missile_volcano",
+    "neodymium_dense_wire", "schrabidate_dense_wire", "aluminum_plate_sextuple",
+    "machine_flare", "machine_catalytic_cracker", "machine_coker", "machine_vacuum_distill",
+    "machine_catalytic_reformer", "machine_hydrotreater", "machine_radiolysis",
+    "icf_laser_component_casing", "icf_laser_component_port", "icf_laser_component_cell",
+    "icf_laser_component_emitter", "icf_laser_component_capacitor", "icf_laser_component_turbo",
+    "icf_component_0", "icf_component_1", "icf_component_3", "struct_icf_core",
+    "dfc_core", "dfc_emitter", "dfc_receiver", "dfc_injector", "dfc_stabilizer",
+    "sliding_blast_door_legacy", "large_vehicle_door", "water_door", "qe_containment",
+    "qe_sliding_door", "round_airlock_door", "secure_access_door", "sliding_seal_door",
+    "cargo_door", "silo_hatch", "silo_hatch_large", "transition_seal", "emp_bomb",
     "ingot_euphemium", "ingot_dineutronium", "powder_astatine", "gem_volcanic",
     "ingot_osmiridium", "ingot_pc", "ingot_pvc", "ingot_bakelite", "ingot_polymer",
 }
@@ -88,6 +116,16 @@ def resolve_more(expr: str, kn: set[str]) -> tuple[str, int] | None:
     if m:
         from phase11_machine_parts import resolve_ore
         return resolve_ore(m.group(1), m.group(2), int(m.group(3)), kn)
+    m = re.search(r"ModBlocks\.icf_laser_component\s*,\s*(\d+)\s*,\s*EnumICFPart\.(\w+)", expr)
+    if m:
+        from phase11_machine_parts import ICF_LASER_ENUM
+        cid = ICF_LASER_ENUM.get(m.group(2))
+        return (f"hbm:{cid}", int(m.group(1))) if cid and cid in kn else None
+    m = re.search(r"ModBlocks\.icf_component\s*,\s*(\d+)\s*,\s*(\d+)", expr)
+    if m:
+        from phase11_machine_parts import ICF_COMPONENT_META
+        cid = ICF_COMPONENT_META.get(m.group(2))
+        return (f"hbm:{cid}", int(m.group(1))) if cid and cid in kn else None
     hit = resolve_stack(expr, kn)
     if hit:
         return hit
@@ -436,6 +474,87 @@ def gen_solder(kn: set[str]) -> int:
             f"{arr(groups[0])}, {arr(groups[1])}, {arr(groups[2])}));"
         )
         ok += 1
+    # CE SolderingRecipes.java:192-282 upgrade_template family (parser misses multiline AStack[])
+    if "upgrade_template" in kn:
+        templates = [
+            ("upgrade_speed_1", "powder_red_copper"),
+            ("upgrade_effect_1", "powder_emerald"),
+            ("upgrade_power_1", "powder_gold"),
+            ("upgrade_fortune_1", "powder_niobium"),
+            ("upgrade_afterburn_1", "powder_tungsten"),
+        ]
+        def arr(xs):
+            return "new AStack[]{" + ", ".join(xs) + "}"
+        for out_id, dust in templates:
+            if out_id not in kn or dust not in kn:
+                continue
+            body.append(
+                f"        RECIPES.add(new SolderingRecipe(new ItemStack(item(\"{out_id}\"), 1), 200, 1000, "
+                f"{arr(['new ComparableStack(item(\"circuit_vacuum_tube\"), 4)', 'new ComparableStack(item(\"circuit_capacitor\"), 1)'])}, "
+                f"{arr(['new ComparableStack(item(\"upgrade_template\"), 1)', f'new ComparableStack(item(\"{dust}\"), 4)'])}, "
+                f"new AStack[]{{}}));"
+            )
+            ok += 1
+        if "upgrade_radius" in kn:
+            body.append(
+                f"        RECIPES.add(new SolderingRecipe(new ItemStack(item(\"upgrade_radius\"), 1), 200, 1000, "
+                f"{arr(['new ComparableStack(item(\"circuit_chip\"), 4)', 'new ComparableStack(item(\"circuit_capacitor\"), 4)'])}, "
+                f"{arr(['new ComparableStack(item(\"upgrade_template\"), 1)', 'new ComparableStack(item(\"minecraft:glowstone_dust\"), 4)'])}, "
+                f"new AStack[]{{}}));"
+            )
+            ok += 1
+        if "upgrade_health" in kn and "powder_lithium" in kn:
+            body.append(
+                f"        RECIPES.add(new SolderingRecipe(new ItemStack(item(\"upgrade_health\"), 1), 200, 1000, "
+                f"{arr(['new ComparableStack(item(\"circuit_chip\"), 4)', 'new ComparableStack(item(\"circuit_capacitor\"), 4)'])}, "
+                f"{arr(['new ComparableStack(item(\"upgrade_template\"), 1)', 'new ComparableStack(item(\"powder_lithium\"), 4)'])}, "
+                f"new AStack[]{{}}));"
+            )
+            ok += 1
+    # CE SolderingRecipes.java:284-294 addFirstUpgrade / addSecondUpgrade (no528 default)
+    upgrades = [
+        ("upgrade_speed_1", "upgrade_speed_2"),
+        ("upgrade_effect_1", "upgrade_effect_2"),
+        ("upgrade_power_1", "upgrade_power_2"),
+        ("upgrade_fortune_1", "upgrade_fortune_2"),
+        ("upgrade_afterburn_1", "upgrade_afterburn_2"),
+    ]
+    seconds = [
+        ("upgrade_speed_2", "upgrade_speed_3"),
+        ("upgrade_effect_2", "upgrade_effect_3"),
+        ("upgrade_power_2", "upgrade_power_3"),
+        ("upgrade_fortune_2", "upgrade_fortune_3"),
+        ("upgrade_afterburn_2", "upgrade_afterburn_3"),
+    ]
+    def arr(xs):
+        return "new AStack[]{" + ", ".join(xs) + "}"
+    for lo, hi in upgrades:
+        if lo not in kn or hi not in kn:
+            continue
+        plastic = resolve_more("new OreDictStack(ANY_PLASTIC.ingot(), 4)", kn)
+        if not plastic:
+            continue
+        body.append(
+            f"        RECIPES.add(new SolderingRecipe(new ItemStack(item(\"{hi}\"), 1), 300, 10000, "
+            f"{arr(['new ComparableStack(item(\"circuit_chip\"), 8)', 'new ComparableStack(item(\"circuit_capacitor\"), 4)'])}, "
+            f"{arr([f'new ComparableStack(item(\"{lo}\"), 1)', java_stack(plastic)])}, "
+            f"new AStack[]{{}}));"
+        )
+        ok += 1
+    for lo, hi in seconds:
+        if lo not in kn or hi not in kn:
+            continue
+        rubber = resolve_more("new OreDictStack(RUBBER.ingot(), 4)", kn)
+        if not rubber:
+            continue
+        body.append(
+            f"        RECIPES.add(new SolderingRecipe(new ItemStack(item(\"{hi}\"), 1), 400, 25000, "
+            f"new FluidStack(Fluids.SOLVENT, 500), "
+            f"{arr(['new ComparableStack(item(\"circuit_chip\"), 16)', 'new ComparableStack(item(\"circuit_capacitor\"), 16)'])}, "
+            f"{arr([f'new ComparableStack(item(\"{lo}\"), 1)', java_stack(rubber)])}, "
+            f"new AStack[]{{}}));"
+        )
+        ok += 1
     java = HEADER + """/**
  * CE {@code SolderingRecipes.java}. Generated from CE registerDefaults (no 528/LBSM forks).
  */
@@ -640,6 +759,13 @@ def assets() -> None:
         "sulfur", "niter",
         "casing_small", "casing_large", "casing_small_steel", "casing_large_steel",
         "casing_shotshell", "casing_buckshot", "casing_buckshot_advanced",
+        "upgrade_template", "neutron_reflector", "missile_assembly",
+        "thruster_small", "thruster_medium", "thruster_large",
+        "fuel_tank_small", "fuel_tank_medium", "fuel_tank_large",
+        "warhead_generic_small", "warhead_incendiary_small", "warhead_cluster_small", "warhead_buster_small",
+        "warhead_generic_medium", "warhead_incendiary_medium", "warhead_cluster_medium", "warhead_buster_medium",
+        "warhead_generic_large", "warhead_incendiary_large", "warhead_cluster_large", "warhead_buster_large",
+        "warhead_nuclear", "warhead_mirv", "warhead_volcano",
     ]
     tex_src = CE_ASSETS / "textures" / "items"
     tex_dst = ASSETS / "textures" / "item"
@@ -665,11 +791,23 @@ def assets() -> None:
                 if src.exists():
                     shutil.copy2(src, dest)
                     break
-        (models / f"{name}.json").write_text(json.dumps({
-            "parent": "minecraft:item/generated",
-            "textures": {"layer0": f"hbm:item/{name}"},
-        }, indent=2) + "\n")
-    for blk in ("machine_ammo_press", "machine_arc_welder", "machine_soldering_station", "fusion_plasma_forge"):
+        if not (models / f"{name}.json").exists():
+            (models / f"{name}.json").write_text(json.dumps({
+                "parent": "minecraft:item/generated",
+                "textures": {"layer0": f"hbm:item/{name}"},
+            }, indent=2) + "\n")
+    for blk in (
+        "machine_ammo_press", "machine_arc_welder", "machine_soldering_station", "fusion_plasma_forge",
+        "machine_flare", "machine_catalytic_cracker", "machine_coker", "machine_vacuum_distill",
+        "machine_catalytic_reformer", "machine_hydrotreater", "machine_radiolysis",
+        "icf_laser_component_casing", "icf_laser_component_port", "icf_laser_component_cell",
+        "icf_laser_component_emitter", "icf_laser_component_capacitor", "icf_laser_component_turbo",
+        "icf_component_0", "icf_component_1", "icf_component_3", "struct_icf_core",
+        "dfc_core", "dfc_emitter", "dfc_receiver", "dfc_injector", "dfc_stabilizer",
+        "sliding_blast_door_legacy", "large_vehicle_door", "water_door", "qe_containment",
+        "qe_sliding_door", "round_airlock_door", "secure_access_door", "sliding_seal_door",
+        "cargo_door", "silo_hatch", "silo_hatch_large", "transition_seal",
+    ):
         (ASSETS / "models" / "block").mkdir(parents=True, exist_ok=True)
         (ASSETS / "blockstates").mkdir(parents=True, exist_ok=True)
         (ASSETS / "models" / "block" / f"{blk}.json").write_text(json.dumps({
@@ -700,6 +838,15 @@ def assets() -> None:
         "container.machineArcWelder": "Arc Welder",
         "container.machineSolderingStation": "Soldering Station",
         "container.machinePlasmaForge": "Plasma Forge",
+        "item.hbm.upgrade_template": "Machine Upgrade Template",
+        "item.hbm.neutron_reflector": "Neutron Reflector",
+        "block.hbm.icf_laser_component_casing": "ICF Laser Casing",
+        "block.hbm.icf_laser_component_port": "ICF Laser Port",
+        "block.hbm.icf_laser_component_cell": "ICF Laser Cell",
+        "block.hbm.icf_laser_component_emitter": "ICF Laser Flash Tube",
+        "block.hbm.icf_laser_component_capacitor": "ICF Laser Capacitor",
+        "block.hbm.icf_laser_component_turbo": "ICF Laser Turbocharger",
+        "block.hbm.sliding_blast_door_legacy": "Sliding Blast Door (Legacy)",
     }
     for path in (lang, gen):
         if not path.exists():

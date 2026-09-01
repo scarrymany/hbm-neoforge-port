@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_beam"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "minecraft:gray_dye"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:cargo_door",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

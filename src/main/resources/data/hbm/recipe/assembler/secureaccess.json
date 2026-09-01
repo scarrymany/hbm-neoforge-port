@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:plate_polymer"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "minecraft:red_dye"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:secure_access_door",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

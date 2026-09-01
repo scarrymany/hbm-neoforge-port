@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:plate_polymer"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "minecraft:white_dye"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:sliding_seal_door",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

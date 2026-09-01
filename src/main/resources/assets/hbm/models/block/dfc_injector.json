@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "hbm:block/dfc_injector"
+    "all": "hbm:block/block_steel"
   }
 }

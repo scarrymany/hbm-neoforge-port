@@ -1,0 +1,65 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:battery_lithium_pack"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:neodymium_dense_wire"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:plate_aluminium"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "tag:hbm:any_plastic"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_cyclotron",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

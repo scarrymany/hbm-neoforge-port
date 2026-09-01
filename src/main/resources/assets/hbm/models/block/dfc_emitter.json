@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "hbm:block/dfc_emitter"
+    "all": "hbm:block/block_steel"
   }
 }

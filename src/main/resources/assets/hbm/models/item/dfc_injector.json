@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "hbm:block/dfc_injector"
-  }
+  "parent": "hbm:block/dfc_injector"
 }

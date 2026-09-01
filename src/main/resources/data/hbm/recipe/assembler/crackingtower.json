@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_scaffold"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_desh"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_niobium"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_catalytic_cracker",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

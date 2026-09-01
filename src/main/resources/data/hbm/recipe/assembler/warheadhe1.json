@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ball_dynamite"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_chip"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:warhead_generic_small",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

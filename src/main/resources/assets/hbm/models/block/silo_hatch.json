@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "hbm:block/silo_hatch"
+    "all": "hbm:block/block_steel"
   }
 }

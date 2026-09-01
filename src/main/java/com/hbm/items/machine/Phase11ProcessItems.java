@@ -16,7 +16,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * Citations: {@code ModItems.java:393} {@code fuel_additive}, {@code :1231-1232} biomass,
  * {@code :1287} {@code pellet_charged}, {@code :1325} {@code oil_tar}/{@code EnumTarType},
  * {@code :1330-1333} {@code solid_fuel*}, {@code :1155} {@code dust}, {@code :1234}/{:1237}
- * cordite/ball_tnt, {@code :2314+} {@code particle_*}, {@code :943} {@code bio_wafer}.
+ * cordite/ball_tnt, {@code :2314+} {@code particle_*}, {@code :943} {@code bio_wafer},
+ * {@code :1842} {@code upgrade_template}, {@code :2461}/{@code :2492-2535} missile parts.
  */
 public final class Phase11ProcessItems {
 
@@ -93,10 +94,45 @@ public final class Phase11ProcessItems {
         for (String id : particles) {
             control(id);
         }
+
+        // CE ModItems.java:1842 — SolderingRecipes.java:192-282 upgrade-template family
+        parts1("upgrade_template");
+        // CE ModItems.java:1861 / ArcWelderRecipes.java:59-65
+        parts("neutron_reflector");
+        // CE ModItems.java:2461 / 2492-2535 — ArcWelderRecipes.java:166-215 missile parts
+        parts1("missile_assembly");
+        parts("thruster_small");
+        parts("thruster_medium");
+        parts("thruster_large");
+        parts("fuel_tank_small");
+        parts("fuel_tank_medium");
+        parts("fuel_tank_large");
+        // CE ModItems.java:2492-2508 — ArcWelderRecipes.java:217-350 finished-missile inputs
+        parts("warhead_generic_small");
+        parts("warhead_incendiary_small");
+        parts("warhead_cluster_small");
+        parts("warhead_buster_small");
+        parts("warhead_generic_medium");
+        parts("warhead_incendiary_medium");
+        parts("warhead_cluster_medium");
+        parts("warhead_buster_medium");
+        parts("warhead_generic_large");
+        parts("warhead_incendiary_large");
+        parts("warhead_cluster_large");
+        parts("warhead_buster_large");
+        parts("warhead_nuclear");
+        parts("warhead_mirv");
+        parts("warhead_volcano");
     }
 
     private static DeferredItem<Item> parts(String name) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.PARTS, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> parts1(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(1)));
         CreativeTabContents.add(ModCreativeTabs.PARTS, item);
         return item;
     }

@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m357_fmj"), 8),
                 null, new ComparableStack(item("ingot_steel"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m357_jhp"), 8),
-                new ComparableStack(item("ingot_polymer"), 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m357_ap"), 8),
                 null, new ComparableStack(item("ingot_weaponsteel"), 1), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_small_steel")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m357_express"), 8),
@@ -48,7 +49,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m44_fmj"), 6),
                 null, new ComparableStack(item("ingot_steel"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m44_jhp"), 6),
-                new ComparableStack(item("ingot_polymer"), 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m44_ap"), 6),
                 null, new ComparableStack(item("ingot_weaponsteel"), 1), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_small_steel")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("m44_express"), 6),
@@ -58,7 +59,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p22_fmj"), 24),
                 null, new ComparableStack(item("ingot_steel"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p22_jhp"), 24),
-                new ComparableStack(item("ingot_polymer"), 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p22_ap"), 24),
                 null, new ComparableStack(item("ingot_weaponsteel"), 1), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_small_steel")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p9_sp"), 12),
@@ -66,7 +67,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p9_fmj"), 12),
                 null, new ComparableStack(item("ingot_steel"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p9_jhp"), 12),
-                new ComparableStack(item("ingot_polymer"), 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), new ComparableStack(item("ingot_copper"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null, null, new ComparableStack(item("casing_small")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("p9_ap"), 12),
                 null, new ComparableStack(item("ingot_weaponsteel"), 1), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_small_steel")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r556_sp"), 16),
@@ -74,7 +75,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r556_fmj"), 16),
                 null, ((new ComparableStack(item("ingot_steel"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, ((new ComparableStack(item("casing_small"))).copy(2)), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r556_jhp"), 16),
-                new ComparableStack(item("ingot_polymer"), 1), ((new ComparableStack(item("ingot_copper"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, ((new ComparableStack(item("casing_small"))).copy(2)), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), ((new ComparableStack(item("ingot_copper"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, ((new ComparableStack(item("casing_small"))).copy(2)), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r556_ap"), 16),
                 null, ((new ComparableStack(item("ingot_weaponsteel"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(4)), null, null, ((new ComparableStack(item("casing_small_steel"))).copy(2)), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r762_sp"), 12),
@@ -82,7 +83,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r762_fmj"), 12),
                 null, ((new ComparableStack(item("ingot_steel"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, ((new ComparableStack(item("casing_small"))).copy(2)), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r762_jhp"), 12),
-                new ComparableStack(item("ingot_polymer"), 1), ((new ComparableStack(item("ingot_copper"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, ((new ComparableStack(item("casing_small"))).copy(2)), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), ((new ComparableStack(item("ingot_copper"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, ((new ComparableStack(item("casing_small"))).copy(2)), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r762_ap"), 12),
                 null, ((new ComparableStack(item("ingot_weaponsteel"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(4)), null, null, ((new ComparableStack(item("casing_small_steel"))).copy(2)), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("r762_du"), 12),
@@ -94,7 +95,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("bmg50_fmj"), 12),
                 null, ((new ComparableStack(item("ingot_steel"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null, null, new ComparableStack(item("casing_large")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("bmg50_jhp"), 12),
-                new ComparableStack(item("ingot_polymer"), 1), ((new ComparableStack(item("ingot_copper"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null, null, new ComparableStack(item("casing_large")), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), ((new ComparableStack(item("ingot_copper"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null, null, new ComparableStack(item("casing_large")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("bmg50_ap"), 12),
                 null, ((new ComparableStack(item("ingot_weaponsteel"), 1)).copy(2)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(6)), null, null, new ComparableStack(item("casing_large_steel")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("bmg50_du"), 12),
@@ -120,7 +121,7 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g10"), 4),
                 null, ((new ComparableStack(item("nugget_lead"), 1)).copy(8)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_buckshot_advanced")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g10_shrapnel"), 4),
-                new ComparableStack(item("ingot_polymer"), 1), ((new ComparableStack(item("nugget_lead"), 1)).copy(8)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_buckshot_advanced")), null));
+                OreDictStack.ofHbmTag("any_plastic", 1), ((new ComparableStack(item("nugget_lead"), 1)).copy(8)), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_buckshot_advanced")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g10_du"), 4),
                 null, new ComparableStack(item("ingot_u238"), 1), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(2)), null, null, new ComparableStack(item("casing_buckshot_advanced")), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("g10_slug"), 4),
@@ -132,28 +133,13 @@ public final class AmmoPressRecipes {
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("rocket_demo"), 2),
                 null, ((OreDictStack.ofHbmTag("any_highexplosive", 1)).copy(2)), null, null, new ComparableStack(item("casing_large")), null, null, ((OreDictStack.ofHbmTag("any_smokeless", 1)).copy(3)), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("capacitor_ir"), 4),
-                null, new ComparableStack(item("ingot_polymer"), 1), null, null, new ComparableStack(item("ingot_niobium"), 1), null, null, new ComparableStack(item("ingot_polymer"), 1), null));
+                null, OreDictStack.ofHbmTag("any_plastic", 1), null, null, new ComparableStack(item("ingot_niobium"), 1), null, null, OreDictStack.ofHbmTag("any_plastic", 1), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("coil_ferrouranium"), 4),
                 null, null, null, null, new ComparableStack(item("ingot_ferrouranium"), 1), null, null, null, null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("ct_hook"), 16),
                 null, new ComparableStack(item("ingot_steel"), 1), null, null, new ComparableStack(item("steel_pipe"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null));
         RECIPES.add(new AmmoPressRecipe(new ItemStack(item("ct_mortar"), 4),
                 null, ((OreDictStack.ofHbmTag("any_highexplosive", 1)).copy(4)), null, null, new ComparableStack(item("steel_pipe"), 1), null, null, OreDictStack.ofHbmTag("any_smokeless", 1), null));
-        // CE :936+ / :1024 / :1038 — fluid-slot + coil family (previous 6-recipe stub)
-        ComparableStack steelPlate = new ComparableStack(item("plate_steel"));
-        ComparableStack leadPlate = new ComparableStack(item("plate_lead"));
-        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_diesel")),
-                null, steelPlate, null, null, new FluidStack(Fluids.DIESEL, 1_000), null, null, steelPlate, null));
-        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_gas")),
-                null, steelPlate, null, null, new FluidStack(Fluids.GAS, 1_000), null, null, steelPlate, null));
-        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("flame_balefire")),
-                null, steelPlate, null, null, new FluidStack(Fluids.BALEFIRE, 1_000), null, null, steelPlate, null));
-        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("tau_uranium"), 16),
-                null, leadPlate, null, null, new ComparableStack(item("ingot_u238")), null, null, leadPlate, null));
-        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("coil_tungsten"), 4),
-                null, null, null, null, new ComparableStack(item("ingot_tungsten")), null, null, null, null));
-        RECIPES.add(new AmmoPressRecipe(new ItemStack(item("coil_ferrouranium"), 4),
-                null, null, null, null, new ComparableStack(item("ingot_ferrouranium")), null, null, null, null));
     }
 
     private static Item item(String id) {

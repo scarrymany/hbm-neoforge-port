@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:titanium_plate_triple"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:billet_u235"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:cordite"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:warhead_nuclear",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

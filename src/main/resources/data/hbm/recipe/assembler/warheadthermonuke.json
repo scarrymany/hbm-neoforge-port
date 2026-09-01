@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:titanium_plate_triple"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:lead_plate_triple"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:billet_pu239"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ball_tatb"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller_advanced"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:warhead_mirv",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100,
+  "input_fluids": [
+    {
+      "type": "DEUTERIUM",
+      "fill": 4000
+    }
+  ]
+}

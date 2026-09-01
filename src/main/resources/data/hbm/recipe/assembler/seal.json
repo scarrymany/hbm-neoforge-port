@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:cmb_brick_reinforced"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 36
+    },
+    {
+      "item": {
+        "item": "hbm:steel_block"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "minecraft:yellow_dye"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:transition_seal",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

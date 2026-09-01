@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:plate_polymer"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_bolt"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "minecraft:green_dye"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:round_airlock_door",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}
