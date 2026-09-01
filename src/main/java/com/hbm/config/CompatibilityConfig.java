@@ -98,6 +98,8 @@ public class CompatibilityConfig {
     public static ConfigValue<List<? extends String>> MINEFREQ_RAW;
     public static ConfigValue<List<? extends String>> DUD_STRUCTURE_RAW;
     public static ConfigValue<List<? extends String>> BARREL_STRUCTURE_RAW;
+    public static ConfigValue<List<? extends String>> SPACESHIP_STRUCTURE_RAW;
+    public static ConfigValue<List<? extends String>> SATELLITE_STRUCTURE_RAW;
 
     static void init(ModConfigSpec.Builder builder) {
         builder.push("mobs");
@@ -338,6 +340,12 @@ public class CompatibilityConfig {
         BARREL_STRUCTURE_RAW = builder
                 .comment("Spawns CE's waste-tank Barrel every Nth chunk (1-in-N chance). [CE CompatibilityConfig.barrelStructure 03.13_barrelSpawn default 0:5000]")
                 .defineListAllowEmpty("barrelStructure", () -> List.of("minecraft:overworld=5000"), entry -> entry instanceof String);
+        SPACESHIP_STRUCTURE_RAW = builder
+                .comment("Spawns CE's crashed Spaceship every Nth chunk (1-in-N chance). [CE CompatibilityConfig.spaceshipStructure 03.12_spaceshipSpawn default 0:1000]")
+                .defineListAllowEmpty("spaceshipStructure", () -> List.of("minecraft:overworld=1000"), entry -> entry instanceof String);
+        SATELLITE_STRUCTURE_RAW = builder
+                .comment("Spawns CE's Satellite dish every Nth chunk (1-in-N chance). [CE CompatibilityConfig.satelliteStructure 03.07_satelliteSpawn default 0:500]")
+                .defineListAllowEmpty("satelliteStructure", () -> List.of("minecraft:overworld=500"), entry -> entry instanceof String);
 
         builder.pop();
     }
@@ -434,4 +442,6 @@ public class CompatibilityConfig {
     public static Map<String, Integer> minefreq() { return spawnMap(MINEFREQ_RAW); }
     public static Map<String, Integer> dudStructure() { return spawnMap(DUD_STRUCTURE_RAW); }
     public static Map<String, Integer> barrelStructure() { return spawnMap(BARREL_STRUCTURE_RAW); }
+    public static Map<String, Integer> spaceshipStructure() { return spawnMap(SPACESHIP_STRUCTURE_RAW); }
+    public static Map<String, Integer> satelliteStructure() { return spawnMap(SATELLITE_STRUCTURE_RAW); }
 }

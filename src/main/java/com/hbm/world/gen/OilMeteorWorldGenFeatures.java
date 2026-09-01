@@ -12,7 +12,9 @@ import com.hbm.world.feature.NitanChestFeature;
 import com.hbm.world.feature.OilBubbleFeature;
 import com.hbm.world.feature.OilSandBubbleFeature;
 import com.hbm.world.feature.RadioFeature;
+import com.hbm.world.feature.SatelliteFeature;
 import com.hbm.world.feature.SellafieldFeature;
+import com.hbm.world.feature.SpaceshipFeature;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -33,9 +35,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * <p>
  * Leftover CE {@code enableDungeons} structures (no generator in this port):
  * TODO(CE: HbmWorldGen.java:347-358) hive — {@code GlyphidHive.generate}, {@code hiveSpawn} 256;
- * TODO(CE: HbmWorldGen.java:367-368) desert-atom — {@code DesertAtom001}, {@code atomStructure} 0:500, {@code !canRain && temp>=2};
- * TODO(CE: HbmWorldGen.java:373-374) satellite dish — {@code Satellite}, {@code satelliteStructure} 0:500, {@code temp<1 || temp>1.8};
- * TODO(CE: HbmWorldGen.java:377) spaceship — {@code Spaceship}, {@code spaceshipStructure} 0:1000.
+ * TODO(CE: HbmWorldGen.java:367-368) desert-atom — {@code DesertAtom001}, {@code atomStructure} 0:500, {@code !canRain && temp>=2}.
  */
 public final class OilMeteorWorldGenFeatures {
 
@@ -66,6 +66,10 @@ public final class OilMeteorWorldGenFeatures {
             FEATURES.register("dud", () -> new DudFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, BarrelFeature> BARREL =
             FEATURES.register("barrel", () -> new BarrelFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, SpaceshipFeature> SPACESHIP =
+            FEATURES.register("spaceship", () -> new SpaceshipFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, SatelliteFeature> SATELLITE =
+            FEATURES.register("satellite", () -> new SatelliteFeature(NoneFeatureConfiguration.CODEC));
 
     private OilMeteorWorldGenFeatures() {
     }

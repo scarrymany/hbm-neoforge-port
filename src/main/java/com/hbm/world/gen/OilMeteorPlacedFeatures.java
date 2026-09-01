@@ -53,6 +53,8 @@ public final class OilMeteorPlacedFeatures {
     public static final ResourceKey<PlacedFeature> NITAN_CHEST = key("nitan_chest");
     public static final ResourceKey<PlacedFeature> DUD = key("dud");
     public static final ResourceKey<PlacedFeature> BARREL = key("barrel");
+    public static final ResourceKey<PlacedFeature> SPACESHIP = key("spaceship");
+    public static final ResourceKey<PlacedFeature> SATELLITE = key("satellite");
 
     private OilMeteorPlacedFeatures() {
     }
@@ -72,6 +74,8 @@ public final class OilMeteorPlacedFeatures {
         register(context, NITAN_CHEST, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.NITAN_CHEST), SURFACE_MODIFIERS);
         register(context, DUD, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.DUD), SURFACE_MODIFIERS);
         register(context, BARREL, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.BARREL), SURFACE_MODIFIERS);
+        register(context, SPACESHIP, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.SPACESHIP), SURFACE_MODIFIERS);
+        register(context, SATELLITE, configuredFeatures.getOrThrow(OilMeteorConfiguredFeatures.SATELLITE), SURFACE_MODIFIERS);
     }
 
     private static void register(BootstrapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key,

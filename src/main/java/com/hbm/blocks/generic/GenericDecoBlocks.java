@@ -129,7 +129,9 @@ public final class GenericDecoBlocks {
         // CE ModBlocks.deco_steel / steel_scaffold — missing from the original deco table; Antenna
         // (CE Antenna.java:48) and ItemPoolsLegacy.POOL_ANTENNA need both.
         registerBlock("deco_steel", () -> new DecoBlock(deco15Props(), DecoBlock.Shape.PLAIN), ModCreativeTabs.BLOCKS);
-        registerBlock("steel_scaffold", () -> new DecoBlock(deco15Props(), DecoBlock.Shape.BEAM), ModCreativeTabs.BLOCKS);
+        // CE ModBlocks.steel_scaffold is BlockScaffold (ORIENT), not DecoBlock. Satellite.java uses
+        // EnumScaffoldOrient. Distinct from scaffold_steel (GenericBlocks).
+        registerBlock("steel_scaffold", () -> new BlockScaffold(deco15Props(), BlockScaffold.Variant.STEEL), ModCreativeTabs.BLOCKS);
     }
 
     private static void registerDecoCRT() {

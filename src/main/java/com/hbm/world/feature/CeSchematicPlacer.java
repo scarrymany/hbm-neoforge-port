@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hbm.blockentity.machine.CrateBlockEntity;
+import com.hbm.blocks.generic.BlockScaffold;
 import com.hbm.blocks.generic.BlockSellafield;
 import com.hbm.itempool.ItemPool;
 import com.hbm.main.MainRegistry;
@@ -13,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
@@ -36,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -116,6 +119,7 @@ public final class CeSchematicPlacer {
                 ItemStack stack = ItemPool.getStack(pool, random);
                 if (!stack.isEmpty()) chest.setItem(random.nextInt(slots), stack);
             }
+            extraItem(random, special).ifPresent(stack -> chest.setItem(random.nextInt(slots), stack));
             return;
         }
         if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
@@ -126,7 +130,17 @@ public final class CeSchematicPlacer {
                 ItemStack stack = ItemPool.getStack(pool, random);
                 if (!stack.isEmpty()) inv.setStackInSlot(random.nextInt(slots), stack);
             }
+            extraItem(random, special).ifPresent(stack -> inv.setStackInSlot(random.nextInt(slots), stack));
         }
+    }
+
+    private static Optional<ItemStack> extraItem(RandomSource random, Special special) {
+        if (special.item == null || special.chance <= 0 || random.nextInt(special.chance) != 0) {
+            return Optional.empty();
+        }
+        Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(special.item)).orElse(null);
+        if (item == null) return Optional.empty();
+        return Optional.of(new ItemStack(item));
     }
 
     /** CE {@code Library.placeDoorWithoutCheck} at Library.java:1119-1127. */
@@ -174,6 +188,14 @@ public final class CeSchematicPlacer {
         if (cell.level != null && state.hasProperty(BlockSellafield.LEVEL)) {
             int lv = Math.max(0, Math.min(5, cell.level));
             state = state.setValue(BlockSellafield.LEVEL, lv);
+        }
+        if (cell.orient != null && state.hasProperty(BlockScaffold.ORIENT)) {
+            for (BlockScaffold.Orient value : BlockScaffold.Orient.values()) {
+                if (value.getSerializedName().equals(cell.orient)) {
+                    state = state.setValue(BlockScaffold.ORIENT, value);
+                    break;
+                }
+            }
         }
         return state;
     }
@@ -228,6 +250,7 @@ public final class CeSchematicPlacer {
                 String half = null;
                 Boolean open = null;
                 Integer level = null;
+                String orient = null;
                 Special special = null;
                 if (rec.size() > 4) {
                     JsonObject extra = rec.get(4).getAsJsonObject();
@@ -235,6 +258,7 @@ public final class CeSchematicPlacer {
                     if (extra.has("h")) half = extra.get("h").getAsString();
                     if (extra.has("o")) open = extra.get("o").getAsBoolean();
                     if (extra.has("l")) level = extra.get("l").getAsInt();
+                    if (extra.has("or")) orient = extra.get("or").getAsString();
                     if (extra.has("s")) {
                         JsonObject s = extra.getAsJsonObject("s");
                         special = new Special(
@@ -244,10 +268,12 @@ public final class CeSchematicPlacer {
                                 s.has("rand") ? s.get("rand").getAsInt() : 0,
                                 s.has("base") ? s.get("base").getAsInt() : 0,
                                 s.has("facing") ? s.get("facing").getAsString() : facing,
-                                s.has("hinge") ? s.get("hinge").getAsString() : "left");
+                                s.has("hinge") ? s.get("hinge").getAsString() : "left",
+                                s.has("item") ? s.get("item").getAsString() : null,
+                                s.has("chance") ? s.get("chance").getAsInt() : 0);
                     }
                 }
-                cells.add(new Cell(x, y, z, id, facing, half, open, level, special));
+                cells.add(new Cell(x, y, z, id, facing, half, open, level, orient, special));
             }
             MainRegistry.logger.info("Loaded CE schematic {} ({} cells)", name, cells.size());
             return new Schematic(cells);
@@ -259,9 +285,9 @@ public final class CeSchematicPlacer {
     private record Schematic(List<Cell> cells) {
     }
 
-    private record Cell(int x, int y, int z, String blockId, String facing, String half, Boolean open, Integer level, Special special) {
+    private record Cell(int x, int y, int z, String blockId, String facing, String half, Boolean open, Integer level, String orient, Special special) {
     }
 
-    private record Special(String type, String pool, int rolls, int rand, int base, String facing, String hinge) {
+    private record Special(String type, String pool, int rolls, int rand, int base, String facing, String hinge, String item, int chance) {
     }
 }
