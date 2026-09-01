@@ -1,8 +1,8 @@
 {
-  "weighted_pct": 69.7,
-  "unweighted_pct": 84.9,
+  "weighted_pct": 74.4,
+  "unweighted_pct": 87.2,
   "ce_sum": 7767,
-  "port_sum": 5411,
+  "port_sum": 5781,
   "rows": [
     {
       "cat": "items",
@@ -37,14 +37,14 @@
     {
       "cat": "vanilla_crafting",
       "ce": 1950,
-      "port": 866,
-      "pct": 44.4
+      "port": 1129,
+      "pct": 57.9
     },
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 954,
-      "pct": 47.5
+      "port": 1061,
+      "pct": 52.8
     },
     {
       "cat": "advancements",
@@ -114,11 +114,11 @@
         "addSlabStair": 25,
         "add9or1": 43
       },
-      "port": 866,
+      "port": 1129,
       "by_type": {
-        "minecraft:crafting_shaped": 394,
-        "minecraft:crafting_shapeless": 343,
-        "minecraft:smelting": 123
+        "minecraft:crafting_shaped": 556,
+        "minecraft:crafting_shapeless": 440,
+        "minecraft:smelting": 127
       }
     },
     "machine_recipes": {
@@ -178,22 +178,24 @@
         "CrucibleRecipes": 14,
         "CrystallizerRecipes": 1,
         "HeatRecipes": 2,
+        "LemegetonRecipes": 37,
         "LiquefactionRecipes": 31,
         "MagicRecipes": 3,
         "MixerRecipes": 1,
+        "OutgasserRecipes": 20,
         "PUREXRecipes": 51,
         "ParticleAcceleratorRecipes": 10,
         "PlasmaForgeRecipes": 35,
         "PyroOvenRecipes": 10,
         "SolderingRecipes": 26,
         "SolidificationRecipes": 49,
-        "CentrifugeRecipes": 29,
+        "CentrifugeRecipes": 69,
         "ChemPlantRecipes": 72,
         "CyclotronRecipes": 1,
         "ElectrolyserFluidRecipes": 7,
-        "SILEXRecipes": 19
+        "SILEXRecipes": 29
       },
-      "port": 954,
+      "port": 1061,
       "by_type": {
         "hbm:assembler": 356,
         "hbm:breeder": 30,
@@ -212,9 +214,9 @@
     },
     "reachability": {
       "port_items": 2026,
-      "reachable_via_recipe_or_loot": 885,
-      "pct": 43.7
+      "reachable_via_recipe_or_loot": 919,
+      "pct": 45.4
     }
   },
-  "recipe_json_total": 1352
+  "recipe_json_total": 1615
 }
