@@ -8,8 +8,9 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`.
 
-Verified this wave: `compileJava` 0. `runServer` pending this commit.
-No new tag (Dummyable wave). `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0,
+`./gradlew runServer` **Done (5.637s)** on wiped world port 25566, **3946 recipes**.
+No recipe parse errors. No new tag (Dummyable wave). `v0.0.1-rc2` stays.
 
 ## Top line
 
