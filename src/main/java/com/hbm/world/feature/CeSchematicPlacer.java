@@ -116,7 +116,11 @@ public final class CeSchematicPlacer {
      */
     private static void setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
         if (level.setBlock(pos, state, 3)) return;
-        level.getLevel().setBlock(pos, state, 3);
+        // Never create chunks here — ServerLevel.setBlock on an unloaded column
+        // cascades Feature.place at forced 1/1 and wedges "Preparing level".
+        var server = level.getLevel();
+        if (!server.hasChunk(pos.getX() >> 4, pos.getZ() >> 4)) return;
+        server.setBlock(pos, state, 3);
     }
 
     private static void fillContainer(WorldGenLevel level, BlockPos pos, RandomSource random, Special special) {
