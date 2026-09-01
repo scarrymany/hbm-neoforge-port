@@ -2773,7 +2773,7 @@ public class ModRecipeProvider extends RecipeProvider {
         output.accept(id("rbmk_fuel_recycle"), RBMKFuelRecycleRecipe.INSTANCE, null);
         output.accept(id("scrap_split"), ScrapSplitRecipe.INSTANCE, null);
         // Only 3 of CE's 5 ContainerUpgradeCraftingHandler tiers are item-ready today - the 2
-        // mass_storage tiers are skipped (unregistered circuit/mass_storage_* families), see
+        // mass_storage tiers are skipped (unregistered circuit_* family), see
         // ContainerUpgradeRecipe's own class javadoc and this task's stillBlocked report output.
         output.accept(id("container_upgrade_crate_desh"), ContainerUpgradeRecipe.CRATE_DESH, null);
         output.accept(id("container_upgrade_crate_tungsten"), ContainerUpgradeRecipe.CRATE_TUNGSTEN, null);

@@ -1041,6 +1041,7 @@
   "container.pneumoStorageClutter": "Пневматическое хранилище",
   "container.pneumoTube": "Пневмотруба",
   "container.press": "Пресс",
+  "container.conveyor_press": "Конвейерный пресс",
   "container.puf6_tank": "Бочка PuF6",
   "container.pumpjack": "Станок-качалка",
   "container.radGen": "Радиационный двигатель",

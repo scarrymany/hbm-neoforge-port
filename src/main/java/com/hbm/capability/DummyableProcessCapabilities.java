@@ -287,5 +287,11 @@ public final class DummyableProcessCapabilities {
                 (be, side) -> be.getItemHandlerCapability(side));
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_DIFURNACE_RTG.get(),
                 (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MACHINE_CONVEYOR_PRESS.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, DummyableProcessBlockEntities.MACHINE_CONVEYOR_PRESS.get(),
+                (be, side) -> be.getEnergyStorageCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, DummyableProcessBlockEntities.MASS_STORAGE.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
     }
 }

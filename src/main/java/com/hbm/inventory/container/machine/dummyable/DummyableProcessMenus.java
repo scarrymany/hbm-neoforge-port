@@ -59,6 +59,8 @@ import com.hbm.blockentity.machine.dummyable.MachineAutocrafterBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineKeyForgeBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineDiFurnaceBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineDiFurnaceRtgBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineConveyorPressBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MassStorageBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -127,6 +129,8 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<KeyForgeMenu>> MACHINE_KEYFORGE;
     public static DeferredHolder<MenuType<?>, MenuType<DiFurnaceMenu>> MACHINE_DIFURNACE;
     public static DeferredHolder<MenuType<?>, MenuType<DiFurnaceRtgMenu>> MACHINE_DIFURNACE_RTG;
+    public static DeferredHolder<MenuType<?>, MenuType<ConveyorPressMenu>> MACHINE_CONVEYOR_PRESS;
+    public static DeferredHolder<MenuType<?>, MenuType<MassStorageMenu>> MASS_STORAGE;
 
     private DummyableProcessMenus() {
     }
@@ -250,6 +254,10 @@ public final class DummyableProcessMenus {
                 new DiFurnaceMenu(id, inv, (MachineDiFurnaceBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_DIFURNACE_RTG = reg("machine_difurnace_rtg", (id, inv, buf) ->
                 new DiFurnaceRtgMenu(id, inv, (MachineDiFurnaceRtgBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_CONVEYOR_PRESS = reg("machine_conveyor_press", (id, inv, buf) ->
+                new ConveyorPressMenu(id, inv, (MachineConveyorPressBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MASS_STORAGE = reg("mass_storage", (id, inv, buf) ->
+                new MassStorageMenu(id, inv, (MassStorageBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

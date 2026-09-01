@@ -41,9 +41,7 @@ import java.util.function.Supplier;
  * <b>Only 3 of CE's 5 concrete instances are ported</b> ({@link Tier#CRATE_DESH}/
  * {@link Tier#CRATE_TUNGSTEN}/{@link Tier#SAFE}) - the 2 mass-storage tiers
  * ({@code mass_storage_desh}, {@code mass_storage}) are skipped: they need a {@code circuit}/
- * {@code circuit_*} item family and {@code mass_storage}/{@code mass_storage_iron}/
- * {@code mass_storage_desh} blocks/items, none of which exist anywhere in this port (confirmed by
- * the research report's item/registry dependency check and re-confirmed here by grep - zero hits).
+ * {@code circuit_*} item family (blocks now exist; upgrade recipes stay skipped until circuits land).
  * See this task's {@code stillBlocked} report output for the exact missing ids.
  * <p>
  * <b>Shape composition, deliberately not {@code ShapedRecipePattern}</b>: the research report's

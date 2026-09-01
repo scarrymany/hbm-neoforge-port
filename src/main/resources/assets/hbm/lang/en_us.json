@@ -1053,6 +1053,7 @@
   "container.pneumoStorageClutter": "Pneumatic Storage Clutter",
   "container.pneumoTube": "Pneumatic Tube",
   "container.press": "Burner Press",
+  "container.conveyor_press": "Conveyor Press",
   "container.puf6_tank": "PuF6 Tank",
   "container.pumpjack": "Pumpjack",
   "container.radGen": "Radiation-Powered Engine",

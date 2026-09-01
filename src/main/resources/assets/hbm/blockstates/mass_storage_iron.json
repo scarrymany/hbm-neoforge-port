@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "hbm:block/mass_storage_iron" },
+    "facing=south": { "model": "hbm:block/mass_storage_iron", "y": 180 },
+    "facing=west": { "model": "hbm:block/mass_storage_iron", "y": 270 },
+    "facing=east": { "model": "hbm:block/mass_storage_iron", "y": 90 }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "hbm:block/mass_storage_wood" },
+    "facing=south": { "model": "hbm:block/mass_storage_wood", "y": 180 },
+    "facing=west": { "model": "hbm:block/mass_storage_wood", "y": 270 },
+    "facing=east": { "model": "hbm:block/mass_storage_wood", "y": 90 }
+  }
+}

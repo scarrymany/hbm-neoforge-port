@@ -75,5 +75,7 @@ public final class DummyableProcessClientRegistry {
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_KEYFORGE, KeyForgeScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_DIFURNACE, DiFurnaceScreen::new);
         SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_DIFURNACE_RTG, DiFurnaceRtgScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MACHINE_CONVEYOR_PRESS, ConveyorPressScreen::new);
+        SafeMenuScreens.bind(event, DummyableProcessMenus.MASS_STORAGE, MassStorageScreen::new);
     }
 }

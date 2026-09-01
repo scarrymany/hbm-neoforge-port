@@ -36,7 +36,8 @@ import java.util.function.Supplier;
  * ashpit / heat boilers / cooling towers / telex / radar screen / siren / condenser /
  * condenser powered / intake / drain / BAT9000 / deuterium / fan /
  * UF6/PuF6 tanks / funnel / microwave / electric furnace / detector / orbus /
- * autocrafter / keyforge / di-furnace / RTG di-furnace.
+ * autocrafter / keyforge / di-furnace / RTG di-furnace /
+ * conveyor press / mass storage.
  */
 public final class DummyableProcessBlocks {
 
@@ -125,6 +126,11 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineDiFurnaceBlock> MACHINE_DIFURNACE_ON;
     public static DeferredBlock<MachineDiFurnaceRtgBlock> MACHINE_DIFURNACE_RTG_OFF;
     public static DeferredBlock<MachineDiFurnaceRtgBlock> MACHINE_DIFURNACE_RTG_ON;
+    public static DeferredBlock<MachineConveyorPressBlock> MACHINE_CONVEYOR_PRESS;
+    public static DeferredBlock<com.hbm.blocks.machine.MassStorageBlock> MASS_STORAGE_WOOD;
+    public static DeferredBlock<com.hbm.blocks.machine.MassStorageBlock> MASS_STORAGE_IRON;
+    public static DeferredBlock<com.hbm.blocks.machine.MassStorageBlock> MASS_STORAGE_DESH;
+    public static DeferredBlock<com.hbm.blocks.machine.MassStorageBlock> MASS_STORAGE;
 
     private DummyableProcessBlocks() {
     }
@@ -212,6 +218,11 @@ public final class DummyableProcessBlocks {
         MACHINE_DIFURNACE_ON = registerBlockNoTab("machine_difurnace_on", () -> new MachineDiFurnaceBlock(MACHINE_PROPS));
         MACHINE_DIFURNACE_RTG_OFF = registerBlock("machine_difurnace_rtg_off", () -> new MachineDiFurnaceRtgBlock(MACHINE_PROPS));
         MACHINE_DIFURNACE_RTG_ON = registerBlockNoTab("machine_difurnace_rtg_on", () -> new MachineDiFurnaceRtgBlock(MACHINE_PROPS));
+        MACHINE_CONVEYOR_PRESS = registerBlock("machine_conveyor_press", () -> new MachineConveyorPressBlock(MACHINE_PROPS));
+        MASS_STORAGE_WOOD = registerBlock("mass_storage_wood", () -> new com.hbm.blocks.machine.MassStorageBlock(MACHINE_PROPS, 1_000));
+        MASS_STORAGE_IRON = registerBlock("mass_storage_iron", () -> new com.hbm.blocks.machine.MassStorageBlock(MACHINE_PROPS, 10_000));
+        MASS_STORAGE_DESH = registerBlock("mass_storage_desh", () -> new com.hbm.blocks.machine.MassStorageBlock(MACHINE_PROPS, 100_000));
+        MASS_STORAGE = registerBlock("mass_storage", () -> new com.hbm.blocks.machine.MassStorageBlock(MACHINE_PROPS, 1_000_000));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

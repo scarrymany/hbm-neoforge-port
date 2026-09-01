@@ -78,6 +78,8 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineKeyForgeBlockEntity>> MACHINE_KEYFORGE;
     public static Supplier<BlockEntityType<MachineDiFurnaceBlockEntity>> MACHINE_DIFURNACE;
     public static Supplier<BlockEntityType<MachineDiFurnaceRtgBlockEntity>> MACHINE_DIFURNACE_RTG;
+    public static Supplier<BlockEntityType<MachineConveyorPressBlockEntity>> MACHINE_CONVEYOR_PRESS;
+    public static Supplier<BlockEntityType<MassStorageBlockEntity>> MASS_STORAGE;
 
     private DummyableProcessBlockEntities() {
     }
@@ -374,6 +376,19 @@ public final class DummyableProcessBlockEntities {
                 (pos, state) -> new MachineDiFurnaceRtgBlockEntity(MACHINE_DIFURNACE_RTG.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_DIFURNACE_RTG_OFF.get(),
                 DummyableProcessBlocks.MACHINE_DIFURNACE_RTG_ON.get()
+        ).build(null));
+        MACHINE_CONVEYOR_PRESS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_conveyor_press", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineConveyorPressBlockEntity(MACHINE_CONVEYOR_PRESS.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CONVEYOR_PRESS.get()
+        ).build(null));
+        MASS_STORAGE = ModBlocks.BLOCK_ENTITY_TYPES.register("mass_storage", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MassStorageBlockEntity(MASS_STORAGE.get(), pos, state,
+                        state.getBlock() instanceof com.hbm.blocks.machine.MassStorageBlock block
+                                ? block.getCapacity() : 10_000),
+                DummyableProcessBlocks.MASS_STORAGE_WOOD.get(),
+                DummyableProcessBlocks.MASS_STORAGE_IRON.get(),
+                DummyableProcessBlocks.MASS_STORAGE_DESH.get(),
+                DummyableProcessBlocks.MASS_STORAGE.get()
         ).build(null));
     }
 }

@@ -12,6 +12,7 @@ import com.hbm.packet.toclient.SatPanelPayload;
 import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
 import com.hbm.packet.toserver.LaunchPadRustedControlPacket;
+import com.hbm.packet.toserver.MassStorageControlPacket;
 import com.hbm.packet.toserver.SatPanelActionPayload;
 import com.hbm.packet.toserver.TurretControlPacket;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -108,5 +109,7 @@ public class HbmNetwork {
         // Phase 5 (gui_screens_survey_weapons_storage_special): C2S control packet for the rusted
         // launch pad's bare-Screen GUI.
         registrar.playToServer(LaunchPadRustedControlPacket.TYPE, LaunchPadRustedControlPacket.STREAM_CODEC, LaunchPadRustedControlPacket::handleServer);
+
+        registrar.playToServer(MassStorageControlPacket.TYPE, MassStorageControlPacket.STREAM_CODEC, MassStorageControlPacket::handleServer);
     }
 }
