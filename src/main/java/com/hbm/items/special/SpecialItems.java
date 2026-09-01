@@ -164,6 +164,9 @@ public final class SpecialItems {
 
     public static final DeferredItem<ItemRag> RAG =
             register("rag", () -> new ItemRag(new Item.Properties(), "rag_damp", "rag_piss"));
+    // CE ModItems.java:1318-1319 ItemBase partsTab. ItemRag already swaps to these ids.
+    public static final DeferredItem<Item> RAG_DAMP = registerParts("rag_damp", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> RAG_PISS = registerParts("rag_piss", () -> new Item(new Item.Properties()));
     static {
         CreativeTabContents.add(ModCreativeTabs.PARTS, RAG);
     }
@@ -423,11 +426,16 @@ public final class SpecialItems {
             register("gas_mask_filter_combo", () -> new Item(new Item.Properties().stacksTo(1).durability(24000)));
     public static final DeferredItem<com.hbm.items.armor.ItemModV1> V1 =
             register("v1", () -> new com.hbm.items.armor.ItemModV1(new Item.Properties().stacksTo(1)));
+    // CE ModItems.java:242 ItemModNightVision helmet-only armor mod. Slot type only — no invented NV tick.
+    public static final DeferredItem<com.hbm.items.armor.ItemArmorMod> NIGHT_VISION =
+            register("night_vision", () -> new com.hbm.items.armor.ItemArmorMod(
+                    new Item.Properties(), com.hbm.handler.ArmorModHandler.helmet_only, true, false, false, false));
     static {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_MASKMAN);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_COMBO);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, V1);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, NIGHT_VISION);
     }
 
     // ==================== RAD Beast leader loot (docs/phase4/entities_bosses.md RAD Beast section /

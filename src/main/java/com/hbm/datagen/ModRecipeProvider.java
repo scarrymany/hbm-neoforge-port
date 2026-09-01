@@ -1179,13 +1179,9 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_plate", has(plateIron))
                 .save(output, id("armor/mask_of_infamy"));
 
-        // ArmorRecipes.java:158-162: masks. mask_rag/mask_piss (line 165-166) are NOT reproduced -
-        // ModItems.rag_damp/rag_piss in CE are not separate items, only ItemRag *state names* on the
-        // single "rag" item (confirmed by reading com.hbm.items.special.SpecialItems.RAG's own
-        // constructor call); matching one specific rag state as a plain shaped-recipe ingredient would
-        // need a component-predicate custom ingredient, the same "handlers"-class complexity this
-        // task's scope explicitly excludes (see class javadoc). goggles/ashglasses are skipped too -
-        // neither output item was found registered under any name in this port.
+        // ArmorRecipes.java:158-162: masks. mask_rag craft lives in ce_craft (rag_damp is now a
+        // real ItemBase). mask_piss output is ArmorModel helmet, not registered. ashglasses skipped
+        // (output unregistered). goggles is ce_craft/armor/goggles.json.
         Item plateSteel = item("plate_steel");
         Item ingotRubber = item("ingot_rubber");
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("gas_mask"))

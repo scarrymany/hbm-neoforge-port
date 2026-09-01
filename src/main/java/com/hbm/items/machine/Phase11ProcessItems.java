@@ -196,6 +196,10 @@ public final class Phase11ProcessItems {
         parts("deuterium_filter");
         // CE ModItems.java:1297 ItemBase partsTab — deuterium_filter + gas_mask_filter_* crafts
         parts("catalyst_clay");
+        // CE ModItems.java:1304 ItemBakedBase partsTab + CraftingManager.java:831
+        parts("safety_fuse");
+        // CE ModItems.java:239 ItemModSensor — I/O + assets; no invented sensor HUD
+        consume("gas_tester");
         // CE ModItems.java:284 ItemCustomLore max16 controlTab — energy_core shapeless
         control16("fuse");
         // CE ModItems.java:399 ItemBase controlTab — t51/ajr/liquidator plate crafts

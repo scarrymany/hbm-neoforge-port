@@ -173,6 +173,25 @@ public final class SpecialArmorItems {
     // builder calls at all. No fire immunity, no potion effects, no hazard-class registration of
     // their own beyond what ArmorUtil.register() wires for the helmet. No creative tab.
 
+    // CE ModItems.java:719 ArmorModel IRON HEAD. Overlay/custom model stay Phase 5.
+    public static final DeferredItem<Item> GOGGLES = ModItems.ITEMS.register("goggles",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    static {
+        COMBAT_TAB.add(GOGGLES);
+    }
+
+    // CE ModItems.java:471-473 ArmorFSB aMatPaa + Haste. getReflector() = neutron_reflector.
+    public static final DeferredItem<Item> PAA_PLATE = ModItems.ITEMS.register("paa_plate",
+            () -> paaEffects(new ArmorFSB(MaterialRegistry.aMatPaa, ArmorItem.Type.CHESTPLATE, props(MaterialRegistry.aMatPaa, ArmorItem.Type.CHESTPLATE))));
+    public static final DeferredItem<Item> PAA_LEGS = ModItems.ITEMS.register("paa_legs",
+            () -> paaEffects(new ArmorFSB(MaterialRegistry.aMatPaa, ArmorItem.Type.LEGGINGS, props(MaterialRegistry.aMatPaa, ArmorItem.Type.LEGGINGS))));
+    public static final DeferredItem<Item> PAA_BOOTS = ModItems.ITEMS.register("paa_boots",
+            () -> paaEffects(new ArmorFSB(MaterialRegistry.aMatPaa, ArmorItem.Type.BOOTS, props(MaterialRegistry.aMatPaa, ArmorItem.Type.BOOTS))));
+
+    private static ArmorFSB paaEffects(ArmorFSB armor) {
+        return armor.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 30, 0, false, true));
+    }
+
     public static final DeferredItem<Item> ASBESTOS_HELMET = ModItems.ITEMS.register("asbestos_helmet",
             () -> new ArmorFSB(MaterialRegistry.aMatAsbestos, ArmorItem.Type.HELMET, props(MaterialRegistry.aMatAsbestos, ArmorItem.Type.HELMET)));
     public static final DeferredItem<Item> ASBESTOS_PLATE = ModItems.ITEMS.register("asbestos_plate",
