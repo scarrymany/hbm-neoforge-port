@@ -176,8 +176,19 @@ public final class SpecialArmorItems {
     // CE ModItems.java:719 ArmorModel IRON HEAD. Overlay/custom model stay Phase 5.
     public static final DeferredItem<Item> GOGGLES = ModItems.ITEMS.register("goggles",
             () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    // CE ModItems.java:720 ArmorAshGlasses. Port has no ArmorAshGlasses — ArmorModel stand-in, no invented ash overlay.
+    public static final DeferredItem<Item> ASHGLASSES = ModItems.ITEMS.register("ashglasses",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    // CE ModItems.java:722-723 ArmorModel IRON HEAD. Unblocks ItemRag mask_rag water/throw transitions.
+    public static final DeferredItem<Item> MASK_DAMP = ModItems.ITEMS.register("mask_damp",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    public static final DeferredItem<Item> MASK_PISS = ModItems.ITEMS.register("mask_piss",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
     static {
         COMBAT_TAB.add(GOGGLES);
+        COMBAT_TAB.add(ASHGLASSES);
+        COMBAT_TAB.add(MASK_DAMP);
+        COMBAT_TAB.add(MASK_PISS);
     }
 
     // CE ModItems.java:471-473 ArmorFSB aMatPaa + Haste. getReflector() = neutron_reflector.

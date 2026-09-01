@@ -424,6 +424,13 @@ public final class SpecialItems {
             register("gas_mask_filter", () -> new Item(new Item.Properties().stacksTo(1).durability(18000)));
     public static final DeferredItem<Item> GAS_MASK_FILTER_COMBO =
             register("gas_mask_filter_combo", () -> new Item(new Item.Properties().stacksTo(1).durability(24000)));
+    // CE ModItems.java:177-179 ItemFilter 4000/4000/12000. Same inert-durability stand-in as the two above.
+    public static final DeferredItem<Item> GAS_MASK_FILTER_RAG =
+            register("gas_mask_filter_rag", () -> new Item(new Item.Properties().stacksTo(1).durability(4000)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER_PISS =
+            register("gas_mask_filter_piss", () -> new Item(new Item.Properties().stacksTo(1).durability(4000)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER_MONO =
+            register("gas_mask_filter_mono", () -> new Item(new Item.Properties().stacksTo(1).durability(12000)));
     public static final DeferredItem<com.hbm.items.armor.ItemModV1> V1 =
             register("v1", () -> new com.hbm.items.armor.ItemModV1(new Item.Properties().stacksTo(1)));
     // CE ModItems.java:242 ItemModNightVision helmet-only armor mod. Slot type only — no invented NV tick.
@@ -434,6 +441,9 @@ public final class SpecialItems {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_MASKMAN);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_COMBO);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_RAG);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_PISS);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_MONO);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, V1);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, NIGHT_VISION);
     }

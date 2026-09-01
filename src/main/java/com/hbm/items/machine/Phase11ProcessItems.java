@@ -289,6 +289,10 @@ public final class Phase11ProcessItems {
         fuel("coke_lignite", 3200);
         fuel("coke_petroleum", 3200);
         parts1("catalytic_converter");
+        // CE ModItems.java:775-777 ItemBakedBase weaponTab (default stack 64).
+        weapon("stick_tnt");
+        weapon("stick_semtex");
+        weapon("stick_c4");
     }
 
     private static DeferredItem<Item> parts(String name) {
@@ -361,6 +365,12 @@ public final class Phase11ProcessItems {
     private static DeferredItem<Item> nuke1(String name) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(1)));
         CreativeTabContents.add(ModCreativeTabs.NUKE, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> weapon(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }
 

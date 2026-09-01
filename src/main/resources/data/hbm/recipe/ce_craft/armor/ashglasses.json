@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "I I",
+    "GPG"
+  ],
+  "key": {
+    "I": {
+      "tag": "hbm:any_rubber"
+    },
+    "G": {
+      "item": "hbm:glass_ash"
+    },
+    "P": {
+      "tag": "hbm:any_plastic"
+    }
+  },
+  "result": {
+    "id": "hbm:ashglasses",
+    "count": 1
+  }
+}
