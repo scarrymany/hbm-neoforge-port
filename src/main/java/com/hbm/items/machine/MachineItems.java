@@ -213,6 +213,9 @@ public final class MachineItems {
         tab(ModCreativeTabs.CONTROL, reg("battery_potato", () -> new ItemBattery(100, 0, 100, props())));
         tab(ModCreativeTabs.CONTROL, reg("energy_core",
                 () -> new ItemBattery(10000000, 0, 1000, Rarity.UNCOMMON, true, props())));
+        // CE ModItems.java:349 ItemFusionCore(2500000) — percent-only tooltip like energy_core
+        tab(ModCreativeTabs.CONTROL, reg("fusion_core",
+                () -> new ItemBattery(2500000, 0, 1000, Rarity.UNCOMMON, true, props())));
         registerPlainBattery("memory", Long.MAX_VALUE / 100L, 100000000000000L, 100000000000000L, null);
 
         tab(ModCreativeTabs.CONTROL, reg("battery_creative", () -> new ItemBatteryCreative(props())));

@@ -8,25 +8,24 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (6.015s)** on wiped world port 25566, **4047 recipes**
-(anvil is Java table, not JSON — count unchanged). No recipe parse errors. No new tag.
-`v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0.
+`./gradlew runServer` pending this commit (anvil is Java table, not JSON).
+No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **105.7%** (8213 / 7767) |
-| **Unweighted** (mean of category %) | **103.8%** |
-| Recipe/loot + machine-table + ItemPools reachability | **62.4%** (1615 / 2590) |
+| **Weighted** (Σport / ΣCE) | **106.0%** (8234 / 7767) |
+| **Unweighted** (mean of category %) | **104.0%** |
+| Recipe/loot + machine-table + ItemPools reachability | **63.3%** (1648 / 2604) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 161**, **machine 89**, **vanilla 52**.
-Weighted **105.7%**. Reachability **62.4%** — still the owner pain. Not a tag.
+Largest remaining holes: **blocks 154**, **machine 89**, **vanilla 52**.
+Weighted **106.0%**. Reachability **63.3%** — still the owner pain. Not a tag.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -34,19 +33,40 @@ Weighted **105.7%**. Reachability **62.4%** — still the owner pain. Not a tag.
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2590 | **139.0%** | +`scrap`/`scrap_nuclear`/`scrap_oil`/`pipes_steel` (`parts()`). `hidden(scrap_plastic)` + 6 `control(debris_*)` registered, census regex misses those helpers |
-| Blocks | 1169 | 1008 | **86.2%** | unchanged |
+| Items (flattened ids) | 1863 | 2604 | **139.8%** | +anvil leftover I/O (`sawblade`/`wings_*`/`mold_base`/`fusion_core`/`egg_glyphid`/…) |
+| Blocks | 1169 | 1015 | **86.8%** | +anvil leftover casings (`pump_*`/`thresher`/`chimney_*`/`bm_power_box`/`fluid_duct_exhaust`) |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950 |
-| Machine recipes | ~2009 | 1920 | **95.6%** | +anvil Java table. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201/200**. Cyclotron **42=42**. Anvil unique **67 / 200** (I/O that exists). Centrifuge 75/78 AE2 skip. |
+| Machine recipes | ~2009 | 1920 | **95.6%** | +anvil Java table. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201/200**. Cyclotron **42=42**. Anvil unique **116 / 200** `stack("id")` / honest **166 / 200**. Centrifuge 75/78 AE2 skip. |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (reachability + Anvil GUI)
+## What changed this wave (Anvil leftover I/O)
+
+- Reachability **62.4% → 63.3%** (1615 / 2590 → 1648 / 2604). Items **2590 → 2604**.
+- Registered leftover anvil I/O **with existing CE png/json/lang**: items
+  `sawblade`, `wings_limp`, `mold_base`, `wings_murk`, `deuterium_filter`,
+  `egg_glyphid`, `flame_pony`; `fusion_core` as `ItemBattery(2500000)` (CE
+  `ItemFusionCore`); casings `pump_steam`/`pump_electric`/`machine_thresher`/
+  `fluid_duct_exhaust`/`chimney_brick`/`chimney_industrial`/`bm_power_box`.
+  Chimney models parent CE `brick_concrete`/`concrete_smooth` (CE only had `.obj`).
+- Anvil rows for shells/pipes/stamps + leftover machines (`heat_boiler` =
+  CE `machine_boiler` field) + recycling (deco/firebox/RBMK/pile/toaster/CRT)
+  whose I/O exists. Flatten holders stay flattened (`circuit_*`, `{mat}_shell`).
+- Unique anvil: CE **200** vs port **116** `stack("id")` (was 67). Honest
+  `stack`+`out`+`plate` overlap **166 / 200**. Remaining 34 = hot/mold/flask/
+  flatten holders / `machine_deuterium_tower` fluid /
+  TODO(CE: AnvilRecipes.java:75-130).
+- Anvil GUI + smithing + construction E2E stayed from prior wave. New casings
+  are placeable + anvil-craftable, **not** full CE Dummyable TE/GUI.
+  `wings_murk` is `ItemBase` stacksTo(1), not CE flight armor.
+- Assembler SKIP7 not invented. No self-drop loot padding.
+
+## Prior wave (reachability + Anvil GUI)
 
 - Reachability **60.5% → 62.4%** (1567 → 1615 / 2590). Census `loot_outputs()` now
   scans live `ItemPools*` (`addHbm` / `ItemPoolLookups.add`) — those pools already
@@ -57,7 +77,7 @@ Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%**
   `AnvilScreen` blit CE `gui_anvil.png` + `AnvilCraftPacket` construction from
   player inv. Smithing consume on take. Recipes: upgrades + gunmetal + plates +
   deco + coils/motors + machines/armor/fuel plates with registered I/O.
-  TODO(CE: AnvilRecipes.java:75-130) hot/mold/cyanide/rename. `machine_boiler` AIR.
+  TODO(CE: AnvilRecipes.java:75-130) hot/mold/cyanide/rename.
 - Liquefaction: `oil_tar_crude` BITUMEN 75, `oil_tar_crack` BITUMEN 100,
   `lignite` COALOIL 150, `lead_block` LEAD 900. coal/wood tar remaps stay.
 - Assembler SKIP7 not invented.
@@ -220,23 +240,24 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
   TODO(CE: TileEntityMachineSuperComputer.java:186-194)
 - Autosaw entity shred skipped
 - `catalytic_converter` `ANY_BISMOID.ingot()` → `ingot_bismuth` (no `any_bismoid` tag)
-- wave11 drops: `powder_fire` / `key` / `gear_large` / `sawblade` / `mold_base` unregistered
+- wave11 drops: `powder_fire` / `key` / `gear_large` unregistered (`sawblade`/`mold_base` now registered)
 - wave13 drops: unregistered armor pieces / SEDNA parts / inserts / claddings / foods / `block_steel`
 - fluid-NBT / `OreDictionary.WILDCARD` / LBSM-gated / commented CE crafts skipped
 
 ## Recipe-graph reachability (cheap)
 
-**62.4%** (1615 / 2590). JSON loot + Java machine-table **outputs** + live `ItemPools*`
+**63.3%** (1648 / 2604). JSON loot + Java machine-table **outputs** + live `ItemPools*`
 (`addHbm` / `ItemPoolLookups.add`). Inputs not counted. Self-drop block loot not added.
 
-Before this wave: **60.5%** (1567 / 2590). +48 honest (pools that already fire + anvil
-outs that exist + sat leftovers `fluorite`/`gravel_diamond`/`moon_turf`).
+Before this wave: **62.4%** (1615 / 2590). +27 items / +6 blocks from leftover anvil I/O
++ matching construction/recycle rows (not self-drop padding).
 
 ## Next single gap
 
-**Anvil** unique: CE **200** Mod* outs / 236 add-sites vs port **67** with registered I/O.
-GUI is live this wave. Leftover rows need unregistered I/O (hot/mold/shell/pipe/sawblade/
-recycling). Do not invent.
+**Anvil** unique leftover: CE **200** vs port **116** `stack("id")` / honest **166 / 200**.
+Remaining 34 wait on hot/mold (`AnvilSmithingHotRecipe` / `AnvilSmithingMold` + mold meta
+16–28), flask infusion meta, `machine_deuterium_tower` fluid AStack, flatten holders.
+TODO(CE: AnvilRecipes.java:75-130). Do not invent.
 
 Next other family by unique CE vs port (not regex 145-style): Press **41/38**,
 Combination ~done, Exposure done, Liquefaction leftovers landed, Solidification live.

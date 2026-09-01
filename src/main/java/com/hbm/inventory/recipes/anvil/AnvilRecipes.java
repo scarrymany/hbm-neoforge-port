@@ -20,8 +20,9 @@ import java.util.List;
 
 /**
  * CE {@code AnvilRecipes.java}. Smithing {@code :59-131} + construction {@code :140+}.
- * Rows whose I/O is AIR are skipped — no fake ids. Cited skips stay (hot/mold/cyanide/rename,
- * Mats shell/pipe autogen, recycling of unregistered machines).
+ * Rows whose I/O is AIR are skipped — no fake ids. Shell/pipe/stamp/recycle rows land when
+ * the flattened autogen / already-registered I/O exists.
+ * TODO(CE: AnvilRecipes.java:75-130) hot/mold/cyanide/rename still blocked.
  */
 public final class AnvilRecipes {
 
@@ -52,9 +53,9 @@ public final class AnvilRecipes {
 
     /**
      * CE {@code :59-73} anvil upgrades (iron/lead × 9 targets) + {@code :96} gunmetal.
-     * SKIP {@code :75-93} hot ({@code AnvilSmithingHotRecipe}), {@code :98-127} mold,
-     * {@code :93-94} wings/flask, {@code :129-130} cyanide/rename —
-     * TODO(CE: AnvilRecipes.java:75-130).
+     * SKIP {@code :75-91} hot ({@code AnvilSmithingHotRecipe}), {@code :98-127} mold,
+     * {@code :94} flask infusion meta, {@code :129-130} cyanide/rename —
+     * TODO(CE: AnvilRecipes.java:75-130). {@code :93} wings_murk is live (I/O registered).
      */
     private static void registerSmithing() {
         String[] bases = {"anvil_iron", "anvil_lead"};
@@ -70,6 +71,8 @@ public final class AnvilRecipes {
             smith(1, stack("anvil_osmiridium"), cmp(base), tag("ingots/osmiridium", 10));
         }
         smith(1, stack("ingot_gunmetal"), tag("ingots/copper"), tag("ingots/aluminum"));
+        // CE :93 — regular smithing, not hot
+        smith(1916169, stack("wings_murk"), cmp("wings_limp"), cmp("particle_tachyon"));
     }
 
     private static void registerConstruction() {
@@ -223,7 +226,7 @@ public final class AnvilRecipes {
                 tag("ingots/copper", 8),
                 tag("plates/steel", 8));
 
-        // :376-381 machine_boiler — block not registered. TODO(CE: AnvilRecipes.java:376-381)
+        // :376-381 CE machine_boiler → port id heat_boiler (registerLeftoverMachines)
 
         // :383-389 soldering
         construct(2, stack("machine_soldering_station"),
@@ -285,6 +288,320 @@ public final class AnvilRecipes {
                 cmp("tank_steel"),
                 tag("plates/lead", 2),
                 cmp("nuclear_waste_vitrified", 10));
+
+        registerShellsPipes();
+        registerLeftoverMachines();
+        registerConstructionStamps();
+        registerConstructionRecycling();
+    }
+
+    /** CE {@code :194-203} Mats SHELL/PIPE autogen — ids are {@code {mat}_{shell|pipe}}. */
+    private static void registerShellsPipes() {
+        construct(1, stack("titanium_shell"), tag("plates/titanium", 4));
+        construct(1, stack("copper_shell"), tag("plates/copper", 4));
+        construct(1, stack("aluminum_shell"), tag("plates/aluminum", 4));
+        construct(1, stack("steel_shell"), tag("plates/steel", 4));
+        construct(1, stack("weaponsteel_shell"), tag("plates/weaponsteel", 4));
+        construct(1, stack("saturnite_shell"), tag("plates/saturnite", 4));
+
+        construct(1, stack("iron_pipe"), tag("ingots/iron", 3));
+        construct(1, stack("copper_pipe"), tag("plates/copper", 3));
+        construct(1, stack("aluminum_pipe"), tag("plates/aluminum", 3));
+        construct(1, stack("lead_pipe"), tag("plates/lead", 3));
+        construct(1, stack("steel_pipe"), tag("plates/steel", 3));
+        construct(1, stack("durasteel_pipe"), tag("plates/dura_steel", 3));
+        construct(1, stack("rubber_pipe"), tag("ingots/rubber", 3));
+    }
+
+    /** CE construction leftovers whose I/O is now registered (heat_boiler = CE {@code machine_boiler} field). */
+    private static void registerLeftoverMachines() {
+        // :229-235 CE machine_rockmill → port id machine_rock_mill
+        construct(2, stack("machine_rock_mill"),
+                new ComparableStack(Blocks.STONE, 16),
+                tag("plates/steel", 4),
+                cmp("copper_pipe"),
+                cmp("motor"));
+        // :253-260 pumps
+        construct(2, stack("pump_steam"),
+                new ComparableStack(Blocks.COBBLESTONE, 8),
+                new ComparableStack(Items.OAK_PLANKS, 16),
+                tag("plates/copper", 8),
+                cmp("lead_pipe", 2));
+        construct(3, stack("pump_electric"),
+                new ComparableStack(Blocks.STONE_BRICKS, 8),
+                tag("plates/steel", 16),
+                cmp("lead_pipe", 4),
+                cmp("motor", 2),
+                cmp("circuit_vacuum_tube", 4));
+        // :376-381 CE machine_boiler field registers as heat_boiler
+        construct(2, stack("heat_boiler"),
+                tag("ingots/steel", 4),
+                tag("plates/copper", 16),
+                cmp("plate_polymer", 8));
+        // :351-358 steam engine
+        construct(2, stack("machine_steam_engine"),
+                cmp("reinforced_stone", 16),
+                tag("plates/steel", 12),
+                cmp("steel_shell", 2),
+                cmp("coil_copper", 4),
+                cmp("gear_bronze"));
+        // :360-367 / :406-413 saws — sawblade now registered
+        construct(2, stack("machine_sawmill"),
+                new ComparableStack(Items.OAK_PLANKS, 16),
+                tag("plates/steel", 6),
+                tag("ingots/copper", 8),
+                tag("ingots/iron", 4),
+                cmp("sawblade"));
+        construct(2, stack("machine_autosaw"),
+                tag("plates/steel", 4),
+                tag("ingots/iron", 12),
+                tag("ingots/copper", 2),
+                cmp("circuit_vacuum_tube", 2),
+                cmp("sawblade"));
+        construct(2, stack("machine_thresher"),
+                tag("plates/steel", 8),
+                tag("ingots/iron", 12),
+                tag("ingots/copper", 2),
+                cmp("circuit_vacuum_tube"));
+        // :423-435 towers
+        construct(3, stack("machine_tower_small"),
+                cmp("brick_concrete", 64),
+                new ComparableStack(Blocks.IRON_BARS, 128),
+                cmp("machine_condenser", 4));
+        construct(4, stack("machine_tower_large"),
+                cmp("concrete_smooth", 128),
+                cmp("steel_scaffold", 32),
+                cmp("machine_condenser", 16),
+                cmp("steel_pipe", 8));
+        // :437-442
+        construct(2, stack("wings_limp"),
+                new ComparableStack(Items.BONE, 16),
+                new ComparableStack(Items.LEATHER, 4),
+                new ComparableStack(Items.FEATHER, 24));
+        // :444-451
+        construct(2, stack("machine_deuterium_extractor"),
+                cmp("sulfur", 12),
+                cmp("steel_shell", 4),
+                tag("plates/copper", 6),
+                cmp("circuit_basic", 2));
+        // :464-480 pylons
+        construct(2, stack("red_pylon_large"),
+                cmp("concrete", 2),
+                cmp("steel_scaffold", 8),
+                cmp("plate_polymer", 8),
+                cmp("coil_copper", 4));
+        construct(2, stack("substation", 2),
+                cmp("concrete", 8),
+                tag("ingots/steel", 8),
+                cmp("plate_polymer", 12),
+                cmp("coil_copper", 8));
+        // :482-506 chimneys
+        construct(2, stack("chimney_brick"),
+                tag("plates/steel", 4),
+                new ComparableStack(Blocks.BRICKS, 16),
+                cmp("steel_grate", 2));
+        construct(3, stack("chimney_industrial"),
+                tag("plates/steel", 16),
+                cmp("concrete", 64),
+                cmp("steel_grate", 4),
+                cmp("filter_coal", 4));
+        // :568-582 ducts / cable (one flatten each, not CE meta 0-14)
+        construct(2, stack("fluid_duct_box"), tag("plates/iron"));
+        construct(2, stack("fluid_duct_exhaust", 8), tag("plates/iron"), cmp("plate_polymer"));
+        construct(2, stack("red_cable_box", 16), tag("ingots/red_copper"), cmp("plate_polymer"));
+        // :612-616 one cassette (port flattened siren_track, not per-track meta)
+        construct(2, stack("siren_track"), tag("plates/steel"), cmp("plate_polymer"));
+        // :178-180 annihilator
+        construct(2, stack("machine_annihilator"),
+                new ComparableStack(Blocks.STONE_BRICKS, 16),
+                cmp("ingot_firebrick", 16),
+                tag("ingots/iron", 8),
+                tag("ingots/copper", 8));
+        // :190-192
+        construct(1916169, stack("depth_dnt"), tag("ingots/dineutronium", 4), cmp("depth_brick"));
+        // :490-497
+        construct(5, stack("bm_power_box"),
+                cmp("steel_wall", 2),
+                new ComparableStack(Items.REDSTONE, 4),
+                new ComparableStack(Items.LEVER, 2),
+                cmp("mingrade_dense_wire", 3));
+        // :521-526
+        construct(3, stack("demon_core_open"), cmp("man_core"), tag("ingots/beryllium", 4), cmp("screwdriver"));
+        // :547-551 — inputs exist; meteorite_forged is ItemHot (not anvil-hot recipe)
+        construct(6, stack("plate_armor_fau"),
+                cmp("ingot_meteorite_forged", 4),
+                tag("ingots/desh"),
+                cmp("billet_yharonite"));
+        construct(7, stack("plate_armor_dnt"),
+                cmp("plate_dineutronium", 4),
+                cmp("particle_sparkticle"),
+                cmp("plate_armor_fau", 6));
+    }
+
+    /** CE {@code registerConstructionStamps} :585-609 + ammo stamps :621-624. */
+    private static void registerConstructionStamps() {
+        construct(1, stack("stamp_stone_plate"), cmp("stamp_stone_flat"));
+        construct(1, stack("stamp_stone_wire"), cmp("stamp_stone_flat"));
+        construct(1, stack("stamp_stone_circuit"), cmp("stamp_stone_flat"));
+        construct(1, stack("stamp_iron_plate"), cmp("stamp_iron_flat"));
+        construct(1, stack("stamp_iron_wire"), cmp("stamp_iron_flat"));
+        construct(1, stack("stamp_iron_circuit"), cmp("stamp_iron_flat"));
+        construct(2, stack("stamp_steel_plate"), cmp("stamp_steel_flat"));
+        construct(2, stack("stamp_steel_wire"), cmp("stamp_steel_flat"));
+        construct(2, stack("stamp_steel_circuit"), cmp("stamp_steel_flat"));
+        construct(2, stack("stamp_titanium_plate"), cmp("stamp_titanium_flat"));
+        construct(2, stack("stamp_titanium_wire"), cmp("stamp_titanium_flat"));
+        construct(2, stack("stamp_titanium_circuit"), cmp("stamp_titanium_flat"));
+        construct(2, stack("stamp_obsidian_plate"), cmp("stamp_obsidian_flat"));
+        construct(2, stack("stamp_obsidian_wire"), cmp("stamp_obsidian_flat"));
+        construct(2, stack("stamp_obsidian_circuit"), cmp("stamp_obsidian_flat"));
+        construct(3, stack("stamp_desh_plate"), cmp("stamp_desh_flat"));
+        construct(3, stack("stamp_desh_wire"), cmp("stamp_desh_flat"));
+        construct(3, stack("stamp_desh_circuit"), cmp("stamp_desh_flat"));
+        construct(2, stack("stamp_9"), cmp("stamp_iron_flat"), tag("ingots/gunmetal", 2));
+        construct(2, stack("stamp_50"), cmp("stamp_iron_flat"), tag("ingots/gunmetal", 2));
+        construct(4, stack("stamp_desh_9"), cmp("stamp_desh_flat"), tag("ingots/weaponsteel", 4));
+        construct(4, stack("stamp_desh_50"), cmp("stamp_desh_flat"), tag("ingots/weaponsteel", 4));
+    }
+
+    /** CE {@code registerConstructionRecycling} :640+ — only rows whose I/O exists. */
+    private static void registerConstructionRecycling() {
+        recycle(1, cmp("deco_titanium", 4), out("ingot_titanium"));
+        recycle(1, cmp("deco_red_copper", 4), out("ingot_red_copper"));
+        recycle(1, cmp("deco_tungsten", 4), out("ingot_tungsten"));
+        recycle(1, cmp("deco_aluminium", 4), out("ingot_aluminium"));
+        recycle(1, cmp("deco_steel", 4), out("ingot_steel"));
+        recycle(1, cmp("deco_rusty_steel", 8), out("ingot_steel"));
+        recycle(1, cmp("deco_lead", 4), out("ingot_lead"));
+        recycle(1, cmp("deco_beryllium", 4), out("ingot_beryllium"));
+        recycle(1, cmp("deco_asbestos", 4), out("ingot_asbestos"));
+
+        recycle(2, cmp("heater_firebox"), out("plate_steel", 8), out("ingot_copper", 6));
+        recycle(2, cmp("heater_oven"), out("ingot_firebrick", 16), out("ingot_copper", 8));
+        recycle(2, cmp("machine_stirling"), out("plate_steel", 6), out("ingot_copper", 8), out("coil_copper", 4), out("gear_bronze"));
+        recycle(2, cmp("machine_stirling_steel"), out("plate_steel", 16), out("ingot_beryllium", 6), out("ingot_copper", 8), out("coil_gold", 16), out("gear_steel"));
+        recycle(2, cmp("gear_steel"), out("plate_steel", 8), out("ingot_titanium"));
+        recycle(2, cmp("gear_bronze"), out("plate_iron", 8), out("ingot_copper"));
+        recycle(2, cmp("fluid_duct_box"), out("plate_iron"));
+        recycle(2, cmp("fluid_duct_exhaust", 8), out("plate_iron"), out("plate_polymer"));
+        recycle(2, cmp("red_cable_box", 16), out("ingot_red_copper"), out("plate_polymer"));
+
+        // CE :640-654 chunk_ore RARE — port flatten chunk_ore_rare
+        recycle(2, cmp("chunk_ore_rare"),
+                out("fragment_boron"),
+                out("fragment_boron", 1, 0.5F),
+                out("fragment_lanthanium", 1, 0.1F),
+                out("fragment_cobalt"),
+                out("fragment_cobalt", 1, 0.5F),
+                out("fragment_cerium", 1, 0.1F),
+                out("fragment_neodymium", 1, 0.5F),
+                out("fragment_niobium", 1, 0.5F));
+
+        recycle(2, cmp("tape_recorder"), out("ingot_steel"), out("ingot_tungsten", 1, 0.25F));
+        recycle(2, cmp("pole_top"),
+                out("ingot_tungsten", 3),
+                out("ingot_red_copper"),
+                out("ingot_beryllium", 2),
+                out("ingot_beryllium", 1, 0.5F));
+        recycle(2, cmp("pole_satellite_receiver"),
+                out("ingot_steel", 3),
+                out("ingot_steel", 2, 0.5F),
+                out("circuit_vacuum_tube", 1, 0.5F),
+                out("mingrade_wire"));
+        recycle(1, cmp("filing_cabinet"),
+                out("plate_steel", 2),
+                out("plate_steel", 2, 0.5F),
+                out("plate_polymer", 2, 0.25F),
+                out("scrap"));
+
+        recycle(2, cmp("deco_computer_ibm_300pl"),
+                out("crt_display"),
+                out("scrap", 3),
+                out("copper_wire", 4),
+                out("circuit_pcb", 2),
+                out("circuit_vacuum_tube", 1, 0.5F),
+                out("circuit_capacitor", 1, 0.75F),
+                out("circuit_capacitor", 1, 0.5F),
+                out("circuit_analog", 1, 0.1F));
+        for (String crt : new String[]{"deco_crt_clean", "deco_crt_broken", "deco_crt_blinking", "deco_crt_bsod"}) {
+            recycle(2, cmp(crt),
+                    out("crt_display"),
+                    out("scrap", 2),
+                    out("copper_wire", 2),
+                    out("gold_wire", 2, 0.25F),
+                    out("circuit_vacuum_tube", 1, 0.25F));
+        }
+        recycle(2, cmp("deco_toaster_iron"),
+                out("plate_iron", 3),
+                out("scrap"),
+                out("coil_tungsten"),
+                vanilla(Items.BREAD, 1, 0.5F),
+                out("fusion_core", 1, 0.01F));
+        recycle(2, cmp("deco_toaster_steel"),
+                out("plate_steel", 3),
+                out("scrap"),
+                out("coil_tungsten", 2),
+                vanilla(Items.BREAD, 1, 0.5F),
+                out("battery_sc_ra226", 1, 0.1F),
+                out("fusion_core", 1, 0.05F));
+        recycle(2, cmp("deco_toaster_wood"),
+                out("powder_sawdust", 4),
+                out("scrap"),
+                out("coil_tungsten", 4),
+                vanilla(Items.BREAD, 1, 0.5F),
+                out("fusion_core", 1, 0.5F),
+                out("fusion_core", 1, 0.5F),
+                out("gem_alexandrite", 1, 0.25F),
+                out("flame_pony", 1, 0.01F));
+
+        recycle(2, cmp("pile_rod_uranium"), out("billet_uranium", 3), out("plate_iron", 2));
+        recycle(2, cmp("pile_rod_source"), out("billet_ra226be", 3), out("plate_iron", 2));
+        recycle(2, cmp("pile_rod_boron"), out("ingot_boron", 2), vanilla(Items.STICK, 2, 1F));
+        recycle(2, cmp("pile_rod_detector"), out("ingot_boron", 2), out("motor"), out("circuit_vacuum_tube"));
+        recycle(2, cmp("pile_rod_lithium"), out("lithium"), out("cell"));
+        recycle(2, cmp("pile_rod_plutonium"), out("billet_pu_mix", 2), out("billet_uranium"), out("plate_iron", 2));
+        recycle(2, cmp("pile_rod_pu239"), out("billet_pu239"), out("billet_pu_mix"), out("billet_uranium"), out("plate_iron", 2));
+
+        recycle(4, cmp("rbmk_moderator"), out("rbmk_blank"), out("block_graphite", 4));
+        recycle(4, cmp("rbmk_absorber"), out("rbmk_blank"), out("ingot_boron", 8));
+        recycle(4, cmp("rbmk_reflector"), out("rbmk_blank"), out("neutron_reflector", 8));
+        recycle(4, cmp("rbmk_control"), out("rbmk_absorber"), out("ingot_graphite", 2), out("motor", 2));
+        recycle(4, cmp("rbmk_control_mod"), out("rbmk_control"), out("block_graphite", 4), out("nugget_bismuth", 4));
+        recycle(4, cmp("rbmk_control_auto"), out("rbmk_control"), out("circuit_advanced"), out("crt_display"));
+        recycle(4, cmp("rbmk_rod_reasim"), out("rbmk_blank"), out("ingot_zirconium", 4), out("steel_shell", 2));
+        recycle(4, cmp("rbmk_rod_reasim_mod"), out("rbmk_rod_reasim"), out("block_graphite", 4), out("ingot_tcalloy", 4));
+        recycle(4, cmp("rbmk_outgasser"), out("rbmk_blank"), out("steel_grate", 6), out("tank_steel"), vanilla(Items.HOPPER, 1, 1F));
+        recycle(4, cmp("rbmk_storage"), out("rbmk_blank"), out("crate_steel", 2));
+        recycle(4, cmp("rbmk_rod"), out("rbmk_blank"), out("steel_shell", 2));
+        recycle(4, cmp("rbmk_rod_mod"), out("rbmk_rod"), out("block_graphite", 4), out("nugget_bismuth", 4));
+        recycle(4, cmp("rbmk_boiler"), out("rbmk_blank"), out("copper_pipe", 6), out("copper_shell", 2));
+        recycle(4, cmp("rbmk_cooler"), out("rbmk_blank"), out("steel_grate", 4), out("plate_polymer", 4));
+        recycle(4, cmp("reactor_research"),
+                out("ingot_steel", 8),
+                out("ingot_tcalloy", 4),
+                out("motor_desh", 2),
+                out("ingot_boron", 5),
+                out("plate_lead", 8),
+                out("crt_display", 3),
+                out("circuit_basic"),
+                out("circuit_basic", 1, 0.5F));
+
+        recycle(3, cmp("machine_turbine"), out("turbine_titanium"), out("coil_copper", 2), out("ingot_steel", 4));
+        recycle(3, cmp("yellow_barrel"), out("tank_steel"), out("plate_lead", 2), out("nuclear_waste", 10));
+        recycle(3, cmp("vitrified_barrel"), out("tank_steel"), out("plate_lead", 2), out("nuclear_waste_vitrified", 10));
+        recycle(1, cmp("egg_glyphid"),
+                out("glyphid_meat", 2),
+                out("glyphid_meat", 1, 0.5F),
+                vanilla(Items.BONE, 1, 0.75F),
+                vanilla(Items.EXPERIENCE_BOTTLE, 1, 0.5F));
+        recycle(1, cmp("fusion_heater"),
+                out("steel_pipe", 4),
+                out("copper_pipe", 2),
+                out("circuit_analog", 1, 0.5F));
+        recycle(1, cmp("fusion_hatch"),
+                out("steel_pipe", 4),
+                out("copper_pipe", 4),
+                out("circuit_analog", 1, 0.75F));
     }
 
     private static void plate(String ingotTag, String out) {
@@ -302,6 +619,30 @@ public final class AnvilRecipes {
             if (empty(stack)) return;
         }
         CONSTRUCTION.add(new AnvilConstructionRecipe(in, new AnvilOutput(out)).setTier(tier));
+    }
+
+    private static void recycle(int tier, AStack in, AnvilOutput... outs) {
+        if (empty(in)) return;
+        for (AnvilOutput o : outs) {
+            if (o == null || empty(o.stack)) return;
+        }
+        CONSTRUCTION.add(new AnvilConstructionRecipe(in, outs).setTier(tier));
+    }
+
+    private static AnvilOutput out(String id) {
+        return new AnvilOutput(stack(id));
+    }
+
+    private static AnvilOutput out(String id, int n) {
+        return new AnvilOutput(stack(id, n));
+    }
+
+    private static AnvilOutput out(String id, int n, float chance) {
+        return new AnvilOutput(stack(id, n), chance);
+    }
+
+    private static AnvilOutput vanilla(Item item, int n, float chance) {
+        return new AnvilOutput(new ItemStack(item, n), chance);
     }
 
     private static boolean empty(ItemStack stack) {
@@ -362,6 +703,12 @@ public final class AnvilRecipes {
             Collections.addAll(this.input, input);
             this.output.add(output);
             this.overlay = OverlayType.CONSTRUCTION;
+        }
+
+        public AnvilConstructionRecipe(AStack input, AnvilOutput[] output) {
+            this.input.add(input);
+            Collections.addAll(this.output, output);
+            this.overlay = OverlayType.RECYCLING;
         }
 
         public AnvilConstructionRecipe setTier(int tier) {

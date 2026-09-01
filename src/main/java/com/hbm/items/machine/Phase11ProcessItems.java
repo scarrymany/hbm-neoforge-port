@@ -21,7 +21,9 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * cordite/ball_tnt, {@code :2314+} {@code particle_*}, {@code :943} {@code bio_wafer},
  * {@code :1842} {@code upgrade_template}, {@code :2461}/{@code :2492-2535} missile parts,
  * {@code :1151-1154} scrap family, {@code :1310} {@code pipes_steel},
- * {@code :1994-2000} debris_* (ShredderRecipes.java:208/:347/:405-410).
+ * {@code :1994-2000} debris_* (ShredderRecipes.java:208/:347/:405-410),
+ * {@code sawblade}/{@code wings_limp}/{@code mold_base}/{@code wings_murk}/
+ * {@code deuterium_filter}/{@code egg_glyphid}/{@code flame_pony} (Anvil leftover I/O).
  */
 public final class Phase11ProcessItems {
 
@@ -180,6 +182,14 @@ public final class Phase11ProcessItems {
         parts("fluorite");
         // CE ModItems.java:1296 — cladding crafts
         parts("ducttape");
+        // CE AnvilRecipes leftover I/O — assets already in tree (tex/model/lang).
+        parts("sawblade");
+        parts("wings_limp");
+        parts("mold_base");
+        parts1("wings_murk");
+        parts("deuterium_filter");
+        consume("egg_glyphid");
+        parts("flame_pony");
         // CE ModItems.java:1173 — syringe_metal_empty input
         control("rod_empty");
         // CE dysfunctional_reactor — ass.protoreactor / ninadidnothingwrong
