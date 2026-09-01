@@ -2,6 +2,7 @@ package com.hbm.world.feature;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,6 +17,15 @@ public final class CeStructureSpawn {
     }
 
     public static boolean locationIsValidSpawn(WorldGenLevel level, BlockPos airPos, boolean sandstone) {
+        if (isValidColumn(level, airPos, sandstone)) return true;
+        // Spaceship 13×24 / satellite 25×31 corners leave the WorldGenRegion.
+        // CE IWorldGenerator saw populated neighbors; Feature decoration does not.
+        var server = level.getLevel();
+        if (!server.hasChunk(airPos.getX() >> 4, airPos.getZ() >> 4)) return false;
+        return isValidColumn(server, airPos, sandstone);
+    }
+
+    private static boolean isValidColumn(BlockGetter level, BlockPos airPos, boolean sandstone) {
         if (!level.getBlockState(airPos).isAir()) return false;
         BlockState ground = level.getBlockState(airPos.below());
         if (isValidSpawnBlock(ground, sandstone)) return true;
