@@ -2,11 +2,14 @@ package com.hbm.inventory.recipes;
 
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
+import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.BilletPowderItems;
+import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.items.machine.Phase11ProcessItems;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -62,8 +65,8 @@ import java.util.Map;
  * {@code POWDER_DIAMOND} substitution (see that class's {@code POWDER_DIAMOND} entry), a discrepancy
  * from the research report's suggested {@code Items.DIAMOND} substitution.
  * <p>
- * <b>Still blocked</b>: {@code COLLOID} ({@code ModItems.dust}), {@code FULLERENE}/{@code LYE}
- * ({@code powder_ash}), {@code BITUMEN} ({@code oil_tar}/{@code EnumTarType}).
+ * Landed leftover: {@code COLLOID}/{@code FULLERENE}/{@code LYE}/{@code BITUMEN}
+ * ({@code dust}, {@code powder_ash_*}, {@code hbm:any_tar}).
  * Landed this pass: {@code IONGEL}/{@code SCHRABIDIC} ({@code pellet_charged}),
  * {@code PETROIL_LEADED}/{@code GASOLINE_LEADED}/{@code COALGAS_LEADED} ({@code fuel_additive_antiknock}). <b>Correction to the research report</b>: CE's
  * {@code ALUMINA} key has a real 2-recipe pair, but only the first ({@code F.dust()} -&gt;
@@ -272,6 +275,19 @@ public final class MixerRecipes {
         register(Fluids.COALGAS_LEADED, new MixerRecipe(12_000, 40)
                 .setStack1(new FluidStack(Fluids.COALGAS, 10_000))
                 .setSolid(new ComparableStack(hbmItem("fuel_additive_antiknock"))));
+
+        // CE MixerRecipes.java:45 / :52 / :96 / :102
+        register(Fluids.COLLOID, new MixerRecipe(500, 20)
+                .setStack1(new FluidStack(Fluids.WATER, 500))
+                .setSolid(new ComparableStack(Phase11ProcessItems.DUST.get())));
+        register(Fluids.FULLERENE, new MixerRecipe(250, 50)
+                .setStack1(new FluidStack(Fluids.RADIOSOLVENT, 500))
+                .setSolid(new ComparableStack(BilletPowderItems.powderAsh(EnumAshType.SOOT).get())));
+        register(Fluids.LYE, new MixerRecipe(100, 100)
+                .setStack1(new FluidStack(Fluids.WATER, 100))
+                .setSolid(new ComparableStack(BilletPowderItems.powderAsh(EnumAshType.WOOD).get())));
+        register(Fluids.BITUMEN, new MixerRecipe(50, 20)
+                .setSolid(OreDictStack.ofHbmTag("any_tar", 1)));
     }
 
     /**

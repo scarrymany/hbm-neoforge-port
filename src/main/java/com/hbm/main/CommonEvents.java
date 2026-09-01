@@ -86,6 +86,7 @@ import com.hbm.inventory.recipes.chem.CentrifugeRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
 import com.hbm.inventory.recipes.chem.CyclotronRecipes;
 import com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes;
+import com.hbm.inventory.recipes.ElectrolyserMetalRecipes;
 import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes;
 import com.hbm.inventory.recipes.chem.SILEXRecipes;
 import com.hbm.itempool.ItemPoolsSatellite;
@@ -152,6 +153,7 @@ public class CommonEvents {
             CyclotronRecipes.register();
             ChemPlantRecipes.register();
             ElectrolyserFluidRecipes.register();
+            ElectrolyserMetalRecipes.register();
             PUREXRecipes.register();
             LiquefactionRecipes.register();
             SolidificationRecipes.register();

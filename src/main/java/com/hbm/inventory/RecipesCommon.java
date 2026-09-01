@@ -1,5 +1,9 @@
 package com.hbm.inventory;
 
+import com.hbm.inventory.fluid.FluidType;
+import com.hbm.inventory.fluid.Fluids;
+import com.hbm.items.machine.ItemFluidIcon;
+import com.hbm.items.machine.ItemRBMKPellet;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -25,17 +29,11 @@ import java.util.List;
  * {@code com.hbm.inventory.recipes.loader.GenericRecipe(s)} (see that package for the pool system
  * this class does not itself provide).
  * <p>
- * Two 1.12 -> 1.21.1 concepts this class deliberately does NOT carry over, per
- * {@code docs/phase2/items_tool_machine_coupling_and_recipe_system.md}'s Part B design and
- * {@code ItemStackUtil}'s own header comment flagging this exact gap:
+ * Flattened CE item-damage variants are distinct {@link Item} instances here ({@code meta = 0}).
+ * {@link ComparableStack#meta} is restored as CE's comparison type for the two 1.21 component
+ * dimensions CE still keys as damage: {@link ItemRBMKPellet} stage 0–9 and
+ * {@link ItemFluidIcon} fluid id. {@link #WILDCARD} is CE {@code OreDictionary.WILDCARD_VALUE}.
  * <ul>
- *     <li><b>Item metadata (damage-value subtypes)</b> is gone in modern Minecraft — distinct
- *     "meta variants" of a CE item are now distinct registered {@link Item} instances. CE's
- *     {@code ComparableStack.meta}/{@code OreDictionary.WILDCARD_VALUE} fields and every
- *     meta-taking constructor are dropped; {@link ComparableStack} compares only
- *     {@link Item} identity + count. Existing consumers ({@code IToolable}, {@code HazardSystem})
- *     only ever call the plain {@code ComparableStack(ItemStack)} constructor, so this is not a
- *     regression against anything already committed.</li>
  *     <li><b>{@code OreDictionary}</b> (string ore names like {@code "ingotIron"}) is gone,
  *     replaced by the tag system. {@link OreDictStack} is keyed on a {@link TagKey}&lt;{@link Item}&gt;
  *     instead of a {@code String} — the same substitution
@@ -125,31 +123,49 @@ public final class RecipesCommon {
     }
 
     /**
-     * This is mutable! Exact-{@link Item} + count match. See the class header for why this no
-     * longer carries a {@code meta} field.
+     * This is mutable! Exact-{@link Item} + count + {@link #meta} match (CE comparison type).
+     * {@code meta} is pellet stage / fluid-icon id, not flattened 1.12 damage.
      */
     public static class ComparableStack extends AStack {
 
+        /** CE {@code OreDictionary.WILDCARD_VALUE} — ignore meta in equals/matchesRecipe. */
+        public static final int WILDCARD = 32767;
+
         public Item item;
+        public int meta;
 
         public ComparableStack(ItemStack stack) {
             if (stack == null || stack.isEmpty()) {
                 this.item = null;
                 this.stacksize = 0;
+                this.meta = 0;
                 return;
             }
             this.item = stack.getItem();
             this.stacksize = stack.getCount();
+            this.meta = metaOf(stack);
         }
 
         public ComparableStack(Item item) {
             this.item = item;
             this.stacksize = 1;
+            this.meta = 0;
         }
 
         public ComparableStack(Item item, int stacksize) {
             this.item = item;
             this.stacksize = stacksize;
+            this.meta = 0;
+        }
+
+        public ComparableStack(Item item, int stacksize, int meta) {
+            this.item = item;
+            this.stacksize = stacksize;
+            this.meta = meta;
+        }
+
+        public ComparableStack(Item item, int stacksize, Enum<?> theEnum) {
+            this(item, stacksize, theEnum.ordinal());
         }
 
         public ComparableStack(Block block) {
@@ -160,13 +176,35 @@ public final class RecipesCommon {
             this(block == null ? null : block.asItem(), stacksize);
         }
 
+        public ComparableStack(Block block, int stacksize, int meta) {
+            this(block == null ? null : block.asItem(), stacksize, meta);
+        }
+
+        public static int metaOf(ItemStack stack) {
+            if (stack == null || stack.isEmpty()) return 0;
+            if (stack.getItem() instanceof ItemRBMKPellet) return ItemRBMKPellet.getStage(stack);
+            if (stack.getItem() instanceof ItemFluidIcon) {
+                FluidType type = ItemFluidIcon.getFluidType(stack);
+                return type == null ? 0 : type.getID();
+            }
+            return 0;
+        }
+
         public ComparableStack makeSingular() {
             stacksize = 1;
             return this;
         }
 
         public ItemStack toStack() {
-            return item == null ? ItemStack.EMPTY : new ItemStack(item, Math.max(stacksize, 1));
+            if (item == null) return ItemStack.EMPTY;
+            ItemStack stack = new ItemStack(item, Math.max(stacksize, 1));
+            if (item instanceof ItemRBMKPellet) {
+                ItemRBMKPellet.setStage(stack, meta);
+            } else if (item instanceof ItemFluidIcon) {
+                FluidType type = Fluids.fromID(meta);
+                if (type != null) return ItemFluidIcon.make(item, type, 0);
+            }
+            return stack;
         }
 
         @Override
@@ -195,6 +233,7 @@ public final class RecipesCommon {
                     result = prime * result + name.hashCode();
                 }
             }
+            result = prime * result + meta;
             result = prime * result + stacksize;
             return result;
         }
@@ -207,6 +246,7 @@ public final class RecipesCommon {
             if (item == null) {
                 if (other.item != null) return false;
             } else if (!item.equals(other.item)) return false;
+            if (meta != WILDCARD && other.meta != WILDCARD && meta != other.meta) return false;
             return stacksize == other.stacksize;
         }
 
@@ -216,6 +256,7 @@ public final class RecipesCommon {
                 int thisId = Item.getId(item);
                 int thatId = Item.getId(comp.item);
                 if (thisId != thatId) return Integer.compare(thisId, thatId);
+                if (meta != comp.meta) return Integer.compare(meta, comp.meta);
                 return Integer.compare(stacksize, comp.stacksize);
             }
             // if compared with an OreDictStack, the ComparableStack takes priority (matches CE)
@@ -227,22 +268,23 @@ public final class RecipesCommon {
         public boolean matchesRecipe(ItemStack stack, boolean ignoreSize) {
             if (stack == null || stack.isEmpty()) return false;
             if (stack.getItem() != this.item) return false;
+            if (this.meta != WILDCARD && metaOf(stack) != this.meta) return false;
             return ignoreSize || stack.getCount() >= this.stacksize;
         }
 
         @Override
         public AStack copy() {
-            return new ComparableStack(item, stacksize);
+            return new ComparableStack(item, stacksize, meta);
         }
 
         @Override
         public AStack copy(int stacksize) {
-            return new ComparableStack(item, stacksize);
+            return new ComparableStack(item, stacksize, meta);
         }
 
         @Override
         public String toString() {
-            return "ComparableStack: { " + stacksize + " x " + (item == null ? "null" : BuiltInRegistries.ITEM.getKey(item)) + " }";
+            return "ComparableStack: { " + stacksize + " x " + (item == null ? "null" : BuiltInRegistries.ITEM.getKey(item)) + "@" + meta + " }";
         }
 
         @Override

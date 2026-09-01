@@ -371,6 +371,93 @@ def recipe_outputs(recipes: list[tuple[Path, dict]]) -> set[str]:
     return outs
 
 
+WASTE_KIND = {
+    "nuclearWasteLong": "nuclear_waste_long",
+    "nuclearWasteLongTiny": "nuclear_waste_long_tiny",
+    "nuclearWasteLongDepleted": "nuclear_waste_long_depleted",
+    "nuclearWasteLongDepletedTiny": "nuclear_waste_long_depleted_tiny",
+    "nuclearWasteShort": "nuclear_waste_short",
+    "nuclearWasteShortTiny": "nuclear_waste_short_tiny",
+    "nuclearWasteShortDepleted": "nuclear_waste_short_depleted",
+    "nuclearWasteShortDepletedTiny": "nuclear_waste_short_depleted_tiny",
+}
+
+# Mats.getRegistryName() = names[0].lower — only materials used as ElectrolyserMetal outputs.
+MAT_SCRAP = {
+    "IRON": "iron",
+    "GOLD": "gold",
+    "URANIUM": "uranium",
+    "THORIUM": "thorium232",
+    "PLUTONIUM": "plutonium",
+    "TITANIUM": "titanium",
+    "COPPER": "copper",
+    "TUNGSTEN": "tungsten",
+    "ALUMINIUM": "aluminum",
+    "BERYLLIUM": "beryllium",
+    "LEAD": "lead",
+    "SCHRABIDIUM": "schrabidium",
+    "ZIRCONIUM": "zirconium",
+    "BORON": "boron",
+    "LITHIUM": "lithium",
+    "DURA": "durasteel",
+    "COBALT": "cobalt",
+    "RADIUM": "radium226",
+    "POLONIUM": "polonium210",
+}
+
+
+def machine_table_outputs() -> set[str]:
+    """Item ids produced by Java machine tables (not JSON). Outputs only — no input keys."""
+    outs: set[str] = set()
+    recipes_root = PORT_JAVA / "inventory" / "recipes"
+    if not recipes_root.exists():
+        return outs
+    item_ctor = re.compile(
+        r'new ItemStack\(\s*(?:'
+        r'(?:IngotNuggetItems|BilletPowderItems|PlateCrystalWasteItems|Phase11ProcessItems)\.([A-Z][A-Z0-9_]+)'
+        r'|(?:item|hbmItem|stack)\("([a-z0-9_]+)"'
+        r'|SpecialItems\.(nuclearWaste\w+)\(ItemWaste\w+\.WasteClass\.([A-Z0-9_]+)\)'
+        r'|drive\(EnumDriveType\.([A-Z0-9_]+)\)'
+        r'|BilletPowderItems\.powderAsh\(EnumAshType\.([A-Z]+)\)'
+        r')'
+    )
+    stack_helper = re.compile(r'\bstack\("([a-z0-9_]+)"')
+    add_out_item = re.compile(
+        r'\.addOut\(\s*(?:i\s*<\s*\d+\s*\?\s*)?new ItemStack\(\s*'
+        r'(?:IngotNuggetItems|BilletPowderItems|PlateCrystalWasteItems|Phase11ProcessItems)\.([A-Z][A-Z0-9_]+)'
+    )
+    for p in java_files(recipes_root):
+        text = read(p)
+        for m in item_ctor.finditer(text):
+            field, lit, waste_kind, waste_cls, drive, ash = m.groups()
+            if field:
+                outs.add("hbm:" + field.lower())
+            if lit:
+                outs.add("hbm:" + lit)
+            if waste_kind and waste_cls:
+                prefix = WASTE_KIND.get(waste_kind, waste_kind)
+                outs.add(f"hbm:{prefix}_{waste_cls.lower()}")
+            if drive:
+                outs.add("hbm:drive_" + drive.lower())
+            if ash:
+                outs.add("hbm:powder_ash_" + ash.lower())
+        for sid in stack_helper.findall(text):
+            outs.add("hbm:" + sid)
+        for field in add_out_item.findall(text):
+            outs.add("hbm:" + field.lower())
+        if p.stem == "ElectrolyserMetalRecipes":
+            for mat in re.findall(r'Mats\.MAT_([A-Z0-9]+)', text):
+                name = MAT_SCRAP.get(mat)
+                if name:
+                    outs.add("hbm:scraps_" + name)
+        if p.stem == "SuperComputerRecipes":
+            for dt in re.findall(r'drive\(EnumDriveType\.([A-Z0-9_]+)\)', text):
+                outs.add("hbm:drive_" + dt.lower())
+            for folder in re.findall(r'item\("(blueprint_folder_[a-z_]+)"\)', text):
+                outs.add("hbm:" + folder)
+    return outs
+
+
 def loot_outputs() -> set[str]:
     outs: set[str] = set()
     for base in (PORT_RES, PORT_GEN):
@@ -473,7 +560,7 @@ def main() -> None:
     port_items_n = len(port_items)
     port_blocks_n = len(port_blocks)
 
-    outs = recipe_outputs(recipes) | loot_outputs()
+    outs = recipe_outputs(recipes) | loot_outputs() | machine_table_outputs()
     reachable = {i for i in port_items if f"hbm:{i}" in outs or i in {o.split(":")[-1] for o in outs}}
     reach_pct = pct(len(reachable), max(1, port_items_n))
 
@@ -515,6 +602,7 @@ def main() -> None:
         "reachability": {
             "port_items": port_items_n,
             "reachable_via_recipe_or_loot": len(reachable),
+            "includes_machine_tables": True,
             "pct": round(reach_pct, 1),
         },
     }

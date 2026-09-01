@@ -1,8 +1,8 @@
 {
-  "weighted_pct": 102.8,
-  "unweighted_pct": 102.4,
+  "weighted_pct": 103.7,
+  "unweighted_pct": 102.8,
   "ce_sum": 7767,
-  "port_sum": 7983,
+  "port_sum": 8053,
   "rows": [
     {
       "cat": "items",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1707,
-      "pct": 85.0
+      "port": 1777,
+      "pct": 88.5
     },
     {
       "cat": "advancements",
@@ -184,6 +184,7 @@
         "CrackingRecipes": 12,
         "CrucibleRecipes": 14,
         "CrystallizerRecipes": 1,
+        "ElectrolyserMetalRecipes": 17,
         "EngineRecipes": 23,
         "ExposureChamberRecipes": 4,
         "FractionRecipes": 19,
@@ -216,9 +217,9 @@
         "ChemPlantRecipes": 72,
         "CyclotronRecipes": 1,
         "ElectrolyserFluidRecipes": 7,
-        "SILEXRecipes": 42
+        "SILEXRecipes": 95
       },
-      "port": 1707,
+      "port": 1777,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,
@@ -237,8 +238,9 @@
     },
     "reachability": {
       "port_items": 2574,
-      "reachable_via_recipe_or_loot": 1348,
-      "pct": 52.4
+      "reachable_via_recipe_or_loot": 1529,
+      "includes_machine_tables": true,
+      "pct": 59.4
     }
   },
   "recipe_json_total": 2656

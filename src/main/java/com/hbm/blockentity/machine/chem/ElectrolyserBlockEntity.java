@@ -44,8 +44,9 @@ import java.util.Map;
  * into the world via {@code com.hbm.util.CrucibleUtil.pourFullStack}, a foundry/casting system not
  * ported anywhere in this port yet (the research doc's own words: "flag as a real Phase 2/4 boundary
  * dependency: the electrolyser's ore side cannot function without a foundry/casting target existing
- * downstream"). {@link com.hbm.inventory.recipes.chem.ElectrolyserFluidRecipes} therefore has no
- * {@code ElectrolyserMetalRecipes} sibling in this pass either.
+ * downstream"). Crystal table is {@link com.hbm.inventory.recipes.ElectrolyserMetalRecipes}.
+ * TODO(CE: com.hbm.tileentity.machine.TileEntityElectrolyser.java metal half):
+ * ore slots + {@code CrucibleUtil.pourFullStack} — foundry pour not ported. Do not invent.
  * <p>
  * {@link #tankIn} is fixed to CE's own constructor default, {@link Fluids#WATER} (CE's
  * {@code IItemFluidIdentifier}-based tank retyping is not ported, same reasoning as

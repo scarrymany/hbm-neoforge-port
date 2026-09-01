@@ -1,8 +1,10 @@
 package com.hbm.inventory.recipes.chem;
 
 import com.hbm.inventory.RecipesCommon.ComparableStack;
+import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.BilletPowderItems;
+import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.PlateCrystalWasteItems;
 import com.hbm.items.machine.ItemFELCrystal.EnumWavelengths;
 import com.hbm.items.machine.Phase11ProcessItems;
@@ -47,33 +49,9 @@ import java.util.Map;
  * {@link Items#DIAMOND} instead (no substitution comment, unlike every other deliberate one in this
  * file - flagged by {@code mrec_03_silex_misc.md} open question #2 as a bug, corrected here).
  * <p>
- * <b>Still not ported, and why</b> (see the research report's "Item/registry dependency check" for
- * the full citation trail):
- * <ul>
- *   <li>The entire 255-entry RBMK-pellet reprocessing loop (CE lines 117-472) - every one of its
- *   entries outputs {@code nuclear_waste_long_tiny}/{@code nuclear_waste_short_tiny}, neither of
- *   which is registered in this port ({@link SpecialItems} only carries the base
- *   {@code nuclear_waste_long}/{@code nuclear_waste_short} families, see that class's own
- *   "task-scoped families" comment). The loop's keys would also need this class's
- *   {@link #RECIPES} map widened from {@code ComparableStack} to {@code AStack} (to hold an
- *   {@code NbtComparableStack} keyed on the pellet's burnup-stage data component) - not attempted
- *   here since nothing below needs it.</li>
- *   <li>12 of the 24 post-loop waste-reprocessing entries key on
- *   {@code nuclear_waste_long_depleted}/{@code nuclear_waste_short_depleted}, also not registered.</li>
- *   <li>Depleted waste + {@code fallout} + {@code dust_tiny} are registered this wave.</li>
- *   <li>{@code fluid_icon}(DEATH/VITRIOL/REDMUD) - every ingredient/output item these 3 entries need
- *   <i>is</i> already registered, but reaching them at runtime needs a real fluid-tank-direct
- *   reprocessing path {@link com.hbm.blockentity.machine.chem.SilexBlockEntity} does not have yet
- *   (its own javadoc documents this gap), plus a key-collision-safe {@code NbtComparableStack}
- *   design (three different fluids all synthesize the same base {@code fluid_icon} {@link Item}, so
- *   a plain {@link ComparableStack} key cannot tell them apart, and a naive exact-data-component
- *   {@code NbtComparableStack} key would also need to ignore the tank's current fill amount, which
- *   is not an established pattern anywhere in this codebase yet) - genuine machine-logic design work,
- *   not a pure data addition, so deliberately left as a follow-up rather than guessed here.</li>
- *   <li>The DRX pellet's 6-output "mystery box" joke recipe needs {@code ModItems.undefined}
- *   (CE's {@code ItemCustomLore} troll placeholder), not registered - low priority, part of the
- *   blocked RBMK loop anyway.</li>
- * </ul>
+ * RBMK pellet keys use restored {@link ComparableStack#meta} = {@code ItemRBMKPellet} stage 0–9
+ * (CE {@code SILEXRecipes.java:117-472}). {@code fluid_icon} keys use meta = fluid id
+ * ({@code :96-115}, {@code :664}). DRX still skipped — {@code ModItems.undefined} is not registered.
  */
 public final class SILEXRecipes {
 
@@ -96,6 +74,14 @@ public final class SILEXRecipes {
      */
     private static Block hbmBlock(String path) {
         return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+    }
+
+    private static Item hbmItem(String path) {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+    }
+
+    private static ComparableStack pellet(String id, int meta) {
+        return new ComparableStack(hbmItem(id), 1, meta);
     }
 
     public static synchronized void register() {
@@ -149,6 +135,26 @@ public final class SILEXRecipes {
                         .addOut(new ItemStack(BilletPowderItems.POWDER_BORON.get()), 5)
                         .addOut(new ItemStack(BilletPowderItems.POWDER_LITHIUM.get()), 10)
                         .addOut(new ItemStack(PlateCrystalWasteItems.CRYSTAL_FLUORITE.get()), 5));
+
+        // CE SILEXRecipes.java:96-115 fluid_icon DEATH/VITRIOL/REDMUD — meta = fluid id
+        RECIPES.put(new ComparableStack(hbmItem("fluid_icon"), 1, Fluids.DEATH.getID()),
+                new SILEXRecipe(1000, 1000, 4)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_IMPURE_OSMIRIDIUM.get()), 1));
+        RECIPES.put(new ComparableStack(hbmItem("fluid_icon"), 1, Fluids.VITRIOL.getID()),
+                new SILEXRecipe(1000, 300, EnumWavelengths.IR)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_BROMINE.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_IODINE.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_IRON.get()), 5)
+                        .addOut(new ItemStack(hbmItem("sulfur")), 15));
+        RECIPES.put(new ComparableStack(hbmItem("fluid_icon"), 1, Fluids.REDMUD.getID()),
+                new SILEXRecipe(300, 50, EnumWavelengths.VISIBLE)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_ALUMINIUM.get()), 10)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_NEODYMIUM_TINY.get(), 3), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_BORON_TINY.get(), 3), 5)
+                        .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 5)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_IRON.get()), 20)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_TITANIUM.get()), 15)
+                        .addOut(new ItemStack(BilletPowderItems.POWDER_SODIUM.get()), 10));
 
         // ==================== mrec-03-silex-misc additions ====================
         // The rest of CE's 13 pre-loop static entries (CE lines 62-87) whose ingredient AND output
@@ -370,13 +376,12 @@ public final class SILEXRecipes {
                         .addOut(new ItemStack(BilletPowderItems.POWDER_CS137_TINY.get()), 3)
                         .addOut(new ItemStack(IngotNuggetItems.NUGGET_AU198.get()), 1));
 
-        // TODO(CE: com.hbm.inventory.recipes.SILEXRecipes.java:117-472): RBMK pellet loop keys
-        // pellet meta 0-4 / 5-9 (xenon). Port ComparableStack dropped meta; MachineDataComponents.RBMK_PELLET_STAGE
-        // exists but shipping one recipe for all stages is unfaithful. Do not invent. Blocked by NbtComparableStack.
-        // TODO(CE: com.hbm.inventory.recipes.SILEXRecipes.java:96-115): fluid_icon DEATH/VITRIOL/REDMUD —
-        // same fluid_icon item, need NbtComparableStack ignoring fill + SILEX tank-direct path. Do not invent.
-        // TODO(CE: com.hbm.inventory.recipes.SILEXRecipes.java:664): fluid_icon FULLERENE → powder_ash FULLERENE.
-        // powder_ash_fullerene is registered; blocked by the same fluid_icon key. Do not invent.
+        // CE SILEXRecipes.java:664
+        RECIPES.put(new ComparableStack(hbmItem("fluid_icon"), 1, Fluids.FULLERENE.getID()),
+                new SILEXRecipe(1_000, 1_000, EnumWavelengths.VISIBLE)
+                        .addOut(new ItemStack(BilletPowderItems.powderAsh(EnumAshType.FULLERENE).get()), 1));
+
+        registerPelletLoop();
 
         for (ItemWasteLong.WasteClass c : ItemWasteLong.WasteClass.VALUES) {
             TINY_WASTE.put(SpecialItems.nuclearWasteLongTiny(c).get(), SpecialItems.nuclearWasteLong(c).get());
@@ -385,6 +390,318 @@ public final class SILEXRecipes {
         for (ItemWasteShort.WasteClass c : ItemWasteShort.WasteClass.VALUES) {
             TINY_WASTE.put(SpecialItems.nuclearWasteShortTiny(c).get(), SpecialItems.nuclearWasteShort(c).get());
             TINY_WASTE.put(SpecialItems.nuclearWasteShortDepletedTiny(c).get(), SpecialItems.nuclearWasteShortDepleted(c).get());
+        }
+    }
+
+    /**
+     * CE {@code SILEXRecipes.java:117-472}. Keys are {@code ComparableStack(pellet, 1, stage)}.
+     * DRX skipped — {@code ModItems.undefined} is not registered.
+     */
+    private static void registerPelletLoop() {
+        Item xe = BilletPowderItems.POWDER_XE135_TINY.get();
+        Item coalTiny = BilletPowderItems.POWDER_COAL_TINY.get();
+        Item wasteTiny = Phase11ProcessItems.NUCLEAR_WASTE_TINY.get();
+        Item u235l = SpecialItems.nuclearWasteLongTiny(ItemWasteLong.WasteClass.URANIUM235).get();
+        Item u235s = SpecialItems.nuclearWasteShortTiny(ItemWasteShort.WasteClass.URANIUM235).get();
+        Item u233l = SpecialItems.nuclearWasteLongTiny(ItemWasteLong.WasteClass.URANIUM233).get();
+        Item u233s = SpecialItems.nuclearWasteShortTiny(ItemWasteShort.WasteClass.URANIUM233).get();
+        Item thL = SpecialItems.nuclearWasteLongTiny(ItemWasteLong.WasteClass.THORIUM).get();
+        Item npL = SpecialItems.nuclearWasteLongTiny(ItemWasteLong.WasteClass.NEPTUNIUM).get();
+        Item npS = SpecialItems.nuclearWasteShortTiny(ItemWasteShort.WasteClass.NEPTUNIUM).get();
+        Item pu239s = SpecialItems.nuclearWasteShortTiny(ItemWasteShort.WasteClass.PLUTONIUM239).get();
+        Item pu240s = SpecialItems.nuclearWasteShortTiny(ItemWasteShort.WasteClass.PLUTONIUM240).get();
+        Item pu241s = SpecialItems.nuclearWasteShortTiny(ItemWasteShort.WasteClass.PLUTONIUM241).get();
+        Item schL = SpecialItems.nuclearWasteLongTiny(ItemWasteLong.WasteClass.SCHRABIDIUM).get();
+        Item schS = SpecialItems.nuclearWasteShortTiny(ItemWasteShort.WasteClass.SCHRABIDIUM).get();
+
+        for (int i = 0; i < 5; i++) {
+            RECIPES.put(pellet("rbmk_pellet_ueu", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM.get()), 86 - i * 11)
+                    .addOut(i < 2 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 10 + i * 3)
+                    .addOut(new ItemStack(u235l), 2 + 3 * i)
+                    .addOut(new ItemStack(u235s), 2 + 5 * i));
+            RECIPES.put(pellet("rbmk_pellet_ueu", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM.get()), 86 - i * 11)
+                    .addOut(i < 2 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 10 + i * 3)
+                    .addOut(new ItemStack(u235l), 2 + 3 * i)
+                    .addOut(new ItemStack(u235s), 1 + 5 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_meu", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM_FUEL.get()), 84 - i * 16)
+                    .addOut(i < 1 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 4)
+                    .addOut(new ItemStack(u235l), 4 + 5 * i)
+                    .addOut(new ItemStack(u235s), 6 + 7 * i));
+            RECIPES.put(pellet("rbmk_pellet_meu", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM_FUEL.get()), 83 - i * 16)
+                    .addOut(i < 1 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 4)
+                    .addOut(new ItemStack(u235l), 4 + 5 * i)
+                    .addOut(new ItemStack(u235s), 6 + 7 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_heu233", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U233.get()), 90 - i * 20)
+                    .addOut(new ItemStack(u233l), 4 + 8 * i)
+                    .addOut(new ItemStack(u233s), 6 + 12 * i));
+            RECIPES.put(pellet("rbmk_pellet_heu233", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U233.get()), 89 - i * 20)
+                    .addOut(new ItemStack(u233l), 4 + 8 * i)
+                    .addOut(new ItemStack(u233s), 6 + 12 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_heu235", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U235.get()), 90 - i * 20)
+                    .addOut(new ItemStack(u235l), 4 + 8 * i)
+                    .addOut(new ItemStack(u235s), 6 + 12 * i));
+            RECIPES.put(pellet("rbmk_pellet_heu235", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U235.get()), 89 - i * 20)
+                    .addOut(new ItemStack(u235l), 4 + 8 * i)
+                    .addOut(new ItemStack(u235s), 6 + 12 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_uzh", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 75)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM_FUEL.get()), 20 - i * 4)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 3 + i * 3)
+                    .addOut(new ItemStack(u235l), 1 + i)
+                    .addOut(new ItemStack(u235s), 1 + i));
+            RECIPES.put(pellet("rbmk_pellet_uzh", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 75)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM_FUEL.get()), 19 - i * 4)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 3 + i * 3)
+                    .addOut(new ItemStack(u235l), 1 + i)
+                    .addOut(new ItemStack(u235s), 1 + i));
+
+            RECIPES.put(pellet("rbmk_pellet_thmeu", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_THORIUM_FUEL.get()), 84 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U233.get()), 6 + i * 4)
+                    .addOut(new ItemStack(thL), 10 + 16 * i));
+            RECIPES.put(pellet("rbmk_pellet_thmeu", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_THORIUM_FUEL.get()), 83 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U233.get()), 6 + i * 4)
+                    .addOut(new ItemStack(thL), 10 + 16 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_lep", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PLUTONIUM_FUEL.get()), 84 - i * 14)
+                    .addOut(i < 1 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 2)
+                    .addOut(new ItemStack(pu239s), 7 + 8 * i)
+                    .addOut(new ItemStack(pu240s), 3 + 4 * i));
+            RECIPES.put(pellet("rbmk_pellet_lep", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PLUTONIUM_FUEL.get()), 83 - i * 14)
+                    .addOut(i < 1 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 2)
+                    .addOut(new ItemStack(pu239s), 7 + 8 * i)
+                    .addOut(new ItemStack(pu240s), 3 + 4 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_mep", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 85 - i * 20)
+                    .addOut(new ItemStack(pu239s), 10 + 10 * i)
+                    .addOut(new ItemStack(pu240s), 5 + 5 * i));
+            RECIPES.put(pellet("rbmk_pellet_mep", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 84 - i * 20)
+                    .addOut(new ItemStack(pu239s), 10 + 10 * i)
+                    .addOut(new ItemStack(pu240s), 5 + 5 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_hep239", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU239.get()), 85 - i * 20)
+                    .addOut(new ItemStack(pu239s), 15 + 20 * i));
+            RECIPES.put(pellet("rbmk_pellet_hep239", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU239.get()), 84 - i * 20)
+                    .addOut(new ItemStack(pu239s), 15 + 20 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_hep241", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 85 - i * 20)
+                    .addOut(new ItemStack(pu241s), 15 + 20 * i));
+            RECIPES.put(pellet("rbmk_pellet_hep241", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 84 - i * 20)
+                    .addOut(new ItemStack(pu241s), 15 + 20 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_men", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM_FUEL.get()), 84 - i * 14)
+                    .addOut(i < 1 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 2)
+                    .addOut(new ItemStack(npL), 4 + 5 * i)
+                    .addOut(new ItemStack(npS), 6 + 7 * i));
+            RECIPES.put(pellet("rbmk_pellet_men", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM_FUEL.get()), 83 - i * 14)
+                    .addOut(i < 1 ? new ItemStack(IngotNuggetItems.NUGGET_PU239.get()) : new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 2)
+                    .addOut(new ItemStack(npL), 4 + 5 * i)
+                    .addOut(new ItemStack(npS), 6 + 7 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_hen", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM.get()), 90 - i * 20)
+                    .addOut(new ItemStack(npL), 4 + 8 * i)
+                    .addOut(new ItemStack(npS), 6 + 12 * i));
+            RECIPES.put(pellet("rbmk_pellet_hen", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_NEPTUNIUM.get()), 89 - i * 20)
+                    .addOut(new ItemStack(npL), 4 + 8 * i)
+                    .addOut(new ItemStack(npS), 6 + 12 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_mox", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_MOX_FUEL.get()), 84 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 4)
+                    .addOut(new ItemStack(u235l), 2 + 3 * i)
+                    .addOut(new ItemStack(u235s), 3 + 5 * i)
+                    .addOut(new ItemStack(pu239s), 5 + 8 * i));
+            RECIPES.put(pellet("rbmk_pellet_mox", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_MOX_FUEL.get()), 83 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU_MIX.get()), 6 + i * 4)
+                    .addOut(new ItemStack(u235l), 2 + 3 * i)
+                    .addOut(new ItemStack(u235s), 3 + 5 * i)
+                    .addOut(new ItemStack(pu239s), 5 + 8 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_leaus", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AUSTRALIUM_LESSER.get()), 90 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 6 + 12 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PB209.get()), 4 + 8 * i));
+            RECIPES.put(pellet("rbmk_pellet_leaus", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AUSTRALIUM_LESSER.get()), 89 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 6 + 12 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PB209.get()), 4 + 8 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_heaus", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AUSTRALIUM_GREATER.get()), 90 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AU198.get()), 5 + 10 * i)
+                    .addOut(new ItemStack(Items.GOLD_NUGGET), 3 + 6 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PB209.get()), 2 + 4 * i));
+            RECIPES.put(pellet("rbmk_pellet_heaus", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AUSTRALIUM_GREATER.get()), 89 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AU198.get()), 5 + 10 * i)
+                    .addOut(new ItemStack(Items.GOLD_NUGGET), 3 + 6 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PB209.get()), 2 + 4 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_les", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LES.get()), 90 - i * 20)
+                    .addOut(new ItemStack(npL), 2 + 3 * i)
+                    .addOut(new ItemStack(npS), 2 + 5 * i)
+                    .addOut(new ItemStack(schL), 1 + 2 * i)
+                    .addOut(new ItemStack(schS), 1 + 2 * i)
+                    .addOut(new ItemStack(coalTiny), 4 + 8 * i));
+            RECIPES.put(pellet("rbmk_pellet_les", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LES.get()), 90 - i * 20)
+                    .addOut(new ItemStack(npL), 2 + 3 * i)
+                    .addOut(new ItemStack(npS), 2 + 5 * i)
+                    .addOut(new ItemStack(schL), 1 + 2 * i)
+                    .addOut(new ItemStack(schS), 1 + 2 * i)
+                    .addOut(new ItemStack(coalTiny), 4 + 8 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_mes", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_SCHRABIDIUM_FUEL.get()), 90 - i * 20)
+                    .addOut(new ItemStack(npL), 1 + 3 * i)
+                    .addOut(new ItemStack(npS), 2 + 4 * i)
+                    .addOut(new ItemStack(schL), 1 + 3 * i)
+                    .addOut(new ItemStack(schS), 2 + 4 * i)
+                    .addOut(new ItemStack(coalTiny), 4 + 6 * i));
+            RECIPES.put(pellet("rbmk_pellet_mes", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_SCHRABIDIUM_FUEL.get()), 90 - i * 20)
+                    .addOut(new ItemStack(npL), 1 + 3 * i)
+                    .addOut(new ItemStack(npS), 2 + 4 * i)
+                    .addOut(new ItemStack(schL), 1 + 3 * i)
+                    .addOut(new ItemStack(schS), 2 + 4 * i)
+                    .addOut(new ItemStack(coalTiny), 4 + 6 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_hes", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_HES.get()), 90 - i * 20)
+                    .addOut(new ItemStack(npL), 1 + 2 * i)
+                    .addOut(new ItemStack(npS), 1 + 3 * i)
+                    .addOut(new ItemStack(schL), 2 + 5 * i)
+                    .addOut(new ItemStack(schS), 4 + 6 * i)
+                    .addOut(new ItemStack(coalTiny), 2 + 4 * i));
+            RECIPES.put(pellet("rbmk_pellet_hes", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_HES.get()), 90 - i * 20)
+                    .addOut(new ItemStack(npL), 1 + 2 * i)
+                    .addOut(new ItemStack(npS), 1 + 3 * i)
+                    .addOut(new ItemStack(schL), 2 + 5 * i)
+                    .addOut(new ItemStack(schS), 4 + 6 * i)
+                    .addOut(new ItemStack(coalTiny), 2 + 4 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_balefire", i), new SILEXRecipe(400, 100, 3)
+                    .addOut(new ItemStack(BilletPowderItems.POWDER_BALEFIRE.get()), 90 - i * 20)
+                    .addOut(new ItemStack(wasteTiny), 10 + 20 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_balefire_gold", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AU198.get()), 90 - 20 * i)
+                    .addOut(new ItemStack(BilletPowderItems.POWDER_BALEFIRE.get()), 10 + 20 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_flashlead", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AU198.get()), 44 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PB209.get()), 44 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 1 + 6 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_MERCURY.get()), 1 + 6 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_GH336.get()), 10 + 8 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_po210be", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_POLONIUM.get()), 45 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_BERYLLIUM.get()), 45 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 5 + 10 * i)
+                    .addOut(new ItemStack(coalTiny), 5 + 10 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_pu238be", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU238.get()), 45 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_BERYLLIUM.get()), 45 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 3 + 5 * i)
+                    .addOut(new ItemStack(wasteTiny), 2 + 5 * i)
+                    .addOut(new ItemStack(coalTiny), 5 + 10 * i));
+            RECIPES.put(pellet("rbmk_pellet_pu238be", i + 5), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(xe), 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU238.get()), 44 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_BERYLLIUM.get()), 45 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 3 + 5 * i)
+                    .addOut(new ItemStack(wasteTiny), 2 + 5 * i)
+                    .addOut(new ItemStack(coalTiny), 5 + 10 * i));
+
+            RECIPES.put(pellet("rbmk_pellet_ra226be", i), new SILEXRecipe(600, 100, 1)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_RA226.get()), 45 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_BERYLLIUM.get()), 45 - 10 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_LEAD.get()), 3 + 5 * i)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_POLONIUM.get()), 2 + 5 * i)
+                    .addOut(new ItemStack(coalTiny), 5 + 10 * i));
+
+            // TODO(CE: com.hbm.inventory.recipes.SILEXRecipes.java:417-431): DRX pellet
+            // outputs ModItems.undefined ×6 — not registered. Do not invent.
+
+            RECIPES.put(pellet("rbmk_pellet_zfb_bismuth", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 50 + i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 150));
+            RECIPES.put(pellet("rbmk_pellet_zfb_bismuth", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(xe), 3)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_URANIUM.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_BISMUTH.get()), 50 + i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 147));
+
+            RECIPES.put(pellet("rbmk_pellet_zfb_pu241", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U235.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU240.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 50 + i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 150));
+            RECIPES.put(pellet("rbmk_pellet_zfb_pu241", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(xe), 3)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_U235.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU240.get()), 50 - i * 10)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 50 + i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 147));
+
+            RECIPES.put(pellet("rbmk_pellet_zfb_am_mix", i), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 100 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AM_MIX.get()), 50 + i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 150));
+            RECIPES.put(pellet("rbmk_pellet_zfb_am_mix", i + 5), new SILEXRecipe(600, 100, 2)
+                    .addOut(new ItemStack(xe), 3)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_PU241.get()), 100 - i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_AM_MIX.get()), 50 + i * 20)
+                    .addOut(new ItemStack(IngotNuggetItems.NUGGET_ZIRCONIUM.get()), 147));
         }
     }
 
@@ -423,6 +740,11 @@ public final class SILEXRecipes {
             this.fluidProduced = fluidProduced;
             this.fluidConsumed = fluidConsumed;
             this.laserStrength = laserStrength;
+        }
+
+        /** CE {@code SILEXRecipe(int, int, int)} — indexes {@link EnumWavelengths#values()}. */
+        public SILEXRecipe(int fluidProduced, int fluidConsumed, int wavelength) {
+            this(fluidProduced, fluidConsumed, EnumWavelengths.values()[wavelength]);
         }
 
         public SILEXRecipe addOut(ItemStack stack, int weight) {

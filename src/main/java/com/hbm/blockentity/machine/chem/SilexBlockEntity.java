@@ -12,8 +12,11 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.chem.SILEXRecipes;
 import com.hbm.inventory.recipes.chem.SILEXRecipes.SILEXRecipe;
 import com.hbm.items.machine.ItemFELCrystal.EnumWavelengths;
+import com.hbm.main.MainRegistry;
 import com.hbm.util.WeightedRandom;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -23,6 +26,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,11 +47,10 @@ import java.util.List;
  *   <li>No item-container fluid loading (canister/gas-icon item slots 2-3 in CE) - same pre-existing
  *   gap as every other machine in this area (see {@code MachineRefineryBlockEntity}'s javadoc). The
  *   acid tank fills only through the pipe network.</li>
- *   <li>No direct-fluid-input reprocessing path (CE additionally lets {@code UF6}/{@code PUF6}/
- *   {@code DEATH} fed straight into the tank convert directly to material charge, bypassing the item
- *   slot). Only the solid-feedstock-via-item-slot path (the mechanic actually described in the task's
- *   research doc) is ported; none of this pass's ported {@link SILEXRecipes} entries need the
- *   fluid-direct path anyway.</li>
+ *   <li>{@link #loadFluid()} is CE {@code TileEntitySILEX.java:169-222}: UF6/PUF6/DEATH
+ *   {@code fluidConversion} plus any tank type that has a {@code fluid_icon} SILEX row
+ *   (VITRIOL/REDMUD/FULLERENE) convert 50 mB/tick with no peroxide consume. Peroxide + item-slot
+ *   path is unchanged.</li>
  *   <li>SILEX has no HE power requirement in CE either (it implements no
  *   {@code IEnergyReceiverMK2}) - this is not a simplification, it is preserved.</li>
  *   <li>{@link #mode} is reset to {@link EnumWavelengths#NULL} every tick and must be set from
@@ -118,7 +121,29 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         return (currentFill * i) / MAX_FILL;
     }
 
-    private void loadFeedstock() {
+    /** CE {@code TileEntitySILEX.java:169-222}. */
+    private void loadFluid() {
+        FluidType type = tank.getTankType();
+        ComparableStack conv = conversionFor(type);
+        if (conv != null) {
+            if (currentFill == 0) current = (ComparableStack) conv.copy();
+            if (current != null && current.equals(conv)) {
+                int toFill = Math.min(50, Math.min(MAX_FILL - currentFill, tank.getFill()));
+                currentFill += toFill;
+                tank.setFill(tank.getFill() - toFill);
+            }
+        } else {
+            ComparableStack direct = new ComparableStack(fluidIcon(), 1, type.getID());
+            if (SILEXRecipes.getOutput(direct.toStack()) != null) {
+                if (currentFill == 0) current = (ComparableStack) direct.copy();
+                if (current != null && current.equals(direct)) {
+                    int toFill = Math.min(50, Math.min(MAX_FILL - currentFill, tank.getFill()));
+                    currentFill += toFill;
+                    tank.setFill(tank.getFill() - toFill);
+                }
+            }
+        }
+
         loadDelay++;
         if (loadDelay > 20) loadDelay = 0;
         if (loadDelay != 0) return;
@@ -139,10 +164,21 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         }
     }
 
+    private static Item fluidIcon() {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "fluid_icon"));
+    }
+
+    private static ComparableStack conversionFor(FluidType type) {
+        if (type == Fluids.UF6 || type == Fluids.PUF6 || type == Fluids.DEATH) {
+            return new ComparableStack(fluidIcon(), 1, type.getID());
+        }
+        return null;
+    }
+
     private boolean process() {
         if (current == null || currentFill <= 0) return false;
 
-        SILEXRecipe recipe = SILEXRecipes.getOutput(current.getStack());
+        SILEXRecipe recipe = SILEXRecipes.getOutput(current.toStack());
         if (recipe == null) return false;
         if (recipe.laserStrength.ordinal() > mode.ordinal()) return false;
         if (currentFill < recipe.fluidConsumed) return false;
@@ -201,7 +237,7 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         EnumWavelengths fromFel = com.hbm.blockentity.machine.accel.FelBlockEntity.laserHitting(level, worldPosition);
         if (fromFel != EnumWavelengths.NULL) mode = fromFel;
 
-        loadFeedstock();
+        loadFluid();
 
         if (!process()) progress = 0;
 
@@ -232,7 +268,8 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         tag.putInt("fill", currentFill);
         tag.putInt("progress", progress);
         if (current != null && current.item != null) {
-            tag.putString("currentItem", net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(current.item).toString());
+            tag.putString("currentItem", BuiltInRegistries.ITEM.getKey(current.item).toString());
+            tag.putInt("currentMeta", current.meta);
         }
     }
 
@@ -245,7 +282,7 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         if (tag.contains("currentItem")) {
             net.minecraft.world.item.Item item = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
                     net.minecraft.resources.ResourceLocation.parse(tag.getString("currentItem")));
-            current = new ComparableStack(item, 1);
+            current = new ComparableStack(item, 1, tag.getInt("currentMeta"));
         } else {
             current = null;
         }

@@ -8,24 +8,23 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.303s)** on wiped world port 25566, **3946 recipes**.
-No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0. runServer recorded after this commit.
+No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **102.8%** (7983 / 7767) |
-| **Unweighted** (mean of category %) | **102.4%** |
-| Recipe/loot reachability of port items | **52.4%** (1348 / 2574) |
+| **Weighted** (Σport / ΣCE) | **103.7%** (8053 / 7767) |
+| **Unweighted** (mean of category %) | **102.8%** |
+| Recipe/loot + machine-table reachability | **59.4%** (1529 / 2574) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 162**, **machine 302**, **vanilla 52**.
-Weighted **102.8%**. Category holes remain. Not content-complete.
+Largest remaining holes: **blocks 162**, **machine 232**, **vanilla 52**.
+Weighted **103.7%**. Category holes remain. Not content-complete.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -39,7 +38,7 @@ Weighted **102.8%**. Category holes remain. Not content-complete.
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950. +3 ducrete CraftingManager rows |
-| Machine recipes | ~2009 | 1707 | **85.0%** | +SILEX depleted/fallout + StorageDrum + SuperComputer. ChemPlant 72/72 (CE 145 double-count) |
+| Machine recipes | ~2009 | 1777 | **88.5%** | SILEX 95/96 (pellet+fluid_icon, DRX skipped) + ElectrolyserMetal 17/23. ChemPlant 72/72 |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
@@ -77,9 +76,9 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ### Unchanged this wave
 
-- Machine **1682 → 1707 / 85.0%**. ChemPlant 72/72 already live. SILEX +13 depleted/fallout.
-  StorageDrum CE table live (census 6 sites / runtime 28). SuperComputer 18 runtime / census 7 sites.
-  Cited leftovers: SILEX RBMK pellet loop `:117-472`, fluid_icon `:96-115`/`:664`.
+- Machine **1707 → 1777 / 88.5%**. SILEX 42→95 (`ComparableStack.meta` pellet loop + fluid_icon).
+  ElectrolyserMetal crystal 17. Mixer COLLOID/FULLERENE/LYE/BITUMEN (census still 1 `register` site).
+  Cited leftovers: SILEX DRX `:417-431` (`undefined`), SuperComputer dropdown, Electrolyser pour.
 - Blocks **790 / 67.6%**. No dummy blocks.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
 - Client NPE fix (`CrucibleBlocks.registerAll` + `SafeMenuScreens`) from prior HEAD.
@@ -94,7 +93,7 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 - Assembler expensive-mode `inputItemsEx` legs — dropped (same as prior assembler ports)
 - PA recipe `#10` SBD.ingot() — no schrabidate INGOT autogen
 - Texture misses with no CE file — documented, no invented art
-- ElectrolyserMetal → foundry. Not stubbed.
+- ElectrolyserMetal crystal table landed (17). Pour/ore slots still TODO. `crystal_aluminium` + bedrock loop skipped.
 - PUREX chance-output / ICF / vitrification / naquadria — missing I/O
 - Full Albion beam physics — detector runs the recipe table locally
 - AmmoPress fluid-slot recipes (FLAME_*) — stored, not consumed (no tank on the press)
@@ -106,8 +105,7 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 - Blast `meteorite_sword_*` — items missing, row dropped after register
 - RockMill AE2 module / blueprint cycling — auto-detect instead
 - Annihilator 528 gate — table registered unconditionally (same CE lines)
-- SILEX RBMK pellet loop — TODO(CE: SILEXRecipes.java:117-472) NbtComparableStack / stage meta
-- SILEX fluid_icon DEATH/VITRIOL/REDMUD/FULLERENE — TODO(CE: SILEXRecipes.java:96-115, :664)
+- SILEX DRX pellet — TODO(CE: SILEXRecipes.java:417-431) `ModItems.undefined` not registered
 - Press meteorite sword / briquette / page_of — AIR filtered
 - Rotary `ModuleBurnTime` heat mods — vanilla burn/2
 - WasteDrum RBMK rod heat path — `ItemRBMKRod.updateHeat` not in this port
@@ -149,13 +147,13 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**52.4%** (1348 / 2574). JSON/loot only — machine tables (ChemPlant/SILEX/StorageDrum/SuperComputer)
-do not feed this graph.
+**59.4%** (1529 / 2574). JSON/loot + Java machine-table **outputs** (`new ItemStack` / `stack("` /
+ElectrolyserMetal scraps). Inputs are not counted. Not flattened extras.
 
 ## Next single gap
 
-Blocks **86.1%** (162 missing). Machine leftover **~302** (SILEX RBMK loop + fluid_icon + assembler
-skip 7 + other families). Vanilla leftover **52**. Weighted **102.8%**. `v0.0.1-rc2` stays (no new tag).
+Blocks **86.1%** (162 missing). Machine leftover **~232** (ElectrolyserMetal bedrock/aluminium,
+assembler skip 7, other families). Vanilla leftover **52**. Weighted **103.7%**. `v0.0.1-rc2` stays.
 
 ## Entities (Phase 9 leftovers)
 

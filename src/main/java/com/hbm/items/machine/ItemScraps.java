@@ -1,11 +1,17 @@
 package com.hbm.items.machine;
 
 import com.hbm.inventory.material.MaterialShapes;
+import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.NTMMaterial;
 import com.hbm.items.ItemBase;
+import com.hbm.main.MainRegistry;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
@@ -45,6 +51,15 @@ public class ItemScraps extends ItemBase {
         stack.set(MachineDataComponents.SCRAP_AMOUNT.get(), amount);
         if (liquid) stack.set(MachineDataComponents.SCRAP_LIQUID.get(), true);
         return stack;
+    }
+
+    /** CE {@code ItemScraps.create(MaterialStack, liquid)} — flattened {@code scraps_<mat>}. */
+    public static ItemStack create(Mats.MaterialStack stack, boolean liquid) {
+        if (stack == null || stack.material == null) return ItemStack.EMPTY;
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(
+                MainRegistry.MODID, "scraps_" + stack.material.getRegistryName()));
+        if (item == Items.AIR) return ItemStack.EMPTY;
+        return create(new ItemStack(item), stack.amount, liquid);
     }
 
     @Override
