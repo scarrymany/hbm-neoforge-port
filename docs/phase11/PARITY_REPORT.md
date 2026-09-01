@@ -9,7 +9,7 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.751s)** on wiped world port 25566, **4052 recipes**.
+`./gradlew runServer` **Done (1.692s)** on wiped world port 25566, **4052 recipes**.
 No recipe parse errors. No Exception/ERROR. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
@@ -126,6 +126,10 @@ Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
   `machine_transformer*` stay BlockBase (CE ModBlocks.java:979-982).
   Leftover later: assembly/chemical factory, turret_arty/himars, seal_*,
   pile_brick, solinium/fstbmb.
+
+Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
++ runServer **Done (1.692s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
+No physical place. No Exception/ERROR.
 
 ## Prior wave (fluidtank / bigasstank / compact / satlinker)
 
