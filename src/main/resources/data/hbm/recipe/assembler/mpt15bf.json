@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_15"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_pipe"
+      },
+      "count": 5
+    },
+    {
+      "item": {
+        "item": "hbm:tungsten_plate_triple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_saturnite"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_thruster_15_balefire",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

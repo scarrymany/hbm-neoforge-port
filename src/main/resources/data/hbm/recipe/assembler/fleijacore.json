@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:nugget_u235"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:nugget_neptunium"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:nugget_beryllium"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:coil_copper"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:fleija_core",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

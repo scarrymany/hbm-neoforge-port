@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_15"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_weaponsteel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:billet_pu239"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:neutron_reflector"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ball_tatb"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_warhead_15_nuclear",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

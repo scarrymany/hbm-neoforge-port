@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "NCN",
+    "SPS"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:syringe_empty"
+    },
+    "S": {
+      "item": "hbm:sulfur"
+    },
+    "P": {
+      "item": "hbm:nugget_pu239"
+    },
+    "N": {
+      "item": "hbm:nugget_pu238"
+    }
+  },
+  "result": {
+    "id": "hbm:syringe_awesome",
+    "count": 1
+  }
+}

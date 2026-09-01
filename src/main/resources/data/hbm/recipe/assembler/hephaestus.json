@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_niobium"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:glass_quartz"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_hephaestus",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

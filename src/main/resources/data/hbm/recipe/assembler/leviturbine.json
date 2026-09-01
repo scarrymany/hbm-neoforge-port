@@ -1,0 +1,71 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_sextuple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:turbine_tungsten"
+      },
+      "count": 5
+    },
+    {
+      "item": {
+        "item": "hbm:turbine_titanium"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:flywheel_beryllium"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 48
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_pipe"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_chungus",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

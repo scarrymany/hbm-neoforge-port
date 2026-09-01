@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_dura_steel"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:crystal_redstone"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "minecraft:diamond"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_mining_laser",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

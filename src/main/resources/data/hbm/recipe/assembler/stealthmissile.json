@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 20
+    },
+    {
+      "item": {
+        "item": "hbm:plate_aluminium"
+      },
+      "count": 20
+    },
+    {
+      "item": {
+        "item": "minecraft:black_dye"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:steel_bolt"
+      },
+      "count": 32
+    }
+  ],
+  "output": {
+    "id": "hbm:missile_stealth",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

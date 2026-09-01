@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_15"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_weaponsteel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:neutron_reflector"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:powder_magic"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:egg_balefire_shard"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_warhead_15_balefire",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

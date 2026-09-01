@@ -1,0 +1,65 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_meteorite"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_desh"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:drill_titanium"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:fluid_barrel_full"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:thruster_small"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:photo_panel"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:battery_lithium_pack"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:sat_lunar_miner",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

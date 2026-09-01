@@ -121,6 +121,164 @@ def recipes() -> list[dict]:
                   ["hbm:sliding_blast_door"]),
         shapeless("machine/sliding_blast_door_from_legacy", "hbm:sliding_blast_door", 1,
                   ["hbm:sliding_blast_door_legacy"]),
+        # PowderRecipes.java:66 F.dust()
+        shapeless("powder/powder_flux_fluorite", "hbm:powder_flux", 4,
+                  ["hbm:fluorite", "minecraft:sand"]),
+        # ConsumableRecipes.java:76
+        shapeless("consumable/can_mrsugar", "hbm:can_mrsugar", 1,
+                  ["hbm:can_empty", "minecraft:potion", "minecraft:sugar", "hbm:fluorite"]),
+        # ConsumableRecipes.java:96
+        shaped("consumable/syringe_empty", "hbm:syringe_empty", 6,
+               ["P", "C", "B"],
+               {
+                   "P": item("hbm:plate_iron"),
+                   "C": item("hbm:cell"),
+                   "B": item("minecraft:iron_bars"),
+               }),
+        # ConsumableRecipes.java:97
+        shaped("consumable/syringe_antidote", "hbm:syringe_antidote", 6,
+               ["SSS", "PMP", "SSS"],
+               {
+                   "S": item("hbm:syringe_empty"),
+                   "P": item("minecraft:pumpkin_seeds"),
+                   "M": item("minecraft:milk_bucket"),
+               }),
+        # ConsumableRecipes.java:103
+        shaped("consumable/syringe_awesome", "hbm:syringe_awesome", 1,
+               ["SPS", "NCN", "SPS"],
+               {
+                   "C": item("hbm:syringe_empty"),
+                   "S": item("hbm:sulfur"),
+                   "P": item("hbm:nugget_pu239"),
+                   "N": item("hbm:nugget_pu238"),
+               }),
+        # ConsumableRecipes.java:101
+        shaped("consumable/syringe_poison", "hbm:syringe_poison", 1,
+               ["SLS", "LCL", "SLS"],
+               {
+                   "C": item("hbm:syringe_empty"),
+                   "S": item("minecraft:spider_eye"),
+                   "L": item("hbm:powder_lead"),
+               }),
+        # ConsumableRecipes.java:105
+        shaped("consumable/syringe_metal_empty", "hbm:syringe_metal_empty", 6,
+               ["P", "C", "B"],
+               {
+                   "P": item("hbm:plate_iron"),
+                   "C": item("hbm:rod_empty"),
+                   "B": item("minecraft:iron_bars"),
+               }),
+        # ConsumableRecipes.java:106
+        shaped("consumable/syringe_metal_stimpak", "hbm:syringe_metal_stimpak", 1,
+               [" N ", "NSN", " N "],
+               {
+                   "N": item("minecraft:nether_wart"),
+                   "S": item("hbm:syringe_metal_empty"),
+               }),
+        # ConsumableRecipes.java:108
+        shaped("consumable/syringe_metal_medx", "hbm:syringe_metal_medx", 1,
+               [" N ", "NSN", " N "],
+               {
+                   "N": item("minecraft:quartz"),
+                   "S": item("hbm:syringe_metal_empty"),
+               }),
+        # ConsumableRecipes.java:109
+        shaped("consumable/syringe_metal_psycho", "hbm:syringe_metal_psycho", 1,
+               [" N ", "NSN", " N "],
+               {
+                   "N": item("minecraft:glowstone_dust"),
+                   "S": item("hbm:syringe_metal_empty"),
+               }),
+        # ConsumableRecipes.java:110
+        shaped("consumable/syringe_metal_super", "hbm:syringe_metal_super", 1,
+               [" N ", "PSP", "L L"],
+               {
+                   "N": item("hbm:bottle_nuka"),
+                   "P": item("hbm:plate_steel"),
+                   "S": item("hbm:syringe_metal_stimpak"),
+                   "L": item("minecraft:leather"),
+               }),
+        # ConsumableRecipes.java:117
+        shaped("consumable/pill_iodine", "hbm:pill_iodine", 8,
+               ["IF"],
+               {
+                   "I": item("hbm:powder_iodine"),
+                   "F": item("hbm:fluorite"),
+               }),
+        # ConsumableRecipes.java:118
+        shaped("consumable/plan_c", "hbm:plan_c", 1,
+               ["PFP"],
+               {
+                   "P": item("hbm:powder_poison"),
+                   "F": item("hbm:fluorite"),
+               }),
+        # ConsumableRecipes.java:119
+        shapeless("consumable/radx", "hbm:radx", 1,
+                  ["hbm:powder_coal", "hbm:powder_coal", "hbm:fluorite"]),
+        # ConsumableRecipes.java:134
+        shaped("consumable/med_bag", "hbm:med_bag", 1,
+               ["LLL", "SIS", "LLL"],
+               {
+                   "L": item("minecraft:leather"),
+                   "S": item("hbm:syringe_metal_stimpak"),
+                   "I": item("hbm:syringe_antidote"),
+               }),
+        # ConsumableRecipes.java:151
+        shapeless("consumable/cladding_paint", "hbm:cladding_paint", 1,
+                  ["hbm:nugget_lead", "hbm:nugget_lead", "hbm:nugget_lead", "hbm:nugget_lead",
+                   "minecraft:clay_ball", "minecraft:glass_bottle"]),
+        # ConsumableRecipes.java:152
+        shaped("consumable/cladding_rubber", "hbm:cladding_rubber", 1,
+               ["RCR", "CDC", "RCR"],
+               {
+                   "R": item("hbm:ingot_rubber"),
+                   "C": item("hbm:powder_coal"),
+                   "D": item("hbm:ducttape"),
+               }),
+        # ConsumableRecipes.java:153
+        shaped("consumable/cladding_lead", "hbm:cladding_lead", 1,
+               ["DPD", "PRP", "DPD"],
+               {
+                   "R": item("hbm:cladding_rubber"),
+                   "P": item("hbm:plate_lead"),
+                   "D": item("hbm:ducttape"),
+               }),
+        # ConsumableRecipes.java:154
+        shaped("consumable/cladding_desh", "hbm:cladding_desh", 1,
+               ["DPD", "PRP", "DPD"],
+               {
+                   "R": item("hbm:cladding_lead"),
+                   "P": item("hbm:plate_desh"),
+                   "D": item("hbm:ducttape"),
+               }),
+        # ConsumableRecipes.java:155
+        shaped("consumable/cladding_ghiorsium", "hbm:cladding_ghiorsium", 1,
+               ["DPD", "PRP", "DPD"],
+               {
+                   "R": item("hbm:cladding_desh"),
+                   "P": item("hbm:ingot_gh336"),
+                   "D": item("hbm:ducttape"),
+               }),
+        # ConsumableRecipes.java:156
+        shaped("consumable/cladding_obsidian", "hbm:cladding_obsidian", 1,
+               ["OOO", "PDP", "OOO"],
+               {
+                   "O": item("minecraft:obsidian"),
+                   "P": item("hbm:plate_steel"),
+                   "D": item("hbm:ducttape"),
+               }),
+        # ConsumableRecipes.java:157
+        shaped("consumable/cladding_iron", "hbm:cladding_iron", 1,
+               ["OOO", "PDP", "OOO"],
+               {
+                   "O": item("hbm:plate_iron"),
+                   "P": item("hbm:plate_polymer"),
+                   "D": item("hbm:ducttape"),
+               }),
+        # ConsumableRecipes.java:73 leftover can_redbomb now that pellet_cluster exists
+        shapeless("consumable/can_redbomb", "hbm:can_redbomb", 1,
+                  ["hbm:can_empty", "minecraft:potion", "minecraft:sugar", "hbm:pellet_cluster"]),
+        # CraftingManager.java:647 satlinker (block not registered this pass — skip)
     ]
 
 

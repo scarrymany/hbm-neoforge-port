@@ -1,0 +1,59 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:aluminum_plate_triple"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tcalloy"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_bismoid"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:capacitor_tantalum_pack"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:glass_quartz"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_exposure_chamber",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

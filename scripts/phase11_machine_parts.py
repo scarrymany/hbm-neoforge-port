@@ -83,8 +83,13 @@ MAT: dict[str, list[str]] = {
     "WC": ["tungsten_carbide"],
     "ANY_CONCRETE": ["concrete_smooth"],
     "ANY_TAR": [],
+    "ANY_PLASTICEXPLOSIVE": [],
     "ANY_BISMOID": ["bismuth"],
     "ANY_BISMOIDBRONZE": ["bismuthbronze"],
+    "TA": ["tantalium", "tantalum"],
+    "LI": ["lithium"],
+    "NP237": ["neptunium"],
+    "SA327": ["solinium"],
     "B": ["boron"],
     "BI": ["bismuth"],
     "BE": ["beryllium"],
@@ -127,6 +132,7 @@ SHAPE_CANDIDATES = {
     "wireFine": ["{m}_wire", "wire_{m}", "wire_fine_{m}"],
     "wireDense": ["{m}_dense_wire", "wire_dense_{m}", "{m}_wire"],
     "bolt": ["{m}_bolt", "bolt_{m}"],
+    "mechanism": ["{m}_gun_mechanism", "{m}_mechanism", "gun_mechanism_{m}"],
     "dust": ["powder_{m}", "{m}_dust", "dust_{m}"],
     "gem": ["gem_{m}", "{m}_gem"],
     "nugget": ["nugget_{m}", "{m}_nugget"],
@@ -263,6 +269,101 @@ ITEM_MAP = {
     "ModItems.sat_head_resonator": "sat_head_resonator",
     "ModItems.photo_panel": "photo_panel",
     "ModItems.ballistite": "ballistite",
+    "ModItems.thruster_nuclear": "thruster_nuclear",
+    "ModItems.entanglement_kit": "entanglement_kit",
+    "ModItems.tank_steel": "tank_steel",
+    "ModItems.pellet_buckshot": "pellet_buckshot",
+    "ModItems.pellet_cluster": "pellet_cluster",
+    "ModItems.seg_10": "seg_10",
+    "ModItems.seg_15": "seg_15",
+    "ModItems.seg_20": "seg_20",
+    "ModItems.fluorite": "fluorite",
+    "ModItems.ducttape": "ducttape",
+    "ModItems.rod_empty": "rod_empty",
+    "ModItems.dysfunctional_reactor": "dysfunctional_reactor",
+    "ModItems.spawn_chopper": "chopper",
+    "ModItems.rocket_fuel": "rocket_fuel",
+    "ModItems.missile_stealth": "missile_stealth",
+    "ModItems.mp_thruster_10_kerosene": "mp_thruster_10_kerosene",
+    "ModItems.mp_thruster_10_solid": "mp_thruster_10_solid",
+    "ModItems.mp_thruster_10_xenon": "mp_thruster_10_xenon",
+    "ModItems.mp_thruster_15_kerosene": "mp_thruster_15_kerosene",
+    "ModItems.mp_thruster_15_kerosene_dual": "mp_thruster_15_kerosene_dual",
+    "ModItems.mp_thruster_15_kerosene_triple": "mp_thruster_15_kerosene_triple",
+    "ModItems.mp_thruster_15_solid": "mp_thruster_15_solid",
+    "ModItems.mp_thruster_15_solid_hexdecuple": "mp_thruster_15_solid_hexdecuple",
+    "ModItems.mp_thruster_15_hydrogen": "mp_thruster_15_hydrogen",
+    "ModItems.mp_thruster_15_hydrogen_dual": "mp_thruster_15_hydrogen_dual",
+    "ModItems.mp_thruster_15_balefire_short": "mp_thruster_15_balefire_short",
+    "ModItems.mp_thruster_15_balefire": "mp_thruster_15_balefire",
+    "ModItems.mp_thruster_15_balefire_large": "mp_thruster_15_balefire_large",
+    "ModItems.mp_thruster_20_kerosene": "mp_thruster_20_kerosene",
+    "ModItems.mp_thruster_20_kerosene_dual": "mp_thruster_20_kerosene_dual",
+    "ModItems.mp_thruster_20_kerosene_triple": "mp_thruster_20_kerosene_triple",
+    "ModItems.mp_thruster_20_solid": "mp_thruster_20_solid",
+    "ModItems.mp_thruster_20_solid_multi": "mp_thruster_20_solid_multi",
+    "ModItems.mp_thruster_20_solid_multier": "mp_thruster_20_solid_multier",
+    "ModItems.mp_fuselage_10_kerosene": "mp_fuselage_10_kerosene",
+    "ModItems.mp_fuselage_10_long_kerosene": "mp_fuselage_10_long_kerosene",
+    "ModItems.mp_fuselage_10_solid": "mp_fuselage_10_solid",
+    "ModItems.mp_fuselage_10_long_solid": "mp_fuselage_10_long_solid",
+    "ModItems.mp_fuselage_10_xenon": "mp_fuselage_10_xenon",
+    "ModItems.mp_fuselage_10_15_kerosene": "mp_fuselage_10_15_kerosene",
+    "ModItems.mp_fuselage_10_15_solid": "mp_fuselage_10_15_solid",
+    "ModItems.mp_fuselage_10_15_hydrogen": "mp_fuselage_10_15_hydrogen",
+    "ModItems.mp_fuselage_10_15_balefire": "mp_fuselage_10_15_balefire",
+    "ModItems.mp_fuselage_15_kerosene": "mp_fuselage_15_kerosene",
+    "ModItems.mp_fuselage_15_solid": "mp_fuselage_15_solid",
+    "ModItems.mp_fuselage_15_hydrogen": "mp_fuselage_15_hydrogen",
+    "ModItems.mp_fuselage_15_20_kerosene": "mp_fuselage_15_20_kerosene",
+    "ModItems.mp_fuselage_15_20_solid": "mp_fuselage_15_20_solid",
+    "ModItems.mp_warhead_10_he": "mp_warhead_10_he",
+    "ModItems.mp_warhead_10_incendiary": "mp_warhead_10_incendiary",
+    "ModItems.mp_warhead_10_buster": "mp_warhead_10_buster",
+    "ModItems.mp_warhead_10_nuclear": "mp_warhead_10_nuclear",
+    "ModItems.mp_warhead_10_nuclear_large": "mp_warhead_10_nuclear_large",
+    "ModItems.mp_warhead_10_taint": "mp_warhead_10_taint",
+    "ModItems.mp_warhead_10_cloud": "mp_warhead_10_cloud",
+    "ModItems.mp_warhead_15_he": "mp_warhead_15_he",
+    "ModItems.mp_warhead_15_incendiary": "mp_warhead_15_incendiary",
+    "ModItems.mp_warhead_15_nuclear": "mp_warhead_15_nuclear",
+    "ModItems.mp_warhead_15_n2": "mp_warhead_15_n2",
+    "ModItems.mp_warhead_15_balefire": "mp_warhead_15_balefire",
+    "ModBlocks.machine_supercomputer": "machine_supercomputer",
+    "ModBlocks.machine_arc_furnace": "machine_arc_furnace",
+    "ModBlocks.machine_compressor": "machine_compressor",
+    "ModBlocks.machine_compressor_compact": "machine_compressor_compact",
+    "ModBlocks.machine_epress": "machine_epress",
+    "ModBlocks.machine_ore_slopper": "machine_ore_slopper",
+    "ModBlocks.machine_mining_laser": "machine_mining_laser",
+    "ModBlocks.machine_teleporter": "machine_teleporter",
+    "ModBlocks.machine_satlink": "machine_satlink",
+    "ModBlocks.machine_forcefield": "machine_forcefield",
+    "ModBlocks.machine_strand_caster": "machine_strand_caster",
+    "ModBlocks.machine_assembly_factory": "machine_assembly_factory",
+    "ModBlocks.machine_chemical_factory": "machine_chemical_factory",
+    "ModBlocks.machine_turbofan": "machine_turbofan",
+    "ModBlocks.machine_hephaestus": "machine_hephaestus",
+    "ModBlocks.machine_chungus": "machine_chungus",
+    "ModBlocks.machine_radgen": "machine_radgen",
+    "ModBlocks.machine_pyrooven": "machine_pyrooven",
+    "ModBlocks.machine_fluidtank": "machine_fluidtank",
+    "ModBlocks.machine_bigasstank": "machine_bigasstank",
+    "ModBlocks.machine_exposure_chamber": "machine_exposure_chamber",
+    "ModBlocks.reactor_research": "reactor_research",
+    "ModBlocks.reactor_zirnox": "reactor_zirnox",
+    "ModBlocks.seal_frame": "seal_frame",
+    "ModBlocks.seal_controller": "seal_controller",
+    "ModBlocks.vitrified_barrel": "vitrified_barrel",
+    "ModBlocks.struct_torus_core": "struct_torus_core",
+    "ModBlocks.fusion_klystron": "fusion_klystron",
+    "ModBlocks.fusion_collector": "fusion_collector",
+    "ModBlocks.fusion_breeder": "fusion_breeder",
+    "ModBlocks.fusion_boiler": "fusion_boiler",
+    "ModBlocks.fusion_mhdt": "fusion_mhdt",
+    "ModBlocks.fusion_coupler": "fusion_coupler",
+    "ModBlocks.watz_element": "watz_element",
+    "ModBlocks.watz_cooler": "watz_cooler",
     "ModItems.sat_gerald": "sat_gerald",
     "ModItems.sat_chip": "sat_chip",
     "ModItems.schrabidium_hammer": "schrabidium_hammer",
@@ -380,6 +481,13 @@ SAT_TYPE = {
     "DEATH_RAY": "sat_laser",
     "XENIUM_RESONATOR": "sat_resonator",
     "RELAY": "sat_relay",
+    "MINER_ASTRO": "sat_miner",
+    "MINER_LUNAR": "sat_lunar_miner",
+    "DETECTOR": "satellite_detector",
+    "PRECISION_LASER": "satellite_precision_laser",
+    "RAY_SCAN": "satellite_ray_scan",
+    "SCIENCE": "satellite_science",
+    "SCIENCE_SENSOR": "satellite_science_sensor",
 }
 
 KEY_DYES = {
@@ -390,6 +498,10 @@ KEY_DYES = {
     "KEY_WHITE": "minecraft:white_dye",
     "KEY_GRAY": "minecraft:gray_dye",
     "KEY_GREY": "minecraft:gray_dye",
+    "KEY_BLACK": "minecraft:black_dye",
+    "KEY_ORANGE": "minecraft:orange_dye",
+    "KEY_LIGHTGRAY": "minecraft:light_gray_dye",
+    "KEY_LIGHTGREY": "minecraft:light_gray_dye",
 }
 
 
@@ -403,7 +515,8 @@ def known_ids() -> set[str]:
     helper = re.compile(
         r'(?:registerParts|registerIngot|registerNugget|registerLoreIngot|registerItem|'
         r'registerBlock|registerMachine|registerResource|registerBillet|reg1|'
-        r'registerPowder|registerFuelPowder|registerUpgrade|registerCasing|ore|reg|parts1|parts)\(\s*"([a-z][a-z0-9_]*)"'
+        r'registerPowder|registerFuelPowder|registerUpgrade|registerCasing|ore|reg|parts1|parts|'
+        r'fuel|consumeFx|consume|cladding|casing|part|standard)\(\s*"([a-z][a-z0-9_]*)"'
     )
     for p in java.rglob("*.java"):
         extra.update(helper.findall(p.read_text(errors="ignore")))
@@ -418,6 +531,10 @@ def known_ids() -> set[str]:
         "fuel_additive_antiknock", "fuel_additive_deicer",
         "nuclear_waste_tiny", "nuclear_waste_vitrified",
         "machine_purex", "machine_liquefactor",
+        "rocket_fuel", "chopper", "sat_relay", "sat_miner", "sat_lunar_miner",
+        "satellite_detector", "satellite_precision_laser", "satellite_ray_scan",
+        "satellite_science", "satellite_science_sensor",
+        "pa_coil_gold", "pa_coil_niobium", "pa_coil_bscco", "pa_coil_chlorophyte",
     }
     for d in ("steel", "steel_diamond", "hss", "hss_diamond", "desh", "desh_diamond",
               "tcalloy", "tcalloy_diamond", "ferro", "ferro_diamond"):
@@ -641,6 +758,14 @@ def resolve_ore(mat: str, shape: str, n: int, known: set[str]) -> tuple[str, int
         return "tag:hbm:any_highexplosive", n
     if mat == "ANY_SMOKELESS":
         return "tag:hbm:any_smokeless", n
+    if mat == "ANY_TAR":
+        return "tag:hbm:any_tar", n
+    if mat == "ANY_PLASTICEXPLOSIVE":
+        return "tag:hbm:any_highexplosive", n
+    if mat == "KEY_PLANKS":
+        return "tag:minecraft:planks", n
+    if mat == "KEY_ANYPANE":
+        return "tag:c:glass_panes", n
     tokens = MAT.get(mat)
     if tokens is None:
         tokens = [mat.lower()]
@@ -790,6 +915,14 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
         if src == "ModItems" and name == "satellite":
             cid = SAT_TYPE.get(en)
             return (f"hbm:{cid}", n) if cid and cid in known else None
+        if src == "ModItems" and name == "pa_coil":
+            cid = f"pa_coil_{en.lower()}"
+            return (f"hbm:{cid}", n) if cid in known else None
+        if src == "ModItems" and name == "pile_rod":
+            for cand in (f"pile_rod_{en.lower()}", f"pile_rod_mk2_{en.lower()}"):
+                if cand in known:
+                    return f"hbm:{cand}", n
+            return None
         return None
 
     m = re.match(
@@ -816,8 +949,15 @@ def resolve_stack(expr: str, known: set[str]) -> tuple[str, int] | None:
         return "minecraft:glowstone_dust", int(m.group(1) or 1)
 
     m = re.match(r"new OreDictStack\((KEY_\w+)(?:,\s*(\d+))?\)", expr)
-    if m and m.group(1) in KEY_DYES:
-        return KEY_DYES[m.group(1)], int(m.group(2) or 1)
+    if m:
+        key = m.group(1)
+        n = int(m.group(2) or 1)
+        if key in KEY_DYES:
+            return KEY_DYES[key], n
+        if key == "KEY_PLANKS":
+            return "tag:minecraft:planks", n
+        if key == "KEY_ANYPANE":
+            return "tag:c:glass_panes", n
 
     m = re.match(r"new ComparableStack\((ModItems|ModBlocks)\.(\w+)(?:,\s*(\d+))?\)", expr)
     if m:

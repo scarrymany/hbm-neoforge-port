@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_dura_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:mingrade_dense_wire"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:seal_controller",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

@@ -1,0 +1,65 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:plate_desh"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:fluid_barrel_full"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:photo_panel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:thruster_nuclear"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_uranium_fuel"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:magnetron"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:battery_lithium_pack"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:sat_relay",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

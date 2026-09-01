@@ -1,0 +1,53 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_boron"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_graphite"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:concrete_smooth"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:reactor_zirnox",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

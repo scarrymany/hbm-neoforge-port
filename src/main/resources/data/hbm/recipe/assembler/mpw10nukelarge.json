@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_10"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_weaponsteel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:billet_pu239"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:neutron_reflector"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_warhead_10_nuclear_large",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

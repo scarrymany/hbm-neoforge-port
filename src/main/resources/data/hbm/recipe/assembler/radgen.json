@@ -1,0 +1,59 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:coil_magnetized_tungsten"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:magnetizedtungsten_wire"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:reactor_core"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_starmetal"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "minecraft:red_dye"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_radgen",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

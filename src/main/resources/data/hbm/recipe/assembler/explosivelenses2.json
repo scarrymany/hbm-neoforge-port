@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_aluminium"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:neutron_reflector"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:ball_tatb"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_rubber"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:explosive_lenses",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 100
+}

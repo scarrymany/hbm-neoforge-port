@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:tungsten_plate_sextuple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_triple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:bscco_dense_wire"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_bismoid"
+      },
+      "count": 2
+    }
+  ],
+  "output": {
+    "id": "hbm:fusion_klystron",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

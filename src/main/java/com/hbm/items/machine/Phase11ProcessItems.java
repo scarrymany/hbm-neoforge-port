@@ -5,7 +5,9 @@ import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ItemBase;
 import com.hbm.items.ItemEnums;
 import com.hbm.items.ModItems;
+import com.hbm.items.armor.ItemModCladding;
 import com.hbm.items.food.ItemLemon;
+import com.hbm.items.special.ItemConsumable;
 import com.hbm.items.special.ItemFuel;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
@@ -136,6 +138,50 @@ public final class Phase11ProcessItems {
         parts("photo_panel");
         // CE ModItems.java (ballistite) — PowderRecipes.java:25 leftover vanilla craft
         parts("ballistite");
+
+        // CE ModItems.java:1303 / AssemblyMachineRecipes.java:820 thrusternerva + :1015 satelliterelay
+        parts("thruster_nuclear");
+        // CE ModItems.java:2727 / AssemblyMachineRecipes.java:362 teleporter input
+        parts("entanglement_kit");
+        // CE ModItems.java:2536 / AssemblyMachineRecipes.java yellowbarrel
+        parts("tank_steel");
+        // CE ModItems.java:1281 / :1289 — cluster/buckshot leftover assembler
+        parts("pellet_buckshot");
+        parts("pellet_cluster");
+        // CE ModItems.java:2530-2532 — mp_* assembler inputs
+        parts("seg_10");
+        parts("seg_15");
+        parts("seg_20");
+        // CE ModItems.java:1134 — F.dust() / leftover Powder+Consumable crafts
+        parts("fluorite");
+        // CE ModItems.java:1296 — cladding crafts
+        parts("ducttape");
+        // CE ModItems.java:1173 — syringe_metal_empty input
+        control("rod_empty");
+        // CE dysfunctional_reactor — ass.protoreactor / ninadidnothingwrong
+        parts("dysfunctional_reactor");
+
+        // CE ModItems.java:117-126 syringes. ConsumableRecipes.java:96-114
+        consume("syringe_empty");
+        consumeFx("syringe_antidote");
+        consumeFx("syringe_poison");
+        consumeFx("syringe_awesome");
+        consume("syringe_metal_empty");
+        consumeFx("syringe_metal_stimpak");
+        consumeFx("syringe_metal_medx");
+        consumeFx("syringe_metal_psycho");
+        consumeFx("syringe_metal_super");
+        consumeFx("syringe_taint");
+        consumeFx("med_bag");
+
+        // CE ModItems.java:191-197 ItemModCladding / ConsumableRecipes.java:151-157
+        cladding("cladding_paint", 0.025);
+        cladding("cladding_rubber", 0.05);
+        cladding("cladding_lead", 0.1);
+        cladding("cladding_desh", 0.2);
+        cladding("cladding_ghiorsium", 0.5);
+        cladding("cladding_iron", 0.0);
+        cladding("cladding_obsidian", 0.0);
     }
 
     private static DeferredItem<Item> parts(String name) {
@@ -172,6 +218,24 @@ public final class Phase11ProcessItems {
         FoodProperties food = new FoodProperties.Builder().nutrition(nutrition).saturationModifier(saturation).build();
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemLemon(new Item.Properties().food(food)));
         CreativeTabContents.add(ModCreativeTabs.PARTS, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> consume(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> consumeFx(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemConsumable(new Item.Properties(), "syringe_awesome".equals(name)));
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> cladding(String name, double rad) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemModCladding(new Item.Properties(), rad));
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, item);
         return item;
     }
 }

@@ -1,0 +1,17 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:nugget_lead"
+      },
+      "count": 6
+    }
+  ],
+  "output": {
+    "id": "hbm:pellet_buckshot",
+    "count": 1
+  },
+  "duration": 50,
+  "power": 100
+}

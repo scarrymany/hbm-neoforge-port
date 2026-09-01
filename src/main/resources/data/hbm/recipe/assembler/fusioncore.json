@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_sextuple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_bismoid"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:struct_torus_core",
+    "count": 1
+  },
+  "duration": 600,
+  "power": 100
+}

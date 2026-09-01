@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:crystal_niter"
+  },
+  "output": {
+    "id": "hbm:niter",
+    "count": 8
+  },
+  "duration": 60
+}

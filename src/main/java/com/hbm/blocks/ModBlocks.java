@@ -87,6 +87,7 @@ public final class ModBlocks {
         com.hbm.blocks.machine.accel.AccelBlocks.registerAll();
         com.hbm.blocks.machine.workshop.WorkshopBlocks.registerAll();
         com.hbm.blocks.generic.BallsSpawnerBlocks.registerAll();
+        com.hbm.blocks.machine.Phase11CasingBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }

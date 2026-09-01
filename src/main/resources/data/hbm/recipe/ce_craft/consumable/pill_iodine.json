@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IF"
+  ],
+  "key": {
+    "I": {
+      "item": "hbm:powder_iodine"
+    },
+    "F": {
+      "item": "hbm:fluorite"
+    }
+  },
+  "result": {
+    "id": "hbm:pill_iodine",
+    "count": 8
+  }
+}

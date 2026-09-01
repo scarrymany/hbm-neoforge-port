@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:concrete_smooth"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_firebrick"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:machine_transformer"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_analog"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_arc_furnace",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

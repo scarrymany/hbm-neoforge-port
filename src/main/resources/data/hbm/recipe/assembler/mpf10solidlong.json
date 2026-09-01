@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_10"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:plate_titanium"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 6
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_fuselage_10_long_solid",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

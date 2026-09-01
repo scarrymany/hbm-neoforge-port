@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:sphere_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_advanced"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 24
+    }
+  ],
+  "output": {
+    "id": "hbm:mine_naval",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:crystal_fluorite"
+  },
+  "output": {
+    "id": "hbm:fluorite",
+    "count": 8
+  },
+  "duration": 60
+}

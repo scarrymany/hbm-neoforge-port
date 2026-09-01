@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_sextuple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_sextuple"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:bismuthbronze_plate_triple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:schrabidate_dense_wire"
+      },
+      "count": 64
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_quantum"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:fusion_mhdt",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

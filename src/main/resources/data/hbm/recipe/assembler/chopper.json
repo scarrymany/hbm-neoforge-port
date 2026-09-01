@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_combine_steel"
+      },
+      "count": 24
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:magnetizedtungsten_wire"
+      },
+      "count": 48
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 5
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller_advanced"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:chopper",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 100
+}

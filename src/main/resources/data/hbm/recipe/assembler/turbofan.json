@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:durasteel_pipe"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:turbine_tungsten"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:gold_dense_wire"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_turbofan",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

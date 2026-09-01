@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_fluidtank",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

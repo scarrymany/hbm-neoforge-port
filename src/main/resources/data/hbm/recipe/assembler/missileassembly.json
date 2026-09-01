@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:aluminum_shell"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "tag": "hbm:any_plastic"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:rocket_fuel"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:missile_assembly",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

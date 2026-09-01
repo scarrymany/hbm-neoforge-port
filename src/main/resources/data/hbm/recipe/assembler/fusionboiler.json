@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_triple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:copper_shell"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:steel_pipe"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:fusion_boiler",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

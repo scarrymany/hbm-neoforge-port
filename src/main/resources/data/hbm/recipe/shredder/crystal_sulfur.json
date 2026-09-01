@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:crystal_sulfur"
+  },
+  "output": {
+    "id": "hbm:sulfur",
+    "count": 8
+  },
+  "duration": 60
+}

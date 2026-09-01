@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_sextuple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:steel_scaffold"
+      },
+      "count": 16
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_bigasstank",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

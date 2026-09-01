@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:dysfunctional_reactor"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_euphemium"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller_advanced"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:nuke_prototype",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

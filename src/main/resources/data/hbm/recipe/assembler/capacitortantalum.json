@@ -1,0 +1,23 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_tantalium"
+      },
+      "count": 24
+    }
+  ],
+  "output": {
+    "id": "hbm:capacitor_tantalum_pack",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 10000
+}

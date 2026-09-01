@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:tank_steel"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_lead"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:nuclear_waste_vitrified"
+      },
+      "count": 10
+    }
+  ],
+  "output": {
+    "id": "hbm:vitrified_barrel",
+    "count": 1
+  },
+  "duration": 400,
+  "power": 400
+}

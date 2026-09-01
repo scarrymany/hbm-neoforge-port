@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:ingot_firebrick"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "item": "hbm:copper_plate_sextuple"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:steel_shell"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:concrete_smooth"
+      },
+      "count": 8
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_strand_caster",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

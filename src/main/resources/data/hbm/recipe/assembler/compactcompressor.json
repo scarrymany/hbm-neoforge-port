@@ -1,0 +1,41 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_triple"
+      },
+      "count": 8
+    },
+    {
+      "item": {
+        "item": "hbm:titanium_shell"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:copper_pipe"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:motor"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_compressor_compact",
+    "count": 1
+  },
+  "duration": 200,
+  "power": 100
+}

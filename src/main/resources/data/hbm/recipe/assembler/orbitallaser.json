@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:weaponsteel_shell"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:photo_panel"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:capacitor_tantalum_pack"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:crystal_redstone"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:part_generic_lde"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_controller_advanced"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:satellite_precision_laser",
+    "count": 1
+  },
+  "duration": 1200,
+  "power": 25000
+}

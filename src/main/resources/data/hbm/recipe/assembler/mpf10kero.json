@@ -1,0 +1,29 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_10"
+      },
+      "count": 2
+    },
+    {
+      "item": {
+        "item": "hbm:plate_aluminium"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 3
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_fuselage_10_kerosene",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

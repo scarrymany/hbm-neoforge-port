@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:tcalloy_plate_sextuple"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:plate_copper"
+      },
+      "count": 32
+    },
+    {
+      "item": {
+        "item": "hbm:bscco_dense_wire"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_bismoid"
+      },
+      "count": 4
+    }
+  ],
+  "output": {
+    "id": "hbm:fusion_coupler",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}

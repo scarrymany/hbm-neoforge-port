@@ -1,0 +1,35 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:seg_10"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:plate_steel"
+      },
+      "count": 6
+    },
+    {
+      "item": {
+        "tag": "hbm:any_highexplosive"
+      },
+      "count": 3
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_basic"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:mp_warhead_10_he",
+    "count": 1
+  },
+  "duration": 100,
+  "power": 100
+}

@@ -1,0 +1,47 @@
+{
+  "type": "hbm:assembler",
+  "inputs": [
+    {
+      "item": {
+        "item": "hbm:steel_plate_sextuple"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "tag": "hbm:any_hardplastic"
+      },
+      "count": 16
+    },
+    {
+      "item": {
+        "item": "hbm:ingot_cft"
+      },
+      "count": 4
+    },
+    {
+      "item": {
+        "item": "hbm:copper_pipe"
+      },
+      "count": 12
+    },
+    {
+      "item": {
+        "item": "hbm:motor_desh"
+      },
+      "count": 1
+    },
+    {
+      "item": {
+        "item": "hbm:circuit_bismoid"
+      },
+      "count": 1
+    }
+  ],
+  "output": {
+    "id": "hbm:machine_pyrooven",
+    "count": 1
+  },
+  "duration": 300,
+  "power": 100
+}
