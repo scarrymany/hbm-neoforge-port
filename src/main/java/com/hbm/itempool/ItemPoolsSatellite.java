@@ -22,14 +22,10 @@ import java.util.List;
  * around - do not "fix" this back to CE's literal constant values, that would silently break
  * {@code SatelliteMiner}/{@code SatelliteLunarMiner}'s existing pool lookups.
  * <p>
- * <b>3 of CE's ~32 combined entries are skipped</b> (Headline finding #5): {@code ModItems.fluorite}
- * and {@code ModBlocks.gravel_diamond} (both confirmed absent from this port's registry by
- * repo-wide grep - only the higher-tier {@code crystal_fluorite} exists) and all 3 weighted rolls of
- * {@code ModBlocks.moon_turf} (likewise absent). Every other entry (23 of {@code POOL_SAT_MINER}'s
- * 26, all 7 of {@code POOL_SAT_LUNAR}'s) is ported with CE's exact min/max/weight values. CE's
- * {@code meta = 0} parameter on every entry is dropped per {@link ItemPool}'s own class javadoc -
- * this port's Sedna item content gives every discrete variant its own real {@code Item}, so there is
- * nothing left for a metadata discriminator to select.
+ * CE {@code ItemPoolsSatellite.java}:33/{@code :38}/{@code :lunar} leftovers whose I/O now exists:
+ * {@code fluorite} ({@code Phase11ProcessItems.parts}), {@code gravel_diamond} and {@code moon_turf}
+ * ({@code Phase8Blocks}). Weights match CE. Every other entry keeps CE min/max/weight. CE's
+ * {@code meta = 0} parameter on every entry is dropped per {@link ItemPool}'s own class javadoc.
  */
 public final class ItemPoolsSatellite {
 
@@ -58,29 +54,28 @@ public final class ItemPoolsSatellite {
                 ItemPool.entry(BilletPowderItems.POWDER_POWER.get(), 2, 2, 5),
                 ItemPool.entry(BilletPowderItems.POWDER_COPPER.get(), 5, 5, 15),
                 ItemPool.entry(BilletPowderItems.POWDER_LEAD.get(), 3, 3, 10),
-                // SKIPPED: CE weighted(ModItems.fluorite, 0, 4, 4, 15) - fluorite is not registered
-                // in this port (only the higher-tier crystal_fluorite exists) - see class javadoc.
                 ItemPool.entry(BilletPowderItems.POWDER_LAPIS.get(), 4, 4, 10),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_ALUMINIUM.get(), 1, 1, 5),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_GOLD.get(), 1, 1, 5),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_PHOSPHORUS.get(), 1, 1, 10),
-                // SKIPPED: CE weighted(ModBlocks.gravel_diamond, 0, 1, 1, 3) - not registered
-                // anywhere in this port - see class javadoc.
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_URANIUM.get(), 1, 1, 3),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_PLUTONIUM.get(), 1, 1, 3),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_TRIXITE.get(), 1, 1, 1),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_STARMETAL.get(), 1, 1, 1),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_LITHIUM.get(), 2, 2, 4)
         ));
+        ItemPoolLookups.add(miner, "fluorite", 4, 4, 15);
+        ItemPoolLookups.add(miner, "gravel_diamond", 1, 1, 3);
 
         ItemPool lunar = new ItemPool(POOL_SAT_LUNAR);
         lunar.pool.addAll(List.of(
-                // SKIPPED: CE's 3 weighted(ModBlocks.moon_turf, 0, {48,32,16}, {48,32,16}, {5,7,5})
-                // rolls - moon_turf is not registered anywhere in this port - see class javadoc.
                 ItemPool.entry(BilletPowderItems.POWDER_LITHIUM.get(), 3, 3, 5),
                 ItemPool.entry(BilletPowderItems.POWDER_IRON.get(), 3, 3, 5),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_IRON.get(), 1, 1, 1),
                 ItemPool.entry(PlateCrystalWasteItems.CRYSTAL_LITHIUM.get(), 1, 1, 1)
         ));
+        ItemPoolLookups.add(lunar, "moon_turf", 48, 48, 5);
+        ItemPoolLookups.add(lunar, "moon_turf", 32, 32, 7);
+        ItemPoolLookups.add(lunar, "moon_turf", 16, 16, 5);
     }
 }

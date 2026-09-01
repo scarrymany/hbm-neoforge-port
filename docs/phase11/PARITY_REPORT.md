@@ -8,24 +8,23 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 + plant/glyph/bedrock loops, plus flatten extras; **not** lang keys). Recipe JSON counted from
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
-Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.242s)** on wiped world port 25566, **4047 recipes**
-(+101 vs prior 3946 = new shredder JSON). No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+Verified this wave: `compileJava` 0.
+`./gradlew runServer` after push (wiped world, port 25566). No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **105.7%** (8209 / 7767) |
+| **Weighted** (Σport / ΣCE) | **105.7%** (8213 / 7767) |
 | **Unweighted** (mean of category %) | **103.8%** |
-| Recipe/loot + machine-table reachability | **60.5%** (1567 / 2590) |
+| Recipe/loot + machine-table + ItemPools reachability | **62.4%** (1615 / 2590) |
 | CE `@AutoRegister` entities still missing | **none** |
 
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 161**, **machine 93**, **vanilla 52**.
-Weighted **105.7%**. Category holes remain. Not content-complete.
+Largest remaining holes: **blocks 161**, **machine 89**, **vanilla 52**.
+Weighted **105.7%**. Reachability **62.4%** — still the owner pain. Not a tag.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
 
@@ -39,13 +38,29 @@ Weighted **105.7%**. Category holes remain. Not content-complete.
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
 | Vanilla crafting | ~1950 | 1898 | **97.3%** | CE estimate kept at 1950 |
-| Machine recipes | ~2009 | 1916 | **95.4%** | +101 shredder JSON. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201 JSON / 200 inputs** vs CE **177 sites / ~211** expanded. Cyclotron unique **42=42** (regex 43 = helper). Centrifuge 75/78 AE2 skip. |
+| Machine recipes | ~2009 | 1920 | **95.6%** | +anvil Java table. ChemPlant unique **72=72**. Crystallizer unique **303/~309**. Shredder unique **201/200**. Cyclotron **42=42**. Anvil unique **67 / 200** (I/O that exists). Centrifuge 75/78 AE2 skip. |
 | Advancements | 65 | 65 | **100%** | JSON under `data/hbm/advancement(s)` |
 
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (Shredder + Cyclotron start)
+## What changed this wave (reachability + Anvil GUI)
+
+- Reachability **60.5% → 62.4%** (1567 → 1615 / 2590). Census `loot_outputs()` now
+  scans live `ItemPools*` (`addHbm` / `ItemPoolLookups.add`) — those pools already
+  fire from structures / satellite miners / vending. Not JSON self-drop padding.
+- Sat leftovers whose I/O now exists: `fluorite` 4/4/15, `gravel_diamond` 1/1/3,
+  `moon_turf` 48/48/5 + 32/32/7 + 16/16/5. Stale "absent" javadoc fixed.
+- **Anvil E2E**: `NTMAnvil.useWithoutItem` → `AnvilMenu` (2+1, no BE) +
+  `AnvilScreen` blit CE `gui_anvil.png` + `AnvilCraftPacket` construction from
+  player inv. Smithing consume on take. Recipes: upgrades + gunmetal + plates +
+  deco + coils/motors + machines/armor/fuel plates with registered I/O.
+  TODO(CE: AnvilRecipes.java:75-130) hot/mold/cyanide/rename. `machine_boiler` AIR.
+- Liquefaction: `oil_tar_crude` BITUMEN 75, `oil_tar_crack` BITUMEN 100,
+  `lignite` COALOIL 150, `lead_block` LEAD 900. coal/wood tar remaps stay.
+- Assembler SKIP7 not invented.
+
+## Prior wave (Shredder + Cyclotron start)
 
 - Family: **Shredder**. Leftover CE `registerDefaults` rows → JSON `data/hbm/recipe/shredder/`
   (TE already queries `ProcessingRecipes.SHREDDER_TYPE`). **201** files, **200** unique
@@ -209,15 +224,23 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Recipe-graph reachability (cheap)
 
-**60.3%** (1559 / 2586). JSON/loot + Java machine-table **outputs**. Inputs not counted.
+**62.4%** (1615 / 2590). JSON loot + Java machine-table **outputs** + live `ItemPools*`
+(`addHbm` / `ItemPoolLookups.add`). Inputs not counted. Self-drop block loot not added.
+
+Before this wave: **60.5%** (1567 / 2590). +48 honest (pools that already fire + anvil
+outs that exist + sat leftovers `fluorite`/`gravel_diamond`/`moon_turf`).
 
 ## Next single gap
 
-Blocks **86.2%** (161 missing). Next real recipe family after Crystallizer: **Shredder**
-`registerDefaults` ~223 vs ~99 JSON, or **Cyclotron** 43 vs 12. Anvil 236 table-only (no GUI).
+**Anvil** unique: CE **200** Mod* outs / 236 add-sites vs port **67** with registered I/O.
+GUI is live this wave. Leftover rows need unregistered I/O (hot/mold/shell/pipe/sawblade/
+recycling). Do not invent.
+
+Next other family by unique CE vs port (not regex 145-style): Press **41/38**,
+Combination ~done, Exposure done, Liquefaction leftovers landed, Solidification live.
 Assembler skip 7. `v0.0.1-rc2` stays.
-Crystallizer E2E: leftover solids/bedrock **yes**. GUI blit **wired**, client not opened.
-Fluid-id slots still trimmed. ChemPlant unique complete.
+Anvil E2E: smithing consume/produce **yes** (menu slots). Construction **yes**
+(`AnvilCraftPacket` + player inv). GUI blit CE `gui_anvil.png`, not gray-box.
 
 ## Entities (Phase 9 leftovers)
 

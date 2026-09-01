@@ -59,6 +59,7 @@ import com.hbm.inventory.recipes.LemegetonRecipes;
 import com.hbm.inventory.recipes.OutgasserRecipes;
 import com.hbm.inventory.recipes.RockMillRecipes;
 import com.hbm.inventory.recipes.PressRecipes;
+import com.hbm.inventory.recipes.anvil.AnvilRecipes;
 import com.hbm.inventory.recipes.PyroOvenRecipes;
 import com.hbm.inventory.recipes.RotaryFurnaceRecipes;
 import com.hbm.inventory.recipes.WasteDrumRecipes;
@@ -169,6 +170,7 @@ public class CommonEvents {
             RockMillRecipes.register();
             AnnihilatorRecipes.register();
             PressRecipes.register();
+            AnvilRecipes.register();
             RotaryFurnaceRecipes.register();
             WasteDrumRecipes.register();
             FractionRecipes.register();

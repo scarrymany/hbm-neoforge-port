@@ -4,6 +4,7 @@ import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.BlockFallingBase;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.NTMAnvil;
+import com.hbm.inventory.container.AnvilMenus;
 import com.hbm.blocks.machine.RailBooster;
 import com.hbm.blocks.machine.RailGeneric;
 import com.hbm.blocks.machine.RailHighspeed;
@@ -350,6 +351,7 @@ public final class Phase8Blocks {
         registerBlock("anvil_dnt", () -> new NTMAnvil(anvil, NTMAnvil.TIER_PARTICLE), ModCreativeTabs.MACHINE);
         registerBlock("anvil_osmiridium", () -> new NTMAnvil(anvil, NTMAnvil.TIER_GERALD), ModCreativeTabs.MACHINE);
         registerBlock("anvil_murky", () -> new NTMAnvil(anvil, 1916169), ModCreativeTabs.MACHINE);
+        AnvilMenus.registerAll();
     }
 
     /** CE {@code ModBlocks.java}:857 / {@code GeigerCounter.java}:28 — facing casing for Bunker. */

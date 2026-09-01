@@ -1,15 +1,20 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.inventory.container.AnvilMenu;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.Mirror;
@@ -18,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -28,8 +34,7 @@ import java.util.Map;
 
 /**
  * CE {@code NTMAnvil} ({@code ModBlocks.java}:1094-1105). Facing falling casing + tier tooltip
- * ({@code NTMAnvil.java}:40-62, 136-150, 184-186). GUI / {@code ContainerAnvil} is Phase 2 machine
- * work — click does nothing this pass.
+ * ({@code NTMAnvil.java}:40-62, 136-150, 184-186). Opens {@code ContainerAnvil}/{@code GUIAnvil}.
  */
 public class NTMAnvil extends FallingBlock {
 
@@ -91,6 +96,17 @@ public class NTMAnvil extends FallingBlock {
     @Override
     protected BlockState mirror(BlockState state, Mirror mirror) {
         return state.rotate(mirror.getRotation(state.getValue(FACING)));
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (level.isClientSide) return InteractionResult.SUCCESS;
+        int openTier = this.tier;
+        player.openMenu(new SimpleMenuProvider(
+                (id, inv, ply) -> new AnvilMenu(id, inv, openTier),
+                Component.translatable("container.hbm.anvil", openTier)),
+                buf -> buf.writeVarInt(openTier));
+        return InteractionResult.CONSUME;
     }
 
     @Override

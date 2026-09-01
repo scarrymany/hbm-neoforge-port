@@ -400,6 +400,12 @@ public final class RecipesCommon {
             return new OreDictStack(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", path)));
         }
 
+        public static OreDictStack ofCommonTag(String path, int count) {
+            OreDictStack stack = ofCommonTag(path);
+            stack.setCount(count);
+            return stack;
+        }
+
         public static OreDictStack ofHbmTag(String path, int count) {
             return new OreDictStack(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path)), count);
         }

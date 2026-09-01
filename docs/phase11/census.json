@@ -2,7 +2,7 @@
   "weighted_pct": 105.7,
   "unweighted_pct": 103.8,
   "ce_sum": 7767,
-  "port_sum": 8209,
+  "port_sum": 8213,
   "rows": [
     {
       "cat": "items",
@@ -43,8 +43,8 @@
     {
       "cat": "machine_recipes",
       "ce": 2009,
-      "port": 1916,
-      "pct": 95.4
+      "port": 1920,
+      "pct": 95.6
     },
     {
       "cat": "advancements",
@@ -191,7 +191,7 @@
         "HeatRecipes": 2,
         "HydrotreatingRecipes": 6,
         "LemegetonRecipes": 37,
-        "LiquefactionRecipes": 31,
+        "LiquefactionRecipes": 35,
         "MagicRecipes": 3,
         "MixerRecipes": 1,
         "OreSlopperRecipes": 6,
@@ -219,7 +219,7 @@
         "ElectrolyserFluidRecipes": 7,
         "SILEXRecipes": 95
       },
-      "port": 1916,
+      "port": 1920,
       "by_type": {
         "hbm:assembler": 628,
         "hbm:breeder": 30,
@@ -238,9 +238,9 @@
     },
     "reachability": {
       "port_items": 2590,
-      "reachable_via_recipe_or_loot": 1567,
+      "reachable_via_recipe_or_loot": 1615,
       "includes_machine_tables": true,
-      "pct": 60.5
+      "pct": 62.4
     }
   },
   "recipe_json_total": 2757

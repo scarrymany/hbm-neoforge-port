@@ -19,8 +19,8 @@ import java.util.Map;
 
 /**
  * CE {@code LiquefactionRecipes.java:32-69}. Each insert is a live {@code RECIPES.put} for the census.
- * Skipped: lignite gem, {@code glyphid_gland_empty}, {@code plant_flower} metas,
- * {@code PB.block}, food→SALIENT dynamic. Tar keys landed ({@code oil_tar_*} flatten).
+ * Skipped: {@code glyphid_gland_empty}, {@code plant_flower} metas, food→SALIENT dynamic.
+ * {@code oil_tar_crude}/{@code oil_tar_crack}/{@code lignite}/{@code lead_block} landed.
  */
 public final class LiquefactionRecipes {
 
@@ -35,23 +35,28 @@ public final class LiquefactionRecipes {
         if (registered) return;
         registered = true;
 
-        // :32 KEY_*_TAR → oil_tar flatten
+        // :32 KEY_*_TAR → oil_tar flatten. CE KEY_OIL_TAR/KEY_CRACK_TAR → BITUMEN.
+        // coal/wood tar keep the already-shipped remaps (not CE BITUMEN 50) — do not "fix".
         RECIPES.put(new ComparableStack(item("oil_tar_coal")), new FluidStack(Fluids.COALOIL, 200));
         RECIPES.put(new ComparableStack(item("oil_tar_wood")), new FluidStack(Fluids.HEATINGOIL, 200));
         RECIPES.put(new ComparableStack(item("oil_tar_wax")), new FluidStack(Fluids.LUBRICANT, 100));
         RECIPES.put(new ComparableStack(item("oil_tar_paraffin")), new FluidStack(Fluids.LUBRICANT, 100));
+        RECIPES.put(new ComparableStack(item("oil_tar_crude")), new FluidStack(Fluids.BITUMEN, 75));
+        RECIPES.put(new ComparableStack(item("oil_tar_crack")), new FluidStack(Fluids.BITUMEN, 100));
 
         // :33-34
         RECIPES.put(new ComparableStack(Items.COAL), new FluidStack(Fluids.COALOIL, 250));
         RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_COAL.get()), new FluidStack(Fluids.COALOIL, 250));
         // :36
         RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_LIGNITE.get()), new FluidStack(Fluids.COALOIL, 150));
+        RECIPES.put(new ComparableStack(item("lignite")), new FluidStack(Fluids.COALOIL, 150));
         // :40
         RECIPES.put(new ComparableStack(Items.OAK_LOG), new FluidStack(Fluids.MUG, 100));
         // :41-43
         RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_SODIUM.get()), new FluidStack(Fluids.SODIUM, 100));
         RECIPES.put(new ComparableStack(IngotNuggetItems.INGOT_LEAD.get()), new FluidStack(Fluids.LEAD, 100));
         RECIPES.put(new ComparableStack(BilletPowderItems.POWDER_LEAD.get()), new FluidStack(Fluids.LEAD, 100));
+        RECIPES.put(new ComparableStack(item("lead_block")), new FluidStack(Fluids.LEAD, 900));
         // :46-54
         RECIPES.put(new ComparableStack(Blocks.NETHERRACK.asItem()), new FluidStack(Fluids.LAVA, 250));
         RECIPES.put(new ComparableStack(Blocks.COBBLESTONE.asItem()), new FluidStack(Fluids.LAVA, 250));

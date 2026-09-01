@@ -470,6 +470,17 @@ def loot_outputs() -> set[str]:
             text = p.read_text(encoding="utf-8", errors="replace")
             outs.update(re.findall(r'"name"\s*:\s*"(hbm:[^"]+)"', text))
             outs.update(re.findall(r'"item"\s*:\s*"(hbm:[^"]+)"', text))
+    # Live Java ItemPools (structures / satellite miners / vending). These fire in-world;
+    # census was JSON-only and treated the pools as invisible.
+    itempool = PORT_JAVA / "itempool"
+    if itempool.exists():
+        add_id = re.compile(
+            r'(?:addHbm|ItemPoolLookups\.add)\(\s*\w+\s*,\s*"([a-z0-9_]+)"'
+        )
+        for p in java_files(itempool):
+            text = read(p)
+            for sid in add_id.findall(text):
+                outs.add("hbm:" + sid)
     return outs
 
 
