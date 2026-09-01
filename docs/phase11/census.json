@@ -1,14 +1,14 @@
 {
-  "weighted_pct": 106.0,
+  "weighted_pct": 106.1,
   "unweighted_pct": 104.0,
   "ce_sum": 7767,
-  "port_sum": 8234,
+  "port_sum": 8237,
   "rows": [
     {
       "cat": "items",
       "ce": 1863,
-      "port": 2604,
-      "pct": 139.8
+      "port": 2607,
+      "pct": 139.9
     },
     {
       "cat": "blocks",
@@ -59,7 +59,7 @@
       "ce_expanded_approx": 1863,
       "ce_string_ctors": 1307,
       "ce_used": 1863,
-      "port": 2604,
+      "port": 2607,
       "method": "phase10 extract_all_ids (Java register/reg + Mats autogen + loops)"
     },
     "blocks": {
@@ -237,8 +237,8 @@
       "port": 65
     },
     "reachability": {
-      "port_items": 2604,
-      "reachable_via_recipe_or_loot": 1648,
+      "port_items": 2607,
+      "reachable_via_recipe_or_loot": 1649,
       "includes_machine_tables": true,
       "pct": 63.3
     }
