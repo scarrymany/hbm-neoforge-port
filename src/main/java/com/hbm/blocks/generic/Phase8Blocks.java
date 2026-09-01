@@ -84,6 +84,18 @@ public final class Phase8Blocks {
         registerBlock("concrete_smooth", () -> new BlockBase(stone(15.0F, 140.0F), true), ModCreativeTabs.BLOCKS);
         registerBlock("concrete_asbestos", () -> new BlockBase(stone(15.0F, 1500.0F), true), ModCreativeTabs.BLOCKS);
         registerBlock("concrete_rebar", () -> new BlockBase(stone(50.0F, 240.0F), true), ModCreativeTabs.BLOCKS);
+        // CE ModBlocks.java:360-362 / :128 / :1547 / :1283 / :1314-1316 — leftover cubes.
+        registerBlock("gneiss_brick", () -> new BlockBase(stone(1.5F, 10.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("gneiss_tile", () -> new BlockBase(stone(1.5F, 10.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("gneiss_chiseled", () -> new BlockBase(stone(1.5F, 10.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("vinyl_tile_large", () -> new BlockBase(stone(10.0F, 60.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("vinyl_tile_small", () -> new BlockBase(stone(10.0F, 60.0F)), ModCreativeTabs.BLOCKS);
+        registerBlock("pink_planks", () -> new BlockBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOD)), null);
+        registerBlock("struct_launcher", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MISSILE);
+        registerBlock("struct_scaffold", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MISSILE);
+        registerBlock("fusion_heater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        registerBlock("fusion_hatch", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        registerBlock("fusion_core_block", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
     }
 
     /** CE ModBlocks.java:398-405 — meteor dungeon brick family. {@code meteor_spawner} is a cube here

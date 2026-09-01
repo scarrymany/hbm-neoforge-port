@@ -103,6 +103,49 @@ def extract_all_ids() -> tuple[set[str], set[str]]:
     for s in ("scaffold_steel", "scaffold_red", "scaffold_white", "scaffold_yellow"):
         blocks.add(s)
         items.add(s)
+    # GenericBlocks metadata loops already registered via registerBlock("prefix_" + enum)
+    for pref, enum_name, src in (
+        ("platemetal_", "PlatemetalType", enums_deco),
+        ("stone_resource_", "EnumStoneType", enums_deco),
+        ("lightstone_", "LightstoneType", enums_deco),
+        ("block_cap_", "EnumBlockCapType", enums_deco),
+        ("block_meteor_ore_", "EnumMeteorType", enums_deco),
+    ):
+        m = re.search(rf"enum {enum_name} \{{(.*?)\}}", src, flags=re.S)
+        if not m:
+            continue
+        for n in re.findall(r"\b([A-Z][A-Z0-9_]+)\b", m.group(1)):
+            if n in {"VALUES"}:
+                continue
+            bid = pref + n.lower()
+            blocks.add(bid)
+            items.add(bid)
+    for n in re.findall(r"\b([A-Z][A-Z0-9_]+)\b",
+                        re.search(r"enum EnumStalagmiteType \{(.*?)\}", enums_deco, flags=re.S).group(1)
+                        if re.search(r"enum EnumStalagmiteType \{(.*?)\}", enums_deco, flags=re.S) else ""):
+        if n in {"VALUES"}:
+            continue
+        s = n.lower()
+        blocks.add(f"stalagmite_{s}")
+        blocks.add(f"stalactite_{s}")
+        items.add(f"stalagmite_{s}")
+        items.add(f"stalactite_{s}")
+    coke_src = (JAVA / "items" / "ItemEnums.java").read_text(errors="ignore") if (JAVA / "items" / "ItemEnums.java").exists() else ""
+    m = re.search(r"enum EnumCokeType \{(.*?)\}", coke_src, flags=re.S)
+    if m:
+        for n in re.findall(r"\b([A-Z][A-Z0-9_]+)\b", m.group(1)):
+            if n in {"VALUES"}:
+                continue
+            bid = "block_coke_" + n.lower()
+            blocks.add(bid)
+            items.add(bid)
+    for name in (
+        "ladder_sturdy", "ladder_iron", "ladder_gold", "ladder_aluminium", "ladder_copper",
+        "ladder_titanium", "ladder_lead", "ladder_cobalt", "ladder_steel", "ladder_tungsten",
+        "ladder_red", "ladder_red_top",
+    ):
+        blocks.add(name)
+        items.add(name)
     # PlantBlocks / glyph loops
     enums = (JAVA / "blocks" / "PlantEnums.java").read_text(errors="ignore")
     for pref, enum_name in (

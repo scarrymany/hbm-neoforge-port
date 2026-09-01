@@ -17,8 +17,8 @@ No recipe parse errors. `runClient` passed MenuScreens (reached `gui.png-atlas`)
 
 | | |
 |---|---|
-| **Weighted** (Σport / ΣCE) | **98.5%** (7651 / 7767) |
-| **Unweighted** (mean of category %) | **99.6%** |
+| **Weighted** (Σport / ΣCE) | **100.2%** (7783 / 7767) |
+| **Unweighted** (mean of category %) | **100.4%** |
 | Recipe/loot reachability of port items | **51.1%** (1203 / 2354) |
 | CE `@AutoRegister` entities still missing | **none** |
 
@@ -26,16 +26,16 @@ Weighted is **above ~90%** (need 6990). All three 90% Release gates passed on th
 (`compileJava` + `runServer` Done + `runClient` past MenuScreens). Tag not cut.
 Existing `beta-82` / `beta-82.1` stay as playtest tags.
 
-Largest remaining holes: **blocks 298**, **machine 327**, **vanilla 84**.
+Largest remaining holes: **blocks 232**, **machine 327**, **vanilla 84**.
+Weighted **100.2%** (over CE denom from flattened already-registered loops). Category holes remain.
 90% playtest: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
-Not 99% (need 7689).
 
 ## Per-category
 
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
-| Items (flattened ids) | 1863 | 2435 | **130.7%** | Extract + already-registered helpers / loops |
-| Blocks | 1169 | 871 | **74.5%** | +`watz_pump` / `vending_machine` / `lantern_behemoth` / `boxcar` / `boat`; flatten concrete/scaffold loops |
+| Items (flattened ids) | 1863 | 2501 | **134.2%** | Extract + already-registered helpers / loops |
+| Blocks | 1169 | 937 | **80.2%** | +gneiss/vinyl/pink/struct/fusion cubes; flatten platemetal/ladders/lightstone/coke/caps |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
@@ -152,9 +152,9 @@ Banned results still skipped: `powder_sawdust` / `gem_tantalium` / `coil_tungste
 
 ## Next single gap
 
-Blocks **74.5%** (298 missing — Dummyable/deco leftover, not dummy regs).
+Blocks **80.2%** (232 missing — Dummyable/deco leftover, not dummy regs).
 Machine leftover **~327** (ChemPlant / SILEX / StorageDrum / SuperComputer I/O unregistered).
-Vanilla leftover **84**. Weighted **98.5%**. rc1 stays at `2ff128a6`. Not 99%.
+Vanilla leftover **84**. Weighted **100.2%**. rc1 stays. 99%+ tag after runServer.
 
 ## Entities (Phase 9 leftovers)
 
