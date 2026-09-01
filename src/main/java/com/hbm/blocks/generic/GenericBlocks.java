@@ -1,8 +1,12 @@
 package com.hbm.blocks.generic;
 
+import com.hbm.blockentity.machine.DoorGenericBlockEntities;
 import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.BlockEnums;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.machine.BlastDoor;
+import com.hbm.blocks.machine.DummyBlockBlast;
+import com.hbm.tileentity.DoorDecl;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ItemEnums.EnumCokeType;
@@ -52,6 +56,23 @@ import java.util.function.Supplier;
  * per the port report, out of this pass entirely.
  */
 public final class GenericBlocks {
+
+    public static DeferredBlock<BlockDoorGeneric> VAULT_DOOR;
+    public static DeferredBlock<BlastDoor> BLAST_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> FIRE_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> SLIDING_BLAST_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> LARGE_VEHICLE_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> WATER_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> QE_CONTAINMENT;
+    public static DeferredBlock<BlockDoorGeneric> QE_SLIDING_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> ROUND_AIRLOCK_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> SECURE_ACCESS_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> SLIDING_SEAL_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> CARGO_DOOR;
+    public static DeferredBlock<BlockDoorGeneric> SILO_HATCH;
+    public static DeferredBlock<BlockDoorGeneric> SILO_HATCH_LARGE;
+    public static DeferredBlock<BlockDoorGeneric> TRANSITION_SEAL;
+    public static DeferredBlock<DummyBlockBlast> DUMMY_BLOCK_BLAST;
 
     private GenericBlocks() {
     }
@@ -277,27 +298,32 @@ public final class GenericBlocks {
         registerBlock("door_metal", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(5.0F, 5.0F).sound(SoundType.METAL).noOcclusion()), null);
         registerBlock("door_office", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 10.0F).sound(SoundType.METAL).noOcclusion()), null);
         registerBlock("door_bunker", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()), null);
-        // CE vault/blast/fire/sliding doors are custom multiblock TEs (not vanilla DoorBlock).
-        // Placeable casings so assembler recipes can output them; full open/close TE later.
-        // Assets already exist as cube_all (blockstates/vault_door.json etc.).
-        BlockBehaviour.Properties blast = BlockBehaviour.Properties.of().strength(10.0F, 6000.0F).sound(SoundType.METAL);
-        registerBlock("vault_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("blast_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("fire_door", () -> new BlockBase(BlockBehaviour.Properties.of().strength(10.0F, 1500.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
-        registerBlock("sliding_blast_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        // CE AssemblyMachineRecipes.java:189-214 leftover door outputs (casings only, TE later).
-        registerBlock("sliding_blast_door_legacy", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("large_vehicle_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("water_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("qe_containment", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("qe_sliding_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("round_airlock_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("secure_access_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("sliding_seal_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("cargo_door", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("silo_hatch", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("silo_hatch_large", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
-        registerBlock("transition_seal", () -> new BlockBase(blast), ModCreativeTabs.MACHINE);
+
+        VAULT_DOOR = registerBlock("vault_door", () -> new BlockDoorGeneric(doorProps(500.0F, 1000.0F), DoorDecl.VAULT_DOOR, true), ModCreativeTabs.MACHINE);
+        BLAST_DOOR = registerBlock("blast_door", () -> new BlastDoor(doorProps(250.0F, 1000.0F)), ModCreativeTabs.MACHINE);
+        FIRE_DOOR = registerBlock("fire_door", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.FIRE_DOOR, true), ModCreativeTabs.MACHINE);
+        SLIDING_BLAST_DOOR = registerBlock("sliding_blast_door", () -> new BlockDoorGeneric(doorProps(150.0F, 750.0F), DoorDecl.SLIDE_DOOR, false), ModCreativeTabs.MACHINE);
+        // TODO(CE: ModBlocks.java:893): BlockSlidingBlastDoor TESR/keypad — not BlockDoorGeneric.
+        registerBlock("sliding_blast_door_legacy", () -> new BlockBase(doorProps(150.0F, 750.0F)), ModCreativeTabs.MACHINE);
+        LARGE_VEHICLE_DOOR = registerBlock("large_vehicle_door", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.LARGE_VEHICLE_DOOR, true), ModCreativeTabs.MACHINE);
+        WATER_DOOR = registerBlock("water_door", () -> new BlockDoorGeneric(doorProps(50.0F, 500.0F), DoorDecl.WATER_DOOR, false), ModCreativeTabs.MACHINE);
+        QE_CONTAINMENT = registerBlock("qe_containment", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.QE_CONTAINMENT, true), ModCreativeTabs.MACHINE);
+        QE_SLIDING_DOOR = registerBlock("qe_sliding_door", () -> new BlockDoorGeneric(doorProps(100.0F, 500.0F), DoorDecl.QE_SLIDING, false), ModCreativeTabs.MACHINE);
+        ROUND_AIRLOCK_DOOR = registerBlock("round_airlock_door", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.ROUND_AIRLOCK_DOOR, true), ModCreativeTabs.MACHINE);
+        SECURE_ACCESS_DOOR = registerBlock("secure_access_door", () -> new BlockDoorGeneric(doorProps(200.0F, 2000.0F), DoorDecl.SECURE_ACCESS_DOOR, true), ModCreativeTabs.MACHINE);
+        SLIDING_SEAL_DOOR = registerBlock("sliding_seal_door", () -> new BlockDoorGeneric(doorProps(10.0F, 1000.0F), DoorDecl.SLIDING_SEAL_DOOR, false), ModCreativeTabs.MACHINE);
+        CARGO_DOOR = registerBlock("cargo_door", () -> new BlockDoorGeneric(doorProps(5.0F, 50.0F), DoorDecl.CARGO_DOOR, false), ModCreativeTabs.MACHINE);
+        SILO_HATCH = registerBlock("silo_hatch", () -> new BlockDoorGeneric(doorProps(10.0F, 100.0F), DoorDecl.SILO_HATCH, false), ModCreativeTabs.MACHINE);
+        SILO_HATCH_LARGE = registerBlock("silo_hatch_large", () -> new BlockDoorGeneric(doorProps(10.0F, 100.0F), DoorDecl.SILO_HATCH_LARGE, false), ModCreativeTabs.MACHINE);
+        TRANSITION_SEAL = registerBlock("transition_seal", () -> new BlockDoorGeneric(doorProps(1000.0F, 1_000_000.0F), DoorDecl.TRANSITION_SEAL, true), ModCreativeTabs.MACHINE);
+        DUMMY_BLOCK_BLAST = ModBlocks.BLOCKS.register("dummy_block_blast",
+                () -> new DummyBlockBlast(BlockBehaviour.Properties.of().strength(500.0F, 10_000.0F).sound(SoundType.METAL).noOcclusion().noLootTable()));
+
+        DoorGenericBlockEntities.registerAll();
+    }
+
+    private static BlockBehaviour.Properties doorProps(float hardness, float resistance) {
+        return BlockBehaviour.Properties.of().strength(hardness, resistance).sound(SoundType.METAL).noOcclusion();
     }
 
     /** CE's twelve registrations; only {@code ladder_red_top} sets {@code capTop}. */

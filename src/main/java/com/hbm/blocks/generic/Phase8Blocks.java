@@ -119,7 +119,7 @@ public final class Phase8Blocks {
         registerBlock("fusion_core_block", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         // CE ModBlocks.java:1351 BlockHadronCoil factor 10. Casing + CE assets; hadron TE later.
         registerBlock("hadron_coil_alloy", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
-        // CE ModBlocks.java:1009 MachineGenerator — leftover cube, tab null, no TE.
+        // CE ModBlocks.java:1009 / MachineGenerator.java — Block, no TE. Drop: circuit ADVANCED.
         registerBlock("machine_generator", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), null);
         // CE ModBlocks.java:811-812 — leftover cubes (BlockBakeBase → BlockBase, no TE).
         registerBlock("cm_flux", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);

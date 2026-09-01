@@ -48,7 +48,7 @@ import java.util.List;
  * Flattened CE {@code ItemAmmoArty}/{@code ItemAmmoHIMARS} tables.
  * TODO(CE: ItemAmmoArty.java:242-244): {@code ExplosionCreator.composeEffect} — not ported (VFX).
  * TODO(CE: ItemAmmoArty.java:285-287): {@code HbmEffectNT.RBMKMush} — not in {@link HbmEffect}.
- * TODO(CE: CargoShellCraftingHandler.java:28): shapeless empty cargo + any item → NBT {@code cargo}.
+ * Cargo shell craft: {@link com.hbm.inventory.recipes.crafting.CargoShellCraftingRecipe}.
  * TODO(CE: ItemAmmoHIMARS.java:256-260): {@code volcanic_lava_block} — slag stand-in.
  */
 public final class ArtilleryAmmo {
@@ -121,6 +121,18 @@ public final class ArtilleryAmmo {
             return ItemStack.EMPTY;
         }
         return ItemStack.parseOptional(registries, tag.getCompound("cargo"));
+    }
+
+    /** CE {@code CargoShellCraftingHandler.getCraftingResult} writes NBT key {@code cargo}. */
+    public static ItemStack setCargo(ItemStack shell, ItemStack cargo, HolderLookup.Provider registries) {
+        ItemStack out = shell.copy();
+        out.setCount(1);
+        CompoundTag tag = out.get(DataComponents.CUSTOM_DATA) != null
+                ? out.get(DataComponents.CUSTOM_DATA).copyTag()
+                : new CompoundTag();
+        tag.put("cargo", cargo.copyWithCount(1).save(registries));
+        out.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        return out;
     }
 
     public static int typeOfHimars(Item item) {

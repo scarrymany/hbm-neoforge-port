@@ -34,6 +34,9 @@ public final class DynamicCraftingRecipes {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GrenadeCraftingRecipe>> GRENADE_SERIALIZER =
             HbmRecipes.RECIPE_SERIALIZERS.register("grenade_crafting", () -> GrenadeCraftingRecipe.Serializer.INSTANCE);
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CargoShellCraftingRecipe>> CARGO_SHELL_SERIALIZER =
+            HbmRecipes.RECIPE_SERIALIZERS.register("cargo_shell_crafting", () -> CargoShellCraftingRecipe.Serializer.INSTANCE);
+
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<RBMKFuelRecycleRecipe>> RBMK_FUEL_RECYCLE_SERIALIZER =
             HbmRecipes.RECIPE_SERIALIZERS.register("rbmk_fuel_recycle", () -> RBMKFuelRecycleRecipe.Serializer.INSTANCE);
 
