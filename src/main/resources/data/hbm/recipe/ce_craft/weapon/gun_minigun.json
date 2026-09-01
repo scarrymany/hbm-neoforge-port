@@ -1,0 +1,45 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "BMG",
+    "BRE",
+    "BGM"
+  ],
+  "key": {
+    "B": [
+      {
+        "tag": "c:light_barrels/tcalloy"
+      },
+      {
+        "tag": "c:light_barrels/cdalloy"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "R": [
+      {
+        "tag": "c:heavy_receivers/tcalloy"
+      },
+      {
+        "tag": "c:heavy_receivers/cdalloy"
+      }
+    ],
+    "E": {
+      "item": "hbm:motor_desh"
+    }
+  },
+  "result": {
+    "id": "hbm:gun_minigun",
+    "count": 1
+  }
+}

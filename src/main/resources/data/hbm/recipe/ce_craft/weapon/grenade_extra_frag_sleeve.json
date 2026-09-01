@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    " T ",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "hbm:steel_bolt"
+    },
+    "T": {
+      "item": "hbm:ducttape"
+    }
+  },
+  "result": {
+    "id": "hbm:grenade_extra_frag_sleeve",
+    "count": 1
+  }
+}

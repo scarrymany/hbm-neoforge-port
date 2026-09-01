@@ -1,0 +1,40 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    [
+      {
+        "tag": "c:plates_triple/tcalloy"
+      },
+      {
+        "tag": "c:plates_triple/cdalloy"
+      }
+    ],
+    [
+      {
+        "tag": "c:plates_triple/tcalloy"
+      },
+      {
+        "tag": "c:plates_triple/cdalloy"
+      }
+    ],
+    [
+      {
+        "tag": "c:plates_triple/tcalloy"
+      },
+      {
+        "tag": "c:plates_triple/cdalloy"
+      }
+    ],
+    {
+      "item": "hbm:ducttape"
+    }
+  ],
+  "result": {
+    "id": "hbm:weapon_mod_generic_tcalloy_damage",
+    "count": 1
+  }
+}

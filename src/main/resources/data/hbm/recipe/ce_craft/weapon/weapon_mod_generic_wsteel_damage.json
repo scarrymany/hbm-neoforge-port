@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    {
+      "tag": "c:plates_triple/weaponsteel"
+    },
+    {
+      "tag": "c:plates_triple/weaponsteel"
+    },
+    {
+      "tag": "c:plates_triple/weaponsteel"
+    },
+    {
+      "item": "hbm:ducttape"
+    }
+  ],
+  "result": {
+    "id": "hbm:weapon_mod_generic_wsteel_damage",
+    "count": 1
+  }
+}

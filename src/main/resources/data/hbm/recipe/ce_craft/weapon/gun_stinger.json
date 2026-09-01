@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "BBB",
+    "PGM"
+  ],
+  "key": {
+    "B": {
+      "tag": "c:heavy_barrels/weaponsteel"
+    },
+    "P": {
+      "item": "hbm:circuit_advanced"
+    },
+    "G": {
+      "tag": "c:grips/weaponsteel"
+    },
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    }
+  },
+  "result": {
+    "id": "hbm:gun_stinger",
+    "count": 1
+  }
+}

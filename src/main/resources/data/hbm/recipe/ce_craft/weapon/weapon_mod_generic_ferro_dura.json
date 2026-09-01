@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "tag": "c:plates/weaponsteel"
+    },
+    {
+      "tag": "c:plates_triple/ferrouranium"
+    },
+    {
+      "item": "hbm:ducttape"
+    }
+  ],
+  "result": {
+    "id": "hbm:weapon_mod_generic_ferro_dura",
+    "count": 1
+  }
+}

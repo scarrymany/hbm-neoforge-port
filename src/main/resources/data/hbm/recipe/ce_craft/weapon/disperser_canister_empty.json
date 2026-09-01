@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "PGP",
+    " P "
+  ],
+  "key": {
+    "P": {
+      "tag": "hbm:any_hardplastic"
+    },
+    "G": {
+      "item": "hbm:glass_boron"
+    }
+  },
+  "result": {
+    "id": "hbm:disperser_canister_empty",
+    "count": 4
+  }
+}

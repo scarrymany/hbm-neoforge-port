@@ -1,5 +1,7 @@
 package com.hbm.items.gear;
 
+import com.hbm.creativetabs.CreativeTabContents;
+import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ModItems;
 import com.hbm.main.MainRegistry;
 import com.hbm.main.MaterialRegistry;
@@ -189,6 +191,19 @@ public final class SpecialArmorItems {
         COMBAT_TAB.add(ASHGLASSES);
         COMBAT_TAB.add(MASK_DAMP);
         COMBAT_TAB.add(MASK_PISS);
+    }
+
+    // CE ModItems.java:738-740 ArmorModel CHEST, consumableTab. Overlay stays Phase 5.
+    public static final DeferredItem<Item> CAPE_RADIATION = ModItems.ITEMS.register("cape_radiation",
+            () -> new ArmorModel(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE, props(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE)));
+    public static final DeferredItem<Item> CAPE_GASMASK = ModItems.ITEMS.register("cape_gasmask",
+            () -> new ArmorModel(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE, props(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE)));
+    public static final DeferredItem<Item> CAPE_SCHRABIDIUM = ModItems.ITEMS.register("cape_schrabidium",
+            () -> new ArmorModel(MaterialRegistry.aMatSchrab, ArmorItem.Type.CHESTPLATE, props(MaterialRegistry.aMatSchrab, ArmorItem.Type.CHESTPLATE)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CAPE_RADIATION);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CAPE_GASMASK);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CAPE_SCHRABIDIUM);
     }
 
     // CE ModItems.java:471-473 ArmorFSB aMatPaa + Haste. getReflector() = neutron_reflector.

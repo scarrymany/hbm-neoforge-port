@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "tag": "c:gun_mechanisms/gunmetal"
+    },
+    {
+      "tag": "c:plates_triple/durasteel"
+    },
+    {
+      "tag": "c:plates_triple/durasteel"
+    },
+    {
+      "tag": "c:plates_triple/durasteel"
+    },
+    {
+      "item": "hbm:ducttape"
+    }
+  ],
+  "result": {
+    "id": "hbm:weapon_mod_generic_dura_damage",
+    "count": 1
+  }
+}

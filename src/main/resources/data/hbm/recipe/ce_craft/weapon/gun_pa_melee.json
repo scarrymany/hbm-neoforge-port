@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " C ",
+    "MWM"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:circuit_basic"
+    },
+    "M": {
+      "item": "hbm:motor"
+    },
+    "W": {
+      "item": "hbm:gold_dense_wire"
+    }
+  },
+  "result": {
+    "id": "hbm:gun_pa_melee",
+    "count": 1
+  }
+}
