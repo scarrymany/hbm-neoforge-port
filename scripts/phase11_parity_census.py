@@ -406,6 +406,36 @@ MAT_SCRAP = {
 }
 
 
+def worldgen_bedrock_outputs() -> set[str]:
+    """Honest worldgen → excavator → slopper/processing grid.
+
+    ``BedrockOreFeature`` places ``ore_bedrock_block`` TEs holding ``bedrock_ore_base``
+    (overworld) or nether glowstone/``powder_fire``/quartz. Excavator
+    ``collectBedrock`` harvests that resource. ``OreSlopperRecipes`` + the
+    existing processing tables expand BASE into the 26×6 ``BedrockOreItems``
+    grid (same loop as ``BedrockOreItems.java:42-48``). Not a fake craft.
+    """
+    outs = {"hbm:bedrock_ore_base", "hbm:powder_fire"}
+    grades = [
+        m.group(1)
+        for m in re.finditer(
+            r"^\s+([A-Z][A-Z0-9_]+)\(",
+            (PORT_JAVA / "items" / "special" / "BedrockOreGrade.java").read_text(errors="ignore"),
+            flags=re.M,
+        )
+        if m.group(1) != "VALUES"
+    ]
+    types = ["light", "heavy", "rare", "actinide", "nonmetal", "crystal"]
+    type_src = (PORT_JAVA / "items" / "special" / "BedrockOreType.java").read_text(errors="ignore")
+    found = re.findall(r'"(\w+)"\s*,', type_src)
+    # ctor 3rd string is the suffix; keep only the known six
+    suffixes = [t for t in found if t in types] or types
+    for g in grades:
+        for t in suffixes:
+            outs.add(f"hbm:bedrock_ore_new_{g.lower()}_{t}")
+    return outs
+
+
 def machine_table_outputs() -> set[str]:
     """Item ids produced by Java machine tables (not JSON). Outputs only — no input keys."""
     outs: set[str] = set()
@@ -584,7 +614,7 @@ def main() -> None:
     port_items_n = len(port_items)
     port_blocks_n = len(port_blocks)
 
-    outs = recipe_outputs(recipes) | loot_outputs() | machine_table_outputs()
+    outs = recipe_outputs(recipes) | loot_outputs() | machine_table_outputs() | worldgen_bedrock_outputs()
     reachable = {i for i in port_items if f"hbm:{i}" in outs or i in {o.split(":")[-1] for o in outs}}
     reach_pct = pct(len(reachable), max(1, port_items_n))
 

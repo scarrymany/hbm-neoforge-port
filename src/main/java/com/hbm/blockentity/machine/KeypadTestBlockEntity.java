@@ -2,7 +2,6 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
-import com.hbm.blocks.BlockDummyable;
 import com.hbm.interfaces.IKeypadHandler;
 import com.hbm.inventory.container.machine.KeypadMenu;
 import com.hbm.util.Keypad;
@@ -14,17 +13,16 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** CE {@code TileEntitySlidingBlastDoorKeypad}. */
-public class SlidingBlastDoorKeypadBlockEntity extends LoadedBaseBlockEntity
+/** CE {@code TileEntityKeypadBase} used by {@code keypad_test}. */
+public class KeypadTestBlockEntity extends LoadedBaseBlockEntity
         implements ITickableBE, IKeypadHandler, MenuProvider {
 
     public final Keypad keypad = new Keypad(this);
 
-    public SlidingBlastDoorKeypadBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public KeypadTestBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
 
@@ -36,33 +34,6 @@ public class SlidingBlastDoorKeypadBlockEntity extends LoadedBaseBlockEntity
     @Override
     public Keypad getKeypad() {
         return keypad;
-    }
-
-    @Override
-    public void keypadActivated() {
-        if (level == null || !(getBlockState().getBlock() instanceof BlockDummyable dummyable)) return;
-        var core = dummyable.findCoreBlockEntity(level, worldPosition);
-        if (core instanceof SlidingBlastDoorBlockEntity door) door.toggle();
-    }
-
-    @Override
-    public void passwordSet() {
-        if (level == null || !(getBlockState().getBlock() instanceof BlockDummyable dummyable)) return;
-        BlockPos corePos = dummyable.findCore(level, worldPosition);
-        if (corePos == null) return;
-        BlockEntity core = level.getBlockEntity(corePos);
-        if (core instanceof SlidingBlastDoorBlockEntity door) {
-            door.keypadLocked = true;
-            door.setChanged();
-            BlockPos offset = worldPosition.subtract(corePos);
-            BlockPos otherPad = corePos.offset(-offset.getX(), offset.getY(), -offset.getZ());
-            if (level.getBlockEntity(otherPad) instanceof IKeypadHandler other) {
-                Keypad pad = other.getKeypad();
-                pad.clearCode();
-                pad.isSettingCode = false;
-                pad.storedCode = this.keypad.storedCode;
-            }
-        }
     }
 
     @Override

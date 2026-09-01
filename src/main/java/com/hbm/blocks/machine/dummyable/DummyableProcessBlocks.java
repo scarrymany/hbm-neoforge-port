@@ -222,7 +222,8 @@ public final class DummyableProcessBlocks {
         MACHINE_INDUSTRIAL_BOILER = registerBlock("machine_industrial_boiler", () -> new HeatBoilerIndustrialBlock(MACHINE_PROPS));
         MACHINE_TOWER_SMALL = registerBlock("machine_tower_small", () -> new MachineTowerSmallBlock(MACHINE_PROPS));
         MACHINE_TOWER_LARGE = registerBlock("machine_tower_large", () -> new MachineTowerLargeBlock(MACHINE_PROPS));
-        RADIO_TELEX = registerBlock("radio_telex", () -> new RadioTelexBlock(MACHINE_PROPS));
+        RADIO_TELEX = registerBlock("radio_telex", () -> new RadioTelexBlock(
+                BlockBehaviour.Properties.of().strength(3.0F, 10.0F).sound(SoundType.WOOD).requiresCorrectToolForDrops()));
         RADAR_SCREEN = registerBlock("radar_screen", () -> new RadarScreenBlock(MACHINE_PROPS));
         MACHINE_SIREN = registerBlock("machine_siren", () -> new com.hbm.blocks.machine.MachineSirenBlock(MACHINE_PROPS));
         MACHINE_CONDENSER = registerBlock("machine_condenser", () -> new com.hbm.blocks.machine.MachineCondenserBlock(MACHINE_PROPS));

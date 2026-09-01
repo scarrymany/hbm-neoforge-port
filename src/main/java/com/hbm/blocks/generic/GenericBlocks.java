@@ -6,6 +6,7 @@ import com.hbm.blocks.BlockEnums;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blocks.machine.BlastDoor;
 import com.hbm.blocks.machine.BlockSlidingBlastDoor;
+import com.hbm.blocks.test.KeypadTestBlock;
 import com.hbm.blocks.machine.DummyBlockBlast;
 import com.hbm.tileentity.DoorDecl;
 import com.hbm.creativetabs.CreativeTabContents;
@@ -77,6 +78,7 @@ public final class GenericBlocks {
     public static DeferredBlock<BlockSlidingBlastDoor> SLIDING_BLAST_DOOR_LEGACY;
     public static DeferredBlock<BlockSlidingBlastDoor> SLIDING_BLAST_DOOR_2;
     public static DeferredBlock<BlockSlidingBlastDoor> SLIDING_BLAST_DOOR_KEYPAD;
+    public static DeferredBlock<KeypadTestBlock> KEYPAD_TEST;
 
     private GenericBlocks() {
     }
@@ -310,8 +312,8 @@ public final class GenericBlocks {
         SLIDING_BLAST_DOOR_LEGACY = registerBlock("sliding_blast_door_legacy", () -> new BlockSlidingBlastDoor(doorProps(150.0F, 750.0F)), ModCreativeTabs.MACHINE);
         SLIDING_BLAST_DOOR_2 = registerBlock("sliding_blast_door_2", () -> new BlockSlidingBlastDoor(doorProps(150.0F, 750.0F)), ModCreativeTabs.MACHINE);
         SLIDING_BLAST_DOOR_KEYPAD = registerBlock("sliding_blast_door_keypad", () -> new BlockSlidingBlastDoor(doorProps(150.0F, 750.0F)), null);
-        // TODO(CE: ModBlocks.java:913 / KeypadTest.java:1): keypad_test not registered.
-        // Blocked by Keypad / KeypadClient / IKeypadHandler. Do not invent a dead cube.
+        KEYPAD_TEST = registerBlock("keypad_test", () -> new KeypadTestBlock(
+                BlockBehaviour.Properties.of().strength(15.0F, 7500.0F).sound(SoundType.METAL)), null);
         LARGE_VEHICLE_DOOR = registerBlock("large_vehicle_door", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.LARGE_VEHICLE_DOOR, true), ModCreativeTabs.MACHINE);
         WATER_DOOR = registerBlock("water_door", () -> new BlockDoorGeneric(doorProps(50.0F, 500.0F), DoorDecl.WATER_DOOR, false), ModCreativeTabs.MACHINE);
         QE_CONTAINMENT = registerBlock("qe_containment", () -> new BlockDoorGeneric(doorProps(100.0F, 1000.0F), DoorDecl.QE_CONTAINMENT, true), ModCreativeTabs.MACHINE);

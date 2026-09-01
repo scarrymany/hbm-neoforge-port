@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "R",
+    "C",
+    "S"
+  ],
+  "key": {
+    "R": {
+      "item": "hbm:radio_torch_receiver"
+    },
+    "C": {
+      "item": "hbm:circuit_basic"
+    },
+    "S": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:rtty_pager",
+    "count": 1
+  }
+}

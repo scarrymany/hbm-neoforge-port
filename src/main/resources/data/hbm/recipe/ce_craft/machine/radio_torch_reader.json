@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    "IRI"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "R": {
+      "item": "minecraft:redstone_torch"
+    },
+    "I": {
+      "item": "hbm:circuit_vacuum_tube"
+    }
+  },
+  "result": {
+    "id": "hbm:radio_torch_reader",
+    "count": 4
+  }
+}

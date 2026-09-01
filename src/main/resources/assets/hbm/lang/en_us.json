@@ -1059,6 +1059,8 @@
   "container.pumpjack": "Pumpjack",
   "container.radGen": "Radiation-Powered Engine",
   "container.radar": "Radar",
+  "container.radioTelex": "Radio Telex",
+  "container.ntmKeypad": "Keypad",
   "container.radiobox": "FM Transmitter",
   "container.radiolysis": "RTG and Radiolysis Chamber",
   "container.radiorec": "FM Radio",

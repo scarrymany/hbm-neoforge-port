@@ -1,59 +1,56 @@
 {
-  "forge_marker": 1,
   "variants": {
-    "facing": {
-      "up": {
-        "x": 0
-      },
-      "down": {
-        "x": 180
-      },
-      "east": {
-        "y": 90,
-        "x": 90
-      },
-      "south": {
-        "y": 180,
-        "x": 90
-      },
-      "west": {
-        "y": 270,
-        "x": 90
-      },
-      "north": {
-        "x": 90
-      }
+    "facing=up,lit=false": {
+      "model": "hbm:block/radio_torch_receiver_off"
     },
-    "lit": {
-      "false": {
-        "model": "hbm:block/radio_torch_receiver_off"
-      },
-      "true": {
-        "model": "hbm:block/radio_torch_receiver_on"
-      }
+    "facing=up,lit=true": {
+      "model": "hbm:block/radio_torch_receiver_on"
     },
-    "": {
-      "up": {
-        "x": 0
-      },
-      "down": {
-        "x": 180
-      },
-      "east": {
-        "y": 90,
-        "x": 90
-      },
-      "south": {
-        "y": 180,
-        "x": 90
-      },
-      "west": {
-        "y": 270,
-        "x": 90
-      },
-      "north": {
-        "x": 90
-      }
+    "facing=down,lit=false": {
+      "model": "hbm:block/radio_torch_receiver_off",
+      "x": 180
+    },
+    "facing=down,lit=true": {
+      "model": "hbm:block/radio_torch_receiver_on",
+      "x": 180
+    },
+    "facing=east,lit=false": {
+      "model": "hbm:block/radio_torch_receiver_off",
+      "y": 90,
+      "x": 90
+    },
+    "facing=east,lit=true": {
+      "model": "hbm:block/radio_torch_receiver_on",
+      "y": 90,
+      "x": 90
+    },
+    "facing=south,lit=false": {
+      "model": "hbm:block/radio_torch_receiver_off",
+      "y": 180,
+      "x": 90
+    },
+    "facing=south,lit=true": {
+      "model": "hbm:block/radio_torch_receiver_on",
+      "y": 180,
+      "x": 90
+    },
+    "facing=west,lit=false": {
+      "model": "hbm:block/radio_torch_receiver_off",
+      "y": 270,
+      "x": 90
+    },
+    "facing=west,lit=true": {
+      "model": "hbm:block/radio_torch_receiver_on",
+      "y": 270,
+      "x": 90
+    },
+    "facing=north,lit=false": {
+      "model": "hbm:block/radio_torch_receiver_off",
+      "x": 90
+    },
+    "facing=north,lit=true": {
+      "model": "hbm:block/radio_torch_receiver_on",
+      "x": 90
     }
   }
 }

@@ -17,6 +17,7 @@ public final class DoorGenericBlockEntities {
     public static Supplier<BlockEntityType<DummyBlockEntity>> DUMMY_BLAST;
     public static Supplier<BlockEntityType<SlidingBlastDoorBlockEntity>> SLIDING_BLAST_DOOR;
     public static Supplier<BlockEntityType<SlidingBlastDoorKeypadBlockEntity>> SLIDING_BLAST_KEYPAD;
+    public static Supplier<BlockEntityType<KeypadTestBlockEntity>> KEYPAD_TEST;
 
     private DoorGenericBlockEntities() {
     }
@@ -64,6 +65,12 @@ public final class DoorGenericBlockEntities {
                 BlockEntityType.Builder.of(
                         (pos, state) -> new SlidingBlastDoorKeypadBlockEntity(SLIDING_BLAST_KEYPAD.get(), pos, state),
                         GenericBlocks.SLIDING_BLAST_DOOR_KEYPAD.get()
+                ).build(null));
+
+        KEYPAD_TEST = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_keypad_test", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new KeypadTestBlockEntity(KEYPAD_TEST.get(), pos, state),
+                        GenericBlocks.KEYPAD_TEST.get()
                 ).build(null));
     }
 }

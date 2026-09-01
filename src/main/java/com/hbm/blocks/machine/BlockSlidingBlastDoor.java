@@ -18,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
  * CE {@code BlockSlidingBlastDoor} — Dummyable {3,0,0,0,3,3} offset 0.
  * {@code sliding_blast_door} itself is {@code BlockDoorGeneric}; this class is legacy / _2 / keypad.
  * TODO(CE: BlockSlidingBlastDoor.java:17): Galacticraft {@code IPartialSealableBlock}.
- * TODO(CE: TileEntitySlidingBlastDoorKeypad.java:1): Keypad / {@code IKeypadHandler} / KeypadClient.
+ * Keypad extras open {@link com.hbm.inventory.gui.machine.KeypadScreen} (functional, not OBJ VFX).
  */
 public class BlockSlidingBlastDoor extends BlockDummyable implements IRadResistantBlock {
 
@@ -112,7 +113,10 @@ public class BlockSlidingBlastDoor extends BlockDummyable implements IRadResista
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
         if (this == GenericBlocks.SLIDING_BLAST_DOOR_KEYPAD.get()) {
-            // TODO(CE: BlockSlidingBlastDoor.java:95-97): KeypadClient click.
+            if (level.getBlockEntity(pos) instanceof MenuProvider provider) {
+                player.openMenu(provider, pos);
+                return InteractionResult.CONSUME;
+            }
             return InteractionResult.PASS;
         }
         ItemStack held = player.getMainHandItem();

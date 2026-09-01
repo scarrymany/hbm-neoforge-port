@@ -3,9 +3,12 @@ package com.hbm.blockentity.machine.accel;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.generic.BlockBedrockOreTE;
 import com.hbm.inventory.container.machine.accel.ExcavatorMenu;
 import com.hbm.items.ItemEnums;
 import com.hbm.items.machine.ItemDrillbit;
+import com.hbm.items.special.BedrockOreItems;
+import com.hbm.items.special.ItemBedrockOreBase;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -98,6 +101,14 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
             BlockPos target = nextTarget(radius);
             if (target == null) break;
             BlockState state = server.getBlockState(target);
+            if (state.getBlock() instanceof BlockBedrockOreTE) {
+                if (!collectBedrock(server, target, type)) {
+                    depth++;
+                    continue;
+                }
+                power -= BASE_CONSUMPTION;
+                return;
+            }
             if (state.isAir() || state.getDestroySpeed(server, target) < 0) {
                 depth++;
                 continue;
@@ -117,6 +128,26 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
             power -= BASE_CONSUMPTION;
             depth++;
         }
+    }
+
+    /**
+     * CE {@code TileEntityMachineExcavator.collectBedrock}: copy TE resource, fortune via
+     * {@link ItemBedrockOreBase#setOreAmount}. Does not destroy the deposit. Acid-gated ores
+     * are skipped — this excavator has no tank (CE does).
+     */
+    private boolean collectBedrock(ServerLevel server, BlockPos pos, ItemEnums.EnumDrillType drill) {
+        if (!(server.getBlockEntity(pos) instanceof BlockBedrockOreTE.BedrockOreBlockEntity ore)) return false;
+        if (ore.resource.isEmpty()) return false;
+        if (ore.tier > drill.tier) return false;
+        if (ore.acidRequirement != null) return false;
+
+        ItemStack stack = ore.resource.copy();
+        if (stack.is(BedrockOreItems.BEDROCK_ORE_BASE.get())) {
+            ItemBedrockOreBase.setOreAmount(stack, pos.getX(), pos.getZ(), 1D + drill.fortune * 0.25D);
+        }
+        if (!canFit(List.of(stack))) return false;
+        insertOutput(stack);
+        return true;
     }
 
     private BlockPos nextTarget(int radius) {

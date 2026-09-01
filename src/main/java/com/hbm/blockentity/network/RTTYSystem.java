@@ -1,69 +1,99 @@
 package com.hbm.blockentity.network;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Minimal stub of CE's {@code com.hbm.tileentity.network.RTTYSystem} (199 lines in CE), per
- * {@code docs/phase3/scattered_military_items.md}'s explicit recommendation: this is real,
- * cross-cutting infrastructure with 19 CE call sites spanning RBMK console peripherals, the
- * satellite save-data system, and a radio-torch/telex family - none of which are scoped by any
- * Phase 2/3 package this wave. {@link com.hbm.items.tool.ItemRTTYPager} is the only consumer wired
- * against this stub so far; whoever ports the real channel-broadcast network (melody generator,
- * one-tick publish delay, {@code RTTYSpecialSignal} enum, RBMK/satellite consumers) should replace
- * this class's body without needing to change {@code ItemRTTYPager}'s two-method
- * {@link #listen}/{@link #broadcast} call sites.
- * <p>
- * Lives under {@code com.hbm.blockentity.network} rather than a literal
- * {@code com.hbm.tileentity.network} mirror of CE's package - this port's established convention
- * (see {@code docs/phase2/multiblock_framework.md}) renames every CE {@code com.hbm.tileentity.*}
- * package to {@code com.hbm.blockentity.*}, and {@code com.hbm.blockentity.network} already exists
- * as the home for this port's other network-adjacent block-entity infrastructure (fluid ducts, pipes).
- * <p>
- * Simplified from CE in two ways, both documented rather than silently different:
- * <ul>
- *     <li>No one-tick publish delay - CE queues into {@code newMessages} and only makes a signal
- *     visible to {@link #listen} on the following tick (via a server-tick-event flush). This stub
- *     publishes immediately, so a same-tick {@code broadcast} is visible to a same-tick
- *     {@code listen}. Harmless for the only current consumer ({@code ItemRTTYPager} polls once per
- *     item tick, not the same tick it may itself broadcast).</li>
- *     <li>No numeric-signal summing, no melody generator, no {@code RTTYSpecialSignal} enum - none
- *     of CE's 19 real consumers exist in this port yet, so there is nothing yet that depends on
- *     those behaviors.</li>
- * </ul>
+ * CE {@code com.hbm.tileentity.network.RTTYSystem}: one-tick delayed broadcast map,
+ * numeric summing, {@link RTTYSpecialSignal}. Melody on {@code "2012-08-06"} skipped —
+ * CE {@code NoteBuilder} is not in this port (pager still hears empty ticks on that channel).
  */
 public final class RTTYSystem {
 
-    private static final Map<ChannelKey, RTTYChannel> CHANNELS = new ConcurrentHashMap<>();
+    public static final Map<ChannelKey, RTTYChannel> broadcast = new ConcurrentHashMap<>();
+    public static final Map<ChannelKey, Object> newMessages = new ConcurrentHashMap<>();
 
     private RTTYSystem() {
     }
 
-    /** Pushes a new signal onto the given channel, visible to {@link #listen} immediately (see class javadoc). */
+    /**
+     * Pushes a new signal to be used next tick. Only the last signal pushed will be used, unless
+     * both the existing and new signal parse as numbers, in which case they are summed.
+     */
     public static void broadcast(Level level, String channelName, Object signal) {
-        RTTYChannel channel = new RTTYChannel();
-        channel.timeStamp = level.getGameTime();
-        channel.signal = signal;
-        CHANNELS.put(new ChannelKey(level, channelName), channel);
+        ChannelKey identifier = new ChannelKey(level, channelName);
+
+        if (NumberUtils.isCreatable("" + signal) && newMessages.containsKey(identifier)) {
+            Object existing = newMessages.get(identifier);
+            if (NumberUtils.isCreatable("" + existing)) {
+                try {
+                    long first = Long.parseLong("" + signal);
+                    long second = Long.parseLong("" + existing);
+                    newMessages.put(identifier, "" + (first + second));
+                    return;
+                } catch (Exception ignored) {
+                }
+            }
+        }
+
+        newMessages.put(identifier, signal);
     }
 
-    /** Returns the RTTY channel with that name on that level, or {@code null} if nothing has ever broadcast to it. */
+    /** Returns the RTTY channel with that name, or {@code null}. */
     public static RTTYChannel listen(Level level, String channelName) {
-        return CHANNELS.get(new ChannelKey(level, channelName));
+        return broadcast.get(new ChannelKey(level, channelName));
+    }
+
+    /**
+     * Moves all new messages to the broadcast map, adding the appropriate timestamp and
+     * clearing the new message queue. Call from {@code ServerTickEvent.Pre}.
+     */
+    public static void updateBroadcastQueue() {
+        for (Entry<ChannelKey, Object> worldEntry : newMessages.entrySet()) {
+            ChannelKey identifier = worldEntry.getKey();
+            Object lastSignal = worldEntry.getValue();
+
+            RTTYChannel channel = new RTTYChannel();
+            channel.timeStamp = identifier.level().getGameTime();
+            channel.signal = lastSignal;
+            broadcast.put(identifier, channel);
+        }
+
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            for (ServerLevel world : server.getAllLevels()) {
+                long time = world.getGameTime();
+                RTTYChannel chan = new RTTYChannel();
+                chan.timeStamp = time;
+                chan.signal = "";
+                broadcast.put(new ChannelKey(world, "2012-08-06"), chan);
+            }
+        }
+
+        newMessages.clear();
     }
 
     public static final class RTTYChannel {
-        /** The level's game time at the moment of publishing. */
         public long timeStamp = -1;
-        /** A signal can be anything - a number, an encoded string, whatever the broadcaster sent. */
         public Object signal;
     }
 
-    private record ChannelKey(Level level, String channel) {
-        private ChannelKey {
+    public enum RTTYSpecialSignal {
+        BEGIN_TTY,
+        STOP_TTY,
+        PRINT_BUFFER
+    }
+
+    public record ChannelKey(Level level, String channel) {
+        public ChannelKey {
             Objects.requireNonNull(level);
             Objects.requireNonNull(channel);
         }
