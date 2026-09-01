@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "CBC",
+    "III"
+  ],
+  "key": {
+    "I": { "tag": "hbm:any_rubber" },
+    "C": { "item": "hbm:cladding_lead" },
+    "B": { "item": "hbm:hazmat_helmet_grey" }
+  },
+  "result": { "id": "hbm:liquidator_helmet", "count": 1 }
+}

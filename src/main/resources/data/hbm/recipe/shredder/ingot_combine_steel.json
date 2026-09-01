@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ingot_combine_steel"
+  },
+  "output": {
+    "id": "hbm:powder_combine_steel",
+    "count": 1
+  },
+  "duration": 60
+}

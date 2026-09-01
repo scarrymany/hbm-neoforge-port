@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:plate_steel"
+    },
+    {
+      "item": "hbm:plate_polymer"
+    },
+    {
+      "item": "hbm:tungsten_wire"
+    }
+  ],
+  "result": {
+    "id": "hbm:fuse",
+    "count": 1
+  }
+}

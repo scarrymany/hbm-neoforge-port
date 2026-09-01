@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "PUP",
+    "SPS"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:plate_steel"
+    },
+    "P": {
+      "item": "hbm:powder_fire"
+    },
+    "U": {
+      "item": "hbm:upgrade_template"
+    }
+  },
+  "result": {
+    "id": "hbm:upgrade_nullifier",
+    "count": 1
+  }
+}

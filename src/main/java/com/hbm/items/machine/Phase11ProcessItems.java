@@ -194,6 +194,12 @@ public final class Phase11ProcessItems {
         parts("sawblade");
         parts("mold_base");
         parts("deuterium_filter");
+        // CE ModItems.java:1297 ItemBase partsTab — deuterium_filter + gas_mask_filter_* crafts
+        parts("catalyst_clay");
+        // CE ModItems.java:284 ItemCustomLore max16 controlTab — energy_core shapeless
+        control16("fuse");
+        // CE ModItems.java:399 ItemBase controlTab — t51/ajr/liquidator plate crafts
+        control("gas_empty");
         // CE ModItems.java:1305 / :1307 ItemBase; :887 ItemHot(200). Mold/hot recipes stay cited.
         parts("blade_titanium");
         parts("blade_tungsten");
@@ -301,6 +307,12 @@ public final class Phase11ProcessItems {
 
     private static DeferredItem<Item> control(String name) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> control16(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(16)));
         CreativeTabContents.add(ModCreativeTabs.CONTROL, item);
         return item;
     }

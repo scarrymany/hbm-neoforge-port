@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CCC",
+    "DXD",
+    "C C"
+  ],
+  "key": {
+    "D": {
+      "item": "hbm:ingot_desh"
+    },
+    "C": {
+      "item": "hbm:plate_copper"
+    },
+    "X": {
+      "item": "hbm:steel_legs"
+    }
+  },
+  "result": {
+    "id": "hbm:steamsuit_legs",
+    "count": 1
+  }
+}

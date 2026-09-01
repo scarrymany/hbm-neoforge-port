@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPC",
+    "PBP",
+    "IXI"
+  ],
+  "key": {
+    "P": { "item": "hbm:plate_armor_ajr" },
+    "C": { "item": "hbm:circuit_basic" },
+    "I": { "tag": "hbm:any_plastic" },
+    "X": { "item": "hbm:gas_mask_m65" },
+    "B": { "item": "hbm:titanium_helmet" }
+  },
+  "result": { "id": "hbm:ajr_helmet", "count": 1 }
+}

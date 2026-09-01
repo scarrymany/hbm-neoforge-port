@@ -406,6 +406,7 @@ public final class SpecialItems {
     // ==================== MaskMan boss loot (docs/phase4/entities_bosses.md) ====================
     // coin_maskman: CE ModItems.java:1419, ItemCustomLore, UNCOMMON, consumableTab - same pattern as
     // coin_worm/the ItemSiegeCoin family above.
+    // gas_mask_filter: CE ModItems.java:180 ItemFilter 18000. Same inert-durability stand-in as combo.
     // gas_mask_filter_combo: CE ModItems.java:181, `new ItemFilter("gas_mask_filter_combo", 24000)
     // .setMaxStackSize(1).setCreativeTab(MainRegistry.consumableTab)`. Ported here as a minimal plain
     // Item (durability only) purely so EntityMaskMan's death loot can pre-install a real filter stack
@@ -416,12 +417,15 @@ public final class SpecialItems {
 
     public static final DeferredItem<ItemCustomLore> COIN_MASKMAN =
             register("coin_maskman", () -> new ItemCustomLore(new Item.Properties().rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER =
+            register("gas_mask_filter", () -> new Item(new Item.Properties().stacksTo(1).durability(18000)));
     public static final DeferredItem<Item> GAS_MASK_FILTER_COMBO =
             register("gas_mask_filter_combo", () -> new Item(new Item.Properties().stacksTo(1).durability(24000)));
     public static final DeferredItem<com.hbm.items.armor.ItemModV1> V1 =
             register("v1", () -> new com.hbm.items.armor.ItemModV1(new Item.Properties().stacksTo(1)));
     static {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_MASKMAN);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_COMBO);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, V1);
     }

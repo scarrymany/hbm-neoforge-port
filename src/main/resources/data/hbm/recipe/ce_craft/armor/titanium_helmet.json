@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XXX",
+    "X X"
+  ],
+  "key": {
+    "X": {
+      "item": "hbm:ingot_titanium"
+    }
+  },
+  "result": {
+    "id": "hbm:titanium_helmet",
+    "count": 1
+  }
+}

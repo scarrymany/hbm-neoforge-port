@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "EEE",
+    "ECE",
+    "E E"
+  ],
+  "key": {
+    "E": {
+      "item": "hbm:ingot_starmetal"
+    },
+    "C": {
+      "item": "hbm:cobalt_legs"
+    }
+  },
+  "result": {
+    "id": "hbm:starmetal_legs",
+    "count": 1
+  }
+}

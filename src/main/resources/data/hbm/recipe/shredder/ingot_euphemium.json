@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ingot_euphemium"
+  },
+  "output": {
+    "id": "hbm:powder_euphemium",
+    "count": 1
+  },
+  "duration": 60
+}

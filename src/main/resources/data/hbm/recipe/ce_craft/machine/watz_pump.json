@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MPM",
+    "PCP",
+    "PSP"
+  ],
+  "key": {
+    "M": { "item": "hbm:motor_desh" },
+    "P": { "tag": "hbm:any_resistantalloy_plate_cast" },
+    "C": { "item": "hbm:circuit_bismoid" },
+    "S": { "item": "hbm:pipes_steel" }
+  },
+  "result": { "id": "hbm:watz_pump", "count": 1 }
+}

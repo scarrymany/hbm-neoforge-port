@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SBS",
+    " C ",
+    " I "
+  ],
+  "key": {
+    "S": { "item": "minecraft:string" },
+    "B": { "item": "minecraft:black_wool" },
+    "C": { "item": "hbm:circuit_advanced" },
+    "I": { "item": "hbm:ingot_starmetal" }
+  },
+  "result": { "id": "hbm:bj_helmet", "count": 1 }
+}

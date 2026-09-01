@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "CBC",
+    "I I"
+  ],
+  "key": {
+    "I": { "tag": "hbm:any_rubber" },
+    "C": { "item": "hbm:cladding_lead" },
+    "B": { "item": "hbm:hazmat_legs_grey" }
+  },
+  "result": { "id": "hbm:liquidator_legs", "count": 1 }
+}

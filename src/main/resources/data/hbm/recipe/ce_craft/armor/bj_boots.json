@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "N N",
+    "BSB"
+  ],
+  "key": {
+    "N": {
+      "item": "hbm:plate_armor_lunar"
+    },
+    "S": {
+      "item": "hbm:starmetal_boots"
+    },
+    "B": {
+      "item": "hbm:starmetal_block"
+    }
+  },
+  "result": {
+    "id": "hbm:bj_boots",
+    "count": 1
+  }
+}

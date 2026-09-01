@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PWP",
+    "PBP",
+    "FSF"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_armor_fau"
+    },
+    "W": {
+      "item": "minecraft:red_wool"
+    },
+    "B": {
+      "item": "hbm:starmetal_helmet"
+    },
+    "F": {
+      "item": "hbm:gas_mask_filter"
+    },
+    "S": {
+      "item": "hbm:steel_pipe"
+    }
+  },
+  "result": {
+    "id": "hbm:fau_helmet",
+    "count": 1
+  }
+}

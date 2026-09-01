@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "EEE",
+    "ESE",
+    "EPE"
+  ],
+  "key": {
+    "E": {
+      "item": "hbm:ingot_schrabidium"
+    },
+    "S": {
+      "item": "hbm:starmetal_legs"
+    },
+    "P": {
+      "item": "hbm:pellet_charged"
+    }
+  },
+  "result": {
+    "id": "hbm:schrabidium_legs",
+    "count": 1
+  }
+}

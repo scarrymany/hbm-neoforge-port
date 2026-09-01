@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ICI",
+    "IBI"
+  ],
+  "key": {
+    "I": { "tag": "hbm:any_rubber" },
+    "C": { "item": "hbm:cladding_lead" },
+    "B": { "item": "hbm:hazmat_boots_grey" }
+  },
+  "result": { "id": "hbm:liquidator_boots", "count": 1 }
+}

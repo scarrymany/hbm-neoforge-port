@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "X X",
+    "XXX",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "item": "hbm:ingot_combine_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:cmb_plate",
+    "count": 1
+  }
+}

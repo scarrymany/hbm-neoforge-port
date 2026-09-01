@@ -63,6 +63,7 @@ public class ModItems {
         com.hbm.items.machine.CouplingMachineItems.registerAll();
         com.hbm.items.armor.ArmorDataComponents.register(modEventBus);
         com.hbm.items.armor.PoweredArmorItems.registerAll(modEventBus);
+        com.hbm.items.gear.BasicArmorItems.registerAll();
         com.hbm.items.gear.SpecialArmorItems.registerAll(modEventBus);
         com.hbm.items.gear.JetpackItems.registerAll(modEventBus);
         com.hbm.items.bomb.NukeCasingItems.registerAll();
