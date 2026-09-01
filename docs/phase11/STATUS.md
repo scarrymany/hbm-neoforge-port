@@ -19,5 +19,6 @@
   **60.5%** (1567 / 2590).
 - Centrifuge **75/78** accepted. AE2 stays cited. AmmoPress fluid-slot stays cited.
 - Assembler skip **7**. `SafeMenuScreens.bind` stays. `modId` stays `hbm`.
-- Verified: `compileJava` 0. `runServer` pending this revision.
+- Verified: `compileJava` 0, `runServer` **Done (5.242s)** / 4047 recipes
+  (+101 shredder JSON), port 25566.
 - No tag. `master` untouched.
