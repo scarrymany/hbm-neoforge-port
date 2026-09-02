@@ -248,6 +248,8 @@ public final class IngotNuggetItems {
             register("ingot_meteorite", () -> new ItemHot(new Item.Properties(), 200));
     public static final DeferredItem<Item> INGOT_METEORITE_FORGED =
             register("ingot_meteorite_forged", () -> new ItemHot(new Item.Properties(), 200));
+    public static final DeferredItem<Item> BLADE_METEORITE =
+            register("blade_meteorite", () -> new ItemHot(new Item.Properties(), 200));
 
     // ===== scattered ingot_ entries (CE ModItems.java ~L1005, L1136-1137) =====
 

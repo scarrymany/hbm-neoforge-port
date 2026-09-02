@@ -25,7 +25,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * {@code :1151-1154} scrap family, {@code :1310} {@code pipes_steel},
  * {@code :1994-2000} debris_* (ShredderRecipes.java:208/:347/:405-410),
  * {@code sawblade}/{@code mold_base}/{@code deuterium_filter}/{@code egg_glyphid}/
- * {@code flame_pony}/{@code blade_titanium}/{@code blade_tungsten}/{@code blade_meteorite}
+ * {@code flame_pony}/{@code blade_titanium}/{@code blade_tungsten} (ported, part-tab). blade_meteorite
+ * moved to {@code IngotNuggetItems} for meteorite sword chain proximity.
  * (Anvil leftover I/O). {@code lignite} CE {@code ItemFuel} 1200 ({@code ModItems.java:1339}).
  * {@code wings_*} live in {@code JetpackItems} as {@code WingsMurk}.
  */
@@ -209,9 +210,9 @@ public final class Phase11ProcessItems {
         // CE ModItems.java:399 ItemBase controlTab — t51/ajr/liquidator plate crafts
         control("gas_empty");
         // CE ModItems.java:1305 / :1307 ItemBase; :887 ItemHot(200). Mold/hot recipes stay cited.
+        // blade_meteorite (ItemHot) now registered in IngotNuggetItems — meteorite sword chain item.
         parts("blade_titanium");
         parts("blade_tungsten");
-        partsHot("blade_meteorite", 200);
         consume("egg_glyphid");
         parts("flame_pony");
         // CE ModItems.java:1173 — syringe_metal_empty input

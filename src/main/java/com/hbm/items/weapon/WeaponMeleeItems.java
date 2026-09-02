@@ -6,6 +6,7 @@ import com.hbm.handler.ability.IWeaponAbility;
 import com.hbm.items.ModItems;
 import com.hbm.items.tool.ItemBoltgun;
 import com.hbm.items.tool.ItemSwordAbility;
+import com.hbm.items.tool.ItemSwordMeteorite;
 import com.hbm.items.tool.ToolTiers;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
@@ -19,24 +20,17 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * Registers the {@code items/weapon} melee items this package's task ports: {@code crucible}
  * ({@link ItemCrucible}), {@code boltgun} ({@link ItemBoltgun}, which despite living in
  * {@code items/tool} in CE - and in this port, matching CE's package - is a melee-scope item per
- * this package's task brief), and 10 of the 11 direct {@link ItemSwordAbility} instances (CE:
+ * this package's task brief), 10 direct {@link ItemSwordAbility} instances (CE:
  * {@code titanium_sword} through {@code dnt_sword}, per {@code docs/phase3/melee_weapons.md} section
- * A) - this fixes the gap that report's own follow-up wiring note (and this class's own earlier
- * javadoc) flagged: {@link ItemSwordAbility} was fully built and correct but never actually
- * registered anywhere.
+ * A), and 12 {@link com.hbm.items.tool.ItemSwordMeteorite} variants ({@code meteorite_sword} through
+ * {@code meteorite_sword_baleful} - the full multi-stage chain of sword upgrades via machine/reactor
+ * processing).
  * <p>
  * <b>Still not registered here</b> - genuinely blocked, not an oversight:
  * <ul>
  *     <li>{@code elec_sword} - needs {@code ItemSwordAbilityPower} (battery-charge sword variant,
  *     mirroring {@code ItemToolAbilityPower}), which does not exist yet anywhere in this port.</li>
- *     <li>The 11 {@code meteorite_sword}* tiers - need {@code ItemSwordMeteorite} (unbreakable,
- *     {@code this ==}-dispatched flavor-text tooltip variant of the sword family) plus a
- *     {@code matMeteorite}-equivalent {@link Tier}, neither of which exists yet.</li>
  * </ul>
- * Both are real, narrow, named gaps - see this area's structured-output report - left unbuilt rather
- * than guessed at, since inventing either class's exact shape without the real 1.21.1 battery/tooltip
- * API already proven elsewhere in this port would be exactly the kind of unverified new class this
- * review pass should not add.
  * <p>
  * CE parity note (confirmed by direct read of CE's real {@code ModItems.java}): of these 10 swords,
  * only {@code mese_gavel} is creative-tab-visible in CE (its constructor chain ends in
@@ -117,6 +111,44 @@ public final class WeaponMeleeItems {
 
     public static final DeferredItem<Item> DNT_SWORD = ModItems.ITEMS.register("dnt_sword", () ->
             new ItemSwordAbility(12F, 0, ToolTiers.MESE, new Item.Properties()));
+
+    // ==================== ItemSwordMeteorite 12-tier upgrade chain ====================
+
+    public static final DeferredItem<Item> METEORITE_SWORD = ModItems.ITEMS.register("meteorite_sword", () ->
+            new ItemSwordMeteorite(9F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_SEARED = ModItems.ITEMS.register("meteorite_sword_seared", () ->
+            new ItemSwordMeteorite(10F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_REFORGED = ModItems.ITEMS.register("meteorite_sword_reforged", () ->
+            new ItemSwordMeteorite(12.5F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_HARDENED = ModItems.ITEMS.register("meteorite_sword_hardened", () ->
+            new ItemSwordMeteorite(15F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_ALLOYED = ModItems.ITEMS.register("meteorite_sword_alloyed", () ->
+            new ItemSwordMeteorite(17.5F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_MACHINED = ModItems.ITEMS.register("meteorite_sword_machined", () ->
+            new ItemSwordMeteorite(20F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_TREATED = ModItems.ITEMS.register("meteorite_sword_treated", () ->
+            new ItemSwordMeteorite(22.5F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_ETCHED = ModItems.ITEMS.register("meteorite_sword_etched", () ->
+            new ItemSwordMeteorite(25F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_BRED = ModItems.ITEMS.register("meteorite_sword_bred", () ->
+            new ItemSwordMeteorite(30F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_IRRADIATED = ModItems.ITEMS.register("meteorite_sword_irradiated", () ->
+            new ItemSwordMeteorite(35F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_FUSED = ModItems.ITEMS.register("meteorite_sword_fused", () ->
+            new ItemSwordMeteorite(50F, 0, ToolTiers.METEORITE));
+
+    public static final DeferredItem<Item> METEORITE_SWORD_BALEFUL = ModItems.ITEMS.register("meteorite_sword_baleful", () ->
+            new ItemSwordMeteorite(75F, 0, ToolTiers.METEORITE));
 
     public static void registerAll() {
         CreativeTabContents.add(ModCreativeTabs.WEAPON, CRUCIBLE);

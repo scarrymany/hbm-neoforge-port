@@ -23,11 +23,10 @@ import java.util.List;
  * CE {@code AnvilRecipes.java}. Smithing {@code :59-131} + construction {@code :140+}.
  * Rows whose I/O is AIR are skipped — no fake ids. Shell/pipe/stamp/recycle rows land when
  * the flattened autogen / already-registered I/O exists.
- * Ported: 8 {@link AnvilSmithingHotRecipe} (meteorite + cobalt decoration) + 18
+ * Ported: 8 {@link AnvilSmithingHotRecipe} (meteorite + cobalt decoration + meteorite_sword_reforged) + 18
  * {@link AnvilSmithingMold} + 9 mold-construction rows ({@code :626-635}).
  * TODO(CE: AnvilRecipes.java:75-80) 9 dusted-steel + chainsteel — {@code ingot_steel_dusted_*} is a
  * plain {@code Item}, not {@code ItemHotDusted}. Do not invent.
- * TODO(CE: AnvilRecipes.java:84) {@code meteorite_sword_reforged} — sword chain not registered.
  * TODO(CE: AnvilRecipes.java:129-130) cyanide/rename.
  */
 public final class AnvilRecipes {
@@ -60,7 +59,7 @@ public final class AnvilRecipes {
     /**
      * CE {@code :59-127} anvil upgrades + gunmetal + hot (I/O that exists) + mold smithing.
      * {@code :93} wings_murk and {@code :94} flask_infusion are live (flask flattened SHIELD).
-     * SKIP {@code :75-80} dusted/chainsteel, {@code :84} meteorite sword, {@code :129-130} cyanide/rename.
+     * SKIP {@code :75-80} dusted/chainsteel, {@code :129-130} cyanide/rename.
      */
     private static void registerSmithing() {
         String[] bases = {"anvil_iron", "anvil_lead"};
@@ -91,6 +90,7 @@ public final class AnvilRecipes {
         // CE :82-91 — meteorite hot + cobalt decoration. Skip cyanide/rename and sword/dusted.
         smithHot(3, "ingot_meteorite", "ingot_meteorite", "ingot_meteorite_forged");
         smithHot(3, "ingot_meteorite_forged", "ingot_meteorite_forged", "blade_meteorite");
+        smithHot(3, "meteorite_sword_seared", "ingot_meteorite_forged", "meteorite_sword_reforged");
         smithHot(3, "cobalt_sword", "ingot_meteorite", "cobalt_decorated_sword");
         smithHot(3, "cobalt_pickaxe", "ingot_meteorite", "cobalt_decorated_pickaxe");
         smithHot(3, "cobalt_axe", "ingot_meteorite", "cobalt_decorated_axe");
