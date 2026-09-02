@@ -1,7 +1,12 @@
 package com.hbm.blockentity.network;
 
+import com.hbm.api.conveyor.IConveyorBelt;
+import com.hbm.blocks.network.BlockCraneBoxer;
+import com.hbm.entity.ConveyorEntityTypes;
+import com.hbm.entity.item.EntityMovingPackage;
 import com.hbm.menu.CraneBoxerMenu;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -15,19 +20,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * NeoForge port of CE's {@code TileEntityCraneBoxer} - packages items into boxes.
- * Simplified without EntityMovingPackage: just a 21-slot buffer accepting items from conveyor.
  * CE logic: collects full stacks, packages them based on mode (4/8/16 items or redstone trigger).
- * Deferred: EntityMovingPackage spawning (needs conveyor package entity system).
+ * Spawns EntityMovingPackage onto adjacent conveyor belt.
  */
 public class CraneBoxerBlockEntity extends BlockEntity implements MenuProvider {
 
     public static final int INVENTORY_SIZE = 21;
+    public static final byte MODE_4 = 0;
+    public static final byte MODE_8 = 1;
+    public static final byte MODE_16 = 2;
+    public static final byte MODE_REDSTONE = 3;
 
     private final ItemStackHandler inventory = new ItemStackHandler(INVENTORY_SIZE) {
         @Override
@@ -36,7 +45,8 @@ public class CraneBoxerBlockEntity extends BlockEntity implements MenuProvider {
         }
     };
 
-    public byte mode = 0; // CE modes: 0=4 items, 1=8 items, 2=16 items, 3=redstone trigger
+    public byte mode = MODE_4; // CE default: MODE_4
+    private boolean lastRedstone = false;
 
     public CraneBoxerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -47,9 +57,113 @@ public class CraneBoxerBlockEntity extends BlockEntity implements MenuProvider {
             return;
         }
 
-        // CE logic: package items into EntityMovingPackage based on mode
-        // Simplified: no EntityMovingPackage system yet - just buffer
-        // TODO(CE): Port EntityMovingPackage to enable boxer output functionality
+        boolean redstone = level.hasNeighborSignal(worldPosition);
+
+        // CE MODE_REDSTONE: package on redstone pulse (edge trigger)
+        if (mode == MODE_REDSTONE && redstone && !lastRedstone) {
+            trySpawnPackage(-1); // -1 = any non-empty slots
+        }
+
+        lastRedstone = redstone;
+
+        // CE other modes: package every 2 ticks when enough full stacks collected
+        if (mode != MODE_REDSTONE && level.getGameTime() % 2 == 0) {
+            int packSize = switch (mode) {
+                case MODE_4 -> 4;
+                case MODE_8 -> 8;
+                case MODE_16 -> 16;
+                default -> 1;
+            };
+
+            int fullStacks = 0;
+            for (int i = 0; i < inventory.getSlots(); i++) {
+                ItemStack stack = inventory.getStackInSlot(i);
+                if (!stack.isEmpty() && stack.getCount() == stack.getMaxStackSize()) {
+                    fullStacks++;
+                }
+            }
+
+            if (fullStacks >= packSize) {
+                trySpawnPackage(packSize);
+            }
+        }
+    }
+
+    /**
+     * CE's package spawning logic: collect items, spawn EntityMovingPackage on conveyor.
+     * @param packSize -1 for "any non-empty", else exact count of full stacks to pack
+     */
+    private void trySpawnPackage(int packSize) {
+        Direction outputSide = getOutputSide();
+        BlockPos outputPos = worldPosition.relative(outputSide);
+        IConveyorBelt belt = null;
+
+        if (level.getBlockState(outputPos).getBlock() instanceof IConveyorBelt b) {
+            belt = b;
+        }
+
+        if (belt == null) {
+            return;
+        }
+
+        // Collect items to pack
+        ItemStack[] box;
+        if (packSize < 0) {
+            // MODE_REDSTONE: pack any non-empty
+            int count = 0;
+            for (int i = 0; i < inventory.getSlots(); i++) {
+                if (!inventory.getStackInSlot(i).isEmpty()) {
+                    count++;
+                }
+            }
+            if (count == 0) return;
+
+            box = new ItemStack[count];
+            int idx = 0;
+            for (int i = 0; i < inventory.getSlots(); i++) {
+                ItemStack stack = inventory.getStackInSlot(i);
+                if (!stack.isEmpty()) {
+                    box[idx++] = stack.copy();
+                    inventory.setStackInSlot(i, ItemStack.EMPTY);
+                }
+            }
+        } else {
+            // Other modes: pack exact count of full stacks
+            box = new ItemStack[packSize];
+            int packed = 0;
+            for (int i = 0; i < inventory.getSlots() && packed < packSize; i++) {
+                ItemStack stack = inventory.getStackInSlot(i);
+                if (!stack.isEmpty() && stack.getCount() == stack.getMaxStackSize()) {
+                    box[packSize - 1 - packed] = stack.copy();
+                    inventory.setStackInSlot(i, ItemStack.EMPTY);
+                    packed++;
+                }
+            }
+        }
+
+        // Spawn EntityMovingPackage
+        EntityMovingPackage pkg = new EntityMovingPackage(ConveyorEntityTypes.MOVING_PACKAGE.get(), level);
+        Vec3 spawnPos = new Vec3(
+                worldPosition.getX() + 0.5 + outputSide.getStepX() * 0.55,
+                worldPosition.getY() + 0.5 + outputSide.getStepY() * 0.55,
+                worldPosition.getZ() + 0.5 + outputSide.getStepZ() * 0.55
+        );
+        Vec3 snap = belt.getClosestSnappingPosition(level, outputPos, spawnPos);
+        pkg.setPos(snap.x, snap.y, snap.z);
+        pkg.setItemStacks(box);
+        level.addFreshEntity(pkg);
+        setChanged();
+    }
+
+    /**
+     * CE's getOutputSide: opposite of block facing (matches CraneInserter pattern).
+     */
+    private Direction getOutputSide() {
+        BlockState state = getBlockState();
+        if (state.getBlock() instanceof BlockCraneBoxer) {
+            return state.getValue(BlockCraneBoxer.FACING).getOpposite();
+        }
+        return Direction.NORTH;
     }
 
     /**

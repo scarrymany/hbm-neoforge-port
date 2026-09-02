@@ -1,7 +1,12 @@
 package com.hbm.blockentity.network;
 
+import com.hbm.api.conveyor.IConveyorBelt;
+import com.hbm.blocks.network.BlockCraneUnboxer;
+import com.hbm.entity.ConveyorEntityTypes;
+import com.hbm.entity.item.EntityMovingItem;
 import com.hbm.menu.CraneUnboxerMenu;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -15,15 +20,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * NeoForge port of CE's {@code TileEntityCraneUnboxer} - unpacks boxes into individual items.
- * Simplified without EntityMovingPackage: just a 21-slot buffer outputting items to conveyor.
- * CE logic: receives EntityMovingPackage, extracts items, outputs them individually.
- * Deferred: EntityMovingPackage receiving (needs conveyor package entity system).
+ * CE logic: receives EntityMovingPackage (via onPackageEnter), buffers items, outputs them as EntityMovingItem.
+ * Simplified: no upgrade slots (ejector speed/stack size) - using CE defaults (20 tick delay, 1 item/cycle).
  */
 public class CraneUnboxerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -36,6 +41,8 @@ public class CraneUnboxerBlockEntity extends BlockEntity implements MenuProvider
         }
     };
 
+    private int tickCounter = 0;
+
     public CraneUnboxerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -45,9 +52,65 @@ public class CraneUnboxerBlockEntity extends BlockEntity implements MenuProvider
             return;
         }
 
-        // CE logic: output buffered items to conveyor as EntityMovingItem
-        // Simplified: no output yet - just buffer
-        // TODO(CE): Port EntityMovingItem spawning to enable unboxer output functionality
+        tickCounter++;
+
+        // CE default: 20 tick delay (1s), 1 item per output
+        int delay = 20;
+        int amount = 1;
+
+        if (tickCounter >= delay && !level.hasNeighborSignal(worldPosition)) {
+            tickCounter = 0;
+
+            Direction outputSide = getOutputSide();
+            BlockPos outputPos = worldPosition.relative(outputSide);
+            IConveyorBelt belt = null;
+
+            if (level.getBlockState(outputPos).getBlock() instanceof IConveyorBelt b) {
+                belt = b;
+            }
+
+            if (belt != null) {
+                // Find first non-empty slot and output
+                for (int i = 0; i < inventory.getSlots(); i++) {
+                    ItemStack stack = inventory.getStackInSlot(i);
+
+                    if (!stack.isEmpty()) {
+                        int toSend = Math.min(amount, stack.getCount());
+                        ItemStack outStack = stack.copy();
+                        stack.shrink(toSend);
+                        if (stack.isEmpty()) {
+                            inventory.setStackInSlot(i, ItemStack.EMPTY);
+                        }
+                        outStack.setCount(toSend);
+
+                        // Spawn EntityMovingItem on conveyor
+                        EntityMovingItem item = new EntityMovingItem(ConveyorEntityTypes.MOVING_ITEM.get(), level);
+                        Vec3 spawnPos = new Vec3(
+                                worldPosition.getX() + 0.5 + outputSide.getStepX() * 0.55,
+                                worldPosition.getY() + 0.5 + outputSide.getStepY() * 0.55,
+                                worldPosition.getZ() + 0.5 + outputSide.getStepZ() * 0.55
+                        );
+                        Vec3 snap = belt.getClosestSnappingPosition(level, outputPos, spawnPos);
+                        item.setPos(snap.x, snap.y, snap.z);
+                        item.setItemStack(outStack);
+                        level.addFreshEntity(item);
+                        setChanged();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * CE's getOutputSide: same as block facing (matches CE's crane_unboxer pattern).
+     */
+    private Direction getOutputSide() {
+        BlockState state = getBlockState();
+        if (state.getBlock() instanceof BlockCraneUnboxer) {
+            return state.getValue(BlockCraneUnboxer.FACING);
+        }
+        return Direction.NORTH;
     }
 
     /**
@@ -131,6 +194,7 @@ public class CraneUnboxerBlockEntity extends BlockEntity implements MenuProvider
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.put("Inventory", inventory.serializeNBT(registries));
+        tag.putInt("TickCounter", tickCounter);
     }
 
     @Override
@@ -139,6 +203,7 @@ public class CraneUnboxerBlockEntity extends BlockEntity implements MenuProvider
         if (tag.contains("Inventory")) {
             inventory.deserializeNBT(registries, tag.getCompound("Inventory"));
         }
+        tickCounter = tag.getInt("TickCounter");
     }
 
     @Override
