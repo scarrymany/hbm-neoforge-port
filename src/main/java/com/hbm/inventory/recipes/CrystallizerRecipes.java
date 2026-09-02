@@ -3,10 +3,13 @@ package com.hbm.inventory.recipes;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.material.MaterialShapes;
+import com.hbm.inventory.material.Mats;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.items.machine.ItemScraps;
 import com.hbm.items.special.BedrockOreGrade;
 import com.hbm.items.special.BedrockOreItems;
 import com.hbm.items.special.BedrockOreType;
@@ -157,7 +160,10 @@ public final class CrystallizerRecipes {
         register(new ComparableStack(Blocks.COAL_ORE), Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT,
                 new CrystallizerRecipe(new ItemStack(PlateCrystalWasteItems.CRYSTAL_COAL.get()), baseTime, 0.05F));
         // TODO(CE: CrystallizerRecipes.java:75): LI.ore() — no ore_lithium block. Do not invent.
-        // TODO(CE: CrystallizerRecipes.java:79): MALACHITE.ingot() → ItemScraps copper. No scrap_copper.
+        // CE :79 = MALACHITE.ingot() → ItemScraps copper (300 ticks, 0.1F prod, SULFURIC_ACID 250mB)
+        // MAT_MALACHITE exists but ingot_malachite item not registered — skip (material exists as ore only)
+        // register(new ComparableStack(item("ingot_malachite")), Fluids.SULFURIC_ACID, 250,
+        //         new CrystallizerRecipe(ItemScraps.create(Mats.MAT_COPPER, MaterialShapes.INGOT.q(1)), 300, 0.1F));
 
         ore("ore_rare", Fluids.SULFURIC_ACID, 500, PlateCrystalWasteItems.CRYSTAL_RARE.get(), baseTime, 0.05F);
         ore("ore_cinnabar", Fluids.PEROXIDE, DEFAULT_ACID_AMOUNT, PlateCrystalWasteItems.CRYSTAL_CINNABAR.get(), baseTime, 0.05F);
