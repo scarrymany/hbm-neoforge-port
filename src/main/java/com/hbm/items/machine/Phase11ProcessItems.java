@@ -202,6 +202,10 @@ public final class Phase11ProcessItems {
         consume("gas_tester");
         // CE ModItems.java:284 ItemCustomLore max16 controlTab — energy_core shapeless
         control16("fuse");
+        // CE ModItems.java:1843 ItemEnumMulti parts_legendary / EnumLegendaryType (TIER1/TIER2/TIER3) - ArmorRecipes.java:95-98 RPA armor
+        parts1("parts_legendary_tier1");
+        parts1("parts_legendary_tier2");
+        parts1("parts_legendary_tier3");
         // CE ModItems.java:399 ItemBase controlTab — t51/ajr/liquidator plate crafts
         control("gas_empty");
         // CE ModItems.java:1305 / :1307 ItemBase; :887 ItemHot(200). Mold/hot recipes stay cited.

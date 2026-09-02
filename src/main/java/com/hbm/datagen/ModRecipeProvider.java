@@ -1297,6 +1297,44 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_plate", has(plateArmorDnt))
                 .save(output, id("armor/dns_boots"));
 
+        // ArmorRecipes.java:95-98: rpa_helmet/_plate/_legs/_boots. All use TIER2 parts_legendary.
+        Item plateKevlar = item("plate_kevlar");
+        Item plateArmorAjr = item("plate_armor_ajr");
+        Item partsLegendaryTier2 = item("parts_legendary_tier2");
+        Item motorDesh = item("motor_desh");
+        Item gasMaskFilterCombo = item("gas_mask_filter_combo");
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("rpa_helmet"))
+                .pattern("KPK").pattern("PLP").pattern(" F ")
+                .define('K', plateKevlar)
+                .define('P', plateArmorAjr)
+                .define('L', partsLegendaryTier2)
+                .define('F', gasMaskFilterCombo)
+                .unlockedBy("has_parts_legendary", has(partsLegendaryTier2))
+                .save(output, id("armor/rpa_helmet"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("rpa_plate"))
+                .pattern("P P").pattern("MLM").pattern("PKP")
+                .define('P', plateArmorAjr)
+                .define('M', motorDesh)
+                .define('L', partsLegendaryTier2)
+                .define('K', plateKevlar)
+                .unlockedBy("has_parts_legendary", has(partsLegendaryTier2))
+                .save(output, id("armor/rpa_plate"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("rpa_legs"))
+                .pattern("MPM").pattern("KLK").pattern("P P")
+                .define('M', motorDesh)
+                .define('P', plateArmorAjr)
+                .define('K', plateKevlar)
+                .define('L', partsLegendaryTier2)
+                .unlockedBy("has_parts_legendary", has(partsLegendaryTier2))
+                .save(output, id("armor/rpa_legs"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("rpa_boots"))
+                .pattern("KLK").pattern("P P")
+                .define('K', plateKevlar)
+                .define('L', partsLegendaryTier2)
+                .define('P', plateArmorAjr)
+                .unlockedBy("has_parts_legendary", has(partsLegendaryTier2))
+                .save(output, id("armor/rpa_boots"));
+
         // ArmorRecipes.java:70-73: ajro_* (dyed ajr_*). ajr_* itself has no CE recipe in this pass
         // either (needs titanium_helmet/_plate/_legs/_boots, none of which exist in this port - see
         // class javadoc) but is, again, a real registered item, valid as an ingredient here.
