@@ -1064,6 +1064,19 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_ingot", has(item("ingot_schrabidium")))
                 .save(output, id("mineral/block_schrabidium_cluster"));
 
+        // CE MineralRecipes.java: block_euphemium 3x3 compress/decompress
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, item("block_euphemium"))
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .define('#', item("ingot_euphemium"))
+                .unlockedBy("has_ingot", has(item("ingot_euphemium")))
+                .save(output, id("mineral/block_euphemium_many_from_one"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("ingot_euphemium"), 9)
+                .requires(item("block_euphemium"))
+                .unlockedBy("has_block", has(item("block_euphemium")))
+                .save(output, id("mineral/block_euphemium_one_from_many"));
+
         Item fragmentMeteorite = item("fragment_meteorite");
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("block_meteor_cobble"))
                 .pattern("##")
