@@ -5762,6 +5762,29 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_string", has(Items.STRING))
                 .save(output, id("rag"));
 
+        // ---- CraftingManager.java:269-274 crafts (conveyor_wand variants). ----
+        // CE :269 = conveyor_wand x16 (leather variant) = "LLL","I I","LLL", L=leather, I=IRON.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("conveyor_wand"), 16)
+                .pattern("LLL")
+                .pattern("I I")
+                .pattern("LLL")
+                .define('L', Items.LEATHER)
+                .define('I', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/iron")))
+                .unlockedBy("has_leather", has(Items.LEATHER))
+                .save(output, id("conveyor_wand_leather"));
+        
+        // CE :270 = conveyor_wand x16 (rope variant) = "RSR","I I","RSR", R=plant_item ROPE, S=IRON.plate(), I=IRON.ingot() — rope not ported, skip
+        
+        // CE :271 = conveyor_wand x64 (rubber variant) = "LLL","I I","LLL", L=ANY_RUBBER.ingot(), I=IRON.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("conveyor_wand"), 64)
+                .pattern("LLL")
+                .pattern("I I")
+                .pattern("LLL")
+                .define('L', item("ingot_rubber"))
+                .define('I', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/iron")))
+                .unlockedBy("has_rubber", has(item("ingot_rubber")))
+                .save(output, id("conveyor_wand_rubber"));
+
         // SKIP :947-948 = anchor_remote / teleanchor (CE uses ItemBattery + powder_magic + gem_alexandrite)
         // SKIP :949 = field_disturber (CE uses STAR + circuit_bismoid)
         // SKIP :950-951 = holotape crafts (EnumHoloImage)
