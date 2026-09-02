@@ -4492,8 +4492,28 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_iron_dust", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dusts/iron"))))
                 .save(output, id("catalyst_clay"));
 
-        // CE :640-645 = singularity_spark (2 patterns) + ams_core_* — check ingredients
-        // SKIP singularities — plate_euphemium/plate_dalekanium not registered yet
+        // CE :598-599 = singularity_spark (2 alternate patterns)
+        // Pattern 1: "XAX","BCB","XAX", X=plate_dineutronium, A=singularity_counter_resonant, B=singularity_super_heated, C=black_hole
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("singularity_spark"))
+                .pattern("XAX").pattern("BCB").pattern("XAX")
+                .define('X', item("plate_dineutronium"))
+                .define('A', item("singularity_counter_resonant"))
+                .define('B', item("singularity_super_heated"))
+                .define('C', item("black_hole"))
+                .unlockedBy("has_black_hole", has(item("black_hole")))
+                .save(output, id("singularity_spark_alt1"));
+        
+        // Pattern 2: "XBX","ACA","XBX", X=plate_dineutronium, A=singularity_counter_resonant, B=singularity_super_heated, C=black_hole
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("singularity_spark"))
+                .pattern("XBX").pattern("ACA").pattern("XBX")
+                .define('X', item("plate_dineutronium"))
+                .define('A', item("singularity_counter_resonant"))
+                .define('B', item("singularity_super_heated"))
+                .define('C', item("black_hole"))
+                .unlockedBy("has_black_hole", has(item("black_hole")))
+                .save(output, id("singularity_spark_alt2"));
+
+        // CE :600 ams_core_sing, CE :602 ams_core_eyeofharmony — already in FluidContainerCraftingRecipe.java
 
         // ---- CraftingManager.java:587-591 crafts (padlock_unbreakable, records). ----
         // CE :587 = padlock_unbreakable = " P ","PBP","PDP", P=BIGMT.plate(), D=DIAMOND.gem(), B=DURA.bolt()
@@ -5038,8 +5058,25 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("sand_lead"));
 
         // ---- CraftingManager.java:743-792 crafts (runes, barrels, tesla, upgrades). ----
-        // SKIP :743-749 runes — endgame singularity/powder_magic items not registered yet
-        // SKIP :750 ams_lens — plate_dineutronium not registered yet
+        // SKIP :743-749 most runes — endgame powder_magic items not all registered yet
+        
+        // CE :694 rune_jera = rune_blank + powder_spark_mix + singularity_spark
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("rune_jera"))
+                .requires(item("rune_blank"))
+                .requires(item("powder_spark_mix"))
+                .requires(item("singularity_spark"))
+                .unlockedBy("has_singularity_spark", has(item("singularity_spark")))
+                .save(output, id("rune_jera"));
+        
+        // CE :696 ams_lens = "PDP","GDG","PDP", P=plate_dineutronium, G=reinforced_glass, D=diamond_block
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ams_lens"))
+                .pattern("PDP").pattern("GDG").pattern("PDP")
+                .define('P', item("plate_dineutronium"))
+                .define('G', block("reinforced_glass"))
+                .define('D', Blocks.DIAMOND_BLOCK)
+                .unlockedBy("has_dineutronium", has(item("plate_dineutronium")))
+                .save(output, id("ams_lens"));
+        
         // SKIP :751-767 ams_catalyst_* — EUPH material not added yet
 
         // CE :768-770 = barrels
