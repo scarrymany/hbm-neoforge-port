@@ -5833,9 +5833,16 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_redstone", has(Blocks.REDSTONE_BLOCK))
                 .save(output, id("deco_emitter"));
 
-        // SKIP :929-930 = name_tag (CE uses KEY_SLIME / ANY_TAR)
-        // SKIP :931 = lead (CE uses plant_item ROPE DictFrame)
-        // SKIP :932 = rag (wool crafting, low impact)
+        // :929-930 name_tag — already ported at :5915-5935 (slime_ball + tar variants)
+        // :931 lead — already ported at :5937-5945 (plant_item_rope)
+        // CE :932 = rag x4 = "SW","WS", S=string, W=wool (ItemTags.WOOL)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("rag"), 4)
+                .pattern("SW")
+                .pattern("WS")
+                .define('S', Items.STRING)
+                .define('W', ItemTags.WOOL)
+                .unlockedBy("has_wool", has(ItemTags.WOOL))
+                .save(output, id("rag_from_wool"));
         // SKIP :934-935 = solid_fuel / canister (CE uses Fluids.HEATINGOIL.getDict / ComplexOreIngredient)
 
         // CE :937 = machine_condenser
@@ -5878,7 +5885,19 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('C', item("circuit_basic"))
                 .unlockedBy("has_piston", has(item("part_generic_piston_hydraulic")))
                 .save(output, id("refueler"));
-        // SKIP :944 = press_preheater (CE uses Fluids.LAVA.getDict)
+        // CE :944 = press_preheater = "CCC","SLS","TST", C=CU.plate() (copper), S=stone, L=Fluids.LAVA.getDict (lava_bucket), T=W.ingot() (tungsten)
+        TagKey<Item> copperPlateTagPreheater = MaterialShapes.PLATE.commonTag(Mats.MAT_COPPER);
+        TagKey<Item> tungstenIngotTagPreheater = MaterialShapes.INGOT.commonTag(Mats.MAT_TUNGSTEN);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("press_preheater"))
+                .pattern("CCC")
+                .pattern("SLS")
+                .pattern("TST")
+                .define('C', copperPlateTagPreheater)
+                .define('S', Items.STONE)
+                .define('L', Items.LAVA_BUCKET)
+                .define('T', tungstenIngotTagPreheater)
+                .unlockedBy("has_copper", has(copperPlateTagPreheater))
+                .save(output, id("press_preheater"));
         
         // CE :945 = fluid_identifier_multi = "D","C","P", D=dye, C=circuit_analog, P=IRON.plate()
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fluid_identifier_multi"))
@@ -5985,7 +6004,16 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("conveyor_wand_rubber"));
 
         // SKIP :947-948 = anchor_remote / teleanchor (CE uses ItemBattery + powder_magic + gem_alexandrite)
-        // SKIP :949 = field_disturber (CE uses STAR + circuit_bismoid)
+        // CE :949 = field_disturber = "ICI","CAC","ICI", I=STAR.ingot(), C=circuit_bismoid, A=gem_alexandrite
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("field_disturber"))
+                .pattern("ICI")
+                .pattern("CAC")
+                .pattern("ICI")
+                .define('I', starIngotTag)
+                .define('C', item("circuit_bismoid"))
+                .define('A', item("gem_alexandrite"))
+                .unlockedBy("has_alexandrite", has(item("gem_alexandrite")))
+                .save(output, id("field_disturber"));
         // SKIP :950-951 = holotape crafts (EnumHoloImage)
         // SKIP :953-955 = part_generic pistons (EnumPartType)
 
@@ -6376,7 +6404,17 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("cm_engine_bismuth"));
 
         // SKIP :1153-1157 = cm_circuit variants (CE uses DictFrame EnumCircuitType)
-        // SKIP :1158 = cm_flux (CE uses ZR.plateCast + reactor_core)
+        // CE :1157 = cm_flux = "NNN","ZCZ","NNN", Z=ZR.plateCast(), N=neutron_reflector, C=reactor_core
+        TagKey<Item> zrPlateCastTag = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_ZIRCONIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_flux"))
+                .pattern("NNN")
+                .pattern("ZCZ")
+                .pattern("NNN")
+                .define('Z', zrPlateCastTag)
+                .define('N', item("neutron_reflector"))
+                .define('C', item("reactor_core"))
+                .unlockedBy("has_reactor_core", has(item("reactor_core")))
+                .save(output, id("cm_flux"));
         
         // CE :1159 = cm_heat
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("cm_heat"))
