@@ -3,11 +3,11 @@
 Registry vs CE png/json. Copied **only** missing CE assets. No invented art.
 Data-component register() strings (`heat`, `gun_states`, …) are not items and are excluded.
 
-- Census: items **2616**, blocks **960**
-- Previous leftover wave (origin leftover doc): items **18**, blocks **46** (census 2589/949)
-- Origin before this wave (recompute): items **22**, blocks **50**
-- This wave AFTER: items **20** (0.76%), blocks **48** (5.00%)
-- Closed this wave: `rbmk_display` + `crane_extractor`
+- Census: items **2634**, blocks **978**
+- Previous leftover wave: items **20**, blocks **48** (census 2616/960)
+- Origin before this wave (cm_* family registered, no models): leftover would be items **36**, blocks **64**
+- This wave AFTER: items **20** (0.76%), blocks **48** (4.91%)
+- Closed this wave: 16 `cm_{block,sheet,tank,port}_{steel,desh,bismoid_bronze,resistant}`
 
 Strict playable = model/blockstate exists **and** every referenced texture file exists
 (or is vanilla `minecraft:`).
@@ -16,6 +16,7 @@ Strict playable = model/blockstate exists **and** every referenced texture file 
 
 - `rbmk_display` → CE `blocks/rbmk/rbmk_display` (`TODO(CE:RBMKMiniPanelBase.java:145)` same sprite as blank)
 - `crane_extractor` → CE cube `crane_ejector` (`TODO(CE:ModBlocks.java:1113)` `new CraneExtractor(..., "crane_ejector")`)
+- `cm_*` family → CE `cm_{block,sheet,tank,port}_{steel,alloy,desh,tcalloy}` (`TODO(CE:BlockEnums.java:40-44)` STEEL/ALLOY/DESH/TCALLOY; port `bismoid_bronze`=ALLOY, `resistant`=TCALLOY)
 
 Turret **world** cubes skipped: CE has no cube png for chekhov/howard/… Inventory already CE `block_steel`.
 TESR machine world cubes skipped: inventory already wired from `textures/models/*`.
