@@ -2871,6 +2871,7 @@ public class ModRecipeProvider extends RecipeProvider {
      * still blocked (not registered).
      */
     private void craftingManagerRecipes(RecipeOutput output) {
+        Item ingotPolymer = item("ingot_polymer");
         // ---- Fluid containers (CraftingManager.java:177-178). ----
         // canister_empty = "S ","AA","AA", S=STEEL.plate(), A=AL.plate()
         Item plateSteel = item("plate_steel");
@@ -2919,19 +2920,170 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_wire", has(goldWireTag))
                 .save(output, id("component/coil_gold_steel"));
 
-        // coil_copper_torus (CraftingManager.java:210) = " C ","CPC"," C ", P=IRON.plate(), C=coil_copper
+        // coil_copper_torus (CraftingManager.java:210-213) = " C ","CPC"," C ", P=IRON/STEEL.plate(), C=coil_copper
         Item coilCopper = item("coil_copper");
         Item plateIron = item("plate_iron");
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_copper_torus"), 2)
                 .pattern(" C ").pattern("CPC").pattern(" C ")
                 .define('C', coilCopper).define('P', plateIron)
                 .unlockedBy("has_coil", has(coilCopper))
-                .save(output, id("component/coil_copper_torus"));
+                .save(output, id("component/coil_copper_torus_iron"));
+        // Alternate with STEEL.plate()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_copper_torus"), 2)
+                .pattern(" C ").pattern("CPC").pattern(" C ")
+                .define('C', coilCopper).define('P', plateSteel)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("component/coil_copper_torus_steel"));
+
+        // coil_gold_torus (CraftingManager.java:211-213) = " C ","CPC"," C ", P=IRON/STEEL.plate(), C=coil_gold
+        Item coilGold = item("coil_gold");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_gold_torus"), 2)
+                .pattern(" C ").pattern("CPC").pattern(" C ")
+                .define('C', coilGold).define('P', plateIron)
+                .unlockedBy("has_coil", has(coilGold))
+                .save(output, id("component/coil_gold_torus_iron"));
+        // Alternate with STEEL.plate()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_gold_torus"), 2)
+                .pattern(" C ").pattern("CPC").pattern(" C ")
+                .define('C', coilGold).define('P', plateSteel)
+                .unlockedBy("has_coil", has(coilGold))
+                .save(output, id("component/coil_gold_torus_steel"));
+
+        // coil_tungsten (CraftingManager.java:214-215) = "WWW","WIW","WWW", W=W.wireFine(), I=IRON/STEEL.ingot()
+        TagKey<Item> tungstenWireTag = MaterialShapes.WIRE.commonTag(Mats.MAT_TUNGSTEN);
+        Item coilTungsten = item("coil_tungsten");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, coilTungsten)
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', tungstenWireTag).define('I', Items.IRON_INGOT)
+                .unlockedBy("has_wire", has(tungstenWireTag))
+                .save(output, id("component/coil_tungsten_iron"));
+        // Alternate with STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, coilTungsten)
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', tungstenWireTag).define('I', ingotSteel)
+                .unlockedBy("has_wire", has(tungstenWireTag))
+                .save(output, id("component/coil_tungsten_steel"));
+
+        // coil_magnetized_tungsten (CraftingManager.java:216-217) = "WWW","WIW","WWW", W=MAGTUNG.wireFine(), I=IRON/STEEL.ingot()
+        TagKey<Item> magtungWireTag = MaterialShapes.WIRE.commonTag(Mats.MAT_MAGTUNG);
+        Item coilMagnetizedTungsten = item("coil_magnetized_tungsten");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, coilMagnetizedTungsten)
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', magtungWireTag).define('I', Items.IRON_INGOT)
+                .unlockedBy("has_wire", has(magtungWireTag))
+                .save(output, id("component/coil_magnetized_tungsten_iron"));
+        // Alternate with STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, coilMagnetizedTungsten)
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', magtungWireTag).define('I', ingotSteel)
+                .unlockedBy("has_wire", has(magtungWireTag))
+                .save(output, id("component/coil_magnetized_tungsten_steel"));
+
+        // ---- Motors (CraftingManager.java:219-222). ----
+        // motor (CE :219) = " R ","ICI","ITI", R=MINGRADE.wireFine(), T=coil_copper_torus, I=IRON.plate(), C=coil_copper
+        Item coilCopperTorus = item("coil_copper_torus");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor"), 2)
+                .pattern(" R ").pattern("ICI").pattern("ITI")
+                .define('R', mingradeWireTag)
+                .define('T', coilCopperTorus)
+                .define('I', plateIron)
+                .define('C', coilCopper)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("component/motor_iron"));
+        // Alternate (CE :220) with STEEL.plate()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor"), 2)
+                .pattern(" R ").pattern("ICI").pattern(" T ")
+                .define('R', mingradeWireTag)
+                .define('T', coilCopperTorus)
+                .define('I', plateSteel)
+                .define('C', coilCopper)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("component/motor_steel"));
+
+        // motor_desh (CE :221) = "PCP","DMD","PCP", P=ANY_PLASTIC.ingot(), C=GOLD.wireDense(), D=DESH.ingot(), M=motor
+        Item motor = item("motor");
+        Item ingotDesh = item("ingot_desh");
+        TagKey<Item> goldDensewireTag = MaterialShapes.DENSEWIRE.commonTag(Mats.MAT_GOLD);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor_desh"))
+                .pattern("PCP").pattern("DMD").pattern("PCP")
+                .define('P', ingotPolymer)
+                .define('C', goldDensewireTag)
+                .define('D', ingotDesh)
+                .define('M', motor)
+                .unlockedBy("has_motor", has(motor))
+                .save(output, id("component/motor_desh"));
+
+        // motor_bismuth (CE :222) = "BCB","SDS","BCB", B=BI.nugget(), C=ND.wireDense(), S=STEEL.plateCast(), D=DURA.ingot()
+        TagKey<Item> bismuthNuggetTag = MaterialShapes.NUGGET.commonTag(Mats.MAT_BISMUTH);
+        TagKey<Item> neodymiumDensewireTag = MaterialShapes.DENSEWIRE.commonTag(Mats.MAT_NEODYMIUM);
+        TagKey<Item> steelCastplateTag = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_STEEL);
+        TagKey<Item> durasteelIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_DURA);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor_bismuth"))
+                .pattern("BCB").pattern("SDS").pattern("BCB")
+                .define('B', bismuthNuggetTag)
+                .define('C', neodymiumDensewireTag)
+                .define('S', steelCastplateTag)
+                .define('D', durasteelIngotTag)
+                .unlockedBy("has_motor", has(motor))
+                .save(output, id("component/motor_bismuth"));
+
+        // deuterium_filter (CE :223) = "TST","SCS","TST", T=ANY_RESISTANTALLOY.ingot() (TCALLOY or CDALLOY), S=S.dust(), C=catalyst_clay
+        Ingredient resistantAlloyIngot = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_TCALLOY)),
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_CDALLOY))
+        );
+        TagKey<Item> sulfurDustTag = MaterialShapes.DUST.commonTag(Mats.MAT_SULFUR);
+        Item catalystClay = item("catalyst_clay");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("deuterium_filter"))
+                .pattern("TST").pattern("SCS").pattern("TST")
+                .define('T', resistantAlloyIngot)
+                .define('S', sulfurDustTag)
+                .define('C', catalystClay)
+                .unlockedBy("has_catalyst", has(catalystClay))
+                .save(output, id("component/deuterium_filter"));
+
+        // ---- Fins/turbines/components (CraftingManager.java:225-244). ----
+        // Skip fins_* and pedestal_steel (missing blade_titanium/fins_* items, CE uses EnumPartType).
+        // turbine_titanium (CE :234) = "BBB","BSB","BBB", B=blade_titanium, S=STEEL.ingot()
+        // Skip: blade_titanium item not registered (CE line 233 is just Item, no enum).
+
+        // turbine_tungsten (CE :241) = "BBB","BSB","BBB", B=blade_tungsten, S=DURA.ingot()
+        // Skip: blade_tungsten item not registered.
+
+        // sphere_steel (CE :229) = "PIP","I I","PIP", P=STEEL.plate(), I=STEEL.ingot()
+        Item sphereSteel = item("sphere_steel");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, sphereSteel)
+                .pattern("PIP").pattern("I I").pattern("PIP")
+                .define('P', plateSteel)
+                .define('I', ingotSteel)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("component/sphere_steel"));
+
+        // ring_starmetal (CE :242) = " S ","S S"," S ", S=STAR.ingot()
+        TagKey<Item> starmetalIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_STAR);
+        Item ringStarmetal = item("ring_starmetal");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ringStarmetal)
+                .pattern(" S ").pattern("S S").pattern(" S ")
+                .define('S', starmetalIngotTag)
+                .unlockedBy("has_starmetal", has(starmetalIngotTag))
+                .save(output, id("component/ring_starmetal"));
+
+        // flywheel_beryllium (CE :243) = "IBI","BTB","IBI", B=BE.block(), I=IRON.plateCast(), T=DURA.pipe()
+        TagKey<Item> berylliumBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_BERYLLIUM);
+        TagKey<Item> ironCastplateTag = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_IRON);
+        TagKey<Item> durasteelPipeTag = MaterialShapes.PIPE.commonTag(Mats.MAT_DURA);
+        Item flywheelBeryllium = item("flywheel_beryllium");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, flywheelBeryllium)
+                .pattern("IBI").pattern("BTB").pattern("IBI")
+                .define('B', berylliumBlockTag)
+                .define('I', ironCastplateTag)
+                .define('T', durasteelPipeTag)
+                .unlockedBy("has_beryllium", has(berylliumBlockTag))
+                .save(output, id("component/flywheel_beryllium"));
 
         // ---- Lighting machines (CraftingManager.java:486). ----
         // floodlight = "CSC","TST","G G", C=circuit_capacitor, S=STEEL.plate(), T=coil_tungsten, G=KEY_ANYPANE
         Item circuitCapacitor = item("circuit_capacitor");
-        Item coilTungsten = item("coil_tungsten");
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, item("floodlight"), 2)
                 .pattern("CSC").pattern("TST").pattern("G G")
                 .define('C', circuitCapacitor)
@@ -2943,7 +3095,6 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // ---- Satellite machines (CraftingManager.java:648). ----
         // machine_tape_drive = "PPP","CCC","PPP", P=ANY_PLASTIC.ingot(), C=circuit_pcb
-        Item ingotPolymer = item("ingot_polymer");
         Item circuitPcb = item("circuit_pcb");
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("machine_tape_drive"))
                 .pattern("PPP").pattern("CCC").pattern("PPP")
