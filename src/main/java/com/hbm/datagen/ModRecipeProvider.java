@@ -5883,6 +5883,103 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("rbmk_cooler"));
 
         // SKIP :1090-1113 = launch_code + circuit_star_component/piece (CE uses DictFrame + stackFromEnum)
+
+        // ---- CraftingManager.java:1114-1162 crafts (circuit_star, sliding_blast_door, cm_* blocks, plushie). ----
+        // SKIP :1115-1132 = circuit_star_component/circuit_star assembly (CE uses stackFromEnum)
+
+        // CE :1135-1138 = sliding_blast_door_skin cycling
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("sliding_blast_door_skin0"))
+                .pattern("SPS").pattern("DPD").pattern("SPS")
+                .define('P', Items.PAPER)
+                .define('D', ItemTags.DYEABLE)
+                .define('S', steelPlateTag)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("sliding_blast_door_skin0"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("sliding_blast_door_skin1"))
+                .requires(item("sliding_blast_door_skin0"))
+                .unlockedBy("has_skin0", has(item("sliding_blast_door_skin0")))
+                .save(output, id("sliding_blast_door_skin1"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("sliding_blast_door_skin2"))
+                .requires(item("sliding_blast_door_skin1"))
+                .unlockedBy("has_skin1", has(item("sliding_blast_door_skin1")))
+                .save(output, id("sliding_blast_door_skin2"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("sliding_blast_door_skin0"))
+                .requires(item("sliding_blast_door_skin2"))
+                .unlockedBy("has_skin2", has(item("sliding_blast_door_skin2")))
+                .save(output, id("sliding_blast_door_skin0_cycle"));
+
+        // CE :1139-1142 = cm_block variants (steel, bismoid_bronze, desh, resistant_alloy)
+        TagKey<Item> steelCastPlateTagLocal3 = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block_steel"), 4)
+                .pattern(" I ").pattern("IPI").pattern(" I ")
+                .define('I', steelIngotTagLocal10)
+                .define('P', steelCastPlateTagLocal3)
+                .unlockedBy("has_steel", has(steelIngotTagLocal10))
+                .save(output, id("cm_block_steel"));
+
+        // SKIP :1140 = cm_block bismoid_bronze (ANY_BISMOIDBRONZE not added)
+        // SKIP :1141 = cm_block desh (DESH not fully added)
+        // SKIP :1142 = cm_block resistant_alloy (ANY_RESISTANTALLOY not added)
+
+        // CE :1144-1148 = cm_sheet/tank/port per block variant (loop i=0..3)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_sheet_steel"), 16)
+                .pattern("BB").pattern("BB")
+                .define('B', block("cm_block_steel"))
+                .unlockedBy("has_block", has(block("cm_block_steel")))
+                .save(output, id("cm_sheet_steel"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_tank_steel"), 4)
+                .pattern(" B ").pattern("BGB").pattern(" B ")
+                .define('B', block("cm_block_steel"))
+                .define('G', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "glass_blocks")))
+                .unlockedBy("has_block", has(block("cm_block_steel")))
+                .save(output, id("cm_tank_steel"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_port_steel"))
+                .pattern("P").pattern("B").pattern("P")
+                .define('B', block("cm_block_steel"))
+                .define('P', ironPlateTag)
+                .unlockedBy("has_block", has(block("cm_block_steel")))
+                .save(output, id("cm_port_steel"));
+
+        // CE :1150-1152 = cm_engine variants (steel, desh, bismuth)
+        TagKey<Item> steelIngotTagLocal11 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("cm_engine_steel"))
+                .pattern(" I ").pattern("IMI").pattern(" I ")
+                .define('I', steelIngotTagLocal11)
+                .define('M', item("motor"))
+                .unlockedBy("has_motor", has(item("motor")))
+                .save(output, id("cm_engine_steel"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("cm_engine_desh"))
+                .pattern(" I ").pattern("IMI").pattern(" I ")
+                .define('I', steelIngotTagLocal11)
+                .define('M', item("motor_desh"))
+                .unlockedBy("has_motor", has(item("motor_desh")))
+                .save(output, id("cm_engine_desh"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("cm_engine_bismuth"))
+                .pattern(" I ").pattern("IMI").pattern(" I ")
+                .define('I', steelIngotTagLocal11)
+                .define('M', item("motor_bismuth"))
+                .unlockedBy("has_motor", has(item("motor_bismuth")))
+                .save(output, id("cm_engine_bismuth"));
+
+        // SKIP :1153-1157 = cm_circuit variants (CE uses DictFrame EnumCircuitType)
+        // SKIP :1158 = cm_flux (CE uses ZR.plateCast + reactor_core)
+        
+        // CE :1159 = cm_heat
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("cm_heat"))
+                .pattern("PCP").pattern("PCP").pattern("PCP")
+                .define('P', item("plate_polymer"))
+                .define('C', copperIngotTagLocal)
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("cm_heat"));
+
+        // SKIP :1161-1162 = plushie (CE uses DictFrame circuit + rag)
     }
 
     // ================================================================================================
