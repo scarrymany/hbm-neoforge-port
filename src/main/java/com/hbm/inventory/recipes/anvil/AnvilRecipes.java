@@ -23,9 +23,9 @@ import java.util.List;
  * CE {@code AnvilRecipes.java}. Smithing {@code :59-131} + construction {@code :140+}.
  * Rows whose I/O is AIR are skipped — no fake ids. Shell/pipe/stamp/recycle rows land when
  * the flattened autogen / already-registered I/O exists.
- * Ported: 8 {@link AnvilSmithingHotRecipe} (meteorite + cobalt decoration + meteorite_sword_reforged) + 18
+ * Ported: 18 {@link AnvilSmithingHotRecipe} (dusted steel purity chain 0→9→chainsteel + meteorite + cobalt decoration + meteorite_sword_reforged) + 18
  * {@link AnvilSmithingMold} + {@link AnvilSmithingCyanideRecipe} + {@link AnvilSmithingRenameRecipe}
- * + 9 dusted steel purity progression + chainsteel + 9 mold-construction rows ({@code :626-635}).
+ * + 9 mold-construction rows ({@code :626-635}).
  */
 public final class AnvilRecipes {
 
