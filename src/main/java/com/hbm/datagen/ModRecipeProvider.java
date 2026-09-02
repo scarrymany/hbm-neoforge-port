@@ -4238,8 +4238,47 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("solid_fuel_presto"));
 
         // ---- CraftingManager.java:587-640 crafts (records, fluid ducts, tanks, singularities). ----
-        // SKIP :587 padlock_unbreakable — BIGMT material not added yet
-        // SKIP :588-590 records — ANY_PLASTIC not added yet; defer until plastic material exists
+        // CE :587 = padlock_unbreakable = " P ","PBP","PDP", P=BIGMT.plate() (SATURN plate), D=DIAMOND.gem(), B=DURA.bolt()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("padlock_unbreakable"))
+                .pattern(" P ")
+                .pattern("PBP")
+                .pattern("PDP")
+                .define('P', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "plates/saturnite")))
+                .define('D', Items.DIAMOND)
+                .define('B', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "bolts/duralex")))
+                .unlockedBy("has_saturn", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "plates/saturnite"))))
+                .save(output, id("padlock_unbreakable"));
+        
+        // CE :588-590 records — ANY_PLASTIC.ingot() (use plate_polymer as plastic equivalent)
+        // CE :588 = record_lc = " S ","SDS"," S ", S=ANY_PLASTIC.ingot(), D=LAPIS.dust()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("record_lc"))
+                .pattern(" S ")
+                .pattern("SDS")
+                .pattern(" S ")
+                .define('S', item("plate_polymer"))
+                .define('D', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dusts/lapis")))
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("record_lc"));
+        
+        // CE :589 = record_ss = " S ","SDS"," S ", S=ANY_PLASTIC.ingot(), D=MINGRADE.dust()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("record_ss"))
+                .pattern(" S ")
+                .pattern("SDS")
+                .pattern(" S ")
+                .define('S', item("plate_polymer"))
+                .define('D', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dusts/iron")))
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("record_ss"));
+        
+        // CE :590 = record_vc = " S ","SDS"," S ", S=ANY_PLASTIC.ingot(), D=CMB.dust()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("record_vc"))
+                .pattern(" S ")
+                .pattern("SDS")
+                .pattern(" S ")
+                .define('S', item("plate_polymer"))
+                .define('D', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dusts/combine")))
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("record_vc"));
 
         // CE :592 = polaroid = " C ","RPY"," B ", B=LAPIS.dust(), C=COAL.dust(), R=MINGRADE.dust(), Y=GOLD.dust(), P=paper
         TagKey<Item> mingradeDustTag = MaterialShapes.DUST.commonTag(Mats.MAT_MINGRADE);
@@ -4653,7 +4692,20 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_saturn", has(saturnPlateTag))
                 .save(output, id("custom_fall"));
 
-        // SKIP :671 machine_controller — ANY_RESISTANTALLOY not added yet
+        // CE :670 = machine_controller = "TDT","DCD","TDT", T=ANY_RESISTANTALLOY.ingot() (TCALLOY or CDALLOY), D=crt_display, C=circuit_advanced
+        Ingredient resistantAlloyIngotController = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_TCALLOY)),
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_CDALLOY))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_controller"))
+                .pattern("TDT")
+                .pattern("DCD")
+                .pattern("TDT")
+                .define('T', resistantAlloyIngotController)
+                .define('D', item("crt_display"))
+                .define('C', item("circuit_advanced"))
+                .unlockedBy("has_tcalloy", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/tcalloy"))))
+                .save(output, id("machine_controller"));
 
         // CE :672 = containment_box = "LUL","UCU","LUL", L=PB.plate(), U=FERRO.ingot(), C=crate_steel
         TagKey<Item> leadPlateTagLocal2 = MaterialShapes.PLATE.commonTag(Mats.MAT_LEAD);
@@ -4682,7 +4734,33 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_rubber", has(ingotRubberLocal2))
                 .save(output, id("casing_bag_rubber"));
 
-        // SKIP ammo_bag — WEAPONSTEEL not added yet
+        // CE :674-675 = ammo_bag = "LLL","MGM","LLL", L=LEATHER or ANY_RUBBER, G=WEAPONSTEEL.plate(), M=WEAPONSTEEL.mechanism()
+        TagKey<Item> weaponsteelPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_WEAPONSTEEL);
+        TagKey<Item> weaponsteelMechanismTag = MaterialShapes.MECHANISM.commonTag(Mats.MAT_WEAPONSTEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ammo_bag"))
+                .pattern("LLL")
+                .pattern("MGM")
+                .pattern("LLL")
+                .define('L', Items.LEATHER)
+                .define('G', weaponsteelPlateTag)
+                .define('M', weaponsteelMechanismTag)
+                .unlockedBy("has_weaponsteel", has(weaponsteelPlateTag))
+                .save(output, id("ammo_bag_leather"));
+        
+        // CE :675 variant with rubber
+        Ingredient rubberIngot = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_RUBBER)),
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_PVC))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ammo_bag"))
+                .pattern("LLL")
+                .pattern("MGM")
+                .pattern("LLL")
+                .define('L', rubberIngot)
+                .define('G', weaponsteelPlateTag)
+                .define('M', weaponsteelMechanismTag)
+                .unlockedBy("has_weaponsteel", has(weaponsteelPlateTag))
+                .save(output, id("ammo_bag_rubber"));
 
         // CE :678-681 = rad_absorber (4 tiers)
         // CE :678 = rad_absorber BASE = "ICI","CPC","ICI", I=CU.ingot(), C=COAL.dust(), P=PB.dust()
@@ -4977,7 +5055,20 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_transformer", has(block("machine_transformer")))
                 .save(output, id("tesla"));
 
-        // SKIP :772 struct_watz_core — ANY_RESISTANTALLOY.plateCast() not added yet
+        // CE :772 = struct_watz_core = "CBC","BHB","CBC", B=ANY_RESISTANTALLOY.plateCast() (TCALLOY or CDALLOY cast plate), C=circuit_advanced, H=watz_cooler
+        Ingredient resistantAlloyPlateCast = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_TCALLOY)),
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_CDALLOY))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("struct_watz_core"))
+                .pattern("CBC")
+                .pattern("BHB")
+                .pattern("CBC")
+                .define('B', resistantAlloyPlateCast)
+                .define('C', item("circuit_advanced"))
+                .define('H', block("watz_cooler"))
+                .unlockedBy("has_watz", has(block("watz_cooler")))
+                .save(output, id("struct_watz_core"));
         
         // CE :773 = fusion_heater (shapeless: fusion_hatch → fusion_heater)
         ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, block("fusion_heater"))
@@ -5244,8 +5335,33 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_control", has(block("rbmk_control")))
                 .save(output, id("rbmk_control_auto"));
 
-        // SKIP :852 rbmk_rod_reasim — ZR (zirconium) material not added yet
-        // SKIP :853 rbmk_rod_reasim_mod — ANY_RESISTANTALLOY not added yet
+        // CE :852 = rbmk_rod_reasim = "ZCZ","ZRZ","ZCZ", Z=ZR.ingot() (zirconium), C=STEEL.shell(), R=rbmk_blank
+        TagKey<Item> zrIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_ZIRCONIUM);
+        TagKey<Item> shellSteelTag = MaterialShapes.SHELL.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_rod_reasim"))
+                .pattern("ZCZ")
+                .pattern("ZRZ")
+                .pattern("ZCZ")
+                .define('Z', zrIngotTag)
+                .define('C', shellSteelTag)
+                .define('R', block("rbmk_blank"))
+                .unlockedBy("has_zirconium", has(zrIngotTag))
+                .save(output, id("rbmk_rod_reasim"));
+        
+        // CE :853 = rbmk_rod_reasim_mod = "BGB","GRG","BGB", B=ANY_RESISTANTALLOY.ingot() (TCALLOY or CDALLOY), G=GRAPHITE.block(), R=rbmk_rod_reasim
+        Ingredient resistantAlloyIngotRbmk = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_TCALLOY)),
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_CDALLOY))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_rod_reasim_mod"))
+                .pattern("BGB")
+                .pattern("GRG")
+                .pattern("BGB")
+                .define('B', resistantAlloyIngotRbmk)
+                .define('G', graphiteBlockTag)
+                .define('R', block("rbmk_rod_reasim"))
+                .unlockedBy("has_reasim", has(block("rbmk_rod_reasim")))
+                .save(output, id("rbmk_rod_reasim_mod"));
 
         // CE :854 = rbmk_outgasser = "GHG","GRG","GTG", G=steel_grate, H=hopper, T=tank_steel, R=rbmk_blank
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_outgasser"))
@@ -6149,8 +6265,33 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("cm_block_steel"));
 
         // SKIP :1140 = cm_block bismoid_bronze (ANY_BISMOIDBRONZE not added)
-        // SKIP :1141 = cm_block desh (DESH not fully added)
-        // SKIP :1142 = cm_block resistant_alloy (ANY_RESISTANTALLOY not added)
+        // CE :1141 = cm_block desh = "BBB","BBB","BBB", B=DESH.block()
+        TagKey<Item> deshBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_DESH);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block"), 9)
+                .pattern("BBB")
+                .pattern("BBB")
+                .pattern("BBB")
+                .define('B', deshBlockTag)
+                .unlockedBy("has_desh", has(deshBlockTag))
+                .save(output, id("cm_block_from_desh"));
+        
+        // CE :1142 = cm_block resistant_alloy = " I ","IPI"," I ", I=ANY_RESISTANTALLOY.ingot(), P=ANY_RESISTANTALLOY.plateCast()
+        Ingredient resistantAlloyIngotCm = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_TCALLOY)),
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_CDALLOY))
+        );
+        Ingredient resistantAlloyPlateCastCm = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_TCALLOY)),
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_CDALLOY))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block"), 4)
+                .pattern(" I ")
+                .pattern("IPI")
+                .pattern(" I ")
+                .define('I', resistantAlloyIngotCm)
+                .define('P', resistantAlloyPlateCastCm)
+                .unlockedBy("has_tcalloy", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/tcalloy"))))
+                .save(output, id("cm_block_from_resistant_alloy"));
 
         // CE :1144-1148 = cm_sheet/tank/port per block variant (loop i=0..3)
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_sheet_steel"), 16)
