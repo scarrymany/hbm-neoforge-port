@@ -1,5 +1,6 @@
 package com.hbm.datagen;
 
+import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.NTMMaterial;
@@ -5159,7 +5160,17 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_shredder", has(item("upgrade_shredder")))
                 .save(output, id("upgrade_centrifuge"));
 
-        // SKIP :781 upgrade_crystallizer — fluid_barrel_full(PEROXIDE) not implemented yet
+        // CE :781 upgrade_crystallizer = "PHP","CUC","DTD", P=fluid_barrel_full(PEROXIDE), H=circuit_advanced, C=barrel_steel, U=upgrade_centrifuge, D=motor, T=machine_transformer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_crystallizer"))
+                .pattern("PHP").pattern("CUC").pattern("DTD")
+                .define('P', FluidTankIngredients.barrelFull(Fluids.PEROXIDE))
+                .define('H', item("circuit_advanced"))
+                .define('C', item("barrel_steel"))
+                .define('U', item("upgrade_centrifuge"))
+                .define('D', item("motor"))
+                .define('T', block("machine_transformer"))
+                .unlockedBy("has_centrifuge", has(item("upgrade_centrifuge")))
+                .save(output, id("upgrade_crystallizer"));
         
         // CE :782 = upgrade_screm
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_screm"))
@@ -5843,7 +5854,21 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('W', ItemTags.WOOL)
                 .unlockedBy("has_wool", has(ItemTags.WOOL))
                 .save(output, id("rag_from_wool"));
-        // SKIP :934-935 = solid_fuel / canister (CE uses Fluids.HEATINGOIL.getDict / ComplexOreIngredient)
+        
+        // CE :839 = solid_fuel x3 = Fluids.HEATINGOIL.getDict(16000) + KEY_TOOL_CHEMISTRYSET (chemistry_set)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("solid_fuel"), 3)
+                .requires(FluidTankIngredients.barrelFull(Fluids.HEATINGOIL, 16000))
+                .requires(item("chemistry_set"))
+                .unlockedBy("has_heatingoil", has(item("fluid_barrel_full")))
+                .save(output, id("solid_fuel"));
+        
+        // CE :935 (approx, CE uses ComplexOreIngredient for solid_fuel/wood variants) = canister_fuel
+        // Simplified: one craft for the single canister_fuel item from HEATINGOIL barrel
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("canister_fuel"))
+                .requires(FluidTankIngredients.barrelFull(Fluids.HEATINGOIL, 16000))
+                .requires(item("canister_empty"))
+                .unlockedBy("has_heatingoil", has(item("fluid_barrel_full")))
+                .save(output, id("canister_fuel"));
 
         // CE :937 = machine_condenser
         TagKey<Item> steelIngotTagLocal10 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
@@ -6279,7 +6304,14 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_template", has(item("upgrade_template")))
                 .save(output, id("upgrade_5g"));
 
-        // SKIP :1036 = bdcl (CE uses ANY_TAR + Fluids.WATER.getDict + KEY_WHITE)
+        // CE :941 = bdcl = ANY_TAR.any() + Fluids.WATER.getDict(1000) + KEY_WHITE (bone_meal/white dye)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, item("bdcl"))
+                .requires(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "oil_tar")))
+                .requires(FluidTankIngredients.tankFull(Fluids.WATER, 1000))
+                .requires(Items.BONE_MEAL) // KEY_WHITE
+                .unlockedBy("has_tar", has(item("oil_tar_crude")))
+                .save(output, id("bdcl"));
+
         // SKIP :1038 = book_of_ (CE uses DictFrame EnumPages + egg_balefire)
         // SKIP :1040-1064 = GeneralConfig.enableLBSM crafts (cordite, semtex, ore_uranium water recovery, plate 2x2 simple, wire_fine autogen)
 
