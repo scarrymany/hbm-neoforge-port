@@ -5150,7 +5150,20 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_fusion_core", has(item("fusion_core")))
                 .save(output, id("energy_core"));
 
-        // SKIP :776 catalytic_converter — ANY_HARDPLASTIC/ANY_BISMOID not added yet
+        // CE :719 = catalytic_converter = "PCP","PBP","PCP", P=ANY_HARDPLASTIC.ingot(), C=CO.dust(), B=ANY_BISMOID.ingot()
+        // ANY_HARDPLASTIC = MAT_HARDPLASTIC; ANY_BISMOID = bismuth OR arsenic
+        Ingredient anyHardplasticIngot = Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_HARDPLASTIC));
+        Ingredient anyBismoidIngot = CompoundIngredient.of(
+                Ingredient.of(item("ingot_bismuth")),
+                Ingredient.of(item("ingot_arsenic"))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("catalytic_converter"))
+                .pattern("PCP").pattern("PBP").pattern("PCP")
+                .define('P', anyHardplasticIngot)
+                .define('C', item("powder_cobalt"))
+                .define('B', anyBismoidIngot)
+                .unlockedBy("has_hardplastic", has(MaterialShapes.INGOT.commonTag(Mats.MAT_HARDPLASTIC)))
+                .save(output, id("catalytic_converter"));
 
         // CE :778 = upgrade_nullifier = "SPS","PUP","SPS", S=STEEL.plate(), P=powder_fire, U=upgrade_template
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_nullifier"))
@@ -6494,7 +6507,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(steelIngotTagLocal10))
                 .save(output, id("cm_block_steel"));
 
-        // SKIP :1140 = cm_block bismoid_bronze (ANY_BISMOIDBRONZE not added)
+        // SKIP :1049 = cm_block bismoid_bronze (plate_cast_bismuth_bronze / plate_cast_arsenic_bronze / cm_block_bismoid_bronze not registered)
         // CE :1141 = cm_block desh = "BBB","BBB","BBB", B=DESH.block()
         TagKey<Item> deshBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_DESH);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block"), 9)
