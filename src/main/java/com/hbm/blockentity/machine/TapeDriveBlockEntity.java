@@ -1,15 +1,15 @@
 package com.hbm.blockentity.machine;
 
 import com.hbm.blockentity.MachineBaseBlockEntity;
-import com.hbm.blockentity.BlockEntityProxyBase;
+import com.hbm.blockentity.machine.dummyable.MachineSatLinkBlockEntity;
 import com.hbm.inventory.container.TapeDriveMenu;
 import com.hbm.items.ModItems;
-import com.hbm.items.machine.DriveItem;
+import com.hbm.items.machine.ItemDrive;
 import com.hbm.saveddata.satellites.Satellite;
 import com.hbm.saveddata.satellites.SatelliteSavedData;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -49,8 +49,7 @@ public class TapeDriveBlockEntity extends MachineBaseBlockEntity implements Menu
         return Component.translatable("container.machineTapeDrive");
     }
 
-    @Override
-    public void tickCommon() {
+    public void serverTick() {
         if (level == null || level.isClientSide) return;
 
         if (level.getGameTime() % 10 == 0) {
@@ -58,11 +57,9 @@ public class TapeDriveBlockEntity extends MachineBaseBlockEntity implements Menu
             BlockPos targetPos = worldPosition.relative(facing);
             BlockEntity connected = level.getBlockEntity(targetPos);
 
-            if (connected instanceof BlockEntityProxyBase proxy) {
-                connected = proxy.getTarget();
-            }
+            // Skip proxy check for now - CE uses TileEntityProxyBase, port doesn't have it yet
 
-            if (connected instanceof SatLinkBlockEntity link) {
+            if (connected instanceof MachineSatLinkBlockEntity link) {
                 if (link.connected) {
                     SatelliteSavedData dat = SatelliteSavedData.getData(level);
                     Satellite satellite = dat.sats.get(link.freq);
@@ -70,14 +67,14 @@ public class TapeDriveBlockEntity extends MachineBaseBlockEntity implements Menu
                     if (satellite != null && satellite.hasData(level)) {
                         for (int i = 0; i < 12; i++) {
                             ItemStack stack = inventory.getStackInSlot(i);
-                            if (stack.isEmpty() || stack.getItem() != ModItems.DRIVE.get()) continue;
+                            if (stack.isEmpty() || !(stack.getItem() instanceof ItemDrive driveItem)) continue;
 
-                            DriveItem.EnumDriveType type = DriveItem.getTypeFromStack(stack);
-                            DriveItem.EnumDriveType ret = satellite.getOutputData(type);
+                            ItemDrive.EnumDriveType type = driveItem.getDriveType();
+                            ItemDrive.EnumDriveType ret = satellite.getOutputData(type);
 
                             if (ret != null) {
                                 satellite.consumeData();
-                                inventory.setStackInSlot(i, DriveItem.createStack(ret, 1));
+                                inventory.setStackInSlot(i, new ItemStack(com.hbm.items.machine.MachineItems.DRIVES.get(ret).get(), 1));
                                 dat.setDirty();
                                 break;
                             }
@@ -90,7 +87,7 @@ public class TapeDriveBlockEntity extends MachineBaseBlockEntity implements Menu
 
     @Override
     public boolean isItemValidForSlot(int slot, @NotNull ItemStack stack) {
-        return stack.getItem() == ModItems.DRIVE.get();
+        return stack.getItem() instanceof ItemDrive;
     }
 
     @Override
@@ -108,7 +105,7 @@ public class TapeDriveBlockEntity extends MachineBaseBlockEntity implements Menu
     }
 
     @Override
-    public void serialize(ByteBuf buf) {
+    public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
 
         for (int i = 0; i < 12; i++) {
@@ -118,11 +115,11 @@ public class TapeDriveBlockEntity extends MachineBaseBlockEntity implements Menu
             if (!stack.isEmpty()) {
                 type = SLOT_ANY;
 
-                if (stack.getItem() == ModItems.DRIVE.get()) {
-                    DriveItem.EnumDriveType driveType = DriveItem.getTypeFromStack(stack);
-                    if (driveType == DriveItem.EnumDriveType.DISK_EMPTY || driveType == DriveItem.EnumDriveType.FLASH_EMPTY) {
+                if (stack.getItem() instanceof ItemDrive driveItem) {
+                    ItemDrive.EnumDriveType driveType = driveItem.getDriveType();
+                    if (driveType == ItemDrive.EnumDriveType.DISK_EMPTY || driveType == ItemDrive.EnumDriveType.FLASH_EMPTY) {
                         type = SLOT_EMPTY_TAPE;
-                    } else if (driveType == DriveItem.EnumDriveType.DISK_BROKEN || driveType == DriveItem.EnumDriveType.FLASH_BROKEN) {
+                    } else if (driveType == ItemDrive.EnumDriveType.DISK_BROKEN || driveType == ItemDrive.EnumDriveType.FLASH_BROKEN) {
                         type = SLOT_ANY;
                     } else {
                         type = SLOT_FILLED_TAPE;
@@ -135,7 +132,7 @@ public class TapeDriveBlockEntity extends MachineBaseBlockEntity implements Menu
     }
 
     @Override
-    public void deserialize(ByteBuf buf) {
+    public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
 
         for (int i = 0; i < 12; i++) {

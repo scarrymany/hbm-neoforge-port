@@ -102,7 +102,7 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, ModMenuTypes.BATTERY, BatteryScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.FLUID_TANK, FluidTankScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.LEMEGETON, LemegetonScreen::new);
-        SafeMenuScreens.bind(event, ModMenuTypes.TAPE_DRIVE, TapeDriveScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.TAPE_DRIVE, com.hbm.client.gui.TapeDriveScreen::new);
 
         BombClientRegistry.registerScreens(event);
     }
