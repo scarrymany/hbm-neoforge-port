@@ -90,6 +90,12 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneGrabberMenu>> CRANE_GRABBER =
             reg("crane_grabber", com.hbm.menu.CraneGrabberMenu::new);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneBoxerMenu>> CRANE_BOXER =
+            reg("crane_boxer", com.hbm.menu.CraneBoxerMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneUnboxerMenu>> CRANE_UNBOXER =
+            reg("crane_unboxer", com.hbm.menu.CraneUnboxerMenu::new);
+
     private ModMenuTypes() {
     }
 

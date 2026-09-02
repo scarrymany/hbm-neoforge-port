@@ -1,8 +1,10 @@
 package com.hbm.blocks.network;
 
+import com.hbm.blockentity.network.CraneBoxerBlockEntity;
 import com.hbm.blockentity.network.CraneExtractorBlockEntity;
 import com.hbm.blockentity.network.CraneGrabberBlockEntity;
 import com.hbm.blockentity.network.CraneInserterBlockEntity;
+import com.hbm.blockentity.network.CraneUnboxerBlockEntity;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -19,7 +21,8 @@ import java.util.function.Supplier;
 
 /**
  * Block + BlockEntity registration for crane family - follows {@link ConveyorBlocks} pattern.
- * Phase 1: crane_inserter + crane_extractor + crane_grabber. Other crane types (boxer, unboxer, router, partitioner) deferred.
+ * Phase 1: crane_inserter + crane_extractor + crane_grabber.
+ * Phase 2: crane_boxer + crane_unboxer (simplified without EntityMovingPackage).
  */
 public final class CraneBlocks {
 
@@ -31,6 +34,12 @@ public final class CraneBlocks {
 
     public static DeferredBlock<? extends Block> CRANE_GRABBER;
     public static Supplier<BlockEntityType<CraneGrabberBlockEntity>> CRANE_GRABBER_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> CRANE_BOXER;
+    public static Supplier<BlockEntityType<CraneBoxerBlockEntity>> CRANE_BOXER_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> CRANE_UNBOXER;
+    public static Supplier<BlockEntityType<CraneUnboxerBlockEntity>> CRANE_UNBOXER_BE_TYPE;
 
     private CraneBlocks() {
     }
@@ -72,6 +81,28 @@ public final class CraneBlocks {
                 BlockEntityType.Builder.of(
                         (pos, state) -> new CraneGrabberBlockEntity(CRANE_GRABBER_BE_TYPE.get(), pos, state),
                         CRANE_GRABBER.get()
+                ).build(null));
+
+        // crane_boxer (simplified without EntityMovingPackage)
+        CRANE_BOXER = ModBlocks.BLOCKS.register("crane_boxer", () -> new BlockCraneBoxer(props));
+        ModItems.ITEMS.register("crane_boxer", () -> new BlockItem(CRANE_BOXER.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, CRANE_BOXER);
+
+        CRANE_BOXER_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("crane_boxer", () -> 
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new CraneBoxerBlockEntity(CRANE_BOXER_BE_TYPE.get(), pos, state),
+                        CRANE_BOXER.get()
+                ).build(null));
+
+        // crane_unboxer (simplified without EntityMovingPackage)
+        CRANE_UNBOXER = ModBlocks.BLOCKS.register("crane_unboxer", () -> new BlockCraneUnboxer(props));
+        ModItems.ITEMS.register("crane_unboxer", () -> new BlockItem(CRANE_UNBOXER.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, CRANE_UNBOXER);
+
+        CRANE_UNBOXER_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("crane_unboxer", () -> 
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new CraneUnboxerBlockEntity(CRANE_UNBOXER_BE_TYPE.get(), pos, state),
+                        CRANE_UNBOXER.get()
                 ).build(null));
     }
 }

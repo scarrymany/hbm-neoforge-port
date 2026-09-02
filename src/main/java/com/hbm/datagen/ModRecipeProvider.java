@@ -6061,7 +6061,29 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
                 .save(output, id("crane_splitter"));
         
-        // SKIP :974-978 crane_boxer/unboxer/router/partitioner
+        // CE :971 crane_boxer = "WWW","WPW","CCC", W=KEY_PLANKS, P=PISTON_PNEUMATIC, C=conveyor_wand
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_boxer"), 2)
+                .pattern("WWW")
+                .pattern("WPW")
+                .pattern("CCC")
+                .define('W', ItemTags.PLANKS)
+                .define('P', item("part_generic_piston_pneumatic"))
+                .define('C', item("conveyor_wand"))
+                .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
+                .save(output, id("crane_boxer"));
+
+        // CE :972 crane_unboxer = "WWW","WPW","CCC", W=KEY_STICK (vanilla stick), P=shears, C=conveyor_wand
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_unboxer"), 2)
+                .pattern("WWW")
+                .pattern("WPW")
+                .pattern("CCC")
+                .define('W', Items.STICK)
+                .define('P', Items.SHEARS)
+                .define('C', item("conveyor_wand"))
+                .unlockedBy("has_conveyor_wand", has(item("conveyor_wand")))
+                .save(output, id("crane_unboxer"));
+        
+        // SKIP :976-978 crane_router/partitioner
         // BlockCraneBase family subtypes — deferred until ported live
         // CE :980 = machine_conveyor_press = "CPC","CBC","CCC", C=CU.plate() (copper), P=machine_epress, B=conveyor_wand
         TagKey<Item> copperPlateTagConveyor = MaterialShapes.PLATE.commonTag(Mats.MAT_COPPER);
