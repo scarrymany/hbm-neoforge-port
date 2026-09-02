@@ -4,6 +4,8 @@ import com.hbm.blockentity.network.CraneBoxerBlockEntity;
 import com.hbm.blockentity.network.CraneExtractorBlockEntity;
 import com.hbm.blockentity.network.CraneGrabberBlockEntity;
 import com.hbm.blockentity.network.CraneInserterBlockEntity;
+import com.hbm.blockentity.network.CranePartitionerBlockEntity;
+import com.hbm.blockentity.network.CraneRouterBlockEntity;
 import com.hbm.blockentity.network.CraneUnboxerBlockEntity;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
@@ -22,7 +24,8 @@ import java.util.function.Supplier;
 /**
  * Block + BlockEntity registration for crane family - follows {@link ConveyorBlocks} pattern.
  * Phase 1: crane_inserter + crane_extractor + crane_grabber.
- * Phase 2: crane_boxer + crane_unboxer (simplified without EntityMovingPackage).
+ * Phase 2: crane_boxer + crane_unboxer (EntityMovingPackage system).
+ * Phase 3: crane_router + crane_partitioner (simplified round-robin routing, no ModulePatternMatcher).
  */
 public final class CraneBlocks {
 
@@ -40,6 +43,12 @@ public final class CraneBlocks {
 
     public static DeferredBlock<? extends Block> CRANE_UNBOXER;
     public static Supplier<BlockEntityType<CraneUnboxerBlockEntity>> CRANE_UNBOXER_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> CRANE_ROUTER;
+    public static Supplier<BlockEntityType<CraneRouterBlockEntity>> CRANE_ROUTER_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> CRANE_PARTITIONER;
+    public static Supplier<BlockEntityType<CranePartitionerBlockEntity>> CRANE_PARTITIONER_BE_TYPE;
 
     private CraneBlocks() {
     }
@@ -103,6 +112,28 @@ public final class CraneBlocks {
                 BlockEntityType.Builder.of(
                         (pos, state) -> new CraneUnboxerBlockEntity(CRANE_UNBOXER_BE_TYPE.get(), pos, state),
                         CRANE_UNBOXER.get()
+                ).build(null));
+
+        // crane_router (simplified without ModulePatternMatcher)
+        CRANE_ROUTER = ModBlocks.BLOCKS.register("crane_router", () -> new BlockCraneRouter(props));
+        ModItems.ITEMS.register("crane_router", () -> new BlockItem(CRANE_ROUTER.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, CRANE_ROUTER);
+
+        CRANE_ROUTER_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("crane_router", () -> 
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new CraneRouterBlockEntity(CRANE_ROUTER_BE_TYPE.get(), pos, state),
+                        CRANE_ROUTER.get()
+                ).build(null));
+
+        // crane_partitioner (simplified without custom model)
+        CRANE_PARTITIONER = ModBlocks.BLOCKS.register("crane_partitioner", () -> new BlockCranePartitioner(props));
+        ModItems.ITEMS.register("crane_partitioner", () -> new BlockItem(CRANE_PARTITIONER.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, CRANE_PARTITIONER);
+
+        CRANE_PARTITIONER_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("crane_partitioner", () -> 
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new CranePartitionerBlockEntity(CRANE_PARTITIONER_BE_TYPE.get(), pos, state),
+                        CRANE_PARTITIONER.get()
                 ).build(null));
     }
 }
