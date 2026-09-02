@@ -87,6 +87,9 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneExtractorMenu>> CRANE_EXTRACTOR =
             reg("crane_extractor", com.hbm.menu.CraneExtractorMenu::new);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneGrabberMenu>> CRANE_GRABBER =
+            reg("crane_grabber", com.hbm.menu.CraneGrabberMenu::new);
+
     private ModMenuTypes() {
     }
 

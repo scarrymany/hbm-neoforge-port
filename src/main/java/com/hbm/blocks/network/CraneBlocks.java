@@ -1,6 +1,7 @@
 package com.hbm.blocks.network;
 
 import com.hbm.blockentity.network.CraneExtractorBlockEntity;
+import com.hbm.blockentity.network.CraneGrabberBlockEntity;
 import com.hbm.blockentity.network.CraneInserterBlockEntity;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
@@ -18,7 +19,7 @@ import java.util.function.Supplier;
 
 /**
  * Block + BlockEntity registration for crane family - follows {@link ConveyorBlocks} pattern.
- * Phase 1: crane_inserter + crane_extractor. Other crane types (grabber, boxer, etc.) deferred.
+ * Phase 1: crane_inserter + crane_extractor + crane_grabber. Other crane types (boxer, unboxer, router, partitioner) deferred.
  */
 public final class CraneBlocks {
 
@@ -27,6 +28,9 @@ public final class CraneBlocks {
 
     public static DeferredBlock<? extends Block> CRANE_EXTRACTOR;
     public static Supplier<BlockEntityType<CraneExtractorBlockEntity>> CRANE_EXTRACTOR_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> CRANE_GRABBER;
+    public static Supplier<BlockEntityType<CraneGrabberBlockEntity>> CRANE_GRABBER_BE_TYPE;
 
     private CraneBlocks() {
     }
@@ -57,6 +61,17 @@ public final class CraneBlocks {
                 BlockEntityType.Builder.of(
                         (pos, state) -> new CraneExtractorBlockEntity(CRANE_EXTRACTOR_BE_TYPE.get(), pos, state),
                         CRANE_EXTRACTOR.get()
+                ).build(null));
+
+        // crane_grabber
+        CRANE_GRABBER = ModBlocks.BLOCKS.register("crane_grabber", () -> new BlockCraneGrabber(props));
+        ModItems.ITEMS.register("crane_grabber", () -> new BlockItem(CRANE_GRABBER.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, CRANE_GRABBER);
+
+        CRANE_GRABBER_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("crane_grabber", () -> 
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new CraneGrabberBlockEntity(CRANE_GRABBER_BE_TYPE.get(), pos, state),
+                        CRANE_GRABBER.get()
                 ).build(null));
     }
 }
