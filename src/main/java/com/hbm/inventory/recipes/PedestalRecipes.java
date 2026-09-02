@@ -2,7 +2,10 @@ package com.hbm.inventory.recipes;
 
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
-import com.hbm.items.ModItems;
+import com.hbm.main.MainRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import com.hbm.items.weapon.sedna.content.GunEnergyItems;
 import com.hbm.items.weapon.sedna.content.GunHeavyItems;
 import com.hbm.items.weapon.sedna.content.GunLauncherItems;
@@ -58,10 +61,16 @@ public final class PedestalRecipes {
 
         // 2. gun_maresleg_broken (no extra, set 0)
         // CE :55-63. Ring: barbed_wire×4 corners, WEAPONSTEEL.plate()×4 edges
-        // TODO(CE: PedestalRecipes.java:56-60): bolt_spike×16 not registered; CE uses barbed_wire BLOCK
-        // (ModBlocks.barbed_wire) as ring ingredient. NeoForge: barbed_wire exists as block
-        // (GenericBlocks.java:562-567). Accept block OR item? For now: skip (no barbed_wire item).
-        // Center: gun_maresleg
+        register(new PedestalRecipe(
+                gun("gun_maresleg"),
+                new AStack[] {
+                        block("barbed_wire"), plate("desh"), block("barbed_wire"),
+                        plate("desh"), null, plate("desh"),
+                        block("barbed_wire"), plate("desh"), block("barbed_wire")
+                },
+                gun("gun_maresleg_broken"),
+                null, 0
+        ));
         
         // 3. gun_heavy_revolver_lilmac (no extra, set 0)
         // CE :65-73. Ring: null, weapon_mod_special(SCOPE), null / powder_magic, —, WEAPONSTEEL.plate() /
@@ -80,8 +89,16 @@ public final class PedestalRecipes {
 
         // 4. gun_heavy_revolver_protege (no extra, set 0)
         // CE :75-83. Ring: chain×16 corners, CINNABAR.gem()/scrap_nuclear edges
-        // TODO(CE: PedestalRecipes.java:77-79): chain not registered as item (only dungeon_chain block).
-        // Skip for now.
+        register(new PedestalRecipe(
+                gun("gun_heavy_revolver"),
+                new AStack[] {
+                        block("dungeon_chain").copy(16), gem("cinnabar"), block("dungeon_chain").copy(16),
+                        item("scrap_nuclear"), null, item("scrap_nuclear"),
+                        block("dungeon_chain").copy(16), gem("cinnabar"), block("dungeon_chain").copy(16)
+                },
+                gun("gun_heavy_revolver_protege"),
+                null, 0
+        ));
         
         // 5. gun_amat_subtlety (no extra, set 0)
         // CE :85-93. Ring: STAR.ingot() corners, AL.plateCast() edges
@@ -162,17 +179,42 @@ public final class PedestalRecipes {
 
         // 11. gun_folly (FULL_MOON, set 1)
         // CE :145-153. Ring: item_secret(FOLLY)×4 corners, item_secret(CONTROLLER)×2/BSCCO.ingot()×16 edges
-        // TODO(CE: PedestalRecipes.java:147-149): item_secret(FOLLY/CONTROLLER) skipped (ItemPoolsRedRoom.java:41/47).
-        // Use placeholder.
+        register(new PedestalRecipe(
+                gun("gun_amat"),
+                new AStack[] {
+                        item("item_secret_folly"), item("item_secret_controller"), item("item_secret_folly"),
+                        ingot("bscco").copy(16), null, item("item_secret_controller"),
+                        item("item_secret_folly"), ingot("bscco").copy(16), item("item_secret_folly")
+                },
+                gun("gun_folly"),
+                ExtraCondition.FULL_MOON, 1
+        ));
         
         // 12. gun_aberrator (no extra, set 1)
         // CE :155-163. Ring: null corners, item_secret(ABERRATOR) edges
-        // TODO(CE: PedestalRecipes.java:157-159): item_secret(ABERRATOR) not registered.
-        // Skip for now.
+        register(new PedestalRecipe(
+                gun("gun_amat"),
+                new AStack[] {
+                        null, item("item_secret_aberrator"), null,
+                        item("item_secret_aberrator"), null, item("item_secret_aberrator"),
+                        null, item("item_secret_aberrator"), null
+                },
+                gun("gun_aberrator"),
+                null, 1
+        ));
         
         // 13. gun_aberrator_eott (GOOD_KARMA, set 1)
         // CE :165-173. Ring: item_secret(ABERRATOR) all 8 slots
-        // TODO(CE: PedestalRecipes.java:167-169): same as above.
+        register(new PedestalRecipe(
+                gun("gun_aberrator"),
+                new AStack[] {
+                        item("item_secret_aberrator"), item("item_secret_aberrator"), item("item_secret_aberrator"),
+                        item("item_secret_aberrator"), null, item("item_secret_aberrator"),
+                        item("item_secret_aberrator"), item("item_secret_aberrator"), item("item_secret_aberrator")
+                },
+                gun("gun_aberrator_eott"),
+                ExtraCondition.GOOD_KARMA, 1
+        ));
         
         // 14. ammo_secret(FOLLY_SM) ×1 (FULL_MOON, set 1)
         // CE :175-183. Ring: STAR.ingot() corners, powder_magic edges
@@ -190,19 +232,45 @@ public final class PedestalRecipes {
 
         // 15. ammo_secret(FOLLY_NUKE) ×1 (FULL_MOON, set 1)
         // CE :185-193. Ring: STAR.ingot() corners, powder_magic edges
-        // Center: ammo_standard(NUKE_HIGH)×4
-        // TODO(CE: PedestalRecipes.java:188): ammo_standard not ported (missile ammo family).
-        // Skip for now.
+        // Center: nuke_high×4
+        register(new PedestalRecipe(
+                ammo("nuke_high").copy(4),
+                new AStack[] {
+                        ingot("schrabidium"), powder("powder_magic"), ingot("schrabidium"),
+                        powder("powder_magic"), null, powder("powder_magic"),
+                        ingot("schrabidium"), powder("powder_magic"), ingot("schrabidium")
+                },
+                ammo("folly_nuke"),
+                ExtraCondition.FULL_MOON, 1
+        ));
         
         // 16. ammo_secret(P35_800) ×5 (no extra, set 1)
         // CE :195-203. Ring: all null except center
         // Center: item_secret(ABERRATOR)×1
-        // TODO(CE: PedestalRecipes.java:198): item_secret(ABERRATOR) not registered.
+        register(new PedestalRecipe(
+                item("item_secret_aberrator"),
+                new AStack[] {
+                        null, null, null,
+                        null, null, null,
+                        null, null, null
+                },
+                ammo("p35_800").copy(5),
+                null, 1
+        ));
         
         // 17. ammo_secret(P35_800_BL) ×10 (no extra, set 1)
         // CE :205-213. Ring: all null except center
         // Center: item_secret(ABERRATOR)×3
-        // TODO(CE: PedestalRecipes.java:208): same as above.
+        register(new PedestalRecipe(
+                item("item_secret_aberrator").copy(3),
+                new AStack[] {
+                        null, null, null,
+                        null, null, null,
+                        null, null, null
+                },
+                ammo("p35_800_bl").copy(10),
+                null, 1
+        ));
     }
 
     private static void register(PedestalRecipe recipe) {
@@ -216,18 +284,19 @@ public final class PedestalRecipes {
         return switch (name) {
             case "gun_light_revolver" -> new ComparableStack(GunPistolItems.GUN_LIGHT_REVOLVER.get());
             case "gun_light_revolver_dani" -> new ComparableStack(GunPistolItems.GUN_LIGHT_REVOLVER_DANI.get());
-            case "gun_maresleg" -> new ComparableStack(GunRifleItems.GUN_MARESLEG.get());
+            case "gun_maresleg" -> new ComparableStack(GunShotgunItems.GUN_MARESLEG.get());
+            case "gun_maresleg_broken" -> new ComparableStack(GunShotgunItems.GUN_MARESLEG_BROKEN.get());
             case "gun_heavy_revolver" -> new ComparableStack(GunPistolItems.GUN_HEAVY_REVOLVER.get());
             case "gun_heavy_revolver_lilmac" -> new ComparableStack(GunPistolItems.GUN_HEAVY_REVOLVER_LILMAC.get());
             case "gun_heavy_revolver_protege" -> new ComparableStack(GunPistolItems.GUN_HEAVY_REVOLVER_PROTEGE.get());
             case "gun_amat" -> new ComparableStack(GunRifleItems.GUN_AMAT.get());
             case "gun_amat_subtlety" -> new ComparableStack(GunRifleItems.GUN_AMAT_SUBTLETY.get());
             case "gun_amat_penance" -> new ComparableStack(GunRifleItems.GUN_AMAT_PENANCE.get());
-            case "gun_flamer" -> new ComparableStack(GunLauncherItems.GUN_FLAMER.get());
-            case "gun_flamer_daybreaker" -> new ComparableStack(GunLauncherItems.GUN_FLAMER_DAYBREAKER.get());
+            case "gun_flamer" -> new ComparableStack(GunHeavyItems.GUN_FLAMER.get());
+            case "gun_flamer_daybreaker" -> new ComparableStack(GunHeavyItems.GUN_FLAMER_DAYBREAKER.get());
             case "gun_autoshotgun" -> new ComparableStack(GunShotgunItems.GUN_AUTOSHOTGUN.get());
-            case "gun_minigun" -> new ComparableStack(GunHeavyItems.GUN_MINIGUN.get());
-            case "gun_minigun_lacunae" -> new ComparableStack(GunHeavyItems.GUN_MINIGUN_LACUNAE.get());
+            case "gun_minigun" -> new ComparableStack(GunRifleItems.GUN_MINIGUN.get());
+            case "gun_minigun_lacunae" -> new ComparableStack(GunRifleItems.GUN_MINIGUN_LACUNAE.get());
             case "gun_laser_pistol" -> new ComparableStack(GunEnergyItems.GUN_LASER_PISTOL.get());
             case "gun_laser_pistol_morning_glory" -> new ComparableStack(GunEnergyItems.GUN_LASER_PISTOL_MORNING_GLORY.get());
             case "gun_folly" -> new ComparableStack(GunEnergyItems.GUN_FOLLY.get());
@@ -241,6 +310,9 @@ public final class PedestalRecipes {
         return switch (name) {
             case "folly_sm" -> new ComparableStack(GunEnergyItems.FOLLY_SM.get());
             case "folly_nuke" -> new ComparableStack(GunEnergyItems.FOLLY_NUKE.get());
+            case "nuke_high" -> new ComparableStack(GunEnergyItems.NUKE_HIGH.get());
+            case "p35_800" -> new ComparableStack(GunEnergyItems.P35800.get());
+            case "p35_800_bl" -> new ComparableStack(GunEnergyItems.P35800_BL.get());
             default -> throw new IllegalArgumentException("Unknown ammo: " + name);
         };
     }
@@ -264,6 +336,7 @@ public final class PedestalRecipes {
         String itemName = switch (materialName) {
             case "schrabidium" -> "ingot_schrabidium"; // CE STAR
             case "phosphorus_white" -> "ingot_phosphorus_white"; // CE P_WHITE
+            case "bscco" -> "ingot_bscco";
             default -> "ingot_" + materialName;
         };
         return item(itemName);
@@ -271,6 +344,18 @@ public final class PedestalRecipes {
 
     private static AStack powder(String name) {
         return item(name);
+    }
+    
+    private static AStack gem(String materialName) {
+        String itemName = switch (materialName) {
+            case "cinnabar" -> "gem_cinnabar";
+            default -> "gem_" + materialName;
+        };
+        return item(itemName);
+    }
+    
+    private static AStack block(String blockName) {
+        return item(blockName);
     }
 
     private static AStack weaponModScope() {
@@ -282,13 +367,15 @@ public final class PedestalRecipes {
     }
 
     private static AStack weaponModFurnitureBlack() {
-        // TODO(CE: PedestalRecipes.java:99): weapon_mod_special(FURNITURE_BLACK) not ported as discrete item.
-        // CE has FURNITURE_BLACK as weapon mod enum variant. Use generic furniture as placeholder.
-        return item("weapon_mod_special_scope"); // Placeholder — need actual furniture_black
+        return item("weapon_mod_special_furniture_black");
     }
 
     private static AStack item(String name) {
-        return new ComparableStack(ModItems.itemByName(name));
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, name));
+        if (item == null || item == Items.AIR) {
+            throw new IllegalArgumentException("Item not registered: " + name);
+        }
+        return new ComparableStack(item);
     }
 
     // ========== Recipe container ==========
@@ -367,8 +454,10 @@ public final class PedestalRecipes {
 
         /**
          * CE BlockPedestal.java:168-186. Check celestial angle / moon phase / player karma.
-         * TODO(CE: PedestalRecipes.java:230-233): Karma system (HbmCapability.getData(player).getReputation())
-         * not ported yet. GOOD_KARMA/BAD_KARMA always return false for now.
+         * TODO(BlockPedestal): Karma conditions (GOOD_KARMA/BAD_KARMA) require player context
+         * (HbmPlayerAttachment.getData(player).getReputation() >= 10 / <= -10). BlockPedestal's
+         * recipe-matching logic must pass player when it calls this check. For now, these conditions
+         * always fail.
          */
         public boolean check(Level level) {
             return switch (this) {
@@ -386,12 +475,13 @@ public final class PedestalRecipes {
                     yield angle >= 0.24F && angle <= 0.26F; // Midday (adjusted for NeoForge angle range)
                 }
                 case GOOD_KARMA -> {
-                    // TODO(CE: PedestalRecipes.java:232): HbmCapability.getData(player).getReputation() >= 10
-                    // Karma/reputation system not ported yet. Return false for now.
+                    // TODO(BlockPedestal): player-context check needed:
+                    // HbmPlayerAttachment.getData(player).getReputation() >= 10
                     yield false;
                 }
                 case BAD_KARMA -> {
-                    // TODO(CE: PedestalRecipes.java:232): reputation <= -10
+                    // TODO(BlockPedestal): player-context check needed:
+                    // HbmPlayerAttachment.getData(player).getReputation() <= -10
                     yield false;
                 }
             };

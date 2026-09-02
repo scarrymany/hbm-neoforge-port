@@ -287,11 +287,14 @@ public final class Phase11ProcessItems {
         consume("cap_fritz");
         // CE ItemEnums.EnumSecretType / ass.50bmgbypass — CE tab=null
         hidden("item_secret_selenium_steel");
+        hidden("item_secret_folly");
+        hidden("item_secret_controller");
+        hidden("item_secret_aberrator");
 
         // CE ModItems.java:1241-1245 consumable items for legendary gun crafts (PedestalRecipes.java)
         // CE cite: PedestalRecipes.java:71 (BONE.grip), :109 (morning_glory), :119 (wild_p/card_aos/card_qos)
+        // Note: bone_grip already registered in previous wave (commit 17494466)
         consume("morning_glory");
-        parts("bone_grip");
         consume("wild_p");
         consume("card_aos");
         consume("card_qos");
