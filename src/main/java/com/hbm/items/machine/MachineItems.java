@@ -80,8 +80,7 @@ public final class MachineItems {
     public static DeferredItem<Item> CENTRIFUGE_ELEMENT, THERMO_ELEMENT, RTG_UNIT, DRILL_TITANIUM;
     public static DeferredItem<Item> CANISTER_EMPTY, TURBINE_TITANIUM, TURBINE_TUNGSTEN, MAGNETRON, CRT_DISPLAY;
     public static DeferredItem<Item> SPHERE_STEEL, FLYWHEEL_BERYLLIUM, REACTOR_CORE;
-    public static DeferredItem<Item> TANK_STEEL, BLADE_TITANIUM, BLADE_TUNGSTEN, DUCTTAPE;
-    public static DeferredItem<Item> FINS_FLAT, FINS_SMALL_STEEL, FINS_BIG_STEEL, FINS_TRI_STEEL, FINS_QUAD_TITANIUM, PEDESTAL_STEEL;
+    public static DeferredItem<Item> RING_STARMETAL;
     public static DeferredItem<Item> HAZMAT_CLOTH, HAZMAT_CLOTH_RED, HAZMAT_CLOTH_GREY, ASBESTOS_CLOTH, FILTER_COAL;
 
     public static final Map<ItemDrive.EnumDriveType, DeferredItem<Item>> DRIVES = new EnumMap<>(ItemDrive.EnumDriveType.class);
@@ -154,17 +153,8 @@ public final class MachineItems {
         CRT_DISPLAY = tab(ModCreativeTabs.PARTS, reg("crt_display", () -> new Item(props())));
         SPHERE_STEEL = tab(ModCreativeTabs.PARTS, reg("sphere_steel", () -> new Item(props())));
         FLYWHEEL_BERYLLIUM = tab(ModCreativeTabs.PARTS, reg("flywheel_beryllium", () -> new Item(props())));
-        // CE ModItems.java:2536, 1305-1306, 1296, 2515-2519, 2530 — tank/blade/fins/pedestal parts for crafts.
-        TANK_STEEL = tab(ModCreativeTabs.PARTS, reg("tank_steel", () -> new Item(props())));
-        BLADE_TITANIUM = tab(ModCreativeTabs.PARTS, reg("blade_titanium", () -> new Item(props())));
-        BLADE_TUNGSTEN = tab(ModCreativeTabs.PARTS, reg("blade_tungsten", () -> new Item(props())));
-        DUCTTAPE = tab(ModCreativeTabs.PARTS, reg("ducttape", () -> new Item(props())));
-        FINS_FLAT = tab(ModCreativeTabs.PARTS, reg("fins_flat", () -> new Item(props())));
-        FINS_SMALL_STEEL = tab(ModCreativeTabs.PARTS, reg("fins_small_steel", () -> new Item(props())));
-        FINS_BIG_STEEL = tab(ModCreativeTabs.PARTS, reg("fins_big_steel", () -> new Item(props())));
-        FINS_TRI_STEEL = tab(ModCreativeTabs.PARTS, reg("fins_tri_steel", () -> new Item(props())));
-        FINS_QUAD_TITANIUM = tab(ModCreativeTabs.PARTS, reg("fins_quad_titanium", () -> new Item(props())));
-        PEDESTAL_STEEL = tab(ModCreativeTabs.PARTS, reg("pedestal_steel", () -> new Item(props())));
+        RING_STARMETAL = tab(ModCreativeTabs.PARTS, reg("ring_starmetal", () -> new Item(props())));
+        // CE ModItems.java — tank_steel/blade_titanium/blade_tungsten/ducttape/fins_*/pedestal_steel all registered in Phase11ProcessItems.
         REACTOR_CORE = tab(ModCreativeTabs.PARTS, reg("reactor_core", () -> new Item(props())));
         HAZMAT_CLOTH = tab(ModCreativeTabs.PARTS, reg("hazmat_cloth", () -> new Item(props())));
         HAZMAT_CLOTH_RED = tab(ModCreativeTabs.PARTS, reg("hazmat_cloth_red", () -> new Item(props())));

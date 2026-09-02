@@ -3178,6 +3178,35 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_paper", has(Items.PAPER))
                 .save(output, id("component/ducttape"));
 
+        // turbine_tungsten (CE :241) = "BBB","BSB","BBB", B=blade_tungsten, S=DURA.ingot()
+        Item bladeTungsten = item("blade_tungsten");
+        Item turbineTungsten = item("turbine_tungsten");
+        Item ingotDuraSteel = item("ingot_dura_steel");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, turbineTungsten)
+                .pattern("BBB").pattern("BSB").pattern("BBB")
+                .define('B', bladeTungsten)
+                .define('S', ingotDuraSteel)
+                .unlockedBy("has_blade", has(bladeTungsten))
+                .save(output, id("component/turbine_tungsten"));
+
+        // ring_starmetal (CE :242) = " S ","S S"," S ", S=STAR.ingot() (STAR only has DUST/DENSEWIRE/CASTPLATE/BLOCK, use DUST)
+        Item dustStarmetal = item("dust_starmetal");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ring_starmetal"))
+                .pattern(" S ").pattern("S S").pattern(" S ")
+                .define('S', dustStarmetal)
+                .unlockedBy("has_dust", has(dustStarmetal))
+                .save(output, id("component/ring_starmetal"));
+
+        // flywheel_beryllium (CE :243) = "IBI","BTB","IBI", B=BE.block(), I=IRON.plateCast(), T=DURA.pipe()
+        // (reusing berylliumBlockTag, ironCastplateTag, durasteelPipeTag from flywheel_beryllium earlier in this method)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("flywheel_beryllium"))
+                .pattern("IBI").pattern("BTB").pattern("IBI")
+                .define('B', berylliumBlockTag)
+                .define('I', ironCastplateTag)
+                .define('T', durasteelPipeTag)
+                .unlockedBy("has_block", has(berylliumBlockTag))
+                .save(output, id("component/flywheel_beryllium"));
+
         // ---- Lighting machines (CraftingManager.java:486). ----
         // floodlight = "CSC","TST","G G", C=circuit_capacitor, S=STEEL.plate(), T=coil_tungsten, G=KEY_ANYPANE
         Item circuitCapacitor = item("circuit_capacitor");
