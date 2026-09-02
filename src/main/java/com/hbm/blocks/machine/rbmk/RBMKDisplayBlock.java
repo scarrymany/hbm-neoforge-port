@@ -20,6 +20,10 @@ import javax.annotation.Nullable;
 /**
  * CE: com.hbm.blocks.machine.rbmk.RBMKDisplay
  * RBMK display panel - shows a 7x7 grid of RBMK column status. No GUI, rotates with screwdriver.
+ * 
+ * TODO(CE:com.hbm.render.tileentity.RenderRBMKDisplay.java:1-173): Port TESR renderer that draws
+ * colored 3D columns on panel face. BE already scans 7×7 columns (RBMKDisplayBlockEntity:60-97);
+ * missing only the client-side renderer registration + draw logic.
  */
 public class RBMKDisplayBlock extends RBMKMiniPanelBlock implements IToolable {
     public static final MapCodec<RBMKDisplayBlock> CODEC = simpleCodec(RBMKDisplayBlock::new);
