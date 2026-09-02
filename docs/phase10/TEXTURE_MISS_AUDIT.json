@@ -1,10 +1,16 @@
 {
   "census_items": 2575,
   "census_blocks": 944,
+  "orig_before_item_miss": 61,
+  "orig_before_block_miss": 74,
   "before_item_miss": 61,
   "before_block_miss": 74,
-  "after_item_miss": 24,
-  "after_block_miss": 48,
+  "after_item_miss": 25,
+  "after_block_miss": 49,
+  "fixed_items": 36,
+  "fixed_blocks": 25,
+  "copied": 0,
+  "rewired": 0,
   "after_item_ids": [
     "americium241_block",
     "americium242_block",
@@ -14,6 +20,7 @@
     "balls_spawner_spent",
     "barrel",
     "carbon_block",
+    "concrete_light_gray",
     "counterfeit_keys",
     "dyatlov",
     "fext_sand",
@@ -39,6 +46,7 @@
     "balls_spawner_spent",
     "barrel",
     "carbon_block",
+    "concrete_light_gray",
     "ghiorsium336_block",
     "machine_assembly_machine",
     "machine_chemical_plant",
@@ -80,6 +88,5 @@
     "turret_maxwell",
     "turret_richard",
     "turret_tauon"
-  ],
-  "rewired": 66
+  ]
 }
