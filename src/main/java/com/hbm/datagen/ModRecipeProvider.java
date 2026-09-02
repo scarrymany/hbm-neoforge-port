@@ -4414,8 +4414,14 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // SKIP :620-630 fluid_tank_v2/fluid_barrel_v2 + conversions — conditional on config flag
         // SKIP :633-634 inf_water/inf_water_mk2 — conditional on !enable528
-        // SKIP :637 piston_selenium — requires registered item
-        // SKIP :638 catalyst_clay shapeless — registered but no check needed
+        // SKIP :637 piston_selenium — item not registered yet
+        
+        // CE :638 = catalyst_clay (shapeless: IRON dust + clay_ball)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("catalyst_clay"))
+                .requires(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dusts/iron")))
+                .requires(Items.CLAY_BALL)
+                .unlockedBy("has_iron_dust", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dusts/iron"))))
+                .save(output, id("catalyst_clay"));
 
         // CE :640-645 = singularity_spark (2 patterns) + ams_core_* — check ingredients
         // SKIP singularities — plate_euphemium/plate_dalekanium not registered yet
@@ -5000,8 +5006,27 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_shredder", has(item("upgrade_shredder")))
                 .save(output, id("upgrade_centrifuge"));
 
-        // SKIP :782 upgrade_crystallizer — fluid_barrel_full(PEROXIDE) not implemented yet
-        // SKIP :783 upgrade_screm — crystal_xen not registered yet
+        // SKIP :781 upgrade_crystallizer — fluid_barrel_full(PEROXIDE) not implemented yet
+        
+        // CE :782 = upgrade_screm
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_screm"))
+                .pattern("SUS").pattern("SCS").pattern("SUS")
+                .define('S', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "plates/steel")))
+                .define('U', item("upgrade_template"))
+                .define('C', item("crystal_xen"))
+                .unlockedBy("has_crystal_xen", has(item("crystal_xen")))
+                .save(output, id("upgrade_screm"));
+
+        // CE :783 = upgrade_gc_speed
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_gc_speed"))
+                .pattern("GNG").pattern("RUR").pattern("GMG")
+                .define('G', item("coil_gold"))
+                .define('N', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/niobium")))
+                .define('R', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/rubber")))
+                .define('U', item("upgrade_template"))
+                .define('M', item("motor"))
+                .unlockedBy("has_upgrade_template", has(item("upgrade_template")))
+                .save(output, id("upgrade_gc_speed"));
 
         // CE :784 = upgrade_gc_speed = "GNG","RUR","GMG", R=RUBBER.ingot(), M=motor, G=coil_gold, N=NB.ingot(), U=upgrade_template
         TagKey<Item> niobiumIngotTagLocal = MaterialShapes.INGOT.commonTag(Mats.MAT_NIOBIUM);
