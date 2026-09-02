@@ -421,8 +421,8 @@ public final class AnvilRecipes {
                 tag("plates/lead", 2),
                 cmp("nuclear_waste_vitrified", 10));
 
-        // :521-526 demon_core_open (skip — man_core not registered)
-        // TODO(CE :521-526): demon_core_open requires man_core + screwdriver
+        // :521-526 demon_core_open (skip — man_core needs ItemManMike custom class not yet ported)
+        // TODO(CE :521-526): demon_core_open requires man_core (ItemManMike) + screwdriver
 
         // :529-530 plate_desh
         construct(3, stack("plate_desh", 4),
