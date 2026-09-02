@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "C",
+    "S"
+  ],
+  "key": {
+    "P": {
+      "tag": "c:ingots/any_rubber"
+    },
+    "C": {
+      "item": "hbm:circuit_bismoid"
+    },
+    "S": {
+      "item": "hbm:steel_scaffold"
+    }
+  },
+  "result": {
+    "id": "hbm:mp_c_5",
+    "count": 1
+  }
+}

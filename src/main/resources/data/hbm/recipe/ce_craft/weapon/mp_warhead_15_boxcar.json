@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SNS",
+    "CBC",
+    "SFS"
+  ],
+  "key": {
+    "S": {
+      "tag": "c:ingots/schraranium"
+    },
+    "N": {
+      "item": "hbm:det_nuke"
+    },
+    "C": {
+      "item": "hbm:circuit_advanced"
+    },
+    "B": {
+      "item": "hbm:boxcar"
+    },
+    "F": {
+      "item": "hbm:tritium_deuterium_cake"
+    }
+  },
+  "result": {
+    "id": "hbm:mp_warhead_15_boxcar",
+    "count": 1
+  }
+}

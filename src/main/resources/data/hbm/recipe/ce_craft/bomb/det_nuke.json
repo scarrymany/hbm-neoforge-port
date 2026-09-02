@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PFP",
+    "DCD",
+    "PFP"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:neutron_reflector"
+    },
+    "F": {
+      "item": "hbm:circuit_controller"
+    },
+    "D": {
+      "item": "hbm:det_charge"
+    },
+    "C": {
+      "item": "hbm:man_core"
+    }
+  },
+  "result": {
+    "id": "hbm:det_nuke",
+    "count": 1
+  }
+}

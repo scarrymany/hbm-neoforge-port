@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "PPP",
+    "RCR",
+    "PPP"
+  ],
+  "key": {
+    "P": [
+      {
+        "tag": "c:ingots/polycarbonate"
+      },
+      {
+        "tag": "c:ingots/pvc"
+      }
+    ],
+    "R": {
+      "item": "hbm:crystal_redstone"
+    },
+    "C": {
+      "item": "hbm:circuit_advanced"
+    }
+  },
+  "result": {
+    "id": "hbm:weapon_mod_special_las_shotgun",
+    "count": 1
+  }
+}
