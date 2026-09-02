@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "hbm:block/pipe_frame",
+    "side": "hbm:block/pipe_frame"
+  }
+}

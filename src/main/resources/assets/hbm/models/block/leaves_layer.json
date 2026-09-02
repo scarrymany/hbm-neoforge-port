@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/carpet",
+  "textures": {
+    "wool": "hbm:block/waste_leaves",
+    "particle": "hbm:block/waste_leaves"
+  }
+}

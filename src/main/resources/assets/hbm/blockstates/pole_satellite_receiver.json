@@ -1,20 +1,5 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "hbm:block/pole_satellite_receiver"
-    },
-    "facing=south": {
-      "model": "hbm:block/pole_satellite_receiver",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "hbm:block/pole_satellite_receiver",
-      "y": 270
-    },
-    "facing=east": {
-      "model": "hbm:block/pole_satellite_receiver",
-      "y": 90
-    },
     "": {
       "model": "hbm:block/pole_satellite_receiver"
     }

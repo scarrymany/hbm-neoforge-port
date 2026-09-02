@@ -1,19 +1,7 @@
 {
   "variants": {
-    "facing=north": {
+    "": {
       "model": "hbm:block/filing_cabinet"
-    },
-    "facing=south": {
-      "model": "hbm:block/filing_cabinet",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "hbm:block/filing_cabinet",
-      "y": 270
-    },
-    "facing=east": {
-      "model": "hbm:block/filing_cabinet",
-      "y": 90
     }
   }
 }

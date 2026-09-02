@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "hbm:block/filing_cabinet"
-  }
+  "parent": "hbm:block/filing_cabinet"
 }

@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube_column",
   "textures": {
-    "all": "hbm:block/deco_steel"
+    "end": "hbm:block/pipe_top_red",
+    "side": "hbm:block/pipe_side_red"
   }
 }

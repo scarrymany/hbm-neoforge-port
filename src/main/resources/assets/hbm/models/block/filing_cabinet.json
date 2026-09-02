@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "hbm:block/filing_cabinet"
+    "all": "hbm:models/file_cabinet_steel"
   }
 }
