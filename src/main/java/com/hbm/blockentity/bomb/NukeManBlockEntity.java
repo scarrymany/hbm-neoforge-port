@@ -30,7 +30,7 @@ public class NukeManBlockEntity extends NukeCasingBlockEntity {
         if (!(exp(1) && exp(2) && exp(3) && exp(4))) return false;
         return !inventory.getStackInSlot(0).isEmpty() && !inventory.getStackInSlot(5).isEmpty()
                 && inventory.getStackInSlot(0).getItem() == NukeCasingItems.MAN_IGNITER.get()
-                && inventory.getStackInSlot(5).getItem() == NukeCasingItems.MAN_CORE.get();
+                && inventory.getStackInSlot(5).getItem() == com.hbm.items.special.SpecialItems.MAN_CORE.get();
     }
 
     @Override

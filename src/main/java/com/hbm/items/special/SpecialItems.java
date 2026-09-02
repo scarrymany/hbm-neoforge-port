@@ -102,13 +102,16 @@ public final class SpecialItems {
         CreativeTabContents.add(ModCreativeTabs.CONTROL, CELL);
     }
 
-    // ==================== ItemDemonCore / demon_core_closed (Pattern F, see HazardRegistry) =====
+    // ==================== ItemManMike (CE :2385) / ItemDemonCore / demon_core_closed (Pattern F, see HazardRegistry) =====
 
+    public static final DeferredItem<com.hbm.items.bomb.ItemManMike> MAN_CORE =
+            register("man_core", () -> new com.hbm.items.bomb.ItemManMike(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<ItemDemonCore> DEMON_CORE_OPEN =
             register("demon_core_open", () -> new ItemDemonCore(new Item.Properties()));
     public static final DeferredItem<ItemCustomLore> DEMON_CORE_CLOSED =
             register("demon_core_closed", () -> new ItemCustomLore(new Item.Properties()));
     static {
+        CreativeTabContents.add(ModCreativeTabs.NUKE, MAN_CORE);
         CreativeTabContents.add(ModCreativeTabs.NUKE, DEMON_CORE_OPEN);
         CreativeTabContents.add(ModCreativeTabs.NUKE, DEMON_CORE_CLOSED);
     }

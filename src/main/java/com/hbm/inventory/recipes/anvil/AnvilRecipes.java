@@ -421,8 +421,11 @@ public final class AnvilRecipes {
                 tag("plates/lead", 2),
                 cmp("nuclear_waste_vitrified", 10));
 
-        // :521-526 demon_core_open (skip — man_core needs ItemManMike custom class not yet ported)
-        // TODO(CE :521-526): demon_core_open requires man_core (ItemManMike) + screwdriver
+        // CE :521-526 = demon_core_open (man_core + BE ingot x4 + screwdriver)
+        construct(3, stack("demon_core_open"),
+                cmp("man_core"),
+                tag("ingots/beryllium", 4),
+                cmp("screwdriver"));
 
         // :529-530 plate_desh
         construct(3, stack("plate_desh", 4),
