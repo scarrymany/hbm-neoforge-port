@@ -9390,5 +9390,6 @@
   "block.hbm.icf_laser_component_emitter": "ICF Laser Flash Tube",
   "block.hbm.icf_laser_component_capacitor": "ICF Laser Capacitor",
   "block.hbm.icf_laser_component_turbo": "ICF Laser Turbocharger",
-  "block.hbm.sliding_blast_door_legacy": "Sliding Blast Door (Legacy)"
+  "block.hbm.sliding_blast_door_legacy": "Sliding Blast Door (Legacy)",
+  "block.hbm.bomb_multi": "Multi Purpose Bomb"
 }

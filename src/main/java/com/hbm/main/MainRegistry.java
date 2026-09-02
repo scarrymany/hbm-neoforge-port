@@ -127,6 +127,7 @@ public class MainRegistry {
         HbmRecipes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.register(modEventBus);
+        com.hbm.inventory.container.bomb.ModBombMenus.register(modEventBus);
 
         Fluids.init();
         // Populates the data-driven Solinium block-swap table (defaults to empty/no-op otherwise).

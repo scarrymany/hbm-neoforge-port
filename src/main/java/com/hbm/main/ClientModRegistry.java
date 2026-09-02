@@ -102,5 +102,7 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, ModMenuTypes.BATTERY, BatteryScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.FLUID_TANK, FluidTankScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.LEMEGETON, LemegetonScreen::new);
+
+        BombClientRegistry.registerScreens(event);
     }
 }

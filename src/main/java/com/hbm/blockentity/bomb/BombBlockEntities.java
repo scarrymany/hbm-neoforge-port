@@ -25,6 +25,8 @@ public final class BombBlockEntities {
     /** Phase 3 ({@code missile_launch_infra}): standalone rusted pad, {@link LaunchPadRustedBlockEntity} - not a {@link LaunchPadBaseBlockEntity} subclass, per the research report's explicit warning. */
     public static Supplier<BlockEntityType<LaunchPadRustedBlockEntity>> LAUNCH_PAD_RUSTED;
 
+    public static Supplier<BlockEntityType<BombMultiBlockEntity>> BOMB_MULTI;
+
     private BombBlockEntities() {
     }
 
@@ -52,6 +54,11 @@ public final class BombBlockEntities {
         LAUNCH_PAD_RUSTED = ModBlocks.BLOCK_ENTITY_TYPES.register("launch_pad_rusted", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new LaunchPadRustedBlockEntity(LAUNCH_PAD_RUSTED.get(), pos, state),
                 BombBlocks.LAUNCH_PAD_RUSTED.get()
+        ).build(null));
+
+        BOMB_MULTI = ModBlocks.BLOCK_ENTITY_TYPES.register("bomb_multi", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new BombMultiBlockEntity(BOMB_MULTI.get(), pos, state),
+                BombBlocks.BOMB_MULTI.get()
         ).build(null));
     }
 }
