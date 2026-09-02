@@ -63,9 +63,9 @@ public final class RBMKDisplayRenderer implements BlockEntityRenderer<RBMKDispla
         // Rotation by facing: CE checks block metadata FACING and rotates
         Direction facing = be.getBlockState().getValue(RBMKMiniPanelBlock.FACING);
         switch (facing) {
-            case NORTH -> poseStack.mulPose(org.joml.Quaternionf.fromAxisAngleDeg(0F, 1F, 0F, 90F));
-            case WEST -> poseStack.mulPose(org.joml.Quaternionf.fromAxisAngleDeg(0F, 1F, 0F, 180F));
-            case SOUTH -> poseStack.mulPose(org.joml.Quaternionf.fromAxisAngleDeg(0F, 1F, 0F, 270F));
+            case NORTH -> poseStack.mulPose(new org.joml.Quaternionf().fromAxisAngleDeg(0F, 1F, 0F, 90F));
+            case WEST -> poseStack.mulPose(new org.joml.Quaternionf().fromAxisAngleDeg(0F, 1F, 0F, 180F));
+            case SOUTH -> poseStack.mulPose(new org.joml.Quaternionf().fromAxisAngleDeg(0F, 1F, 0F, 270F));
             case EAST -> { } // 0 degrees
             default -> { }
         }
@@ -76,7 +76,6 @@ public final class RBMKDisplayRenderer implements BlockEntityRenderer<RBMKDispla
         poseStack.translate(0, -0.5, 0);
 
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.disableTexture(); // CE: disableTexture2D
         RenderSystem.disableCull();
 
         Matrix4f mat = poseStack.last().pose();
@@ -161,7 +160,6 @@ public final class RBMKDisplayRenderer implements BlockEntityRenderer<RBMKDispla
             BufferUploader.drawWithShader(buffer.buildOrThrow());
         }
 
-        RenderSystem.enableTexture(); // CE: enableTexture2D
         RenderSystem.enableCull();
         poseStack.popPose();
     }

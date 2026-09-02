@@ -4,13 +4,16 @@ import com.hbm.blockentity.machine.dummyable.MachineArcFurnaceBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.ArcFurnaceMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import com.hbm.inventory.material.Mats;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 /** CE {@code GUIMachineArcFurnaceLarge} 176×256 — power + progress + liquid toggle. */
 public class ArcFurnaceScreen extends GuiInfoContainer<ArcFurnaceMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_arc_furnace.png");
 
     public ArcFurnaceScreen(ArcFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -31,15 +34,17 @@ public class ArcFurnaceScreen extends GuiInfoContainer<ArcFurnaceMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineArcFurnaceBlockEntity be = this.getMenu().be;
-        int ph = (int) (be.getPower() * 52 / Math.max(1, be.getMaxPower()));
-        guiGraphics.fill(x + 8, y + 106 - ph, x + 24, y + 106, 0xFFFFCC00);
-        int p = (int) (be.progress * 54);
-        guiGraphics.fill(x + 62, y + 42, x + 62 + p, y + 50, be.isProgressing ? 0xFFFF4400 : 0xFF442200);
-        if (be.liquidMode) guiGraphics.fill(x + 152, y + 22, x + 168, y + 30, 0xFF4488FF);
+        int p = (int) (be.getPower() * 70 / Math.max(1, be.getMaxPower()));
+        guiGraphics.blit(TEXTURE, x + 8, y + 106 - p, 176, 70 - p, 7, p);
+        
+        int o = (int) (be.progress * 70);
+        guiGraphics.blit(TEXTURE, x + 17, y + 106 - o, 183, 70 - o, 7, o);
+        
+        if (be.liquidMode) guiGraphics.blit(TEXTURE, x + 151, y + 17, 190, 18, 18, 18);
+        if (be.isProgressing) guiGraphics.blit(TEXTURE, x + 7, y + 17, 190, 0, 18, 18);
     }
 
     @Override
