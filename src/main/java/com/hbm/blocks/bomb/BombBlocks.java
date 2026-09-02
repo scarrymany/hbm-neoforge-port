@@ -80,7 +80,7 @@ public final class BombBlocks {
     public static DeferredBlock<BombThermo> THERM_ENDO;
     public static DeferredBlock<BombThermo> THERM_EXO;
 
-    public static DeferredBlock<BombMultiBlock> BOMB_MULTI;
+    // TODO(CE: com.hbm.blocks.bomb.BombMulti.java:1-264, com.hbm.tileentity.bomb.TileEntityBombMulti.java): bomb_multi — customizable cluster bomb with GUI to configure explosion params (explosionValue, clusterCount, fireRadius). Needs TE + GUI + explosion logic on redstone.
 
     /** Phase 3 ({@code missile_launch_infra}): the three launch-pad multiblocks. */
     public static DeferredBlock<LaunchPad> LAUNCH_PAD;
@@ -123,8 +123,6 @@ public final class BombBlocks {
         EMP_BOMB = registerBlock("emp_bomb", () -> new BombFloat(BOMB_PROPS));
         THERM_ENDO = registerBlock("therm_endo", () -> new BombThermo(BOMB_PROPS));
         THERM_EXO = registerBlock("therm_exo", () -> new BombThermo(BOMB_PROPS));
-
-        BOMB_MULTI = registerBlock("bomb_multi", () -> new BombMultiBlock(BOMB_PROPS));
 
         LAUNCH_PAD = registerBlock("launch_pad", () -> new LaunchPad(LAUNCH_PAD_PROPS));
         LAUNCH_PAD_LARGE = registerBlock("launch_pad_large", () -> new LaunchPadLarge(LAUNCH_PAD_PROPS));
