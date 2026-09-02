@@ -1,21 +1,27 @@
 package com.hbm.blockentity.machine;
 
+import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * Port of CE {@code com.hbm.tileentity.machine.TileEntityCargoElevator} - hydraulic lift platform logic.
  * <p>
  * CE: upstream/hbm-ce/src/main/java/com/hbm/tileentity/machine/TileEntityCargoElevator.java
  * <p>
- * TODO(CE): Full lift behavior - height storage (CE :26), extension animation (CE :28-30, :63-70),
- * entity lifting (CE :83-97), toggleElevator (CE :100-108), merging with lower elevator (CE :43-60),
- * client sync (CE :111-125), ROR integration. Current port: placeholder tick for registration.
+ * Ported: extension animation (CE :63-70), entity lifting (CE :83-97), toggleElevator (CE :100-108),
+ * lower elevator merging (CE :43-60).
+ * TODO(CE): Client sync (CE :74-80, :111-125), ROR integration (CE :170-185), custom rendering.
  */
 public class CargoElevatorBlockEntity extends BlockEntity {
 
@@ -24,12 +30,84 @@ public class CargoElevatorBlockEntity extends BlockEntity {
     public double extension = 0; // CE :29 - current platform height (interpolated)
     public double prevExtension = 0; // CE :30 - for rendering interpolation
 
+    public static final double SPEED = 2D / 20D; // CE :33 - 0.1 blocks per tick
+
     public CargoElevatorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlocks.CARGO_ELEVATOR_ENTITY.get(), pos, state);
     }
 
     public void serverTick() {
-        // TODO(CE): Implement CE :39-98 update() logic (extension animation, entity lifting, lower elevator merging)
+        if (level == null || level.isClientSide) return;
+
+        this.prevExtension = this.extension;
+
+        // CE :43-60: Merge with lower elevator if placed on top of another cargo_elevator
+        BlockState downState = level.getBlockState(worldPosition.below());
+        if (downState.getBlock() == ModBlocks.CARGO_ELEVATOR.get()) {
+            BlockPos lowerCore = ((BlockDummyable) ModBlocks.CARGO_ELEVATOR.get()).findCore(level, worldPosition.below());
+            if (lowerCore != null && lowerCore.getX() == worldPosition.getX() && lowerCore.getZ() == worldPosition.getZ()) {
+                BlockEntity lowerTile = level.getBlockEntity(lowerCore);
+                if (lowerTile instanceof CargoElevatorBlockEntity lower) {
+                    lower.height += this.height + 1;
+                    // Convert this elevator's blocks to dummy parts of the lower elevator
+                    for (int x = worldPosition.getX() - 1; x < worldPosition.getX() + 2; x++) {
+                        for (int z = worldPosition.getZ() - 1; z < worldPosition.getZ() + 2; z++) {
+                            for (int y = worldPosition.getY(); y <= worldPosition.getY() + this.height; y++) {
+                                level.setBlock(new BlockPos(x, y, z),
+                                        ModBlocks.CARGO_ELEVATOR.get().defaultBlockState().setValue(BlockDummyable.META, 1), 3);
+                            }
+                        }
+                    }
+                    lower.setChanged();
+                    return;
+                }
+            }
+        }
+
+        // CE :63-70: Extension animation (move platform up/down towards target)
+        if (this.extension < this.targetExtension) {  // go up
+            this.extension += SPEED;
+            this.extension = Mth.clamp(this.extension, 0D, this.targetExtension);
+        } else if (this.extension > this.targetExtension) {  // go down
+            this.extension -= SPEED;
+            this.extension = Mth.clamp(this.extension, this.targetExtension, this.height);
+        }
+
+        this.extension = Mth.clamp(this.extension, 0D, this.height);
+
+        // CE :83-97: Entity lifting - move entities standing on the platform
+        if (this.extension != this.prevExtension) {
+            double liftUpper = this.worldPosition.getY() + 1D + Math.max(this.extension, this.prevExtension);
+            double liftLower = this.worldPosition.getY() + 1D + Math.min(this.extension, this.prevExtension);
+            AABB liftBox = new AABB(
+                    this.worldPosition.getX() - 0.99D, liftLower, this.worldPosition.getZ() - 0.99D,
+                    this.worldPosition.getX() + 1.99D, liftUpper, this.worldPosition.getZ() + 1.99D
+            );
+
+            List<Entity> toLift = level.getEntities((Entity) null, liftBox);
+
+            for (Entity entity : toLift) {
+                AABB entityBox = entity.getBoundingBox();
+                if (entityBox.minY >= liftLower && entityBox.minY <= liftUpper) {
+                    double delta = entityBox.minY - (this.worldPosition.getY() + 1D + this.extension);
+                    entity.setPos(entity.getX(), entity.getY() - delta, entity.getZ());
+                    entity.setOnGround(true);
+                    entity.setPos(entity.getX(), entity.getY() - 0.125D, entity.getZ());
+                }
+            }
+        }
+
+        setChanged();
+    }
+
+    // CE :100-108: Toggle elevator between retracted (0) and extended (height)
+    public void toggleElevator() {
+        if (this.targetExtension == 0) {
+            this.targetExtension = this.height;
+        } else {
+            this.targetExtension = 0;
+        }
+        setChanged();
     }
 
     @Override
