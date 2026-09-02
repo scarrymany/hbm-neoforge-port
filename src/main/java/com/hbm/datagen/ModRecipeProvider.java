@@ -5823,6 +5823,34 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_magnetron", has(item("magnetron")))
                 .save(output, id("reactor_sensor"));
 
+        // ---- CE CraftingManager.java:785-787 upgrade_stack crafts using PART_GENERIC pistons ----
+        // :785 upgrade_stack_1
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_stack_1"))
+                .pattern(" C ").pattern("PUP").pattern(" C ")
+                .define('C', item("circuit_vacuum_tube"))
+                .define('P', item("part_generic_piston_pneumatic"))
+                .define('U', item("upgrade_template"))
+                .unlockedBy("has_template", has(item("upgrade_template")))
+                .save(output, id("upgrade_stack_1"));
+
+        // :786 upgrade_stack_2
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_stack_2"))
+                .pattern(" C ").pattern("PUP").pattern(" C ")
+                .define('C', item("circuit_capacitor"))
+                .define('P', item("part_generic_piston_hydraulic"))
+                .define('U', item("upgrade_stack_1"))
+                .unlockedBy("has_stack1", has(item("upgrade_stack_1")))
+                .save(output, id("upgrade_stack_2"));
+
+        // :787 upgrade_stack_3
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_stack_3"))
+                .pattern(" C ").pattern("PUP").pattern(" C ")
+                .define('C', item("circuit_chip"))
+                .define('P', item("part_generic_piston_electric"))
+                .define('U', item("upgrade_stack_2"))
+                .unlockedBy("has_stack2", has(item("upgrade_stack_2")))
+                .save(output, id("upgrade_stack_3"));
+
         // CE :1082-1088 = RBMK console + rod/boiler/heater/cooler (!enable528 conditional)
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_console"))
                 .pattern("BBB").pattern("DGD").pattern("DCD")
