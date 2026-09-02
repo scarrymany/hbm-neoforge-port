@@ -7,6 +7,10 @@ import com.hbm.inventory.container.machine.dummyable.MachineFluidTankMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Corrosive;
+import com.hbm.inventory.fluid.trait.FT_Flammable;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
+import com.hbm.inventory.fluid.trait.FluidTraitSimple;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
@@ -23,16 +27,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 /**
  * CE {@code TileEntityMachineFluidTank}: 6 slots, 256000, mode 0=in / 1=both / 2=out / 3=off.
+ * CE :263-370 — post-explode leak/fire/pollute ✓ (FT_Polluting, updateLeak).
  * TODO(CE: TileEntityMachineFluidTank.java:198-235): UniNodespace pipe-mode node.
  * TODO(CE: TileEntityMachineFluidTank.java:70): OC / IControllable / IClimbable / IRepairable.
  * TODO(CE: TileEntityMachineFluidTank.java:253-256): ExplosionVNT.makeAmat.
- * TODO(CE: TileEntityMachineFluidTank.java:263-370): post-explode leak / fire / pollute.
+ * TODO(CE: TileEntityMachineFluidTank.java:343): ExplosionVNT.makeAmat().setBlockAllocator(null).setBlockProcessor(null).
+ * TODO(CE: TileEntityMachineFluidTank.java:348): ParticleUtil.spawnGasFlame particle.
+ * TODO(CE: TileEntityMachineFluidTank.java:356-365): AuxParticlePacketNT Tower particle.
  */
 public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -43,6 +51,7 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
     public final FluidTankNTM tank;
     public short mode;
     public boolean hasExploded;
+    public boolean onFire;
 
     public MachineFluidTankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 6, true, false);
@@ -102,13 +111,26 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
                 // TODO(CE: TileEntityMachineFluidTank.java:253-256): ExplosionVNT.makeAmat
                 level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
                         5.0F, true, Level.ExplosionInteraction.TNT);
-                hasExploded = true;
+                explode();
                 tank.setFill(0);
             }
             FT_Corrosive corrosive = tank.getTankType().getTrait(FT_Corrosive.class);
             if (corrosive != null && corrosive.isHighlyCorrosive()) {
-                hasExploded = true;
+                explode();
             }
+        }
+
+        if (hasExploded) {
+            int leaking;
+            if (tank.getTankType().isAntimatter()) {
+                leaking = tank.getFill();
+            } else if (tank.getTankType().hasTrait(FluidTraitSimple.FT_Gaseous.class)
+                    || tank.getTankType().hasTrait(FluidTraitSimple.FT_Gaseous_ART.class)) {
+                leaking = Math.min(tank.getFill(), tank.getMaxFill() / 100);
+            } else {
+                leaking = Math.min(tank.getFill(), tank.getMaxFill() / 10000);
+            }
+            updateLeak(leaking);
         }
 
         if (!hasExploded) {
@@ -162,6 +184,7 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         tank.writeToNBT(tag, "tank");
         tag.putShort("mode", mode);
         tag.putBoolean("hasExploded", hasExploded);
+        tag.putBoolean("onFire", onFire);
     }
 
     @Override
@@ -170,6 +193,7 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         tank.readFromNBT(tag, "tank");
         mode = tag.getShort("mode");
         hasExploded = tag.getBoolean("hasExploded");
+        onFire = tag.getBoolean("onFire");
     }
 
     @Override
@@ -177,6 +201,7 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         super.serialize(buf);
         buf.writeShort(mode);
         buf.writeBoolean(hasExploded);
+        buf.writeBoolean(onFire);
         tank.serialize(buf);
     }
 
@@ -185,11 +210,61 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         super.deserialize(buf);
         mode = buf.readShort();
         hasExploded = buf.readBoolean();
+        onFire = buf.readBoolean();
         tank.deserialize(buf);
     }
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new MachineFluidTankMenu(id, inv, this);
+    }
+
+    /**
+     * CE {@code TileEntityMachineFluidTank.explode} :315-328 — called when tank breaks, sets {@code hasExploded} and {@code onFire}.
+     */
+    public void explode() {
+        this.hasExploded = true;
+        this.onFire = tank.getTankType().hasTrait(FT_Flammable.class);
+        setChanged();
+    }
+
+    /**
+     * CE {@code TileEntityMachineFluidTank.updateLeak} :330-370 — called every tick post-explosion, leaks fluid and spawns particles.
+     */
+    public void updateLeak(int amount) {
+        if (!hasExploded) return;
+        if (amount <= 0) return;
+
+        tank.getTankType().onFluidRelease(this, tank, amount);
+        tank.setFill(Math.max(0, tank.getFill() - amount));
+
+        var type = tank.getTankType();
+
+        if (type.hasTrait(FluidTraitSimple.FT_Amat.class)) {
+            // TODO(CE: TileEntityMachineFluidTank.java:343): ExplosionVNT.makeAmat().setBlockAllocator(null).setBlockProcessor(null)
+            level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
+                    5.0F, Level.ExplosionInteraction.TNT);
+
+        } else if (type.hasTrait(FT_Flammable.class) && onFire) {
+            var box = new AABB(
+                    worldPosition.getX() - 1.5, worldPosition.getY(), worldPosition.getZ() - 1.5,
+                    worldPosition.getX() + 2.5, worldPosition.getY() + 5, worldPosition.getZ() + 2.5
+            );
+            level.getEntities(null, box).forEach(e -> e.igniteForSeconds(5));
+
+            // TODO(CE: TileEntityMachineFluidTank.java:348): ParticleUtil.spawnGasFlame
+
+            if (level.getGameTime() % 5 == 0) {
+                FT_Polluting.pollute(level, worldPosition, tank.getTankType(), FluidTrait.FluidReleaseType.BURN, amount * 5);
+            }
+
+        } else if (type.hasTrait(FluidTraitSimple.FT_Gaseous.class) || type.hasTrait(FluidTraitSimple.FT_Gaseous_ART.class)) {
+
+            // TODO(CE: TileEntityMachineFluidTank.java:356-365): AuxParticlePacketNT Tower particle
+
+            if (level.getGameTime() % 5 == 0) {
+                FT_Polluting.pollute(level, worldPosition, tank.getTankType(), FluidTrait.FluidReleaseType.SPILL, amount * 5);
+            }
+        }
     }
 }
