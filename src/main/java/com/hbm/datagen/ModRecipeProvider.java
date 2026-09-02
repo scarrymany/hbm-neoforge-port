@@ -4414,9 +4414,20 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // SKIP :620-630 fluid_tank_v2/fluid_barrel_v2 + conversions — conditional on config flag
         // SKIP :633-634 inf_water/inf_water_mk2 — conditional on !enable528
-        // SKIP :637 piston_selenium — item not registered yet
         
-        // CE :638 = catalyst_clay (shapeless: IRON dust + clay_ball)
+        // CE :638 = piston_selenium = "SSS","STS"," D ", S=STEEL.plate(), T=W.ingot(), D=DURA.bolt()
+        TagKey<Item> tungstenIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_TUNGSTEN);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("piston_selenium"))
+                .pattern("SSS")
+                .pattern("STS")
+                .pattern(" D ")
+                .define('S', steelPlateTag)
+                .define('T', tungstenIngotTag)
+                .define('D', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "bolts/duralex")))
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("piston_selenium"));
+        
+        // CE :639 = catalyst_clay (shapeless: IRON dust + clay_ball)
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("catalyst_clay"))
                 .requires(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dusts/iron")))
                 .requires(Items.CLAY_BALL)
@@ -4495,7 +4506,6 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("machine_tape_drive"));
 
         // CE :649 = machine_keyforge = "PCP","WSW","WSW", P=STEEL.plate(), S=W.ingot(), C=padlock, W=KEY_PLANKS
-        TagKey<Item> tungstenIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_TUNGSTEN);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_keyforge"))
                 .pattern("PCP").pattern("WSW").pattern("WSW")
                 .define('P', steelPlateTag)
@@ -5068,11 +5078,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_ejector2", has(item("upgrade_ejector_2")))
                 .save(output, id("upgrade_ejector_3"));
 
-        // SKIP :793 mech_key — ingot_meteorite_forged/coin_maskman not registered yet
+        // CE :792 = mech_key = "MCM","MKM","MMM", M=ingot_meteorite_forged, C=coin_maskman, K=key
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("mech_key"))
+                .pattern("MCM")
+                .pattern("MKM")
+                .pattern("MMM")
+                .define('M', item("ingot_meteorite_forged"))
+                .define('C', item("coin_maskman"))
+                .define('K', item("key"))
+                .unlockedBy("has_meteorite_forged", has(item("ingot_meteorite_forged")))
+                .save(output, id("mech_key"));
+
+        // CE :793 = spawn_ufo = "MMM","DCD","MMM", M=ingot_meteorite, D=DNT.ingot(), C=coin_worm
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("spawn_ufo"))
+                .pattern("MMM")
+                .pattern("DCD")
+                .pattern("MMM")
+                .define('M', item("ingot_meteorite"))
+                .define('D', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/dalekanium_neutronium_trinium")))
+                .define('C', item("coin_worm"))
+                .unlockedBy("has_meteorite", has(item("ingot_meteorite")))
+                .save(output, id("spawn_ufo"));
 
         // ---- CraftingManager.java:794-843 crafts (spawn items, hadron coil conversions, fireworks, rbmk). ----
         // SKIP :794 spawn_chopper — ingot_meteorite not registered yet
-        // SKIP :795 spawn_ufo — ingot_meteorite/DNT.ingot()/coin_worm not registered yet
 
         // SKIP :796-802 wire_dense hadron_coil shapeless conversions — hadron_coil_* blocks not registered yet
 
@@ -5673,7 +5702,17 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // SKIP :943 = refueler (CE uses EnumPartType.PISTON_HYDRAULIC + circuit_basic)
         // SKIP :944 = press_preheater (CE uses Fluids.LAVA.getDict)
-        // SKIP :945 = fluid_identifier (CE uses circuit_analog + dye)
+        
+        // CE :945 = fluid_identifier_multi = "D","C","P", D=dye, C=circuit_analog, P=IRON.plate()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fluid_identifier_multi"))
+                .pattern("D")
+                .pattern("C")
+                .pattern("P")
+                .define('D', ItemTags.DYEABLE)
+                .define('C', item("circuit_analog"))
+                .define('P', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "plates/iron")))
+                .unlockedBy("has_circuit_analog", has(item("circuit_analog")))
+                .save(output, id("fluid_identifier_multi"));
 
         // SKIP :947-948 = anchor_remote / teleanchor (CE uses ItemBattery + powder_magic + gem_alexandrite)
         // SKIP :949 = field_disturber (CE uses STAR + circuit_bismoid)

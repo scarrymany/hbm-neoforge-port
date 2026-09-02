@@ -901,3 +901,6 @@ WARN StatusConsoleListener Advanced terminal features are not available in this 
 [20:05:12] [Server thread/DEBUG] [ne.ne.ne.se.LanguageHook/]: Loaded 5 language files for en_us
 [20:05:12] [Server thread/INFO] [ne.ne.ne.ga.GameTestHooks/]: Enabled Gametest Namespaces: [hbm]
 [20:05:12] [Server thread/INFO] [ne.ne.ne.se.pe.PermissionAPI/]: Successfully initialized permission handler neoforge:default_handler
+[20:10:12] [Server thread/DEBUG] [ne.ne.ne.co.CommonHooks/WP]: Gathered mod list to write to world save world
+[20:15:12] [Server thread/DEBUG] [ne.ne.ne.co.CommonHooks/WP]: Gathered mod list to write to world save world
+[20:20:12] [Server thread/DEBUG] [ne.ne.ne.co.CommonHooks/WP]: Gathered mod list to write to world save world
