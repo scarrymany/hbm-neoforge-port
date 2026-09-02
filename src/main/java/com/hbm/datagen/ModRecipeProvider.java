@@ -6028,6 +6028,17 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(steelIngotTag))
                 .save(output, id("crane_inserter"));
         
+        // CE :968 crane_extractor (steel variant) = "CCC","CPC","CBC", C=STEEL, B=conveyor_wand, P=PISTON_PNEUMATIC
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_extractor"), 4)
+                .pattern("CCC")
+                .pattern("CPC")
+                .pattern("CBC")
+                .define('C', steelIngotTag)
+                .define('P', item("part_generic_piston_pneumatic"))
+                .define('B', item("conveyor_wand"))
+                .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
+                .save(output, id("crane_extractor"));
+        
         // CE :977 crane_splitter = "III","PCP","III", I=STEEL.ingot(), P=PISTON_PNEUMATIC, C=circuit_vacuum_tube
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_splitter"))
                 .pattern("III")
@@ -6039,7 +6050,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
                 .save(output, id("crane_splitter"));
         
-        // SKIP :968-978 crane_extractor/grabber/boxer/unboxer/router/partitioner
+        // SKIP :970-978 crane_grabber/boxer/unboxer/router/partitioner
         // BlockCraneBase family subtypes — deferred until ported live
         // CE :980 = machine_conveyor_press = "CPC","CBC","CCC", C=CU.plate() (copper), P=machine_epress, B=conveyor_wand
         TagKey<Item> copperPlateTagConveyor = MaterialShapes.PLATE.commonTag(Mats.MAT_COPPER);
