@@ -10,6 +10,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.FluidBreederRecipes;
 import com.hbm.inventory.recipes.OutgasserRecipes;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.items.weapon.WeaponMeleeItems;
 import com.hbm.lib.DirPos;
 import com.hbm.uninos.UniNodespace;
 import com.hbm.uninos.networkproviders.PlasmaNetwork;
@@ -32,7 +33,6 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityFusionBreeder}. {@code receivesFusionPower=false} — flux only.
- * TODO(CE: TileEntityFusionBreeder.java:147): meteorite_sword_irradiated → fused — items not registered.
  * TODO(CE: TileEntityFusionBreeder.java:323): OpenComputers ntm_fusion_breeder.
  */
 public class FusionBreederBlockEntity extends MachineBaseBlockEntity
@@ -85,6 +85,8 @@ public class FusionBreederBlockEntity extends MachineBaseBlockEntity
 
     public boolean canProcessSolid() {
         if (inventory.getStackInSlot(1).isEmpty()) return false;
+        if (inventory.getStackInSlot(1).getItem() == WeaponMeleeItems.METEORITE_SWORD_IRRADIATED.get() 
+                && inventory.getStackInSlot(2).isEmpty()) return true;
         OutgasserRecipes.OutgasserRecipe output = OutgasserRecipes.getRecipe(inventory.getStackInSlot(1));
         if (output == null) return false;
         FluidStack fluid = output.fluidOutput;
@@ -110,6 +112,14 @@ public class FusionBreederBlockEntity extends MachineBaseBlockEntity
     }
 
     private void processSolid() {
+        if (inventory.getStackInSlot(1).getItem() == WeaponMeleeItems.METEORITE_SWORD_IRRADIATED.get()) {
+            ItemStack sword = inventory.getStackInSlot(1).copy();
+            sword.shrink(1);
+            inventory.setStackInSlot(1, sword);
+            inventory.setStackInSlot(2, new ItemStack(WeaponMeleeItems.METEORITE_SWORD_FUSED.get()));
+            this.progress = 0;
+            return;
+        }
         OutgasserRecipes.OutgasserRecipe output = OutgasserRecipes.getRecipe(inventory.getStackInSlot(1));
         ItemStack stack = inventory.getStackInSlot(1);
         if (!stack.isEmpty()) {

@@ -13,6 +13,7 @@ import com.hbm.items.machine.ItemZirnoxRod.EnumZirnoxType;
 import com.hbm.items.machine.ItemZirnoxRodDepleted;
 import com.hbm.items.machine.ItemZirnoxRodDepleted.EnumZirnoxTypeDepleted;
 import com.hbm.items.machine.MachineItems;
+import com.hbm.items.weapon.WeaponMeleeItems;
 import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,7 +44,6 @@ import java.util.Map;
  * TODO(CE: TileEntityReactorZirnox.java:198-235): UniNodespace pipe-node (trySubscribe path lives).
  * TODO(CE: TileEntityReactorZirnox.java:267-268): SatelliteRayScan INFO_NUCLEAR.
  * TODO(CE: TileEntityReactorZirnox.java:354-431): EntityZirnoxDebris / zirnox_destroyed / AuxParticle / ExplosionNukeGeneric.waste / achZIRNOXBoom / elementals.
- * TODO(CE: TileEntityReactorZirnox.java:249-250): meteorite_sword_bred → irradiated.
  * TODO(CE: TileEntityReactorZirnox.java:508-656): OC + ROR.
  */
 public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
@@ -162,8 +162,12 @@ public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
         if (isOn) {
             for (int i = 0; i < 24; i++) {
                 ItemStack stack = inventory.getStackInSlot(i);
-                if (!stack.isEmpty() && stack.getItem() instanceof ItemZirnoxRod) {
-                    decay(i);
+                if (!stack.isEmpty()) {
+                    if (stack.getItem() instanceof ItemZirnoxRod) {
+                        decay(i);
+                    } else if (stack.getItem() == WeaponMeleeItems.METEORITE_SWORD_BRED.get()) {
+                        inventory.setStackInSlot(i, new ItemStack(WeaponMeleeItems.METEORITE_SWORD_IRRADIATED.get()));
+                    }
                 }
             }
         }

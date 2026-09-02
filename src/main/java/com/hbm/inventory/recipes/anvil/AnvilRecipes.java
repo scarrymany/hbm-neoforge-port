@@ -24,10 +24,10 @@ import java.util.List;
  * Rows whose I/O is AIR are skipped — no fake ids. Shell/pipe/stamp/recycle rows land when
  * the flattened autogen / already-registered I/O exists.
  * Ported: 8 {@link AnvilSmithingHotRecipe} (meteorite + cobalt decoration + meteorite_sword_reforged) + 18
- * {@link AnvilSmithingMold} + 9 mold-construction rows ({@code :626-635}).
+ * {@link AnvilSmithingMold} + {@link AnvilSmithingCyanideRecipe} + {@link AnvilSmithingRenameRecipe}
+ * + 9 mold-construction rows ({@code :626-635}).
  * TODO(CE: AnvilRecipes.java:75-80) 9 dusted-steel + chainsteel — {@code ingot_steel_dusted_*} is a
  * plain {@code Item}, not {@code ItemHotDusted}. Do not invent.
- * TODO(CE: AnvilRecipes.java:129-130) cyanide/rename.
  */
 public final class AnvilRecipes {
 
@@ -57,9 +57,9 @@ public final class AnvilRecipes {
     }
 
     /**
-     * CE {@code :59-127} anvil upgrades + gunmetal + hot (I/O that exists) + mold smithing.
+     * CE {@code :59-131} anvil upgrades + gunmetal + hot (I/O that exists) + mold smithing + cyanide + rename.
      * {@code :93} wings_murk and {@code :94} flask_infusion are live (flask flattened SHIELD).
-     * SKIP {@code :75-80} dusted/chainsteel, {@code :129-130} cyanide/rename.
+     * SKIP {@code :75-80} dusted/chainsteel.
      */
     private static void registerSmithing() {
         String[] bases = {"anvil_iron", "anvil_lead"};
@@ -122,6 +122,9 @@ public final class AnvilRecipes {
         moldSmith(13, cmp("pipes_steel"), new ItemStack[]{stack("pipes_steel")});
         moldSmith(20, tag("dense_wires/red_copper"), "wireDense", 1);
         moldSmith(21, tag("dense_wires/red_copper", 9), "wireDense", 9);
+
+        SMITHING.add(new AnvilSmithingCyanideRecipe());
+        SMITHING.add(new AnvilSmithingRenameRecipe());
     }
 
     private static void registerConstruction() {

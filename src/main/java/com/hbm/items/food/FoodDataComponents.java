@@ -33,6 +33,18 @@ public final class FoodDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CANTEEN_COOLDOWN =
             register("canteen_cooldown", Codec.INT, ByteBufCodecs.INT);
 
+    /**
+     * CE NBT {@code ntmCyanide} — marks food as poisoned by {@code plan_c} via {@link AnvilSmithingCyanideRecipe}.
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> CYANIDE =
+            register("cyanide", Codec.BOOL, ByteBufCodecs.BOOL);
+
+    /**
+     * CE NBT {@code ntmRedPill} — marks food as "red-pilled" by {@code pill_red} via {@link AnvilSmithingCyanideRecipe}.
+     */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> RED_PILL =
+            register("red_pill", Codec.BOOL, ByteBufCodecs.BOOL);
+
     private FoodDataComponents() {
     }
 

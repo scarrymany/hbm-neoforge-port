@@ -1,0 +1,6 @@
+{
+  "type": "hbm:breeder",
+  "input": { "item": "hbm:meteorite_sword_etched" },
+  "output": { "id": "hbm:meteorite_sword_bred", "count": 1 },
+  "flux": 1000
+}

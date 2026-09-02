@@ -10,6 +10,7 @@ import com.hbm.items.PlateCrystalWasteItems;
 import com.hbm.items.machine.ItemFuelRod;
 import com.hbm.items.machine.ItemPlateFuel;
 import com.hbm.items.machine.MachineItems;
+import com.hbm.items.weapon.WeaponMeleeItems;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -40,7 +41,6 @@ import java.util.Map;
  * CE {@code TileEntityReactorResearch}: 12 plate-fuel slots, maxHeat 50000, rod speed 0.04.
  * TODO(CE: TileEntityReactorResearch.java:420-478): OpenComputers callbacks.
  * TODO(CE: TileEntityReactorResearch.java:335-341): MobConfig.enableElementals radMark.
- * TODO(CE: TileEntityReactorResearch.java:300-301): meteorite_sword_bred → irradiated.
  * TODO(CE: TileEntityReactorResearch.java:232): block_lead / block_desh (not registered).
  */
 public class ReactorResearchBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
@@ -199,6 +199,9 @@ public class ReactorResearchBlockEntity extends MachineBaseBlockEntity implement
                     slotFlux[neighbor] += (int) (outFlux * rodLevel);
                 }
                 continue;
+            }
+            if (stack.getItem() == WeaponMeleeItems.METEORITE_SWORD_BRED.get()) {
+                inventory.setStackInSlot(i, new ItemStack(WeaponMeleeItems.METEORITE_SWORD_IRRADIATED.get()));
             }
             slotFlux[i] = 0;
         }
