@@ -484,8 +484,7 @@ public final class AnvilRecipes {
                     cmp("plate_armor_fau", 6));
         }
 
-        // :552-558 missile_doomsday (uses plateWelded)
-        // TODO(CE :552-558): missile_doomsday requires AL.plateWelded (not yet in MaterialShapes autogen)
+        // :552-558 missile_doomsday — ported at line 712 with aluminum_plate_sextuple
 
         // :560-566 fuel plates (skip — plate_fuel_* excluded per PlateCrystalWasteItems javadoc)
         // TODO(CE :560-566): plate_fuel_u233/u235/mox/pu239/sa326/ra226be/pu238be excluded (see PlateCrystalWasteItems)

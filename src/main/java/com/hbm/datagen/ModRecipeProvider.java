@@ -3685,9 +3685,16 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_lead", has(leadIngotTag))
                 .save(output, id("block/anvil_lead"));
 
-        // CE :340 = machine_fraction_tower = "H","G","H", H=STEEL.plateWelded(), G=steel_grate
-        // NeoForge port does not have plateWelded - skip this craft
-        // TODO(CE): machine_fraction_tower craft needs welded plate system
+        // CE :340 = machine_fraction_tower = "H","G","H", H=STEEL.plateWelded() (plate_sextuple), G=steel_grate
+        TagKey<Item> steelWeldedPlateTag = MaterialShapes.WELDEDPLATE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_fraction_tower"))
+                .pattern("H")
+                .pattern("G")
+                .pattern("H")
+                .define('H', steelWeldedPlateTag)
+                .define('G', block("steel_grate"))
+                .unlockedBy("has_steel_welded", has(steelWeldedPlateTag))
+                .save(output, id("machine_fraction_tower"));
 
         // CE :342 = machine_furnace_brick_off = "III","I I","BBB", I=Items.BRICK, B=Blocks.STONE
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_furnace_brick_off"))
@@ -4388,7 +4395,18 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_rubber", has(ingotRubberLocal))
                 .save(output, id("pneumatic_tube_cast"));
 
-        // SKIP :609 pneumatic_tube (x24) welded copper — plateWelded not added yet
+        // CE :609 = pneumatic_tube x24 = "CRC", C=CU.plateWelded() (copper plate_sextuple), R=ANY_RUBBER.ingot()
+        TagKey<Item> copperWeldedPlateTag = MaterialShapes.WELDEDPLATE.commonTag(Mats.MAT_COPPER);
+        Ingredient rubberIngotPneumatic = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_RUBBER)),
+                Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_PVC))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pneumatic_tube"), 24)
+                .pattern("CRC")
+                .define('C', copperWeldedPlateTag)
+                .define('R', rubberIngotPneumatic)
+                .unlockedBy("has_copper_welded", has(copperWeldedPlateTag))
+                .save(output, id("pneumatic_tube"));
 
         // CE :610 = pneumatic_tube_paintable (x4) = "SAS","A A","SAS", S=STEEL.plate(), A=pneumatic_tube
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pneumatic_tube_paintable"), 4)
@@ -4608,7 +4626,18 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_coil", has(item("coil_copper")))
                 .save(output, id("machine_transformer"));
 
-        // SKIP :662 machine_transformer_dnt — MAGTUNG.wireDense() not added yet (DenseMag)
+        // CE :661 = machine_transformer_dnt = "SDS","MCM","MCM", S=STAR.ingot(), D=DESH.ingot(), M=MAGTUNG.wireDense(), C=circuit_bismoid
+        TagKey<Item> magtungDenseWireTag = MaterialShapes.DENSEWIRE.commonTag(Mats.MAT_MAGTUNG);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_transformer_dnt"))
+                .pattern("SDS")
+                .pattern("MCM")
+                .pattern("MCM")
+                .define('S', starIngotTag)
+                .define('D', deshIngotTag)
+                .define('M', magtungDenseWireTag)
+                .define('C', item("circuit_bismoid"))
+                .unlockedBy("has_magtung_dense", has(magtungDenseWireTag))
+                .save(output, id("machine_transformer_dnt"));
 
         // CE :663 = radiobox = "PLP","PSP","PLP", P=STEEL.plate(), S=ring_starmetal, L=DURA.plate()
         TagKey<Item> duraPlateTagLocal = MaterialShapes.PLATE.commonTag(Mats.MAT_DURA);
@@ -5839,7 +5868,16 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_coil", has(item("coil_copper_torus")))
                 .save(output, id("charger_bulk"));
 
-        // SKIP :943 = refueler (CE uses EnumPartType.PISTON_HYDRAULIC + circuit_basic)
+        // CE :943 = refueler = "SS","HC","SS", S=TI.plate() (titanium), H=PISTON_HYDRAULIC, C=circuit_basic
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("refueler"))
+                .pattern("SS")
+                .pattern("HC")
+                .pattern("SS")
+                .define('S', titaniumPlateTag)
+                .define('H', item("part_generic_piston_hydraulic"))
+                .define('C', item("circuit_basic"))
+                .unlockedBy("has_piston", has(item("part_generic_piston_hydraulic")))
+                .save(output, id("refueler"));
         // SKIP :944 = press_preheater (CE uses Fluids.LAVA.getDict)
         
         // CE :945 = fluid_identifier_multi = "D","C","P", D=dye, C=circuit_analog, P=IRON.plate()
