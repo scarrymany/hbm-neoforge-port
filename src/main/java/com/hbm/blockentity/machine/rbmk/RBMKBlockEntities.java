@@ -34,6 +34,7 @@ public final class RBMKBlockEntities {
     public static Supplier<BlockEntityType<RBMKConsoleBlockEntity>> CONSOLE;
 
     // Mini-panels
+    public static Supplier<BlockEntityType<RBMKDisplayBlockEntity>> DISPLAY;
     // TODO(CE): RBMK_NUMITRON + RBMK_TERMINAL deferred (no GUI/RTTY yet)
 
     private RBMKBlockEntities() {
@@ -123,6 +124,11 @@ public final class RBMKBlockEntities {
         CONSOLE = ModBlocks.BLOCK_ENTITY_TYPES.register("rbmk_console", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new RBMKConsoleBlockEntity(CONSOLE.get(), pos, state),
                 RBMKBlocks.CONSOLE.get()
+        ).build(null));
+
+        DISPLAY = ModBlocks.BLOCK_ENTITY_TYPES.register("rbmk_display", () -> BlockEntityType.Builder.of(
+                RBMKDisplayBlockEntity::new,
+                RBMKBlocks.DISPLAY.get()
         ).build(null));
     }
 }

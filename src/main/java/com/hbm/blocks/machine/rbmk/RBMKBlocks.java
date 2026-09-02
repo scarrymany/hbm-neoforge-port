@@ -56,6 +56,7 @@ public final class RBMKBlocks {
 
     // Mini-panels (display family)
     public static DeferredBlock<RBMKDisplayBlankBlock> DISPLAY_BLANK;
+    public static DeferredBlock<RBMKDisplayBlock> DISPLAY;
     // TODO(CE: com.hbm.blocks.machine.RBMKNumitron.java:1-56, com.hbm.tileentity.machine.TileEntityRBMKNumitron.java:1-293): rbmk_numitron — 2x numitron display + RTTY polling + screwdriver GUI. Needs RTTY system + GUI.
     // TODO(CE: com.hbm.blocks.machine.RBMKTerminal.java:1-32, com.hbm.tileentity.machine.TileEntityRBMKTerminal.java:1-185): rbmk_terminal — 7x7 RBMK grid scanner + GUI. Needs RBMK column scan + GUI.
 
@@ -89,6 +90,7 @@ public final class RBMKBlocks {
         // Mini-panels
         BlockBehaviour.Properties panelProps = BlockBehaviour.Properties.of().strength(3.0F, 30.0F).sound(SoundType.METAL).noOcclusion();
         DISPLAY_BLANK = registerBlock("rbmk_display_blank", () -> new RBMKDisplayBlankBlock(panelProps));
+        DISPLAY = registerBlock("rbmk_display", () -> new RBMKDisplayBlock(panelProps));
 
         RBMKBlockEntities.registerAll();
     }
