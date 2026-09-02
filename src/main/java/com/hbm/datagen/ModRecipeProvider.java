@@ -3389,6 +3389,58 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('I', steelIngotTag)
                 .unlockedBy("has_plate", has(steelPlateTag))
                 .save(output, id("block/crate_steel"));
+
+        // ---- Cable/Pylon/Detector (CraftingManager.java:283-298). ----
+        // cable_switch (CE :283) = "S","W", S=Blocks.LEVER, W=red_wire_coated
+        Item redWireCoated = item("red_wire_coated");
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("cable_switch"))
+                .pattern("S").pattern("W")
+                .define('S', Items.LEVER)
+                .define('W', redWireCoated)
+                .unlockedBy("has_wire", has(redWireCoated))
+                .save(output, id("block/cable_switch"));
+
+        // cable_detector (CE :284) = "S","W", S=REDSTONE.dust(), W=red_wire_coated
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("cable_detector"))
+                .pattern("S").pattern("W")
+                .define('S', Items.REDSTONE)
+                .define('W', redWireCoated)
+                .unlockedBy("has_wire", has(redWireCoated))
+                .save(output, id("block/cable_detector"));
+
+        // cable_diode (CE :285) = " Q ","CAC"," Q ", Q=SI.nugget(), C=red_cable, A=AL.ingot()
+        TagKey<Item> siliconNuggetTag = MaterialShapes.NUGGET.commonTag(Mats.MAT_SILICON);
+        TagKey<Item> aluminiumIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_ALUMINIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("cable_diode"))
+                .pattern(" Q ").pattern("CAC").pattern(" Q ")
+                .define('Q', siliconNuggetTag)
+                .define('C', redCable)
+                .define('A', aluminiumIngotTag)
+                .unlockedBy("has_cable", has(redCable))
+                .save(output, id("block/cable_diode"));
+
+        // machine_detector (CE :286) = "IRI","CTC","IRI", I=plate_polymer, R=REDSTONE.dust(), C=MINGRADE.wireFine(), T=coil_tungsten
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("machine_detector"))
+                .pattern("IRI").pattern("CTC").pattern("IRI")
+                .define('I', ingotPolymer)
+                .define('R', Items.REDSTONE)
+                .define('C', mingradeWireFineTag)
+                .define('T', coilTungsten)
+                .unlockedBy("has_coil", has(coilTungsten))
+                .save(output, id("machine/detector"));
+
+        // radio_telex (CE :266) = "SCR","W#W","WWW", S=radio_torch_sender, C=crt_display, R=radio_torch_receiver, W=KEY_PLANKS, #=circuit ANALOG
+        Item circuitAnalog = item("circuit_analog");
+        Item crtDisplay = item("crt_display");
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("radio_telex"), 2)
+                .pattern("SCR").pattern("W#W").pattern("WWW")
+                .define('S', radioTorchSender)
+                .define('C', crtDisplay)
+                .define('R', item("radio_torch_receiver"))
+                .define('W', ItemTags.PLANKS)
+                .define('#', circuitAnalog)
+                .unlockedBy("has_torch", has(radioTorchSender))
+                .save(output, id("block/radio_telex"));
     }
 
     // ================================================================================================
