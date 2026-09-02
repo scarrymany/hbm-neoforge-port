@@ -54,6 +54,11 @@ public final class RBMKBlocks {
     public static DeferredBlock<RBMKAutoloaderBlock> AUTOLOADER;
     public static DeferredBlock<RBMKConsoleBlock> CONSOLE;
 
+    // Mini-panels (display family)
+    public static DeferredBlock<RBMKDisplayBlankBlock> DISPLAY_BLANK;
+    public static DeferredBlock<RBMKNumitronBlock> NUMITRON;
+    public static DeferredBlock<RBMKTerminalBlock> TERMINAL;
+
     private RBMKBlocks() {
     }
 
@@ -80,6 +85,12 @@ public final class RBMKBlocks {
         OUTLET = registerBlock("rbmk_outlet", () -> new RBMKOutletBlock(MACHINE_PROPS));
         AUTOLOADER = registerBlock("rbmk_autoloader", () -> new RBMKAutoloaderBlock(MACHINE_PROPS));
         CONSOLE = registerBlock("rbmk_console", () -> new RBMKConsoleBlock(MACHINE_PROPS));
+
+        // Mini-panels
+        BlockBehaviour.Properties panelProps = BlockBehaviour.Properties.of().strength(3.0F, 30.0F).sound(SoundType.METAL).noOcclusion();
+        DISPLAY_BLANK = registerBlock("rbmk_display_blank", () -> new RBMKDisplayBlankBlock(panelProps));
+        NUMITRON = registerBlock("rbmk_numitron", () -> new RBMKNumitronBlock(panelProps));
+        TERMINAL = registerBlock("rbmk_terminal", () -> new RBMKTerminalBlock(panelProps));
 
         RBMKBlockEntities.registerAll();
     }

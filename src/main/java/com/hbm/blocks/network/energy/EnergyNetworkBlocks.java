@@ -56,6 +56,7 @@ public final class EnergyNetworkBlocks {
     public static DeferredBlock<PylonMediumBlock> RED_PYLON_MEDIUM_TRANSFORMER;
     public static DeferredBlock<PylonMediumBlock> RED_PYLON_STEEL_TRANSFORMER;
     public static DeferredBlock<SubstationBlock> SUBSTATION;
+    public static DeferredBlock<CableGaugeBlock> RED_CABLE_GAUGE;
 
     private EnergyNetworkBlocks() {
     }
@@ -79,6 +80,7 @@ public final class EnergyNetworkBlocks {
         RED_PYLON_MEDIUM_TRANSFORMER = registerBlock("red_pylon_medium_transformer", () -> new PylonMediumBlock(PYLON_PROPS));
         RED_PYLON_STEEL_TRANSFORMER = registerBlock("red_pylon_steel_transformer", () -> new PylonMediumBlock(PYLON_PROPS));
         SUBSTATION = registerBlock("substation", () -> new SubstationBlock(CABLE_PROPS));
+        RED_CABLE_GAUGE = registerBlock("red_cable_gauge", () -> new CableGaugeBlock(CABLE_PROPS));
 
         com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities.registerAll();
     }
