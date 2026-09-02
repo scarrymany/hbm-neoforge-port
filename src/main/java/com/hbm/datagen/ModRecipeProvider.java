@@ -3820,6 +3820,116 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('I', titaniumIngotTag)
                 .unlockedBy("has_titanium", has(titaniumIngotTag))
                 .save(output, id("blades_titanium"));
+
+        // ---- Steel structure crafts (CraftingManager.java:483-510). ----
+        // CE :483 = lantern = "PGP"," S "," S ", P=KEY_ANYPANE, G=glowstone_dust, S=steel_beam
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("lantern"))
+                .pattern("PGP").pattern(" S ").pattern(" S ")
+                .define('P', Items.GLASS_PANE)
+                .define('G', Items.GLOWSTONE_DUST)
+                .define('S', block("steel_beam"))
+                .unlockedBy("has_beam", has(block("steel_beam")))
+                .save(output, id("block/lantern"));
+
+        // CE :484 = spotlight_incandescent (x8) = "G","T","I", G=KEY_ANYPANE, T=W.wireFine(), I=IRON.ingot()
+        TagKey<Item> tungstenWireFineTagLocal = MaterialShapes.WIRE.commonTag(Mats.MAT_TUNGSTEN);
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("spotlight_incandescent"), 8)
+                .pattern("G").pattern("T").pattern("I")
+                .define('G', Items.GLASS_PANE)
+                .define('T', tungstenWireFineTagLocal)
+                .define('I', Items.IRON_INGOT)
+                .unlockedBy("has_tungsten_wire", has(tungstenWireFineTagLocal))
+                .save(output, id("block/spotlight_incandescent"));
+
+        // CE :487 = floodlight (x2) = "CSC","TST","G G", C=circuit_capacitor, S=STEEL.plate(), T=coil_tungsten, G=KEY_ANYPANE
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("floodlight"), 2)
+                .pattern("CSC").pattern("TST").pattern("G G")
+                .define('C', item("circuit_capacitor"))
+                .define('S', steelPlateTag)
+                .define('T', item("coil_tungsten"))
+                .define('G', Items.GLASS_PANE)
+                .unlockedBy("has_tungsten_coil", has(item("coil_tungsten")))
+                .save(output, id("block/floodlight"));
+
+        // CE :489 = barbed_wire (x16) = "AIA","I I","AIA", A=STEEL.wireFine(), I=IRON.ingot()
+        TagKey<Item> steelWireFineTag = MaterialShapes.WIRE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("barbed_wire"), 16)
+                .pattern("AIA").pattern("I I").pattern("AIA")
+                .define('A', steelWireFineTag)
+                .define('I', Items.IRON_INGOT)
+                .unlockedBy("has_steel_wire", has(steelWireFineTag))
+                .save(output, id("block/barbed_wire"));
+
+        // CE :490-494 = barbed_wire variants (fire/poison/acid/wither/ultradeath)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("barbed_wire_fire"), 8)
+                .pattern("BBB").pattern("BIB").pattern("BBB")
+                .define('B', block("barbed_wire"))
+                .define('I', Items.REDSTONE)
+                .unlockedBy("has_barbed", has(block("barbed_wire")))
+                .save(output, id("block/barbed_wire_fire"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("barbed_wire_poison"), 8)
+                .pattern("BBB").pattern("BIB").pattern("BBB")
+                .define('B', block("barbed_wire"))
+                .define('I', item("powder_poison"))
+                .unlockedBy("has_barbed", has(block("barbed_wire")))
+                .save(output, id("block/barbed_wire_poison"));
+
+        // CE :500-510 = steel structure blocks (steel_beam, steel_wall, steel_scaffold, steel_grate, chain, rebar)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("steel_beam"), 8)
+                .pattern("S").pattern("S").pattern("S")
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("block/steel_beam"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("steel_wall"), 4)
+                .pattern("SSS").pattern("SSS")
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("block/steel_wall"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("steel_scaffold"), 8)
+                .pattern("SSS").pattern(" S ").pattern("SSS")
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("block/steel_scaffold"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("steel_grate"), 4)
+                .pattern("SS").pattern("SS")
+                .define('S', block("steel_beam"))
+                .unlockedBy("has_beam", has(block("steel_beam")))
+                .save(output, id("block/steel_grate"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("chain"), 8)
+                .pattern("S").pattern("S").pattern("S")
+                .define('S', block("steel_beam"))
+                .unlockedBy("has_beam", has(block("steel_beam")))
+                .save(output, id("block/chain"));
+
+        TagKey<Item> steelBoltTagLocal2 = MaterialShapes.BOLT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("rebar"), 8)
+                .pattern("BB").pattern("BB")
+                .define('B', steelBoltTagLocal2)
+                .unlockedBy("has_bolt", has(steelBoltTagLocal2))
+                .save(output, id("block/rebar"));
+
+        // ---- Powder items (CraftingManager.java:537-539). ----
+        // CE :537 = powder_ice (x4) shapeless = snowball + KNO.dust() + REDSTONE.dust()
+        TagKey<Item> knoTag = MaterialShapes.DUST.commonTag(Mats.MAT_KNO);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_ice"), 4)
+                .requires(Items.SNOWBALL)
+                .requires(knoTag)
+                .requires(Items.REDSTONE)
+                .unlockedBy("has_snowball", has(Items.SNOWBALL))
+                .save(output, id("powder_ice"));
+
+        // CE :538 = powder_poison (x4) shapeless = spider_eye + REDSTONE.dust() + NETHERQUARTZ.gem()
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_poison"), 4)
+                .requires(Items.SPIDER_EYE)
+                .requires(Items.REDSTONE)
+                .requires(Items.QUARTZ)
+                .unlockedBy("has_spider_eye", has(Items.SPIDER_EYE))
+                .save(output, id("powder_poison"));
     }
 
     // ================================================================================================
