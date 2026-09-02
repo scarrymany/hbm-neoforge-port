@@ -1171,6 +1171,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_plate", has(plateEuphemium))
                 .save(output, id("armor/euphemium_boots"));
 
+        // ArmorRecipes.java:22-25: titanium_helmet/_plate/_legs/_boots (addHelmet/addChest/addLegs/
+        // addBoots TI.ingot()). Standard vanilla armor patterns.
+        Item ingotTitanium = item("ingot_titanium");
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("titanium_helmet"))
+                .pattern("XXX").pattern("X X")
+                .define('X', ingotTitanium)
+                .unlockedBy("has_ingot", has(ingotTitanium))
+                .save(output, id("armor/titanium_helmet"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("titanium_plate"))
+                .pattern("X X").pattern("XXX").pattern("XXX")
+                .define('X', ingotTitanium)
+                .unlockedBy("has_ingot", has(ingotTitanium))
+                .save(output, id("armor/titanium_plate"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("titanium_legs"))
+                .pattern("XXX").pattern("X X").pattern("X X")
+                .define('X', ingotTitanium)
+                .unlockedBy("has_ingot", has(ingotTitanium))
+                .save(output, id("armor/titanium_legs"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("titanium_boots"))
+                .pattern("X X").pattern("X X")
+                .define('X', ingotTitanium)
+                .unlockedBy("has_ingot", has(ingotTitanium))
+                .save(output, id("armor/titanium_boots"));
+
         // ArmorRecipes.java:163: mask_of_infamy, 7x plate_iron.
         Item plateIron = item("plate_iron");
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("mask_of_infamy"))
