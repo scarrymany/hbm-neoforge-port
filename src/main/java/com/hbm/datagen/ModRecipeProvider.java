@@ -6507,7 +6507,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(steelIngotTagLocal10))
                 .save(output, id("cm_block_steel"));
 
-        // SKIP :1049 = cm_block bismoid_bronze (plate_cast_bismuth_bronze / plate_cast_arsenic_bronze / cm_block_bismoid_bronze not registered)
+        // SKIP :1049 = cm_block bismoid_bronze (cm_block_bismoid_bronze block not registered; plate_triple items exist via MaterialShapes autogen)
         // CE :1141 = cm_block desh = "BBB","BBB","BBB", B=DESH.block()
         TagKey<Item> deshBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_DESH);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block"), 9)
