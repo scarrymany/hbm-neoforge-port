@@ -8,13 +8,15 @@ import com.hbm.packet.toserver.MassStorageControlPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Locale;
 
-/** CE {@code GUIMassStorage}: gauge + provide / toggle output. */
 public class MassStorageScreen extends GuiInfoContainer<MassStorageMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/gui_test_storage.png");
 
     public MassStorageScreen(MassStorageMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -27,25 +29,30 @@ public class MassStorageScreen extends GuiInfoContainer<MassStorageMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MassStorageBlockEntity be = this.getMenu().be;
         int cap = Math.max(1, be.getCapacity());
         int gauge = be.getStockpile() * 88 / cap;
-        guiGraphics.fill(x + 97, y + 105 - gauge, x + 113, y + 105, 0xFF55AA55);
+        guiGraphics.blit(TEXTURE, x + 97, y + 105 - gauge, 176, 88 - gauge, 16, gauge);
 
         if (be.output) {
-            guiGraphics.fill(x + 80, y + 72, x + 94, y + 86, 0xFF44AA44);
-        } else {
-            guiGraphics.fill(x + 80, y + 72, x + 94, y + 86, 0xFF555555);
+            guiGraphics.blit(TEXTURE, x + 80, y + 72, 192, 0, 14, 14);
         }
-        guiGraphics.fill(x + 62, y + 72, x + 76, y + 86, 0xFF888888);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, name, this.imageWidth / 2 - this.font.width(name) / 2, 6, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 96 + 2, 0x404040, false);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        
         MassStorageBlockEntity be = this.getMenu().be;
         String percent = (((int) (be.getStockpile() * 1000D / (double) Math.max(1, be.getCapacity()))) / 10D) + "%";
         drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 96, topPos + 16, 18, 90, mouseX, mouseY,
@@ -56,6 +63,8 @@ public class MassStorageScreen extends GuiInfoContainer<MassStorageMenu> {
                 Component.literal("Click: Provide one"), Component.literal("Shift-click: Provide stack"));
         drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 80, topPos + 72, 14, 14,
                 Component.literal("Toggle output"));
+        
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 
     @Override

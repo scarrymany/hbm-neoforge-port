@@ -5,25 +5,17 @@ import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * Ported (visually, from CE's {@code GUIPWR}) as a plain panel - no {@code assets/hbm/textures/**}
- * tree exists in this port yet (see {@code GuiInfoContainer}'s own no-texture-yet rationale, shared
- * by every Phase 2 machine Screen so far). Shows the two fuel slots, both coolant tank gauges,
- * core/hull heat readouts, flux, and the stepped rod-level buttons ({@link PWRControllerMenu}'s own
- * javadoc explains why buttons replace CE's free-drag slider) - vanilla
- * {@link Button}-&gt;{@code MultiPlayerGameMode#handleInventoryButtonClick}-&gt;
- * {@link PWRControllerMenu#clickMenuButton}, the same plumbing
- * {@code MachineCombustionEngineScreen} already established for an identical slider-replacement
- * problem.
- */
 public class PWRControllerScreen extends GuiInfoContainer<PWRControllerMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/reactors/gui_pwr.png");
 
     public PWRControllerScreen(PWRControllerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 202;
+        this.imageHeight = 188;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -43,20 +35,46 @@ public class PWRControllerScreen extends GuiInfoContainer<PWRControllerMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        this.getMenu().be.tanks[0].renderTank(x + 130, y + 71, 0, 16, 54);
-        this.getMenu().be.tanks[1].renderTank(x + 152, y + 71, 0, 16, 54);
+        var be = this.getMenu().be;
+        int p = (int) (be.progress * 33 / be.processTime);
+        guiGraphics.blit(TEXTURE, x + 54, y + 33, 176, 0, p, 14);
+
+        int c = (int) (be.rodLevel * 52 / 100);
+        guiGraphics.blit(TEXTURE, x + 53, y + 54, 176, 40, c, 2);
+
+        be.tanks[0].renderTank(x + 8, y + 57, 0, 16, 52);
+        be.tanks[1].renderTank(x + 26, y + 57, 0, 16, 52);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 96 + 2, 0x404040, false);
+        
         var be = this.getMenu().be;
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 40, 100, 10, Component.literal("Rods: " + (int) be.rodLevel + "% / target " + (int) be.rodTarget + "%"));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 52, 100, 10, Component.literal("Core heat: " + be.coreHeat + " / " + be.coreHeatCapacity));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 64, 100, 10, Component.literal("Hull heat: " + be.hullHeat));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 76, 100, 10, Component.literal("Flux: " + (int) be.flux));
+        String flux = String.format("%.1f", be.flux);
+        guiGraphics.drawString(this.font, flux, 165 - this.font.width(flux), 64, 0x00FF00, false);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        
+        var be = this.getMenu().be;
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 115, topPos + 31, 18, 18, mouseX, mouseY,
+                Component.literal("Core: " + be.coreHeat + " / " + be.coreHeatCapacity + " TU"));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 151, topPos + 31, 18, 18, mouseX, mouseY,
+                Component.literal("Hull: " + be.hullHeat + " TU"));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 52, topPos + 31, 36, 18, mouseX, mouseY,
+                Component.literal(((int) (be.progress * 100 / be.processTime)) + "%"));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 52, topPos + 53, 54, 4, mouseX, mouseY,
+                Component.literal("Control rod level: " + (100 - (int) be.rodLevel) + "%"));
+        
+        be.tanks[0].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 5, 16, 52);
+        be.tanks[1].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 26, topPos + 5, 16, 52);
+        
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }

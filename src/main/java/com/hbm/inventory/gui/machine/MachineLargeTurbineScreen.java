@@ -4,37 +4,51 @@ import com.hbm.inventory.container.machine.MachineLargeTurbineMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * Ported (visually, from CE's {@code GUIMachineLargeTurbine}) as a plain panel - see
- * {@link MachineRTGScreen}'s javadoc for the no-texture-yet rationale. Purely passive.
- */
 public class MachineLargeTurbineScreen extends GuiInfoContainer<MachineLargeTurbineMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/generators/gui_turbine_large.png");
 
     public MachineLargeTurbineScreen(MachineLargeTurbineMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 165;
-        this.inventoryLabelY = this.imageHeight - 76;
+        this.imageHeight = 168;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        this.getMenu().be.tanks[0].renderTank(x + 8, y + 53, 0, 16, 36);
-        this.getMenu().be.tanks[1].renderTank(x + 152, y + 53, 0, 16, 36);
+        var be = this.getMenu().be;
+        int p = (int) (be.getPower() * 34 / Math.max(1, be.getMaxPower()));
+        guiGraphics.blit(TEXTURE, x + 123, y + 69 - p, 176, 34 - p, 7, p);
+
+        be.tanks[0].renderTank(x + 62, y + 69, 0, 16, 52);
+        be.tanks[1].renderTank(x + 134, y + 69, 0, 16, 52);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 6, 160, 12, this.getMenu().be.getPower(), this.getMenu().be.getMaxPower());
-        this.getMenu().be.tanks[0].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 53 - 36, 16, 36);
-        this.getMenu().be.tanks[1].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 152, topPos + 53 - 36, 16, 36);
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, name, this.imageWidth / 2 - this.font.width(name) / 2, 6, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 96 + 2, 0x404040, false);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        
+        var be = this.getMenu().be;
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 123, topPos + 69 - 34, 7, 34, be.getPower(), be.getMaxPower());
+        be.tanks[0].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 62, topPos + 69 - 52, 16, 52);
+        be.tanks[1].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 134, topPos + 69 - 52, 16, 52);
+        
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }
