@@ -158,6 +158,7 @@ public class ModRecipeProvider extends RecipeProvider {
         rodRecipes(output);
         weaponRecipes(output);
         consumableRecipes(output);
+        craftingManagerRecipes(output);
         dynamicHandlerRecipes(output);
     }
 
@@ -2824,7 +2825,76 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     // ================================================================================================
-    // Part 8: dynamic crafting-table handlers - docs/phase7/crafting_dynamic_handlers.md
+    // Part 8a: CraftingManager misc recipes - basic container/machine-component recipes
+    // ================================================================================================
+    /**
+     * Ports high-value obtainability-hole-closing recipes from CE's
+     * {@code CraftingManager.addCrafting()} whose inputs and outputs are all confirmed registered.
+     * Focus: fluid containers (canister_empty, gas_empty), machine components (coil_copper,
+     * coil_gold), basic tools/items that close reachability gaps. Circuits/motors/advanced items
+     * still blocked (not registered).
+     */
+    private void craftingManagerRecipes(RecipeOutput output) {
+        // ---- Fluid containers (CraftingManager.java:177-178). ----
+        // canister_empty = "S ","AA","AA", S=STEEL.plate(), A=AL.plate()
+        Item plateSteel = item("plate_steel");
+        Item plateAluminium = item("plate_aluminium");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("canister_empty"), 2)
+                .pattern("S ").pattern("AA").pattern("AA")
+                .define('S', plateSteel).define('A', plateAluminium)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("container/canister_empty"));
+
+        // gas_empty = "S ","AA","AA", A=STEEL.plate(), S=CU.plate()
+        Item plateCopper = item("plate_copper");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("gas_empty"), 2)
+                .pattern("S ").pattern("AA").pattern("AA")
+                .define('A', plateSteel).define('S', plateCopper)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("container/gas_empty"));
+
+        // ---- Coils (CraftingManager.java:205-208). ----
+        // coil_copper = "WWW","WIW","WWW", W=MINGRADE.wireFine(), I=IRON.ingot()
+        TagKey<Item> mingradeWireTag = MaterialShapes.WIRE.commonTag(Mats.MAT_MINGRADE);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_copper"))
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', mingradeWireTag).define('I', Items.IRON_INGOT)
+                .unlockedBy("has_wire", has(mingradeWireTag))
+                .save(output, id("component/coil_copper_iron"));
+        // Alternate with STEEL.ingot()
+        Item ingotSteel = item("ingot_steel");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_copper"))
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', mingradeWireTag).define('I', ingotSteel)
+                .unlockedBy("has_wire", has(mingradeWireTag))
+                .save(output, id("component/coil_copper_steel"));
+
+        // coil_gold = "WWW","WIW","WWW", W=GOLD.wireFine(), I=IRON.ingot()
+        TagKey<Item> goldWireTag = MaterialShapes.WIRE.commonTag(Mats.MAT_GOLD);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_gold"))
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', goldWireTag).define('I', Items.IRON_INGOT)
+                .unlockedBy("has_wire", has(goldWireTag))
+                .save(output, id("component/coil_gold_iron"));
+        // Alternate with STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_gold"))
+                .pattern("WWW").pattern("WIW").pattern("WWW")
+                .define('W', goldWireTag).define('I', ingotSteel)
+                .unlockedBy("has_wire", has(goldWireTag))
+                .save(output, id("component/coil_gold_steel"));
+
+        // coil_copper_torus (CraftingManager.java:210) = " C ","CPC"," C ", P=IRON.plate(), C=coil_copper
+        Item coilCopper = item("coil_copper");
+        Item plateIron = item("plate_iron");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_copper_torus"), 2)
+                .pattern(" C ").pattern("CPC").pattern(" C ")
+                .define('C', coilCopper).define('P', plateIron)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("component/coil_copper_torus"));
+    }
+
+    // ================================================================================================
+    // Part 9: dynamic crafting-table handlers - docs/phase7/crafting_dynamic_handlers.md
     // ================================================================================================
     // CE's com.hbm.crafting.handlers.* family (see this class's own "Explicitly not attempted"
     // javadoc paragraph, now updated). Every real matching/assembling logic lives in the Java
