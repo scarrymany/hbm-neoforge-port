@@ -112,6 +112,15 @@ public class BlockLoot extends BaseEntityBlock {
             return this;
         }
 
+        /**
+         * CE {@code BlockLoot.TileEntityLoot.addItem} signature with render offsets (x/y/z floats for bespoke
+         * multi-item static pile model). This port doesn't render the baked pile model — offsets ignored.
+         */
+        public LootBlockEntity addItem(ItemStack stack, float x, float y, float z) {
+            items.add(stack);
+            return this;
+        }
+
         @Override
         protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
             super.saveAdditional(tag, registries);

@@ -48,6 +48,7 @@ public final class GenericCrateBlocks {
     private static final float SMALL_CRATE_RESISTANCE = 2.5F;
 
     public static Supplier<BlockEntityType<BlockLoot.LootBlockEntity>> LOOT_ENTITY_TYPE;
+    public static Supplier<BlockEntityType<BlockPedestal.PedestalBlockEntity>> PEDESTAL_ENTITY_TYPE;
     public static Supplier<BlockEntityType<BlockSupplyCrate.SupplyCrateBlockEntity>> SUPPLY_CRATE_ENTITY_TYPE;
     public static Supplier<BlockEntityType<BlockSkeletonHolder.SkeletonHolderBlockEntity>> SKELETON_HOLDER_ENTITY_TYPE;
 
@@ -91,6 +92,14 @@ public final class GenericCrateBlocks {
         return CRATE_RED;
     }
 
+    public static DeferredBlock<BlockPedestal> pedestal() {
+        return PEDESTAL;
+    }
+
+    public static DeferredBlock<BlockLoot> decoLoot() {
+        return DECO_LOOT;
+    }
+
     public static DeferredBlock<RedBarrel> RED_BARREL;
     public static DeferredBlock<RedBarrel> PINK_BARREL;
     public static DeferredBlock<RedBarrel> LOX_BARREL;
@@ -104,6 +113,8 @@ public final class GenericCrateBlocks {
     private static DeferredBlock<BlockCrate> CRATE_METAL;
     private static DeferredBlock<BlockCrate> CRATE_LEAD;
     private static DeferredBlock<BlockCrate> CRATE_RED;
+    private static DeferredBlock<BlockPedestal> PEDESTAL;
+    private static DeferredBlock<BlockLoot> DECO_LOOT;
 
     private GenericCrateBlocks() {
     }
@@ -147,8 +158,16 @@ public final class GenericCrateBlocks {
         // CE: setCreativeTab(null).setHardness(0.0F).setResistance(0.0F)
         DeferredBlock<BlockLoot> lootBlock = registerBlock("deco_loot",
                 () -> new BlockLoot(BlockBehaviour.Properties.of().strength(0.0F, 0.0F).noOcclusion()), null);
+        DECO_LOOT = lootBlock;
         LOOT_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("deco_loot",
                 () -> BlockEntityType.Builder.of(BlockLoot.LootBlockEntity::new, lootBlock.get()).build(null));
+
+        // CE: pedestal for red-room loot display, tab=null (world-gen only)
+        DeferredBlock<BlockPedestal> pedestalBlock = registerBlock("pedestal",
+                () -> new BlockPedestal(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).noOcclusion()), null);
+        PEDESTAL = pedestalBlock;
+        PEDESTAL_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("pedestal",
+                () -> BlockEntityType.Builder.of(BlockPedestal.PedestalBlockEntity::new, pedestalBlock.get()).build(null));
 
         // CE: setCreativeTab(MainRegistry.missileTab).setHardness(1.0F).setResistance(2.5F)
         DeferredBlock<BlockSupplyCrate> supplyCrateBlock = registerBlock("crate_supply",

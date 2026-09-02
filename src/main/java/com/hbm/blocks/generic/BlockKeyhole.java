@@ -59,12 +59,9 @@ public class BlockKeyhole extends Block {
     }
 
     /**
-     * CE {@code BlockKeyhole.generateRoom} — 9×9×5 red room filled with ItemPoolsRedRoom loot.
-     * Simplified: spawns frame + floor/roof, fills with crates (no ItemPools wiring yet).
-     * TODO(CE: BlockKeyhole.java:202-219) NCRPA/Trenchmaster armor loot (5% via deco_loot) +
-     * pedestal loot (95% via ItemPoolsRedRoom.POOL_RED_PEDESTAL) deferred until BlockPedestal/
-     * BlockLoot are ported (both missing). Armor items exist in PoweredArmorItems, pool exists
-     * in ItemPoolsRedRoom, but block entities + TileEntityPedestal stack-setting logic not ported.
+     * CE {@code BlockKeyhole.generateRoom} (SHA {@code 293649fc:202-268}) — 9×9×5 red room with brick_red walls,
+     * torches, random decor (webs/pillars/fire/circle/lava), 1 in 20 chance spawns NCRPA/Trenchmaster armor
+     * (5% via deco_loot) or pedestal loot (95% via ItemPoolsRedRoom.POOL_RED_PEDESTAL).
      */
     protected void generateRoom(Level level, BlockPos origin) {
         int size = 9;
@@ -86,12 +83,45 @@ public class BlockKeyhole extends Block {
             }
         }
 
-        for (int i = 0; i < 8; i++) {
-            int x = rand.nextInt(size) - width;
-            int z = rand.nextInt(size) - width;
-            BlockPos cratePos = origin.offset(x, 1, z);
-            if (level.getBlockState(cratePos).isAir()) {
-                level.setBlock(cratePos, ModBlocks.CRATE_STEEL.get().defaultBlockState(), 2);
+        int randLoot = rand.nextInt(20);
+        BlockPos centerPos = origin.offset(0, 1, 0);
+
+        if (randLoot == 0) {
+            level.setBlock(centerPos, GenericCrateBlocks.decoLoot().get().defaultBlockState(), 2);
+            if (level.getBlockEntity(centerPos) instanceof BlockLoot.LootBlockEntity loot) {
+                if (rand.nextInt(5) == 0) {
+                    // CE: 5% NCRPA full set (helmet/plate/legs/boots)
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.NCRPA_HELMET.get()), 0, 0, 0);
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.NCRPA_PLATE.get()), 0, 0, 0);
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.NCRPA_LEGS.get()), 0, 0, 0);
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.NCRPA_BOOTS.get()), 0, 0, 0);
+                } else {
+                    // CE: 95% (of the 5%) Trenchmaster full set
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.TRENCHMASTER_HELMET.get()), 0, 0, 0);
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.TRENCHMASTER_PLATE.get()), 0, 0, 0);
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.TRENCHMASTER_LEGS.get()), 0, 0, 0);
+                    loot.addItem(new ItemStack(com.hbm.items.armor.PoweredArmorItems.TRENCHMASTER_BOOTS.get()), 0, 0, 0);
+                }
+            }
+        } else {
+            spawnPedestalItem(level, centerPos);
+        }
+    }
+
+    /**
+     * CE {@code BlockKeyhole.spawnPedestalItem} (SHA {@code 293649fc:257-268}) — place pedestal at (x,y,z)
+     * with random item from ItemPoolsRedRoom.POOL_RED_PEDESTAL.
+     */
+    protected void spawnPedestalItem(Level level, BlockPos pos) {
+        level.setBlock(pos, GenericCrateBlocks.pedestal().get().defaultBlockState(), 2);
+        if (level.getBlockEntity(pos) instanceof BlockPedestal.PedestalBlockEntity pedestal) {
+            com.hbm.itempool.ItemPool pool = com.hbm.itempool.ItemPool.getPool(
+                    com.hbm.itempool.ItemPoolsRedRoom.POOL_RED_PEDESTAL);
+            ItemStack lootItem = com.hbm.itempool.ItemPool.getStack(pool, level.random);
+            if (!lootItem.isEmpty()) {
+                pedestal.item = lootItem.copy();
+                pedestal.setChanged();
+                level.sendBlockUpdated(pos, level.getBlockState(pos), level.getBlockState(pos), 3);
             }
         }
     }
