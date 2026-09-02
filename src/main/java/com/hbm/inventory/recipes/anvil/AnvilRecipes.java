@@ -10,6 +10,7 @@ import com.hbm.items.machine.ItemMold;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -215,8 +216,62 @@ public final class AnvilRecipes {
         // :283-289 heater_oilburner
         construct(2, stack("heater_oilburner"),
                 cmp("tank_steel", 4),
+                tag("pipes/steel", 3),
                 tag("ingots/titanium", 12),
                 tag("ingots/copper", 8));
+
+        // :291-298 heater_electric
+        construct(3, stack("heater_electric"),
+                cmp("plate_polymer", 4),
+                tag("ingots/copper", 8),
+                tag("plates/steel", 8),
+                cmp("coil_tungsten", 8),
+                cmp("circuit_basic"));
+
+        // :300-307 heater_heatex
+        construct(3, stack("heater_heatex"),
+                cmp("ingot_rubber", 4),
+                tag("ingots/copper", 16),
+                tag("plates/steel", 16),
+                tag("pipes/steel", 3));
+
+        // :309-315 furnace_steel
+        construct(2, stack("furnace_steel"),
+                new ComparableStack(Blocks.STONE_BRICKS, 16),
+                tag("ingots/iron", 4),
+                tag("plates/steel", 16),
+                tag("ingots/copper", 8),
+                cmp("steel_grate", 16));
+
+        // :317-323 furnace_combination
+        construct(2, stack("furnace_combination"),
+                new ComparableStack(Blocks.STONE_BRICKS, 8),
+                new OreDictStack(ItemTags.LOGS, 16),
+                tag("cast_plates/copper", 2),
+                new ComparableStack(Items.BRICK, 16));
+
+        // :325-331 machine_rotary_furnace
+        construct(2, stack("machine_rotary_furnace"),
+                new ComparableStack(Blocks.STONE_BRICKS, 8),
+                cmp("ingot_firebrick", 16),
+                tag("ingots/iron", 4),
+                tag("plates/copper", 8));
+
+        // :333-340 machine_stirling
+        construct(2, stack("machine_stirling"),
+                new OreDictStack(ItemTags.PLANKS, 16),
+                tag("plates/steel", 6),
+                tag("ingots/copper", 8),
+                cmp("coil_copper", 4),
+                cmp("gear_large_iron"));
+
+        // :342-349 machine_stirling_steel
+        construct(2, stack("machine_stirling_steel"),
+                tag("plates/steel", 16),
+                tag("ingots/beryllium", 6),
+                tag("ingots/copper", 8),
+                cmp("coil_gold", 16),
+                cmp("gear_large_steel"));
 
         // :291-298 heater_electric
         construct(3, stack("heater_electric"),
