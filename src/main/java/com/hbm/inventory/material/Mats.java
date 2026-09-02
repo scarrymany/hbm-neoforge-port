@@ -71,9 +71,9 @@ public class Mats {
     public static final NTMMaterial MAT_STONE         = makeSmeltable(_VS + 00,    n("Stone"),             0x7F7F7F, 0x353535, 0x4D2F23).n();
     public static final NTMMaterial MAT_CARBON        = makeAdditive(699,          n("Carbon"),            0x363636, 0x030303, 0x404040).setAutogen(WIRE, BLOCK).n();
     public static final NTMMaterial MAT_COAL          = makeNonSmeltable(600,      n("Coal"),              0x363636, 0x030303, 0x404040).setConversion(MAT_CARBON, 2, 1).setAutogen(FRAGMENT).n();
-    public static final NTMMaterial MAT_LIGNITE       = makeNonSmeltable(601,      n("Lignite"),           0x542D0F, 0x261508, 0x472913).setConversion(MAT_CARBON, 3, 1).setAutogen(FRAGMENT).n();
-    public static final NTMMaterial MAT_COALCOKE      = make(610,                  n("CoalCoke")).setConversion(MAT_CARBON, 4, 3).n();
-    public static final NTMMaterial MAT_PETCOKE       = make(611,                  n("PetCoke")).setConversion(MAT_CARBON, 4, 3).n();
+    public static final NTMMaterial MAT_LIGNITE       = makeNonSmeltable(601,      n("Lignite"),           0x542D0F, 0x261508, 0x472913).setConversion(MAT_CARBON, 3, 1).setAutogen(FRAGMENT, GEM).n();
+    public static final NTMMaterial MAT_COALCOKE      = make(610,                  n("CoalCoke")).setConversion(MAT_CARBON, 4, 3).setAutogen(GEM).n();
+    public static final NTMMaterial MAT_PETCOKE       = make(611,                  n("PetCoke")).setConversion(MAT_CARBON, 4, 3).setAutogen(GEM).n();
     public static final NTMMaterial MAT_LIGCOKE       = make(612,                  n("LigniteCoke")).setConversion(MAT_CARBON, 4, 3).n();
     public static final NTMMaterial MAT_GRAPHITE      = make(620,                  n("Graphite")).setConversion(MAT_CARBON, 1, 1).n();
     public static final NTMMaterial MAT_DIAMOND       = makeNonSmeltable(1430,     n("Diamond"),           0xFFFFFF, 0x1B7B6B, 0x8CF4E2).setConversion(MAT_CARBON, 1, 1).setAutogen(FRAGMENT).n();

@@ -4784,7 +4784,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("door_bunker"));
 
         // ---- CraftingManager.java:719-742 crafts (torches, missile assembly, segments, fences, waste sands). ----
-        // SKIP :719-720 torches with LIGNITE/ANY_COKE — LIGNITE.gem() / ANY_COKE.gem() shapes not autogen in port (only FRAGMENT)
+        // CE :719 = torch x3 = "L","S", L=LIGNITE.gem(), S=stick
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Blocks.TORCH, 3)
+                .pattern("L")
+                .pattern("S")
+                .define('L', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "gems/lignite")))
+                .define('S', Items.STICK)
+                .unlockedBy("has_lignite", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "gems/lignite"))))
+                .save(output, id("torch_from_lignite"));
+        
+        // CE :720 = torch x8 = "L","S", L=ANY_COKE.gem(), S=stick
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Blocks.TORCH, 8)
+                .pattern("L")
+                .pattern("S")
+                .define('L', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "gems/coal_coke")))
+                .define('S', Items.STICK)
+                .unlockedBy("has_coke", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "gems/coal_coke"))))
+                .save(output, id("torch_from_coke_coal"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, Blocks.TORCH, 8)
+                .pattern("L")
+                .pattern("S")
+                .define('L', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "gems/petroleum_coke")))
+                .define('S', Items.STICK)
+                .unlockedBy("has_petcoke", has(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "gems/petroleum_coke"))))
+                .save(output, id("torch_from_coke_petroleum"));
 
         // CE :722 = machine_missile_assembly = "PWP","SSS","CCC", P=pedestal_steel, W=wrench, S=STEEL.plate(), C=steel_scaffold
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_missile_assembly"))
@@ -5050,7 +5073,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_template", has(item("upgrade_template")))
                 .save(output, id("upgrade_gc_speed"));
 
-        // SKIP :786-788 upgrade_stack_* — part_generic EnumPartType not registered yet
+        // upgrade_stack_* crafts already ported (CE :786-788) using PART_GENERIC piston items
 
         // CE :789-791 = upgrade_ejector_* (use plate_copper/plate_gold/MAT_SATURN plate)
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_ejector_1"))
@@ -5715,9 +5738,14 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("fluid_identifier_multi"));
 
         // ---- CraftingManager.java:248-258 crafts (rag, rope/slime/tar helpers). ----
-        // CE :248 = plant_item ROPE (shapeless: string x3) — no rope item in port, use vanilla string
-        // CE :249 = plant_item ROPE (shaped 4: hemp x3) — hemp plant not ported yet
-        // CE :250 = string x3 (shapeless: hemp) — hemp plant not ported yet
+        // CE :248 = plant_item ROPE (shapeless: string x3 → rope x1)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("plant_item_rope"))
+                .requires(Items.STRING, 3)
+                .unlockedBy("has_string", has(Items.STRING))
+                .save(output, id("plant_item_rope_from_string"));
+        
+        // CE :249 = plant_item ROPE x4 (shaped: hemp x3) — hemp crop not ported, defer
+        // CE :250 = string x3 (shapeless: hemp) — hemp crop not ported, defer
         
         // CE :258 = ducttape x4 = "F","P","S", F=string, P=paper, S=KEY_SLIME (slime_ball)
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ducttape"), 4)
@@ -5752,7 +5780,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_tar", has(item("oil_tar_crude")))
                 .save(output, id("name_tag_tar"));
         
-        // CE :931 = lead x4 = "RSR", R=plant_item ROPE, S=KEY_SLIME — plant_item EnumPlantType.ROPE not ported (requires hemp plant)
+        // CE :530 = rail_wood x16 = "S S","SRS","S S", S=stick, R=plant_item ROPE — rail_wood block not registered, skip craft
+        
+        // CE :931 = lead x4 = "RSR", R=plant_item ROPE, S=KEY_SLIME
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.LEAD, 4)
+                .pattern("RSR")
+                .define('R', item("plant_item_rope"))
+                .define('S', Items.SLIME_BALL)
+                .unlockedBy("has_rope", has(item("plant_item_rope")))
+                .save(output, id("lead_from_rope"));
         // CE :932 = rag x4 = "SW","WS", S=string, W=wool
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("rag"), 4)
                 .pattern("SW")
@@ -5773,7 +5809,16 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_leather", has(Items.LEATHER))
                 .save(output, id("conveyor_wand_leather"));
         
-        // CE :270 = conveyor_wand x16 (rope variant) = "RSR","I I","RSR", R=plant_item ROPE, S=IRON.plate(), I=IRON.ingot() — plant_item EnumPlantType.ROPE not ported
+        // CE :270 = conveyor_wand x16 (rope variant) = "RSR","I I","RSR", R=plant_item ROPE, S=IRON.plate(), I=IRON.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("conveyor_wand"), 16)
+                .pattern("RSR")
+                .pattern("I I")
+                .pattern("RSR")
+                .define('R', item("plant_item_rope"))
+                .define('S', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "plates/iron")))
+                .define('I', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/iron")))
+                .unlockedBy("has_rope", has(item("plant_item_rope")))
+                .save(output, id("conveyor_wand_rope"));
         
         // CE :271 = conveyor_wand x64 (rubber variant) = "LLL","I I","LLL", L=ANY_RUBBER.ingot(), I=IRON.ingot()
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("conveyor_wand"), 64)

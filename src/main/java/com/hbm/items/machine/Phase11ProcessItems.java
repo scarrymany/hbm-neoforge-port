@@ -118,6 +118,10 @@ public final class Phase11ProcessItems {
         for (ItemEnums.EnumTarType type : ItemEnums.EnumTarType.VALUES) {
             parts("oil_tar_" + type.name().toLowerCase());
         }
+        // CE ModItems.java:1240 ItemEnumMulti plant_item / EnumPlantType
+        for (ItemEnums.EnumPlantType type : ItemEnums.EnumPlantType.VALUES) {
+            parts("plant_item_" + type.name().toLowerCase());
+        }
         // CE ModItems.java:1273 ItemEnumMulti chunk_ore / EnumChunkType
         for (ItemEnums.EnumChunkType type : ItemEnums.EnumChunkType.VALUES) {
             parts("chunk_ore_" + type.name().toLowerCase());
