@@ -44,6 +44,13 @@ public final class SpecialItems {
     public static final DeferredItem<com.hbm.items.BrokenItem> BROKEN_ITEM = register("broken_item",
             () -> new com.hbm.items.BrokenItem(new Item.Properties()));
 
+    // Simple items (pellet_gas)
+    public static final DeferredItem<Item> PELLET_GAS = register("pellet_gas",
+            () -> new Item(new Item.Properties()));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.PARTS, PELLET_GAS);
+    }
+
     // ==================== ItemAMSCore (4 instances) ====================
 
     public static final DeferredItem<ItemAMSCore> AMS_CORE_SING = register("ams_core_sing",

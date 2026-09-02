@@ -4593,8 +4593,16 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_rubber", has(ingotRubberLocal2))
                 .save(output, id("jackt2"));
 
-        // SKIP :667 vent_chlorine — pellet_gas not registered yet
-        
+        // CE :667 = vent_chlorine = "IGI","ICI","IDI", I=IRON.plate(), G=iron_bars, C=pellet_gas, D=dispenser
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("vent_chlorine"))
+                .pattern("IGI").pattern("ICI").pattern("IDI")
+                .define('I', ironPlateTag)
+                .define('G', Items.IRON_BARS)
+                .define('C', item("pellet_gas"))
+                .define('D', Items.DISPENSER)
+                .unlockedBy("has_pellet", has(item("pellet_gas")))
+                .save(output, id("vent_chlorine"));
+
         // CE :668 = vent_chlorine_seal = "ISI","SCS","ISI", I=BIGMT.ingot(), S=STAR.ingot(), C=chlorine_pinwheel
         TagKey<Item> saturnIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_SATURN);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("vent_chlorine_seal"))
@@ -4974,12 +4982,143 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // SKIP :782 upgrade_crystallizer — fluid_barrel_full(PEROXIDE) not implemented yet
         // SKIP :783 upgrade_screm — crystal_xen not registered yet
-        // SKIP :784 upgrade_gc_speed — RUBBER material not added yet
+
+        // CE :784 = upgrade_gc_speed = "GNG","RUR","GMG", R=RUBBER.ingot(), M=motor, G=coil_gold, N=NB.ingot(), U=upgrade_template
+        TagKey<Item> niobiumIngotTagLocal = MaterialShapes.INGOT.commonTag(Mats.MAT_NIOBIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_gc_speed"))
+                .pattern("GNG").pattern("RUR").pattern("GMG")
+                .define('R', item("ingot_rubber"))
+                .define('M', item("motor"))
+                .define('G', item("coil_gold"))
+                .define('N', niobiumIngotTagLocal)
+                .define('U', item("upgrade_template"))
+                .unlockedBy("has_template", has(item("upgrade_template")))
+                .save(output, id("upgrade_gc_speed"));
 
         // SKIP :786-788 upgrade_stack_* — part_generic EnumPartType not registered yet
-        // SKIP :789-791 upgrade_ejector_* — plate_saturnite (MAT_SATURN plate) name mismatch; need plate_saturn
+
+        // CE :789-791 = upgrade_ejector_* (use plate_copper/plate_gold/MAT_SATURN plate)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_ejector_1"))
+                .pattern(" C ").pattern("PUP").pattern(" C ")
+                .define('C', item("plate_copper"))
+                .define('P', item("motor"))
+                .define('U', item("upgrade_template"))
+                .unlockedBy("has_template", has(item("upgrade_template")))
+                .save(output, id("upgrade_ejector_1"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_ejector_2"))
+                .pattern(" C ").pattern("PUP").pattern(" C ")
+                .define('C', item("plate_gold"))
+                .define('P', item("motor"))
+                .define('U', item("upgrade_ejector_1"))
+                .unlockedBy("has_ejector1", has(item("upgrade_ejector_1")))
+                .save(output, id("upgrade_ejector_2"));
+
+        TagKey<Item> saturnPlateTagLocal3 = MaterialShapes.PLATE.commonTag(Mats.MAT_SATURN);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_ejector_3"))
+                .pattern(" C ").pattern("PUP").pattern(" C ")
+                .define('C', saturnPlateTagLocal3)
+                .define('P', item("motor"))
+                .define('U', item("upgrade_ejector_2"))
+                .unlockedBy("has_ejector2", has(item("upgrade_ejector_2")))
+                .save(output, id("upgrade_ejector_3"));
 
         // SKIP :793 mech_key — ingot_meteorite_forged/coin_maskman not registered yet
+
+        // ---- CraftingManager.java:794-843 crafts (spawn items, hadron coil conversions, fireworks, rbmk). ----
+        // SKIP :794 spawn_chopper — ingot_meteorite not registered yet
+        // SKIP :795 spawn_ufo — ingot_meteorite/DNT.ingot()/coin_worm not registered yet
+
+        // SKIP :796-802 wire_dense hadron_coil shapeless conversions — hadron_coil_* blocks not registered yet
+
+        // SKIP :804-829 hadron_* crafts — all commented out in CE (inactive)
+
+        // CE :830 = fireworks = "PPP","PPP","WIW", P=paper, W=KEY_PLANKS, I=IRON.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fireworks"))
+                .pattern("PPP").pattern("PPP").pattern("WIW")
+                .define('P', Items.PAPER)
+                .define('W', ItemTags.PLANKS)
+                .define('I', ironIngotTagLocal)
+                .unlockedBy("has_paper", has(Items.PAPER))
+                .save(output, id("fireworks"));
+
+        // CE :831 = safety_fuse (x8) = "SSS","SGS","SSS", S=string, G=gunpowder
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("safety_fuse"), 8)
+                .pattern("SSS").pattern("SGS").pattern("SSS")
+                .define('S', Items.STRING)
+                .define('G', Items.GUNPOWDER)
+                .unlockedBy("has_gunpowder", has(Items.GUNPOWDER))
+                .save(output, id("safety_fuse"));
+
+        // CE :833-835 = rbmk_lid (x4 each)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("rbmk_lid"), 4)
+                .pattern("PPP").pattern("CCC").pattern("PPP")
+                .define('P', steelPlateTag)
+                .define('C', block("concrete_asbestos"))
+                .unlockedBy("has_concrete", has(block("concrete_asbestos")))
+                .save(output, id("rbmk_lid"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("rbmk_lid_glass"), 4)
+                .pattern("LLL").pattern("BBB").pattern("P P")
+                .define('P', steelPlateTag)
+                .define('L', block("glass_lead"))
+                .define('B', block("glass_boron"))
+                .unlockedBy("has_glass", has(block("glass_lead")))
+                .save(output, id("rbmk_lid_glass_1"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("rbmk_lid_glass"), 4)
+                .pattern("BBB").pattern("LLL").pattern("P P")
+                .define('P', steelPlateTag)
+                .define('L', block("glass_lead"))
+                .define('B', block("glass_boron"))
+                .unlockedBy("has_glass", has(block("glass_lead")))
+                .save(output, id("rbmk_lid_glass_2"));
+
+        // CE :837-839 = pile_device (3 variants: metadata 0,1,2)
+        TagKey<Item> boronIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_BORON);
+        TagKey<Item> steelCastPlateTagLocal = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pile_device"))
+                .pattern(" A ").pattern("CBS")
+                .define('A', aluminumPlateTag)
+                .define('C', steelCastPlateTagLocal)
+                .define('B', boronIngotTag)
+                .define('S', steelShellTag)
+                .unlockedBy("has_boron", has(boronIngotTag))
+                .save(output, id("pile_device_0"));
+
+        TagKey<Item> copperShellTag = MaterialShapes.SHELL.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pile_device_fuel"))
+                .pattern(" M ").pattern("ACA").pattern(" S ")
+                .define('M', item("motor"))
+                .define('A', aluminumPlateTag)
+                .define('C', copperShellTag)
+                .define('S', steelCastPlateTagLocal)
+                .unlockedBy("has_motor", has(item("motor")))
+                .save(output, id("pile_device_1"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pile_device_absorber"))
+                .pattern(" B ").pattern("SBS").pattern("SBS")
+                .define('B', boronIngotTag)
+                .define('S', steelPlateTag)
+                .unlockedBy("has_boron", has(boronIngotTag))
+                .save(output, id("pile_device_2"));
+
+        // CE :842 = rbmk_moderator = " G ","GRG"," G ", G=GRAPHITE.block(), R=rbmk_blank
+        TagKey<Item> graphiteBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_GRAPHITE);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_moderator"))
+                .pattern(" G ").pattern("GRG").pattern(" G ")
+                .define('G', graphiteBlockTag)
+                .define('R', block("rbmk_blank"))
+                .unlockedBy("has_blank", has(block("rbmk_blank")))
+                .save(output, id("rbmk_moderator"));
+
+        // CE :843 = rbmk_absorber = "GGG","GRG","GGG", G=B.ingot(), R=rbmk_blank
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_absorber"))
+                .pattern("GGG").pattern("GRG").pattern("GGG")
+                .define('G', boronIngotTag)
+                .define('R', block("rbmk_blank"))
+                .unlockedBy("has_blank", has(block("rbmk_blank")))
+                .save(output, id("rbmk_absorber"));
     }
 
     // ================================================================================================
