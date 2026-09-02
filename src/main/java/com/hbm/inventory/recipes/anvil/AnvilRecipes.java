@@ -76,6 +76,13 @@ public final class AnvilRecipes {
             smith(1, stack("anvil_osmiridium"), cmp(base), tag("ingots/osmiridium", 10));
         }
         smith(1, stack("ingot_gunmetal"), tag("ingots/copper"), tag("ingots/aluminum"));
+
+        // CE :76-80 — dusted steel purity progression (0→1, 1→2, ..., 8→9) + chainsteel
+        for (int i = 0; i < 9; i++) {
+            smithHot(3, "ingot_steel_dusted_" + i, "ingot_steel_dusted_" + i, "ingot_steel_dusted_" + (i + 1));
+        }
+        smithHot(3, "ingot_steel_dusted_9", "ingot_steel_dusted_9", "ingot_chainsteel");
+
         // CE :93 — regular smithing, not hot
         smith(1916169, stack("wings_murk"), cmp("wings_limp"), cmp("particle_tachyon"));
         // CE :94 — ItemFlask flattened to single SHIELD item

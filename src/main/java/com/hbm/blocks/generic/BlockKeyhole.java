@@ -61,6 +61,10 @@ public class BlockKeyhole extends Block {
     /**
      * CE {@code BlockKeyhole.generateRoom} — 9×9×5 red room filled with ItemPoolsRedRoom loot.
      * Simplified: spawns frame + floor/roof, fills with crates (no ItemPools wiring yet).
+     * TODO(CE: BlockKeyhole.java:202-219) NCRPA/Trenchmaster armor loot (5% via deco_loot) +
+     * pedestal loot (95% via ItemPoolsRedRoom.POOL_RED_PEDESTAL) deferred until BlockPedestal/
+     * BlockLoot are ported (both missing). Armor items exist in PoweredArmorItems, pool exists
+     * in ItemPoolsRedRoom, but block entities + TileEntityPedestal stack-setting logic not ported.
      */
     protected void generateRoom(Level level, BlockPos origin) {
         int size = 9;

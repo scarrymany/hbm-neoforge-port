@@ -235,9 +235,9 @@ public final class IngotNuggetItems {
     public static final DeferredItem<Item> INGOT_UNOBTAINIUM = registerIngot("ingot_unobtainium");
     public static final DeferredItem<Item> INGOT_DAFFERGON = registerIngot("ingot_daffergon");
 
-    // ItemHotDusted, damage 0-9 = forging purity level, heat mechanic deferred (see class javadoc).
-    // Confirmed still-referenced by AnvilRecipes/SmeltingRecipes across all 10 purity levels.
-    public static final List<DeferredItem<Item>> INGOT_STEEL_DUSTED = registerIngotSeries("ingot_steel_dusted", STEEL_DUSTED_VARIANT_COUNT);
+    // ItemHotDusted ported as 10 separate ItemHot instances with decreasing maxHeat (200 - purity*10).
+    // CE AnvilRecipes.java:76-80 confirms 10 hot-smithing recipes for purity progression 0→1..8→9 + chainsteel.
+    public static final List<DeferredItem<Item>> INGOT_STEEL_DUSTED = registerHotDustedSeries("ingot_steel_dusted", STEEL_DUSTED_VARIANT_COUNT);
 
     // ItemHot, heat-glow behavior ported. maxHeat constants confirmed against CE's ModItems.java
     // lines 884-886 (new ItemHot(100, "ingot_chainsteel") / new ItemHot(200, "ingot_meteorite") /
@@ -395,6 +395,17 @@ public final class IngotNuggetItems {
         List<DeferredItem<Item>> items = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             items.add(registerIngot(baseName + "_" + i));
+        }
+        return List.copyOf(items);
+    }
+
+    /** CE ItemHotDusted ported as N ItemHot instances with maxHeat = 200 - purity*10. */
+    private static List<DeferredItem<Item>> registerHotDustedSeries(String baseName, int count) {
+        List<DeferredItem<Item>> items = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            final int purity = i;
+            int maxHeat = 200 - purity * 10;
+            items.add(register(baseName + "_" + i, () -> new ItemHot(new Item.Properties(), maxHeat)));
         }
         return List.copyOf(items);
     }
