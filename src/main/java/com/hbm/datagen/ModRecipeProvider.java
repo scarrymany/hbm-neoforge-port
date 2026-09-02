@@ -3930,6 +3930,133 @@ public class ModRecipeProvider extends RecipeProvider {
                 .requires(Items.QUARTZ)
                 .unlockedBy("has_spider_eye", has(Items.SPIDER_EYE))
                 .save(output, id("powder_poison"));
+
+        // ---- CraftingManager.java:551-590 crafts (bombs, batteries, keys). ----
+        // CE :551 = det_cord (x4) = " P ","PGP"," P ", P=paper, G=gunpowder
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("det_cord"), 4)
+                .pattern(" P ").pattern("PGP").pattern(" P ")
+                .define('P', Items.PAPER)
+                .define('G', Items.GUNPOWDER)
+                .unlockedBy("has_gunpowder", has(Items.GUNPOWDER))
+                .save(output, id("block/det_cord"));
+
+        // CE :552 = det_charge = "PDP","DTD","PDP", P=STEEL.plate(), D=det_cord, T=ANY_PLASTICEXPLOSIVE.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("det_charge"))
+                .pattern("PDP").pattern("DTD").pattern("PDP")
+                .define('P', steelPlateTag)
+                .define('D', block("det_cord"))
+                .define('T', item("ingot_c4"))
+                .unlockedBy("has_det_cord", has(block("det_cord")))
+                .save(output, id("block/det_charge"));
+
+        // CE :555 = det_miner (x4) = "FFF","ITI","ITI", F=flint, I=IRON.plate(), T=ball_dynamite
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("det_miner"), 4)
+                .pattern("FFF").pattern("ITI").pattern("ITI")
+                .define('F', Items.FLINT)
+                .define('I', ironPlateTag)
+                .define('T', item("ball_dynamite"))
+                .unlockedBy("has_dynamite", has(item("ball_dynamite")))
+                .save(output, id("block/det_miner_iron"));
+
+        // CE :556 = det_miner (x12) alt with steel + C4
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("det_miner"), 12)
+                .pattern("FFF").pattern("ITI").pattern("ITI")
+                .define('F', Items.FLINT)
+                .define('I', steelPlateTag)
+                .define('T', item("ingot_c4"))
+                .unlockedBy("has_c4", has(item("ingot_c4")))
+                .save(output, id("block/det_miner_steel"));
+
+        // CE :557 = emp_bomb = "LML","LCL","LML", L=PB.plate(), M=magnetron, C=circuit_advanced
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("emp_bomb"))
+                .pattern("LML").pattern("LCL").pattern("LML")
+                .define('L', leadPlateTag)
+                .define('M', item("magnetron"))
+                .define('C', item("circuit_advanced"))
+                .unlockedBy("has_magnetron", has(item("magnetron")))
+                .save(output, id("block/emp_bomb"));
+
+        // CE :558 = charge_dynamite shapeless = stick_dynamite x3 + ducttape
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, block("charge_dynamite"))
+                .requires(item("stick_dynamite"))
+                .requires(item("stick_dynamite"))
+                .requires(item("stick_dynamite"))
+                .requires(item("ducttape"))
+                .unlockedBy("has_dynamite_stick", has(item("stick_dynamite")))
+                .save(output, id("block/charge_dynamite"));
+
+        // CE :559 = charge_miner = " F ","FCF"," F ", F=flint, C=charge_dynamite
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("charge_miner"))
+                .pattern(" F ").pattern("FCF").pattern(" F ")
+                .define('F', Items.FLINT)
+                .define('C', block("charge_dynamite"))
+                .unlockedBy("has_charge", has(block("charge_dynamite")))
+                .save(output, id("block/charge_miner"));
+
+        // CE :562-563 = hev_battery (x4) two variants
+        TagKey<Item> goldWireFineTagLocal = MaterialShapes.WIRE.commonTag(Mats.MAT_GOLD);
+        TagKey<Item> coTag = MaterialShapes.DUST.commonTag(Mats.MAT_COBALT);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("hev_battery"), 4)
+                .pattern(" W ").pattern("IEI").pattern("ICI")
+                .define('W', goldWireFineTagLocal)
+                .define('I', ingotPolymer)
+                .define('E', Items.REDSTONE)
+                .define('C', coTag)
+                .unlockedBy("has_polymer", has(ingotPolymer))
+                .save(output, id("hev_battery_1"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("hev_battery"), 4)
+                .pattern(" W ").pattern("ICI").pattern("IEI")
+                .define('W', goldWireFineTagLocal)
+                .define('I', ingotPolymer)
+                .define('E', Items.REDSTONE)
+                .define('C', coTag)
+                .unlockedBy("has_polymer", has(ingotPolymer))
+                .save(output, id("hev_battery_2"));
+
+        // CE :579 = key = "  B"," B ","P  ", P=STEEL.plate(), B=STEEL.bolt()
+        TagKey<Item> steelBoltTagLocal3 = MaterialShapes.BOLT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("key"))
+                .pattern("  B").pattern(" B ").pattern("P  ")
+                .define('P', steelPlateTag)
+                .define('B', steelBoltTagLocal3)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("key"));
+
+        // CE :582 = pin = "W "," W"," W", W=CU.wireFine()
+        TagKey<Item> copperWireFineTagLocal = MaterialShapes.WIRE.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("pin"))
+                .pattern("W ").pattern(" W").pattern(" W")
+                .define('W', copperWireFineTagLocal)
+                .unlockedBy("has_copper_wire", has(copperWireFineTagLocal))
+                .save(output, id("pin"));
+
+        // CE :583 = padlock_rusty = "I","B","I", I=IRON.ingot(), B=STEEL.bolt()
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("padlock_rusty"))
+                .pattern("I").pattern("B").pattern("I")
+                .define('I', Items.IRON_INGOT)
+                .define('B', steelBoltTagLocal3)
+                .unlockedBy("has_iron", has(Items.IRON_INGOT))
+                .save(output, id("padlock_rusty"));
+
+        // CE :584 = padlock = " P ","PBP","PPP", P=STEEL.plate(), B=STEEL.bolt()
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("padlock"))
+                .pattern(" P ").pattern("PBP").pattern("PPP")
+                .define('P', steelPlateTag)
+                .define('B', steelBoltTagLocal3)
+                .unlockedBy("has_steel_plate", has(steelPlateTag))
+                .save(output, id("padlock"));
+
+        // CE :585 = padlock_reinforced = " P ","PBP","PDP", P=DURA.plate(), D=plate_desh, B=DURA.bolt()
+        TagKey<Item> duraPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_DURA);
+        TagKey<Item> duraBoltTag = MaterialShapes.BOLT.commonTag(Mats.MAT_DURA);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("padlock_reinforced"))
+                .pattern(" P ").pattern("PBP").pattern("PDP")
+                .define('P', duraPlateTag)
+                .define('D', item("plate_desh"))
+                .define('B', duraBoltTag)
+                .unlockedBy("has_desh_plate", has(item("plate_desh")))
+                .save(output, id("padlock_reinforced"));
     }
 
     // ================================================================================================
