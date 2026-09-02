@@ -56,6 +56,10 @@ public final class ModBlocks {
     public static DeferredBlock<BlockRotatablePillar> BLOCK_SCHRABIDIUM_CLUSTER;
     public static DeferredBlock<BlockRotatablePillar> BLOCK_EUPHEMIUM_CLUSTER;
 
+    public static DeferredBlock<com.hbm.blocks.BlockBase> BRICK_OBSIDIAN;
+    public static DeferredBlock<com.hbm.blocks.machine.CrateBlock> CRATE_STEEL;
+    public static DeferredBlock<com.hbm.blocks.generic.BlockModDoor> DOOR_RED;
+
     // Lighting machines
     public static DeferredBlock<com.hbm.blocks.machine.Floodlight> FLOODLIGHT;
     public static DeferredBlock<com.hbm.blocks.machine.FloodlightBeam> FLOODLIGHT_BEAM;

@@ -88,7 +88,7 @@ public final class Phase8Blocks {
         registerBlock("brick_concrete_broken", () -> new BlockBase(stone(15.0F, 45.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("brick_light", () -> new BlockBase(stone(15.0F, 20.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("brick_asbestos", () -> new BlockBase(stone(15.0F, 40.0F)), ModCreativeTabs.BLOCKS);
-        registerBlock("brick_obsidian", () -> new BlockBase(stone(15.0F, 120.0F)), ModCreativeTabs.BLOCKS);
+        ModBlocks.BRICK_OBSIDIAN = registerBlock("brick_obsidian", () -> new BlockBase(stone(15.0F, 120.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("cmb_brick", () -> new BlockBase(BlockBehaviour.Properties.of().strength(25.0F, 5000.0F).sound(SoundType.METAL)), ModCreativeTabs.BLOCKS);
         registerBlock("concrete", () -> new BlockBase(stone(15.0F, 140.0F), true), ModCreativeTabs.BLOCKS);
         registerBlock("concrete_smooth", () -> new BlockBase(stone(15.0F, 140.0F), true), ModCreativeTabs.BLOCKS);

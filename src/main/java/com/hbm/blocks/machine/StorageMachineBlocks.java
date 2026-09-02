@@ -75,18 +75,19 @@ public final class StorageMachineBlocks {
 
     private static void registerCrates() {
         registerCrate(CrateType.IRON, "crate_iron", 5.0F, 10.0F);
-        registerCrate(CrateType.STEEL, "crate_steel", 5.0F, 20.0F);
+        ModBlocks.CRATE_STEEL = registerCrate(CrateType.STEEL, "crate_steel", 5.0F, 20.0F);
         registerCrate(CrateType.TUNGSTEN, "crate_tungsten", 15.0F, 10000.0F);
         registerCrate(CrateType.DESH, "crate_desh", 7.5F, 300.0F);
         registerCrate(CrateType.SAFE, "safe", 7.5F, 10000.0F);
     }
 
-    private static void registerCrate(CrateType type, String name, float hardness, float resistance) {
+    private static DeferredBlock<CrateBlock> registerCrate(CrateType type, String name, float hardness, float resistance) {
         DeferredBlock<CrateBlock> block = ModBlocks.BLOCKS.register(name,
                 () -> new CrateBlock(BlockBehaviour.Properties.of().strength(hardness, resistance).sound(SoundType.METAL), type));
         ModItems.ITEMS.register(name, () -> new CrateBlockItem(block.get(), new Item.Properties()));
         CreativeTabContents.add(ModCreativeTabs.MACHINE, block);
         CRATES.put(type, block);
+        return block;
     }
 
     private static void registerBatteries() {

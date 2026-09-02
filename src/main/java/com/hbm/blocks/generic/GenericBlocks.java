@@ -300,7 +300,8 @@ public final class GenericBlocks {
     }
 
     private static void registerDoors() {
-        registerBlock("door_red", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()), null);
+        ModBlocks.DOOR_RED = registerBlock("door_red", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()), null);
+        registerBlock("stone_keyhole", () -> new BlockKeyhole(BlockBehaviour.Properties.of().strength(1.5F, 6.0F).sound(SoundType.STONE)), null);
         registerBlock("door_metal", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(5.0F, 5.0F).sound(SoundType.METAL).noOcclusion()), null);
         registerBlock("door_office", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 10.0F).sound(SoundType.METAL).noOcclusion()), null);
         registerBlock("door_bunker", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()), null);
