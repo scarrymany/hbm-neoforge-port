@@ -3,12 +3,15 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.HeaterOvenBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.HeaterOvenMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 /** CE {@code GUIFirebox} for the brick oven. */
 public class HeaterOvenScreen extends GuiInfoContainer<HeaterOvenMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/machine/gui_heating_oven.png");
 
     public HeaterOvenScreen(HeaterOvenMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -21,12 +24,11 @@ public class HeaterOvenScreen extends GuiInfoContainer<HeaterOvenMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         HeaterOvenBlockEntity be = this.getMenu().be;
         int bh = be.maxBurnTime <= 0 ? 0 : be.burnTime * 14 / be.maxBurnTime;
-        guiGraphics.fill(x + 80, y + 54 + (14 - bh), x + 94, y + 68, 0xFFFF6622);
+        if (bh > 0) guiGraphics.blit(TEXTURE, x + 80, y + 54 + (14 - bh), 176, 14 - bh, 14, bh);
         int hh = be.heatEnergy * 52 / HeaterOvenBlockEntity.OVEN_MAX_HEAT;
         guiGraphics.fill(x + 143, y + 70 - hh, x + 159, y + 70, 0xFFFF4400);
     }

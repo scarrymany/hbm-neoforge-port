@@ -3,12 +3,15 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachinePyroOvenBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.PyroOvenMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 /** CE {@code GUIPyroOven} 176×204 — 2 tanks + power + progress. */
 public class PyroOvenScreen extends GuiInfoContainer<PyroOvenMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_pyrooven.png");
 
     public PyroOvenScreen(PyroOvenMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -21,14 +24,13 @@ public class PyroOvenScreen extends GuiInfoContainer<PyroOvenMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachinePyroOvenBlockEntity be = this.getMenu().be;
         int ph = (int) (be.getPower() * 52 / Math.max(1, be.getMaxPower()));
-        guiGraphics.fill(x + 152, y + 70 - ph, x + 168, y + 70, 0xFFFFCC00);
+        if (ph > 0) guiGraphics.blit(TEXTURE, x + 152, y + 70 - ph, 176, 52 - ph, 16, ph);
         int p = (int) (be.progress * 27);
-        guiGraphics.fill(x + 57, y + 47, x + 57 + p, y + 59, be.isProgressing ? 0xFFFF8800 : 0xFF664400);
+        if (p > 0) guiGraphics.fill(x + 57, y + 47, x + 57 + p, y + 59, be.isProgressing ? 0xFFFF8800 : 0xFF664400);
         be.input.renderTank(x + 8, y + 70, 0, 16, 52);
         be.output.renderTank(x + 116, y + 70, 0, 16, 52);
     }

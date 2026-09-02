@@ -3,13 +3,17 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachineBrickFurnaceBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.BrickFurnaceMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 public class BrickFurnaceScreen extends GuiInfoContainer<BrickFurnaceMenu> {
 
-    public BrickFurnaceScreen(BrickFurnaceMenu menu, Inventory inventory, Component title) {
+        private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_furnace_brick.png");
+
+public BrickFurnaceScreen(BrickFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 168;
@@ -20,8 +24,7 @@ public class BrickFurnaceScreen extends GuiInfoContainer<BrickFurnaceMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineBrickFurnaceBlockEntity be = this.getMenu().be;
         int bh = be.maxBurnTime <= 0 ? 0 : be.burnTime * 14 / be.maxBurnTime;

@@ -3,14 +3,18 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachineRadiolysisBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.RadiolysisMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 /** CE {@code GUIRadiolysis} — 3 tanks + RTG heat + power. Wide for 2×5 pellet grid. */
 public class RadiolysisScreen extends GuiInfoContainer<RadiolysisMenu> {
 
-    public RadiolysisScreen(RadiolysisMenu menu, Inventory inventory, Component title) {
+        private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_electrolyser_fluid.png");
+
+public RadiolysisScreen(RadiolysisMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 230;
         this.imageHeight = 166;
@@ -21,8 +25,7 @@ public class RadiolysisScreen extends GuiInfoContainer<RadiolysisMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineRadiolysisBlockEntity be = this.getMenu().be;
         int ph = (int) (be.getPower() * 34 / Math.max(1, be.getMaxPower()));
