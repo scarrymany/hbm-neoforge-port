@@ -3043,14 +3043,60 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("component/deuterium_filter"));
 
         // ---- Fins/turbines/components (CraftingManager.java:225-244). ----
-        // Skip fins_* and pedestal_steel (missing blade_titanium/fins_* items, CE uses EnumPartType).
-        // turbine_titanium (CE :234) = "BBB","BSB","BBB", B=blade_titanium, S=STEEL.ingot()
-        // Skip: blade_titanium item not registered (CE line 233 is just Item, no enum).
+        // tank_steel (CE :217) = "STS","S S","STS", S=STEEL.plate(), T=TI.plate()
+        Item tankSteel = item("tank_steel");
+        TagKey<Item> titaniumPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_TITANIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, tankSteel, 2)
+                .pattern("STS").pattern("S S").pattern("STS")
+                .define('S', plateSteel)
+                .define('T', titaniumPlateTag)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("component/tank_steel"));
 
-        // turbine_tungsten (CE :241) = "BBB","BSB","BBB", B=blade_tungsten, S=DURA.ingot()
-        // Skip: blade_tungsten item not registered.
+        // fins_flat (CE :225) = "IP","PP","IP", P=STEEL.plate(), I=STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fins_flat"))
+                .pattern("IP").pattern("PP").pattern("IP")
+                .define('P', plateSteel)
+                .define('I', ingotSteel)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("component/fins_flat"));
 
-        // sphere_steel (CE :229) = "PIP","I I","PIP", P=STEEL.plate(), I=STEEL.ingot()
+        // fins_small_steel (CE :226) = " PP","PII"," PP", P=STEEL.plate(), I=STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fins_small_steel"))
+                .pattern(" PP").pattern("PII").pattern(" PP")
+                .define('P', plateSteel)
+                .define('I', ingotSteel)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("component/fins_small_steel"));
+
+        // fins_big_steel (CE :227) = " PI","III"," PI", P=STEEL.plate(), I=STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fins_big_steel"))
+                .pattern(" PI").pattern("III").pattern(" PI")
+                .define('P', plateSteel)
+                .define('I', ingotSteel)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("component/fins_big_steel"));
+
+        // fins_tri_steel (CE :228) = " PI","IIB"," PI", P=STEEL.plate(), I=STEEL.ingot(), B=STEEL.block()
+        TagKey<Item> steelBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fins_tri_steel"))
+                .pattern(" PI").pattern("IIB").pattern(" PI")
+                .define('P', plateSteel)
+                .define('I', ingotSteel)
+                .define('B', steelBlockTag)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("component/fins_tri_steel"));
+
+        // fins_quad_titanium (CE :229) = " PP","III"," PP", P=TI.plate(), I=TI.ingot()
+        TagKey<Item> titaniumIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_TITANIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fins_quad_titanium"))
+                .pattern(" PP").pattern("III").pattern(" PP")
+                .define('P', titaniumPlateTag)
+                .define('I', titaniumIngotTag)
+                .unlockedBy("has_plate", has(titaniumPlateTag))
+                .save(output, id("component/fins_quad_titanium"));
+
+        // sphere_steel (CE :230) = "PIP","I I","PIP", P=STEEL.plate(), I=STEEL.ingot()
         Item sphereSteel = item("sphere_steel");
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, sphereSteel)
                 .pattern("PIP").pattern("I I").pattern("PIP")
@@ -3058,6 +3104,38 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('I', ingotSteel)
                 .unlockedBy("has_plate", has(plateSteel))
                 .save(output, id("component/sphere_steel"));
+
+        // pedestal_steel (CE :231) = "P P","P P","III", P=STEEL.plate(), I=STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("pedestal_steel"))
+                .pattern("P P").pattern("P P").pattern("III")
+                .define('P', plateSteel)
+                .define('I', ingotSteel)
+                .unlockedBy("has_plate", has(plateSteel))
+                .save(output, id("component/pedestal_steel"));
+
+        // blade_titanium (CE :233) = "TP","TP","TT", T=TI.ingot(), P=TI.plate()
+        Item bladeTitanium = item("blade_titanium");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, bladeTitanium, 2)
+                .pattern("TP").pattern("TP").pattern("TT")
+                .define('T', titaniumIngotTag)
+                .define('P', titaniumPlateTag)
+                .unlockedBy("has_titanium", has(titaniumIngotTag))
+                .save(output, id("component/blade_titanium"));
+
+        // turbine_titanium (CE :234) = "BBB","BSB","BBB", B=blade_titanium, S=STEEL.ingot()
+        Item turbineTitanium = item("turbine_titanium");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, turbineTitanium)
+                .pattern("BBB").pattern("BSB").pattern("BBB")
+                .define('B', bladeTitanium)
+                .define('S', ingotSteel)
+                .unlockedBy("has_blade", has(bladeTitanium))
+                .save(output, id("component/turbine_titanium"));
+
+        // blade_tungsten (CE uses plain Item, no specific craft - derived from blade_titanium pattern)
+        // Skip blade_tungsten craft (not in CE CraftingManager :217-320 range).
+
+        // turbine_tungsten (CE :241) = "BBB","BSB","BBB", B=blade_tungsten, S=DURA.ingot()
+        // Skip: blade_tungsten has no craft in CE :217-320 (blade item exists but no crafting recipe).
 
         // ring_starmetal (CE :242) = " S ","S S"," S ", S=STAR.ingot()
         TagKey<Item> starmetalIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_STAR);
@@ -3080,6 +3158,25 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('T', durasteelPipeTag)
                 .unlockedBy("has_beryllium", has(berylliumBlockTag))
                 .save(output, id("component/flywheel_beryllium"));
+
+        // ---- Tools/consumables (CraftingManager.java:251-258). ----
+        // Items.PAPER (CE :251) = "SSS", S=powder_sawdust
+        Item powderSawdust = item("powder_sawdust");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.PAPER, 3)
+                .pattern("SSS")
+                .define('S', powderSawdust)
+                .unlockedBy("has_sawdust", has(powderSawdust))
+                .save(output, id("crafting/paper_from_sawdust"));
+
+        // ducttape (CE :258) = "F","P","S", F=Items.STRING, P=Items.PAPER, S=KEY_SLIME
+        Item ducttape = item("ducttape");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, ducttape, 4)
+                .pattern("F").pattern("P").pattern("S")
+                .define('F', Items.STRING)
+                .define('P', Items.PAPER)
+                .define('S', Items.SLIME_BALL)
+                .unlockedBy("has_paper", has(Items.PAPER))
+                .save(output, id("component/ducttape"));
 
         // ---- Lighting machines (CraftingManager.java:486). ----
         // floodlight = "CSC","TST","G G", C=circuit_capacitor, S=STEEL.plate(), T=coil_tungsten, G=KEY_ANYPANE
