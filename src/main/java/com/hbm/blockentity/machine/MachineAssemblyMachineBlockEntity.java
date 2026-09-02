@@ -261,6 +261,13 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
                     } else {
                         current.grow(output.getCount());
                     }
+
+                    // CE TileEntityMachineAssemblyMachine.java:273-275: battery-slot sword upgrade
+                    // (alloyed → machined) when any recipe completes successfully.
+                    ItemStack battery = inventory.getStackInSlot(BATTERY_SLOT);
+                    if (!battery.isEmpty() && battery.getItem() == com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_ALLOYED.get()) {
+                        inventory.setStackInSlot(BATTERY_SLOT, new ItemStack(com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_MACHINED.get()));
+                    }
                 }
             }
         }

@@ -417,6 +417,20 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_circuit", has(circuitAdvanced))
                 .save(output, id("tool/linker"));
 
+        // Meteorite sword chain: blade_meteorite → meteorite_sword (CE pattern: sword-shaped "I","I","S").
+        // CE SmeltingRecipes.java:165 smelts the base meteorite_sword → meteorite_sword_seared with
+        // 0.0 XP (the heatUp mechanic). See smelting section below for that upgrade.
+        Item bladeMeteorite = item("blade_meteorite");
+        Item meteoriteSword = item("meteorite_sword");
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, meteoriteSword)
+                .pattern("B")
+                .pattern("B")
+                .pattern("S")
+                .define('B', bladeMeteorite)
+                .define('S', Items.STICK)
+                .unlockedBy("has_blade", has(bladeMeteorite))
+                .save(output, id("tool/meteorite_sword"));
+
         // Deliberately not ported (see class javadoc for the full reasoning):
         // - elec_sword/_pickaxe/_axe/_shovel, centri_stick, smashing_hammer, chainsaw, matchstick,
         //   carts, lead_gavel, pipe_lead, designator/designator_manual/designator_arty_range and the
@@ -1639,8 +1653,9 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // SmeltingRecipes.java:161-163: ItemHot.heatUp self-smelts. Only the 3 entries whose item is
         // actually ItemHot-backed (and so actually consumes the resulting hbm:heat component,
-        // ItemHot.java's inventoryTick) are ported - blade_meteorite/meteorite_sword (lines 164-165)
-        // need items this port doesn't have at all (see class javadoc), and the 10-entry
+        // ItemHot.java's inventoryTick) are ported. blade_meteorite (line 164) is now registered in
+        // IngotNuggetItems and uses the same heatSelfSmelt pattern below. meteorite_sword (line 165)
+        // is now handled via a real sword→seared upgrade (see below). The 10-entry
         // ingot_steel_dusted loop (lines 169-170) is deliberately NOT ported here even though every
         // id it needs already exists: IngotNuggetItems.java's own javadoc documents
         // ingot_steel_dusted as a plain Item with "heat mechanic deferred... no ItemHotDusted port
@@ -1657,6 +1672,14 @@ public class ModRecipeProvider extends RecipeProvider {
         heatSelfSmelt(output, "ingot_chainsteel", 100);
         heatSelfSmelt(output, "ingot_meteorite", 200);
         heatSelfSmelt(output, "ingot_meteorite_forged", 200);
+        heatSelfSmelt(output, "blade_meteorite", 200);
+
+        // CE SmeltingRecipes.java:165: meteorite_sword → meteorite_sword_seared (real upgrade, 0.0 XP).
+        Item meteoriteSword = item("meteorite_sword");
+        Item meteoriteSwordSeared = item("meteorite_sword_seared");
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(meteoriteSword), RecipeCategory.MISC, new ItemStack(meteoriteSwordSeared, 1), 0.0F, 200)
+                .unlockedBy("has_sword", has(meteoriteSword))
+                .save(output, id("smelting/meteorite_sword_to_seared"));
     }
 
     private static void heatSelfSmelt(RecipeOutput output, String path, int maxHeat) {
