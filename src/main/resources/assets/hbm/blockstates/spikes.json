@@ -1,12 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures": {},
-    "model": "hbm:block/spikes.obj"
-  },
   "variants": {
-    "": [
-      {}
-    ]
+    "": {
+      "model": "hbm:block/spikes"
+    }
   }
 }

@@ -1,12 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures": {},
-    "model": "hbm:block/barrel_red.obj"
-  },
   "variants": {
-    "": [
-      {}
-    ]
+    "": {
+      "model": "hbm:block/red_barrel"
+    }
   }
 }

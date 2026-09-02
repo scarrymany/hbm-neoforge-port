@@ -1,12 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures": {},
-    "model": "hbm:block/antenna_top.obj"
-  },
   "variants": {
-    "": [
-      {}
-    ]
+    "": {
+      "model": "hbm:block/pole_top"
+    }
   }
 }

@@ -1,12 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures": {},
-    "model": "hbm:block/barrel_taint.obj"
-  },
   "variants": {
-    "": [
-      {}
-    ]
+    "": {
+      "model": "hbm:block/taint_barrel"
+    }
   }
 }
