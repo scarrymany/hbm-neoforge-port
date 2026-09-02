@@ -1,14 +1,17 @@
 package com.hbm.inventory.gui;
 
 import com.hbm.inventory.container.LemegetonMenu;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * CE {@code GUILemegeton} — 1-in/1-out conversion. Fill-panel (CE texture not in this tree).
- */
+/** CE {@code GUILemegeton} — 1-in/1-out conversion, 176×166 PNG. */
 public class LemegetonScreen extends GuiInfoContainer<LemegetonMenu> {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_lemegeton.png");
 
     public LemegetonScreen(LemegetonMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -18,13 +21,12 @@ public class LemegetonScreen extends GuiInfoContainer<LemegetonMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, 0xC0C6C6C6);
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawString(this.font, "Material Upgrade Conversion", leftPos + 28, topPos + 6, 0x404040, false);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }
