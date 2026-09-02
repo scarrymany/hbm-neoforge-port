@@ -25,9 +25,7 @@ import java.util.List;
  * the flattened autogen / already-registered I/O exists.
  * Ported: 8 {@link AnvilSmithingHotRecipe} (meteorite + cobalt decoration + meteorite_sword_reforged) + 18
  * {@link AnvilSmithingMold} + {@link AnvilSmithingCyanideRecipe} + {@link AnvilSmithingRenameRecipe}
- * + 9 mold-construction rows ({@code :626-635}).
- * TODO(CE: AnvilRecipes.java:75-80) 9 dusted-steel + chainsteel — {@code ingot_steel_dusted_*} is a
- * plain {@code Item}, not {@code ItemHotDusted}. Do not invent.
+ * + 9 dusted steel purity progression + chainsteel + 9 mold-construction rows ({@code :626-635}).
  */
 public final class AnvilRecipes {
 
@@ -57,9 +55,9 @@ public final class AnvilRecipes {
     }
 
     /**
-     * CE {@code :59-131} anvil upgrades + gunmetal + hot (I/O that exists) + mold smithing + cyanide + rename.
+     * CE {@code :59-131} anvil upgrades + gunmetal + hot (I/O that exists) + dusted steel purity
+     * progression + chainsteel + mold smithing + cyanide + rename.
      * {@code :93} wings_murk and {@code :94} flask_infusion are live (flask flattened SHIELD).
-     * SKIP {@code :75-80} dusted/chainsteel.
      */
     private static void registerSmithing() {
         String[] bases = {"anvil_iron", "anvil_lead"};
