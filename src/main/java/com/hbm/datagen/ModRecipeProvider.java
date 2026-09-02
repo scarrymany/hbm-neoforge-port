@@ -4057,6 +4057,367 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('B', duraBoltTag)
                 .unlockedBy("has_desh_plate", has(item("plate_desh")))
                 .save(output, id("padlock_reinforced"));
+
+        // ---- CraftingManager.java:380-399 crafts (blades_desh, laser_crystals, stamps). ----
+        // CE :380 = blades_desh = " P ","PBP"," P ", P=plate_desh, B=blades_titanium
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("blades_desh"))
+                .pattern(" P ").pattern("PBP").pattern(" P ")
+                .define('P', item("plate_desh"))
+                .define('B', item("blades_titanium"))
+                .unlockedBy("has_titanium_blades", has(item("blades_titanium")))
+                .save(output, id("blades_desh"));
+
+        // CE :384 = laser_crystal_co2 = "QDQ","NCN","QDQ", Q=glass_quartz, D=DESH.ingot(), N=NB.ingot(), C=fluid_tank_full(CO2)
+        TagKey<Item> deshIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_DESH);
+        TagKey<Item> niobiumIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_NIOBIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("laser_crystal_co2"))
+                .pattern("QDQ").pattern("NCN").pattern("QDQ")
+                .define('Q', block("glass_quartz"))
+                .define('D', deshIngotTag)
+                .define('N', niobiumIngotTag)
+                .define('C', item("gas_co2"))
+                .unlockedBy("has_glass_quartz", has(block("glass_quartz")))
+                .save(output, id("laser_crystal_co2"));
+
+        // CE :385 = laser_crystal_bismuth = "QUQ","BCB","QTQ", Q=glass_quartz, U=U.ingot(), T=TH232.ingot(), B=nugget_bismuth, C=crystal_rare
+        TagKey<Item> uraniumIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_URANIUM);
+        TagKey<Item> thoriumIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_THORIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("laser_crystal_bismuth"))
+                .pattern("QUQ").pattern("BCB").pattern("QTQ")
+                .define('Q', block("glass_quartz"))
+                .define('U', uraniumIngotTag)
+                .define('T', thoriumIngotTag)
+                .define('B', item("nugget_bismuth"))
+                .define('C', item("crystal_rare"))
+                .unlockedBy("has_rare_crystal", has(item("crystal_rare")))
+                .save(output, id("laser_crystal_bismuth"));
+
+        // CE :386 = laser_crystal_cmb = "QBQ","CSC","QBQ", Q=glass_quartz, B=CMB.ingot(), C=SBD.ingot(), S=cell(AMAT)
+        TagKey<Item> cmbIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_CMB);
+        TagKey<Item> sbdIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_SCHRABIDIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("laser_crystal_cmb"))
+                .pattern("QBQ").pattern("CSC").pattern("QBQ")
+                .define('Q', block("glass_quartz"))
+                .define('B', cmbIngotTag)
+                .define('C', sbdIngotTag)
+                .define('S', item("antimatter"))
+                .unlockedBy("has_antimatter", has(item("antimatter")))
+                .save(output, id("laser_crystal_cmb"));
+
+        // CE :387 = laser_crystal_bale = "QDQ","SBS","QDQ", Q=glass_quartz, D=DNT.ingot(), B=egg_balefire, S=powder_spark_mix
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("laser_crystal_bale"))
+                .pattern("QDQ").pattern("SBS").pattern("QDQ")
+                .define('Q', block("glass_quartz"))
+                .define('D', item("ingot_dineutronium"))
+                .define('B', item("egg_balefire_shard"))
+                .define('S', item("powder_spark_mix"))
+                .unlockedBy("has_balefire", has(item("egg_balefire_shard")))
+                .save(output, id("laser_crystal_bale"));
+
+        // CE :388 = laser_crystal_digamma = "QUQ","UEU","QUQ", Q=glass_quartz, U=undefined, E=ingot_electronium
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("laser_crystal_digamma"))
+                .pattern("QUQ").pattern("UEU").pattern("QUQ")
+                .define('Q', block("glass_quartz"))
+                .define('U', item("undefined"))
+                .define('E', item("ingot_electronium"))
+                .unlockedBy("has_undefined", has(item("undefined")))
+                .save(output, id("laser_crystal_digamma"));
+
+        // CE :393-399 = stamp_*_flat (loop with brick/netherbrick)
+        // stamp_stone_flat = "III","SSS", I=brick, S=stone
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_stone_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.BRICK)
+                .define('S', Items.STONE)
+                .unlockedBy("has_brick", has(Items.BRICK))
+                .save(output, id("stamp_stone_flat_brick"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_stone_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.NETHER_BRICK)
+                .define('S', Items.STONE)
+                .unlockedBy("has_nether_brick", has(Items.NETHER_BRICK))
+                .save(output, id("stamp_stone_flat_nether"));
+
+        // stamp_iron_flat
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_iron_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.BRICK)
+                .define('S', Items.IRON_INGOT)
+                .unlockedBy("has_iron", has(Items.IRON_INGOT))
+                .save(output, id("stamp_iron_flat_brick"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_iron_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.NETHER_BRICK)
+                .define('S', Items.IRON_INGOT)
+                .unlockedBy("has_iron", has(Items.IRON_INGOT))
+                .save(output, id("stamp_iron_flat_nether"));
+
+        // stamp_steel_flat
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_steel_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.BRICK)
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("stamp_steel_flat_brick"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_steel_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.NETHER_BRICK)
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("stamp_steel_flat_nether"));
+
+        // stamp_titanium_flat
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_titanium_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.BRICK)
+                .define('S', titaniumIngotTag)
+                .unlockedBy("has_titanium", has(titaniumIngotTag))
+                .save(output, id("stamp_titanium_flat_brick"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_titanium_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.NETHER_BRICK)
+                .define('S', titaniumIngotTag)
+                .unlockedBy("has_titanium", has(titaniumIngotTag))
+                .save(output, id("stamp_titanium_flat_nether"));
+
+        // stamp_obsidian_flat
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_obsidian_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.BRICK)
+                .define('S', Items.OBSIDIAN)
+                .unlockedBy("has_obsidian", has(Items.OBSIDIAN))
+                .save(output, id("stamp_obsidian_flat_brick"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_obsidian_flat"))
+                .pattern("III").pattern("SSS")
+                .define('I', Items.NETHER_BRICK)
+                .define('S', Items.OBSIDIAN)
+                .unlockedBy("has_obsidian", has(Items.OBSIDIAN))
+                .save(output, id("stamp_obsidian_flat_nether"));
+
+        // stamp_desh_flat = "BDB","DSD","BDB", B=brick, D=DESH.ingot(), S=FERRO.ingot()
+        TagKey<Item> ferroIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_FERRO);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_desh_flat"))
+                .pattern("BDB").pattern("DSD").pattern("BDB")
+                .define('B', Items.BRICK)
+                .define('D', deshIngotTag)
+                .define('S', ferroIngotTag)
+                .unlockedBy("has_desh", has(deshIngotTag))
+                .save(output, id("stamp_desh_flat_brick"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("stamp_desh_flat"))
+                .pattern("BDB").pattern("DSD").pattern("BDB")
+                .define('B', Items.NETHER_BRICK)
+                .define('D', deshIngotTag)
+                .define('S', ferroIngotTag)
+                .unlockedBy("has_desh", has(deshIngotTag))
+                .save(output, id("stamp_desh_flat_nether"));
+
+        // ---- CraftingManager.java:540-547 crafts (flame_*, solid_fuel_presto). ----
+        // CE :540 = flame_pony = " O ","DPD"," O ", D=dyePink, O=KEY_YELLOW, P=paper
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("flame_pony"))
+                .pattern(" O ").pattern("DPD").pattern(" O ")
+                .define('D', Items.PINK_DYE)
+                .define('O', Items.YELLOW_DYE)
+                .define('P', Items.PAPER)
+                .unlockedBy("has_paper", has(Items.PAPER))
+                .save(output, id("flame_pony"));
+
+        // CE :545 = solid_fuel_presto = " P ","SRS"," P ", P=paper, S=solid_fuel, R=REDSTONE.dust()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("solid_fuel_presto"))
+                .pattern(" P ").pattern("SRS").pattern(" P ")
+                .define('P', Items.PAPER)
+                .define('S', item("solid_fuel"))
+                .define('R', Items.REDSTONE)
+                .unlockedBy("has_solid_fuel", has(item("solid_fuel")))
+                .save(output, id("solid_fuel_presto"));
+
+        // ---- CraftingManager.java:587-640 crafts (records, fluid ducts, tanks, singularities). ----
+        // SKIP :587 padlock_unbreakable — BIGMT material not added yet
+        // SKIP :588-590 records — ANY_PLASTIC not added yet; defer until plastic material exists
+
+        // CE :592 = polaroid = " C ","RPY"," B ", B=LAPIS.dust(), C=COAL.dust(), R=MINGRADE.dust(), Y=GOLD.dust(), P=paper
+        TagKey<Item> mingradeDustTag = MaterialShapes.DUST.commonTag(Mats.MAT_MINGRADE);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("polaroid"))
+                .pattern(" C ").pattern("RPY").pattern(" B ")
+                .define('B', Items.LAPIS_LAZULI)
+                .define('C', Items.COAL)
+                .define('R', mingradeDustTag)
+                .define('Y', Items.GOLD_INGOT)
+                .define('P', Items.PAPER)
+                .unlockedBy("has_paper", has(Items.PAPER))
+                .save(output, id("polaroid"));
+
+        // SKIP :594-596 crystal_horn/charred/virus/pulsar — endgame meteor dusts not registered yet
+
+        // CE :598-600 = fluid_duct_neo (3 variants) — "SAS","   ","SAS"
+        TagKey<Item> aluminumPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_ALUMINIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_duct_neo"), 8)
+                .pattern("SAS").pattern("   ").pattern("SAS")
+                .define('S', steelPlateTag)
+                .define('A', aluminumPlateTag)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("fluid_duct_neo_0"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_duct_neo"), 8)
+                .pattern("IAI").pattern("   ").pattern("IAI")
+                .define('I', ironPlateTag)
+                .define('A', aluminumPlateTag)
+                .unlockedBy("has_iron", has(ironPlateTag))
+                .save(output, id("fluid_duct_neo_1"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_duct_neo"), 8)
+                .pattern("ASA").pattern("   ").pattern("ASA")
+                .define('S', steelPlateTag)
+                .define('A', aluminumPlateTag)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("fluid_duct_neo_2"));
+
+        // CE :601 = fluid_duct_paintable (x8) = "SAS","A A","SAS", S=STEEL.ingot(), A=AL.plate()
+        TagKey<Item> steelIngotTagLocal2 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_duct_paintable"), 8)
+                .pattern("SAS").pattern("A A").pattern("SAS")
+                .define('S', steelIngotTagLocal2)
+                .define('A', aluminumPlateTag)
+                .unlockedBy("has_steel", has(steelIngotTagLocal2))
+                .save(output, id("fluid_duct_paintable"));
+
+        // CE :602 = fluid_duct_paintable_block_exhaust (x8) = "SAS","A A","SAS", S=IRON.ingot(), A=plate_polymer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_duct_paintable_block_exhaust"), 8)
+                .pattern("SAS").pattern("A A").pattern("SAS")
+                .define('S', Items.IRON_INGOT)
+                .define('A', item("plate_polymer"))
+                .unlockedBy("has_iron", has(Items.IRON_INGOT))
+                .save(output, id("fluid_duct_paintable_block_exhaust"));
+
+        // CE :603 = fluid_duct_gauge shapeless = fluid_duct_paintable + STEEL.ingot() + circuit_basic
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, block("fluid_duct_gauge"))
+                .requires(block("fluid_duct_paintable"))
+                .requires(steelIngotTag)
+                .requires(item("circuit_basic"))
+                .unlockedBy("has_duct", has(block("fluid_duct_paintable")))
+                .save(output, id("fluid_duct_gauge"));
+
+        // CE :604 = fluid_valve = "S","W", S=lever, W=fluid_duct_paintable
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_valve"))
+                .pattern("S").pattern("W")
+                .define('S', Items.LEVER)
+                .define('W', block("fluid_duct_paintable"))
+                .unlockedBy("has_duct", has(block("fluid_duct_paintable")))
+                .save(output, id("fluid_valve"));
+
+        // CE :605 = fluid_switch = "S","W", S=REDSTONE.dust(), W=fluid_duct_paintable
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_switch"))
+                .pattern("S").pattern("W")
+                .define('S', Items.REDSTONE)
+                .define('W', block("fluid_duct_paintable"))
+                .unlockedBy("has_duct", has(block("fluid_duct_paintable")))
+                .save(output, id("fluid_switch"));
+
+        // CE :606 = fluid_counter_valve = "S","W", S=circuit_chip, W=fluid_switch
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_counter_valve"))
+                .pattern("S").pattern("W")
+                .define('S', item("circuit_chip"))
+                .define('W', block("fluid_switch"))
+                .unlockedBy("has_switch", has(block("fluid_switch")))
+                .save(output, id("fluid_counter_valve"));
+
+        // CE :607 = fluid_pump = " S ","PGP","IMI", S=STEEL.shell(), P=STEEL.pipe(), G=GRAPHITE.ingot(), I=STEEL.ingot(), M=motor
+        TagKey<Item> graphiteIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_GRAPHITE);
+        TagKey<Item> steelIngotTagLocal3 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("fluid_pump"))
+                .pattern(" S ").pattern("PGP").pattern("IMI")
+                .define('S', steelShellTag)
+                .define('P', steelPipeTag)
+                .define('G', graphiteIngotTag)
+                .define('I', steelIngotTagLocal3)
+                .define('M', item("motor"))
+                .unlockedBy("has_motor", has(item("motor")))
+                .save(output, id("fluid_pump"));
+
+        // CE :608 = pneumatic_tube (x8) = "CRC", C=CU.plateCast(), R=ANY_RUBBER.ingot()
+        Item ingotRubberLocal = item("ingot_rubber");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pneumatic_tube"), 8)
+                .pattern("CRC")
+                .define('C', copperPlateCastTag)
+                .define('R', ingotRubberLocal)
+                .unlockedBy("has_rubber", has(ingotRubberLocal))
+                .save(output, id("pneumatic_tube_cast"));
+
+        // SKIP :609 pneumatic_tube (x24) welded copper — plateWelded not added yet
+
+        // CE :610 = pneumatic_tube_paintable (x4) = "SAS","A A","SAS", S=STEEL.plate(), A=pneumatic_tube
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pneumatic_tube_paintable"), 4)
+                .pattern("SAS").pattern("A A").pattern("SAS")
+                .define('S', steelPlateTag)
+                .define('A', block("pneumatic_tube"))
+                .unlockedBy("has_tube", has(block("pneumatic_tube")))
+                .save(output, id("pneumatic_tube_paintable"));
+
+        // CE :611 = pipe_anchor (x2) = "P","P","S", P=STEEL.pipe(), S=STEEL.ingot()
+        TagKey<Item> steelIngotTagLocal4 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("pipe_anchor"), 2)
+                .pattern("P").pattern("P").pattern("S")
+                .define('P', steelPipeTag)
+                .define('S', steelIngotTagLocal4)
+                .unlockedBy("has_pipe", has(steelPipeTag))
+                .save(output, id("pipe_anchor"));
+
+        // CE :613 = template_folder = "LPL","BPB","LPL", P=paper, L=dye, B=dye
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("template_folder"))
+                .pattern("LPL").pattern("BPB").pattern("LPL")
+                .define('P', Items.PAPER)
+                .define('L', Items.BLUE_DYE)
+                .define('B', Items.RED_DYE)
+                .unlockedBy("has_paper", has(Items.PAPER))
+                .save(output, id("template_folder"));
+
+        // CE :614 = pellet_antimatter = "###", #=cell(AMAT)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("pellet_antimatter"))
+                .pattern("###").pattern("###").pattern("###")
+                .define('#', item("antimatter"))
+                .unlockedBy("has_antimatter", has(item("antimatter")))
+                .save(output, id("pellet_antimatter"));
+
+        // CE :615 = fluid_tank_empty (x8) = "121","1G1","121", 1=AL.plate(), 2=IRON.plate(), G=KEY_ANYPANE
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fluid_tank_empty"), 8)
+                .pattern("121").pattern("1G1").pattern("121")
+                .define('1', aluminumPlateTag)
+                .define('2', ironPlateTag)
+                .define('G', Items.GLASS_PANE)
+                .unlockedBy("has_aluminum", has(aluminumPlateTag))
+                .save(output, id("fluid_tank_empty"));
+
+        // CE :616 = fluid_tank_lead_empty (x4) = "LUL","LTL","LUL", L=PB.plate(), U=U238.billet(), T=fluid_tank_empty
+        TagKey<Item> leadPlateTagLocal = MaterialShapes.PLATE.commonTag(Mats.MAT_LEAD);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fluid_tank_lead_empty"), 4)
+                .pattern("LUL").pattern("LTL").pattern("LUL")
+                .define('L', leadPlateTagLocal)
+                .define('U', item("billet_u238"))
+                .define('T', item("fluid_tank_empty"))
+                .unlockedBy("has_lead", has(leadPlateTagLocal))
+                .save(output, id("fluid_tank_lead_empty"));
+
+        // CE :617 = fluid_barrel_empty (x2) = "121","1G1","121", 1=STEEL.plate(), 2=AL.plate(), G=KEY_ANYPANE
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("fluid_barrel_empty"), 2)
+                .pattern("121").pattern("1G1").pattern("121")
+                .define('1', steelPlateTag)
+                .define('2', aluminumPlateTag)
+                .define('G', Items.GLASS_PANE)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("fluid_barrel_empty"));
+
+        // SKIP :620-630 fluid_tank_v2/fluid_barrel_v2 + conversions — conditional on config flag
+        // SKIP :633-634 inf_water/inf_water_mk2 — conditional on !enable528
+        // SKIP :637 piston_selenium — requires registered item
+        // SKIP :638 catalyst_clay shapeless — registered but no check needed
+
+        // CE :640-645 = singularity_spark (2 patterns) + ams_core_* — check ingredients
+        // SKIP singularities — plate_euphemium/plate_dalekanium not registered yet
     }
 
     // ================================================================================================
