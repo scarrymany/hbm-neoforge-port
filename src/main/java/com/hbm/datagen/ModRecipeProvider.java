@@ -4508,8 +4508,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_advanced", has(item("circuit_advanced")))
                 .save(output, id("sat_chip"));
 
-        // SKIP :651-657 satellite shapeless conversions — deferred
-        // SKIP :658 geiger_counter shapeless — already registered
+        // CE :651-657 = satellite shapeless conversions (block → item EnumSatType variants)
+        // Note: These require DataComponent-based satellite type system; implementing as item-to-item conversions
+        // SKIP for now — requires satellite DataComponent system port
+
+        // CE :658 = geiger_counter shapeless from block
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, item("geiger_counter"))
+                .requires(block("geiger"))
+                .unlockedBy("has_geiger_block", has(block("geiger")))
+                .save(output, id("geiger_counter_from_block"));
 
         // CE :659 = sat_interface = "ISI","PCP","PAP", I=STEEL.ingot(), S=STAR.ingot(), P=plate_polymer, C=sat_chip, A=circuit_advanced
         TagKey<Item> steelIngotTagLocal5 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
@@ -4866,6 +4873,113 @@ public class ModRecipeProvider extends RecipeProvider {
                 .requires(leadDustTagLocal3)
                 .unlockedBy("has_lead", has(leadDustTagLocal3))
                 .save(output, id("sand_lead"));
+
+        // ---- CraftingManager.java:743-792 crafts (runes, barrels, tesla, upgrades). ----
+        // SKIP :743-749 runes — endgame singularity/powder_magic items not registered yet
+        // SKIP :750 ams_lens — plate_dineutronium not registered yet
+        // SKIP :751-767 ams_catalyst_* — EUPH material not added yet
+
+        // CE :768-770 = barrels
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("barrel_plastic"))
+                .pattern("IPI").pattern("I I").pattern("IPI")
+                .define('I', item("plate_polymer"))
+                .define('P', aluminumPlateTag)
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("barrel_plastic"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("barrel_steel"))
+                .pattern("IPI").pattern("I I").pattern("IPI")
+                .define('I', steelPlateTag)
+                .define('P', steelIngotTag)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("barrel_steel"));
+
+        TagKey<Item> tcalloyIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_TCALLOY);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("barrel_tcalloy"))
+                .pattern("IPI").pattern("I I").pattern("IPI")
+                .define('I', tcalloyIngotTag)
+                .define('P', titaniumPlateTag)
+                .unlockedBy("has_tcalloy", has(tcalloyIngotTag))
+                .save(output, id("barrel_tcalloy"));
+
+        TagKey<Item> saturnPlateTagLocal2 = MaterialShapes.PLATE.commonTag(Mats.MAT_SATURN);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("barrel_antimatter"))
+                .pattern("IPI").pattern("I I").pattern("IPI")
+                .define('I', saturnPlateTagLocal2)
+                .define('P', item("coil_gold_torus"))
+                .unlockedBy("has_saturn", has(saturnPlateTagLocal2))
+                .save(output, id("barrel_antimatter"));
+
+        // CE :771 = tesla = "CCC","PIP","WTW", C=coil_copper, I=IRON.ingot(), P=ANY_PLASTIC.ingot(), T=machine_transformer, W=KEY_PLANKS
+        TagKey<Item> ironIngotTagLocal = MaterialShapes.INGOT.commonTag(Mats.MAT_IRON);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("tesla"))
+                .pattern("CCC").pattern("PIP").pattern("WTW")
+                .define('C', item("coil_copper"))
+                .define('I', ironIngotTagLocal)
+                .define('P', ingotPolymerLocal)
+                .define('T', block("machine_transformer"))
+                .define('W', ItemTags.PLANKS)
+                .unlockedBy("has_transformer", has(block("machine_transformer")))
+                .save(output, id("tesla"));
+
+        // SKIP :772 struct_watz_core — ANY_RESISTANTALLOY.plateCast() not added yet
+        // SKIP :773 fusion_heater shapeless — fusion_hatch not registered yet
+        // SKIP :774 energy_core shapeless — fusion_core/fuse not registered yet
+        // SKIP :776 catalytic_converter — ANY_HARDPLASTIC/ANY_BISMOID not added yet
+
+        // CE :778 = upgrade_nullifier = "SPS","PUP","SPS", S=STEEL.plate(), P=powder_fire, U=upgrade_template
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_nullifier"))
+                .pattern("SPS").pattern("PUP").pattern("SPS")
+                .define('S', steelPlateTag)
+                .define('P', item("powder_fire"))
+                .define('U', item("upgrade_template"))
+                .unlockedBy("has_template", has(item("upgrade_template")))
+                .save(output, id("upgrade_nullifier"));
+
+        // CE :779 = upgrade_smelter = "PHP","CUC","DTD", P=CU.plate(), H=hopper, C=coil_tungsten, U=upgrade_template, D=coil_copper, T=machine_transformer
+        TagKey<Item> copperPlateTagLocal = MaterialShapes.PLATE.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_smelter"))
+                .pattern("PHP").pattern("CUC").pattern("DTD")
+                .define('P', copperPlateTagLocal)
+                .define('H', Items.HOPPER)
+                .define('C', item("coil_tungsten"))
+                .define('U', item("upgrade_template"))
+                .define('D', item("coil_copper"))
+                .define('T', block("machine_transformer"))
+                .unlockedBy("has_template", has(item("upgrade_template")))
+                .save(output, id("upgrade_smelter"));
+
+        // CE :780 = upgrade_shredder = "PHP","CUC","DTD", P=motor, H=hopper, C=blades_titanium, U=upgrade_smelter, D=TI.plate(), T=machine_transformer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_shredder"))
+                .pattern("PHP").pattern("CUC").pattern("DTD")
+                .define('P', item("motor"))
+                .define('H', Items.HOPPER)
+                .define('C', item("blades_titanium"))
+                .define('U', item("upgrade_smelter"))
+                .define('D', titaniumPlateTag)
+                .define('T', block("machine_transformer"))
+                .unlockedBy("has_smelter", has(item("upgrade_smelter")))
+                .save(output, id("upgrade_shredder"));
+
+        // CE :781 = upgrade_centrifuge = "PHP","PUP","DTD", P=centrifuge_element, H=hopper, U=upgrade_shredder, D=ANY_PLASTIC.ingot(), T=machine_transformer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_centrifuge"))
+                .pattern("PHP").pattern("PUP").pattern("DTD")
+                .define('P', item("centrifuge_element"))
+                .define('H', Items.HOPPER)
+                .define('U', item("upgrade_shredder"))
+                .define('D', ingotPolymerLocal)
+                .define('T', block("machine_transformer"))
+                .unlockedBy("has_shredder", has(item("upgrade_shredder")))
+                .save(output, id("upgrade_centrifuge"));
+
+        // SKIP :782 upgrade_crystallizer — fluid_barrel_full(PEROXIDE) not implemented yet
+        // SKIP :783 upgrade_screm — crystal_xen not registered yet
+        // SKIP :784 upgrade_gc_speed — RUBBER material not added yet
+
+        // SKIP :786-788 upgrade_stack_* — part_generic EnumPartType not registered yet
+        // SKIP :789-791 upgrade_ejector_* — plate_saturnite (MAT_SATURN plate) name mismatch; need plate_saturn
+
+        // SKIP :793 mech_key — ingot_meteorite_forged/coin_maskman not registered yet
     }
 
     // ================================================================================================
