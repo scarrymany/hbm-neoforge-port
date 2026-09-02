@@ -6507,8 +6507,33 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(steelIngotTagLocal10))
                 .save(output, id("cm_block_steel"));
 
-        // CE :1049 = cm_block bismoid_bronze x4 = " I ","IPI"," I ", I=ANY_BISMOIDBRONZE.ingot(), P=ANY_BISMOIDBRONZE.plateCast() (plate_triple)
-        // ANY_BISMOIDBRONZE = bismuth_bronze OR arsenic_bronze
+        // CE :1046-1054 = cm_block family (steel/bismoid/desh/resistant) + cm_sheet/cm_tank/cm_port derivatives
+        
+        // CE :1046 = cm_block steel x4
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block_steel"), 4)
+                .pattern(" I ").pattern("IPI").pattern(" I ")
+                .define('I', MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL))
+                .define('P', MaterialShapes.CASTPLATE.commonTag(Mats.MAT_STEEL))
+                .unlockedBy("has_steel", has(MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL)))
+                .save(output, id("cm_block_steel"));
+        
+        // CE :1047 = cm_block desh x4
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block_desh"), 4)
+                .pattern(" I ").pattern("IPI").pattern(" I ")
+                .define('I', MaterialShapes.INGOT.commonTag(Mats.MAT_DESH))
+                .define('P', MaterialShapes.CASTPLATE.commonTag(Mats.MAT_DESH))
+                .unlockedBy("has_desh", has(MaterialShapes.INGOT.commonTag(Mats.MAT_DESH)))
+                .save(output, id("cm_block_desh"));
+        
+        // CE :1048 = cm_block resistant x4 (ANY_RESISTANTALLOY = MAT_CMB)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block_resistant"), 4)
+                .pattern(" I ").pattern("IPI").pattern(" I ")
+                .define('I', MaterialShapes.INGOT.commonTag(Mats.MAT_CMB))
+                .define('P', MaterialShapes.CASTPLATE.commonTag(Mats.MAT_CMB))
+                .unlockedBy("has_resistant", has(MaterialShapes.INGOT.commonTag(Mats.MAT_CMB)))
+                .save(output, id("cm_block_resistant"));
+        
+        // CE :1049 = cm_block bismoid_bronze x4
         Ingredient anyBismoidBronzeIngot2 = CompoundIngredient.of(
                 Ingredient.of(item("ingot_bismuth_bronze")),
                 Ingredient.of(item("ingot_arsenic_bronze"))
@@ -6523,6 +6548,81 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('P', anyBismoidBronzePlateTriple)
                 .unlockedBy("has_bismoid_bronze", has(item("ingot_bismuth_bronze")))
                 .save(output, id("cm_block_bismoid_bronze"));
+        
+        // CE :1051-1054 for(i=0;i<4;i++) cm_sheet x16 = "BB","BB", B=cm_block[i]
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_sheet_steel"), 16)
+                .pattern("BB").pattern("BB")
+                .define('B', block("cm_block_steel"))
+                .unlockedBy("has_cm_block", has(block("cm_block_steel")))
+                .save(output, id("cm_sheet_steel"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_sheet_bismoid_bronze"), 16)
+                .pattern("BB").pattern("BB")
+                .define('B', block("cm_block_bismoid_bronze"))
+                .unlockedBy("has_cm_block", has(block("cm_block_bismoid_bronze")))
+                .save(output, id("cm_sheet_bismoid_bronze"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_sheet_desh"), 16)
+                .pattern("BB").pattern("BB")
+                .define('B', block("cm_block_desh"))
+                .unlockedBy("has_cm_block", has(block("cm_block_desh")))
+                .save(output, id("cm_sheet_desh"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_sheet_resistant"), 16)
+                .pattern("BB").pattern("BB")
+                .define('B', block("cm_block_resistant"))
+                .unlockedBy("has_cm_block", has(block("cm_block_resistant")))
+                .save(output, id("cm_sheet_resistant"));
+        
+        // CE :1051-1054 cm_tank x4 = " B ","BGB"," B ", B=cm_block[i], G=KEY_ANYGLASS
+        Ingredient anyGlass = Ingredient.of(ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "glass")));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_tank_steel"), 4)
+                .pattern(" B ").pattern("BGB").pattern(" B ")
+                .define('B', block("cm_block_steel"))
+                .define('G', anyGlass)
+                .unlockedBy("has_cm_block", has(block("cm_block_steel")))
+                .save(output, id("cm_tank_steel"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_tank_bismoid_bronze"), 4)
+                .pattern(" B ").pattern("BGB").pattern(" B ")
+                .define('B', block("cm_block_bismoid_bronze"))
+                .define('G', anyGlass)
+                .unlockedBy("has_cm_block", has(block("cm_block_bismoid_bronze")))
+                .save(output, id("cm_tank_bismoid_bronze"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_tank_desh"), 4)
+                .pattern(" B ").pattern("BGB").pattern(" B ")
+                .define('B', block("cm_block_desh"))
+                .define('G', anyGlass)
+                .unlockedBy("has_cm_block", has(block("cm_block_desh")))
+                .save(output, id("cm_tank_desh"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_tank_resistant"), 4)
+                .pattern(" B ").pattern("BGB").pattern(" B ")
+                .define('B', block("cm_block_resistant"))
+                .define('G', anyGlass)
+                .unlockedBy("has_cm_block", has(block("cm_block_resistant")))
+                .save(output, id("cm_tank_resistant"));
+        
+        // CE :1051-1054 cm_port x1 = "P","B","P", B=cm_block[i], P=IRON.plate()
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_port_steel"))
+                .pattern("P").pattern("B").pattern("P")
+                .define('B', block("cm_block_steel"))
+                .define('P', MaterialShapes.PLATE.commonTag(Mats.MAT_IRON))
+                .unlockedBy("has_cm_block", has(block("cm_block_steel")))
+                .save(output, id("cm_port_steel"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_port_bismoid_bronze"))
+                .pattern("P").pattern("B").pattern("P")
+                .define('B', block("cm_block_bismoid_bronze"))
+                .define('P', MaterialShapes.PLATE.commonTag(Mats.MAT_IRON))
+                .unlockedBy("has_cm_block", has(block("cm_block_bismoid_bronze")))
+                .save(output, id("cm_port_bismoid_bronze"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_port_desh"))
+                .pattern("P").pattern("B").pattern("P")
+                .define('B', block("cm_block_desh"))
+                .define('P', MaterialShapes.PLATE.commonTag(Mats.MAT_IRON))
+                .unlockedBy("has_cm_block", has(block("cm_block_desh")))
+                .save(output, id("cm_port_desh"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_port_resistant"))
+                .pattern("P").pattern("B").pattern("P")
+                .define('B', block("cm_block_resistant"))
+                .define('P', MaterialShapes.PLATE.commonTag(Mats.MAT_IRON))
+                .unlockedBy("has_cm_block", has(block("cm_block_resistant")))
+                .save(output, id("cm_port_resistant"));
         
         // CE :1141 = cm_block desh = "BBB","BBB","BBB", B=DESH.block()
         TagKey<Item> deshBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_DESH);

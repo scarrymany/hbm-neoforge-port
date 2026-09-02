@@ -284,9 +284,62 @@ public final class GenericBlocks {
     private static void registerCmBlock() {
         // CE ModBlocks.java cm_block metadata variants (steel/bismoid/desh/resistant).
         // Port registers separate blocks per material (NeoForge 1.21.1 has no metadata).
-        // CE :1049 = cm_block bismoid bronze = " I ","IPI"," I ", I=ingot, P=plate_triple (CASTPLATE)
+        // CE :1046-1049 = cm_block x4 variants + derivatives (cm_sheet/cm_tank/cm_port)
+        
+        // cm_block base variants
+        registerBlock("cm_block_steel",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 600.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
         registerBlock("cm_block_bismoid_bronze",
                 () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 600.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_block_desh",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 600.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_block_resistant",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 600.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        
+        // cm_sheet derivatives (thin panels)
+        registerBlock("cm_sheet_steel",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(3.0F, 400.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_sheet_bismoid_bronze",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(3.0F, 400.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_sheet_desh",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(3.0F, 400.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_sheet_resistant",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(3.0F, 400.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        
+        // cm_tank derivatives (glass-windowed)
+        registerBlock("cm_tank_steel",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL).noOcclusion()),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_tank_bismoid_bronze",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL).noOcclusion()),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_tank_desh",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL).noOcclusion()),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_tank_resistant",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL).noOcclusion()),
+                ModCreativeTabs.BLOCKS);
+        
+        // cm_port derivatives (I/O connectors)
+        registerBlock("cm_port_steel",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_port_bismoid_bronze",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_port_desh",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+        registerBlock("cm_port_resistant",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(4.0F, 500.0F).sound(SoundType.METAL)),
                 ModCreativeTabs.BLOCKS);
     }
 
