@@ -6507,7 +6507,23 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(steelIngotTagLocal10))
                 .save(output, id("cm_block_steel"));
 
-        // SKIP :1049 = cm_block bismoid_bronze (cm_block_bismoid_bronze block not registered; plate_triple items exist via MaterialShapes autogen)
+        // CE :1049 = cm_block bismoid_bronze x4 = " I ","IPI"," I ", I=ANY_BISMOIDBRONZE.ingot(), P=ANY_BISMOIDBRONZE.plateCast() (plate_triple)
+        // ANY_BISMOIDBRONZE = bismuth_bronze OR arsenic_bronze
+        Ingredient anyBismoidBronzeIngot2 = CompoundIngredient.of(
+                Ingredient.of(item("ingot_bismuth_bronze")),
+                Ingredient.of(item("ingot_arsenic_bronze"))
+        );
+        Ingredient anyBismoidBronzePlateTriple = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_BBRONZE)),
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_ABRONZE))
+        );
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block_bismoid_bronze"), 4)
+                .pattern(" I ").pattern("IPI").pattern(" I ")
+                .define('I', anyBismoidBronzeIngot2)
+                .define('P', anyBismoidBronzePlateTriple)
+                .unlockedBy("has_bismoid_bronze", has(item("ingot_bismuth_bronze")))
+                .save(output, id("cm_block_bismoid_bronze"));
+        
         // CE :1141 = cm_block desh = "BBB","BBB","BBB", B=DESH.block()
         TagKey<Item> deshBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_DESH);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("cm_block"), 9)

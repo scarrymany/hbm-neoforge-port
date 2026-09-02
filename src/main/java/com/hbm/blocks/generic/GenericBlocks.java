@@ -145,6 +145,7 @@ public final class GenericBlocks {
 
         registerScaffold();
         registerPlatemetal();
+        registerCmBlock();
     }
 
     /**
@@ -278,6 +279,17 @@ public final class GenericBlocks {
     }
 
     /** CE's fifteen {@link BlockEnums.PlatemetalType} metadata values, one registry entry each. */
+    // ==================== cm_block construction blocks ====================
+    
+    private static void registerCmBlock() {
+        // CE ModBlocks.java cm_block metadata variants (steel/bismoid/desh/resistant).
+        // Port registers separate blocks per material (NeoForge 1.21.1 has no metadata).
+        // CE :1049 = cm_block bismoid bronze = " I ","IPI"," I ", I=ingot, P=plate_triple (CASTPLATE)
+        registerBlock("cm_block_bismoid_bronze",
+                () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 600.0F).sound(SoundType.METAL)),
+                ModCreativeTabs.BLOCKS);
+    }
+
     private static void registerPlatemetal() {
         BlockBehaviour.Properties props = BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL);
         for (BlockEnums.PlatemetalType type : BlockEnums.PlatemetalType.VALUES) {
