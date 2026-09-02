@@ -78,6 +78,9 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<LemegetonMenu>> LEMEGETON =
             reg("lemegeton", LemegetonMenu::fromNetwork);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<TapeDriveMenu>> TAPE_DRIVE =
+            reg("tape_drive", TapeDriveMenu::fromNetwork);
+
     private ModMenuTypes() {
     }
 

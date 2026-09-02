@@ -390,6 +390,7 @@ public class ModLanguageProvider extends LanguageProvider {
         m.put("machine_silex", "Laser Isotope Separation Chamber (SILEX)");
         m.put("machine_solar_boiler", "Solar Tower Boiler");
         m.put("machine_steam_engine", "Steam Engine");
+        m.put("machine_tape_drive", "Drive Enclosure");
         m.put("machine_turbine", "Steam Turbine");
         m.put("machine_turbine_gas", "Combined Cycle Gas Turbine");
         m.put("pwr_block", "PWR");
@@ -630,6 +631,7 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.launchPad", "Launch Pad");
         this.add("container.launchPadRusted", "Launch Pad");
         this.add("container.launchpadSoyuz", "Soyuz Launch Pad");
+        this.add("container.machineTapeDrive", "Drive Enclosure");
         this.add("container.machineChemicalPlant", "Chemical Plant");
         this.add("container.machineAssemblyFactory", "Assembly Factory");
         this.add("container.machineChemicalFactory", "Chemical Factory");

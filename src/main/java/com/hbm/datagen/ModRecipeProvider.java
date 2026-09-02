@@ -2904,6 +2904,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('C', coilCopper).define('P', plateIron)
                 .unlockedBy("has_coil", has(coilCopper))
                 .save(output, id("component/coil_copper_torus"));
+
+        // ---- Lighting machines (CraftingManager.java:486). ----
+        // floodlight = "CSC","TST","G G", C=circuit_capacitor, S=STEEL.plate(), T=coil_tungsten, G=KEY_ANYPANE
+        Item circuitCapacitor = item("circuit_capacitor");
+        Item coilTungsten = item("coil_tungsten");
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, item("floodlight"), 2)
+                .pattern("CSC").pattern("TST").pattern("G G")
+                .define('C', circuitCapacitor)
+                .define('S', plateSteel)
+                .define('T', coilTungsten)
+                .define('G', GLASS_PANES)
+                .unlockedBy("has_circuit", has(circuitCapacitor))
+                .save(output, id("machine/floodlight"));
+
+        // ---- Satellite machines (CraftingManager.java:648). ----
+        // machine_tape_drive = "PPP","CCC","PPP", P=ANY_PLASTIC.ingot(), C=circuit_pcb
+        Item ingotPolymer = item("ingot_polymer");
+        Item circuitPcb = item("circuit_pcb");
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("machine_tape_drive"))
+                .pattern("PPP").pattern("CCC").pattern("PPP")
+                .define('P', ingotPolymer)
+                .define('C', circuitPcb)
+                .unlockedBy("has_circuit", has(circuitPcb))
+                .save(output, id("machine/tape_drive"));
     }
 
     // ================================================================================================
