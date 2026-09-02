@@ -533,6 +533,21 @@ public final class SpecialItems {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, LINKER);
     }
 
+    // ==================== Runes (CE ModItems:1986-1991, partsTab, maxStack=1) ====================
+
+    public static final DeferredItem<ItemCustomLore> RUNE_BLANK = registerParts("rune_blank",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_ISA = registerParts("rune_isa",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_DAGAZ = registerParts("rune_dagaz",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_HAGALAZ = registerParts("rune_hagalaz",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_JERA = registerParts("rune_jera",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_THURISAZ = registerParts("rune_thurisaz",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+
     // ==================== helpers ====================
 
     private static <T extends Item> DeferredItem<T> register(String name, Supplier<T> factory) {
