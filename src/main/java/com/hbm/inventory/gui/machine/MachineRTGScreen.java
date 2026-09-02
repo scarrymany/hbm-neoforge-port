@@ -1,5 +1,6 @@
 package com.hbm.inventory.gui.machine;
 
+import com.hbm.blockentity.machine.MachineRTGBlockEntity;
 import com.hbm.inventory.container.machine.MachineRTGMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
@@ -27,7 +28,7 @@ public class MachineRTGScreen extends GuiInfoContainer<MachineRTGMenu> {
 
         var be = this.getMenu().be;
         if (be.heat > 0) {
-            int h = be.heat * 52 / Math.max(1, be.heatMax);
+            int h = be.heat * 52 / Math.max(1, MachineRTGBlockEntity.HEAT_MAX);
             guiGraphics.blit(TEXTURE, x + 134, y + 74 - h, 176, 52 - h, 16, h);
         }
         if (be.getPower() > 0) {
@@ -50,7 +51,7 @@ public class MachineRTGScreen extends GuiInfoContainer<MachineRTGMenu> {
         var be = this.getMenu().be;
         drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 152, topPos + 69 - 52, 16, 52, be.getPower(), be.getMaxPower());
         drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 134, topPos + 69 - 52, 16, 52, mouseX + 8, mouseY - 8,
-                Component.literal("RTG Heat " + be.heat + "/" + be.heatMax),
+                Component.literal("RTG Heat " + be.heat + "/" + MachineRTGBlockEntity.HEAT_MAX),
                 Component.literal("RTG Power " + (be.heat * 100) + "HE/s"));
         
         this.renderTooltip(guiGraphics, mouseX, mouseY);

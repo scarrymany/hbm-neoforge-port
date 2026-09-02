@@ -43,9 +43,6 @@ public class MachineDieselScreen extends GuiInfoContainer<MachineDieselMenu> {
         if (be.isOn) {
             guiGraphics.blit(TEXTURE, x + 79, y + 61, 192, 16, 35, 14);
         }
-        if (be.wasOn) {
-            guiGraphics.blit(TEXTURE, x + 89, y + 42, 192, 0, 16, 16);
-        }
 
         be.tank.renderTank(x + 35, y + 69, 0, 16, 52);
     }
