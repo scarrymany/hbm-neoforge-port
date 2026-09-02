@@ -147,6 +147,19 @@ public abstract class ItemRenderGunBase extends HbmItemBEWLR {
      */
     protected static float partialTick = 1F;
 
+    /** Client inventory for CE {@code clientInv()} magazine reads. */
+    protected static net.minecraft.world.entity.player.Inventory clientInv() {
+        LocalPlayer player = net.minecraft.client.Minecraft.getInstance().player;
+        return player == null ? null : player.getInventory();
+    }
+
+    /** Per-gun CE texture, set at BEWLR registration. */
+    public ResourceLocation texture;
+
+    protected ResourceLocation defaultTex() {
+        return texture != null ? texture : GunModels.tex("debug_gun_tex");
+    }
+
     /**
      * Captures {@code partialTick} into the static field above and returns {@code true} - telling
      * NeoForge "I've positioned this myself (via {@link #setupFirstPersonGun} et al.), don't also
@@ -199,6 +212,20 @@ public abstract class ItemRenderGunBase extends HbmItemBEWLR {
     @Override
     protected final void setupThirdPerson(ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack) {
         applyPivotCorrection(poseStack);
+        if (isAkimbo() && ctx == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+            setupThirdPersonAkimbo(stack, poseStack);
+        } else {
+            setupThirdPersonGun(stack, poseStack);
+        }
+    }
+
+    /** CE {@code ItemRenderWeaponBase.isAkimbo} — dual-wield third-person left-hand offset. */
+    public boolean isAkimbo() {
+        return false;
+    }
+
+    /** CE {@code setupThirdPersonAkimbo}; default matches {@link #setupThirdPersonGun}. */
+    public void setupThirdPersonAkimbo(ItemStack stack, PoseStack poseStack) {
         setupThirdPersonGun(stack, poseStack);
     }
 
@@ -265,6 +292,9 @@ public abstract class ItemRenderGunBase extends HbmItemBEWLR {
     protected float getTurnMagnitude(ItemStack stack) { return 2.75F; }
     public float getViewFOV(ItemStack stack, float fov) { return fov; }
 
+    /** CE {@code ItemRenderWeaponBase.getBaseFOV}; unused here, ComputeFov uses {@link #getViewFOV}. */
+    protected float getBaseFOV(ItemStack stack) { return 70F; }
+
     /**
      * CE's {@code ItemRenderWeaponBase.standardAimingTransform} - lerps between a hip-fire and an
      * aimed-down-sights offset by {@link ItemGunBaseNT#aimingProgress}/{@code prevAimingProgress},
@@ -285,6 +315,27 @@ public abstract class ItemRenderGunBase extends HbmItemBEWLR {
     // Muzzle / gap / laser flash - port of CE's renderMuzzleFlash/renderGapFlash/renderLaserFlash,
     // see class javadoc for the RenderType/vertex-format notes.
     // ------------------------------------------------------------------------------------
+
+    @Override
+    protected void renderPart(com.hbm.render.loader.HbmObjModel model, PoseStack poseStack, MultiBufferSource bufferSource,
+                              ResourceLocation texture, int packedLight, int packedOverlay, String partName) {
+        if (model == null || texture == null) return;
+        super.renderPart(model, poseStack, bufferSource, texture, packedLight, packedOverlay, partName);
+    }
+
+    @Override
+    protected void renderPart(com.hbm.render.loader.HbmObjModel model, PoseStack poseStack, MultiBufferSource bufferSource,
+                              ResourceLocation texture, int packedLight, int packedOverlay, int argbTint, String partName) {
+        if (model == null || texture == null) return;
+        super.renderPart(model, poseStack, bufferSource, texture, packedLight, packedOverlay, argbTint, partName);
+    }
+
+    @Override
+    protected void renderAll(com.hbm.render.loader.HbmObjModel model, PoseStack poseStack, MultiBufferSource bufferSource,
+                             ResourceLocation texture, int packedLight, int packedOverlay) {
+        if (model == null || texture == null) return;
+        super.renderAll(model, poseStack, bufferSource, texture, packedLight, packedOverlay);
+    }
 
     public static void renderMuzzleFlash(PoseStack poseStack, MultiBufferSource bufferSource, long lastShot) {
         renderMuzzleFlash(poseStack, bufferSource, lastShot, 75, 15);

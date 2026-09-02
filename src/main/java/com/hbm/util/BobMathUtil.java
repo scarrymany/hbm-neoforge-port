@@ -41,6 +41,11 @@ public class BobMathUtil {
         return x + (y - x) * interp;
     }
 
+    /** CE {@code BobMathUtil.partialTick} — lerp used by Sexy/MK108 belt shell placement. */
+    public static double partialTick(double a, double b, double t) {
+        return a + (b - a) * t;
+    }
+
     /** Smallest of three ints - CE's own overload used by {@code MagazineSingleTypeBase.standardReload}'s reload-amount clamp. */
     public static int min(int a, int b, int c) {
         return Math.min(a, Math.min(b, c));
