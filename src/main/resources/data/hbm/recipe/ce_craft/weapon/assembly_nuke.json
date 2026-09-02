@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " WP",
+    "SEP",
+    " WP"
+  ],
+  "key": {
+    "W": { "item": "hbm:gold_wire" },
+    "P": { "item": "hbm:plate_steel" },
+    "S": { "item": "hbm:steel_shell" },
+    "E": { "item": "hbm:ball_tatb" }
+  },
+  "result": { "id": "hbm:assembly_nuke", "count": 1 }
+}

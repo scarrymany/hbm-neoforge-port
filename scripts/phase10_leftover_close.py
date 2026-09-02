@@ -176,6 +176,16 @@ def main() -> int:
     write_item("machine_minirtg", "hbm:models/machines/rtg_cell_flipped")
     write_item("machine_powerrtg", "hbm:models/machines/rtg_polonium")
 
+    # CE aliases / same-class textures (not invented)
+    write_item("ammo_debug", "hbm:item/ammo_45")  # TODO(CE:GunFactory.java ItemBakedBase ammo_45)
+    write_item("fmn", "hbm:item/tablet")  # TODO(CE:ModItems.java:143 ItemPill tablet)
+    write_item("fext_water", "hbm:item/ammo_fireext")  # TODO(CE:XFactoryTool.java ammo_fireext meta 0)
+    write_item("fext_sand", "hbm:item/ammo_fireext_sand")  # TODO(CE:XFactoryTool.java ammo_fireext meta 2)
+    write_cube("concrete_light_gray", "hbm:block/concrete_silver")  # CE 1.12 silver
+    write_cube("sellafield_bedrock", "hbm:block/sellafield_slaked")  # TODO(CE:BlockSellafieldSlaked.java:51-56)
+    write_cube("skeleton_holder", "hbm:block/dirt_dead")  # TODO(CE:ModBlocks.java:519 cubeAll dirt_dead)
+    write_cube("rbmk_display_blank", "hbm:block/rbmk/rbmk_display")  # TODO(CE:RBMKMiniPanelBase.java:145)
+
     after_i = sorted(i for i in items if not item_playable(i))
     after_b = sorted(b for b in blocks if not block_playable(b))
     print(f"AFTER  item={len(after_i)}/{len(items)} block={len(after_b)}/{len(blocks)}")

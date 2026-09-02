@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SUS",
+    "RPR",
+    "SUS"
+  ],
+  "key": {
+    "S": { "item": "hbm:semtex" },
+    "U": { "item": "hbm:uranium238_block" },
+    "R": { "item": "hbm:ingot_tantalium" },
+    "P": { "item": "hbm:billet_pu239" }
+  },
+  "result": { "id": "hbm:fissure_bomb", "count": 1 }
+}
