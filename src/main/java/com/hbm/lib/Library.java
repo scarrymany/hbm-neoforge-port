@@ -79,6 +79,8 @@ import java.util.TreeMap;
  */
 public final class Library {
 
+    public static final AABB EMPTY_AABB = new AABB(0, 0, 0, 0, 0, 0);
+
     private Library() {
     }
 

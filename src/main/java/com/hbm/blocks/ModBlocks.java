@@ -56,6 +56,12 @@ public final class ModBlocks {
     public static DeferredBlock<BlockRotatablePillar> BLOCK_SCHRABIDIUM_CLUSTER;
     public static DeferredBlock<BlockRotatablePillar> BLOCK_EUPHEMIUM_CLUSTER;
 
+    // Lighting machines
+    public static DeferredBlock<com.hbm.blocks.machine.Floodlight> FLOODLIGHT;
+    public static DeferredBlock<com.hbm.blocks.machine.FloodlightBeam> FLOODLIGHT_BEAM;
+    public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.FloodlightBlockEntity>> FLOODLIGHT_ENTITY;
+    public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.FloodlightBeamBlockEntity>> FLOODLIGHT_BEAM_ENTITY;
+
     private ModBlocks() {
     }
 
@@ -93,6 +99,7 @@ public final class ModBlocks {
         com.hbm.blocks.machine.pile.PileBlocks.registerAll();
         com.hbm.blocks.machine.Phase11CasingBlocks.registerAll();
         com.hbm.blocks.machine.dummyable.DummyableProcessBlocks.registerAll();
+        com.hbm.blocks.machine.LightingBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }
