@@ -3441,6 +3441,100 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('#', circuitAnalog)
                 .unlockedBy("has_torch", has(radioTorchSender))
                 .save(output, id("block/radio_telex"));
+
+        // ---- Red Pylon family (CraftingManager.java:292-298). ----
+        // red_pylon (CE :292) = "CWC","PWP"," T ", C=coil_copper, W=KEY_PLANKS, P=plate_polymer, T=red_wire_coated
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("red_pylon"), 4)
+                .pattern("CWC").pattern("PWP").pattern(" T ")
+                .define('C', coilCopper)
+                .define('W', ItemTags.PLANKS)
+                .define('P', ingotPolymer)
+                .define('T', redWireCoated)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("block/red_pylon"));
+
+        // red_pylon_steel_small (CE :293) = "CWC","PWP"," S ", C=coil_copper, W=STEEL.pipe(), P=plate_polymer, S=KEY_COBBLESTONE
+        TagKey<Item> steelPipeTag = MaterialShapes.PIPE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("red_pylon_steel_small"), 4)
+                .pattern("CWC").pattern("PWP").pattern(" S ")
+                .define('C', coilCopper)
+                .define('W', steelPipeTag)
+                .define('P', ingotPolymer)
+                .define('S', Items.COBBLESTONE)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("block/red_pylon_steel_small"));
+
+        // red_pylon_medium_wood (CE :294) = "CCW","IIW","  S", C=coil_copper, W=KEY_PLANKS, I=plate_polymer, S=KEY_COBBLESTONE
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("red_pylon_medium_wood"), 2)
+                .pattern("CCW").pattern("IIW").pattern("  S")
+                .define('C', coilCopper)
+                .define('W', ItemTags.PLANKS)
+                .define('I', ingotPolymer)
+                .define('S', Items.COBBLESTONE)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("block/red_pylon_medium_wood"));
+
+        // red_pylon_medium_wood_transformer (CE :295) shapeless = red_pylon_medium_wood + plate_polymer + coil_copper
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, item("red_pylon_medium_transformer"))
+                .requires(item("red_pylon_medium_wood"))
+                .requires(ingotPolymer)
+                .requires(coilCopper)
+                .unlockedBy("has_pylon", has(item("red_pylon_medium_wood")))
+                .save(output, id("block/red_pylon_medium_transformer_from_wood"));
+
+        // red_pylon_medium_steel (CE :296) = "CCW","IIW","  S", C=coil_copper, W=STEEL.pipe(), I=plate_polymer, S=KEY_COBBLESTONE
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("red_pylon_medium_steel"), 2)
+                .pattern("CCW").pattern("IIW").pattern("  S")
+                .define('C', coilCopper)
+                .define('W', steelPipeTag)
+                .define('I', ingotPolymer)
+                .define('S', Items.COBBLESTONE)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("block/red_pylon_medium_steel"));
+
+        // red_pylon_medium_steel_transformer (CE :297) shapeless = red_pylon_medium_steel + plate_polymer + coil_copper
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, item("red_pylon_steel_transformer"))
+                .requires(item("red_pylon_medium_steel"))
+                .requires(ingotPolymer)
+                .requires(coilCopper)
+                .unlockedBy("has_pylon", has(item("red_pylon_medium_steel")))
+                .save(output, id("block/red_pylon_steel_transformer_from_steel"));
+
+        // ---- Battery SC family (CraftingManager.java:311-320). ----
+        // battery_sc_empty (CE :311) = "PGP","L L","PGP", P=ANY_PLASTIC.ingot(), G=GOLD.wireFine(), L=PB.plate()
+        TagKey<Item> goldWireFineTag = MaterialShapes.WIRE.commonTag(Mats.MAT_GOLD);
+        TagKey<Item> leadPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_LEAD);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("battery_sc_empty"))
+                .pattern("PGP").pattern("L L").pattern("PGP")
+                .define('P', ingotPolymer)
+                .define('G', goldWireFineTag)
+                .define('L', leadPlateTag)
+                .unlockedBy("has_polymer", has(ingotPolymer))
+                .save(output, id("battery/sc_empty"));
+
+        // battery_sc variants (CE :312-320) shapeless = battery_sc_empty + 2x billet
+        Item batteryScEmpty = item("battery_sc_empty");
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_waste"))
+                .requires(batteryScEmpty).requires(item("billet_nuclear_waste")).requires(item("billet_nuclear_waste"))
+                .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_waste"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_ra226"))
+                .requires(batteryScEmpty).requires(item("billet_ra226")).requires(item("billet_ra226"))
+                .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_ra226"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_co60"))
+                .requires(batteryScEmpty).requires(item("billet_co60")).requires(item("billet_co60"))
+                .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_co60"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_pu238"))
+                .requires(batteryScEmpty).requires(item("billet_pu238")).requires(item("billet_pu238"))
+                .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_pu238"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_au198"))
+                .requires(batteryScEmpty).requires(item("billet_au198")).requires(item("billet_au198"))
+                .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_au198"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_pb209"))
+                .requires(batteryScEmpty).requires(item("billet_pb209")).requires(item("billet_pb209"))
+                .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_pb209"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_am241"))
+                .requires(batteryScEmpty).requires(item("billet_am241")).requires(item("billet_am241"))
+                .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_am241"));
     }
 
     // ================================================================================================
