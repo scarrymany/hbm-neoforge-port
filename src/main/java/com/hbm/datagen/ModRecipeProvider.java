@@ -4939,8 +4939,20 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("tesla"));
 
         // SKIP :772 struct_watz_core — ANY_RESISTANTALLOY.plateCast() not added yet
-        // SKIP :773 fusion_heater shapeless — fusion_hatch not registered yet
-        // SKIP :774 energy_core shapeless — fusion_core/fuse not registered yet
+        
+        // CE :773 = fusion_heater (shapeless: fusion_hatch → fusion_heater)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, block("fusion_heater"))
+                .requires(block("fusion_hatch"))
+                .unlockedBy("has_fusion_hatch", has(block("fusion_hatch")))
+                .save(output, id("fusion_heater"));
+
+        // CE :774 = energy_core (shapeless: fusion_core + fuse → energy_core)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("energy_core"))
+                .requires(item("fusion_core"))
+                .requires(item("fuse"))
+                .unlockedBy("has_fusion_core", has(item("fusion_core")))
+                .save(output, id("energy_core"));
+
         // SKIP :776 catalytic_converter — ANY_HARDPLASTIC/ANY_BISMOID not added yet
 
         // CE :778 = upgrade_nullifier = "SPS","PUP","SPS", S=STEEL.plate(), P=powder_fire, U=upgrade_template
