@@ -421,6 +421,72 @@ public final class AnvilRecipes {
                 tag("plates/lead", 2),
                 cmp("nuclear_waste_vitrified", 10));
 
+        // :521-526 demon_core_open (skip — man_core not registered)
+        // TODO(CE :521-526): demon_core_open requires man_core + screwdriver
+
+        // :529-530 plate_desh
+        construct(3, stack("plate_desh", 4),
+                tag("ingots/desh", 4),
+                cmp("powder_polymer", 2),
+                tag("ingots/duralumin"));
+
+        // :531-533 plate_bismuth
+        construct(4, stack("plate_bismuth"),
+                cmp("nugget_bismuth", 2),
+                tag("billets/uranium", 2),
+                tag("dusts/niobium"));
+
+        // :534-536 plate_armor_titanium
+        construct(2, stack("plate_armor_titanium"),
+                tag("plates/titanium", 2),
+                tag("ingots/steel"),
+                tag("bolts/steel", 4));
+
+        // :537-539 plate_armor_ajr
+        construct(3, stack("plate_armor_ajr", 2),
+                tag("plates/iron", 6),
+                tag("ingots/niobium"),
+                cmp("plate_armor_titanium"));
+
+        // :540-542 plate_armor_hev (uses W.wireFine)
+        construct(4, stack("plate_armor_hev"),
+                tag("plates/duralumin", 4),
+                cmp("plate_armor_titanium"),
+                tag("wires/tungsten", 8));
+
+        // :543-545 plate_armor_lunar (uses MAGTUNG.wireFine + getReflector)
+        Item reflector = item("neutron_reflector");
+        if (reflector != Items.AIR) {
+            construct(4, stack("plate_armor_lunar"),
+                    new ComparableStack(reflector, 4),
+                    tag("ingots/starmetal"),
+                    tag("wires/magnetized_tungsten", 8));
+        }
+
+        // :546-548 plate_armor_fau (uses billet_yharonite)
+        Item yharonite = item("billet_yharonite");
+        if (yharonite != Items.AIR) {
+            construct(6, stack("plate_armor_fau"),
+                    cmp("ingot_meteorite_forged", 4),
+                    tag("ingots/desh"),
+                    new ComparableStack(yharonite));
+        }
+
+        // :549-551 plate_armor_dnt (uses particle_sparkticle + plate_dineutronium)
+        Item sparkticle = item("particle_sparkticle");
+        if (sparkticle != Items.AIR) {
+            construct(7, stack("plate_armor_dnt"),
+                    cmp("plate_dineutronium", 4),
+                    new ComparableStack(sparkticle),
+                    cmp("plate_armor_fau", 6));
+        }
+
+        // :552-558 missile_doomsday (uses plateWelded)
+        // TODO(CE :552-558): missile_doomsday requires AL.plateWelded (not yet in MaterialShapes autogen)
+
+        // :560-566 fuel plates (skip — plate_fuel_* excluded per PlateCrystalWasteItems javadoc)
+        // TODO(CE :560-566): plate_fuel_u233/u235/mox/pu239/sa326/ra226be/pu238be excluded (see PlateCrystalWasteItems)
+
         // :291-298 heater_electric
         construct(3, stack("heater_electric"),
                 cmp("ingot_polymer", 4),

@@ -5811,16 +5811,17 @@ public class ModRecipeProvider extends RecipeProvider {
         // SKIP :1073 = bolt autogen (NTMMaterial loop)
         // SKIP :1076-1079 = struct_launcher_core/large/soyuz_core (CE uses DictFrame circuit + ItemBatteryPack enum)
 
-        // CE :1081 = reactor_sensor (SKIP: WIREFINE shape not defined in MaterialShapes)
-        // TagKey<Item> tungstenWireFineTagLocal = MaterialShapes.WIREFINE.commonTag(Mats.MAT_TUNGSTEN);
-        // ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("reactor_sensor"))
-        //         .pattern("WPW").pattern("CMC").pattern("PPP")
-        //         .define('W', tungstenWireFineTagLocal)
-        //         .define('P', leadPlateTagLocal5)
-        //         .define('C', item("circuit_basic"))
-        //         .define('M', item("magnetron"))
-        //         .unlockedBy("has_magnetron", has(item("magnetron")))
-        //         .save(output, id("reactor_sensor"));
+        // CE :1081 = reactor_sensor (W.wireFine = tag wires/tungsten)
+        TagKey<Item> tungstenWireTag6 = ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "wires/tungsten"));
+        TagKey<Item> steelPlateTag7 = ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "plates/steel"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("reactor_sensor"))
+                .pattern("WPW").pattern("CMC").pattern("PPP")
+                .define('W', tungstenWireTag6)
+                .define('P', steelPlateTag7)
+                .define('C', item("circuit_targeting_device"))
+                .define('M', item("magnetron"))
+                .unlockedBy("has_magnetron", has(item("magnetron")))
+                .save(output, id("reactor_sensor"));
 
         // CE :1082-1088 = RBMK console + rod/boiler/heater/cooler (!enable528 conditional)
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_console"))
