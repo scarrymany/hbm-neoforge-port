@@ -5,16 +5,13 @@ import com.hbm.inventory.gui.GuiInfoContainer;
 import com.hbm.items.machine.ItemRBMKRod;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * Fuel rod channel screen. No {@code assets/hbm/textures/**} tree exists yet in this port (see
- * {@link GuiInfoContainer}'s own javadoc) - background is a plain filled panel rather than a texture
- * blit, functional but not pixel-styled; a later texture-asset pass can swap {@link #renderBg} for a
- * real blit without touching layout logic.
- */
 public class RBMKRodScreen extends GuiInfoContainer<RBMKRodMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/reactors/gui_rbmk_element.png");
 
     public RBMKRodScreen(RBMKRodMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -24,7 +21,14 @@ public class RBMKRodScreen extends GuiInfoContainer<RBMKRodMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        guiGraphics.fill(leftPos, topPos, leftPos + imageWidth, topPos + imageHeight, 0xC0C6C6C6);
+        guiGraphics.blit(TEXTURE, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, name, this.imageWidth / 2 - this.font.width(name) / 2, 6, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 96 + 2, 0x404040, false);
     }
 
     @Override

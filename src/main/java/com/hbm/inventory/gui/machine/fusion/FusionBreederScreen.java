@@ -6,10 +6,12 @@ import com.hbm.inventory.gui.GuiInfoContainer;
 import com.hbm.util.BobMathUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code GUIFusionBreeder}. No CE png in tree — fill-rect. */
 public class FusionBreederScreen extends GuiInfoContainer<FusionBreederMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/reactors/gui_fusion_breeder.png");
 
     public FusionBreederScreen(FusionBreederMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -22,13 +24,14 @@ public class FusionBreederScreen extends GuiInfoContainer<FusionBreederMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        
         var be = this.getMenu().be;
         be.tanks[0].renderTank(x + 26, y + 18, 0, 16, 52);
         be.tanks[1].renderTank(x + 134, y + 18, 0, 16, 52);
+        
         int p = (int) Math.ceil(be.progress * 42 / FusionBreederBlockEntity.CAPACITY);
-        if (p > 0) guiGraphics.fill(x + 67, y + 48, x + 67 + p, y + 58, 0xFF3C78C8);
+        if (p > 0) guiGraphics.blit(TEXTURE, x + 67, y + 48, 176, 0, p, 10);
     }
 
     @Override

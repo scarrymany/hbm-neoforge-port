@@ -8,13 +8,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.commons.lang3.math.NumberUtils;
 
-/** CE {@code GUIFusionKlystron} — outputTarget EditBox. No CE png in tree. */
 public class FusionKlystronScreen extends GuiInfoContainer<FusionKlystronMenu> {
 
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/reactors/gui_fusion_klystron.png");
+    
     private EditBox field;
 
     public FusionKlystronScreen(FusionKlystronMenu menu, Inventory inventory, Component title) {
@@ -39,8 +41,7 @@ public class FusionKlystronScreen extends GuiInfoContainer<FusionKlystronMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
         this.getMenu().be.compair.renderTank(x + 76, y + 18, 0, 16, 52);
     }
 

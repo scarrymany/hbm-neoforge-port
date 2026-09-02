@@ -9,11 +9,13 @@ import com.hbm.util.BobMathUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-/** CE {@code GUIFusionTorus} numbers. No CE png in tree — fill-rect, no invented art. */
 public class FusionTorusScreen extends GuiInfoContainer<FusionTorusMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/reactors/gui_fusion_torus.png");
 
     public FusionTorusScreen(FusionTorusMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -26,8 +28,8 @@ public class FusionTorusScreen extends GuiInfoContainer<FusionTorusMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+        
         var be = this.getMenu().be;
         be.tanks[0].renderTank(x + 44, y + 18, 0, 16, 52);
         be.tanks[1].renderTank(x + 62, y + 18, 0, 16, 52);
@@ -35,10 +37,12 @@ public class FusionTorusScreen extends GuiInfoContainer<FusionTorusMenu> {
         be.tanks[3].renderTank(x + 152, y + 18, 0, 16, 52);
         be.coolantTanks[0].renderTank(x + 188, y + 46, 0, 16, 52);
         be.coolantTanks[1].renderTank(x + 206, y + 46, 0, 16, 52);
+        
         int bar = (int) Math.ceil(70 * be.fusionModule.progress);
-        if (bar > 0) guiGraphics.fill(x + 98, y + 81, x + 98 + bar, y + 87, 0xFF3C78C8);
+        if (bar > 0) guiGraphics.blit(TEXTURE, x + 98, y + 81, 230, 0, bar, 6);
+        
         int bonus = (int) Math.min(Math.ceil(70 * be.fusionModule.bonus), 70);
-        if (bonus > 0) guiGraphics.fill(x + 98, y + 91, x + 98 + bonus, y + 97, 0xFF78C83C);
+        if (bonus > 0) guiGraphics.blit(TEXTURE, x + 98, y + 91, 230, 6, bonus, 6);
     }
 
     @Override

@@ -4,14 +4,12 @@ import com.hbm.inventory.container.bomb.NukeSoliniumMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * CE {@code GUINukeSolinium} 176×222.
- * TODO(CE: GUINukeSolinium.java:16): {@code textures/gui/soliniumSchematic.png} not in this
- * CE tree / leftover assets — flat panel like the other nuke casings. Do not invent art.
- */
 public class NukeSoliniumScreen extends GuiInfoContainer<NukeSoliniumMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/bomb_generic.png");
 
     public NukeSoliniumScreen(NukeSoliniumMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -22,9 +20,13 @@ public class NukeSoliniumScreen extends GuiInfoContainer<NukeSoliniumMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        int x = this.leftPos;
-        int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, name, this.imageWidth / 2 - this.font.width(name) / 2, 6, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, 8, this.imageHeight - 96 + 2, 0x404040, false);
     }
 }

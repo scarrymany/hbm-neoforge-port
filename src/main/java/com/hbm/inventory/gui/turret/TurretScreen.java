@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -153,10 +154,9 @@ public class TurretScreen extends GuiInfoContainer<TurretMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/weapon/gui_turret_base.png"), 
+                x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // Fritz's diesel tank - GUITurretFritz.java: renderTank(guiLeft+134, guiTop+115, z, 7, 52).
         if (this.getMenu().be instanceof TurretFritzBlockEntity fritz) {
             fritz.tank.renderTank(x + 134, y + 115, 0, 7, 52);
         }
