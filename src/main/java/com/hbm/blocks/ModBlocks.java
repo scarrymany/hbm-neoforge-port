@@ -70,6 +70,10 @@ public final class ModBlocks {
     public static DeferredBlock<com.hbm.blocks.machine.MachineTapeDrive> MACHINE_TAPE_DRIVE;
     public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.TapeDriveBlockEntity>> TAPE_DRIVE_ENTITY;
 
+    // Other machines
+    public static DeferredBlock<com.hbm.blocks.machine.BlockCargoElevator> CARGO_ELEVATOR;
+    public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.CargoElevatorBlockEntity>> CARGO_ELEVATOR_ENTITY;
+
     private ModBlocks() {
     }
 
@@ -109,6 +113,7 @@ public final class ModBlocks {
         com.hbm.blocks.machine.dummyable.DummyableProcessBlocks.registerAll();
         com.hbm.blocks.machine.LightingBlocks.registerAll();
         com.hbm.blocks.machine.SatelliteBlocks.registerAll();
+        com.hbm.blocks.machine.MachineBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }

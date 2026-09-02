@@ -4736,7 +4736,14 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_planks", has(block("pink_planks")))
                 .save(output, id("pink_stairs"));
 
-        // SKIP :687 cargo_elevator — part_generic PISTON_HYDRAULIC not registered yet
+        // CE :686 = cargo_elevator (3x, uses steel_grate + STEEL ingot + part_generic PISTON_HYDRAULIC)
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("cargo_elevator"), 3)
+                .pattern("GGG").pattern("SPS")
+                .define('G', block("steel_grate_wide"))
+                .define('S', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel")))
+                .define('P', item("part_generic_piston_hydraulic"))
+                .unlockedBy("has_steel_grate", has(block("steel_grate_wide")))
+                .save(output, id("cargo_elevator"));
 
         // CE :689-691 = doors (door_metal, door_office, door_bunker)
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("door_metal"))
