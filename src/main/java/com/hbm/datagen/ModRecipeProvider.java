@@ -3228,6 +3228,167 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('C', circuitPcb)
                 .unlockedBy("has_circuit", has(circuitPcb))
                 .save(output, id("machine/tape_drive"));
+
+        // ---- Radio torches / wrench / cables / machines (CraftingManager.java:253-305). ----
+        // wrench (CE :253) = " S "," IS","I  ", S=STEEL.ingot(), I=IRON.ingot()
+        Item wrench = item("wrench");
+        TagKey<Item> steelIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        TagKey<Item> ironIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_IRON);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, wrench)
+                .pattern(" S ").pattern(" IS").pattern("I  ")
+                .define('S', steelIngotTag)
+                .define('I', ironIngotTag)
+                .unlockedBy("has_ingot", has(steelIngotTag))
+                .save(output, id("tool/wrench"));
+
+        // wrench_flipped (CE :254) = "S","D","W", S=Items.IRON_SWORD, D=ducttape, W=wrench
+        // (ducttape already defined in this method earlier)
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("wrench_flipped"))
+                .pattern("S").pattern("D").pattern("W")
+                .define('S', Items.IRON_SWORD)
+                .define('D', item("ducttape"))
+                .define('W', wrench)
+                .unlockedBy("has_wrench", has(wrench))
+                .save(output, id("weapon/wrench_flipped"));
+
+        // radio_torch_sender (CE :260) = "G","R","I", G=dustGlowstone, R=REDSTONE_TORCH, I=NETHERQUARTZ.gem()
+        Item radioTorchSender = item("radio_torch_sender");
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, radioTorchSender, 4)
+                .pattern("G").pattern("R").pattern("I")
+                .define('G', Items.GLOWSTONE_DUST)
+                .define('R', Items.REDSTONE_TORCH)
+                .define('I', Items.QUARTZ)
+                .unlockedBy("has_redstone", has(Items.REDSTONE_TORCH))
+                .save(output, id("block/radio_torch_sender"));
+
+        // radio_torch_receiver (CE :261) = "G","R","I", G=dustGlowstone, R=REDSTONE_TORCH, I=IRON.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("radio_torch_receiver"), 4)
+                .pattern("G").pattern("R").pattern("I")
+                .define('G', Items.GLOWSTONE_DUST)
+                .define('R', Items.REDSTONE_TORCH)
+                .define('I', ironIngotTag)
+                .unlockedBy("has_redstone", has(Items.REDSTONE_TORCH))
+                .save(output, id("block/radio_torch_receiver"));
+
+        // radio_torch_logic (CE :262) = "G","R","I", G=dustGlowstone, R=REDSTONE_TORCH, I=circuit CHIP
+        Item circuitChip = item("circuit_chip");
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("radio_torch_logic"), 4)
+                .pattern("G").pattern("R").pattern("I")
+                .define('G', Items.GLOWSTONE_DUST)
+                .define('R', Items.REDSTONE_TORCH)
+                .define('I', circuitChip)
+                .unlockedBy("has_circuit", has(circuitChip))
+                .save(output, id("block/radio_torch_logic"));
+
+        // radio_torch_counter (CE :263) = "G","R","I", G=dustGlowstone, R=REDSTONE_TORCH, I=circuit VACUUM_TUBE
+        Item circuitVacuumTube = item("circuit_vacuum_tube");
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("radio_torch_counter"), 4)
+                .pattern("G").pattern("R").pattern("I")
+                .define('G', Items.GLOWSTONE_DUST)
+                .define('R', Items.REDSTONE_TORCH)
+                .define('I', circuitVacuumTube)
+                .unlockedBy("has_circuit", has(circuitVacuumTube))
+                .save(output, id("block/radio_torch_counter"));
+
+        // radio_torch_reader (CE :264) = " G ","IRI", G=dustGlowstone, R=REDSTONE_TORCH, I=circuit VACUUM_TUBE
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("radio_torch_reader"), 4)
+                .pattern(" G ").pattern("IRI")
+                .define('G', Items.GLOWSTONE_DUST)
+                .define('R', Items.REDSTONE_TORCH)
+                .define('I', circuitVacuumTube)
+                .unlockedBy("has_circuit", has(circuitVacuumTube))
+                .save(output, id("block/radio_torch_reader"));
+
+        // radio_torch_controller (CE :265) = " G ","IRI", G=dustGlowstone, R=REDSTONE_TORCH, I=circuit CHIP
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("radio_torch_controller"), 4)
+                .pattern(" G ").pattern("IRI")
+                .define('G', Items.GLOWSTONE_DUST)
+                .define('R', Items.REDSTONE_TORCH)
+                .define('I', circuitChip)
+                .unlockedBy("has_circuit", has(circuitChip))
+                .save(output, id("block/radio_torch_controller"));
+
+        // machine_electric_furnace_off (CE :277) = "BBB","WFW","RRR", B=BE.ingot(), W=CU.plateCast(), F=Blocks.FURNACE, R=coil_tungsten
+        TagKey<Item> berylliumIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_BERYLLIUM);
+        TagKey<Item> copperPlateCastTag = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("machine_electric_furnace_off"))
+                .pattern("BBB").pattern("WFW").pattern("RRR")
+                .define('B', berylliumIngotTag)
+                .define('W', copperPlateCastTag)
+                .define('F', Items.FURNACE)
+                .define('R', coilTungsten)
+                .unlockedBy("has_beryllium", has(berylliumIngotTag))
+                .save(output, id("machine/electric_furnace"));
+
+        // red_wire_coated (CE :278) = "WRW","RIR","WRW", W=plate_polymer, I=MINGRADE.ingot(), R=MINGRADE.wireFine()
+        TagKey<Item> mingradeIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_MINGRADE);
+        TagKey<Item> mingradeWireFineTag = MaterialShapes.WIRE.commonTag(Mats.MAT_MINGRADE);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("red_wire_coated"), 16)
+                .pattern("WRW").pattern("RIR").pattern("WRW")
+                .define('W', ingotPolymer)
+                .define('I', mingradeIngotTag)
+                .define('R', mingradeWireFineTag)
+                .unlockedBy("has_ingot", has(ingotPolymer))
+                .save(output, id("block/red_wire_coated"));
+
+        // red_cable (CE :287) = " W ","RRR"," W ", W=plate_polymer, R=MINGRADE.wireFine()
+        Item redCable = item("red_cable");
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, redCable, 16)
+                .pattern(" W ").pattern("RRR").pattern(" W ")
+                .define('W', ingotPolymer)
+                .define('R', mingradeWireFineTag)
+                .unlockedBy("has_wire", has(mingradeWireFineTag))
+                .save(output, id("block/red_cable"));
+
+        // red_cable_classic (CE :288) shapeless conversion
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, item("red_cable_classic"))
+                .requires(redCable)
+                .unlockedBy("has_cable", has(redCable))
+                .save(output, id("block/red_cable_classic_from_cable"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, redCable)
+                .requires(item("red_cable_classic"))
+                .unlockedBy("has_cable", has(item("red_cable_classic")))
+                .save(output, id("block/red_cable_from_classic"));
+
+        // machine_wood_burner (CE :299) = "PPP","CFC","I I", P=STEEL.plate528() (welded), C=coil_copper, I=IRON.ingot(), F=Blocks.FURNACE
+        TagKey<Item> steelPlateWeldedTag = MaterialShapes.WELDEDPLATE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("machine_wood_burner"))
+                .pattern("PPP").pattern("CFC").pattern("I I")
+                .define('P', steelPlateWeldedTag)
+                .define('C', coilCopper)
+                .define('F', Items.FURNACE)
+                .define('I', ironIngotTag)
+                .unlockedBy("has_plate", has(steelPlateWeldedTag))
+                .save(output, id("machine/wood_burner"));
+
+        // machine_turbine (CE :300) = "SMS","PTP","SMS", S=STEEL.ingot(), T=turbine_titanium, M=coil_copper, P=ANY_PLASTIC.ingot()
+        // (turbineTitanium already defined in this method earlier)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("machine_turbine"))
+                .pattern("SMS").pattern("PTP").pattern("SMS")
+                .define('S', steelIngotTag)
+                .define('M', coilCopper)
+                .define('T', item("turbine_titanium"))
+                .define('P', ingotPolymer)
+                .unlockedBy("has_turbine", has(item("turbine_titanium")))
+                .save(output, id("machine/turbine"));
+
+        // crate_iron (CE :304) = "PPP","I I","III", P=IRON.plate(), I=IRON.ingot()
+        TagKey<Item> ironPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_IRON);
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, item("crate_iron"))
+                .pattern("PPP").pattern("I I").pattern("III")
+                .define('P', ironPlateTag)
+                .define('I', ironIngotTag)
+                .unlockedBy("has_plate", has(ironPlateTag))
+                .save(output, id("block/crate_iron"));
+
+        // crate_steel (CE :305) = "PPP","I I","III", P=STEEL.plate(), I=STEEL.ingot()
+        TagKey<Item> steelPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, item("crate_steel"))
+                .pattern("PPP").pattern("I I").pattern("III")
+                .define('P', steelPlateTag)
+                .define('I', steelIngotTag)
+                .unlockedBy("has_plate", has(steelPlateTag))
+                .save(output, id("block/crate_steel"));
     }
 
     // ================================================================================================
