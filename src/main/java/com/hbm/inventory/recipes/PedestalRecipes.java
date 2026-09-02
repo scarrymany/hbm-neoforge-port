@@ -150,8 +150,7 @@ public final class PedestalRecipes {
         
         // 9. gun_minigun_lacunae (FULL_MOON, set 0)
         // CE :125-133. Ring: null corners, powder_magic×4 / item_secret(SELENIUM_STEEL)×4 edges
-        // TODO(CE: PedestalRecipes.java:127-129): item_secret(SELENIUM_STEEL) only partially ported
-        // (Phase11ProcessItems.java:289). Use powder_magic placeholder for now.
+        // item_secret_selenium_steel registered Phase11ProcessItems.java:289 (hidden, tab=null).
         register(new PedestalRecipe(
                 gun("gun_minigun"),
                 new AStack[] {
@@ -165,8 +164,7 @@ public final class PedestalRecipes {
 
         // 10. gun_laser_pistol_morning_glory (no extra, set 0)
         // CE :135-143. Ring: null corners, morning_glory/item_secret(SELENIUM_STEEL)×2/EMERALD.gem()×16 edges
-        // TODO(CE: PedestalRecipes.java:137-139): morning_glory exists in loot pools (ItemPoolsRedRoom.java:23).
-        // Check if discrete item registered.
+        // morning_glory registered Phase11ProcessItems.java:297 (consume item for legendary gun craft).
         register(new PedestalRecipe(
                 gun("gun_laser_pistol"),
                 new AStack[] {
