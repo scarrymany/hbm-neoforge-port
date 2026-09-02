@@ -6018,73 +6018,10 @@ public class ModRecipeProvider extends RecipeProvider {
         // SKIP :953-955 = part_generic pistons (EnumPartType)
 
         // ---- CraftingManager.java:956-1016 crafts (crane, radar, drone, gears, foundry). ----
-        // CE :957-979 crane_* — loop over craneCasing={STONEBRICK x1, IRON x2, STEEL x4} yields 3 variants each
-        // Port simplified to main STEEL variant (x4 output) as most useful
-        
-        // CE :966 crane_inserter (steel variant) = "CCC","C C","CBC", C=STEEL.ingot(), B=conveyor_wand or conveyor block
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_inserter"), 4)
-                .pattern("CCC")
-                .pattern("C C")
-                .pattern("CBC")
-                .define('C', steelIngotTag)
-                .define('B', item("conveyor_wand"))
-                .unlockedBy("has_steel", has(steelIngotTag))
-                .save(output, id("crane_inserter"));
-        
-        // CE :968 crane_extractor (steel) = "CCC","CPC","CBC", C=STEEL, B=conveyor_wand, P=PISTON_PNEUMATIC
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_extractor"), 4)
-                .pattern("CCC")
-                .pattern("CPC")
-                .pattern("CBC")
-                .define('C', steelIngotTag)
-                .define('P', item("part_generic_piston_pneumatic"))
-                .define('B', item("conveyor_wand"))
-                .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
-                .save(output, id("crane_extractor"));
-        
-        // CE :970 crane_grabber (steel) = "C C","P P","CBC", C=STEEL, B=conveyor_wand, P=PISTON_PNEUMATIC
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_grabber"), 4)
-                .pattern("C C")
-                .pattern("P P")
-                .pattern("CBC")
-                .define('C', steelIngotTag)
-                .define('P', item("part_generic_piston_pneumatic"))
-                .define('B', item("conveyor_wand"))
-                .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
-                .save(output, id("crane_grabber"));
-        
-        // CE :974 crane_boxer = "WWW","WPW","CCC", W=planks, P=PISTON_PNEUMATIC, C=conveyor_wand
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_boxer"))
-                .pattern("WWW")
-                .pattern("WPW")
-                .pattern("CCC")
-                .define('W', ItemTags.PLANKS)
-                .define('P', item("part_generic_piston_pneumatic"))
-                .define('C', item("conveyor_wand"))
-                .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
-                .save(output, id("crane_boxer"));
-        
-        // CE :975 crane_unboxer = "WWW","WPW","CCC", W=stick, P=shears, C=conveyor_wand
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_unboxer"))
-                .pattern("WWW")
-                .pattern("WPW")
-                .pattern("CCC")
-                .define('W', Items.STICK)
-                .define('P', Items.SHEARS)
-                .define('C', item("conveyor_wand"))
-                .unlockedBy("has_conveyor", has(item("conveyor_wand")))
-                .save(output, id("crane_unboxer"));
-        
-        // CE :976 crane_router = "PIP","ICI","PIP", P=PISTON_PNEUMATIC, I=plate_polymer, C=circuit_basic
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_router"))
-                .pattern("PIP")
-                .pattern("ICI")
-                .pattern("PIP")
-                .define('P', item("part_generic_piston_pneumatic"))
-                .define('I', item("plate_polymer"))
-                .define('C', item("circuit_basic"))
-                .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
-                .save(output, id("crane_router"));
+        // SKIP :957-979 crane_inserter/extractor/grabber/boxer/unboxer/router/partitioner crafts
+        // BlockCraneBase family (259 lines + GUI/menu/renderer) not registered — too large for this wave
+        // Crafts removed to maintain registered=functional constraint
+        // crane_splitter already registered in ConveyorBlocks — keep its craft only
         
         // CE :977 crane_splitter = "III","PCP","III", I=STEEL.ingot(), P=PISTON_PNEUMATIC, C=circuit_vacuum_tube
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_splitter"))
@@ -6096,16 +6033,6 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('C', item("circuit_vacuum_tube"))
                 .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
                 .save(output, id("crane_splitter"));
-        
-        // CE :978 crane_partitioner = " M ","BCB", M=circuit_chip, B=conveyor_wand, C=crate_steel
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_partitioner"))
-                .pattern(" M ")
-                .pattern("BCB")
-                .define('M', item("circuit_chip"))
-                .define('B', item("conveyor_wand"))
-                .define('C', block("crate_steel"))
-                .unlockedBy("has_conveyor", has(item("conveyor_wand")))
-                .save(output, id("crane_partitioner"));
         // CE :980 = machine_conveyor_press = "CPC","CBC","CCC", C=CU.plate() (copper), P=machine_epress, B=conveyor_wand
         TagKey<Item> copperPlateTagConveyor = MaterialShapes.PLATE.commonTag(Mats.MAT_COPPER);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_conveyor_press"))
