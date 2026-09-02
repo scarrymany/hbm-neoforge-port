@@ -14,6 +14,7 @@ import com.hbm.client.render.ClientEntityRenderers;
 import com.hbm.client.render.blockentity.rbmk.RBMKAutoloaderPistonRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKConsoleHeatmapRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKControlRodRenderer;
+import com.hbm.client.render.blockentity.rbmk.RBMKDisplayRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKFuelColumnRenderer;
 import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.gui.BatteryScreen;
@@ -77,6 +78,7 @@ public class ClientModRegistry {
             BlockEntityRenderers.register(RBMKBlockEntities.ROD_REASIM.get(), new RBMKFuelColumnRenderer.Provider());
             BlockEntityRenderers.register(RBMKBlockEntities.CONSOLE.get(), new RBMKConsoleHeatmapRenderer.Provider());
             BlockEntityRenderers.register(RBMKBlockEntities.AUTOLOADER.get(), new RBMKAutoloaderPistonRenderer.Provider());
+            BlockEntityRenderers.register(RBMKBlockEntities.DISPLAY.get(), new RBMKDisplayRenderer.Provider());
 
             // Phase 5 (particle_engine_and_generic_vfx): registers every HbmEffect constant's
             // client-only render handler - must run once, client-side only, before any
