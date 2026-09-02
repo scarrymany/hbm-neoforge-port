@@ -32,6 +32,7 @@ import net.minecraft.world.level.Level;
  *   <li>{@code :642} euphemium + AMAT cell + singularity → {@code ams_core_sing}</li>
  *   <li>{@code :644} dalekanium + lava barrel + black_hole → {@code ams_core_eyeofharmony}</li>
  *   <li>{@code :491} barbed_wire + peroxide tank → {@code barbed_wire_acid} ×8</li>
+ *   <li>{@code ArmorRecipes:76} lunar plate + xenon tanks + {@code mp_thruster_10_xenon} → {@code bj_plate_jetpack}</li>
  * </ul>
  */
 public final class FluidContainerCraftingRecipe implements CraftingRecipe {
@@ -78,6 +79,16 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
                 && itemAt(in, 0, 2, "barbed_wire") && itemAt(in, 1, 2, "barbed_wire")
                 && itemAt(in, 2, 2, "barbed_wire")) {
             return Kind.ACID;
+        }
+        // TODO(CE:ArmorRecipes.java:76) "NFN","TPT","ICI" xenon tanks are fluid-meta
+        if (itemAt(in, 0, 0, "plate_armor_lunar") && itemAt(in, 1, 0, "fins_quad_titanium")
+                && itemAt(in, 2, 0, "plate_armor_lunar")
+                && tankAt(in, 0, 1, "fluid_tank_full", Fluids.XENON, 1000)
+                && itemAt(in, 1, 1, "bj_plate")
+                && tankAt(in, 2, 1, "fluid_tank_full", Fluids.XENON, 1000)
+                && itemAt(in, 0, 2, "mp_thruster_10_xenon") && itemAt(in, 1, 2, "crystal_phosphorus")
+                && itemAt(in, 2, 2, "mp_thruster_10_xenon")) {
+            return Kind.BJ_JETPACK;
         }
         return null;
     }
@@ -126,7 +137,8 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
         PELLET,
         SING,
         EYE,
-        ACID;
+        ACID,
+        BJ_JETPACK;
 
         ItemStack result() {
             return switch (this) {
@@ -134,6 +146,7 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
                 case SING -> stack("ams_core_sing", 1);
                 case EYE -> stack("ams_core_eyeofharmony", 1);
                 case ACID -> stack("barbed_wire_acid", 8);
+                case BJ_JETPACK -> stack("bj_plate_jetpack", 1);
             };
         }
     }
