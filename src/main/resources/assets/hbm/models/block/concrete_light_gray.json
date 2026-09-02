@@ -1,6 +1,10 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
+<<<<<<< HEAD
     "all": "hbm:block/concrete_silver"
+=======
+    "all": "hbm:block/concrete"
+>>>>>>> 44cd9dff (Close LEFTOVER_MISSES: mold/cart_ntm item models (CE assets exist).)
   }
 }
