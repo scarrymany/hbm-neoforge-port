@@ -2842,6 +2842,10 @@ public class ModRecipeProvider extends RecipeProvider {
         return found;
     }
 
+    private static Item block(String path) {
+        return item(path);
+    }
+
     /**
      * Like {@link #item(String)}, but a {@code "minecraft:"}-prefixed id resolves against the vanilla
      * namespace instead of {@code hbm:} - used only by {@link #smeltingRecipes} for the handful of CE
@@ -3535,6 +3539,287 @@ public class ModRecipeProvider extends RecipeProvider {
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("battery_sc_am241"))
                 .requires(batteryScEmpty).requires(item("billet_am241")).requires(item("billet_am241"))
                 .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_am241"));
+
+        // ---- red_connector family (CraftingManager.java:290-291). ----
+        // red_connector (CE :290) = "C","I","S", C=coil_copper, I=plate_polymer, S=STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("red_connector"), 4)
+                .pattern("C").pattern("I").pattern("S")
+                .define('C', coilCopper)
+                .define('I', ingotPolymer)
+                .define('S', steelIngotTag)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("block/red_connector"));
+
+        // red_connector_super (CE :291) = "CCC","III"," S ", C=coil_copper, I=plate_polymer, S=ANY_RESISTANTALLOY.ingot()
+        TagKey<Item> resistantAlloyIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_DURA);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("red_connector_super"), 2)
+                .pattern("CCC").pattern("III").pattern(" S ")
+                .define('C', coilCopper)
+                .define('I', ingotPolymer)
+                .define('S', resistantAlloyIngotTag)
+                .unlockedBy("has_coil", has(coilCopper))
+                .save(output, id("block/red_connector_super"));
+
+        // ---- Next batch from CraftingManager.java ~320-380 (machines, tools, bombs). ----
+        // CE :326 = machine_autocrafter = "SCS","MWM","SCS", S=STEEL.plate(), C=circuit_vacuum, M=motor, W=Blocks.CRAFTING_TABLE
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("machine_autocrafter"))
+                .pattern("SCS").pattern("MWM").pattern("SCS")
+                .define('S', steelPlateTag)
+                .define('C', item("circuit_vacuum_tube"))
+                .define('M', item("motor"))
+                .define('W', Items.CRAFTING_TABLE)
+                .unlockedBy("has_circuit", has(item("circuit_vacuum_tube")))
+                .save(output, id("block/machine_autocrafter"));
+
+        // CE :327 = machine_funnel = "S S","SRS"," S ", S=STEEL.ingot(), R=REDSTONE.dust()
+        TagKey<Item> steelIngotTagLocal = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("machine_funnel"))
+                .pattern("S S").pattern("SRS").pattern(" S ")
+                .define('S', steelIngotTagLocal)
+                .define('R', Items.REDSTONE)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("block/machine_funnel"));
+
+        // CE :328 = hopper (vanilla) from steel
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.HOPPER)
+                .pattern("S S").pattern("S S").pattern(" S ")
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("hopper_from_steel"));
+
+        // CE :329 = bucket (vanilla) from steel
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.BUCKET)
+                .pattern("S S").pattern(" S ")
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("bucket_from_steel"));
+
+        // CE :330 = machine_waste_drum = "LRL","BRB","LRL", L=PB.ingot(), B=Blocks.IRON_BARS, R=rod_quad_empty
+        TagKey<Item> leadIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_LEAD);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_waste_drum"))
+                .pattern("LRL").pattern("BRB").pattern("LRL")
+                .define('L', leadIngotTag)
+                .define('B', Items.IRON_BARS)
+                .define('R', item("rod_quad_empty"))
+                .unlockedBy("has_rod", has(item("rod_quad_empty")))
+                .save(output, id("block/machine_waste_drum"));
+
+        // CE :331 = machine_press = "IRI","IPI","IBI", I=IRON.ingot(), R=Blocks.FURNACE, B=IRON.block(), P=Blocks.PISTON
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_press"))
+                .pattern("IRI").pattern("IPI").pattern("IBI")
+                .define('I', Items.IRON_INGOT)
+                .define('R', Items.FURNACE)
+                .define('P', Items.PISTON)
+                .define('B', Items.IRON_BLOCK)
+                .unlockedBy("has_piston", has(Items.PISTON))
+                .save(output, id("block/machine_press"));
+
+        // CE :332 = machine_ammo_press = "IPI","C C","SSS", I=IRON.ingot(), P=Blocks.PISTON, C=CU.ingot(), S=Blocks.STONE
+        TagKey<Item> copperIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_ammo_press"))
+                .pattern("IPI").pattern("C C").pattern("SSS")
+                .define('I', Items.IRON_INGOT)
+                .define('P', Items.PISTON)
+                .define('C', copperIngotTag)
+                .define('S', Items.STONE)
+                .unlockedBy("has_piston", has(Items.PISTON))
+                .save(output, id("block/machine_ammo_press"));
+
+        // CE :333 = machine_siren = "SIS","ICI","SRS", S=STEEL.plate(), I=ANY_RUBBER.ingot(), C=circuit_vacuum, R=REDSTONE.dust()
+        TagKey<Item> rubberIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_RUBBER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("machine_siren"))
+                .pattern("SIS").pattern("ICI").pattern("SRS")
+                .define('S', steelPlateTag)
+                .define('I', rubberIngotTag)
+                .define('C', item("circuit_vacuum_tube"))
+                .define('R', Items.REDSTONE)
+                .unlockedBy("has_circuit", has(item("circuit_vacuum_tube")))
+                .save(output, id("block/machine_siren"));
+
+        // CE :334 = machine_microwave = "III","SGM","IDI", I=plate_polymer, S=STEEL.plate(), G=KEY_ANYPANE, M=magnetron, D=motor
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_microwave"))
+                .pattern("III").pattern("SGM").pattern("IDI")
+                .define('I', ingotPolymer)
+                .define('S', steelPlateTag)
+                .define('G', Items.GLASS_PANE)
+                .define('M', item("magnetron"))
+                .define('D', item("motor"))
+                .unlockedBy("has_magnetron", has(item("magnetron")))
+                .save(output, id("block/machine_microwave"));
+
+        // CE :335 = machine_solar_boiler = "SHS","DHD","SHS", S=STEEL.ingot(), H=STEEL.shell(), D=KEY_BLACK (black dye)
+        TagKey<Item> steelShellTag = MaterialShapes.SHELL.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_solar_boiler"))
+                .pattern("SHS").pattern("DHD").pattern("SHS")
+                .define('S', steelIngotTagLocal)
+                .define('H', steelShellTag)
+                .define('D', Items.BLACK_DYE)
+                .unlockedBy("has_steel", has(steelIngotTagLocal))
+                .save(output, id("block/machine_solar_boiler"));
+
+        // CE :336 = solar_mirror (x3) = "AAA"," B ","SSS", A=AL.plate(), B=steel_beam, S=STEEL.ingot()
+        TagKey<Item> aluminiumPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_ALUMINIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("solar_mirror"), 3)
+                .pattern("AAA").pattern(" B ").pattern("SSS")
+                .define('A', aluminiumPlateTag)
+                .define('B', block("steel_beam"))
+                .define('S', steelIngotTagLocal)
+                .unlockedBy("has_steel_beam", has(block("steel_beam")))
+                .save(output, id("block/solar_mirror"));
+
+        // CE :337 = anvil_iron = "III"," B ","III", I=IRON.ingot(), B=IRON.block()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("anvil_iron"))
+                .pattern("III").pattern(" B ").pattern("III")
+                .define('I', Items.IRON_INGOT)
+                .define('B', Items.IRON_BLOCK)
+                .unlockedBy("has_iron", has(Items.IRON_INGOT))
+                .save(output, id("block/anvil_iron"));
+
+        // CE :338 = anvil_lead = "III"," B ","III", I=PB.ingot(), B=PB.block()
+        TagKey<Item> leadBlockTag = MaterialShapes.BLOCK.commonTag(Mats.MAT_LEAD);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("anvil_lead"))
+                .pattern("III").pattern(" B ").pattern("III")
+                .define('I', leadIngotTag)
+                .define('B', leadBlockTag)
+                .unlockedBy("has_lead", has(leadIngotTag))
+                .save(output, id("block/anvil_lead"));
+
+        // CE :340 = machine_fraction_tower = "H","G","H", H=STEEL.plateWelded(), G=steel_grate
+        // NeoForge port does not have plateWelded - skip this craft
+        // TODO(CE): machine_fraction_tower craft needs welded plate system
+
+        // CE :342 = machine_furnace_brick_off = "III","I I","BBB", I=Items.BRICK, B=Blocks.STONE
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_furnace_brick_off"))
+                .pattern("III").pattern("I I").pattern("BBB")
+                .define('I', Items.BRICK)
+                .define('B', Items.STONE)
+                .unlockedBy("has_brick", has(Items.BRICK))
+                .save(output, id("block/machine_furnace_brick_off"));
+
+        // CE :343 = furnace_iron = "III","IFI","BBB", I=IRON.ingot(), F=Blocks.FURNACE, B=Blocks.STONEBRICK
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("furnace_iron"))
+                .pattern("III").pattern("IFI").pattern("BBB")
+                .define('I', Items.IRON_INGOT)
+                .define('F', Items.FURNACE)
+                .define('B', Items.STONE_BRICKS)
+                .unlockedBy("has_furnace", has(Items.FURNACE))
+                .save(output, id("block/furnace_iron"));
+
+        // CE :344 = machine_mixer = "PIP","GCG","PMP", P=STEEL.plate(), I=DURA.ingot(), G=KEY_ANYPANE, C=circuit_vacuum, M=motor
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_mixer"))
+                .pattern("PIP").pattern("GCG").pattern("PMP")
+                .define('P', steelPlateTag)
+                .define('I', durasteelIngotTag)
+                .define('G', Items.GLASS_PANE)
+                .define('C', item("circuit_vacuum_tube"))
+                .define('M', item("motor"))
+                .unlockedBy("has_motor", has(item("motor")))
+                .save(output, id("block/machine_mixer"));
+
+        // CE :345 = fan = "BPB","PRP","BPB", B=STEEL.bolt(), P=IRON.plate(), R=REDSTONE.dust()
+        TagKey<Item> steelBoltTagLocal = MaterialShapes.BOLT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("fan"))
+                .pattern("BPB").pattern("PRP").pattern("BPB")
+                .define('B', steelBoltTagLocal)
+                .define('P', ironPlateTag)
+                .define('R', Items.REDSTONE)
+                .unlockedBy("has_steel_bolt", has(steelBoltTagLocal))
+                .save(output, id("block/fan"));
+
+        // CE :349 = upgrade_muffler (x16) = "III","IWI","III", I=ANY_RUBBER.ingot(), W=Blocks.WOOL
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_muffler"), 16)
+                .pattern("III").pattern("IWI").pattern("III")
+                .define('I', rubberIngotTag)
+                .define('W', ItemTags.WOOL)
+                .unlockedBy("has_rubber", has(rubberIngotTag))
+                .save(output, id("upgrade_muffler"));
+
+        // CE :350 = upgrade_template (alt 1) = "WIW","PCP","WIW", W=CU.wireFine(), I=IRON.plate(), C=circuit_analog, P=plate_polymer
+        TagKey<Item> copperWireFineTag = MaterialShapes.WIRE.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_template"))
+                .pattern("WIW").pattern("PCP").pattern("WIW")
+                .define('W', copperWireFineTag)
+                .define('I', ironPlateTag)
+                .define('C', item("circuit_analog"))
+                .define('P', ingotPolymer)
+                .unlockedBy("has_circuit", has(item("circuit_analog")))
+                .save(output, id("upgrade_template_analog"));
+
+        // CE :351 = upgrade_template (alt 2) with circuit_basic
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("upgrade_template"))
+                .pattern("WIW").pattern("PCP").pattern("WIW")
+                .define('W', copperWireFineTag)
+                .define('I', ingotPolymer)
+                .define('C', item("circuit_basic"))
+                .define('P', ingotPolymer)
+                .unlockedBy("has_circuit", has(item("circuit_basic")))
+                .save(output, id("upgrade_template_basic"));
+
+        // CE :360 = detonator = "C","S", C=circuit_basic, S=STEEL.plate()
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("detonator"))
+                .pattern("C").pattern("S")
+                .define('C', item("circuit_basic"))
+                .define('S', steelPlateTag)
+                .unlockedBy("has_circuit", has(item("circuit_basic")))
+                .save(output, id("detonator"));
+
+        // CE :361 = detonator_multi shapeless = detonator + circuit_advanced
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, item("detonator_multi"))
+                .requires(item("detonator"))
+                .requires(item("circuit_advanced"))
+                .unlockedBy("has_detonator", has(item("detonator")))
+                .save(output, id("detonator_multi"));
+
+        // CE :362 = detonator_laser shapeless = rangefinder + circuit_advanced + RUBBER.ingot() + GOLD.wireDense()
+        TagKey<Item> goldWireDenseTag = MaterialShapes.DENSEWIRE.commonTag(Mats.MAT_GOLD);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, item("detonator_laser"))
+                .requires(item("rangefinder"))
+                .requires(item("circuit_advanced"))
+                .requires(rubberIngotTag)
+                .requires(goldWireDenseTag)
+                .unlockedBy("has_rangefinder", has(item("rangefinder")))
+                .save(output, id("detonator_laser"));
+
+        // CE :363 = detonator_deadman shapeless = detonator + defuser + ducttape
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, item("detonator_deadman"))
+                .requires(item("detonator"))
+                .requires(item("defuser"))
+                .requires(item("ducttape"))
+                .unlockedBy("has_detonator", has(item("detonator")))
+                .save(output, id("detonator_deadman"));
+
+        // CE :364 = detonator_de = "T","D","T", T=Blocks.TNT, D=detonator_deadman
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("detonator_de"))
+                .pattern("T").pattern("D").pattern("T")
+                .define('T', Items.TNT)
+                .define('D', item("detonator_deadman"))
+                .unlockedBy("has_deadman", has(item("detonator_deadman")))
+                .save(output, id("detonator_de"));
+
+        // CE :374 = fuse shapeless = STEEL.plate() + plate_polymer + W.wireFine()
+        TagKey<Item> tungstenWireFineTag = MaterialShapes.WIRE.commonTag(Mats.MAT_TUNGSTEN);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("fuse"))
+                .requires(steelPlateTag)
+                .requires(ingotPolymer)
+                .requires(tungstenWireFineTag)
+                .unlockedBy("has_polymer", has(ingotPolymer))
+                .save(output, id("fuse"));
+
+        // CE :378 = blades_steel = " P ","PIP"," P ", P=STEEL.plate(), I=STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("blades_steel"))
+                .pattern(" P ").pattern("PIP").pattern(" P ")
+                .define('P', steelPlateTag)
+                .define('I', steelIngotTag)
+                .unlockedBy("has_steel", has(steelIngotTag))
+                .save(output, id("blades_steel"));
+
+        // CE :379 = blades_titanium = " P ","PIP"," P ", P=TI.plate(), I=TI.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("blades_titanium"))
+                .pattern(" P ").pattern("PIP").pattern(" P ")
+                .define('P', titaniumPlateTag)
+                .define('I', titaniumIngotTag)
+                .unlockedBy("has_titanium", has(titaniumIngotTag))
+                .save(output, id("blades_titanium"));
     }
 
     // ================================================================================================

@@ -23,6 +23,8 @@ public final class EnergyNetworkBlockEntities {
     public static Supplier<BlockEntityType<PylonMediumBlockEntity>> PYLON_MEDIUM;
     public static Supplier<BlockEntityType<SubstationBlockEntity>> SUBSTATION;
     public static Supplier<BlockEntityType<ProxyConductorBlockEntity>> PROXY_CONDUCTOR;
+    public static Supplier<BlockEntityType<ConnectorBlockEntity>> CONNECTOR;
+    public static Supplier<BlockEntityType<ConnectorSuperBlockEntity>> CONNECTOR_SUPER;
 
     private EnergyNetworkBlockEntities() {
     }
@@ -68,6 +70,16 @@ public final class EnergyNetworkBlockEntities {
         PROXY_CONDUCTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("substation_proxy_conductor", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new ProxyConductorBlockEntity(PROXY_CONDUCTOR.get(), pos, state),
                 EnergyNetworkBlocks.SUBSTATION.get()
+        ).build(null));
+
+        CONNECTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("red_connector", () -> BlockEntityType.Builder.of(
+                ConnectorBlockEntity::new,
+                EnergyNetworkBlocks.RED_CONNECTOR.get()
+        ).build(null));
+
+        CONNECTOR_SUPER = ModBlocks.BLOCK_ENTITY_TYPES.register("red_connector_super", () -> BlockEntityType.Builder.of(
+                ConnectorSuperBlockEntity::new,
+                EnergyNetworkBlocks.RED_CONNECTOR_SUPER.get()
         ).build(null));
     }
 }
