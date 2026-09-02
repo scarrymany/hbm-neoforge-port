@@ -1,20 +1,28 @@
 package com.hbm.client.render.item.weapon;
 
 import com.hbm.client.render.item.HbmItemBEWLR;
+import com.hbm.client.render.item.ItemRenderFrames17;
+import com.hbm.config.ClientConfig;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.main.MainRegistry;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
@@ -176,6 +184,104 @@ public abstract class ItemRenderGunBase extends HbmItemBEWLR {
         return true;
     }
 
+    /**
+     * CE {@code ItemRenderWeaponBase.setPerspectiveAndRender} + {@code setupTransformsAndRender}.
+     * Called from {@link GunClientEvents} after cancelling vanilla first-person hand.
+     * TODO(CE:ItemRenderWeaponBase.java:124) ShaderHelper hand-depth / skip-hand not ported.
+     */
+    public void setPerspectiveAndRender(ItemStack stack, PoseStack poseStack, MultiBufferSource bufferSource,
+                                        int packedLight, float interp) {
+        ItemRenderGunBase.partialTick = interp;
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player == null) return;
+        if (!mc.options.getCameraType().isFirstPerson() || mc.options.hideGui) return;
+
+        Matrix4f previous = new Matrix4f(RenderSystem.getProjectionMatrix());
+        float aspect = (float) mc.getWindow().getWidth() / (float) mc.getWindow().getHeight();
+        float far = mc.gameRenderer.getDepthFar() * 2.0F;
+        Matrix4f gunProj = new Matrix4f().perspective(
+                getFOVModifier(interp, ClientConfig.GUN_MODEL_FOV.get()) * ((float) Math.PI / 180F),
+                aspect, 0.05F, far);
+        RenderSystem.setProjectionMatrix(gunProj, VertexSorting.DISTANCE_TO_ORIGIN);
+        RenderSystem.clear(256, Minecraft.ON_OSX);
+        try {
+            setupTransformsAndRender(stack, poseStack, player, interp);
+            ItemDisplayContext ctx = player.getMainArm() == HumanoidArm.RIGHT
+                    ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND
+                    : ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
+            renderByItem(stack, ctx, poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
+        } finally {
+            RenderSystem.setProjectionMatrix(previous, VertexSorting.DISTANCE_TO_ORIGIN);
+        }
+    }
+
+    protected void setupTransformsAndRender(ItemStack stack, PoseStack poseStack, LocalPlayer player, float interp) {
+        float swayMagnitude = getSwayMagnitude(stack);
+        float swayPeriod = getSwayPeriod(stack);
+        float turnMagnitude = getTurnMagnitude(stack);
+
+        float pitch = Mth.lerp(interp, player.xRotO, player.getXRot());
+        float yaw = Mth.lerp(interp, player.yRotO, player.getYRot());
+        float armPitch = Mth.lerp(interp, player.xBobO, player.xBob);
+        float armYaw = Mth.lerp(interp, player.yBobO, player.yBob);
+
+        // ItemInHandRenderer already applied 0.1*(view-arm) before RenderHandEvent.
+        poseStack.mulPose(Axis.YP.rotationDegrees(-(yaw - armYaw) * 0.1F));
+        poseStack.mulPose(Axis.XP.rotationDegrees(-(pitch - armPitch) * 0.1F));
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.bobView().get() && mcCameraOr(player) instanceof net.minecraft.world.entity.player.Player walker) {
+            float f = walker.walkDist - walker.walkDistO;
+            float f1 = -(walker.walkDist + f * interp);
+            float f2 = Mth.lerp(interp, walker.oBob, walker.bob);
+            poseStack.mulPose(Axis.XP.rotationDegrees(-(Math.abs(Mth.cos(f1 * (float) Math.PI - 0.2F) * f2) * 5.0F)));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(-(Mth.sin(f1 * (float) Math.PI) * f2 * 3.0F)));
+            poseStack.translate(
+                    -(Mth.sin(f1 * (float) Math.PI) * f2 * 0.5F),
+                    Math.abs(Mth.cos(f1 * (float) Math.PI) * f2),
+                    0.0F);
+        }
+
+        poseStack.mulPose(Axis.XP.rotationDegrees((pitch - armPitch) * 0.1F * turnMagnitude));
+        poseStack.mulPose(Axis.YP.rotationDegrees((yaw - armYaw) * 0.1F * turnMagnitude));
+
+        if (mcCameraOr(player) instanceof net.minecraft.world.entity.player.Player walker) {
+            float distanceDelta = walker.walkDist - walker.walkDistO;
+            float distanceInterp = -(walker.walkDist + distanceDelta * interp);
+            float camYaw = Mth.lerp(interp, walker.oBob, walker.bob);
+            poseStack.translate(
+                    Mth.sin(distanceInterp * (float) Math.PI * swayPeriod) * camYaw * 0.5F * swayMagnitude,
+                    -Math.abs(Mth.cos(distanceInterp * (float) Math.PI * swayPeriod) * camYaw) * swayMagnitude,
+                    0.0F);
+            poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(distanceInterp * (float) Math.PI * swayPeriod) * camYaw * 3.0F));
+            poseStack.mulPose(Axis.XP.rotationDegrees(Math.abs(Mth.cos(distanceInterp * (float) Math.PI * swayPeriod - 0.2F) * camYaw) * 5.0F));
+        }
+        poseStack.mulPose(Axis.YP.rotationDegrees(180F));
+    }
+
+    private static Entity mcCameraOr(LocalPlayer player) {
+        Entity camera = Minecraft.getInstance().getCameraEntity();
+        return camera != null ? camera : player;
+    }
+
+    private float getFOVModifier(float interp, boolean useFOVSetting) {
+        Minecraft mc = Minecraft.getInstance();
+        Entity view = mc.getCameraEntity() != null ? mc.getCameraEntity() : mc.player;
+        float fov = getBaseFOV(mc.player != null ? mc.player.getMainHandItem() : ItemStack.EMPTY);
+        if (useFOVSetting) {
+            fov = mc.options.fov().get().floatValue();
+        }
+        if (view instanceof LivingEntity living && living.getHealth() <= 0.0F) {
+            float f2 = living.deathTime + interp;
+            fov /= (1.0F - 500.0F / (f2 + 500.0F)) * 2.0F + 1.0F;
+        }
+        if (view != null && view.isEyeInFluid(FluidTags.WATER)) {
+            fov = fov * 60.0F / 70.0F;
+        }
+        return fov;
+    }
+
     // ------------------------------------------------------------------------------------
     // renderModel dispatch - see class javadoc for the CE renderFirstPerson/renderOther split.
     // ------------------------------------------------------------------------------------
@@ -205,16 +311,21 @@ public abstract class ItemRenderGunBase extends HbmItemBEWLR {
 
     @Override
     protected final void setupFirstPerson(ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack) {
-        applyPivotCorrection(poseStack);
         setupFirstPersonGun(stack, poseStack);
     }
 
     @Override
     protected final void setupThirdPerson(ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack) {
-        applyPivotCorrection(poseStack);
-        if (isAkimbo() && ctx == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
-            setupThirdPersonAkimbo(stack, poseStack);
+        undoVanillaItemCenter(poseStack);
+        if (ctx == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+            ItemRenderFrames17.applyThirdPersonLeft(poseStack);
+            if (isAkimbo()) {
+                setupThirdPersonAkimbo(stack, poseStack);
+            } else {
+                setupThirdPersonGun(stack, poseStack);
+            }
         } else {
+            ItemRenderFrames17.applyThirdPerson(poseStack);
             setupThirdPersonGun(stack, poseStack);
         }
     }
@@ -224,62 +335,87 @@ public abstract class ItemRenderGunBase extends HbmItemBEWLR {
         return false;
     }
 
-    /** CE {@code setupThirdPersonAkimbo}; default matches {@link #setupThirdPersonGun}. */
+    /** CE {@code setupThirdPersonAkimbo} default numbers. */
     public void setupThirdPersonAkimbo(ItemStack stack, PoseStack poseStack) {
-        setupThirdPersonGun(stack, poseStack);
+        double scale = 0.125D;
+        poseStack.scale((float) scale, (float) scale, (float) scale);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(15.0F));
+        poseStack.mulPose(Axis.YP.rotationDegrees(12.5F));
+        poseStack.mulPose(Axis.XP.rotationDegrees(10.0F));
+        poseStack.translate(5.0, 0.0, 0.0);
     }
 
     @Override
     protected final void setupGround(ItemStack stack, PoseStack poseStack) {
-        applyPivotCorrection(poseStack);
+        undoVanillaItemCenter(poseStack);
+        ItemRenderFrames17.applyGround(poseStack);
         setupEntityGun(stack, poseStack);
     }
 
     @Override
     protected final void setupEntity(ItemStack stack, ItemDisplayContext ctx, PoseStack poseStack) {
-        applyPivotCorrection(poseStack);
-        setupEntityGun(stack, poseStack);
+        undoVanillaItemCenter(poseStack);
+        if (ctx == ItemDisplayContext.HEAD) {
+            ItemRenderFrames17.applyHead(poseStack);
+            setupThirdPersonGun(stack, poseStack);
+        } else if (ctx == ItemDisplayContext.FIXED) {
+            ItemRenderFrames17.applyFixed(poseStack);
+            setupEntityGun(stack, poseStack);
+        } else {
+            ItemRenderFrames17.applyGround(poseStack);
+            setupEntityGun(stack, poseStack);
+        }
     }
 
     @Override
     protected final void setupInventory(ItemStack stack, PoseStack poseStack) {
-        // No pivot correction in GUI context, matching Neo Edition's confirmed
-        // `if (displayContext != GUI) ...` guard - see class javadoc.
+        undoVanillaItemCenter(poseStack);
+        ItemRenderFrames17.applyGui(poseStack);
         setupInventoryGun(stack, poseStack);
     }
 
-    /** {@code translate(0.5,0,0.5); rotate 180 about Y} - see class javadoc and {@link HbmItemBEWLR}'s own "OBJ pivot/orientation note". */
-    protected void applyPivotCorrection(PoseStack poseStack) {
-        poseStack.translate(0.5, 0.0, 0.5);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180F));
+    /** Vanilla {@code ItemRenderer} always {@code translate(-0.5,-0.5,-0.5)} before BEWLR. */
+    private static void undoVanillaItemCenter(PoseStack poseStack) {
+        poseStack.translate(0.5, 0.5, 0.5);
     }
 
-    /** CE base: {@code translate(0,0,1)} - every concrete gun in this task fully replaces this (matches CE's own subclasses, none of which call {@code super}). */
+    /** CE {@code ItemRenderWeaponBase.setupFirstPerson}. */
     protected void setupFirstPersonGun(ItemStack stack, PoseStack poseStack) {
         poseStack.translate(0.0, 0.0, 1.0);
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && player.isCrouching()) {
+            poseStack.translate(0.0, -3.875 / 8.0, 0.0);
+        } else {
+            float offset = 0.8F;
+            poseStack.mulPose(Axis.YP.rotationDegrees(180F));
+            poseStack.translate(offset, -0.75F * offset, -0.5F * offset);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180F));
+        }
     }
 
-    /** Neo Edition base ({@code scale 0.07; translate 0,6.47,-1.5}) - see class javadoc's confidence note. */
+    /** CE {@code ItemRenderWeaponBase.setupThirdPerson}. */
     protected void setupThirdPersonGun(ItemStack stack, PoseStack poseStack) {
-        float scale = 0.07F;
-        poseStack.scale(scale, scale, scale);
-        poseStack.translate(0.0, 6.47, -1.5);
+        double scale = 0.125D;
+        poseStack.scale((float) scale, (float) scale, (float) scale);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(15.0F));
+        poseStack.mulPose(Axis.YP.rotationDegrees(12.5F));
+        poseStack.mulPose(Axis.XP.rotationDegrees(15.0F));
+        poseStack.translate(3.5, 0.0, 0.0);
     }
 
-    /** Neo Edition base ({@code scale 0.063; translate -7.77,7.77,0; rotate Z45; rotate Y90}) - see class javadoc's confidence note. */
+    /** CE {@code ItemRenderWeaponBase.setupInv}. */
     protected void setupInventoryGun(ItemStack stack, PoseStack poseStack) {
-        float scale = 0.063F;
-        poseStack.scale(scale, scale, scale);
-        poseStack.translate(-7.77, 7.77, 0.0);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(45F));
+        poseStack.scale(1F, 1F, -1F);
+        poseStack.translate(8.0, 8.0, 0.0);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(225F));
         poseStack.mulPose(Axis.YP.rotationDegrees(90F));
     }
 
-    /** Neo Edition base ({@code translate 0,0.5,0; scale 0.05}) - covers GROUND/FIXED/HEAD/NONE, matching CE's own unified {@code setupEntity}. */
+    /** CE {@code ItemRenderWeaponBase.setupEntity}. */
     protected void setupEntityGun(ItemStack stack, PoseStack poseStack) {
-        poseStack.translate(0.0, 0.5, 0.0);
-        float scale = 0.05F;
-        poseStack.scale(scale, scale, scale);
+        double scale = 0.125D;
+        poseStack.scale((float) scale, (float) scale, (float) scale);
+        poseStack.mulPose(Axis.YP.rotationDegrees(-90F));
     }
 
     // ------------------------------------------------------------------------------------

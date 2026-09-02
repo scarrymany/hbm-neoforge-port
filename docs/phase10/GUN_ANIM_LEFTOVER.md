@@ -1,33 +1,28 @@
-# CE gun animation leftover
+# CE gun held/render leftover
 
-Sedna bus engine, 12 CE JSON clips, and 68 weapon OBJs were already in-tree.
-This wave wired CE `ItemRender*` + `LAMBDA_*_ANIMS` onto registered guns.
-No invented keyframes.
+Sedna bus engine, CE `ItemRender*`, and factory lambdas were already wired.
+This wave ports the CE held/render pipeline: `builtin/entity` item models,
+`RenderHandEvent` cancel + `setPerspectiveAndRender` viewmodel, CE
+`ItemRenderFrames17` + `setupThirdPerson`/`setupInv`/`setupEntity` numbers.
 
-## Gained CE anims (renderer + lambda)
+No invented keyframes or hold poses.
 
-Already wired before this wave: `gun_spas12`, `gun_uzi`, `gun_am180`.
+## Now using CE FP viewmodel + TP pose
 
-Newly bound this wave (CE renderer + CE factory lambda):
+Every gun bound in `GunAnimationRegistration` (68): 3D OBJ via BEWLR, CE first-person
+projection/sway/turn, CE third-person/GUI/ground frames.
 
-- pistols: `gun_uzi_akimbo`, `gun_pepperbox`, `gun_light_revolver`(+atlas/dani), `gun_henry`(+lincoln), `gun_heavy_revolver`(+lilmac/protege), `gun_hangman`, `gun_greasegun`, `gun_lag`, `gun_star_f`(+akimbo)
-- shotguns: `gun_maresleg`(+akimbo/broken), `gun_liberator`, `gun_autoshotgun`(+shredder/sexy/heretic), `gun_double_barrel`(+sacred_dragon)
-- rifles: `gun_g3`(+zebra), `gun_stg77`, `gun_carbine`, `gun_minigun`(+lacunae/dual), `gun_mas36`, `gun_amat`(+subtlety/penance), `gun_m2`
-- launchers: `gun_flaregun`, `gun_congolake`, `gun_mk108`, `gun_bolter`
-- heavy: `gun_panzerschreck`, `gun_stinger`, `gun_quadro`, `gun_missile_launcher`, `gun_charge_thrower`, `gun_flamer`(+topaz/daybreaker), `gun_chemthrower`, `gun_drill`, `gun_pa_melee`, `gun_debug`
-- energy: `gun_tau`, `gun_coilgun`, `gun_n_i_4_n_i`, `gun_tesla_cannon`, `gun_laser_pistol`(+pew_pew/morning_glory), `gun_lasrifle`, `gun_fatman`, `gun_folly`, `gun_aberrator`(+eott)
+## Still vanilla / no Sedna held renderer
 
-## Still static / incomplete
-
-- `gun_fireext` — CE uses legacy `ItemRenderFireExt` (`TEISRBase`), not Sedna `ItemRenderWeaponBase`. TODO(CE:ItemRenderFireExt.java:20)
+- `gun_fireext` — CE legacy `ItemRenderFireExt` (`TEISRBase`). TODO(CE:ItemRenderFireExt.java:20)
 - `gun_pa_ranged` — CE `ItemGunPA`, no dedicated Sedna FP renderer. TODO(CE:XFactoryPA.java:36)
 - `gun_b92` — legacy `ItemRenderGunAnim`, not Sedna bus. TODO(CE:ClientProxy.java:323)
 - Orphan CE JSON never referenced in CE Java either: `python.json`, `cursed.json`, `novac.json`, `ks23.json`, `supershotty.json`, `benelli.json`. TODO(CE:ResourceManager.java:537-543)
 
 ## True blockers (not invented around)
 
+- ShaderHelper hand-depth / skip-hand: TODO(CE:ItemRenderWeaponBase.java:124)
 - smokeNodes trail: TODO(CE:ItemGunBaseNT.java:329)
-- Custom FP projection `setPerspectiveAndRender`: TODO(CE:ItemRenderWeaponBase.java:116). Port uses BEWLR + `applyForgeHandTransform` + `ViewportEvent.ComputeFov`.
 - CYCLE recoil callback: TODO(CE:GunAnimationPacketSedna.java:96-102)
 - Trenchmaster reload speed / equip-progress reset: TODO(CE:GunAnimationPacketSedna.java:116-119)
 - Spent-casing tint: TODO(CE:ItemRenderSPAS12.java:64-73) / TODO(CE:ItemRenderCongoLake.java:86)
