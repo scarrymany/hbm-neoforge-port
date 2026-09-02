@@ -6018,10 +6018,15 @@ public class ModRecipeProvider extends RecipeProvider {
         // SKIP :953-955 = part_generic pistons (EnumPartType)
 
         // ---- CraftingManager.java:956-1016 crafts (crane, radar, drone, gears, foundry). ----
-        // SKIP :957-979 crane_inserter/extractor/grabber/boxer/unboxer/router/partitioner crafts
-        // BlockCraneBase family (259 lines + GUI/menu/renderer) not registered — too large for this wave
-        // Crafts removed to maintain registered=functional constraint
-        // crane_splitter already registered in ConveyorBlocks — keep its craft only
+        // CE :966 crane_inserter (steel variant) = "CCC","C C","CBC", C=STEEL.ingot(), B=conveyor_wand
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_inserter"), 4)
+                .pattern("CCC")
+                .pattern("C C")
+                .pattern("CBC")
+                .define('C', steelIngotTag)
+                .define('B', item("conveyor_wand"))
+                .unlockedBy("has_steel", has(steelIngotTag))
+                .save(output, id("crane_inserter"));
         
         // CE :977 crane_splitter = "III","PCP","III", I=STEEL.ingot(), P=PISTON_PNEUMATIC, C=circuit_vacuum_tube
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("crane_splitter"))
@@ -6033,6 +6038,9 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('C', item("circuit_vacuum_tube"))
                 .unlockedBy("has_pneumatic", has(item("part_generic_piston_pneumatic")))
                 .save(output, id("crane_splitter"));
+        
+        // SKIP :968-978 crane_extractor/grabber/boxer/unboxer/router/partitioner
+        // BlockCraneBase family subtypes — deferred until ported live
         // CE :980 = machine_conveyor_press = "CPC","CBC","CCC", C=CU.plate() (copper), P=machine_epress, B=conveyor_wand
         TagKey<Item> copperPlateTagConveyor = MaterialShapes.PLATE.commonTag(Mats.MAT_COPPER);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_conveyor_press"))

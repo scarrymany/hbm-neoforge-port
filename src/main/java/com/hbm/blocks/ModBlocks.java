@@ -91,6 +91,7 @@ public final class ModBlocks {
         com.hbm.blocks.network.FluidDuctBlocks.registerAll();
         com.hbm.blockentity.network.FluidDuctBlockEntities.registerAll();
         com.hbm.blocks.network.ConveyorBlocks.registerAll();
+        com.hbm.blocks.network.CraneBlocks.registerAll();
         com.hbm.blocks.machine.OilChainBlocks.registerAll();
         com.hbm.blocks.machine.ProcessingBlocks.registerAll();
         com.hbm.blocks.machine.chem.ChemIsotopeBlocks.registerAll();

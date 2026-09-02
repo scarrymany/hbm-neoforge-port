@@ -81,6 +81,9 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<TapeDriveMenu>> TAPE_DRIVE =
             reg("tape_drive", TapeDriveMenu::fromNetwork);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneInserterMenu>> CRANE_INSERTER =
+            reg("crane_inserter", com.hbm.menu.CraneInserterMenu::new);
+
     private ModMenuTypes() {
     }
 
