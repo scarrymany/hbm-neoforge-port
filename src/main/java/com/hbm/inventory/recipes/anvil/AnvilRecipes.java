@@ -273,6 +273,154 @@ public final class AnvilRecipes {
                 cmp("coil_gold", 16),
                 cmp("gear_large_steel"));
 
+        // :351-358 machine_steam_engine
+        construct(2, stack("machine_steam_engine"),
+                cmp("reinforced_stone", 16),
+                tag("plates/steel", 12),
+                tag("shells/steel", 2),
+                cmp("coil_copper", 4),
+                cmp("gear_large_iron"));
+
+        // :360-367 machine_sawmill
+        construct(2, stack("machine_sawmill"),
+                new OreDictStack(ItemTags.PLANKS, 16),
+                tag("plates/steel", 6),
+                tag("ingots/copper", 8),
+                tag("ingots/iron", 4),
+                cmp("sawblade"));
+
+        // :369-374 machine_crucible
+        construct(2, stack("machine_crucible"),
+                cmp("ingot_firebrick", 20),
+                tag("ingots/copper", 8),
+                tag("plates/steel", 8));
+
+        // :376-381 machine_boiler
+        construct(2, stack("machine_boiler"),
+                tag("ingots/steel", 4),
+                tag("plates/copper", 16),
+                cmp("plate_polymer", 8));
+
+        // :383-389 machine_soldering_station
+        construct(2, stack("machine_soldering_station"),
+                tag("cast_plates/steel", 2),
+                cmp("coil_copper", 4),
+                tag("bolts/tungsten", 4),
+                cmp("circuit_vacuum_tube", 2));
+
+        // :391-397 machine_arc_welder
+        construct(2, stack("machine_arc_welder"),
+                tag("cast_plates/steel", 4),
+                tag("ingots/tungsten", 8),
+                cmp("machine_transformer"),
+                cmp("arc_electrode", 2));
+
+        // :399-404 machine_industrial_boiler
+        construct(3, stack("machine_industrial_boiler"),
+                tag("cast_plates/steel", 8),
+                tag("ingots/copper", 8),
+                cmp("plate_polymer", 4));
+
+        // :406-410 machine_transformer
+        construct(2, stack("machine_transformer"),
+                tag("plates/steel", 4),
+                tag("ingots/iron", 12),
+                cmp("coil_copper", 4),
+                cmp("coil_gold", 2));
+
+        // :406-413 machine_autosaw
+        construct(2, stack("machine_autosaw"),
+                tag("plates/steel", 8),
+                tag("ingots/iron", 12),
+                tag("ingots/copper", 2),
+                cmp("circuit_vacuum_tube", 2),
+                cmp("sawblade"));
+
+        // :415-421 machine_thresher
+        construct(2, stack("machine_thresher"),
+                tag("plates/steel", 8),
+                tag("ingots/iron", 12),
+                tag("ingots/copper", 2),
+                cmp("circuit_vacuum_tube"));
+
+        // :423-428 machine_tower_small
+        construct(3, stack("machine_tower_small"),
+                cmp("brick_concrete", 64),
+                new ComparableStack(Blocks.IRON_BARS, 128),
+                cmp("machine_condenser", 4));
+
+        // :429-435 machine_tower_large
+        construct(4, stack("machine_tower_large"),
+                cmp("concrete_smooth", 128),
+                cmp("steel_scaffold", 32),
+                cmp("machine_condenser", 16),
+                tag("pipes/steel", 8));
+
+        // :437-442 wings_limp
+        construct(2, stack("wings_limp"),
+                new ComparableStack(Items.BONE, 16),
+                new ComparableStack(Items.LEATHER, 4),
+                new ComparableStack(Items.FEATHER, 24));
+
+        // :444-451 machine_deuterium_extractor
+        construct(2, stack("machine_deuterium_extractor"),
+                cmp("sulfur", 12),
+                tag("shells/steel", 4),
+                tag("cast_plates/copper", 6),
+                cmp("circuit_basic", 2));
+
+        // :453-462 machine_deuterium_tower (skip SOURGAS fluid requirement for now - CE :460)
+        // TODO(CE :453-462): machine_deuterium_tower requires Fluids.SOURGAS.getDict(1_000) × 8
+
+        // :464-471 red_pylon_large
+        construct(2, stack("red_pylon_large"),
+                cmp("concrete_smooth", 2),
+                cmp("steel_scaffold", 8),
+                cmp("plate_polymer", 8),
+                cmp("coil_copper", 4));
+
+        // :473-480 substation
+        construct(2, stack("substation", 2),
+                cmp("concrete_smooth", 8),
+                tag("ingots/steel", 8),
+                cmp("plate_polymer", 12),
+                cmp("coil_copper", 8));
+
+        // :482-488 chimney_brick
+        construct(2, stack("chimney_brick"),
+                tag("plates/steel", 4),
+                new ComparableStack(Blocks.BRICKS, 16),
+                cmp("steel_grate", 2));
+
+        // :490-497 bm_power_box (uses wire_dense metadata Mats.MAT_MINGRADE)
+        Item mingradeDense = item(MaterialShapes.DENSEWIRE.buildRegistryName(Mats.MAT_MINGRADE));
+        if (mingradeDense != Items.AIR) {
+            construct(5, stack("bm_power_box"),
+                    cmp("steel_wall", 2),
+                    tag("dusts/redstone", 4),
+                    new ComparableStack(Blocks.LEVER, 2),
+                    new ComparableStack(mingradeDense, 3));
+        }
+
+        // :499-506 chimney_industrial
+        construct(3, stack("chimney_industrial"),
+                tag("plates/steel", 16),
+                cmp("concrete_smooth", 64),
+                cmp("steel_grate", 4),
+                cmp("filter_coal", 4));
+
+        // :508-513 yellow_barrel
+        construct(3, stack("yellow_barrel"),
+                cmp("tank_steel"),
+                tag("plates/lead", 2),
+                cmp("nuclear_waste", 10));
+
+        // :514-519 vitrified_barrel
+        construct(3, stack("vitrified_barrel"),
+                cmp("tank_steel"),
+                tag("plates/lead", 2),
+                cmp("nuclear_waste_vitrified", 10));
+
         // :291-298 heater_electric
         construct(3, stack("heater_electric"),
                 cmp("ingot_polymer", 4),
