@@ -5714,6 +5714,54 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_circuit_analog", has(item("circuit_analog")))
                 .save(output, id("fluid_identifier_multi"));
 
+        // ---- CraftingManager.java:248-258 crafts (rag, rope/slime/tar helpers). ----
+        // CE :248 = plant_item ROPE (shapeless: string x3) — no rope item in port, use vanilla string
+        // CE :249 = plant_item ROPE (shaped 4: hemp x3) — hemp plant not ported yet
+        // CE :250 = string x3 (shapeless: hemp) — hemp plant not ported yet
+        
+        // CE :258 = ducttape x4 = "F","P","S", F=string, P=paper, S=KEY_SLIME (slime_ball)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ducttape"), 4)
+                .pattern("F")
+                .pattern("P")
+                .pattern("S")
+                .define('F', Items.STRING)
+                .define('P', Items.PAPER)
+                .define('S', Items.SLIME_BALL)
+                .unlockedBy("has_slime", has(Items.SLIME_BALL))
+                .save(output, id("ducttape"));
+        
+        // CE :929 = name_tag = "SB ","BPB"," BP", S=string, B=KEY_SLIME, P=paper
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.NAME_TAG)
+                .pattern("SB ")
+                .pattern("BPB")
+                .pattern(" BP")
+                .define('S', Items.STRING)
+                .define('B', Items.SLIME_BALL)
+                .define('P', Items.PAPER)
+                .unlockedBy("has_slime", has(Items.SLIME_BALL))
+                .save(output, id("name_tag_slime"));
+        
+        // CE :930 = name_tag (alt) = "SB ","BPB"," BP", S=string, B=ANY_TAR, P=paper
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.NAME_TAG)
+                .pattern("SB ")
+                .pattern("BPB")
+                .pattern(" BP")
+                .define('S', Items.STRING)
+                .define('B', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "oil_tar")))
+                .define('P', Items.PAPER)
+                .unlockedBy("has_tar", has(item("oil_tar_crude")))
+                .save(output, id("name_tag_tar"));
+        
+        // CE :931 = lead x4 = "RSR", R=plant_item ROPE, S=KEY_SLIME — rope not ported, skip
+        // CE :932 = rag x4 = "SW","WS", S=string, W=wool
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("rag"), 4)
+                .pattern("SW")
+                .pattern("WS")
+                .define('S', Items.STRING)
+                .define('W', ItemTags.WOOL)
+                .unlockedBy("has_string", has(Items.STRING))
+                .save(output, id("rag"));
+
         // SKIP :947-948 = anchor_remote / teleanchor (CE uses ItemBattery + powder_magic + gem_alexandrite)
         // SKIP :949 = field_disturber (CE uses STAR + circuit_bismoid)
         // SKIP :950-951 = holotape crafts (EnumHoloImage)
