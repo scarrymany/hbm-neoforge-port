@@ -4418,6 +4418,229 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // CE :640-645 = singularity_spark (2 patterns) + ams_core_* — check ingredients
         // SKIP singularities — plate_euphemium/plate_dalekanium not registered yet
+
+        // ---- CraftingManager.java:646-690 crafts (photo_panel, machines, sat items, jackt, doors, rad_absorber). ----
+        // CE :646 = photo_panel = " G ","IPI"," C ", G=KEY_ANYPANE, I=plate_polymer, P=NETHERQUARTZ.dust(), C=circuit_pcb
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("photo_panel"))
+                .pattern(" G ").pattern("IPI").pattern(" C ")
+                .define('G', Items.GLASS_PANE)
+                .define('I', item("plate_polymer"))
+                .define('P', Items.QUARTZ)
+                .define('C', item("circuit_pcb"))
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("photo_panel"));
+
+        // CE :647 = machine_satlinker = "PSP","SCS","PSP", P=STEEL.plate(), S=STAR.ingot(), C=sat_chip
+        TagKey<Item> starIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_STAR);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_satlinker"))
+                .pattern("PSP").pattern("SCS").pattern("PSP")
+                .define('P', steelPlateTag)
+                .define('S', starIngotTag)
+                .define('C', item("sat_chip"))
+                .unlockedBy("has_sat_chip", has(item("sat_chip")))
+                .save(output, id("machine_satlinker"));
+
+        // SKIP :648 machine_tape_drive — ANY_PLASTIC not added yet
+        // CE :649 = machine_keyforge = "PCP","WSW","WSW", P=STEEL.plate(), S=W.ingot(), C=padlock, W=KEY_PLANKS
+        TagKey<Item> tungstenIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_TUNGSTEN);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_keyforge"))
+                .pattern("PCP").pattern("WSW").pattern("WSW")
+                .define('P', steelPlateTag)
+                .define('S', tungstenIngotTag)
+                .define('C', item("padlock"))
+                .define('W', ItemTags.PLANKS)
+                .unlockedBy("has_padlock", has(item("padlock")))
+                .save(output, id("machine_keyforge"));
+
+        // SKIP :650 sat_chip — ANY_PLASTIC not added yet
+        // SKIP :651-657 satellite shapeless conversions — deferred
+        // SKIP :658 geiger_counter shapeless — already registered
+
+        // CE :659 = sat_interface = "ISI","PCP","PAP", I=STEEL.ingot(), S=STAR.ingot(), P=plate_polymer, C=sat_chip, A=circuit_advanced
+        TagKey<Item> steelIngotTagLocal5 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("sat_interface"))
+                .pattern("ISI").pattern("PCP").pattern("PAP")
+                .define('I', steelIngotTagLocal5)
+                .define('S', starIngotTag)
+                .define('P', item("plate_polymer"))
+                .define('C', item("sat_chip"))
+                .define('A', item("circuit_advanced"))
+                .unlockedBy("has_sat_chip", has(item("sat_chip")))
+                .save(output, id("sat_interface"));
+
+        // CE :660 = sat_coord = "SII","SCA","SPP", I=STEEL.ingot(), S=STAR.ingot(), P=plate_polymer, C=sat_chip, A=circuit_advanced
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("sat_coord"))
+                .pattern("SII").pattern("SCA").pattern("SPP")
+                .define('I', steelIngotTagLocal5)
+                .define('S', starIngotTag)
+                .define('P', item("plate_polymer"))
+                .define('C', item("sat_chip"))
+                .define('A', item("circuit_advanced"))
+                .unlockedBy("has_sat_chip", has(item("sat_chip")))
+                .save(output, id("sat_coord"));
+
+        // CE :661 = machine_transformer = "SCS","MDM","SCS", S=IRON.ingot(), D=MINGRADE.ingot(), M=coil_copper, C=circuit_capacitor
+        TagKey<Item> mingradIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_MINGRADE);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_transformer"))
+                .pattern("SCS").pattern("MDM").pattern("SCS")
+                .define('S', Items.IRON_INGOT)
+                .define('D', mingradIngotTag)
+                .define('M', item("coil_copper"))
+                .define('C', item("circuit_capacitor"))
+                .unlockedBy("has_coil", has(item("coil_copper")))
+                .save(output, id("machine_transformer"));
+
+        // SKIP :662 machine_transformer_dnt — MAGTUNG.wireDense() not added yet (DenseMag)
+
+        // CE :663 = radiobox = "PLP","PSP","PLP", P=STEEL.plate(), S=ring_starmetal, L=DURA.plate()
+        TagKey<Item> duraPlateTagLocal = MaterialShapes.PLATE.commonTag(Mats.MAT_DURA);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("radiobox"))
+                .pattern("PLP").pattern("PSP").pattern("PLP")
+                .define('P', steelPlateTag)
+                .define('S', item("ring_starmetal"))
+                .define('L', duraPlateTagLocal)
+                .unlockedBy("has_ring", has(item("ring_starmetal")))
+                .save(output, id("radiobox"));
+
+        // SKIP :664 radiorec — ANY_PLASTIC not added yet
+
+        // CE :665-666 = jackt (2 variants) = "S S","LIL","LIL", S=STEEL.plate(), L=leather, I=ANY_RUBBER.ingot()
+        Item ingotRubberLocal2 = item("ingot_rubber");
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("jackt"))
+                .pattern("S S").pattern("LIL").pattern("LIL")
+                .define('S', steelPlateTag)
+                .define('L', Items.LEATHER)
+                .define('I', ingotRubberLocal2)
+                .unlockedBy("has_rubber", has(ingotRubberLocal2))
+                .save(output, id("jackt"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("jackt2"))
+                .pattern("S S").pattern("LIL").pattern("III")
+                .define('S', steelPlateTag)
+                .define('L', Items.LEATHER)
+                .define('I', ingotRubberLocal2)
+                .unlockedBy("has_rubber", has(ingotRubberLocal2))
+                .save(output, id("jackt2"));
+
+        // SKIP :667 vent_chlorine — pellet_gas not registered yet
+        // SKIP :668 vent_chlorine_seal — BIGMT not added yet
+        // CE :669 = spikes (x4) = "BBB","BBB","TTT", B=STEEL.bolt(), T=STEEL.ingot()
+        TagKey<Item> steelBoltTagLocal4 = MaterialShapes.BOLT.commonTag(Mats.MAT_STEEL);
+        TagKey<Item> steelIngotTagLocal6 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("spikes"), 4)
+                .pattern("BBB").pattern("BBB").pattern("TTT")
+                .define('B', steelBoltTagLocal4)
+                .define('T', steelIngotTagLocal6)
+                .unlockedBy("has_bolt", has(steelBoltTagLocal4))
+                .save(output, id("spikes"));
+
+        // SKIP :670 custom_fall — BIGMT not added yet
+        // SKIP :671 machine_controller — ANY_RESISTANTALLOY not added yet
+
+        // CE :672 = containment_box = "LUL","UCU","LUL", L=PB.plate(), U=FERRO.ingot(), C=crate_steel
+        TagKey<Item> leadPlateTagLocal2 = MaterialShapes.PLATE.commonTag(Mats.MAT_LEAD);
+        TagKey<Item> ferroIngotTagLocal = MaterialShapes.INGOT.commonTag(Mats.MAT_FERRO);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("containment_box"))
+                .pattern("LUL").pattern("UCU").pattern("LUL")
+                .define('L', leadPlateTagLocal2)
+                .define('U', ferroIngotTagLocal)
+                .define('C', block("crate_steel"))
+                .unlockedBy("has_crate", has(block("crate_steel")))
+                .save(output, id("containment_box"));
+
+        // CE :673-676 = casing_bag/ammo_bag (4 variants) with leather + rubber
+        TagKey<Item> gunmetalPlateTag = MaterialShapes.PLATE.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("casing_bag"))
+                .pattern(" L ").pattern("LGL").pattern(" L ")
+                .define('L', Items.LEATHER)
+                .define('G', gunmetalPlateTag)
+                .unlockedBy("has_leather", has(Items.LEATHER))
+                .save(output, id("casing_bag_leather"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("casing_bag"))
+                .pattern(" L ").pattern("LGL").pattern(" L ")
+                .define('L', ingotRubberLocal2)
+                .define('G', gunmetalPlateTag)
+                .unlockedBy("has_rubber", has(ingotRubberLocal2))
+                .save(output, id("casing_bag_rubber"));
+
+        // SKIP ammo_bag — WEAPONSTEEL not added yet
+
+        // CE :678-681 = rad_absorber (4 tiers)
+        // CE :678 = rad_absorber BASE = "ICI","CPC","ICI", I=CU.ingot(), C=COAL.dust(), P=PB.dust()
+        TagKey<Item> leadDustTag = MaterialShapes.DUST.commonTag(Mats.MAT_LEAD);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("rad_absorber"))
+                .pattern("ICI").pattern("CPC").pattern("ICI")
+                .define('I', copperIngotTag)
+                .define('C', Items.COAL)
+                .define('P', leadDustTag)
+                .unlockedBy("has_copper", has(copperIngotTag))
+                .save(output, id("rad_absorber_base"));
+
+        // CE :679 = rad_absorber RED = "ICI","CPC","ICI", I=TI.ingot(), C=COAL.dust(), P=rad_absorber_base
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("rad_absorber_red"))
+                .pattern("ICI").pattern("CPC").pattern("ICI")
+                .define('I', titaniumIngotTag)
+                .define('C', Items.COAL)
+                .define('P', block("rad_absorber"))
+                .unlockedBy("has_base", has(block("rad_absorber")))
+                .save(output, id("rad_absorber_red"));
+
+        // SKIP :680-681 rad_absorber GREEN/PINK — ANY_PLASTIC/BIGMT not added yet
+
+        // CE :682 = decon = "BGB","SAS","BSB", B=BE.ingot(), G=iron_bars, S=STEEL.ingot(), A=rad_absorber_base
+        TagKey<Item> steelIngotTagLocal7 = MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("decon"))
+                .pattern("BGB").pattern("SAS").pattern("BSB")
+                .define('B', berylliumIngotTag)
+                .define('G', Items.IRON_BARS)
+                .define('S', steelIngotTagLocal7)
+                .define('A', block("rad_absorber"))
+                .unlockedBy("has_absorber", has(block("rad_absorber")))
+                .save(output, id("decon"));
+
+        // CE :684-686 = pink_planks/slab/stairs
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("pink_planks"), 4)
+                .pattern("W")
+                .define('W', block("pink_log"))
+                .unlockedBy("has_log", has(block("pink_log")))
+                .save(output, id("pink_planks"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("pink_slab"), 6)
+                .pattern("WWW")
+                .define('W', block("pink_planks"))
+                .unlockedBy("has_planks", has(block("pink_planks")))
+                .save(output, id("pink_slab"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("pink_stairs"), 6)
+                .pattern("W  ").pattern("WW ").pattern("WWW")
+                .define('W', block("pink_planks"))
+                .unlockedBy("has_planks", has(block("pink_planks")))
+                .save(output, id("pink_stairs"));
+
+        // SKIP :687 cargo_elevator — part_generic PISTON_HYDRAULIC not registered yet
+
+        // CE :689-691 = doors (door_metal, door_office, door_bunker)
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("door_metal"))
+                .pattern("II").pattern("SS").pattern("II")
+                .define('I', ironPlateTag)
+                .define('S', steelPlateTag)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("door_metal"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("door_office"))
+                .pattern("II").pattern("SS").pattern("II")
+                .define('I', ItemTags.PLANKS)
+                .define('S', ironPlateTag)
+                .unlockedBy("has_iron", has(ironPlateTag))
+                .save(output, id("door_office"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("door_bunker"))
+                .pattern("II").pattern("SS").pattern("II")
+                .define('I', steelPlateTag)
+                .define('S', leadPlateTagLocal2)
+                .unlockedBy("has_lead", has(leadPlateTagLocal2))
+                .save(output, id("door_bunker"));
     }
 
     // ================================================================================================
