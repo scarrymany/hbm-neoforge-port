@@ -151,7 +151,7 @@ public class BlockPedestal extends BaseEntityBlock {
         }
 
         // Find matching recipe
-        PedestalRecipes.PedestalRecipe recipe = PedestalRecipes.findRecipe(stacks, level);
+        PedestalRecipes.PedestalRecipe recipe = PedestalRecipes.findRecipe(stacks, level, pos);
         if (recipe == null) return;
 
         // Consume inputs from all 9 pedestals

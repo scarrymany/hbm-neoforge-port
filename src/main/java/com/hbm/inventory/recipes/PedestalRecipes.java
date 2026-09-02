@@ -3,6 +3,7 @@ package com.hbm.inventory.recipes;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.main.MainRegistry;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -399,7 +400,7 @@ public final class PedestalRecipes {
          * CE BlockPedestal.java:188-196. Check if 9-element array (center + 8 ring positions)
          * matches this recipe's pattern. {@code stacks[4]} = center, rest = ring clockwise from NW.
          */
-        public boolean matches(ItemStack[] stacks, Level level) {
+        public boolean matches(ItemStack[] stacks, Level level, BlockPos centerPos) {
             if (stacks.length != 9) return false;
 
             // Check center
@@ -419,7 +420,7 @@ public final class PedestalRecipes {
             }
 
             // Check extra condition (celestial/karma)
-            if (extra != null && !extra.check(level)) return false;
+            if (extra != null && !extra.check(level, centerPos)) return false;
 
             return true;
         }
@@ -454,12 +455,9 @@ public final class PedestalRecipes {
 
         /**
          * CE BlockPedestal.java:168-186. Check celestial angle / moon phase / player karma.
-         * TODO(BlockPedestal): Karma conditions (GOOD_KARMA/BAD_KARMA) require player context
-         * (HbmPlayerAttachment.getData(player).getReputation() >= 10 / <= -10). BlockPedestal's
-         * recipe-matching logic must pass player when it calls this check. For now, these conditions
-         * always fail.
+         * Karma conditions check nearest player (CE searches 8-block radius from pedestal center).
          */
-        public boolean check(Level level) {
+        public boolean check(Level level, BlockPos pos) {
             return switch (this) {
                 case FULL_MOON -> {
                     // CE: world.provider.getMoonPhase(world.getWorldTime()) == 0
@@ -475,14 +473,18 @@ public final class PedestalRecipes {
                     yield angle >= 0.24F && angle <= 0.26F; // Midday (adjusted for NeoForge angle range)
                 }
                 case GOOD_KARMA -> {
-                    // TODO(BlockPedestal): player-context check needed:
-                    // HbmPlayerAttachment.getData(player).getReputation() >= 10
-                    yield false;
+                    // CE BlockPedestal.java:170-178: search nearest player in 8-block radius
+                    var player = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 8.0, false);
+                    if (player == null) yield false;
+                    var data = player.getData(com.hbm.capability.ModAttachments.PLAYER_ATTACHMENT);
+                    yield data.getReputation() >= 10;
                 }
                 case BAD_KARMA -> {
-                    // TODO(BlockPedestal): player-context check needed:
-                    // HbmPlayerAttachment.getData(player).getReputation() <= -10
-                    yield false;
+                    // CE BlockPedestal.java:180-186: search nearest player in 8-block radius
+                    var player = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 8.0, false);
+                    if (player == null) yield false;
+                    var data = player.getData(com.hbm.capability.ModAttachments.PLAYER_ATTACHMENT);
+                    yield data.getReputation() <= -10;
                 }
             };
         }
@@ -491,10 +493,10 @@ public final class PedestalRecipes {
     /**
      * Find first matching recipe for given 9-stack array (center + 8 ring).
      */
-    public static PedestalRecipe findRecipe(ItemStack[] stacks, Level level) {
+    public static PedestalRecipe findRecipe(ItemStack[] stacks, Level level, BlockPos centerPos) {
         register();
         for (PedestalRecipe recipe : recipes) {
-            if (recipe.matches(stacks, level)) {
+            if (recipe.matches(stacks, level, centerPos)) {
                 return recipe;
             }
         }
