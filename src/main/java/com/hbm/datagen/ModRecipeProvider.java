@@ -5635,6 +5635,254 @@ public class ModRecipeProvider extends RecipeProvider {
         // SKIP :949 = field_disturber (CE uses STAR + circuit_bismoid)
         // SKIP :950-951 = holotape crafts (EnumHoloImage)
         // SKIP :953-955 = part_generic pistons (EnumPartType)
+
+        // ---- CraftingManager.java:956-1016 crafts (crane, radar, drone, gears, foundry). ----
+        // SKIP :957-979 = crane_inserter/extractor/grabber/boxer/unboxer/router/splitter/partitioner (CE uses EnumPartType.PISTON_PNEUMATIC + conveyor_wand DictFrame)
+        // SKIP :980 = machine_conveyor_press (CE uses machine_epress + conveyor_wand)
+
+        // CE :981-982 = radar_screen + radar_linker
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("radar_screen"))
+                .pattern("PCP").pattern("SRS").pattern("PCP")
+                .define('P', item("plate_polymer"))
+                .define('C', item("circuit_basic"))
+                .define('S', steelPlateTag)
+                .define('R', item("crt_display"))
+                .unlockedBy("has_display", has(item("crt_display")))
+                .save(output, id("radar_screen"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("radar_linker"))
+                .pattern("S").pattern("C").pattern("P")
+                .define('S', item("crt_display"))
+                .define('C', item("circuit_basic"))
+                .define('P', steelPlateTag)
+                .unlockedBy("has_display", has(item("crt_display")))
+                .save(output, id("radar_linker"));
+
+        // SKIP :984-1000 = drone crafts (CE uses ItemDrone enum + DictFrame + Fluids.KEROSENE + plateWelded)
+
+        // CE :1002 = ball_resin
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ball_resin"))
+                .pattern("DD").pattern("DD")
+                .define('D', Blocks.DANDELION)
+                .unlockedBy("has_flower", has(Blocks.DANDELION))
+                .save(output, id("ball_resin"));
+
+        // SKIP :1004-1008 = parts_legendary (CE uses ItemEnums.EnumLegendaryType + DictFrame)
+
+        // CE :1010-1012 = gear_large + sawblade
+        TagKey<Item> titaniumIngotTagLocal2 = MaterialShapes.INGOT.commonTag(Mats.MAT_TITANIUM);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("gear_large_iron"))
+                .pattern("III").pattern("ICI").pattern("III")
+                .define('I', ironPlateTag)
+                .define('C', copperIngotTagLocal)
+                .unlockedBy("has_iron", has(ironPlateTag))
+                .save(output, id("gear_large_iron"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("gear_large_steel"))
+                .pattern("III").pattern("ICI").pattern("III")
+                .define('I', steelPlateTag)
+                .define('C', titaniumIngotTagLocal2)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("gear_large_steel"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("sawblade"))
+                .pattern("III").pattern("ICI").pattern("III")
+                .define('I', steelPlateTag)
+                .define('C', ironIngotTag)
+                .unlockedBy("has_steel", has(steelPlateTag))
+                .save(output, id("sawblade"));
+
+        // CE :1014-1016 = foundry blocks
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("foundry_basin"))
+                .pattern("B B").pattern("B B").pattern("BSB")
+                .define('B', item("ingot_firebrick"))
+                .define('S', Blocks.STONE_SLAB)
+                .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
+                .save(output, id("foundry_basin"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("foundry_mold"))
+                .pattern("B B").pattern("BSB")
+                .define('B', item("ingot_firebrick"))
+                .define('S', Blocks.STONE_SLAB)
+                .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
+                .save(output, id("foundry_mold"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("foundry_channel"), 4)
+                .pattern("B B").pattern(" S ")
+                .define('B', item("ingot_firebrick"))
+                .define('S', Blocks.STONE_SLAB)
+                .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
+                .save(output, id("foundry_channel"));
+
+        // ---- CraftingManager.java:1017-1060 crafts (foundry, machines, vinyl_tile, upgrades). ----
+        // CE :1018 = foundry_outlet (shapeless: foundry_channel + STEEL.plate())
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, block("foundry_outlet"))
+                .requires(block("foundry_channel"))
+                .requires(steelPlateTag)
+                .unlockedBy("has_channel", has(block("foundry_channel")))
+                .save(output, id("foundry_outlet"));
+
+        // SKIP :1019 = foundry_tank (TODO in CE)
+
+        // CE :1021 = foundry_slagtap
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, block("foundry_slagtap"))
+                .requires(block("foundry_channel"))
+                .requires(Blocks.STONE_BRICKS)
+                .unlockedBy("has_channel", has(block("foundry_channel")))
+                .save(output, id("foundry_slagtap"));
+
+        // CE :1022 = mold_base
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("mold_base"))
+                .pattern(" B ").pattern("BIB").pattern(" B ")
+                .define('B', item("ingot_firebrick"))
+                .define('I', ironIngotTag)
+                .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
+                .save(output, id("mold_base"));
+
+        // CE :1023 = brick_fire
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("brick_fire"))
+                .pattern("BB").pattern("BB")
+                .define('B', item("ingot_firebrick"))
+                .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
+                .save(output, id("brick_fire"));
+
+        // CE :1024 = ingot_firebrick (shapeless from brick_fire)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("ingot_firebrick"), 4)
+                .requires(block("brick_fire"))
+                .unlockedBy("has_brick", has(block("brick_fire")))
+                .save(output, id("ingot_firebrick_from_brick"));
+
+        // CE :1026-1028 = machine_drain, machine_intake, filing_cabinet
+        TagKey<Item> steelCastPlateTagLocal2 = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_STEEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_drain"))
+                .pattern("PPP").pattern("T  ").pattern("PPP")
+                .define('P', steelCastPlateTagLocal2)
+                .define('T', item("tank_steel"))
+                .unlockedBy("has_tank", has(item("tank_steel")))
+                .save(output, id("machine_drain"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_intake"))
+                .pattern("GGG").pattern("PMP").pattern("PTP")
+                .define('G', block("steel_grate"))
+                .define('P', steelPlateTag)
+                .define('M', item("motor"))
+                .define('T', item("tank_steel"))
+                .unlockedBy("has_grate", has(block("steel_grate")))
+                .save(output, id("machine_intake"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("filing_cabinet"))
+                .pattern(" P ").pattern("PIP").pattern(" P ")
+                .define('P', steelPlateTag)
+                .define('I', item("plate_polymer"))
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("filing_cabinet"));
+
+        // CE :1030-1032 = vinyl_tile variants
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("vinyl_tile"), 4)
+                .pattern(" I ").pattern("IBI").pattern(" I ")
+                .define('I', item("plate_polymer"))
+                .define('B', block("brick_light"))
+                .unlockedBy("has_polymer", has(item("plate_polymer")))
+                .save(output, id("vinyl_tile"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("vinyl_tile_black"), 4)
+                .pattern("BB").pattern("BB")
+                .define('B', block("vinyl_tile"))
+                .unlockedBy("has_tile", has(block("vinyl_tile")))
+                .save(output, id("vinyl_tile_black"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, block("vinyl_tile"))
+                .requires(block("vinyl_tile_black"))
+                .unlockedBy("has_black", has(block("vinyl_tile_black")))
+                .save(output, id("vinyl_tile_from_black"));
+
+        // CE :1034 = upgrade_5g
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("upgrade_5g"))
+                .requires(item("upgrade_template"))
+                .requires(item("gem_alexandrite"))
+                .unlockedBy("has_template", has(item("upgrade_template")))
+                .save(output, id("upgrade_5g"));
+
+        // SKIP :1036 = bdcl (CE uses ANY_TAR + Fluids.WATER.getDict + KEY_WHITE)
+        // SKIP :1038 = book_of_ (CE uses DictFrame EnumPages + egg_balefire)
+        // SKIP :1040-1064 = GeneralConfig.enableLBSM crafts (cordite, semtex, ore_uranium water recovery, plate 2x2 simple, wire_fine autogen)
+
+        // ---- CraftingManager.java:1066-1088 crafts (bolts autogen, launcher, RBMK). ----
+        // SKIP :1073 = bolt autogen (NTMMaterial loop)
+        // SKIP :1076-1079 = struct_launcher_core/large/soyuz_core (CE uses DictFrame circuit + ItemBatteryPack enum)
+
+        // CE :1081 = reactor_sensor (SKIP: WIREFINE shape not defined in MaterialShapes)
+        // TagKey<Item> tungstenWireFineTagLocal = MaterialShapes.WIREFINE.commonTag(Mats.MAT_TUNGSTEN);
+        // ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("reactor_sensor"))
+        //         .pattern("WPW").pattern("CMC").pattern("PPP")
+        //         .define('W', tungstenWireFineTagLocal)
+        //         .define('P', leadPlateTagLocal5)
+        //         .define('C', item("circuit_basic"))
+        //         .define('M', item("magnetron"))
+        //         .unlockedBy("has_magnetron", has(item("magnetron")))
+        //         .save(output, id("reactor_sensor"));
+
+        // CE :1082-1088 = RBMK console + rod/boiler/heater/cooler (!enable528 conditional)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_console"))
+                .pattern("BBB").pattern("DGD").pattern("DCD")
+                .define('B', boronIngotTag)
+                .define('D', block("deco_rbmk"))
+                .define('G', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "glass_panes")))
+                .define('C', item("circuit_analog"))
+                .unlockedBy("has_deco", has(block("deco_rbmk")))
+                .save(output, id("rbmk_console"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_crane_console"))
+                .pattern("BCD").pattern("DDD")
+                .define('B', boronIngotTag)
+                .define('D', block("deco_rbmk"))
+                .define('C', item("circuit_analog"))
+                .unlockedBy("has_deco", has(block("deco_rbmk")))
+                .save(output, id("rbmk_crane_console"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_rod"))
+                .pattern("C").pattern("R").pattern("C")
+                .define('C', steelShellTag)
+                .define('R', block("rbmk_blank"))
+                .unlockedBy("has_blank", has(block("rbmk_blank")))
+                .save(output, id("rbmk_rod"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_rod_mod"))
+                .pattern("BGB").pattern("GRG").pattern("BGB")
+                .define('G', graphiteBlockTag)
+                .define('R', block("rbmk_rod"))
+                .define('B', item("nugget_bismuth"))
+                .unlockedBy("has_rod", has(block("rbmk_rod")))
+                .save(output, id("rbmk_rod_mod"));
+
+        TagKey<Item> copperPipeTagLocal3 = MaterialShapes.PIPE.commonTag(Mats.MAT_COPPER);
+        TagKey<Item> copperShellTagLocal = MaterialShapes.SHELL.commonTag(Mats.MAT_COPPER);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_boiler"))
+                .pattern("CPC").pattern("CRC").pattern("CPC")
+                .define('C', copperPipeTagLocal3)
+                .define('P', copperShellTagLocal)
+                .define('R', block("rbmk_blank"))
+                .unlockedBy("has_blank", has(block("rbmk_blank")))
+                .save(output, id("rbmk_boiler"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_heater"))
+                .pattern("CIC").pattern("PRP").pattern("CIC")
+                .define('C', copperPipeTagLocal3)
+                .define('P', steelShellTag)
+                .define('R', block("rbmk_blank"))
+                .define('I', item("plate_polymer"))
+                .unlockedBy("has_blank", has(block("rbmk_blank")))
+                .save(output, id("rbmk_heater"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("rbmk_cooler"))
+                .pattern("IGI").pattern("GCG").pattern("IGI")
+                .define('C', block("rbmk_blank"))
+                .define('I', item("plate_polymer"))
+                .define('G', block("steel_grate"))
+                .unlockedBy("has_blank", has(block("rbmk_blank")))
+                .save(output, id("rbmk_cooler"));
+
+        // SKIP :1090-1113 = launch_code + circuit_star_component/piece (CE uses DictFrame + stackFromEnum)
     }
 
     // ================================================================================================
