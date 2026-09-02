@@ -1,7 +1,9 @@
 package com.hbm.blocks.generic;
 
+import com.hbm.inventory.recipes.PedestalRecipes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.InteractionResult;
@@ -26,10 +28,10 @@ import java.util.List;
 /**
  * Port of CE {@code BlockPedestal} (SHA {@code 293649fc}): red-room/loot-display pedestal that holds
  * one item. Right-click swaps/places/removes. Redstone-powered pedestal checks 3×3 grid for
- * {@link PedestalRecipe} multiblock patterns (moon/sun/karma conditions). CE implements redstone
- * ritual crafting; simplified here: only hold/display item, no recipes (PedestalRecipes not ported).
+ * {@link PedestalRecipes.PedestalRecipe} multiblock patterns (moon/sun/karma conditions).
  * <p>
- * CE cite: {@code BlockPedestal.java:40-145} (block) + {@code :208-245} (TileEntity).
+ * CE cite: {@code BlockPedestal.java:40-145} (block) + {@code :208-245} (TileEntity) +
+ * {@code :144-196} (neighborChanged → scan 3×3 → match recipe → consume → spawn output).
  */
 public class BlockPedestal extends BaseEntityBlock {
 
@@ -110,10 +112,82 @@ public class BlockPedestal extends BaseEntityBlock {
         return InteractionResult.PASS;
     }
 
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, BlockPos neighborPos, boolean movedByPiston) {
+        if (level.isClientSide) return;
+
+        // CE BlockPedestal.java:144-196: check if center pedestal has redstone power
+        if (!level.hasNeighborSignal(pos)) return;
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof PedestalBlockEntity centerPedestal)) return;
+        if (centerPedestal.item.isEmpty()) return;
+
+        // Scan 3×3 pedestal grid: 8 pedestals at distance 3 in cardinal/diagonal directions + center
+        // CE BlockPedestal.java:144-156: NW/N/NE/W/center/E/SW/S/SE order
+        BlockPos[] offsets = {
+                pos.offset(-3, 0, -3), // NW
+                pos.offset(0, 0, -3),  // N
+                pos.offset(3, 0, -3),  // NE
+                pos.offset(-3, 0, 0),  // W
+                pos,                   // center
+                pos.offset(3, 0, 0),   // E
+                pos.offset(-3, 0, 3),  // SW
+                pos.offset(0, 0, 3),   // S
+                pos.offset(3, 0, 3)    // SE
+        };
+
+        ItemStack[] stacks = new ItemStack[9];
+        PedestalBlockEntity[] pedestals = new PedestalBlockEntity[9];
+
+        for (int i = 0; i < 9; i++) {
+            BlockEntity entity = level.getBlockEntity(offsets[i]);
+            if (entity instanceof PedestalBlockEntity pedestal) {
+                pedestals[i] = pedestal;
+                stacks[i] = pedestal.item.copy();
+            } else {
+                stacks[i] = ItemStack.EMPTY;
+            }
+        }
+
+        // Find matching recipe
+        PedestalRecipes.PedestalRecipe recipe = PedestalRecipes.findRecipe(stacks, level);
+        if (recipe == null) return;
+
+        // Consume inputs from all 9 pedestals
+        for (int i = 0; i < 9; i++) {
+            if (pedestals[i] != null) {
+                int[] ringIndices = {0, 1, 2, 3, 5, 6, 7, 8};
+                if (i == 4) {
+                    // Center
+                    pedestals[i].item.shrink(recipe.centerInput.count());
+                } else {
+                    // Ring
+                    int ringIdx = -1;
+                    for (int j = 0; j < 8; j++) {
+                        if (ringIndices[j] == i) {
+                            ringIdx = j;
+                            break;
+                        }
+                    }
+                    if (ringIdx >= 0 && recipe.ring[ringIdx] != null) {
+                        pedestals[i].item.shrink(recipe.ring[ringIdx].count());
+                    }
+                }
+                pedestals[i].setChanged();
+                level.sendBlockUpdated(offsets[i], state, state, 3);
+            }
+        }
+
+        // Spawn output at center pedestal position
+        ItemEntity outputEntity = new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, recipe.output.copy());
+        level.addFreshEntity(outputEntity);
+    }
+
     /**
      * CE {@code TileEntityPedestal} — single-slot item holder for red-room loot display. Syncs to client
-     * for rendering. CE recipe-checking logic (neighborChanged → check 3×3 pedestal grid → PedestalRecipes
-     * match → consume inputs → spawn output) **not ported** — only storage/display implemented.
+     * for rendering. Recipe-checking logic (neighborChanged → check 3×3 pedestal grid → PedestalRecipes
+     * match → consume inputs → spawn output) now fully ported.
      */
     public static class PedestalBlockEntity extends BlockEntity {
 

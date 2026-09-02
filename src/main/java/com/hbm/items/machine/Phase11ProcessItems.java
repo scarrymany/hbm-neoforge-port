@@ -288,6 +288,19 @@ public final class Phase11ProcessItems {
         // CE ItemEnums.EnumSecretType / ass.50bmgbypass — CE tab=null
         hidden("item_secret_selenium_steel");
 
+        // CE ModItems.java:1241-1245 consumable items for legendary gun crafts (PedestalRecipes.java)
+        // CE cite: PedestalRecipes.java:71 (BONE.grip), :109 (morning_glory), :119 (wild_p/card_aos/card_qos)
+        consume("morning_glory");
+        parts("bone_grip");
+        consume("wild_p");
+        consume("card_aos");
+        consume("card_qos");
+        // CE ModItems.java:1172 ItemBase partsTab — CE PedestalRecipes.java:57/:117 (barbed_wire recipe)
+        // bolt_spike×16 (CE has bolt_spike commented out in ItemBoltgun.java:58 with //FIXME)
+        // Register as parts item with TODO cite
+        // TODO(CE: PedestalRecipes.java:57/117): bolt_spike not fully implemented in CE itself (commented FIXME)
+        parts("bolt_spike");
+
         // CE ModItems.java:1323 coke flatten + :1211 catalytic_converter (reformer/hydrotreater slot).
         fuel("coke_coal", 3200);
         fuel("coke_lignite", 3200);
