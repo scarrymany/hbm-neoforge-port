@@ -4572,6 +4572,62 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_sandstone", has(Blocks.SANDSTONE))
                 .save(output, id("block/reinforced_sand"));
 
+        // CE CraftingManager.java line ~570 — concrete x4 <- concrete_smooth
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("concrete"), 4)
+                .pattern("CC")
+                .pattern("CC")
+                .define('C', block("concrete_smooth"))
+                .unlockedBy("has_concrete_smooth", has(block("concrete_smooth")))
+                .save(output, id("block/concrete"));
+
+        // CE CraftingManager.java line ~572 — brick_concrete x4 <- concrete_smooth + clay_ball (variant 1)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("brick_concrete"), 4)
+                .pattern(" C ")
+                .pattern("CBC")
+                .pattern(" C ")
+                .define('C', block("concrete_smooth"))
+                .define('B', Items.CLAY_BALL)
+                .unlockedBy("has_concrete_smooth", has(block("concrete_smooth")))
+                .save(output, id("block/brick_concrete_smooth"));
+
+        // CE CraftingManager.java line ~573 — brick_concrete x4 <- concrete + clay_ball (variant 2)
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("brick_concrete"), 4)
+                .pattern(" C ")
+                .pattern("CBC")
+                .pattern(" C ")
+                .define('C', block("concrete"))
+                .define('B', Items.CLAY_BALL)
+                .unlockedBy("has_concrete", has(block("concrete")))
+                .save(output, id("block/brick_concrete"));
+
+        // CE CraftingManager.java line ~574 — brick_concrete_mossy x8 <- brick_concrete + vine
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("brick_concrete_mossy"), 8)
+                .pattern("CCC")
+                .pattern("CVC")
+                .pattern("CCC")
+                .define('C', block("brick_concrete"))
+                .define('V', Blocks.VINE)
+                .unlockedBy("has_brick_concrete", has(block("brick_concrete")))
+                .save(output, id("block/brick_concrete_mossy"));
+
+        // CE CraftingManager.java line ~575 — brick_concrete_cracked x6 <- brick_concrete
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("brick_concrete_cracked"), 6)
+                .pattern(" C ")
+                .pattern("C C")
+                .pattern(" C ")
+                .define('C', block("brick_concrete"))
+                .unlockedBy("has_brick_concrete", has(block("brick_concrete")))
+                .save(output, id("block/brick_concrete_cracked"));
+
+        // CE CraftingManager.java line ~576 — brick_concrete_broken x6 <- brick_concrete_cracked
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("brick_concrete_broken"), 6)
+                .pattern(" C ")
+                .pattern("C C")
+                .pattern(" C ")
+                .define('C', block("brick_concrete_cracked"))
+                .unlockedBy("has_brick_concrete_cracked", has(block("brick_concrete_cracked")))
+                .save(output, id("block/brick_concrete_broken"));
+
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("chain"), 8)
                 .pattern("S").pattern("S").pattern("S")
                 .define('S', block("steel_beam"))
