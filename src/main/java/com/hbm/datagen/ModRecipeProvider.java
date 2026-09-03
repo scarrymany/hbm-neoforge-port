@@ -2013,6 +2013,43 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('L', item("lead_plate")) // CE PB.plate() autogen
                 .unlockedBy("has_gold_wire", has(item("gold_wire")))
                 .save(output, id("component/battery_sc_empty"));
+
+        // CE CraftingManager.java:503 — steel_roof x2 <- STEEL.ingot() horizontal line
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, item("steel_roof"), 2)
+                .pattern("SSS")
+                .define('S', item("ingot_steel")) // CE STEEL.ingot() is discrete ingot_steel
+                .unlockedBy("has_ingot_steel", has(item("ingot_steel")))
+                .save(output, id("block/steel_roof"));
+
+        // CE CraftingManager.java:529 — plate_polymer x8 <- ANY_PLASTIC.ingot() (2 items vertical)
+        TagKey<Item> anyPlasticTag3 = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_plastic"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_polymer"), 8)
+                .pattern("DD")
+                .define('D', anyPlasticTag3) // CE ANY_PLASTIC.ingot() DictGroup
+                .unlockedBy("has_plastic", has(anyPlasticTag3))
+                .save(output, id("component/plate_polymer_plastic"));
+
+        // CE CraftingManager.java:530 — plate_polymer x8 <- ANY_RUBBER.ingot() (2 items vertical)
+        TagKey<Item> anyRubberTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_rubber"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_polymer"), 8)
+                .pattern("DD")
+                .define('D', anyRubberTag) // CE ANY_RUBBER.ingot() DictGroup
+                .unlockedBy("has_rubber", has(anyRubberTag))
+                .save(output, id("component/plate_polymer_rubber"));
+
+        // CE CraftingManager.java:531 — plate_polymer x16 <- FIBER.ingot() (2 items vertical)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_polymer"), 16)
+                .pattern("DD")
+                .define('D', item("ingot_fiberglass")) // CE FIBER.ingot() is discrete ingot_fiberglass
+                .unlockedBy("has_fiberglass", has(item("ingot_fiberglass")))
+                .save(output, id("component/plate_polymer_fiber"));
+
+        // CE CraftingManager.java:532 — plate_polymer x16 <- ASBESTOS.ingot() (2 items vertical)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_polymer"), 16)
+                .pattern("DD")
+                .define('D', item("ingot_asbestos")) // CE ASBESTOS.ingot() is discrete ingot_asbestos
+                .unlockedBy("has_asbestos", has(item("ingot_asbestos")))
+                .save(output, id("component/plate_polymer_asbestos"));
     }
 
     /**
