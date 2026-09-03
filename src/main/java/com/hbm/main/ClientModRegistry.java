@@ -116,6 +116,7 @@ public class ClientModRegistry {
 
         // RBMK column-block Screens
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.OUTGASSER, com.hbm.client.gui.screens.rbmk.RBMKOutgasserScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.STORAGE, com.hbm.client.gui.screens.rbmk.RBMKStorageScreen::new);
 
         BombClientRegistry.registerScreens(event);
     }
