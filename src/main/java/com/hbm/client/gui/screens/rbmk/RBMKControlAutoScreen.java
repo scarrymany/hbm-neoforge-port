@@ -3,11 +3,16 @@ package com.hbm.client.gui.screens.rbmk;
 import com.hbm.blockentity.machine.rbmk.RBMKControlAutoBlockEntity;
 import com.hbm.inventory.container.machine.rbmk.RBMKControlAutoMenu;
 import com.hbm.main.MainRegistry;
+import com.hbm.packet.toserver.NBTControlPacket;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,12 +25,33 @@ import org.jetbrains.annotations.NotNull;
 public class RBMKControlAutoScreen extends AbstractContainerScreen<RBMKControlAutoMenu> {
 
     private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/rbmk/gui_rbmk_control_auto.png");
+    private EditBox[] fields;
 
     public RBMKControlAutoScreen(RBMKControlAutoMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
         this.imageWidth = 176;
         this.imageHeight = 186;
     }
+
+    @Override
+    protected void init() {
+        super.init();
+        // CE GUIRBMKControlAuto.java:40-60: 4 text fields
+        fields = new EditBox[4];
+        RBMKControlAutoBlockEntity be = menu.be;
+        for (int i = 0; i < 4; i++) {
+            fields[i] = new EditBox(this.font, leftPos + 30, topPos + 27 + 11 * i, 26, 6, Component.empty());
+            fields[i].setBordered(false);
+            fields[i].setMaxLength(i < 2 ? 3 : 4);
+            fields[i].setTextColor(0xFFFFFF);
+            addWidget(fields[i]);
+        }
+        fields[0].setValue(String.valueOf((int) be.levelUpper));
+        fields[1].setValue(String.valueOf((int) be.levelLower));
+        fields[2].setValue(String.valueOf((int) be.heatUpper));
+        fields[3].setValue(String.valueOf((int) be.heatLower));
+    }
+
 
     @Override
     protected void renderBg(@NotNull GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
@@ -48,21 +74,10 @@ public class RBMKControlAutoScreen extends AbstractContainerScreen<RBMKControlAu
             graphics.blit(TEXTURE, leftPos + 136, topPos + 21, 210, be.hasPower ? 16 : 0, 16, 16);
         }
 
-        // CE GUIRBMKControlAuto.java:166-168: draw text fields
-        // TODO(CE): Port text field rendering + input (CE GUIRBMKControlAuto.java:40-60, 90-138, 172-180)
-        // 4 fields at x=30, y=27+11*i (26x6px each):
-        // - fields[0]: levelUpper (max 3 chars, 0-100)
-        // - fields[1]: levelLower (max 3 chars, 0-100)
-        // - fields[2]: heatUpper (max 4 chars, 0-9999)
-        // - fields[3]: heatLower (max 4 chars, 0-9999)
-        // Save button at x=28, y=70, 30x10 sends NBTControlPacket with all 4 values
-        // Function buttons at x=61, y=48+k*11 (3 buttons, 22x10) send "function" = k (0=LINEAR, 1=QUAD_UP, 2=QUAD_DOWN)
-
-        // Display current values as static text for now
-        graphics.drawString(this.font, String.valueOf((int) be.levelUpper), leftPos + 30, topPos + 27, 0xFFFFFF, false);
-        graphics.drawString(this.font, String.valueOf((int) be.levelLower), leftPos + 30, topPos + 38, 0xFFFFFF, false);
-        graphics.drawString(this.font, String.valueOf((int) be.heatUpper), leftPos + 30, topPos + 49, 0xFFFFFF, false);
-        graphics.drawString(this.font, String.valueOf((int) be.heatLower), leftPos + 30, topPos + 60, 0xFFFFFF, false);
+        // CE GUIRBMKControlAuto.java:172-180: render text fields
+        for (EditBox field : fields) {
+            field.render(graphics, mouseX, mouseY, partialTick);
+        }
     }
 
     @Override
@@ -91,5 +106,78 @@ public class RBMKControlAutoScreen extends AbstractContainerScreen<RBMKControlAu
             }
             graphics.renderTooltip(this.font, Component.literal(func), mouseX, mouseY);
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // CE GUIRBMKControlAuto.java:90-138: handle field clicks + save button + function buttons
+        for (EditBox field : fields) {
+            if (field.mouseClicked(mouseX, mouseY, button)) {
+                return true;
+            }
+        }
+
+        // Save button at x=28, y=70, 30x10 (CE :99-124)
+        if (mouseX >= leftPos + 28 && mouseX < leftPos + 58 && mouseY >= topPos + 70 && mouseY < topPos + 80) {
+            playClickSound();
+            CompoundTag data = new CompoundTag();
+            double[] vals = new double[4];
+            for (int k = 0; k < 4; k++) {
+                double clamp = k < 2 ? 100 : 9999;
+                try {
+                    double parsed = Double.parseDouble(fields[k].getValue());
+                    int clamped = (int) Mth.clamp(parsed, 0, clamp);
+                    fields[k].setValue(String.valueOf(clamped));
+                    vals[k] = clamped;
+                } catch (NumberFormatException e) {
+                    fields[k].setValue("0");
+                    vals[k] = 0;
+                }
+            }
+            data.putDouble("levelUpper", vals[0]);
+            data.putDouble("levelLower", vals[1]);
+            data.putDouble("heatUpper", vals[2]);
+            data.putDouble("heatLower", vals[3]);
+            PacketDistributor.sendToServer(new NBTControlPacket(menu.be.getBlockPos(), data));
+            return true;
+        }
+
+        // Function buttons at x=61, y=48+k*11 (3 buttons, 22x10) (CE :127-136)
+        for (int k = 0; k < 3; k++) {
+            if (mouseX >= leftPos + 61 && mouseX < leftPos + 83 && mouseY >= topPos + 48 + k * 11 && mouseY < topPos + 58 + k * 11) {
+                playClickSound();
+                CompoundTag data = new CompoundTag();
+                data.putInt("function", k);
+                PacketDistributor.sendToServer(new NBTControlPacket(menu.be.getBlockPos(), data));
+                return true;
+            }
+        }
+
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void playClickSound() {
+        this.minecraft.getSoundManager().play(net.minecraft.client.resources.sounds.SimpleSoundInstance.forUI(
+                net.minecraft.sounds.SoundEvents.UI_BUTTON_CLICK, 1.0F));
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        for (EditBox field : fields) {
+            if (field.keyPressed(keyCode, scanCode, modifiers)) {
+                return true;
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        for (EditBox field : fields) {
+            if (field.charTyped(codePoint, modifiers)) {
+                return true;
+            }
+        }
+        return super.charTyped(codePoint, modifiers);
     }
 }
