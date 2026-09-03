@@ -5,6 +5,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.entity.item.EntityDeliveryDrone;
 import com.hbm.entity.item.EntityDroneBase;
 import com.hbm.inventory.gui.DroneCrateRequesterMenu;
+import com.hbm.module.ModulePatternMatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -32,7 +33,7 @@ import java.util.List;
  * CE: upstream/hbm-ce/src/main/java/com/hbm/tileentity/network/TileEntityDroneRequester.java
  * <p>
  * Phase 4 vertical slice: 18-slot inventory (9 filters + 9 stock). When drone arrives with items, pull into requester stock slots.
- * TODO(CE): RequestNetwork integration (RequestNode, ModulePatternMatcher filters, network-wide requests, filter modes).
+ * TODO(CE): RequestNetwork integration (RequestNode, network-wide requests pathfinding).
  */
 public class DroneCrateRequesterBlockEntity extends BlockEntity implements ITickableBE, IDroneLinkable, Container, MenuProvider {
 
@@ -43,9 +44,11 @@ public class DroneCrateRequesterBlockEntity extends BlockEntity implements ITick
 
     private int tickCounter = 0;
     private NonNullList<ItemStack> inventory = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
+    public ModulePatternMatcher matcher; // CE :31
 
     public DroneCrateRequesterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        this.matcher = new ModulePatternMatcher(9); // CE :33-35 - 9 filter slots
     }
 
     @Override
@@ -73,7 +76,7 @@ public class DroneCrateRequesterBlockEntity extends BlockEntity implements ITick
 
     /**
      * Pull items from drone cargo into requester stock slots (9-17). CE behavior: requester pulls matching items from drone.
-     * Minimal filter logic: if filter slot (0-8) has item, only pull matching items to corresponding stock slot (9-17).
+     * Filter logic: if filter slot (0-8) has item, only pull matching items (using ModulePatternMatcher) to corresponding stock slot (9-17).
      */
     private void pullItemsFromDrone(EntityDeliveryDrone drone) {
         for (int droneSlot = 0; droneSlot < drone.getContainerSize(); droneSlot++) {
@@ -86,8 +89,8 @@ public class DroneCrateRequesterBlockEntity extends BlockEntity implements ITick
                 int stockSlot = filterIdx + 9;
                 ItemStack stockStack = inventory.get(stockSlot);
 
-                // If no filter, or filter matches drone item
-                if (filterStack.isEmpty() || ItemStack.isSameItemSameComponents(filterStack, droneStack)) {
+                // If no filter, or filter matches drone item (using ModulePatternMatcher)
+                if (filterStack.isEmpty() || matcher.isValidForFilter(filterStack, filterIdx, droneStack)) {
                     if (stockStack.isEmpty()) {
                         // Empty stock slot - transfer entire stack
                         inventory.set(stockSlot, droneStack.copy());
@@ -112,6 +115,15 @@ public class DroneCrateRequesterBlockEntity extends BlockEntity implements ITick
         }
     }
 
+    /**
+     * CE :62 nextMode - cycle filter mode (EXACT → WILDCARD → OreDict[...] → EXACT).
+     * Called from Menu when player right-clicks filter slot.
+     */
+    public void nextMode(int filterIndex) {
+        this.matcher.nextMode(this.getLevel(), this.inventory.get(filterIndex), filterIndex);
+        this.setChanged();
+    }
+
     // Container implementation
     @Override public int getContainerSize() { return SLOTS; }
     @Override public boolean isEmpty() { return inventory.stream().allMatch(ItemStack::isEmpty); }
@@ -126,12 +138,14 @@ public class DroneCrateRequesterBlockEntity extends BlockEntity implements ITick
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         ContainerHelper.saveAllItems(tag, inventory, registries);
+        this.matcher.writeToNBT(tag); // CE :88-91
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         ContainerHelper.loadAllItems(tag, inventory, registries);
+        this.matcher.readFromNBT(tag); // CE :81-84
     }
 
     @Override

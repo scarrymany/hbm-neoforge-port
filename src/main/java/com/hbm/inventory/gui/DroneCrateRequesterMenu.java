@@ -7,6 +7,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>
  * CE: upstream/hbm-ce/src/main/java/com/hbm/inventory/container/ContainerDroneRequester.java
  * <p>
- * Partial port: filter slots (0-8) accept items but do NOT implement ModulePatternMatcher mode cycling (CE :76-98).
- * TODO(CE): Port ModulePatternMatcher GUI interaction (right-click filter to cycle EXACT/WILDCARD/OreDict).
+ * Ported: filter slots (0-8) support ModulePatternMatcher mode cycling (right-click → EXACT/WILDCARD/OreDict).
  */
 public class DroneCrateRequesterMenu extends AbstractContainerMenu {
 
@@ -87,6 +87,34 @@ public class DroneCrateRequesterMenu extends AbstractContainerMenu {
         }
 
         return itemstack;
+    }
+
+    @Override
+    public void clicked(int slotId, int button, @NotNull ClickType clickType, @NotNull Player player) {
+        // CE :76-98 - filter slot (0-8) special handling
+        if (slotId >= 0 && slotId < 9) {
+            Slot slot = this.slots.get(slotId);
+
+            // Right-click on filter slot: cycle mode (CE :88-91)
+            if (button == 1 && clickType == ClickType.PICKUP && slot.hasItem()) {
+                if (!player.level().isClientSide) {
+                    requester.nextMode(slotId);
+                }
+                return;
+            }
+            // Left-click on filter slot: set filter + init pattern (CE :94-96)
+            else if (button == 0 && clickType == ClickType.PICKUP) {
+                ItemStack held = this.getCarried();
+                slot.set(held.copy());
+                if (!player.level().isClientSide && !slot.getItem().isEmpty()) {
+                    requester.matcher.initPatternStandard(player.level(), slot.getItem(), slotId);
+                    requester.setChanged();
+                }
+                return;
+            }
+        }
+
+        super.clicked(slotId, button, clickType, player);
     }
 
     @Override
