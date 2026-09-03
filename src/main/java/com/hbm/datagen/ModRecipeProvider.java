@@ -6500,14 +6500,21 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("foundry_channel"));
 
         // ---- CraftingManager.java:1017-1060 crafts (foundry, machines, vinyl_tile, upgrades). ----
+        // CE :1016/:1019 = foundry_tank ("B B","I I","BSB", B=ingot_firebrick, I=STEEL.ingot, S=stone_slab)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("foundry_tank"))
+                .pattern("B B").pattern("I I").pattern("BSB")
+                .define('B', item("ingot_firebrick"))
+                .define('I', MaterialShapes.INGOT.commonTag(Mats.MAT_STEEL))
+                .define('S', Blocks.STONE_SLAB)
+                .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
+                .save(output, id("foundry_tank"));
+
         // CE :1018 = foundry_outlet (shapeless: foundry_channel + STEEL.plate())
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, block("foundry_outlet"))
                 .requires(block("foundry_channel"))
                 .requires(steelPlateTag)
                 .unlockedBy("has_channel", has(block("foundry_channel")))
                 .save(output, id("foundry_outlet"));
-
-        // SKIP :1019 = foundry_tank (TODO in CE)
 
         // CE :1021 = foundry_slagtap
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, block("foundry_slagtap"))
