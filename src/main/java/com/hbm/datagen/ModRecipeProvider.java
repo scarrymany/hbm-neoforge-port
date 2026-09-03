@@ -2096,6 +2096,46 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('B', Items.NETHER_BRICK) // CE "ingotNetherBrick" ore-dict = vanilla nether brick item
                 .unlockedBy("has_nether_brick", has(Items.NETHER_BRICK))
                 .save(output, id("component/plate_polymer_nether_brick"));
+
+        // CE CraftingManager.java line ~305 — coil_copper x1 <- MINGRADE.wireFine() + IRON.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_copper"))
+                .pattern("WWW")
+                .pattern("WIW")
+                .pattern("WWW")
+                .define('W', item("mingrade_wire")) // CE MINGRADE.wireFine() autogen
+                .define('I', item("ingot_iron")) // CE IRON.ingot() discrete
+                .unlockedBy("has_mingrade_wire", has(item("mingrade_wire")))
+                .save(output, id("component/coil_copper_iron"));
+
+        // CE CraftingManager.java line ~306 — coil_copper x1 <- MINGRADE.wireFine() + STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_copper"))
+                .pattern("WWW")
+                .pattern("WIW")
+                .pattern("WWW")
+                .define('W', item("mingrade_wire"))
+                .define('I', item("ingot_steel")) // CE STEEL.ingot() autogen
+                .unlockedBy("has_ingot_steel", has(item("ingot_steel")))
+                .save(output, id("component/coil_copper_steel"));
+
+        // CE CraftingManager.java line ~307 — coil_gold x1 <- GOLD.wireFine() + IRON.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_gold"))
+                .pattern("WWW")
+                .pattern("WIW")
+                .pattern("WWW")
+                .define('W', item("gold_wire")) // CE GOLD.wireFine() autogen
+                .define('I', item("ingot_iron"))
+                .unlockedBy("has_gold_wire", has(item("gold_wire")))
+                .save(output, id("component/coil_gold_iron"));
+
+        // CE CraftingManager.java line ~308 — coil_gold x1 <- GOLD.wireFine() + STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("coil_gold"))
+                .pattern("WWW")
+                .pattern("WIW")
+                .pattern("WWW")
+                .define('W', item("gold_wire"))
+                .define('I', item("ingot_steel"))
+                .unlockedBy("has_ingot_steel", has(item("ingot_steel")))
+                .save(output, id("component/coil_gold_steel"));
     }
 
     /**
