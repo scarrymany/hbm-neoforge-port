@@ -2896,6 +2896,25 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_plate", has(plateSteel))
                 .save(output, id("container/gas_empty"));
 
+        // ---- Circuits (CraftingManager.java:240-242). ----
+        // circuit VACUUM_TUBE = "G","W","I", G=KEY_ANYPANE, W=W.wireFine(), I=plate_polymer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("circuit_vacuum_tube"))
+                .pattern("G").pattern("W").pattern("I")
+                .define('G', GLASS_PANES)
+                .define('W', MaterialShapes.WIRE.commonTag(Mats.MAT_TUNGSTEN))
+                .define('I', item("plate_polymer"))
+                .unlockedBy("has_wire", has(MaterialShapes.WIRE.commonTag(Mats.MAT_TUNGSTEN)))
+                .save(output, id("circuit/circuit_vacuum_tube_tungsten"));
+
+        // circuit VACUUM_TUBE alt (carbon wire) = "G","W","I", G=KEY_ANYPANE, W=CARBON.wireFine(), I=plate_polymer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("circuit_vacuum_tube"))
+                .pattern("G").pattern("W").pattern("I")
+                .define('G', GLASS_PANES)
+                .define('W', MaterialShapes.WIRE.commonTag(Mats.MAT_CARBON))
+                .define('I', item("plate_polymer"))
+                .unlockedBy("has_wire", has(MaterialShapes.WIRE.commonTag(Mats.MAT_CARBON)))
+                .save(output, id("circuit/circuit_vacuum_tube_carbon"));
+
         // ---- Coils (CraftingManager.java:205-208). ----
         // coil_copper = "WWW","WIW","WWW", W=MINGRADE.wireFine(), I=IRON.ingot()
         TagKey<Item> mingradeWireTag = MaterialShapes.WIRE.commonTag(Mats.MAT_MINGRADE);
