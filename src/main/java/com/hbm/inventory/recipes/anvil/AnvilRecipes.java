@@ -205,6 +205,19 @@ public final class AnvilRecipes {
                 tag("ingots/copper", 2),
                 cmp("circuit_vacuum_tube"));
 
+        // CE :327-331 machine_rotary_furnace = stoneBrick x8 + firebrick x16 + IRON.ingot x4 + CU.plate x8, tier 2
+        construct(2, stack("machine_rotary_furnace"),
+                new ComparableStack(Blocks.STONE_BRICKS, 8),
+                cmp("ingot_firebrick", 16),
+                tag("ingots/iron", 4),
+                tag("plates/copper", 8));
+
+        // CE :400-404 machine_industrial_boiler = STEEL.plateCast x8 + CU.ingot x8 + ANY_PLASTIC.ingot x4, tier 3
+        construct(3, stack("machine_industrial_boiler"),
+                tag("cast_plates/steel", 8),
+                tag("ingots/copper", 8),
+                cmp("ingot_polymer", 4));
+
         registerConstructionRecipes();
     }
 
