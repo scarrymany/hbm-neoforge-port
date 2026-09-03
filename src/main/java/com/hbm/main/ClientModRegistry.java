@@ -131,6 +131,12 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_CRYSTALLIZER, com.hbm.client.gui.screens.machine.CrystallizerScreen::new);
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_MIXER, com.hbm.client.gui.screens.machine.MixerScreen::new);
 
+        // Crucible (separate menu registry)
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.CrucibleMenus.MACHINE_CRUCIBLE, com.hbm.inventory.gui.machine.MachineCrucibleScreen::new);
+
+        // Dummyable machines (Ashpit)
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.dummyable.DummyableProcessMenus.MACHINE_ASHPIT, com.hbm.client.gui.screens.machine.dummyable.AshpitScreen::new);
+
         BombClientRegistry.registerScreens(event);
     }
 }
