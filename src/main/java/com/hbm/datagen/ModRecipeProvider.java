@@ -2939,6 +2939,44 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_wire", has(MaterialShapes.WIRE.commonTag(Mats.MAT_CARBON)))
                 .save(output, id("circuit/circuit_vacuum_tube_carbon"));
 
+        // circuit CAPACITOR (CraftingManager.java:245-248) = "I","N","W", I=plate_polymer, N=NB.nugget, W=AL/CU.wireFine
+        // Variant 1: aluminum wire
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("circuit_capacitor"))
+                .pattern("I").pattern("N").pattern("W")
+                .define('I', platePolymer)
+                .define('N', MaterialShapes.NUGGET.commonTag(Mats.MAT_NIOBIUM))
+                .define('W', MaterialShapes.WIRE.commonTag(Mats.MAT_ALUMINIUM))
+                .unlockedBy("has_polymer", has(platePolymer))
+                .save(output, id("circuit/circuit_capacitor_al"));
+
+        // Variant 2: copper wire
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("circuit_capacitor"))
+                .pattern("I").pattern("N").pattern("W")
+                .define('I', platePolymer)
+                .define('N', MaterialShapes.NUGGET.commonTag(Mats.MAT_NIOBIUM))
+                .define('W', MaterialShapes.WIRE.commonTag(Mats.MAT_COPPER))
+                .unlockedBy("has_polymer", has(platePolymer))
+                .save(output, id("circuit/circuit_capacitor_cu"));
+
+        // circuit CAPACITOR (alt) = "IAI","W W", I=plate_polymer x2, A=AL.dust, W=AL/CU.wireFine x2 → 2 capacitors
+        // Variant 3: aluminum wire + aluminum dust
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("circuit_capacitor"), 2)
+                .pattern("IAI").pattern("W W")
+                .define('I', platePolymer)
+                .define('A', MaterialShapes.DUST.commonTag(Mats.MAT_ALUMINIUM))
+                .define('W', MaterialShapes.WIRE.commonTag(Mats.MAT_ALUMINIUM))
+                .unlockedBy("has_polymer", has(platePolymer))
+                .save(output, id("circuit/circuit_capacitor_dust_al"));
+
+        // Variant 4: copper wire + aluminum dust
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("circuit_capacitor"), 2)
+                .pattern("IAI").pattern("W W")
+                .define('I', platePolymer)
+                .define('A', MaterialShapes.DUST.commonTag(Mats.MAT_ALUMINIUM))
+                .define('W', MaterialShapes.WIRE.commonTag(Mats.MAT_COPPER))
+                .unlockedBy("has_polymer", has(platePolymer))
+                .save(output, id("circuit/circuit_capacitor_dust_cu"));
+
         // ---- Coils (CraftingManager.java:205-208). ----
         // coil_copper = "WWW","WIW","WWW", W=MINGRADE.wireFine(), I=IRON.ingot()
         TagKey<Item> mingradeWireTag = MaterialShapes.WIRE.commonTag(Mats.MAT_MINGRADE);
