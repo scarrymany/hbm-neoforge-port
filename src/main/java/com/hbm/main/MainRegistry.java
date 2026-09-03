@@ -96,6 +96,9 @@ public class MainRegistry {
         ModItems.register(modEventBus);
         HbmDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);
+        com.hbm.blocks.machine.foundry.FoundryBlocks.BLOCKS.register(modEventBus);
+        com.hbm.blocks.machine.foundry.FoundryBlocks.ITEMS.register(modEventBus);
+        com.hbm.blockentity.machine.foundry.FoundryBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         ConveyorEntityTypes.register(modEventBus);
         NukeEntityTypes.register(modEventBus);
         EffectEntityTypes.register(modEventBus);
