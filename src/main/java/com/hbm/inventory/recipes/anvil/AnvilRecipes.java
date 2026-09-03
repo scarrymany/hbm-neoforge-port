@@ -343,21 +343,6 @@ public final class AnvilRecipes {
                 cmp("coil_copper", 4),
                 cmp("coil_gold", 2));
 
-        // :406-413 machine_autosaw
-        construct(2, stack("machine_autosaw"),
-                tag("plates/steel", 8),
-                tag("ingots/iron", 12),
-                tag("ingots/copper", 2),
-                cmp("circuit_vacuum_tube", 2),
-                cmp("sawblade"));
-
-        // :415-421 machine_thresher
-        construct(2, stack("machine_thresher"),
-                tag("plates/steel", 8),
-                tag("ingots/iron", 12),
-                tag("ingots/copper", 2),
-                cmp("circuit_vacuum_tube"));
-
         // :423-428 machine_tower_small
         construct(3, stack("machine_tower_small"),
                 cmp("brick_concrete", 64),
@@ -682,12 +667,6 @@ public final class AnvilRecipes {
                 cmp("coil_copper", 4),
                 cmp("gear_bronze"));
         // :360-367 / :406-413 saws — sawblade now registered
-        construct(2, stack("machine_sawmill"),
-                new ComparableStack(Items.OAK_PLANKS, 16),
-                tag("plates/steel", 6),
-                tag("ingots/copper", 8),
-                tag("ingots/iron", 4),
-                cmp("sawblade"));
         construct(2, stack("machine_autosaw"),
                 tag("plates/steel", 4),
                 tag("ingots/iron", 12),
