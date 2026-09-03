@@ -1856,8 +1856,6 @@ public class ModRecipeProvider extends RecipeProvider {
                 .requires(item("sulfur_dust")) // CE S.dust() autogen
                 .unlockedBy("has_powder_fire", has(item("powder_fire")))
                 .save(output, id("powder/powder_fertilizer"));
-        // TODO(CE): PowderRecipes.java:73 has powder_fertilizer ash variant (ANY_ASH.any() + P_RED/KNO/S dust)
-        //   requires ItemTags for ash items (defer until tags ported)
 
         // CE PowderRecipes.java:76 — powder_red_copper x2 <- REDSTONE.dust() + CU.dust()
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_red_copper"), 2)
