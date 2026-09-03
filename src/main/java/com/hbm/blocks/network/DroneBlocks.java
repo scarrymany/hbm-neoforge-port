@@ -2,6 +2,7 @@ package com.hbm.blocks.network;
 
 import com.hbm.blockentity.network.DroneDockBlockEntity;
 import com.hbm.blockentity.network.DroneWaypointBlockEntity;
+import com.hbm.blockentity.network.DroneWaypointRequestBlockEntity;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
@@ -30,6 +31,9 @@ public final class DroneBlocks {
 
     public static DeferredBlock<? extends Block> DRONE_WAYPOINT;
     public static Supplier<BlockEntityType<DroneWaypointBlockEntity>> DRONE_WAYPOINT_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> DRONE_WAYPOINT_REQUEST;
+    public static Supplier<BlockEntityType<DroneWaypointRequestBlockEntity>> DRONE_WAYPOINT_REQUEST_BE_TYPE;
 
     private DroneBlocks() {
     }
@@ -60,6 +64,17 @@ public final class DroneBlocks {
                 BlockEntityType.Builder.of(
                         (pos, state) -> new DroneWaypointBlockEntity(DRONE_WAYPOINT_BE_TYPE.get(), pos, state),
                         DRONE_WAYPOINT.get()
+                ).build(null));
+
+        // drone_waypoint_request (logistics variant)
+        DRONE_WAYPOINT_REQUEST = ModBlocks.BLOCKS.register("drone_waypoint_request", () -> new BlockDroneWaypointRequest(props));
+        ModItems.ITEMS.register("drone_waypoint_request", () -> new BlockItem(DRONE_WAYPOINT_REQUEST.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, DRONE_WAYPOINT_REQUEST);
+
+        DRONE_WAYPOINT_REQUEST_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("drone_waypoint_request", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new DroneWaypointRequestBlockEntity(DRONE_WAYPOINT_REQUEST_BE_TYPE.get(), pos, state),
+                        DRONE_WAYPOINT_REQUEST.get()
                 ).build(null));
     }
 }

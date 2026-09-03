@@ -6272,6 +6272,35 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_drone_patrol", has(item("drone_patrol")))
                 .save(output, id("drone_request"));
 
+        // CE drone_dock craft (derived from CE block pattern: steel frame + circuit + motor)
+        // Pattern inferred from CE logistics infrastructure (similar to crane/conveyor blocks)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_dock"))
+                .pattern("SCS").pattern("PMP").pattern("SBS")
+                .define('S', MaterialShapes.PLATE.commonTag(Mats.MAT_STEEL))
+                .define('C', item("circuit_targeting_tier3"))
+                .define('P', MaterialShapes.WIRE.commonTag(Mats.MAT_COPPER))
+                .define('M', item("motor"))
+                .define('B', MaterialShapes.BLOCK.commonTag(Mats.MAT_STEEL))
+                .unlockedBy("has_circuit_targeting_tier3", has(item("circuit_targeting_tier3")))
+                .save(output, id("drone_dock"));
+
+        // CE drone_waypoint craft (derived from CE block pattern: simpler than dock, marker + frame)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_waypoint"))
+                .pattern(" C ").pattern("SRS").pattern(" S ")
+                .define('C', item("circuit_red_copper"))
+                .define('S', MaterialShapes.PLATE.commonTag(Mats.MAT_STEEL))
+                .define('R', Items.REDSTONE_TORCH)
+                .unlockedBy("has_circuit_red_copper", has(item("circuit_red_copper")))
+                .save(output, id("drone_waypoint"));
+
+        // CE drone_waypoint_request craft (logistics variant: upgrade from transport waypoint)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_waypoint_request"))
+                .pattern("C").pattern("W")
+                .define('C', item("circuit_targeting_tier2"))
+                .define('W', item("drone_waypoint"))
+                .unlockedBy("has_drone_waypoint", has(item("drone_waypoint")))
+                .save(output, id("drone_waypoint_request"));
+
         // CE :1002 = ball_resin
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ball_resin"))
                 .pattern("DD").pattern("DD")
