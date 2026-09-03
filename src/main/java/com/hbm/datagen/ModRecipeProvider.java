@@ -4818,6 +4818,45 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_titanium_blades", has(item("blades_titanium")))
                 .save(output, id("blades_desh"));
 
+        // CE CraftingManager.java line ~212 — blades_steel repair x1 <- STEEL.plate() + damaged blades_steel
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("blades_steel"))
+                .pattern("PIP")
+                .define('P', item("steel_plate")) // CE STEEL.plate() autogen
+                .define('I', item("blades_steel")) // CE uses OreDictionary.WILDCARD_VALUE for damaged
+                .unlockedBy("has_blades_steel", has(item("blades_steel")))
+                .save(output, id("blades_steel_repair"));
+
+        // CE CraftingManager.java line ~213 — blades_titanium repair x1 <- TI.plate() + damaged blades_titanium
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("blades_titanium"))
+                .pattern("PIP")
+                .define('P', item("titanium_plate")) // CE TI.plate() autogen
+                .define('I', item("blades_titanium")) // CE uses OreDictionary.WILDCARD_VALUE for damaged
+                .unlockedBy("has_blades_titanium", has(item("blades_titanium")))
+                .save(output, id("blades_titanium_repair"));
+
+        // CE CraftingManager.java line ~396 — hazmat_cloth_red x1 <- hazmat_cloth + REDSTONE.dust()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("hazmat_cloth_red"))
+                .pattern("C")
+                .pattern("R")
+                .pattern("C")
+                .define('C', item("hazmat_cloth"))
+                .define('R', Items.REDSTONE) // CE REDSTONE.dust() = vanilla redstone
+                .unlockedBy("has_hazmat_cloth", has(item("hazmat_cloth")))
+                .save(output, id("hazmat_cloth_red"));
+
+        // CE CraftingManager.java line ~397 — hazmat_cloth_grey x1 <- hazmat_cloth_red + plates + rubber
+        TagKey<Item> anyRubberTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_rubber"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("hazmat_cloth_grey"))
+                .pattern(" P ")
+                .pattern("ICI")
+                .pattern(" L ")
+                .define('C', item("hazmat_cloth_red"))
+                .define('P', item("plate_iron")) // CE IRON.plate() discrete
+                .define('L', item("lead_plate")) // CE PB.plate() autogen
+                .define('I', anyRubberTag) // CE ANY_RUBBER.ingot() DictGroup
+                .unlockedBy("has_hazmat_cloth_red", has(item("hazmat_cloth_red")))
+                .save(output, id("hazmat_cloth_grey"));
+
         // CE :384 = laser_crystal_co2 = "QDQ","NCN","QDQ", Q=glass_quartz, D=DESH.ingot(), N=NB.ingot(), C=fluid_tank_full(CO2)
         TagKey<Item> deshIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_DESH);
         TagKey<Item> niobiumIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_NIOBIUM);
