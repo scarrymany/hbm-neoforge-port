@@ -157,6 +157,7 @@ public class ModRecipeProvider extends RecipeProvider {
         armorRecipes(output);
         smeltingRecipes(output);
         powderRecipes(output);
+        miscPartRecipes(output);
         rodRecipes(output);
         weaponRecipes(output);
         consumableRecipes(output);
@@ -1779,6 +1780,24 @@ public class ModRecipeProvider extends RecipeProvider {
         // PowderRecipes.java:36: ingot_steel_dusted_0 <- STEEL.ingot() + COAL.dust().
         shapelessBlend(output, "powder/ingot_steel_dusted", item("ingot_steel_dusted_0"), 1,
                 item("ingot_steel"), item("powder_coal"));
+    }
+
+    // ================================================================================================
+    // Miscellaneous part crafts (bolt_spike, etc.) - CE CraftingManager.java misc recipes
+    // ================================================================================================
+
+    /**
+     * CE CraftingManager.java misc part recipes: bolt_spike (L-shape, 4 steel bolts → 2 bolt_spike).
+     */
+    private void miscPartRecipes(RecipeOutput output) {
+        // CE CraftingManager.java: addRecipeAuto(new ItemStack(ModItems.bolt_spike, 2), "BB", "B ", "B ", 'B', STEEL.bolt());
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("bolt_spike"), 2)
+                .pattern("BB")
+                .pattern("B ")
+                .pattern("B ")
+                .define('B', item("steel_bolt"))
+                .unlockedBy("has_steel_bolt", has(item("steel_bolt")))
+                .save(output, id("bolt_spike"));
     }
 
     /**
