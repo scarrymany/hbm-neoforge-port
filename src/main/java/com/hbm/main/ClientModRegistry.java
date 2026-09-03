@@ -120,6 +120,9 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.HEATER, com.hbm.client.gui.screens.rbmk.RBMKHeaterScreen::new);
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.BOILER, com.hbm.client.gui.screens.rbmk.RBMKBoilerScreen::new);
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.ROD, com.hbm.client.gui.screens.rbmk.RBMKRodScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.AUTOLOADER, com.hbm.client.gui.screens.rbmk.RBMKAutoloaderScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL, com.hbm.client.gui.screens.rbmk.RBMKControlScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL_AUTO, com.hbm.client.gui.screens.rbmk.RBMKControlAutoScreen::new);
 
         BombClientRegistry.registerScreens(event);
     }
