@@ -1,5 +1,6 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.blockentity.ITickableBE;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blockentity.machine.CargoElevatorBlockEntity;
@@ -70,11 +71,7 @@ public class BlockCargoElevator extends BlockDummyable {
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
-        return level.isClientSide ? null : (lvl, pos, st, be) -> {
-            if (be instanceof CargoElevatorBlockEntity elevator) {
-                elevator.serverTick();
-            }
-        };
+        return ITickableBE.ticker();
     }
 
     @Override

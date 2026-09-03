@@ -1,10 +1,13 @@
 package com.hbm.blockentity.machine;
 
+import com.hbm.blockentity.ITickableBE;
+import com.hbm.blockentity.LoadedBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -20,15 +23,20 @@ import java.util.List;
  * CE: upstream/hbm-ce/src/main/java/com/hbm/tileentity/machine/TileEntityCargoElevator.java
  * <p>
  * Ported: extension animation (CE :63-70), entity lifting (CE :83-97), toggleElevator (CE :100-108),
- * lower elevator merging (CE :43-60).
- * TODO(CE): Client sync (CE :74-80, :111-125), ROR integration (CE :170-185), custom rendering.
+ * lower elevator merging (CE :43-60), client sync (CE :74-80, :111-125) via LoadedBaseBlockEntity.
+ * TODO(CE): ROR integration (CE :170-185), custom rendering.
  */
-public class CargoElevatorBlockEntity extends BlockEntity {
+public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity implements ITickableBE {
 
     public int height = 0; // CE :26 - number of additional blocks above base
     public int targetExtension = 0; // CE :28 - target platform height
     public double extension = 0; // CE :29 - current platform height (interpolated)
     public double prevExtension = 0; // CE :30 - for rendering interpolation
+    public boolean renderPlatform = true; // CE :31 - whether to render the platform (base elevator only)
+
+    // CE :35-38 - client-side interpolation for smooth animation
+    private double syncExtension = 0;
+    private int sync = 0;
 
     public static final double SPEED = 2D / 20D; // CE :33 - 0.1 blocks per tick
 
@@ -36,10 +44,22 @@ public class CargoElevatorBlockEntity extends BlockEntity {
         super(ModBlocks.CARGO_ELEVATOR_ENTITY.get(), pos, state);
     }
 
-    public void serverTick() {
-        if (level == null || level.isClientSide) return;
+    @Override
+    public void updateEntity() {
+        if (level == null) return;
 
         this.prevExtension = this.extension;
+
+        // CE :74-80 - client-side smooth interpolation
+        if (level.isClientSide) {
+            if (this.sync > 0) {
+                this.extension = this.extension + ((this.syncExtension - this.extension) / (float) this.sync);
+                --this.sync;
+            } else {
+                this.extension = this.syncExtension;
+            }
+            return;
+        }
 
         // CE :43-60: Merge with lower elevator if placed on top of another cargo_elevator
         BlockState downState = level.getBlockState(worldPosition.below());
@@ -108,6 +128,9 @@ public class CargoElevatorBlockEntity extends BlockEntity {
             this.targetExtension = 0;
         }
         setChanged();
+        if (this.level != null && !this.level.isClientSide) {
+            this.networkPackNT(20); // CE :106-107 - sync to clients within 20 blocks
+        }
     }
 
     @Override
@@ -116,6 +139,7 @@ public class CargoElevatorBlockEntity extends BlockEntity {
         this.height = tag.getInt("height");
         this.targetExtension = tag.getInt("targetExtension");
         this.extension = tag.getDouble("extension");
+        this.renderPlatform = tag.getBoolean("renderPlatform");
     }
 
     @Override
@@ -124,5 +148,26 @@ public class CargoElevatorBlockEntity extends BlockEntity {
         tag.putInt("height", height);
         tag.putInt("targetExtension", targetExtension);
         tag.putDouble("extension", extension);
+        tag.putBoolean("renderPlatform", renderPlatform);
+    }
+
+    @Override
+    public void serialize(RegistryFriendlyByteBuf buf) {
+        super.serialize(buf);
+        buf.writeBoolean(this.renderPlatform); // CE :112
+        buf.writeShort((short) this.height); // CE :113
+        buf.writeDouble(this.extension); // CE :114
+    }
+
+    @Override
+    public void deserialize(RegistryFriendlyByteBuf buf) {
+        super.deserialize(buf);
+        this.renderPlatform = buf.readBoolean(); // CE :120
+        this.height = buf.readShort(); // CE :121
+        this.syncExtension = buf.readDouble(); // CE :122
+        // CE :123-125 - start smooth interpolation if extension changed
+        if (this.syncExtension > 0 && this.syncExtension < this.height) {
+            this.sync = 3;
+        }
     }
 }
