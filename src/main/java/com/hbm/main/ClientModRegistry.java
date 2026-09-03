@@ -124,6 +124,12 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL, com.hbm.client.gui.screens.rbmk.RBMKControlScreen::new);
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL_AUTO, com.hbm.client.gui.screens.rbmk.RBMKControlAutoScreen::new);
 
+        // Processing machines (Shredder / Assembler / Crystallizer / Mixer)
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_SHREDDER, com.hbm.client.gui.screens.machine.ShredderScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_ASSEMBLER, com.hbm.inventory.gui.machine.MachineAssemblyMachineScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_CRYSTALLIZER, com.hbm.client.gui.screens.machine.CrystallizerScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_MIXER, com.hbm.client.gui.screens.machine.MixerScreen::new);
+
         BombClientRegistry.registerScreens(event);
     }
 }

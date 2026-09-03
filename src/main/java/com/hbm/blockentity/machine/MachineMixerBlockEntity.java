@@ -93,8 +93,8 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
     );
 
     private long power;
-    private int progress;
-    private int maxProgress;
+    public int progress;
+    public int processTime; // CE: processTime
 
     public MachineMixerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 4, true, true);
@@ -160,11 +160,11 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         if (match == null || power < req || !outputAccepts(match.outputType(), match.recipe().output)) {
             progress = 0;
         } else {
-            maxProgress = getEffectiveProcessTime(match.recipe().processTime);
+            processTime = getEffectiveProcessTime(match.recipe().processTime);
             power -= req;
             progress++;
 
-            if (progress >= maxProgress) {
+            if (progress >= processTime) {
                 progress = 0;
                 MixerRecipe recipe = match.recipe();
                 if (recipe.input1 != null) tanks.get(0).setFill(tanks.get(0).getFill() - recipe.input1.fill);
@@ -188,11 +188,6 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         FluidTankNTM out = tanks.get(2);
         if (out.getTankType() != Fluids.NONE && out.getTankType() != outputType) return false;
         return out.getFill() + amount <= out.getMaxFill();
-    }
-
-    public int getProgressScaled(int scale) {
-        if (maxProgress <= 0) return 0;
-        return (progress * scale) / maxProgress;
     }
 
     @Override
@@ -230,7 +225,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
         tag.putInt("progress", progress);
-        tag.putInt("maxProgress", maxProgress);
+        tag.putInt("processTime", processTime);
         for (int i = 0; i < tanks.size(); i++) tanks.get(i).writeToNBT(tag, "tank" + i);
     }
 
@@ -239,7 +234,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
         progress = tag.getInt("progress");
-        maxProgress = tag.getInt("maxProgress");
+        processTime = tag.getInt("processTime");
         for (int i = 0; i < tanks.size(); i++) tanks.get(i).readFromNBT(tag, "tank" + i);
     }
 
@@ -248,7 +243,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         super.serialize(buf);
         buf.writeLong(power);
         buf.writeInt(progress);
-        buf.writeInt(maxProgress);
+        buf.writeInt(processTime);
         for (FluidTankNTM tank : tanks) tank.serialize(buf);
     }
 
@@ -257,7 +252,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         super.deserialize(buf);
         power = buf.readLong();
         progress = buf.readInt();
-        maxProgress = buf.readInt();
+        processTime = buf.readInt();
         for (FluidTankNTM tank : tanks) tank.deserialize(buf);
     }
 

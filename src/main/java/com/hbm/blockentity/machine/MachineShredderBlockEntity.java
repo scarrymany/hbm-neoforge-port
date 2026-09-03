@@ -277,6 +277,34 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
         progress = buf.readInt();
     }
 
+    public long getPowerScaled(int scale) {
+        return MAX_POWER > 0 ? (power * scale) / MAX_POWER : 0;
+    }
+
+    public int getDiFurnaceProgressScaled(int scale) {
+        return PROCESSING_SPEED > 0 ? (progress * scale) / PROCESSING_SPEED : 0;
+    }
+
+    public int getGearLeft() {
+        ItemStack blade = inventory.getStackInSlot(BLADE_LEFT);
+        if (blade.isEmpty() || !(blade.getItem() instanceof ItemBlades)) return 0;
+        if (blade.getMaxDamage() == 0) return 1;
+        int damage = blade.getDamageValue();
+        if (damage < blade.getMaxDamage() / 2) return 1;
+        if (damage != blade.getMaxDamage()) return 2;
+        return 3;
+    }
+
+    public int getGearRight() {
+        ItemStack blade = inventory.getStackInSlot(BLADE_RIGHT);
+        if (blade.isEmpty() || !(blade.getItem() instanceof ItemBlades)) return 0;
+        if (blade.getMaxDamage() == 0) return 1;
+        int damage = blade.getDamageValue();
+        if (damage < blade.getMaxDamage() / 2) return 1;
+        if (damage != blade.getMaxDamage()) return 2;
+        return 3;
+    }
+
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {

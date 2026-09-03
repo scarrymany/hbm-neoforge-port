@@ -247,6 +247,10 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
         return MAX_POWER;
     }
 
+    public long getPowerScaled(int scale) {
+        return getMaxPower() > 0 ? (power * scale) / getMaxPower() : 0;
+    }
+
     @Override
     public List<FluidTankNTM> getReceivingTanks() {
         return List.of(tank);
