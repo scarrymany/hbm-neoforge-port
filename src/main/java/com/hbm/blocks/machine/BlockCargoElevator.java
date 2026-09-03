@@ -4,7 +4,11 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ModBlocks;
 import com.hbm.blockentity.machine.CargoElevatorBlockEntity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -17,10 +21,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderHighlightEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,8 +39,8 @@ import org.jetbrains.annotations.Nullable;
  * CE: upstream/hbm-ce/src/main/java/com/hbm/blocks/machine/BlockCargoElevator.java (3x1x3 Dummyable)
  * <p>
  * Ported: toggleElevator interaction (CE :82-122), dynamic height growth (CE :92-117),
- * collision boxes for pillars+platform (CE :126-138, :208-219), dynamic drops based on height (CE :190-205).
- * TODO(CE): custom highlight rendering (CE :162-187).
+ * collision boxes for pillars+platform (CE :126-138, :208-219), dynamic drops based on height (CE :190-205),
+ * custom highlight rendering (CE :162-187).
  */
 public class BlockCargoElevator extends BlockDummyable {
 
@@ -161,6 +170,54 @@ public class BlockCargoElevator extends BlockDummyable {
         VoxelShape platform = Shapes.box(x - 1, y + 0.75D + extension, z - 1, x + 2D, y + 1D + extension, z + 2D);
 
         return Shapes.or(pillarNW, pillarNE, pillarSW, pillarSE, platform);
+    }
+
+    // CE :162-187: Custom highlight rendering - draw outline for all elevator AABBs
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public boolean shouldDrawHighlight(Level level, BlockPos pos) {
+        return true;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void drawHighlight(RenderHighlightEvent.Block event, Level level, BlockPos pos) {
+        BlockPos corePos = findCore(level, pos);
+        if (corePos == null) return;
+
+        BlockEntity tile = level.getBlockEntity(corePos);
+        if (!(tile instanceof CargoElevatorBlockEntity elevator)) return;
+
+        Vec3 camera = event.getCamera().getPosition();
+        float expand = 0.002F;
+
+        PoseStack poseStack = event.getPoseStack();
+        VertexConsumer vertexConsumer = event.getMultiBufferSource().getBuffer(RenderType.lines());
+
+        // CE :183: Draw all elevator AABBs (4 pillars + platform)
+        for (AABB aabb : getElevatorAABBs(elevator, corePos)) {
+            AABB transformed = aabb.inflate(expand).move(-camera.x, -camera.y, -camera.z);
+            LevelRenderer.renderLineBox(poseStack, vertexConsumer, transformed, 0.0F, 0.0F, 0.0F, 0.4F);
+        }
+    }
+
+    /**
+     * CE :208-219 — Returns 5 AABBs: 4 corner pillars (0.25 thick) + platform (0.25 thick at extension).
+     */
+    private AABB[] getElevatorAABBs(CargoElevatorBlockEntity elevator, BlockPos corePos) {
+        int x = corePos.getX();
+        int y = corePos.getY();
+        int z = corePos.getZ();
+        int height = elevator.height + 1;
+        double extension = elevator.extension;
+
+        return new AABB[] {
+                new AABB(x - 1, y, z - 1, x - 0.75D, y + height, z - 0.75D),
+                new AABB(x - 1, y, z + 1.75D, x - 0.75D, y + height, z + 2D),
+                new AABB(x + 1.75D, y, z - 1, x + 2D, y + height, z - 0.75D),
+                new AABB(x + 1.75D, y, z + 1.75D, x + 2D, y + height, z + 2D),
+                new AABB(x - 1, y + 0.75D + extension, z - 1, x + 2D, y + 1D + extension, z + 2D),
+        };
     }
 
     /**
