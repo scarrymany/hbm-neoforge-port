@@ -1787,7 +1787,8 @@ public class ModRecipeProvider extends RecipeProvider {
     // ================================================================================================
 
     /**
-     * CE CraftingManager.java misc part recipes: bolt_spike (L-shape, 4 steel bolts → 2 bolt_spike).
+     * CE CraftingManager.java misc part recipes: bolt_spike (L-shape, 4 steel bolts → 2 bolt_spike),
+     * plus CE PowderRecipes.java:57-58 powder_desh_mix (9 tiny_dust → 1, 9 dust → 9).
      */
     private void miscPartRecipes(RecipeOutput output) {
         // CE CraftingManager.java: addRecipeAuto(new ItemStack(ModItems.bolt_spike, 2), "BB", "B ", "B ", 'B', STEEL.bolt());
@@ -1798,6 +1799,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('B', item("steel_bolt"))
                 .unlockedBy("has_steel_bolt", has(item("steel_bolt")))
                 .save(output, id("bolt_spike"));
+
+        // CE PowderRecipes.java:57 — powder_desh_mix tiny_dust variant (B/LA/CE/CO/LI/ND/NB)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_desh_mix"))
+                .requires(item("boron_tiny_dust"), 2)
+                .requires(item("lanthanum_tiny_dust"), 2)
+                .requires(item("cerium_tiny_dust"))
+                .requires(item("cobalt_tiny_dust"))
+                .requires(item("powder_lithium_tiny")) // CE has discrete powder_lithium_tiny, not autogen
+                .requires(item("neodymium_tiny_dust"))
+                .requires(item("niobium_tiny_dust"))
+                .unlockedBy("has_boron_tiny_dust", has(item("boron_tiny_dust")))
+                .save(output, id("powder/powder_desh_mix_tiny"));
+
+        // CE PowderRecipes.java:58 — powder_desh_mix dust variant
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_desh_mix"), 9)
+                .requires(item("boron_dust"), 2)
+                .requires(item("lanthanum_dust"), 2)
+                .requires(item("cerium_dust"))
+                .requires(item("cobalt_dust"))
+                .requires(item("powder_lithium")) // CE uses discrete powder_lithium
+                .requires(item("neodymium_dust"))
+                .requires(item("niobium_dust"))
+                .unlockedBy("has_boron_dust", has(item("boron_dust")))
+                .save(output, id("powder/powder_desh_mix"));
     }
 
     /**
