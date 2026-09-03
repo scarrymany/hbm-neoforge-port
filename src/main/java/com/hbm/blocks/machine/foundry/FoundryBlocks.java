@@ -25,10 +25,29 @@ public class FoundryBlocks {
                     .sound(SoundType.STONE)
                     .noOcclusion()));
 
+    public static final DeferredBlock<BlockFoundryChannel> FOUNDRY_CHANNEL = BLOCKS.register("foundry_channel",
+            () -> new BlockFoundryChannel(BlockBehaviour.Properties.of()
+                    .strength(5.0F, 10.0F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()));
+
+    public static final DeferredBlock<BlockFoundryOutlet> FOUNDRY_OUTLET = BLOCKS.register("foundry_outlet",
+            () -> new BlockFoundryOutlet(BlockBehaviour.Properties.of()
+                    .strength(5.0F, 10.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()));
+
     static {
         ITEMS.register("foundry_tank", () -> new BlockItem(FOUNDRY_TANK.get(),
                 new Item.Properties().fireResistant()));
+        ITEMS.register("foundry_channel", () -> new BlockItem(FOUNDRY_CHANNEL.get(),
+                new Item.Properties().fireResistant()));
+        ITEMS.register("foundry_outlet", () -> new BlockItem(FOUNDRY_OUTLET.get(),
+                new Item.Properties().fireResistant()));
+        
         CreativeTabContents.add(ModCreativeTabs.MACHINE, FOUNDRY_TANK);
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, FOUNDRY_CHANNEL);
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, FOUNDRY_OUTLET);
     }
 
     private FoundryBlocks() {

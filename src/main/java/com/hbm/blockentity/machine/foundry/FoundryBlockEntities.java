@@ -20,6 +20,16 @@ public class FoundryBlockEntities {
                     BlockEntityType.Builder.of(FoundryTankBlockEntity::new, FoundryBlocks.FOUNDRY_TANK.get())
                             .build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FoundryChannelBlockEntity>> FOUNDRY_CHANNEL_BE_TYPE =
+            BLOCK_ENTITY_TYPES.register("foundry_channel", () ->
+                    BlockEntityType.Builder.of(FoundryChannelBlockEntity::new, FoundryBlocks.FOUNDRY_CHANNEL.get())
+                            .build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FoundryOutletBlockEntity>> FOUNDRY_OUTLET_BE_TYPE =
+            BLOCK_ENTITY_TYPES.register("foundry_outlet", () ->
+                    BlockEntityType.Builder.of(FoundryOutletBlockEntity::new, FoundryBlocks.FOUNDRY_OUTLET.get())
+                            .build(null));
+
     private FoundryBlockEntities() {
     }
 }
