@@ -17,10 +17,12 @@ import com.hbm.client.render.blockentity.rbmk.RBMKControlRodRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKDisplayRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKFuelColumnRenderer;
 import com.hbm.inventory.container.ModMenuTypes;
+import com.hbm.inventory.container.machine.ProcessingMenus;
 import com.hbm.inventory.gui.BatteryScreen;
 import com.hbm.inventory.gui.CrateScreen;
 import com.hbm.inventory.gui.FluidTankScreen;
 import com.hbm.inventory.gui.LemegetonScreen;
+import com.hbm.inventory.gui.machine.MachineAssemblyMachineScreen;
 import com.hbm.particle.HbmEffect;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
@@ -111,6 +113,9 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, ModMenuTypes.CRANE_BOXER, com.hbm.client.screen.CraneBoxerScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.CRANE_UNBOXER, com.hbm.client.screen.CraneUnboxerScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.CRANE_ROUTER, com.hbm.client.screen.CraneRouterScreen::new);
+
+        // Phase 2 processing-machines package: Assembly Machine GUI
+        SafeMenuScreens.bind(event, ProcessingMenus.MACHINE_ASSEMBLER, MachineAssemblyMachineScreen::new);
 
         BombClientRegistry.registerScreens(event);
     }
