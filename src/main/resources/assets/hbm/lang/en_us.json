@@ -9403,3 +9403,7 @@
   "block.hbm.sliding_blast_door_legacy": "Sliding Blast Door (Legacy)",
   "block.hbm.bomb_multi": "Multi Purpose Bomb"
 }
+,
+  "item.hbm.fluid_identifier": "Multi Fluid Identifier",
+  "item.hbm.fluid_identifier.info": "Universal fluid identifier for:",
+  "item.hbm.fluid_identifier.info2": "Secondary type:"

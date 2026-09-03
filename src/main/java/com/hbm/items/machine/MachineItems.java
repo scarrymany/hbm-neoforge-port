@@ -78,6 +78,8 @@ public final class MachineItems {
     public static DeferredItem<Item> MOTOR, MOTOR_DESH, MOTOR_BISMUTH;
     public static DeferredItem<Item> COIL_COPPER, COIL_COPPER_TORUS, COIL_TUNGSTEN, COIL_GOLD, COIL_GOLD_TORUS, COIL_MAGNETIZED_TUNGSTEN;
     public static DeferredItem<Item> CENTRIFUGE_ELEMENT, THERMO_ELEMENT, RTG_UNIT, DRILL_TITANIUM;
+    /** CE {@code ModItems.fluid_identifier_multi} */
+    public static DeferredItem<Item> FLUID_IDENTIFIER;
     public static DeferredItem<Item> CANISTER_EMPTY, TURBINE_TITANIUM, TURBINE_TUNGSTEN, MAGNETRON, CRT_DISPLAY;
     public static DeferredItem<Item> SPHERE_STEEL, FLYWHEEL_BERYLLIUM, REACTOR_CORE;
     public static DeferredItem<Item> RING_STARMETAL;
@@ -106,6 +108,7 @@ public final class MachineItems {
         registerDrillbits();
         registerFelCrystals();
         registerFluidContainers();
+        registerFluidIdentifier();
         registerGears();
         registerIcfPellet();
         registerLens();
@@ -373,6 +376,13 @@ public final class MachineItems {
         tab(ModCreativeTabs.CONTROL, reg("fluid_barrel_v2", () -> new ItemFluidTankV2(16000, props())));
 
         reg("fluid_icon", () -> new ItemFluidIcon(props())); // CE: setCreativeTab(null), pure GUI helper, never shown in creative
+    }
+
+    // ==================== ItemFluidIDMulti ====================
+    // CE: fluid_identifier_multi (ItemFluidIDMulti) - player-configurable fluid type identifier with primary/secondary NBT storage.
+
+    private static void registerFluidIdentifier() {
+        FLUID_IDENTIFIER = tab(ModCreativeTabs.CONTROL, reg("fluid_identifier", () -> new ItemFluidIDMulti(props())));
     }
 
     // ==================== ItemGear ====================
