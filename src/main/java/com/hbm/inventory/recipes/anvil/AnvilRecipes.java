@@ -2,6 +2,7 @@ package com.hbm.inventory.recipes.anvil;
 
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
+import com.hbm.inventory.RecipesCommon.FluidBarrelStack;
 import com.hbm.inventory.RecipesCommon.OreDictStack;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
@@ -225,13 +226,14 @@ public final class AnvilRecipes {
                 tag("pipes/copper"),
                 cmp("motor"));
 
-        // CE :473-480 machine_deuterium_tower = STEEL.pipe x12 + concrete_asbestos x8 + steel_scaffold x16 + SOURGAS fluid barrel x8, tier 4
-        // SKIP: Fluids.SOURGAS.getDict() not yet ported (fluid barrel system needs ItemFluidIdentifier)
-        // Port remaining solid inputs only:
+        // CE :455-462 machine_deuterium_tower = deuterium_filter x2 + STEEL.shell x5 + STEEL.pipe x12 + concrete_asbestos x8 + steel_scaffold x16 + SOURGAS fluid barrel x8, tier 4
         construct(4, stack("machine_deuterium_tower"),
+                cmp("deuterium_filter", 2),
+                tag("shells/steel", 5),
                 tag("pipes/steel", 12),
                 cmp("concrete_asbestos", 8),
-                cmp("steel_scaffold", 16));
+                cmp("steel_scaffold", 16),
+                fluidBarrel(com.hbm.inventory.fluid.Fluids.SOURGAS, 1_000, 8));
 
         registerConstructionRecipes();
     }
@@ -1111,6 +1113,10 @@ public final class AnvilRecipes {
 
     private static OreDictStack tag(String path, int n) {
         return OreDictStack.ofCommonTag(path, n);
+    }
+
+    private static FluidBarrelStack fluidBarrel(com.hbm.inventory.fluid.FluidType type, int fluidAmount, int count) {
+        return new FluidBarrelStack(type, fluidAmount, count);
     }
 
     private static ComparableStack cmp(String id) {
