@@ -1830,11 +1830,10 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     /**
-     * PowderRecipes.java:64-70: the Flux cluster, 5 of CE's 7 tiers ready (F/fluorite and PB+S/lead+
-     * sulfur blocked - no {@code powder_fluorite}/{@code powder_sulfur} item exists anywhere in this
-     * port). {@code KEY_SAND} (CE's ore-dict sand tag) has no confirmed common-tag equivalent in this
-     * port - used directly as vanilla {@link Items#SAND} rather than a guessed tag, matching this
-     * class's established "no ore-dict system" simplification.
+     * PowderRecipes.java:64-70: the Flux cluster, all 7 CE tiers (fluorite and lead+sulfur now
+     * registered; niter/borax already present). {@code KEY_SAND} (CE's ore-dict sand tag) has no
+     * confirmed common-tag equivalent in this port - used directly as vanilla {@link Items#SAND}
+     * rather than a guessed tag, matching this class's established "no ore-dict system" simplification.
      */
     private void powderFlux(RecipeOutput output) {
         Item flux = item("powder_flux");
@@ -1843,6 +1842,14 @@ public class ModRecipeProvider extends RecipeProvider {
         shapelessBlend(output, "powder/powder_flux_limestone", flux, 12, item("powder_limestone"), Items.SAND);
         shapelessBlend(output, "powder/powder_flux_calcium", flux, 12, item("powder_calcium"), Items.SAND);
         shapelessBlend(output, "powder/powder_flux_borax", flux, 16, item("powder_borax"), Items.SAND);
+        // CE PowderRecipes.java:68-69 — fluorite + lead+sulfur tiers
+        shapelessBlend(output, "powder/powder_flux_fluorite", flux, 24, item("powder_fluorite"), Items.SAND);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, flux, 24)
+                .requires(item("powder_lead"))
+                .requires(item("powder_sulfur"))
+                .requires(Items.SAND)
+                .unlockedBy("has_powder_lead", has(item("powder_lead")))
+                .save(output, id("powder/powder_flux_lead_sulfur"));
     }
 
     /**

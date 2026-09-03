@@ -166,6 +166,8 @@ public final class BilletPowderItems {
     public static final DeferredItem<Item> POWDER_LITHIUM = registerPowder("powder_lithium");
     public static final DeferredItem<Item> POWDER_LITHIUM_TINY = registerPowder("powder_lithium_tiny");
     public static final DeferredItem<Item> POWDER_QUARTZ = registerPowder("powder_quartz");
+    public static final DeferredItem<Item> POWDER_FLUORITE = registerPowder("powder_fluorite");
+    public static final DeferredItem<Item> POWDER_SULFUR = registerPowder("powder_sulfur");
     public static final DeferredItem<Item> POWDER_BORAX = registerPowder("powder_borax");
     public static final DeferredItem<Item> POWDER_DURA_STEEL = registerPowder("powder_dura_steel");
     public static final DeferredItem<Item> POWDER_POLYMER = registerPowder("powder_polymer");
