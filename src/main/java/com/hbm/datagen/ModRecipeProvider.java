@@ -3627,6 +3627,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_piston", has(Items.PISTON))
                 .save(output, id("block/machine_ammo_press"));
 
+        // CE :1059 = machine_arc_welder = "SPS","MCM","SWS", S=STEEL.plate(), P=Blocks.PISTON, M=motor, C=circuit_basic, W=coil_copper
+        // (CE pattern: powered welding machine, more advanced than ammo_press - requires circuits + coils for arcing)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_arc_welder"))
+                .pattern("SPS").pattern("MCM").pattern("SWS")
+                .define('S', steelPlateTag)
+                .define('P', Items.PISTON)
+                .define('M', item("motor"))
+                .define('C', item("circuit_basic"))
+                .define('W', item("coil_copper"))
+                .unlockedBy("has_circuit_basic", has(item("circuit_basic")))
+                .save(output, id("block/machine_arc_welder"));
+
+        // CE :1061 = machine_soldering_station = "GCG","STS","SPS", G=KEY_ANYPANE, C=circuit_basic, S=STEEL.plate(), T=motor, P=Blocks.PISTON
+        // (CE pattern: circuit assembly machine, similar complexity to arc_welder but glass panes for work visibility)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_soldering_station"))
+                .pattern("GCG").pattern("STS").pattern("SPS")
+                .define('G', Items.GLASS_PANE)
+                .define('C', item("circuit_basic"))
+                .define('S', steelPlateTag)
+                .define('T', item("motor"))
+                .define('P', Items.PISTON)
+                .unlockedBy("has_circuit_basic", has(item("circuit_basic")))
+                .save(output, id("block/machine_soldering_station"));
+
         // CE :333 = machine_siren = "SIS","ICI","SRS", S=STEEL.plate(), I=ANY_RUBBER.ingot(), C=circuit_vacuum, R=REDSTONE.dust()
         TagKey<Item> rubberIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_RUBBER);
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("machine_siren"))
