@@ -218,6 +218,21 @@ public final class AnvilRecipes {
                 tag("ingots/copper", 8),
                 cmp("ingot_polymer", 4));
 
+        // CE :426-431 machine_rockmill = KEY_STONE x16 + STEEL.plate x4 + CU.pipe x1 + motor x1, tier 2
+        construct(2, stack("machine_rockmill"),
+                tag("stone", 16),
+                tag("plates/steel", 4),
+                tag("pipes/copper"),
+                cmp("motor"));
+
+        // CE :473-480 machine_deuterium_tower = STEEL.pipe x12 + concrete_asbestos x8 + steel_scaffold x16 + SOURGAS fluid barrel x8, tier 4
+        // SKIP: Fluids.SOURGAS.getDict() not yet ported (fluid barrel system needs ItemFluidIdentifier)
+        // Port remaining solid inputs only:
+        construct(4, stack("machine_deuterium_tower"),
+                tag("pipes/steel", 12),
+                cmp("concrete_asbestos", 8),
+                cmp("steel_scaffold", 16));
+
         registerConstructionRecipes();
     }
 

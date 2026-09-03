@@ -12,7 +12,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 /**
  * NeoForge port of CE's {@code ContainerCraneRouter} - 30 filter slots (6 sides × 5 filters).
  * CE layout: 2 columns of 15 slots each (3 sides per column, 5 filters per side).
- * TODO(CE): Port full GUI screen with mode toggle buttons + pattern mode tooltips.
+ * Ported: {@link com.hbm.client.screen.CraneRouterScreen} with mode toggle buttons + pattern mode tooltips.
  */
 public class CraneRouterMenu extends AbstractContainerMenu {
 
