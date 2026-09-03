@@ -114,6 +114,9 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, ModMenuTypes.DRONE_CRATE_PROVIDER, com.hbm.inventory.gui.DroneCrateProviderScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.DRONE_CRATE_REQUESTER, com.hbm.inventory.gui.DroneCrateRequesterScreen::new);
 
+        // RBMK column-block Screens
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.OUTGASSER, com.hbm.client.gui.screens.rbmk.RBMKOutgasserScreen::new);
+
         BombClientRegistry.registerScreens(event);
     }
 }
