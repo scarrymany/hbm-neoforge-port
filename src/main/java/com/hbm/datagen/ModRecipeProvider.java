@@ -1918,6 +1918,33 @@ public class ModRecipeProvider extends RecipeProvider {
                 .requires(item("sulfur_dust")) // CE S.dust() autogen
                 .unlockedBy("has_powder_fire", has(item("powder_fire")))
                 .save(output, id("powder/powder_fertilizer_ash"));
+
+        // SKIP: CE PowderRecipes.java:37 powder_bakelite x2 <- Fluids.AROMATICS.getDict(1000) + Fluids.PETROLEUM.getDict(1000) + KEY_TOOL_CHEMISTRYSET
+        //   (requires fluid dict ingredients + chemistry set tool — defer until fluid crafting ported)
+
+        // CE CraftingManager.java:218 — motor x2 <- MINGRADE.wireFine() + coil_copper_torus + IRON.plate() + coil_copper
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor"), 2)
+                .pattern(" R ")
+                .pattern("ICI")
+                .pattern("ITI")
+                .define('R', item("mingrade_wire")) // CE MINGRADE.wireFine() autogen
+                .define('T', item("coil_copper_torus"))
+                .define('I', item("plate_iron")) // CE IRON.plate() is discrete plate_iron
+                .define('C', item("coil_copper"))
+                .unlockedBy("has_coil_copper", has(item("coil_copper")))
+                .save(output, id("component/motor_iron"));
+
+        // CE CraftingManager.java:219 — motor x2 <- MINGRADE.wireFine() + coil_copper_torus + STEEL.plate() + coil_copper
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor"), 2)
+                .pattern(" R ")
+                .pattern("ICI")
+                .pattern(" T ")
+                .define('R', item("mingrade_wire")) // CE MINGRADE.wireFine() autogen
+                .define('T', item("coil_copper_torus"))
+                .define('I', item("steel_plate")) // CE STEEL.plate() autogen
+                .define('C', item("coil_copper"))
+                .unlockedBy("has_coil_copper", has(item("coil_copper")))
+                .save(output, id("component/motor_steel"));
     }
 
     /**
