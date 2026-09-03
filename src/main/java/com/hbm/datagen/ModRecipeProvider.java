@@ -1947,11 +1947,12 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(output, id("component/motor_steel"));
 
         // CE CraftingManager.java:220 — motor_desh x1 <- ANY_PLASTIC.ingot() + GOLD.wireDense() + DESH.ingot() + motor
+        TagKey<Item> anyPlasticTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_plastic"));
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor_desh"))
                 .pattern("PCP")
                 .pattern("DMD")
                 .pattern("PCP")
-                .define('P', item("ingot_polymer")) // CE ANY_PLASTIC.ingot() = polymer OR bakelite; use polymer
+                .define('P', anyPlasticTag) // CE ANY_PLASTIC.ingot() DictGroup = polymer OR bakelite
                 .define('C', item("gold_dense_wire")) // CE GOLD.wireDense() autogen
                 .define('D', item("ingot_desh")) // CE DESH.ingot() is discrete ingot_desh
                 .define('M', item("motor"))
@@ -1969,6 +1970,49 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('M', item("magnetron"))
                 .unlockedBy("has_magnetron", has(item("magnetron")))
                 .save(output, id("component/reactor_sensor"));
+
+        // CE CraftingManager.java:147 — pipes_steel x1 <- STEEL.block() vertical column
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("pipes_steel"))
+                .pattern("B")
+                .pattern("B")
+                .pattern("B")
+                .define('B', item("steel_block")) // CE STEEL.block() autogen
+                .unlockedBy("has_steel_block", has(item("steel_block")))
+                .save(output, id("component/pipes_steel"));
+
+        // CE CraftingManager.java:308 — battery_redstone_pack x1 <- IRON.plate() + REDSTONE.block() + plate_polymer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("battery_redstone_pack"))
+                .pattern("IRI")
+                .pattern("PRP")
+                .pattern("IRI")
+                .define('I', item("plate_iron")) // CE IRON.plate() is discrete plate_iron
+                .define('R', Items.REDSTONE_BLOCK) // CE REDSTONE.block() is vanilla
+                .define('P', item("plate_polymer"))
+                .unlockedBy("has_plate_polymer", has(item("plate_polymer")))
+                .save(output, id("component/battery_redstone_pack"));
+
+        // CE CraftingManager.java:309 — capacitor_copper_pack x1 <- STEEL.plate() + CU.block() + plate_polymer
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("capacitor_copper_pack"))
+                .pattern("IRI")
+                .pattern("PRP")
+                .pattern("IRI")
+                .define('I', item("steel_plate")) // CE STEEL.plate() autogen
+                .define('R', item("copper_block")) // CE CU.block() autogen
+                .define('P', item("plate_polymer"))
+                .unlockedBy("has_plate_polymer", has(item("plate_polymer")))
+                .save(output, id("component/capacitor_copper_pack"));
+
+        // CE CraftingManager.java:311 — battery_sc EMPTY x1 <- ANY_PLASTIC.ingot() + GOLD.wireFine() + PB.plate()
+        TagKey<Item> anyPlasticTag2 = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_plastic"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("battery_sc_empty"))
+                .pattern("PGP")
+                .pattern("L L")
+                .pattern("PGP")
+                .define('P', anyPlasticTag2) // CE ANY_PLASTIC.ingot() DictGroup = polymer OR bakelite
+                .define('G', item("gold_wire")) // CE GOLD.wireFine() autogen
+                .define('L', item("lead_plate")) // CE PB.plate() autogen
+                .unlockedBy("has_gold_wire", has(item("gold_wire")))
+                .save(output, id("component/battery_sc_empty"));
     }
 
     /**
