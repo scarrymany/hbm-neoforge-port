@@ -2168,6 +2168,54 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('#', item("ingot_combine_steel")) // CE CMB.ingot() = ingot_combine_steel (discrete)
                 .unlockedBy("has_ingot_combine_steel", has(item("ingot_combine_steel")))
                 .save(output, id("component/plate_combine_steel"));
+
+        // CE CraftingManager.java line ~443 — plate_iron x4 <- IRON.ingot() (discrete plate, vanilla iron ingot)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_iron"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', Items.IRON_INGOT) // CE IRON.ingot() = vanilla iron
+                .unlockedBy("has_iron_ingot", has(Items.IRON_INGOT))
+                .save(output, id("component/plate_iron"));
+
+        // CE CraftingManager.java line ~445 — plate_aluminium x4 <- AL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_aluminium"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', item("ingot_aluminium")) // CE AL.ingot() = ingot_aluminium (discrete)
+                .unlockedBy("has_ingot_aluminium", has(item("ingot_aluminium")))
+                .save(output, id("component/plate_aluminium"));
+
+        // CE CraftingManager.java line ~446 — plate_titanium x4 <- TI.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_titanium"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', item("ingot_titanium")) // CE TI.ingot() = ingot_titanium (discrete)
+                .unlockedBy("has_ingot_titanium", has(item("ingot_titanium")))
+                .save(output, id("component/plate_titanium"));
+
+        // CE CraftingManager.java line ~449 — plate_lead x4 <- PB.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_lead"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', item("ingot_lead")) // CE PB.ingot() = ingot_lead (discrete)
+                .unlockedBy("has_ingot_lead", has(item("ingot_lead")))
+                .save(output, id("component/plate_lead"));
+
+        // CE CraftingManager.java line ~452 — plate_steel x4 <- STEEL.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_steel"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', item("ingot_steel")) // CE STEEL.ingot() = ingot_steel (discrete)
+                .unlockedBy("has_ingot_steel", has(item("ingot_steel")))
+                .save(output, id("component/plate_steel"));
+
+        // CE CraftingManager.java line ~453 — plate_schrabidium x4 <- SA326.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_schrabidium"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', item("ingot_schrabidium")) // CE SA326.ingot() = ingot_schrabidium (discrete)
+                .unlockedBy("has_ingot_schrabidium", has(item("ingot_schrabidium")))
+                .save(output, id("component/plate_schrabidium"));
     }
 
     /**
