@@ -1892,6 +1892,32 @@ public class ModRecipeProvider extends RecipeProvider {
                 .requires(item("cobalt_dust"), 2) // CE CO.dust() autogen x2
                 .unlockedBy("has_iron_dust", has(item("iron_dust")))
                 .save(output, id("powder/powder_dura_steel_iron_cobalt"));
+
+        // CE PowderRecipes.java:29 — powder_semtex_mix x3 <- solid_fuel + cordite + KNO.dust()
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_semtex_mix"), 3)
+                .requires(item("solid_fuel"))
+                .requires(item("cordite"))
+                .requires(item("saltpeter_dust")) // CE KNO.dust() autogen
+                .unlockedBy("has_cordite", has(item("cordite")))
+                .save(output, id("powder/powder_semtex_mix_cordite"));
+
+        // CE PowderRecipes.java:30 — powder_semtex_mix x1 <- solid_fuel + ballistite + KNO.dust()
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_semtex_mix"))
+                .requires(item("solid_fuel"))
+                .requires(item("ballistite"))
+                .requires(item("saltpeter_dust")) // CE KNO.dust() autogen
+                .unlockedBy("has_ballistite", has(item("ballistite")))
+                .save(output, id("powder/powder_semtex_mix_ballistite"));
+
+        // CE PowderRecipes.java:73 — powder_fertilizer x4 <- ANY_ASH.any() + P_RED.dust() + KNO.dust() + S.dust()
+        TagKey<Item> anyAshTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_ash"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_fertilizer"), 4)
+                .requires(anyAshTag) // CE ANY_ASH.any() tag (wood/coal/misc/fly/soot)
+                .requires(item("powder_fire")) // CE P_RED.dust() is discrete powder_fire
+                .requires(item("saltpeter_dust")) // CE KNO.dust() autogen
+                .requires(item("sulfur_dust")) // CE S.dust() autogen
+                .unlockedBy("has_powder_fire", has(item("powder_fire")))
+                .save(output, id("powder/powder_fertilizer_ash"));
     }
 
     /**
