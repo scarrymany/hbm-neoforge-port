@@ -2896,6 +2896,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_plate", has(plateSteel))
                 .save(output, id("container/gas_empty"));
 
+        // ---- Polymer plates (CraftingManager.java:235-237). ----
+        // plate_polymer = "DD" (2 ingots → 8/16 plates)
+        Item platePolymer = item("plate_polymer");
+        // Variant 1: ANY_PLASTIC.ingot (ingot_polymer/bakelite) → 8 plates
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, platePolymer, 8)
+                .pattern("DD")
+                .define('D', item("ingot_polymer"))
+                .unlockedBy("has_polymer", has(item("ingot_polymer")))
+                .save(output, id("component/plate_polymer_from_polymer"));
+
+        // Variant 2: ingot_bakelite → 8 plates
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, platePolymer, 8)
+                .pattern("DD")
+                .define('D', item("ingot_bakelite"))
+                .unlockedBy("has_bakelite", has(item("ingot_bakelite")))
+                .save(output, id("component/plate_polymer_from_bakelite"));
+
+        // Variant 3: FIBER.ingot (ingot_fiberglass) → 16 plates
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, platePolymer, 16)
+                .pattern("DD")
+                .define('D', item("ingot_fiberglass"))
+                .unlockedBy("has_fiberglass", has(item("ingot_fiberglass")))
+                .save(output, id("component/plate_polymer_from_fiberglass"));
+
         // ---- Circuits (CraftingManager.java:240-242). ----
         // circuit VACUUM_TUBE = "G","W","I", G=KEY_ANYPANE, W=W.wireFine(), I=plate_polymer
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("circuit_vacuum_tube"))
