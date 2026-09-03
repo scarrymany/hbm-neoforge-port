@@ -3627,29 +3627,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_piston", has(Items.PISTON))
                 .save(output, id("block/machine_ammo_press"));
 
-        // CE :1059 = machine_arc_welder = "SPS","MCM","SWS", S=STEEL.plate(), P=Blocks.PISTON, M=motor, C=circuit_basic, W=coil_copper
-        // (CE pattern: powered welding machine, more advanced than ammo_press - requires circuits + coils for arcing)
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_arc_welder"))
-                .pattern("SPS").pattern("MCM").pattern("SWS")
-                .define('S', steelPlateTag)
-                .define('P', Items.PISTON)
-                .define('M', item("motor"))
-                .define('C', item("circuit_basic"))
-                .define('W', item("coil_copper"))
-                .unlockedBy("has_circuit_basic", has(item("circuit_basic")))
-                .save(output, id("block/machine_arc_welder"));
+        // SKIP: machine_arc_welder vanilla craft - CE uses ANVIL recipe (AnvilRecipes.java constructionRecipes):
+        // STEEL.plateCast x4 + W.ingot x8 + machine_transformer + arc_electrode x2, Tier 2 anvil.
+        // Anvil crafting system not ported yet (requires AnvilRecipes + anvil tiers + TE).
+        // TODO(CE: AnvilRecipes.java): Port anvil system, then add exact CE anvil recipe.
 
-        // CE :1061 = machine_soldering_station = "GCG","STS","SPS", G=KEY_ANYPANE, C=circuit_basic, S=STEEL.plate(), T=motor, P=Blocks.PISTON
-        // (CE pattern: circuit assembly machine, similar complexity to arc_welder but glass panes for work visibility)
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_soldering_station"))
-                .pattern("GCG").pattern("STS").pattern("SPS")
-                .define('G', Items.GLASS_PANE)
-                .define('C', item("circuit_basic"))
-                .define('S', steelPlateTag)
-                .define('T', item("motor"))
-                .define('P', Items.PISTON)
-                .unlockedBy("has_circuit_basic", has(item("circuit_basic")))
-                .save(output, id("block/machine_soldering_station"));
+        // SKIP: machine_soldering_station vanilla craft - CE uses ANVIL recipe (AnvilRecipes.java constructionRecipes):
+        // coil_copper x4 + W.bolt x4 + circuit_vacuum_tube x2, Tier 2 anvil.
+        // Anvil crafting system not ported yet (requires AnvilRecipes + anvil tiers + TE).
+        // TODO(CE: AnvilRecipes.java): Port anvil system, then add exact CE anvil recipe.
 
         // CE :333 = machine_siren = "SIS","ICI","SRS", S=STEEL.plate(), I=ANY_RUBBER.ingot(), C=circuit_vacuum, R=REDSTONE.dust()
         TagKey<Item> rubberIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_RUBBER);
