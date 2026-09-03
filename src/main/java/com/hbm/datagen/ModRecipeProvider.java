@@ -1830,10 +1830,9 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     /**
-     * PowderRecipes.java:64-70: the Flux cluster, 5 of CE's 7 tiers ready (F/fluorite and PB+S/lead+
-     * sulfur blocked - CE uses MaterialShapes autogen F.dust()/S.dust() ore-dict, not discrete
-     * powder_fluorite/powder_sulfur items - those items do NOT exist in CE). {@code KEY_SAND} (CE's
-     * ore-dict sand tag) has no confirmed common-tag equivalent in this port - used directly as vanilla
+     * PowderRecipes.java:64-70: the Flux cluster, all 7 CE tiers (fluorite and lead+sulfur now via
+     * MaterialShapes DUST autogen: fluorite_dust/sulfur_dust). {@code KEY_SAND} (CE's ore-dict sand
+     * tag) has no confirmed common-tag equivalent in this port - used directly as vanilla
      * {@link Items#SAND} rather than a guessed tag, matching this class's established "no ore-dict
      * system" simplification.
      */
@@ -1844,9 +1843,14 @@ public class ModRecipeProvider extends RecipeProvider {
         shapelessBlend(output, "powder/powder_flux_limestone", flux, 12, item("powder_limestone"), Items.SAND);
         shapelessBlend(output, "powder/powder_flux_calcium", flux, 12, item("powder_calcium"), Items.SAND);
         shapelessBlend(output, "powder/powder_flux_borax", flux, 16, item("powder_borax"), Items.SAND);
-        // TODO(CE: PowderRecipes.java:68-69): fluorite/lead+sulfur Flux tiers blocked — CE uses
-        // F.dust()/S.dust() ore-dict (MAT_FLUORITE/MAT_SULFUR .setAutogen(DUST)) via MaterialShapes,
-        // not discrete powder_ items. Requires MaterialShapes DUST autogen implementation.
+        // CE PowderRecipes.java:68-69 — fluorite + lead+sulfur tiers via MaterialShapes DUST autogen
+        shapelessBlend(output, "powder/powder_flux_fluorite", flux, 4, item("fluorite_dust"), Items.SAND);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, flux, 8)
+                .requires(item("lead_dust"))
+                .requires(item("sulfur_dust"))
+                .requires(Items.SAND)
+                .unlockedBy("has_lead_dust", has(item("lead_dust")))
+                .save(output, id("powder/powder_flux_lead_sulfur"));
     }
 
     /**

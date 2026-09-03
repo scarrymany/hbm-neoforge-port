@@ -37,7 +37,8 @@ final class MaterialItemGenerator {
             MaterialShapes.WELDEDPLATE, MaterialShapes.HEAVY_COMPONENT, MaterialShapes.WIRE,
             MaterialShapes.DENSEWIRE, MaterialShapes.BOLT, MaterialShapes.LIGHTBARREL,
             MaterialShapes.HEAVYBARREL, MaterialShapes.LIGHTRECEIVER, MaterialShapes.HEAVYRECEIVER,
-            MaterialShapes.MECHANISM, MaterialShapes.STOCK, MaterialShapes.GRIP, MaterialShapes.FRAGMENT);
+            MaterialShapes.MECHANISM, MaterialShapes.STOCK, MaterialShapes.GRIP, MaterialShapes.FRAGMENT,
+            MaterialShapes.DUST); // DUST added for MAT_FLUORITE/MAT_SULFUR (CE PowderRecipes.java:68-69)
 
     private MaterialItemGenerator() {
     }
