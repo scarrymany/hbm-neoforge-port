@@ -3,6 +3,8 @@ package com.hbm.blockentity.machine.dummyable;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.AshpitMenu;
+import com.hbm.items.BilletPowderItems;
+import com.hbm.items.ItemEnums.EnumAshType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -18,8 +20,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * CE {@code TileEntityAshpit} — 5 output slots, door animation.
- * TODO(CE): ash→powder conversion deferred (powder_ash items not registered yet).
+ * CE {@code TileEntityAshpit} — 5 output slots, door animation, ash→powder conversion.
+ * Minimal port: wood ash only for now (other ash types deferred).
  */
 public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, MenuProvider {
@@ -27,6 +29,8 @@ public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
     public int playersUsing = 0;
     public float doorAngle = 0;
     public float prevDoorAngle = 0;
+    public int ashLevelWood = 0;
+    public static final int THRESHOLD_WOOD = 2000;
 
     public MachineAshpitBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, false, false);
@@ -57,7 +61,13 @@ public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
         if (level == null) return;
 
         if (!level.isClientSide) {
-            // TODO(CE): ash→powder conversion deferred (powder_ash items not registered yet)
+            // CE TileEntityAshpit.java:118-132: ash→powder conversion (wood ash only)
+            if (ashLevelWood >= THRESHOLD_WOOD) {
+                if (processAsh(ashLevelWood, EnumAshType.WOOD, THRESHOLD_WOOD)) {
+                    ashLevelWood -= THRESHOLD_WOOD;
+                }
+            }
+
             dataChanged();
             networkPackMK2(50);
         } else {
@@ -75,6 +85,22 @@ public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
         }
     }
 
+    protected boolean processAsh(int level, EnumAshType type, int threshold) {
+        if (level >= threshold) {
+            for (int i = 0; i < 5; i++) {
+                ItemStack slot = inventory.getStackInSlot(i);
+                if (slot.isEmpty()) {
+                    inventory.setStackInSlot(i, new ItemStack(BilletPowderItems.powderAsh(type).get(), 1));
+                    return true;
+                } else if (slot.is(BilletPowderItems.powderAsh(type).get()) && slot.getCount() < slot.getMaxStackSize()) {
+                    slot.grow(1);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new AshpitMenu(id, inv, this);
@@ -84,11 +110,13 @@ public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putInt("playersUsing", playersUsing);
+        tag.putInt("ashLevelWood", ashLevelWood);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         playersUsing = tag.getInt("playersUsing");
+        ashLevelWood = tag.getInt("ashLevelWood");
     }
 }
