@@ -6209,7 +6209,68 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_display", has(item("crt_display")))
                 .save(output, id("radar_linker"));
 
-        // SKIP :984-1000 = drone crafts (CE uses ItemDrone enum + DictFrame + Fluids.KEROSENE + plateWelded)
+        // CE :984-1000 = drone crafts (ItemDrone enum variants → separate drone_* items, EntityDrone AI TODO)
+        // CE :984 = drone PATROL x2 = " P ","HCH"," B ", P=ANY_PLASTIC.ingot(), H=STEEL.pipe(), C=circuit_vacuum_tube, B=STEEL.shell()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_patrol"), 2)
+                .pattern(" P ").pattern("HCH").pattern(" B ")
+                .define('P', Ingredient.of(MaterialShapes.INGOT.commonTag(Mats.MAT_HARDPLASTIC)))
+                .define('H', MaterialShapes.PIPE.commonTag(Mats.MAT_STEEL))
+                .define('C', item("circuit_vacuum_tube"))
+                .define('B', MaterialShapes.SHELL.commonTag(Mats.MAT_STEEL))
+                .unlockedBy("has_circuit_vacuum_tube", has(item("circuit_vacuum_tube")))
+                .save(output, id("drone_patrol"));
+        
+        // CE :985 = drone PATROL_CHUNKLOADING = "E","D", E=ender_pearl, D=drone_PATROL
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_patrol_chunkloading"))
+                .pattern("E").pattern("D")
+                .define('E', Items.ENDER_PEARL)
+                .define('D', item("drone_patrol"))
+                .unlockedBy("has_drone_patrol", has(item("drone_patrol")))
+                .save(output, id("drone_patrol_chunkloading"));
+        
+        // CE :986 = drone PATROL_EXPRESS = " P ","KDK"," P ", P=TI.plateWelded(), K=Fluids.KEROSENE.getDict(1000), D=drone_PATROL
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_patrol_express"))
+                .pattern(" P ").pattern("KDK").pattern(" P ")
+                .define('P', MaterialShapes.WELDEDPLATE.commonTag(Mats.MAT_TITANIUM))
+                .define('K', FluidTankIngredients.tankFull(Fluids.KEROSENE, 1000))
+                .define('D', item("drone_patrol"))
+                .unlockedBy("has_drone_patrol", has(item("drone_patrol")))
+                .save(output, id("drone_patrol_express"));
+        
+        // CE :987 = drone PATROL_EXPRESS_CHUNKLOADING = "E","D", E=ender_pearl, D=drone_PATROL_EXPRESS
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_patrol_express_chunkloading"))
+                .pattern("E").pattern("D")
+                .define('E', Items.ENDER_PEARL)
+                .define('D', item("drone_patrol_express"))
+                .unlockedBy("has_drone_patrol_express", has(item("drone_patrol_express")))
+                .save(output, id("drone_patrol_express_chunkloading_from_express"));
+        
+        // CE :988 = drone PATROL_EXPRESS_CHUNKLOADING (alternate) = " P ","KDK"," P ", P=TI.plateWelded(), K=KEROSENE, D=drone_PATROL_CHUNKLOADING
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_patrol_express_chunkloading"))
+                .pattern(" P ").pattern("KDK").pattern(" P ")
+                .define('P', MaterialShapes.WELDEDPLATE.commonTag(Mats.MAT_TITANIUM))
+                .define('K', FluidTankIngredients.tankFull(Fluids.KEROSENE, 1000))
+                .define('D', item("drone_patrol_chunkloading"))
+                .unlockedBy("has_drone_patrol_chunkloading", has(item("drone_patrol_chunkloading")))
+                .save(output, id("drone_patrol_express_chunkloading_from_chunkloading"));
+        
+        // CE :989-990 = downgrade shapeless (remove chunkloading)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("drone_patrol"))
+                .requires(item("drone_patrol_chunkloading"))
+                .unlockedBy("has_drone_patrol_chunkloading", has(item("drone_patrol_chunkloading")))
+                .save(output, id("drone_patrol_from_chunkloading"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("drone_patrol_express"))
+                .requires(item("drone_patrol_express_chunkloading"))
+                .unlockedBy("has_drone_patrol_express_chunkloading", has(item("drone_patrol_express_chunkloading")))
+                .save(output, id("drone_patrol_express_from_chunkloading"));
+        
+        // CE :991 = drone REQUEST = "E","D", E=circuit_chip, D=drone_PATROL
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("drone_request"))
+                .pattern("E").pattern("D")
+                .define('E', item("circuit_chip"))
+                .define('D', item("drone_patrol"))
+                .unlockedBy("has_drone_patrol", has(item("drone_patrol")))
+                .save(output, id("drone_request"));
 
         // CE :1002 = ball_resin
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ball_resin"))
