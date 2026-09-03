@@ -26,6 +26,7 @@ public final class RBMKMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<RBMKControlAutoMenu>> CONTROL_AUTO = reg("rbmk_control_auto", RBMKControlAutoMenu::fromNetwork);
     public static final DeferredHolder<MenuType<?>, MenuType<RBMKStorageMenu>> STORAGE = reg("rbmk_storage", RBMKStorageMenu::fromNetwork);
     public static final DeferredHolder<MenuType<?>, MenuType<RBMKBoilerMenu>> BOILER = reg("rbmk_boiler", RBMKBoilerMenu::fromNetwork);
+    public static final DeferredHolder<MenuType<?>, MenuType<RBMKHeaterMenu>> HEATER = reg("rbmk_heater", RBMKHeaterMenu::fromNetwork);
     public static final DeferredHolder<MenuType<?>, MenuType<RBMKConsoleMenu>> CONSOLE = reg("rbmk_console", RBMKConsoleMenu::fromNetwork);
     public static final DeferredHolder<MenuType<?>, MenuType<RBMKAutoloaderMenu>> AUTOLOADER = reg("rbmk_autoloader", RBMKAutoloaderMenu::fromNetwork);
     public static final DeferredHolder<MenuType<?>, MenuType<RBMKOutgasserMenu>> OUTGASSER = reg("rbmk_outgasser", RBMKOutgasserMenu::fromNetwork);

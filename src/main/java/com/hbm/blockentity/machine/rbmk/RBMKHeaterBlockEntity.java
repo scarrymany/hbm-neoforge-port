@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.inventory.container.machine.rbmk.RBMKHeaterMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import net.minecraft.core.BlockPos;
@@ -9,8 +10,13 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -20,7 +26,7 @@ import java.util.List;
  * see {@link RBMKBoilerBlockEntity}'s javadoc for the same caveat) from CE's
  * {@code TileEntityRBMKHeater} (328 lines, signature-level survey).
  */
-public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity implements IFluidStandardTransceiverMK2 {
+public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity implements IFluidStandardTransceiverMK2, MenuProvider {
 
     private static final double HEAT_PER_MB = 2D;
 
@@ -121,5 +127,16 @@ public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity implements IFl
         super.deserialize(buf);
         feed.deserialize(buf);
         steam.deserialize(buf);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("container.rbmkHeater");
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new RBMKHeaterMenu(containerId, playerInventory, this);
     }
 }
