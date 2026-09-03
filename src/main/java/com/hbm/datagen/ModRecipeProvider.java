@@ -2074,6 +2074,28 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('P', item("motor"))
                 .unlockedBy("has_motor", has(item("motor")))
                 .save(output, id("component/part_generic_piston_electric"));
+
+        // CE CraftingManager.java:152 — plate_polymer x4 <- string + wool + string (SWS pattern)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_polymer"), 4)
+                .pattern("SWS")
+                .define('S', Items.STRING)
+                .define('W', ItemTags.WOOL) // CE uses Blocks.WOOL (single block), but ItemTags.WOOL covers all colors
+                .unlockedBy("has_wool", has(ItemTags.WOOL))
+                .save(output, id("component/plate_polymer_wool"));
+
+        // CE CraftingManager.java:153 — plate_polymer x4 <- "ingotBrick" ore-dict (vanilla brick)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_polymer"), 4)
+                .pattern("BB")
+                .define('B', Items.BRICK) // CE "ingotBrick" ore-dict = vanilla brick item
+                .unlockedBy("has_brick", has(Items.BRICK))
+                .save(output, id("component/plate_polymer_brick"));
+
+        // CE CraftingManager.java:154 — plate_polymer x4 <- "ingotNetherBrick" ore-dict (vanilla nether brick)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_polymer"), 4)
+                .pattern("BB")
+                .define('B', Items.NETHER_BRICK) // CE "ingotNetherBrick" ore-dict = vanilla nether brick item
+                .unlockedBy("has_nether_brick", has(Items.NETHER_BRICK))
+                .save(output, id("component/plate_polymer_nether_brick"));
     }
 
     /**
