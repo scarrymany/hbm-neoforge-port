@@ -4492,6 +4492,86 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_cobblestone", has(Blocks.COBBLESTONE))
                 .save(output, id("block/reinforced_stone"));
 
+        // CE CraftingManager.java line ~579 — reinforced_brick x4 <- iron_bars + brick_concrete
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_brick"), 4)
+                .pattern("FBF")
+                .pattern("BFB")
+                .pattern("FBF")
+                .define('F', Blocks.IRON_BARS)
+                .define('B', block("brick_concrete"))
+                .unlockedBy("has_brick_concrete", has(block("brick_concrete")))
+                .save(output, id("block/reinforced_brick"));
+
+        // CE CraftingManager.java line ~580 — brick_compound x4 <- steel bolt + reinforced_brick + ANY_TAR
+        TagKey<Item> anyTarTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_tar"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("brick_compound"), 4)
+                .pattern("FBF")
+                .pattern("BTB")
+                .pattern("FBF")
+                .define('F', item("bolt_steel")) // CE STEEL.bolt() autogen
+                .define('B', block("reinforced_brick"))
+                .define('T', anyTarTag) // CE ANY_TAR.any() DictGroup
+                .unlockedBy("has_reinforced_brick", has(block("reinforced_brick")))
+                .save(output, id("block/brick_compound"));
+
+        // CE CraftingManager.java line ~581 — reinforced_glass x4 <- iron_bars + glass
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_glass"), 4)
+                .pattern("FBF")
+                .pattern("BFB")
+                .pattern("FBF")
+                .define('F', Blocks.IRON_BARS)
+                .define('B', Blocks.GLASS)
+                .unlockedBy("has_iron_bars", has(Blocks.IRON_BARS))
+                .save(output, id("block/reinforced_glass"));
+
+        // CE CraftingManager.java line ~582 — reinforced_glass_pane x16 <- reinforced_glass
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_glass_pane"), 16)
+                .pattern("   ")
+                .pattern("GGG")
+                .pattern("GGG")
+                .define('G', block("reinforced_glass"))
+                .unlockedBy("has_reinforced_glass", has(block("reinforced_glass")))
+                .save(output, id("block/reinforced_glass_pane"));
+
+        // CE CraftingManager.java line ~583 — reinforced_laminate_pane x16 <- reinforced_laminate
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_laminate_pane"), 16)
+                .pattern("   ")
+                .pattern("LLL")
+                .pattern("LLL")
+                .define('L', block("reinforced_laminate"))
+                .unlockedBy("has_reinforced_laminate", has(block("reinforced_laminate")))
+                .save(output, id("block/reinforced_laminate_pane"));
+
+        // CE CraftingManager.java line ~584 — reinforced_light x1 <- iron_bars + glowstone
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_light"))
+                .pattern("FFF")
+                .pattern("FBF")
+                .pattern("FFF")
+                .define('F', Blocks.IRON_BARS)
+                .define('B', Blocks.GLOWSTONE)
+                .unlockedBy("has_glowstone", has(Blocks.GLOWSTONE))
+                .save(output, id("block/reinforced_light"));
+
+        // CE CraftingManager.java line ~585 — reinforced_lamp_off x1 <- iron_bars + redstone_lamp
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_lamp_off"))
+                .pattern("FFF")
+                .pattern("FBF")
+                .pattern("FFF")
+                .define('F', Blocks.IRON_BARS)
+                .define('B', Blocks.REDSTONE_LAMP)
+                .unlockedBy("has_redstone_lamp", has(Blocks.REDSTONE_LAMP))
+                .save(output, id("block/reinforced_lamp_off"));
+
+        // CE CraftingManager.java line ~586 — reinforced_sand x4 <- iron_bars + sandstone
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_sand"), 4)
+                .pattern("FBF")
+                .pattern("BFB")
+                .pattern("FBF")
+                .define('F', Blocks.IRON_BARS)
+                .define('B', Blocks.SANDSTONE)
+                .unlockedBy("has_sandstone", has(Blocks.SANDSTONE))
+                .save(output, id("block/reinforced_sand"));
+
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("chain"), 8)
                 .pattern("S").pattern("S").pattern("S")
                 .define('S', block("steel_beam"))
