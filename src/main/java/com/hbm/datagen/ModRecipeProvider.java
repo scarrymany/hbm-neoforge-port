@@ -6537,6 +6537,32 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_brick", has(block("brick_fire")))
                 .save(output, id("ingot_firebrick_from_brick"));
 
+        // CE MineralRecipes.java:7-9 = ball_fireclay (3x clay_ball + aluminum dust/ore OR limestone + sand)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("ball_fireclay"), 4)
+                .requires(Items.CLAY_BALL, 3)
+                .requires(MaterialShapes.DUST.commonTag(Mats.MAT_ALUMINIUM))
+                .unlockedBy("has_clay", has(Items.CLAY_BALL))
+                .save(output, id("ball_fireclay_from_aluminum_dust"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("ball_fireclay"), 4)
+                .requires(Items.CLAY_BALL, 3)
+                .requires(MaterialShapes.ORE.commonTag(Mats.MAT_ALUMINIUM))
+                .unlockedBy("has_clay", has(Items.CLAY_BALL))
+                .save(output, id("ball_fireclay_from_aluminum_ore"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("ball_fireclay"), 4)
+                .requires(Items.CLAY_BALL, 3)
+                .requires(block("stone_resource_limestone"))
+                .requires(ItemTags.SAND)
+                .unlockedBy("has_clay", has(Items.CLAY_BALL))
+                .save(output, id("ball_fireclay_from_limestone"));
+
+        // CE SmeltingRecipes.java:15 = ball_fireclay → ingot_firebrick (smelting, 0.1F exp)
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(item("ball_fireclay")), RecipeCategory.MISC,
+                        item("ingot_firebrick"), 0.1F, 200)
+                .unlockedBy("has_fireclay", has(item("ball_fireclay")))
+                .save(output, id("ingot_firebrick_from_ball_fireclay"));
+
         // CE :1026-1028 = machine_drain, machine_intake, filing_cabinet
         TagKey<Item> steelCastPlateTagLocal2 = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_STEEL);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_drain"))

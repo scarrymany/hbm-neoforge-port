@@ -47,6 +47,7 @@ public final class Phase11ProcessItems {
     public static DeferredItem<Item> BALL_TNT;
     public static DeferredItem<Item> BALL_DYNAMITE;
     public static DeferredItem<Item> BALL_TATB;
+    public static DeferredItem<Item> BALL_FIRECLAY;
     public static DeferredItem<Item> ROCKET_FUEL;
     public static DeferredItem<Item> CANISTER_NAPALM;
     public static DeferredItem<Item> PART_LITHIUM;
@@ -92,6 +93,7 @@ public final class Phase11ProcessItems {
         BALL_TNT = parts("ball_tnt");
         BALL_DYNAMITE = parts("ball_dynamite");
         BALL_TATB = parts("ball_tatb");
+        BALL_FIRECLAY = parts("ball_fireclay"); // CE ModItems.java:1239
         ROCKET_FUEL = fuel("rocket_fuel", 6400);
         CANISTER_NAPALM = parts("canister_napalm");
         PART_LITHIUM = parts("part_lithium");
