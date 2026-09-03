@@ -2050,6 +2050,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('D', item("ingot_asbestos")) // CE ASBESTOS.ingot() is discrete ingot_asbestos
                 .unlockedBy("has_asbestos", has(item("ingot_asbestos")))
                 .save(output, id("component/plate_polymer_asbestos"));
+
+        // CE CraftingManager.java:953 — part_generic PISTON_PNEUMATIC x4 <- IRON.ingot() + CU.ingot() + IRON.plate()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("part_generic_piston_pneumatic"), 4)
+                .pattern(" I ")
+                .pattern("CPC")
+                .pattern(" I ")
+                .define('I', item("ingot_iron")) // CE IRON.ingot() is discrete ingot_iron
+                .define('C', item("ingot_copper")) // CE CU.ingot() is discrete ingot_copper
+                .define('P', item("plate_iron")) // CE IRON.plate() is discrete plate_iron
+                .unlockedBy("has_plate_iron", has(item("plate_iron")))
+                .save(output, id("component/part_generic_piston_pneumatic"));
+
+        // CE CraftingManager.java:955 — part_generic PISTON_ELECTRIC x4 <- ANY_RESISTANTALLOY.ingot() + ANY_PLASTIC.ingot() + motor
+        TagKey<Item> anyResistantalloyTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_resistantalloy"));
+        TagKey<Item> anyPlasticTag4 = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_plastic"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("part_generic_piston_electric"), 4)
+                .pattern(" I ")
+                .pattern("CPC")
+                .pattern(" I ")
+                .define('I', anyResistantalloyTag) // CE ANY_RESISTANTALLOY.ingot() DictGroup = tcalloy OR cdalloy
+                .define('C', anyPlasticTag4) // CE ANY_PLASTIC.ingot() DictGroup = polymer OR bakelite
+                .define('P', item("motor"))
+                .unlockedBy("has_motor", has(item("motor")))
+                .save(output, id("component/part_generic_piston_electric"));
     }
 
     /**
