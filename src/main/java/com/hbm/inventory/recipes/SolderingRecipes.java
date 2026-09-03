@@ -36,8 +36,17 @@ public final class SolderingRecipes {
         RECIPES.add(new SolderingRecipe(new ItemStack(item("circuit_analog"), 1), 100, 100, new AStack[]{new ComparableStack(item("circuit_vacuum_tube"), 3), new ComparableStack(item("circuit_capacitor"), 2)}, new AStack[]{new ComparableStack(item("circuit_pcb"), 4)}, new AStack[]{new OreDictStack(MaterialShapes.WIRE.commonTag(Mats.MAT_LEAD), 4)}));
         RECIPES.add(new SolderingRecipe(new ItemStack(item("circuit_basic"), 1), 200, 250, new AStack[]{new ComparableStack(item("circuit_chip"), 4)}, new AStack[]{new ComparableStack(item("circuit_pcb"), 4)}, new AStack[]{new OreDictStack(MaterialShapes.WIRE.commonTag(Mats.MAT_LEAD), 4)}));
         RECIPES.add(new SolderingRecipe(new ItemStack(item("circuit_advanced"), 1), 300, 1000, new FluidStack(Fluids.SULFURIC_ACID, 1000), new AStack[]{new ComparableStack(item("circuit_chip"), 16), new ComparableStack(item("circuit_capacitor"), 4)}, new AStack[]{new ComparableStack(item("circuit_pcb"), 8), new ComparableStack(item("ingot_rubber"), 2)}, new AStack[]{new OreDictStack(MaterialShapes.WIRE.commonTag(Mats.MAT_LEAD), 8)}));
-        // SKIP CE :75-119 CAPACITOR_BOARD, BISMOID, QUANTUM: circuit_capacitor_tantalium, circuit_chip_bismoid, circuit_chip_quantum, circuit_atomic_clock not registered
-        // SKIP CE :127-186 CONTROLLER*: circuit_controller_chassis, circuit_capacitor_tantalium, circuit_chip_bismoid, circuit_chip_quantum, circuit_atomic_clock not registered
+        
+        // CE :74-82 CAPACITOR_BOARD
+        RECIPES.add(new SolderingRecipe(new ItemStack(item("circuit_capacitor_board"), 1), 200, 300, new FluidStack(Fluids.PEROXIDE, 250), new AStack[]{new ComparableStack(item("circuit_capacitor_tantalium"), 3)}, new AStack[]{new ComparableStack(item("circuit_pcb"), 1)}, new AStack[]{new OreDictStack(MaterialShapes.WIRE.commonTag(Mats.MAT_LEAD), 3)}));
+        
+        // CE :84-100 BISMOID (no-lbsm: 4 CHIP_BISMOID, 16 CHIP, 24 CAPACITOR → 12 PCB, 2 ANY_HARDPLASTIC.ingot + 12 PB wire + 1000mB SOLVENT)
+        RECIPES.add(new SolderingRecipe(new ItemStack(item("circuit_bismoid"), 1), 400, 10000, new FluidStack(Fluids.SOLVENT, 1000), new AStack[]{new ComparableStack(item("circuit_chip_bismoid"), 4), new ComparableStack(item("circuit_chip"), 16), new ComparableStack(item("circuit_capacitor"), 24)}, new AStack[]{new ComparableStack(item("circuit_pcb"), 12), new OreDictStack(MaterialShapes.INGOT.commonTag(Mats.MAT_HARDPLASTIC), 2)}, new AStack[]{new OreDictStack(MaterialShapes.WIRE.commonTag(Mats.MAT_LEAD), 12)}));
+        
+        // CE :102-119 QUANTUM (no-lbsm: 4 CHIP_QUANTUM, 16 CHIP_BISMOID, 4 ATOMIC_CLOCK → 16 PCB, 4 ANY_HARDPLASTIC.ingot + 16 PB wire + 1000mB HELIUM4)
+        RECIPES.add(new SolderingRecipe(new ItemStack(item("circuit_quantum"), 1), 400, 100000, new FluidStack(Fluids.HELIUM4, 1000), new AStack[]{new ComparableStack(item("circuit_chip_quantum"), 4), new ComparableStack(item("circuit_chip_bismoid"), 16), new ComparableStack(item("circuit_atomic_clock"), 4)}, new AStack[]{new ComparableStack(item("circuit_pcb"), 16), new OreDictStack(MaterialShapes.INGOT.commonTag(Mats.MAT_HARDPLASTIC), 4)}, new AStack[]{new OreDictStack(MaterialShapes.WIRE.commonTag(Mats.MAT_LEAD), 16)}));
+        
+        // SKIP CE :127-186 CONTROLLER/CONTROLLER_ADVANCED/CONTROLLER_QUANTUM: require upgrade_speed_1/upgrade_speed_3/upgrade_overdrive_1 (not registered)
         // SKIP CE :191-295 all upgrade_* recipes: upgrade items not registered
     }
 
