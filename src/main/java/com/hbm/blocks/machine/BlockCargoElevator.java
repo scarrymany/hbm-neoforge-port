@@ -30,8 +30,8 @@ import org.jetbrains.annotations.Nullable;
  * CE: upstream/hbm-ce/src/main/java/com/hbm/blocks/machine/BlockCargoElevator.java (3x1x3 Dummyable)
  * <p>
  * Ported: toggleElevator interaction (CE :82-122), dynamic height growth (CE :92-117),
- * collision boxes for pillars+platform (CE :126-138, :208-219).
- * TODO(CE): custom highlight rendering (CE :162-187), dynamic drops based on height (CE :190-205).
+ * collision boxes for pillars+platform (CE :126-138, :208-219), dynamic drops based on height (CE :190-205).
+ * TODO(CE): custom highlight rendering (CE :162-187).
  */
 public class BlockCargoElevator extends BlockDummyable {
 
@@ -161,5 +161,35 @@ public class BlockCargoElevator extends BlockDummyable {
         VoxelShape platform = Shapes.box(x - 1, y + 0.75D + extension, z - 1, x + 2D, y + 1D + extension, z + 2D);
 
         return Shapes.or(pillarNW, pillarNE, pillarSW, pillarSE, platform);
+    }
+
+    /**
+     * CE :190-205 — Dynamic drops based on elevator height: drops (height+1) blocks instead of 1.
+     * Finds the core TE and returns stacks totaling elevator.height + 1.
+     */
+    @Override
+    public @NotNull java.util.List<ItemStack> getDrops(@NotNull BlockState state, net.minecraft.world.level.storage.loot.LootParams.@NotNull Builder builder) {
+        Level level = builder.getLevel();
+        BlockPos pos = BlockPos.containing(builder.getParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN));
+
+        BlockPos corePos = findCore(level, pos);
+        if (corePos == null) {
+            return super.getDrops(state, builder);
+        }
+
+        BlockEntity tile = level.getBlockEntity(corePos);
+        if (!(tile instanceof CargoElevatorBlockEntity elevator)) {
+            return super.getDrops(state, builder);
+        }
+
+        // CE :198-203: drop (height+1) blocks, split into stacks of max 64
+        int toDrop = elevator.height + 1;
+        java.util.List<ItemStack> drops = new java.util.ArrayList<>();
+        while (toDrop > 0) {
+            int perStack = Math.min(toDrop, 64);
+            toDrop -= perStack;
+            drops.add(new ItemStack(this, perStack));
+        }
+        return drops;
     }
 }
