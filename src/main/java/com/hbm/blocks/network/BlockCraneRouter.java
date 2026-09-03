@@ -7,7 +7,9 @@ import com.hbm.blockentity.network.CraneRouterBlockEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -19,12 +21,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * NeoForge port of CE's {@code CraneRouter} - routes items to different directions.
- * Simplified without ModulePatternMatcher: round-robin routing through available outputs.
- * Deferred: CE's 30-slot filter inventory + per-side whitelist/blacklist/wildcard modes.
+ * With ModulePatternMatcher: 30-slot filter inventory + per-side whitelist/blacklist/wildcard modes.
+ * CE behavior: filtered routing with GUI for mode toggles + filter patterns.
  */
 public class BlockCraneRouter extends HorizontalDirectionalBlock implements EntityBlock, IEnterableBlock {
 
@@ -64,6 +67,15 @@ public class BlockCraneRouter extends HorizontalDirectionalBlock implements Enti
                 router.tick();
             }
         };
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (!level.isClientSide && level.getBlockEntity(pos) instanceof CraneRouterBlockEntity router) {
+            player.openMenu(router, pos);
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     @Override

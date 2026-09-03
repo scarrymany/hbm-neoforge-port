@@ -96,6 +96,9 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneUnboxerMenu>> CRANE_UNBOXER =
             reg("crane_unboxer", com.hbm.menu.CraneUnboxerMenu::new);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneRouterMenu>> CRANE_ROUTER =
+            reg("crane_router", com.hbm.menu.CraneRouterMenu::new);
+
     private ModMenuTypes() {
     }
 
