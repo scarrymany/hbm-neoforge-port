@@ -195,6 +195,21 @@ public final class AnvilRecipes {
                 cmp("motor", 2),
                 cmp("circuit_vacuum_tube", 4));
 
+        // CE AnvilRecipes.java constructionRecipes: machine_soldering_station
+        // coil_copper x4, W.bolt() x4, circuit(VACUUM_TUBE) x2, tier 2
+        construct(2, stack("machine_soldering_station"),
+                cmp("coil_copper", 4),
+                tag("bolts/tungsten", 4),
+                cmp("circuit_vacuum_tube", 2));
+
+        // CE AnvilRecipes.java constructionRecipes: machine_arc_welder
+        // STEEL.plateCast() x4, W.ingot() x8, machine_transformer x1, arc_electrode x2, tier 2
+        construct(2, stack("machine_arc_welder"),
+                tag("cast_plates/steel", 4),
+                tag("ingots/tungsten", 8),
+                cmp("machine_transformer"),
+                cmp("arc_electrode", 2));
+
         // :262-267 heater_firebox
         construct(2, stack("heater_firebox"),
                 new ComparableStack(Blocks.FURNACE),
