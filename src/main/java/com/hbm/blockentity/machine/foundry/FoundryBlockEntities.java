@@ -30,6 +30,11 @@ public class FoundryBlockEntities {
                     BlockEntityType.Builder.of(FoundryOutletBlockEntity::new, FoundryBlocks.FOUNDRY_OUTLET.get())
                             .build(null));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<FoundryBasinBlockEntity>> FOUNDRY_BASIN_BE_TYPE =
+            BLOCK_ENTITY_TYPES.register("foundry_basin", () ->
+                    BlockEntityType.Builder.of(FoundryBasinBlockEntity::new, FoundryBlocks.FOUNDRY_BASIN.get())
+                            .build(null));
+
     private FoundryBlockEntities() {
     }
 }

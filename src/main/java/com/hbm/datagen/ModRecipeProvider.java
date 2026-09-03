@@ -6485,12 +6485,13 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
                 .save(output, id("foundry_basin"));
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("foundry_mold"))
-                .pattern("B B").pattern("BSB")
-                .define('B', item("ingot_firebrick"))
-                .define('S', Blocks.STONE_SLAB)
-                .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
-                .save(output, id("foundry_mold"));
+        // TODO(CE): foundry_mold block not yet ported (CE :1014) - small mold holder for single-mold casting
+        // ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("foundry_mold"))
+        //         .pattern("B B").pattern("BSB")
+        //         .define('B', item("ingot_firebrick"))
+        //         .define('S', Blocks.STONE_SLAB)
+        //         .unlockedBy("has_firebrick", has(item("ingot_firebrick")))
+        //         .save(output, id("foundry_mold"));
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("foundry_channel"), 4)
                 .pattern("B B").pattern(" S ")
