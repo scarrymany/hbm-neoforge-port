@@ -4482,6 +4482,16 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_beam", has(block("steel_beam")))
                 .save(output, id("block/steel_grate"));
 
+        // CE CraftingManager.java line ~577 — reinforced_stone x4 <- cobblestone + stone checkerboard
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("reinforced_stone"), 4)
+                .pattern("FBF")
+                .pattern("BFB")
+                .pattern("FBF")
+                .define('F', Blocks.COBBLESTONE) // CE uses cobblestone
+                .define('B', Blocks.STONE) // CE uses stone
+                .unlockedBy("has_cobblestone", has(Blocks.COBBLESTONE))
+                .save(output, id("block/reinforced_stone"));
+
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("chain"), 8)
                 .pattern("S").pattern("S").pattern("S")
                 .define('S', block("steel_beam"))
