@@ -2,11 +2,16 @@ package com.hbm.client.gui.screens.rbmk;
 
 import com.hbm.inventory.container.machine.rbmk.RBMKAutoloaderMenu;
 import com.hbm.main.MainRegistry;
+import com.hbm.packet.toserver.NBTControlPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -46,13 +51,18 @@ public class RBMKAutoloaderScreen extends AbstractContainerScreen<RBMKAutoloader
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // CE GUIRBMKAutoloader.java:39-55: minus button (x=74, y=36, 12x12) and plus button (x=90, y=36, 12x12)
-        // TODO(CE): Port NBTControlPacket for cycle adjustment (CE TileEntityRBMKAutoloader)
-        // if (mouseX >= leftPos + 74 && mouseX < leftPos + 74 + 12 && mouseY >= topPos + 36 && mouseY < topPos + 36 + 12) {
-        //     send NBTControlPacket with "minus" = true
-        // }
-        // if (mouseX >= leftPos + 90 && mouseX < leftPos + 90 + 12 && mouseY >= topPos + 36 && mouseY < topPos + 36 + 12) {
-        //     send NBTControlPacket with "plus" = true
-        // }
+        if (mouseX >= leftPos + 74 && mouseX < leftPos + 74 + 12 && mouseY >= topPos + 36 && mouseY < topPos + 36 + 12) {
+            CompoundTag data = new CompoundTag();
+            data.putBoolean("minus", true);
+            PacketDistributor.sendToServer(new NBTControlPacket(menu.be.getBlockPos(), data));
+            return true;
+        }
+        if (mouseX >= leftPos + 90 && mouseX < leftPos + 90 + 12 && mouseY >= topPos + 36 && mouseY < topPos + 36 + 12) {
+            CompoundTag data = new CompoundTag();
+            data.putBoolean("plus", true);
+            PacketDistributor.sendToServer(new NBTControlPacket(menu.be.getBlockPos(), data));
+            return true;
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

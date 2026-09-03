@@ -17,6 +17,7 @@ import com.hbm.packet.toserver.ItemControlPacket;
 import com.hbm.packet.toserver.KeybindPacket;
 import com.hbm.packet.toserver.LaunchPadRustedControlPacket;
 import com.hbm.packet.toserver.MassStorageControlPacket;
+import com.hbm.packet.toserver.NBTControlPacket;
 import com.hbm.packet.toserver.SatPanelActionPayload;
 import com.hbm.packet.toserver.TurretControlPacket;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -119,5 +120,8 @@ public class HbmNetwork {
         registrar.playToServer(AnvilCraftPacket.TYPE, AnvilCraftPacket.STREAM_CODEC, AnvilCraftPacket::handleServer);
         registrar.playToServer(FusionControlPacket.TYPE, FusionControlPacket.STREAM_CODEC, FusionControlPacket::handleServer);
         registrar.playToServer(KeypadServerPacket.TYPE, KeypadServerPacket.STREAM_CODEC, KeypadServerPacket::handleServer);
+
+        // Phase 11 (rbmk_gui_screens): C2S generic IControlReceiver control packet for RBMK buttons.
+        registrar.playToServer(NBTControlPacket.TYPE, NBTControlPacket.STREAM_CODEC, NBTControlPacket::handle);
     }
 }

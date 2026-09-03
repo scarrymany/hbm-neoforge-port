@@ -4,11 +4,16 @@ import com.hbm.blockentity.machine.rbmk.RBMKBoilerBlockEntity;
 import com.hbm.inventory.container.machine.rbmk.RBMKBoilerMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.main.MainRegistry;
+import com.hbm.packet.toserver.NBTControlPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -70,10 +75,12 @@ public class RBMKBoilerScreen extends AbstractContainerScreen<RBMKBoilerMenu> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // CE GUIRBMKBoiler.java:42-51: compression button click (x=33, y=21, 20x64px)
-        // TODO(CE): Port NBTControlPacket for compression cycling (CE TileEntityRBMKBoiler.java:223-225)
-        // if (mouseX >= leftPos + 33 && mouseX < leftPos + 33 + 20 && mouseY >= topPos + 21 && mouseY < topPos + 21 + 64) {
-        //     send NBTControlPacket with "compression" = true to call BE.cycleCompressor()
-        // }
+        if (mouseX >= leftPos + 33 && mouseX < leftPos + 33 + 20 && mouseY >= topPos + 21 && mouseY < topPos + 21 + 64) {
+            CompoundTag data = new CompoundTag();
+            data.putBoolean("compression", true);
+            PacketDistributor.sendToServer(new NBTControlPacket(menu.be.getBlockPos(), data));
+            return true;
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

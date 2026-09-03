@@ -4,11 +4,16 @@ import com.hbm.blockentity.machine.rbmk.RBMKControlBlockEntity;
 import com.hbm.blockentity.machine.rbmk.RBMKControlManualBlockEntity;
 import com.hbm.inventory.container.machine.rbmk.RBMKControlMenu;
 import com.hbm.main.MainRegistry;
+import com.hbm.packet.toserver.NBTControlPacket;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -62,11 +67,23 @@ public class RBMKControlScreen extends AbstractContainerScreen<RBMKControlMenu> 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // CE GUIRBMKControl.java:47-68: level buttons (5 rows at x=118, y=26+k*11, 30x10) + color buttons (5 at x=28, y=26+k*11, 12x10)
-        // TODO(CE): Port NBTControlPacket for rod control (CE TileEntityRBMKControl)
-        // for (int k = 0; k < 5; k++) {
-        //     if (level button k clicked) send NBTControlPacket with "level" = 1.0 - (k * 0.25)
-        //     if (color button k clicked) send NBTControlPacket with "color" = k
-        // }
+        for (int k = 0; k < 5; k++) {
+            // Level control buttons (CE :51-58)
+            if (mouseX >= leftPos + 118 && mouseX < leftPos + 118 + 30 && mouseY >= topPos + 26 + k * 11 && mouseY < topPos + 26 + 10 + k * 11) {
+                CompoundTag data = new CompoundTag();
+                data.putDouble("level", 1.0D - (k * 0.25D));
+                PacketDistributor.sendToServer(new NBTControlPacket(menu.be.getBlockPos(), data));
+                return true;
+            }
+
+            // Color group buttons (CE :61-67)
+            if (mouseX >= leftPos + 28 && mouseX < leftPos + 28 + 12 && mouseY >= topPos + 26 + k * 11 && mouseY < topPos + 26 + 10 + k * 11) {
+                CompoundTag data = new CompoundTag();
+                data.putInt("color", k);
+                PacketDistributor.sendToServer(new NBTControlPacket(menu.be.getBlockPos(), data));
+                return true;
+            }
+        }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
