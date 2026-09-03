@@ -177,6 +177,34 @@ public final class AnvilRecipes {
                 tag("ingots/copper", 8),
                 tag("plates/steel", 8));
 
+        // CE :179-180 machine_annihilator = stoneBrick x16 + firebrick x16 + IRON.ingot x8 + CU.ingot x8, tier 2
+        construct(2, stack("machine_annihilator"),
+                new ComparableStack(Blocks.STONE_BRICKS, 16),
+                cmp("ingot_firebrick", 16),
+                tag("ingots/iron", 8),
+                tag("ingots/copper", 8));
+
+        // CE :220-225 machine_blast_furnace = stoneBrick x4 + firebrick x32 + CU.plate x8, tier 1
+        construct(1, stack("machine_blast_furnace"),
+                new ComparableStack(Blocks.STONE_BRICKS, 4),
+                cmp("ingot_firebrick", 32),
+                tag("plates/copper", 8));
+
+        // CE :407-413 machine_autosaw = STEEL.plate x4 + IRON.ingot x12 + CU.ingot x2 + vacuum_tube x2 + sawblade, tier 2
+        construct(2, stack("machine_autosaw"),
+                tag("plates/steel", 4),
+                tag("ingots/iron", 12),
+                tag("ingots/copper", 2),
+                cmp("circuit_vacuum_tube", 2),
+                cmp("sawblade"));
+
+        // CE :416-421 machine_thresher = STEEL.plate x8 + IRON.ingot x12 + CU.ingot x2 + vacuum_tube, tier 2
+        construct(2, stack("machine_thresher"),
+                tag("plates/steel", 8),
+                tag("ingots/iron", 12),
+                tag("ingots/copper", 2),
+                cmp("circuit_vacuum_tube"));
+
         registerConstructionRecipes();
     }
 
