@@ -1,5 +1,7 @@
 package com.hbm.blocks.network;
 
+import com.hbm.blockentity.network.DroneCrateProviderBlockEntity;
+import com.hbm.blockentity.network.DroneCrateRequesterBlockEntity;
 import com.hbm.blockentity.network.DroneDockBlockEntity;
 import com.hbm.blockentity.network.DroneWaypointBlockEntity;
 import com.hbm.blockentity.network.DroneWaypointRequestBlockEntity;
@@ -19,10 +21,6 @@ import java.util.function.Supplier;
 
 /**
  * Drone logistics infrastructure blocks. Ported from CE's drone network (BlockDroneDock, BlockDroneWaypoint).
- * <p>
- * Phase 4 minimal registration - full network (requester/provider/logistics waypoint) deferred.
- * TODO(CE: full drone blocks): Add drone_waypoint_request (logistics variant), drone_crate_provider,
- * drone_crate_requester when provider/requester TileEntities are ported.
  */
 public final class DroneBlocks {
 
@@ -34,6 +32,12 @@ public final class DroneBlocks {
 
     public static DeferredBlock<? extends Block> DRONE_WAYPOINT_REQUEST;
     public static Supplier<BlockEntityType<DroneWaypointRequestBlockEntity>> DRONE_WAYPOINT_REQUEST_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> DRONE_CRATE_PROVIDER;
+    public static Supplier<BlockEntityType<DroneCrateProviderBlockEntity>> DRONE_CRATE_PROVIDER_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> DRONE_CRATE_REQUESTER;
+    public static Supplier<BlockEntityType<DroneCrateRequesterBlockEntity>> DRONE_CRATE_REQUESTER_BE_TYPE;
 
     private DroneBlocks() {
     }
@@ -75,6 +79,28 @@ public final class DroneBlocks {
                 BlockEntityType.Builder.of(
                         (pos, state) -> new DroneWaypointRequestBlockEntity(DRONE_WAYPOINT_REQUEST_BE_TYPE.get(), pos, state),
                         DRONE_WAYPOINT_REQUEST.get()
+                ).build(null));
+
+        // drone_crate_provider (CE ModBlocks.java:1127 - DroneDock-style block with provider inventory)
+        DRONE_CRATE_PROVIDER = ModBlocks.BLOCKS.register("drone_crate_provider", () -> new BlockDroneCrateProvider(props));
+        ModItems.ITEMS.register("drone_crate_provider", () -> new BlockItem(DRONE_CRATE_PROVIDER.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, DRONE_CRATE_PROVIDER);
+
+        DRONE_CRATE_PROVIDER_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("drone_crate_provider", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new DroneCrateProviderBlockEntity(DRONE_CRATE_PROVIDER_BE_TYPE.get(), pos, state),
+                        DRONE_CRATE_PROVIDER.get()
+                ).build(null));
+
+        // drone_crate_requester (CE ModBlocks.java:1128 - DroneDock-style block with requester inventory + filters)
+        DRONE_CRATE_REQUESTER = ModBlocks.BLOCKS.register("drone_crate_requester", () -> new BlockDroneCrateRequester(props));
+        ModItems.ITEMS.register("drone_crate_requester", () -> new BlockItem(DRONE_CRATE_REQUESTER.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, DRONE_CRATE_REQUESTER);
+
+        DRONE_CRATE_REQUESTER_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("drone_crate_requester", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new DroneCrateRequesterBlockEntity(DRONE_CRATE_REQUESTER_BE_TYPE.get(), pos, state),
+                        DRONE_CRATE_REQUESTER.get()
                 ).build(null));
     }
 }
