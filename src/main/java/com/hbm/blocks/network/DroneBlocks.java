@@ -1,0 +1,65 @@
+package com.hbm.blocks.network;
+
+import com.hbm.blockentity.network.DroneDockBlockEntity;
+import com.hbm.blockentity.network.DroneWaypointBlockEntity;
+import com.hbm.blocks.ModBlocks;
+import com.hbm.creativetabs.CreativeTabContents;
+import com.hbm.creativetabs.ModCreativeTabs;
+import com.hbm.items.ModItems;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.neoforged.neoforge.registries.DeferredBlock;
+
+import java.util.function.Supplier;
+
+/**
+ * Drone logistics infrastructure blocks. Ported from CE's drone network (BlockDroneDock, BlockDroneWaypoint).
+ * <p>
+ * Phase 4 minimal registration - full network (requester/provider/logistics waypoint) deferred.
+ * TODO(CE: full drone blocks): Add drone_waypoint_request (logistics variant), drone_crate_provider,
+ * drone_crate_requester when provider/requester TileEntities are ported.
+ */
+public final class DroneBlocks {
+
+    public static DeferredBlock<? extends Block> DRONE_DOCK;
+    public static Supplier<BlockEntityType<DroneDockBlockEntity>> DRONE_DOCK_BE_TYPE;
+
+    public static DeferredBlock<? extends Block> DRONE_WAYPOINT;
+    public static Supplier<BlockEntityType<DroneWaypointBlockEntity>> DRONE_WAYPOINT_BE_TYPE;
+
+    private DroneBlocks() {
+    }
+
+    public static void registerAll() {
+        BlockBehaviour.Properties props = BlockBehaviour.Properties.of()
+                .strength(5.0F, 30.0F)
+                .sound(SoundType.METAL)
+                .requiresCorrectToolForDrops();
+
+        // drone_dock
+        DRONE_DOCK = ModBlocks.BLOCKS.register("drone_dock", () -> new BlockDroneDock(props));
+        ModItems.ITEMS.register("drone_dock", () -> new BlockItem(DRONE_DOCK.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, DRONE_DOCK);
+
+        DRONE_DOCK_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("drone_dock", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new DroneDockBlockEntity(DRONE_DOCK_BE_TYPE.get(), pos, state),
+                        DRONE_DOCK.get()
+                ).build(null));
+
+        // drone_waypoint (transport variant)
+        DRONE_WAYPOINT = ModBlocks.BLOCKS.register("drone_waypoint", () -> new BlockDroneWaypoint(props));
+        ModItems.ITEMS.register("drone_waypoint", () -> new BlockItem(DRONE_WAYPOINT.get(), new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.MACHINE, DRONE_WAYPOINT);
+
+        DRONE_WAYPOINT_BE_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("drone_waypoint", () ->
+                BlockEntityType.Builder.of(
+                        (pos, state) -> new DroneWaypointBlockEntity(DRONE_WAYPOINT_BE_TYPE.get(), pos, state),
+                        DRONE_WAYPOINT.get()
+                ).build(null));
+    }
+}
