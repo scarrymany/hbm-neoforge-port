@@ -4,6 +4,7 @@ import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.MachineMixerMenu;
 import com.hbm.inventory.fluid.FluidType;
@@ -65,7 +66,7 @@ import java.util.Map;
  * similarly: {@code -= processTime*speedLevel/4}, then {@code /= (overLevel+1)}, floored at 1 tick.
  */
 public class MachineMixerBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
 
     public static final long MAX_POWER = 10_000L;
     private static final int TANK_REAGENT_CAPACITY = 16_000;
@@ -95,6 +96,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
     private long power;
     public int progress;
     public int processTime; // CE: processTime
+    public int recipeIndex; // CE: recipeIndex - player-cyclable recipe selector for competing recipes
 
     public MachineMixerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 4, true, true);
@@ -226,6 +228,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         tag.putLong("power", power);
         tag.putInt("progress", progress);
         tag.putInt("processTime", processTime);
+        tag.putInt("recipe", recipeIndex);
         for (int i = 0; i < tanks.size(); i++) tanks.get(i).writeToNBT(tag, "tank" + i);
     }
 
@@ -235,6 +238,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         power = tag.getLong("power");
         progress = tag.getInt("progress");
         processTime = tag.getInt("processTime");
+        recipeIndex = tag.getInt("recipe");
         for (int i = 0; i < tanks.size(); i++) tanks.get(i).readFromNBT(tag, "tank" + i);
     }
 
@@ -244,6 +248,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(power);
         buf.writeInt(progress);
         buf.writeInt(processTime);
+        buf.writeInt(recipeIndex);
         for (FluidTankNTM tank : tanks) tank.serialize(buf);
     }
 
@@ -253,6 +258,7 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         power = buf.readLong();
         progress = buf.readInt();
         processTime = buf.readInt();
+        recipeIndex = buf.readInt();
         for (FluidTankNTM tank : tanks) tank.deserialize(buf);
     }
 
@@ -260,5 +266,22 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new MachineMixerMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return true;
+    }
+
+    /**
+     * CE TileEntityMachineMixer.receiveControl - cycles {@link #recipeIndex} to select
+     * next competing recipe for the same output fluid.
+     */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("toggle")) {
+            this.recipeIndex++;
+            setChanged();
+        }
     }
 }

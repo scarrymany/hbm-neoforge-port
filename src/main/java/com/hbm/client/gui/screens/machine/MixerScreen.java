@@ -2,8 +2,11 @@ package com.hbm.client.gui.screens.machine;
 
 import com.hbm.blockentity.machine.MachineMixerBlockEntity;
 import com.hbm.inventory.container.machine.MachineMixerMenu;
+import com.hbm.inventory.recipes.MixerRecipes;
+import com.hbm.inventory.recipes.MixerRecipes.MixerRecipe;
 import com.hbm.main.MainRegistry;
 import com.hbm.packet.toserver.NBTControlPacket;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
@@ -12,8 +15,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * NeoForge port of CE {@code GUIMixer}.
@@ -110,8 +117,42 @@ public class MixerScreen extends AbstractContainerScreen<MachineMixerMenu> {
         }
         // CE GUIMixer.java:43-55: recipe selector tooltip
         if (mouseX >= leftPos + 62 && mouseX < leftPos + 62 + 12 && mouseY >= topPos + 22 && mouseY < topPos + 22 + 12) {
-            // TODO(CE): Port MixerRecipes cycling display (requires recipe system, deferred)
-            graphics.renderTooltip(this.font, Component.literal("Recipe selector\nClick to change!"), mouseX, mouseY);
+            renderRecipeCyclingTooltip(graphics, mouseX, mouseY);
         }
+    }
+
+    /**
+     * CE GUIMixer.java:43-55 - Recipe cycling tooltip showing current recipe (recipeIndex+1)/total
+     * with input fluids/solid ingredient display and "Click to change!" hint.
+     */
+    private void renderRecipeCyclingTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
+        MachineMixerBlockEntity be = menu.be;
+        MixerRecipe[] recipes = MixerRecipes.getOutput(be.tanks.get(2).getTankType());
+
+        if (recipes == null || recipes.length <= 1) {
+            // No competing recipes for this output fluid - show simple hint
+            graphics.renderTooltip(this.font, Component.literal("Recipe selector\nClick to change!"), mouseX, mouseY);
+            return;
+        }
+
+        List<Component> tooltip = new ArrayList<>();
+        tooltip.add(Component.literal("Current recipe (" + (be.recipeIndex % recipes.length + 1) + "/" + recipes.length + "):").withStyle(ChatFormatting.YELLOW));
+
+        MixerRecipe recipe = recipes[be.recipeIndex % recipes.length];
+        if (recipe.input1 != null) {
+            tooltip.add(Component.literal("- " + recipe.input1.type.getLocalizedName()));
+        }
+        if (recipe.input2 != null) {
+            tooltip.add(Component.literal("- " + recipe.input2.type.getLocalizedName()));
+        }
+        if (recipe.solidInput != null) {
+            ItemStack solid = recipe.solidInput.extractForCyclingDisplay(20);
+            if (!solid.isEmpty()) {
+                tooltip.add(Component.literal("- ").append(solid.getHoverName()));
+            }
+        }
+        tooltip.add(Component.literal("Click to change!").withStyle(ChatFormatting.RED));
+
+        graphics.renderComponentTooltip(this.font, tooltip, mouseX, mouseY);
     }
 }
