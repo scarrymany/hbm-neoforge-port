@@ -1,19 +1,23 @@
 package com.hbm.inventory.gui;
 
 import com.hbm.main.MainRegistry;
+import com.hbm.module.ModulePatternMatcher;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+
+import java.util.Arrays;
 
 /**
- * Minimal CE {@code GUIDroneRequester} - requester inventory screen (filter + stock slots).
+ * CE {@code GUIDroneRequester} - requester inventory screen (filter + stock slots).
  * <p>
  * CE: upstream/hbm-ce/src/main/java/com/hbm/inventory/gui/GUIDroneRequester.java
  * <p>
- * Partial port: displays filter and stock slots, but no ModulePatternMatcher mode indicators.
- * TODO(CE): Render filter mode overlays (EXACT/WILDCARD/OreDict icons) on filter slots.
+ * Port includes filter mode overlay tooltips (CE :38-40).
  */
 public class DroneCrateRequesterScreen extends AbstractContainerScreen<DroneCrateRequesterMenu> {
 
@@ -34,5 +38,20 @@ public class DroneCrateRequesterScreen extends AbstractContainerScreen<DroneCrat
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
         this.renderTooltip(graphics, mouseX, mouseY);
+
+        if (this.menu.getCarried().isEmpty()) {
+            for (int i = 0; i < 9; i++) {
+                Slot slot = this.menu.slots.get(i);
+                if (this.isHovering(slot.x, slot.y, 16, 16, mouseX, mouseY)) {
+                    String mode = this.menu.getFilterMode(i);
+                    if (mode != null) {
+                        graphics.renderComponentTooltip(this.font, Arrays.asList(
+                                Component.literal("Right click to change").withStyle(ChatFormatting.RED),
+                                Component.literal(ModulePatternMatcher.getLabel(mode))
+                        ), mouseX, mouseY - 30);
+                    }
+                }
+            }
+        }
     }
 }

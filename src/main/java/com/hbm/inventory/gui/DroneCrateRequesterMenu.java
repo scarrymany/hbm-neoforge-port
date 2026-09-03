@@ -127,4 +127,11 @@ public class DroneCrateRequesterMenu extends AbstractContainerMenu {
         DroneCrateRequesterBlockEntity requester = (DroneCrateRequesterBlockEntity) playerInv.player.level().getBlockEntity(pos);
         return new DroneCrateRequesterMenu(containerId, playerInv, requester);
     }
+
+    public String getFilterMode(int filterIndex) {
+        if (filterIndex >= 0 && filterIndex < 9) {
+            return requester.matcher.modes[filterIndex];
+        }
+        return null;
+    }
 }
