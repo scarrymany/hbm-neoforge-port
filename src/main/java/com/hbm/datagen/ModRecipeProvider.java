@@ -2152,6 +2152,22 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('#', item("copper_ingot")) // CE CU.ingot() autogen
                 .unlockedBy("has_copper_ingot", has(item("copper_ingot")))
                 .save(output, id("component/plate_copper"));
+
+        // CE CraftingManager.java line ~450 — plate_saturnite x4 <- BIGMT.ingot() (discrete plate, CE BIGMT = Saturnite)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_saturnite"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', item("ingot_saturnite")) // CE BIGMT.ingot() = ingot_saturnite (discrete)
+                .unlockedBy("has_ingot_saturnite", has(item("ingot_saturnite")))
+                .save(output, id("component/plate_saturnite"));
+
+        // CE CraftingManager.java line ~451 — plate_combine_steel x4 <- CMB.ingot()
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("plate_combine_steel"), 4)
+                .pattern("##")
+                .pattern("##")
+                .define('#', item("ingot_combine_steel")) // CE CMB.ingot() = ingot_combine_steel (discrete)
+                .unlockedBy("has_ingot_combine_steel", has(item("ingot_combine_steel")))
+                .save(output, id("component/plate_combine_steel"));
     }
 
     /**
