@@ -2,8 +2,13 @@ package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.rbmk.IRBMKLoadable;
 import com.hbm.handler.neutron.RBMKNeutronHandler;
+import com.hbm.inventory.container.machine.rbmk.RBMKStorageMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -12,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * Spent/spare fuel rod storage column - a 9-slot buffer an autoloader or crane can pull from/push
  * into. Ported from CE's {@code TileEntityRBMKStorage} (111 lines).
  */
-public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IRBMKLoadable {
+public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IRBMKLoadable, MenuProvider {
 
     public static final int SLOTS = 9;
 
@@ -97,5 +102,15 @@ public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IR
                 return;
             }
         }
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getDefaultName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new RBMKStorageMenu(containerId, playerInventory, this);
     }
 }

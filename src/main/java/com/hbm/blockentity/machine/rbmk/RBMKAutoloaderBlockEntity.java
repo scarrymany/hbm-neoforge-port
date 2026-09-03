@@ -4,6 +4,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.interfaces.ICopiable;
+import com.hbm.inventory.container.machine.rbmk.RBMKAutoloaderMenu;
 import com.hbm.items.machine.ItemRBMKRod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,7 +13,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -26,7 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * Ported (simplified piston-animation timing; core swap logic preserved) from CE's
  * {@code TileEntityRBMKAutoloader} (313 lines, signature-level survey).
  */
-public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements ITickableBE, IControlReceiver, ICopiable {
+public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements ITickableBE, IControlReceiver, ICopiable, MenuProvider {
 
     public static final double SPEED = 0.005D;
 
@@ -170,5 +174,15 @@ public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         piston = buf.readDouble();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getDefaultName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new RBMKAutoloaderMenu(containerId, playerInventory, this);
     }
 }

@@ -3,6 +3,7 @@ package com.hbm.blockentity.machine.rbmk;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.interfaces.IControlReceiver;
+import com.hbm.inventory.container.machine.rbmk.RBMKConsoleMenu;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
@@ -11,7 +12,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,7 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * configuration/JEI-adjacent remainder signature-surveyed only). This is data aggregation only - the
  * console owns no flux/heat/meltdown math of its own, matching the research report's framing.
  */
-public class RBMKConsoleBlockEntity extends MachineBaseBlockEntity implements ITickableBE, IControlReceiver {
+public class RBMKConsoleBlockEntity extends MachineBaseBlockEntity implements ITickableBE, IControlReceiver, MenuProvider {
 
     public static final int GRID = 15;
     public static final int FLUX_BUFFER = 60;
@@ -187,5 +191,15 @@ public class RBMKConsoleBlockEntity extends MachineBaseBlockEntity implements IT
         ByteBuf plain = Unpooled.wrappedBuffer(bytes);
         for (int i = 0; i < fluxBuffer.length; i++) fluxBuffer[i] = plain.readInt();
         for (int i = 0; i < columns.length; i++) columns[i] = RBMKColumn.readFromBuf(plain);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getDefaultName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new RBMKConsoleMenu(containerId, playerInventory, this);
     }
 }
