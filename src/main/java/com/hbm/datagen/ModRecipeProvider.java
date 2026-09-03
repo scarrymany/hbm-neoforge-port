@@ -6400,18 +6400,50 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_drone_patrol", has(item("drone_patrol")))
                 .save(output, id("drone_request"));
 
-        // SKIP: drone_dock craft - CE CraftingManager.java:956-1016 section (crane/radar/drone/gears) has no
-        // drone_dock recipe. Block exists in CE (confirmed by texture/lang) but no vanilla craft found in
-        // CraftingManager survey. Possibly Assembly Machine recipe or uncraftable (creative/command only).
-        // TODO(CE: CraftingManager full survey): Check if drone_dock has AssemblyRecipe or other recipe type.
+        // CE :994 = drone_waypoint x4 (dyeGreen + redstone_torch + circuit_basic)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("drone_waypoint"), 4)
+                .pattern("G").pattern("T").pattern("C")
+                .define('G', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dyes/green")))
+                .define('T', Blocks.REDSTONE_TORCH)
+                .define('C', item("circuit_basic"))
+                .unlockedBy("has_circuit_basic", has(item("circuit_basic")))
+                .save(output, id("drone_waypoint"));
 
-        // SKIP: drone_waypoint craft - CE CraftingManager.java:956-1016 section has no drone_waypoint recipe.
-        // Same as drone_dock - block exists but no vanilla craft found in surveyed CraftingManager range.
-        // TODO(CE: CraftingManager full survey): Check AssemblyRecipe or other recipe systems.
+        // CE :996 = drone_waypoint_request x4 (dyeBlue + redstone_torch + circuit_basic)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("drone_waypoint_request"), 4)
+                .pattern("G").pattern("T").pattern("C")
+                .define('G', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dyes/blue")))
+                .define('T', Blocks.REDSTONE_TORCH)
+                .define('C', item("circuit_basic"))
+                .unlockedBy("has_circuit_basic", has(item("circuit_basic")))
+                .save(output, id("drone_waypoint_request"));
 
-        // SKIP: drone_waypoint_request craft - CE CraftingManager.java:956-1016 section has no drone_waypoint_request
-        // recipe. Logistics waypoint variant exists (texture + lang confirmed) but no vanilla craft found.
-        // TODO(CE: CraftingManager full survey): Check AssemblyRecipe or other recipe systems.
+        // CE :997 = drone_crate_requester (drone_waypoint_request + crate_steel + dyeYellow)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("drone_crate_requester"))
+                .pattern("T").pattern("C").pattern("B")
+                .define('T', block("drone_waypoint_request"))
+                .define('C', block("crate_steel"))
+                .define('B', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dyes/yellow")))
+                .unlockedBy("has_drone_waypoint_request", has(block("drone_waypoint_request")))
+                .save(output, id("drone_crate_requester"));
+
+        // CE :998 = drone_crate_provider (drone_waypoint_request + crate_steel + dyeOrange)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("drone_crate_provider"))
+                .pattern("T").pattern("C").pattern("B")
+                .define('T', block("drone_waypoint_request"))
+                .define('C', block("crate_steel"))
+                .define('B', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "dyes/orange")))
+                .unlockedBy("has_drone_waypoint_request", has(block("drone_waypoint_request")))
+                .save(output, id("drone_crate_provider"));
+
+        // CE :999 = drone_dock (drone_waypoint_request + crate_steel + circuit_advanced)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("drone_dock"))
+                .pattern("T").pattern("C").pattern("B")
+                .define('T', block("drone_waypoint_request"))
+                .define('C', block("crate_steel"))
+                .define('B', item("circuit_advanced"))
+                .unlockedBy("has_circuit_advanced", has(item("circuit_advanced")))
+                .save(output, id("drone_dock"));
 
         // CE :1002 = ball_resin
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("ball_resin"))

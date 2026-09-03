@@ -99,6 +99,12 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneRouterMenu>> CRANE_ROUTER =
             reg("crane_router", com.hbm.menu.CraneRouterMenu::new);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.inventory.gui.DroneCrateProviderMenu>> DRONE_CRATE_PROVIDER =
+            reg("drone_crate_provider", com.hbm.inventory.gui.DroneCrateProviderMenu::fromNetwork);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.inventory.gui.DroneCrateRequesterMenu>> DRONE_CRATE_REQUESTER =
+            reg("drone_crate_requester", com.hbm.inventory.gui.DroneCrateRequesterMenu::fromNetwork);
+
     private ModMenuTypes() {
     }
 

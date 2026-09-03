@@ -4,19 +4,25 @@ import com.hbm.api.drone.IDroneLinkable;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.entity.item.EntityDeliveryDrone;
 import com.hbm.entity.item.EntityDroneBase;
+import com.hbm.inventory.gui.DroneCrateProviderMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -28,7 +34,7 @@ import java.util.List;
  * Phase 4 vertical slice: 9-slot provider inventory. When delivery drone arrives nearby, push items from provider into drone cargo.
  * TODO(CE): RequestNetwork integration (OfferNode, network-wide item offers, pathfinding).
  */
-public class DroneCrateProviderBlockEntity extends BlockEntity implements ITickableBE, IDroneLinkable, Container {
+public class DroneCrateProviderBlockEntity extends BlockEntity implements ITickableBE, IDroneLinkable, Container, MenuProvider {
 
     private static final double SEARCH_RADIUS = 16.0;
     private static final int UPDATE_INTERVAL = 20;
@@ -119,5 +125,16 @@ public class DroneCrateProviderBlockEntity extends BlockEntity implements ITicka
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         ContainerHelper.loadAllItems(tag, inventory, registries);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.translatable("container.droneProvider");
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new DroneCrateProviderMenu(containerId, playerInventory, this);
     }
 }
