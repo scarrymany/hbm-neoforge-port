@@ -123,6 +123,7 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.AUTOLOADER, com.hbm.client.gui.screens.rbmk.RBMKAutoloaderScreen::new);
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL, com.hbm.client.gui.screens.rbmk.RBMKControlScreen::new);
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL_AUTO, com.hbm.client.gui.screens.rbmk.RBMKControlAutoScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONSOLE, com.hbm.client.gui.screens.rbmk.RBMKConsoleScreen::new);
 
         // Processing machines (Shredder / Assembler / Crystallizer / Mixer)
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_SHREDDER, com.hbm.client.gui.screens.machine.ShredderScreen::new);
