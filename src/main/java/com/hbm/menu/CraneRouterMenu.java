@@ -54,6 +54,50 @@ public class CraneRouterMenu extends AbstractContainerMenu {
     }
 
     @Override
+    public void clicked(int slotId, int button, net.minecraft.world.inventory.ClickType clickType, Player player) {
+        // CE: filter slot special handling
+        // Right-click on filter slot: cycle pattern mode
+        // Left-click on filter slot: set filter + init pattern
+        if (slotId >= 0 && slotId < 30) {
+            Slot slot = this.slots.get(slotId);
+            
+            if (button == 1 && clickType == net.minecraft.world.inventory.ClickType.PICKUP && slot.hasItem()) {
+                // Right-click: cycle pattern mode (CE: nextMode)
+                if (!player.level().isClientSide) {
+                    blockEntity.patterns[slotId / 5].nextMode(player.level(), slot.getItem(), slotId % 5);
+                    blockEntity.setChanged();
+                }
+                return;
+            } else if (button == 0 && clickType == net.minecraft.world.inventory.ClickType.PICKUP) {
+                // Left-click: set filter + init pattern (CE: slot.putStack + initPattern)
+                ItemStack held = this.getCarried();
+                slot.set(held.copy());
+                if (!player.level().isClientSide && !slot.getItem().isEmpty()) {
+                    blockEntity.patterns[slotId / 5].initPatternSmart(player.level(), slot.getItem(), slotId % 5);
+                    blockEntity.setChanged();
+                }
+                return;
+            }
+        }
+        
+        super.clicked(slotId, button, clickType, player);
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int id) {
+        // Mode toggle buttons (6 sides: id 0-5)
+        if (id >= 0 && id < 6) {
+            if (!player.level().isClientSide) {
+                int currentMode = blockEntity.modes[id];
+                blockEntity.modes[id] = (currentMode + 1) % 4; // Cycle: NONE → WHITELIST → BLACKLIST → WILDCARD → NONE
+                blockEntity.setChanged();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public ItemStack quickMoveStack(Player player, int index) {
         // CE: shift-clicking disabled for filter slots
         return ItemStack.EMPTY;

@@ -110,6 +110,7 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, ModMenuTypes.CRANE_GRABBER, com.hbm.client.screen.CraneGrabberScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.CRANE_BOXER, com.hbm.client.screen.CraneBoxerScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.CRANE_UNBOXER, com.hbm.client.screen.CraneUnboxerScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRANE_ROUTER, com.hbm.client.screen.CraneRouterScreen::new);
 
         BombClientRegistry.registerScreens(event);
     }
