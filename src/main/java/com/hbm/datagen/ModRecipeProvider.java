@@ -4628,6 +4628,29 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_brick_concrete_cracked", has(block("brick_concrete_cracked")))
                 .save(output, id("block/brick_concrete_broken"));
 
+        // CE CraftingManager.java line ~571 — concrete_pillar x6 <- concrete_smooth + iron_bars
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("concrete_pillar"), 6)
+                .pattern("CBC")
+                .pattern("CBC")
+                .pattern("CBC")
+                .define('C', block("concrete_smooth"))
+                .define('B', Blocks.IRON_BARS)
+                .unlockedBy("has_concrete_smooth", has(block("concrete_smooth")))
+                .save(output, id("block/concrete_pillar"));
+
+        // CE CraftingManager.java line ~587 — asphalt_light x1 <- asphalt + glowstone_dust (shapeless)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, block("asphalt_light"))
+                .requires(block("asphalt"))
+                .requires(Items.GLOWSTONE_DUST)
+                .unlockedBy("has_asphalt", has(block("asphalt")))
+                .save(output, id("block/asphalt_light"));
+
+        // CE CraftingManager.java line ~588 — asphalt x1 <- asphalt_light (shapeless)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, block("asphalt"))
+                .requires(block("asphalt_light"))
+                .unlockedBy("has_asphalt_light", has(block("asphalt_light")))
+                .save(output, id("block/asphalt_from_light"));
+
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, block("chain"), 8)
                 .pattern("S").pattern("S").pattern("S")
                 .define('S', block("steel_beam"))
