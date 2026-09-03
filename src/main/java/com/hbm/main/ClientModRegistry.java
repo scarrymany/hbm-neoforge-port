@@ -134,8 +134,8 @@ public class ClientModRegistry {
         // Crucible (separate menu registry)
         SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.CrucibleMenus.MACHINE_CRUCIBLE, com.hbm.inventory.gui.machine.MachineCrucibleScreen::new);
 
-        // Dummyable machines (Ashpit)
-        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.dummyable.DummyableProcessMenus.MACHINE_ASHPIT, com.hbm.client.gui.screens.machine.dummyable.AshpitScreen::new);
+        // Dummyable machines (all registered in DummyableProcessClientRegistry)
+        com.hbm.inventory.gui.machine.dummyable.DummyableProcessClientRegistry.registerScreens(event);
 
         BombClientRegistry.registerScreens(event);
     }
