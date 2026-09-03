@@ -1823,6 +1823,75 @@ public class ModRecipeProvider extends RecipeProvider {
                 .requires(item("niobium_dust"))
                 .unlockedBy("has_boron_dust", has(item("boron_dust")))
                 .save(output, id("powder/powder_desh_mix"));
+
+        // CE PowderRecipes.java:46 — powder_power x3 <- "dustGlowstone" + DIAMOND.dust() + MAGTUNG.dust()
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_power"), 3)
+                .requires(Items.GLOWSTONE_DUST) // CE "dustGlowstone"
+                .requires(item("powder_diamond")) // CE DIAMOND.dust() is discrete powder_diamond
+                .requires(item("magnetizedtungsten_dust")) // CE MAGTUNG.dust() autogen
+                .unlockedBy("has_powder_diamond", has(item("powder_diamond")))
+                .save(output, id("powder/powder_power"));
+
+        // CE PowderRecipes.java:49 — powder_spark_mix x3 <- DESH.dust() + EUPH.dust() + powder_power
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_spark_mix"), 3)
+                .requires(item("workersalloy_dust")) // CE DESH.dust() autogen
+                .requires(item("powder_euphemium")) // CE EUPH.dust() is discrete powder_euphemium
+                .requires(item("powder_power"))
+                .unlockedBy("has_powder_power", has(item("powder_power")))
+                .save(output, id("powder/powder_spark_mix"));
+
+        // CE PowderRecipes.java:55 — powder_desh_ready x1 <- powder_desh_mix + 2×ingot_mercury + COAL.dust()
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_desh_ready"))
+                .requires(item("powder_desh_mix"))
+                .requires(item("nugget_mercury"), 2) // CE ingot_mercury registry id is nugget_mercury
+                .requires(item("powder_coal")) // CE COAL.dust() is discrete powder_coal
+                .unlockedBy("has_powder_desh_mix", has(item("powder_desh_mix")))
+                .save(output, id("powder/powder_desh_ready"));
+
+        // CE PowderRecipes.java:72 — powder_fertilizer x4 <- CA.dust() + P_RED.dust() + KNO.dust() + S.dust()
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_fertilizer"), 4)
+                .requires(item("calcium_dust")) // CE CA.dust() autogen
+                .requires(item("powder_fire")) // CE P_RED.dust() is discrete powder_fire
+                .requires(item("saltpeter_dust")) // CE KNO.dust() autogen
+                .requires(item("sulfur_dust")) // CE S.dust() autogen
+                .unlockedBy("has_powder_fire", has(item("powder_fire")))
+                .save(output, id("powder/powder_fertilizer"));
+        // TODO(CE): PowderRecipes.java:73 has powder_fertilizer ash variant (ANY_ASH.any() + P_RED/KNO/S dust)
+        //   requires ItemTags for ash items (defer until tags ported)
+
+        // CE PowderRecipes.java:76 — powder_red_copper x2 <- REDSTONE.dust() + CU.dust()
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_red_copper"), 2)
+                .requires(Items.REDSTONE) // CE REDSTONE.dust() is vanilla redstone
+                .requires(item("copper_dust")) // CE CU.dust() autogen
+                .unlockedBy("has_copper_dust", has(item("copper_dust")))
+                .save(output, id("powder/powder_red_copper"));
+
+        // CE PowderRecipes.java:77-80 — powder_dura_steel 4 variants (LBSM-gated but we port all)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_dura_steel"), 2)
+                .requires(item("steel_dust")) // CE STEEL.dust() autogen
+                .requires(item("tungsten_dust")) // CE W.dust() autogen
+                .unlockedBy("has_steel_dust", has(item("steel_dust")))
+                .save(output, id("powder/powder_dura_steel_steel_tungsten"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_dura_steel"), 2)
+                .requires(item("steel_dust")) // CE STEEL.dust() autogen
+                .requires(item("cobalt_dust")) // CE CO.dust() autogen
+                .unlockedBy("has_steel_dust", has(item("steel_dust")))
+                .save(output, id("powder/powder_dura_steel_steel_cobalt"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_dura_steel"), 4)
+                .requires(item("iron_dust")) // CE IRON.dust() autogen
+                .requires(item("powder_coal")) // CE COAL.dust() is discrete powder_coal
+                .requires(item("tungsten_dust"), 2) // CE W.dust() autogen x2
+                .unlockedBy("has_iron_dust", has(item("iron_dust")))
+                .save(output, id("powder/powder_dura_steel_iron_tungsten"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("powder_dura_steel"), 4)
+                .requires(item("iron_dust")) // CE IRON.dust() autogen
+                .requires(item("powder_coal")) // CE COAL.dust() is discrete powder_coal
+                .requires(item("cobalt_dust"), 2) // CE CO.dust() autogen x2
+                .unlockedBy("has_iron_dust", has(item("iron_dust")))
+                .save(output, id("powder/powder_dura_steel_iron_cobalt"));
     }
 
     /**
