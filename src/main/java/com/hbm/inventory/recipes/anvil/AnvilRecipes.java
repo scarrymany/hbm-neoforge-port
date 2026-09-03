@@ -157,6 +157,26 @@ public final class AnvilRecipes {
         construct(3, new ItemStack(Items.DIAMOND), tag("dusts/diamond"));
         construct(3, new ItemStack(Items.EMERALD), tag("dusts/emerald"));
 
+        // CE :280-281 machine_ashpit = stoneSlabs x16 + firebrick x8 + STEEL.plate x2 + IRON.ingot x4, tier 2
+        construct(2, stack("machine_ashpit"),
+                new ComparableStack(Blocks.STONE_SLAB.asItem(), 16),
+                cmp("ingot_firebrick", 8),
+                tag("plates/steel", 2),
+                tag("ingots/iron", 4));
+
+        // CE :366-368 machine_sawmill = stoneSlabs x16 + firebrick x8 + IRON.ingot x4 + sawblade, tier 2
+        construct(2, stack("machine_sawmill"),
+                new ComparableStack(Blocks.STONE_SLAB.asItem(), 16),
+                cmp("ingot_firebrick", 8),
+                tag("ingots/iron", 4),
+                cmp("sawblade"));
+
+        // CE :371-374 machine_crucible = firebrick x20 + CU.ingot x8 + STEEL.plate x8, tier 2
+        construct(2, stack("machine_crucible"),
+                cmp("ingot_firebrick", 20),
+                tag("ingots/copper", 8),
+                tag("plates/steel", 8));
+
         registerConstructionRecipes();
     }
 
