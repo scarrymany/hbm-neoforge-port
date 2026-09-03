@@ -3637,6 +3637,43 @@ public class ModRecipeProvider extends RecipeProvider {
         // Anvil crafting system not ported yet (requires AnvilRecipes + anvil tiers + TE).
         // TODO(CE: AnvilRecipes.java): Port anvil system, then add exact CE anvil recipe.
 
+        // CE CraftingManager arc_electrode recipes (4 types, pattern "C","T","C")
+        // GRAPHITE: GRAPHITE.ingot x2 + STEEL.bolt → arc_electrode_graphite
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("arc_electrode_graphite"))
+                .pattern("C").pattern("T").pattern("C")
+                .define('C', MaterialShapes.INGOT.commonTag(Mats.MAT_GRAPHITE))
+                .define('T', MaterialShapes.BOLT.commonTag(Mats.MAT_STEEL))
+                .unlockedBy("has_graphite", has(MaterialShapes.INGOT.commonTag(Mats.MAT_GRAPHITE)))
+                .save(output, id("item/arc_electrode_graphite"));
+
+        // SKIP: GRAPHITE alt (PETCOKE.gem + ANY_TAR) — powder_petroleum_coke not registered
+
+        // LANTHANIUM: LA.ingot x2 + KEY_BRICK → arc_electrode_lanthanium
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("arc_electrode_lanthanium"))
+                .pattern("C").pattern("T").pattern("C")
+                .define('C', MaterialShapes.INGOT.commonTag(Mats.MAT_LANTHANIUM))
+                .define('T', Items.BRICK)
+                .unlockedBy("has_lanthanium", has(MaterialShapes.INGOT.commonTag(Mats.MAT_LANTHANIUM)))
+                .save(output, id("item/arc_electrode_lanthanium"));
+
+        // DESH: DESH.ingot x2 + TI.ingot → arc_electrode_desh
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("arc_electrode_desh"))
+                .pattern("C").pattern("T").pattern("C")
+                .define('C', MaterialShapes.INGOT.commonTag(Mats.MAT_DESH))
+                .define('T', MaterialShapes.INGOT.commonTag(Mats.MAT_TITANIUM))
+                .unlockedBy("has_desh", has(MaterialShapes.INGOT.commonTag(Mats.MAT_DESH)))
+                .save(output, id("item/arc_electrode_desh"));
+
+        // DESH alt: DESH.ingot x2 + W.ingot
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("arc_electrode_desh"))
+                .pattern("C").pattern("T").pattern("C")
+                .define('C', MaterialShapes.INGOT.commonTag(Mats.MAT_DESH))
+                .define('T', MaterialShapes.INGOT.commonTag(Mats.MAT_TUNGSTEN))
+                .unlockedBy("has_desh", has(MaterialShapes.INGOT.commonTag(Mats.MAT_DESH)))
+                .save(output, id("item/arc_electrode_desh_alt"));
+
+        // SKIP: SATURNITE (BIGMT.ingot + NB.ingot) — ingot_bigmt not registered
+
         // CE :333 = machine_siren = "SIS","ICI","SRS", S=STEEL.plate(), I=ANY_RUBBER.ingot(), C=circuit_vacuum, R=REDSTONE.dust()
         TagKey<Item> rubberIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_RUBBER);
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("machine_siren"))
