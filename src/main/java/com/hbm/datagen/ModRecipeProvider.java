@@ -1945,6 +1945,30 @@ public class ModRecipeProvider extends RecipeProvider {
                 .define('C', item("coil_copper"))
                 .unlockedBy("has_coil_copper", has(item("coil_copper")))
                 .save(output, id("component/motor_steel"));
+
+        // CE CraftingManager.java:220 — motor_desh x1 <- ANY_PLASTIC.ingot() + GOLD.wireDense() + DESH.ingot() + motor
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor_desh"))
+                .pattern("PCP")
+                .pattern("DMD")
+                .pattern("PCP")
+                .define('P', item("ingot_polymer")) // CE ANY_PLASTIC.ingot() = polymer OR bakelite; use polymer
+                .define('C', item("gold_dense_wire")) // CE GOLD.wireDense() autogen
+                .define('D', item("ingot_desh")) // CE DESH.ingot() is discrete ingot_desh
+                .define('M', item("motor"))
+                .unlockedBy("has_motor", has(item("motor")))
+                .save(output, id("component/motor_desh"));
+
+        // CE CraftingManager.java:1080 — reactor_sensor x1 <- W.wireFine() + PB.plate() + circuit_basic + magnetron
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("reactor_sensor"))
+                .pattern("WPW")
+                .pattern("CMC")
+                .pattern("PPP")
+                .define('W', item("tungsten_wire")) // CE W.wireFine() autogen
+                .define('P', item("lead_plate")) // CE PB.plate() autogen
+                .define('C', item("circuit_basic")) // CE DictFrame.fromOne(circuit, BASIC)
+                .define('M', item("magnetron"))
+                .unlockedBy("has_magnetron", has(item("magnetron")))
+                .save(output, id("component/reactor_sensor"));
     }
 
     /**
