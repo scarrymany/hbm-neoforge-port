@@ -82,6 +82,14 @@ public final class MachineItems {
     public static DeferredItem<Item> SPHERE_STEEL, FLYWHEEL_BERYLLIUM, REACTOR_CORE;
     public static DeferredItem<Item> RING_STARMETAL;
     public static DeferredItem<Item> HAZMAT_CLOTH, HAZMAT_CLOTH_RED, HAZMAT_CLOTH_GREY, ASBESTOS_CLOTH, FILTER_COAL;
+    /** CE ModItems.java:358-377 — machine upgrade chips. */
+    public static DeferredItem<Item> UPGRADE_SPEED_1, UPGRADE_SPEED_2, UPGRADE_SPEED_3;
+    public static DeferredItem<Item> UPGRADE_EFFECT_1, UPGRADE_EFFECT_2, UPGRADE_EFFECT_3;
+    public static DeferredItem<Item> UPGRADE_POWER_1, UPGRADE_POWER_2, UPGRADE_POWER_3;
+    public static DeferredItem<Item> UPGRADE_FORTUNE_1, UPGRADE_FORTUNE_2, UPGRADE_FORTUNE_3;
+    public static DeferredItem<Item> UPGRADE_AFTERBURN_1, UPGRADE_AFTERBURN_2, UPGRADE_AFTERBURN_3;
+    public static DeferredItem<Item> UPGRADE_RADIUS, UPGRADE_HEALTH;
+    public static DeferredItem<Item> UPGRADE_OVERDRIVE_1, UPGRADE_OVERDRIVE_2, UPGRADE_OVERDRIVE_3;
 
     public static final Map<ItemDrive.EnumDriveType, DeferredItem<Item>> DRIVES = new EnumMap<>(ItemDrive.EnumDriveType.class);
 
@@ -390,26 +398,27 @@ public final class MachineItems {
     // ==================== ItemMachineUpgrade ====================
 
     private static void registerMachineUpgrades() {
-        registerUpgrade("upgrade_speed_1", ItemMachineUpgrade.UpgradeType.SPEED, 1, 1, "desc.upgrade1");
-        registerUpgrade("upgrade_speed_2", ItemMachineUpgrade.UpgradeType.SPEED, 2, 2, "desc.upgrade1");
-        registerUpgrade("upgrade_speed_3", ItemMachineUpgrade.UpgradeType.SPEED, 3, 3, "desc.upgrade1");
-        registerUpgrade("upgrade_effect_1", ItemMachineUpgrade.UpgradeType.EFFECT, 1, 0, "desc.upgrade2");
-        registerUpgrade("upgrade_effect_2", ItemMachineUpgrade.UpgradeType.EFFECT, 2, 0, "desc.upgrade2");
-        registerUpgrade("upgrade_effect_3", ItemMachineUpgrade.UpgradeType.EFFECT, 3, 0, "desc.upgrade2");
-        registerUpgrade("upgrade_power_1", ItemMachineUpgrade.UpgradeType.POWER, 1, 0, "desc.upgrade3");
-        registerUpgrade("upgrade_power_2", ItemMachineUpgrade.UpgradeType.POWER, 2, 0, "desc.upgrade3");
-        registerUpgrade("upgrade_power_3", ItemMachineUpgrade.UpgradeType.POWER, 3, 0, "desc.upgrade3");
-        registerUpgrade("upgrade_fortune_1", ItemMachineUpgrade.UpgradeType.FORTUNE, 1, 0, "desc.upgrade4");
-        registerUpgrade("upgrade_fortune_2", ItemMachineUpgrade.UpgradeType.FORTUNE, 2, 0, "desc.upgrade4");
-        registerUpgrade("upgrade_fortune_3", ItemMachineUpgrade.UpgradeType.FORTUNE, 3, 0, "desc.upgrade4");
-        registerUpgrade("upgrade_afterburn_1", ItemMachineUpgrade.UpgradeType.AFTERBURN, 1, 0, "desc.upgrade5");
-        registerUpgrade("upgrade_afterburn_2", ItemMachineUpgrade.UpgradeType.AFTERBURN, 2, 0, "desc.upgrade5");
-        registerUpgrade("upgrade_afterburn_3", ItemMachineUpgrade.UpgradeType.AFTERBURN, 3, 0, "desc.upgrade5");
-        registerUpgradeStack("upgrade_radius", "desc.upgrade7", "desc.upgraderd", "desc.upgradestack");
-        registerUpgradeStack("upgrade_health", "desc.upgrade8", "desc.upgradeht", "desc.upgradestack");
-        registerUpgrade("upgrade_overdrive_1", ItemMachineUpgrade.UpgradeType.OVERDRIVE, 1, 4, "desc.upgrade6");
-        registerUpgrade("upgrade_overdrive_2", ItemMachineUpgrade.UpgradeType.OVERDRIVE, 2, 6, "desc.upgrade6");
-        registerUpgrade("upgrade_overdrive_3", ItemMachineUpgrade.UpgradeType.OVERDRIVE, 3, 8, "desc.upgrade6");
+        // CE ModItems.java:358-377 — upgrade chips, exposed as fields for SolderingRecipes CONTROLLER circuits
+        UPGRADE_SPEED_1 = registerUpgradeField("upgrade_speed_1", ItemMachineUpgrade.UpgradeType.SPEED, 1, 1, "desc.upgrade1");
+        UPGRADE_SPEED_2 = registerUpgradeField("upgrade_speed_2", ItemMachineUpgrade.UpgradeType.SPEED, 2, 2, "desc.upgrade1");
+        UPGRADE_SPEED_3 = registerUpgradeField("upgrade_speed_3", ItemMachineUpgrade.UpgradeType.SPEED, 3, 3, "desc.upgrade1");
+        UPGRADE_EFFECT_1 = registerUpgradeField("upgrade_effect_1", ItemMachineUpgrade.UpgradeType.EFFECT, 1, 0, "desc.upgrade2");
+        UPGRADE_EFFECT_2 = registerUpgradeField("upgrade_effect_2", ItemMachineUpgrade.UpgradeType.EFFECT, 2, 0, "desc.upgrade2");
+        UPGRADE_EFFECT_3 = registerUpgradeField("upgrade_effect_3", ItemMachineUpgrade.UpgradeType.EFFECT, 3, 0, "desc.upgrade2");
+        UPGRADE_POWER_1 = registerUpgradeField("upgrade_power_1", ItemMachineUpgrade.UpgradeType.POWER, 1, 0, "desc.upgrade3");
+        UPGRADE_POWER_2 = registerUpgradeField("upgrade_power_2", ItemMachineUpgrade.UpgradeType.POWER, 2, 0, "desc.upgrade3");
+        UPGRADE_POWER_3 = registerUpgradeField("upgrade_power_3", ItemMachineUpgrade.UpgradeType.POWER, 3, 0, "desc.upgrade3");
+        UPGRADE_FORTUNE_1 = registerUpgradeField("upgrade_fortune_1", ItemMachineUpgrade.UpgradeType.FORTUNE, 1, 0, "desc.upgrade4");
+        UPGRADE_FORTUNE_2 = registerUpgradeField("upgrade_fortune_2", ItemMachineUpgrade.UpgradeType.FORTUNE, 2, 0, "desc.upgrade4");
+        UPGRADE_FORTUNE_3 = registerUpgradeField("upgrade_fortune_3", ItemMachineUpgrade.UpgradeType.FORTUNE, 3, 0, "desc.upgrade4");
+        UPGRADE_AFTERBURN_1 = registerUpgradeField("upgrade_afterburn_1", ItemMachineUpgrade.UpgradeType.AFTERBURN, 1, 0, "desc.upgrade5");
+        UPGRADE_AFTERBURN_2 = registerUpgradeField("upgrade_afterburn_2", ItemMachineUpgrade.UpgradeType.AFTERBURN, 2, 0, "desc.upgrade5");
+        UPGRADE_AFTERBURN_3 = registerUpgradeField("upgrade_afterburn_3", ItemMachineUpgrade.UpgradeType.AFTERBURN, 3, 0, "desc.upgrade5");
+        UPGRADE_RADIUS = registerUpgradeStackField("upgrade_radius", "desc.upgrade7", "desc.upgraderd", "desc.upgradestack");
+        UPGRADE_HEALTH = registerUpgradeStackField("upgrade_health", "desc.upgrade8", "desc.upgradeht", "desc.upgradestack");
+        UPGRADE_OVERDRIVE_1 = registerUpgradeField("upgrade_overdrive_1", ItemMachineUpgrade.UpgradeType.OVERDRIVE, 1, 4, "desc.upgrade6");
+        UPGRADE_OVERDRIVE_2 = registerUpgradeField("upgrade_overdrive_2", ItemMachineUpgrade.UpgradeType.OVERDRIVE, 2, 6, "desc.upgrade6");
+        UPGRADE_OVERDRIVE_3 = registerUpgradeField("upgrade_overdrive_3", ItemMachineUpgrade.UpgradeType.OVERDRIVE, 3, 8, "desc.upgrade6");
         registerUpgrade("upgrade_smelter", ItemMachineUpgrade.UpgradeType.SPECIAL, 0, 0, "desc.upgrade9", "desc.upgrade12");
         registerUpgrade("upgrade_shredder", ItemMachineUpgrade.UpgradeType.SPECIAL, 0, 0, "desc.upgrade9", "desc.upgrade13");
         registerUpgrade("upgrade_centrifuge", ItemMachineUpgrade.UpgradeType.SPECIAL, 0, 0, "desc.upgrade9", "desc.upgrade21");
@@ -430,8 +439,16 @@ public final class MachineItems {
         tab(ModCreativeTabs.CONTROL, reg(name, () -> new ItemMachineUpgrade(type, tier, speed, props().stacksTo(1), descKeys)));
     }
 
+    private static DeferredItem<Item> registerUpgradeField(String name, ItemMachineUpgrade.UpgradeType type, int tier, int speed, String... descKeys) {
+        return tab(ModCreativeTabs.CONTROL, reg(name, () -> new ItemMachineUpgrade(type, tier, speed, props().stacksTo(1), descKeys)));
+    }
+
     private static void registerUpgradeStack(String name, String... descKeys) {
         tab(ModCreativeTabs.CONTROL, reg(name, () -> new ItemMachineUpgrade(ItemMachineUpgrade.UpgradeType.SPECIAL, 0, 0, props().stacksTo(16), descKeys)));
+    }
+
+    private static DeferredItem<Item> registerUpgradeStackField(String name, String... descKeys) {
+        return tab(ModCreativeTabs.CONTROL, reg(name, () -> new ItemMachineUpgrade(ItemMachineUpgrade.UpgradeType.SPECIAL, 0, 0, props().stacksTo(16), descKeys)));
     }
 
     // ==================== ItemMold ====================
