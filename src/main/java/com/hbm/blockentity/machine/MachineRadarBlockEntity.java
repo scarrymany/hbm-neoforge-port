@@ -4,24 +4,39 @@ import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.entity.IRadarDetectableNT;
 import com.hbm.api.entity.IRadarDetectableNT.RadarScanParams;
 import com.hbm.api.entity.RadarEntry;
+import com.hbm.blockentity.IRadarCommandReceiver;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blockentity.machine.dummyable.RadarScreenBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.machine.RadarMenu;
+import com.hbm.items.ISatChip;
 import com.hbm.items.tool.ItemCoordinateBase;
 import com.hbm.items.tool.MilitaryC2Items;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
+import com.hbm.main.MainRegistry;
+import com.hbm.saveddata.satellites.Satellite;
 import com.hbm.saveddata.satellites.SatelliteDetector;
+import com.hbm.saveddata.satellites.SatelliteHorizons;
+import com.hbm.saveddata.satellites.SatelliteLaser;
 import com.hbm.saveddata.satellites.SatelliteRayScan;
+import com.hbm.saveddata.satellites.SatelliteResonator;
+import com.hbm.saveddata.satellites.SatelliteSavedData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -41,10 +56,11 @@ import java.util.List;
  * radarAltitude 55 / radarBuffer 30 Exact CE :88-89 + :422 + :432.
  * SatelliteRayScan.INFO_RADAR + Detector MEDIUM Exact CE :451-454.
  * Slot 8 linker → screen entries Exact CE :290-304. Inventory 10 Exact CE :118.
+ * Slots 0–7 sat_relay / linker launch Exact CE :536-594.
  * Scans {@link IRadarDetectableNT} + players. Map GUI skipped — no CE {@code gui_radar_nt.png}.
  */
 public class MachineRadarBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
 
     public static final long MAX_POWER = 100_000L;
     public static final int CONSUMPTION = 500;
@@ -246,6 +262,8 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(power);
         buf.writeInt(contacts);
         buf.writeInt(redPower);
+        buf.writeInt(entries.size());
+        for (RadarEntry entry : entries) entry.toBytes(buf);
     }
 
     @Override
@@ -254,6 +272,85 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         power = buf.readLong();
         contacts = buf.readInt();
         redPower = buf.readInt();
+        int count = buf.readInt();
+        entries.clear();
+        for (int i = 0; i < count; i++) {
+            RadarEntry entry = new RadarEntry();
+            entry.fromBytes(buf);
+            entries.add(entry);
+        }
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    @Override
+    public void receiveControl(CompoundTag data) {
+        // CE TileEntityMachineRadarNT.java:519 — empty; launch is player overload
+    }
+
+    @Override
+    public void receiveControl(ServerPlayer player, CompoundTag data) {
+        // CE TileEntityMachineRadarNT.java:523-594
+        if (data.contains("link") && level != null) {
+            int id = data.getInt("link");
+            if (id < 0 || id > 7) return;
+            ItemStack link = inventory.getStackInSlot(id);
+
+            if (!link.isEmpty() && link.getItem() == satRelayItem()) {
+                Satellite sat = SatelliteSavedData.getData(level).getSatFromFreq(ISatChip.getFreqS(link));
+                if (sat instanceof SatelliteLaser && data.contains("launchPosX")) {
+                    int x = data.getInt("launchPosX");
+                    int z = data.getInt("launchPosZ");
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            HBMSoundHandler.techBleep.get(), SoundSource.AMBIENT, 1.0F, 1.0F);
+                    sat.onClick(level, player, x, z);
+                }
+                if (sat instanceof SatelliteHorizons && data.contains("launchPosX")) {
+                    int x = data.getInt("launchPosX");
+                    int z = data.getInt("launchPosZ");
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            HBMSoundHandler.techBleep.get(), SoundSource.AMBIENT, 1.0F, 1.0F);
+                    sat.onCoordAction(level, player, x, 60, z);
+                }
+                if (sat instanceof SatelliteResonator && data.contains("launchPosX")) {
+                    int x = data.getInt("launchPosX");
+                    int z = data.getInt("launchPosZ");
+                    int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z);
+                    level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                            HBMSoundHandler.techBleep.get(), SoundSource.AMBIENT, 1.0F, 1.0F);
+                    sat.onCoordAction(level, player, x, y, z);
+                }
+            }
+            if (!link.isEmpty() && link.getItem() == MilitaryC2Items.RADAR_LINKER.get()) {
+                BlockPos target = ItemCoordinateBase.getPosition(link);
+                if (target != null) {
+                    BlockEntity tile = level.getBlockEntity(target);
+                    if (tile instanceof IRadarCommandReceiver rec) {
+                        if (data.contains("launchEntity")) {
+                            Entity entity = level.getEntity(data.getInt("launchEntity"));
+                            if (entity != null && rec.sendCommandEntity(entity)) {
+                                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                                        HBMSoundHandler.techBleep.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                            }
+                        } else if (data.contains("launchPosX")) {
+                            int x = data.getInt("launchPosX");
+                            int z = data.getInt("launchPosZ");
+                            if (rec.sendCommandPosition(x, target.getY(), z)) {
+                                level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                                        HBMSoundHandler.techBleep.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static Item satRelayItem() {
+        return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "sat_relay"));
     }
 
     @Nullable

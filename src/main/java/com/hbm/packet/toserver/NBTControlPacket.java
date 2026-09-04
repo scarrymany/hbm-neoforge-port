@@ -57,6 +57,8 @@ public record NBTControlPacket(BlockPos pos, CompoundTag nbt) implements CustomP
                 BlockEntity be = player.level().getBlockEntity(packet.pos);
                 if (be instanceof IControlReceiver receiver) {
                     if (receiver.hasPermission(player)) {
+                        // CE NBTControlPacket.Handler :65-66 — player overload then nbt
+                        receiver.receiveControl(player, packet.nbt);
                         receiver.receiveControl(packet.nbt);
                     }
                 }
