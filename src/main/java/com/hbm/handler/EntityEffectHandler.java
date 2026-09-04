@@ -34,6 +34,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
@@ -391,7 +392,7 @@ public final class EntityEffectHandler {
         }
 
         HbmLivingAttachment props = HbmLivingAttachment.getData(living);
-        Random rand = living.getRandom();
+        RandomSource rand = living.getRandom();
         boolean dirty = false;
 
         if (living.fireImmune()) {
