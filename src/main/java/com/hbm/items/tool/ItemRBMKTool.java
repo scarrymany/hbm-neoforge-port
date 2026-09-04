@@ -1,10 +1,13 @@
 package com.hbm.items.tool;
 
 import com.hbm.blockentity.machine.rbmk.RBMKConsoleBlockEntity;
+import com.hbm.blockentity.machine.rbmk.RBMKDisplayBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.machine.rbmk.RBMKBaseBlock;
 import com.hbm.blocks.machine.rbmk.RBMKConsoleBlock;
+import com.hbm.blocks.machine.rbmk.RBMKDisplayBlock;
 import com.hbm.util.TagsUtil;
+import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -21,16 +24,10 @@ import net.minecraft.world.level.block.Block;
 import java.util.List;
 
 /**
- * RBMK console-linking tool, ported from CE's {@code com.hbm.items.tool.ItemRBMKTool} (read in
- * full). Right-click any {@link RBMKBaseBlock} column to mark its core position (via
- * {@link TagsUtil}), then right-click a {@link RBMKConsoleBlock} to feed that position into
- * {@link RBMKConsoleBlockEntity#setTarget} - both classes are real, already-shipped column-blocks
- * package content per {@code docs/phase2/rbmk_reactor.md}.
- * <p>
- * <b>Not ported</b>: CE's {@code rbmk_crane_console}/{@code rbmk_display} branches - neither
- * {@code TileEntityRBMKCraneConsole} nor {@code TileEntityRBMKDisplay} exists anywhere in this port
- * yet (confirmed: {@code com.hbm.blockentity.machine.rbmk} has no such classes), so those two
- * branches are genuinely unported targets, not an oversight in this item.
+ * Exact CE {@code com.hbm.items.tool.ItemRBMKTool} {@code :43-120}: column → NBT
+ * {@code posX/Y/Z}, console {@code setTarget}, display {@code setTarget}. Crane console
+ * stays skipped (block/TE not registered). CE {@code getAttributeModifiers} +2 is a no-op
+ * (returns {@code super} after putting the modifier) and is not reproduced.
  */
 public class ItemRBMKTool extends Item {
 
@@ -46,6 +43,7 @@ public class ItemRBMKTool extends Item {
         ItemStack stack = context.getItemInHand();
         Block block = level.getBlockState(pos).getBlock();
 
+        // CE ItemRBMKTool.java:46-61
         if (block instanceof RBMKBaseBlock) {
             BlockPos core = ((BlockDummyable) block).findCore(level, pos);
             if (core != null && !level.isClientSide) {
@@ -55,17 +53,28 @@ public class ItemRBMKTool extends Item {
                 tag.putInt("posZ", core.getZ());
                 TagsUtil.putCustomData(stack, tag);
                 if (player != null) {
-                    player.displayClientMessage(Component.literal("Position linked").withStyle(ChatFormatting.YELLOW), false);
+                    player.sendSystemMessage(Component.translatable("item.rbmk_tool.linked").withStyle(ChatFormatting.YELLOW));
                 }
             }
             return InteractionResult.SUCCESS;
         }
 
+        // CE ItemRBMKTool.java:64-80 — port console is a single block, not Dummyable
         if (block instanceof RBMKConsoleBlock && TagsUtil.hasCustomData(stack)) {
             if (!level.isClientSide && level.getBlockEntity(pos) instanceof RBMKConsoleBlockEntity console && player != null) {
                 CompoundTag tag = TagsUtil.getCustomData(stack);
                 console.setTarget(tag.getInt("posX"), tag.getInt("posY"), tag.getInt("posZ"));
-                player.displayClientMessage(Component.literal("Target set").withStyle(ChatFormatting.YELLOW), false);
+                player.sendSystemMessage(Component.translatable("item.rbmk_tool.set").withStyle(ChatFormatting.YELLOW));
+            }
+            return InteractionResult.SUCCESS;
+        }
+
+        // CE ItemRBMKTool.java:99-112
+        if (block instanceof RBMKDisplayBlock && TagsUtil.hasCustomData(stack)) {
+            if (!level.isClientSide && level.getBlockEntity(pos) instanceof RBMKDisplayBlockEntity display && player != null) {
+                CompoundTag tag = TagsUtil.getCustomData(stack);
+                display.setTarget(tag.getInt("posX"), tag.getInt("posY"), tag.getInt("posZ"));
+                player.sendSystemMessage(Component.translatable("item.rbmk_tool.set").withStyle(ChatFormatting.YELLOW));
             }
             return InteractionResult.SUCCESS;
         }
@@ -75,6 +84,9 @@ public class ItemRBMKTool extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.literal("Right-click a column, then an RBMK console to link them."));
+        // CE ItemRBMKTool.java:118-120
+        for (String s : I18nUtil.resolveKeyArray("item.rbmk_tool.desc")) {
+            tooltip.add(Component.literal(s).withStyle(ChatFormatting.YELLOW));
+        }
     }
 }
