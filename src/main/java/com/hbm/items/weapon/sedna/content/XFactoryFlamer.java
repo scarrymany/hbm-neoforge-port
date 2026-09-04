@@ -4,6 +4,10 @@ import com.hbm.capability.HbmLivingAttachment;
 import com.hbm.capability.ModAttachments;
 import com.hbm.entity.effect.EntityFireLingering;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
+import com.hbm.explosion.vanillant.ExplosionVNT;
+import com.hbm.explosion.vanillant.standard.EntityProcessorCrossSmooth;
+import com.hbm.explosion.vanillant.standard.ExplosionEffectWeapon;
+import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.items.weapon.sedna.GunConfig;
@@ -46,9 +50,11 @@ import java.util.function.BiFunction;
  * {@link MagazineFluid}-backed). See {@code docs/phase3/guns_and_ammo.md}'s {@code XFactoryFlamer}
  * table.
  * <p>
- * Diesel/napalm/balefire ricochet linger is Exact CE {@code :77-80} via registered
- * {@link EntityFireLingering}. Direct ignite on living hits is {@link HbmLivingAttachment}.
- * {@code flame_nograv} Exact CE {@code :123}. FlameCreator trail VFX skipped.
+ * Diesel/gas/napalm/balefire ricochet linger is Exact CE {@code :77-80}. Gas {@code :78} is
+ * {@code igniteIfPossible} only — CE has no gas puddle. Daybreaker {@code onImpact} explode
+ * Exact CE {@code :130-137} via local {@code Lego.standardExplode} copy. Direct ignite on
+ * living hits is {@link HbmLivingAttachment}. {@code flame_nograv} Exact CE {@code :123}.
+ * FlameCreator trail VFX skipped.
  * <p>
  * <b>{@code gun_chemthrower} is a real but simplified port, not the bespoke {@code ItemGunChemthrower}
  * subclass</b>: CE's real class evaluates the tank's currently-loaded chemical against a large
@@ -88,7 +94,8 @@ public final class XFactoryFlamer {
     public static final BulletConfig flame_nograv = flame_diesel.clone("flame_nograv").setGrav(0);
     public static final BulletConfig flame_gas = new BulletConfig("flame_gas").setItem(() -> ITEM_FLAME_GAS)
             .setupDamageClass(DamageClass.FIRE).setLife(10).setSpread(0.05F).setVel(1F).setGrav(0).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
-            .setOnImpact(XFactoryFlamer::igniteFire);
+            .setOnImpact(XFactoryFlamer::igniteFire)
+            .setOnRicochet(XFactoryFlamer::lingerGas);
     public static final BulletConfig flame_napalm = new BulletConfig("flame_napalm").setItem(() -> ITEM_FLAME_NAPALM)
             .setupDamageClass(DamageClass.FIRE).setLife(200).setVel(1F).setGrav(0.02).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
             .setOnImpact(XFactoryFlamer::igniteFire)
@@ -103,10 +110,15 @@ public final class XFactoryFlamer {
     public static final BulletConfig flame_topaz_napalm = flame_napalm.clone("flame_topaz_napalm").setProjectiles(2).setSpread(0.05F).setLife(60).setGrav(0);
     public static final BulletConfig flame_topaz_balefire = flame_balefire.clone("flame_topaz_balefire").setProjectiles(2).setSpread(0.05F).setLife(60).setGrav(0);
 
-    public static final BulletConfig flame_daybreaker_diesel = flame_diesel.clone("flame_daybreaker_diesel").setLife(200).setVel(2F).setGrav(0.035);
-    public static final BulletConfig flame_daybreaker_gas = flame_gas.clone("flame_daybreaker_gas").setLife(200).setVel(2F).setGrav(0.035);
-    public static final BulletConfig flame_daybreaker_napalm = flame_napalm.clone("flame_daybreaker_napalm").setLife(200).setVel(2F).setGrav(0.035);
-    public static final BulletConfig flame_daybreaker_balefire = flame_balefire.clone("flame_daybreaker_balefire").setLife(200).setVel(2F).setGrav(0.035);
+    /** Exact CE {@code XFactoryFlamer.java:130-137}. */
+    public static final BulletConfig flame_daybreaker_diesel = flame_diesel.clone("flame_daybreaker_diesel").setLife(200).setVel(2F).setGrav(0.035)
+            .setOnImpact(XFactoryFlamer::daybreakerDiesel);
+    public static final BulletConfig flame_daybreaker_gas = flame_gas.clone("flame_daybreaker_gas").setLife(200).setVel(2F).setGrav(0.035)
+            .setOnImpact(XFactoryFlamer::daybreakerGas);
+    public static final BulletConfig flame_daybreaker_napalm = flame_napalm.clone("flame_daybreaker_napalm").setLife(200).setVel(2F).setGrav(0.035)
+            .setOnImpact(XFactoryFlamer::daybreakerNapalm);
+    public static final BulletConfig flame_daybreaker_balefire = flame_balefire.clone("flame_daybreaker_balefire").setLife(200).setVel(2F).setGrav(0.035)
+            .setOnImpact(XFactoryFlamer::daybreakerBalefire);
 
     // ==================== guns ====================
 
@@ -233,6 +245,11 @@ public final class XFactoryFlamer {
         if (!igniteIfPossible(bullet, mop)) spawnFire(bullet, mop, 2F, 1F, 100, EntityFireLingering.TYPE_DIESEL);
     }
 
+    /** CE {@code XFactoryFlamer.java:78} {@code LAMBDA_LINGER_GAS} — ignite only, no puddle. */
+    public static void lingerGas(EntityBulletBaseMK4 bullet, BlockHitResult mop) {
+        igniteIfPossible(bullet, mop);
+    }
+
     /** CE {@code XFactoryFlamer.java:79} {@code LAMBDA_LINGER_NAPALM}. */
     public static void lingerNapalm(EntityBulletBaseMK4 bullet, BlockHitResult mop) {
         if (!igniteIfPossible(bullet, mop)) spawnFire(bullet, mop, 2.5F, 1F, 200, EntityFireLingering.TYPE_DIESEL);
@@ -269,6 +286,49 @@ public final class XFactoryFlamer {
         if (world.getEntitiesOfClass(EntityFireLingering.class, box).isEmpty()) {
             EntityFireLingering.spawn(world, hit.x, hit.y, hit.z, width, height, type, duration);
         }
+        bullet.discard();
+    }
+
+    /** CE {@code spawnFire} only acts on {@code typeOfHit.BLOCK}. */
+    public static void spawnFire(EntityBulletBaseMK4 bullet, HitResult mop, float width, float height, int duration, int type) {
+        if (mop instanceof BlockHitResult bhr) spawnFire(bullet, bhr, width, height, duration, type);
+    }
+
+    /** Local copy of CE {@code Lego.standardExplode(bullet, mop, range)} — same as {@code XFactory40mm}. */
+    private static void standardExplode(EntityBulletBaseMK4 bullet, HitResult hr, float range) {
+        Vec3 hit = hr.getLocation();
+        ExplosionVNT vnt = new ExplosionVNT(bullet.level(), hit.x, hit.y, hit.z, range, bullet.getThrower());
+        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, bullet.damage)
+                .setupPiercing(bullet.config.armorThresholdNegation, bullet.config.armorPiercingPercent));
+        vnt.setPlayerProcessor(new PlayerProcessorStandard());
+        vnt.setSFX(new ExplosionEffectWeapon(10, 2.5F, 1F));
+        vnt.explode();
+    }
+
+    /** CE {@code XFactoryFlamer.java:130-131}. */
+    public static void daybreakerDiesel(EntityBulletBaseMK4 bullet, HitResult mop) {
+        standardExplode(bullet, mop, 5F);
+        spawnFire(bullet, mop, 6F, 2F, 200, EntityFireLingering.TYPE_DIESEL);
+        bullet.discard();
+    }
+
+    /** CE {@code XFactoryFlamer.java:132-133}. */
+    public static void daybreakerGas(EntityBulletBaseMK4 bullet, HitResult mop) {
+        standardExplode(bullet, mop, 5F);
+        bullet.discard();
+    }
+
+    /** CE {@code XFactoryFlamer.java:134-135}. */
+    public static void daybreakerNapalm(EntityBulletBaseMK4 bullet, HitResult mop) {
+        standardExplode(bullet, mop, 7.5F);
+        spawnFire(bullet, mop, 6F, 2F, 300, EntityFireLingering.TYPE_DIESEL);
+        bullet.discard();
+    }
+
+    /** CE {@code XFactoryFlamer.java:136-137}. */
+    public static void daybreakerBalefire(EntityBulletBaseMK4 bullet, HitResult mop) {
+        standardExplode(bullet, mop, 5F);
+        spawnFire(bullet, mop, 7.5F, 2.5F, 400, EntityFireLingering.TYPE_BALEFIRE);
         bullet.discard();
     }
 
