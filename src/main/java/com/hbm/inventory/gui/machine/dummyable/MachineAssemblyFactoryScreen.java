@@ -19,7 +19,8 @@ import net.minecraft.world.entity.player.Inventory;
 /**
  * CE {@code GUIMachineAssemblyFactory} — {@code gui_assembly_factory.png} 256×240 (atlas 256×256).
  * Recipe click {@code 6+(i%2)*109, 53+(i/2)*56} opens {@link GUIScreenRecipeSelector}
- * (CE {@code GUIMachineAssemblyFactory.java:62}).
+ * (CE {@code GUIMachineAssemblyFactory.java:62}). Ghost inputs
+ * {@code GUIMachineAssemblyFactory.java:112-130}.
  */
 public class MachineAssemblyFactoryScreen extends GuiInfoContainer<MachineAssemblyFactoryMenu> {
 
@@ -71,6 +72,11 @@ public class MachineAssemblyFactoryScreen extends GuiInfoContainer<MachineAssemb
             if (recipe != null) {
                 guiGraphics.renderItem(recipe.getIcon(), x + 7 + (i % 2) * 109, y + 54 + (i / 2) * 56);
             }
+            int start = MachineAssemblyFactoryBlockEntity.inputStart(i);
+            renderGhostInputs(guiGraphics, TEXTURE, recipe, new int[]{
+                    start, start + 1, start + 2, start + 3, start + 4, start + 5,
+                    start + 6, start + 7, start + 8, start + 9, start + 10, start + 11
+            });
         }
         for (int j = 0; j < 4; j++) {
             be.inputTanks[j].renderTank(x + 105 + (j % 2) * 109, y + 52 + (j / 2) * 56, 0, 5, 32);

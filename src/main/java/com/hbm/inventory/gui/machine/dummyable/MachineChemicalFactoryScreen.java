@@ -18,7 +18,8 @@ import net.minecraft.world.entity.player.Inventory;
 /**
  * CE {@code GUIMachineChemicalFactory} — {@code gui_chemical_factory.png} 248×216 (atlas 256×256).
  * Recipe click {@code 74, 19+i*22} opens {@link GUIScreenRecipeSelector}
- * (CE {@code GUIMachineChemicalFactory.java:63}).
+ * (CE {@code GUIMachineChemicalFactory.java:63}). Ghost inputs
+ * {@code GUIMachineChemicalFactory.java:113-130}.
  */
 public class MachineChemicalFactoryScreen extends GuiInfoContainer<MachineChemicalFactoryMenu> {
 
@@ -65,6 +66,11 @@ public class MachineChemicalFactoryScreen extends GuiInfoContainer<MachineChemic
             if (recipe != null) {
                 guiGraphics.renderItem(recipe.getIcon(), x + 75, y + 20 + i * 22);
             }
+            renderGhostInputs(guiGraphics, TEXTURE, recipe, new int[]{
+                    MachineChemicalFactoryBlockEntity.itemIn(i, 0),
+                    MachineChemicalFactoryBlockEntity.itemIn(i, 1),
+                    MachineChemicalFactoryBlockEntity.itemIn(i, 2)
+            });
         }
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 4; j++) {
