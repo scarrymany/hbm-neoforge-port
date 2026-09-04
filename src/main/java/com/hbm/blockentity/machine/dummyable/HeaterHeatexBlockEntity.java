@@ -32,7 +32,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityHeaterHeatex.java}:89-157 — COOLANT_HOT → COOLANT via FT_Coolable HEATEXCHANGER.
- * ROR: CE {@code :286-299}. tanksNew[0]/[1] → hot/cold.
+ * {@code tanksNew[0].setType(0)} Exact CE {@code :85}. ROR: CE {@code :286-299}.
  */
 public class HeaterHeatexBlockEntity extends MachineBaseBlockEntity
         implements IHeatSource, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
@@ -64,10 +64,8 @@ public class HeaterHeatexBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        ItemStack id = inventory.getStackInSlot(0);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            hot.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityHeaterHeatex.java:85
+        this.hot.setType(0, inventory);
 
         heatEnergy = (int) (heatEnergy * 0.999D);
         tryConvert();

@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineRadiolysis}: RTG heat ×10 HE, crack 100 mB when heat&gt;100.
- * Sterilize ({@code ntmContagion}) skipped — NBT not ported.
+ * {@code tanks[0].setType(10, 11)} Exact CE {@code :118}. Sterilize ({@code ntmContagion}) skipped.
  */
 public class MachineRadiolysisBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -92,10 +92,8 @@ public class MachineRadiolysisBlockEntity extends MachineBaseBlockEntity
         heat = newHeat;
         power = Math.min(MAX_POWER, power + heat * 10L);
 
-        ItemStack id = inventory.getStackInSlot(10);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            input.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineRadiolysis.java:118
+        this.input.setType(10, 11, inventory);
         setupTanks();
 
         if (heat > 100) {

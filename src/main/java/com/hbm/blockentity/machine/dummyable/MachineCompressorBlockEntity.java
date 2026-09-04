@@ -32,6 +32,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineCompressorBase}: 4 slots, 2×16k tanks, 100k HE, generic +1 PU fallback.
+ * {@code tanks[0].setType(0)} Exact CE {@code :91}.
  */
 public class MachineCompressorBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -88,10 +89,8 @@ public class MachineCompressorBlockEntity extends MachineBaseBlockEntity
         }
 
         power = Library.chargeTEFromItems(inventory, 1, power, MAX_POWER);
-        ItemStack id = inventory.getStackInSlot(0);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            input.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineCompressorBase.java:91
+        this.input.setType(0, inventory);
         setupTanks();
 
         CompressorRecipe rec = CompressorRecipes.getRecipe(input.getTankType(), input.getPressure());
