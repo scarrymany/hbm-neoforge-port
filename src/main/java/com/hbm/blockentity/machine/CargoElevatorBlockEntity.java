@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine;
 
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
@@ -27,10 +29,14 @@ import java.util.List;
  * <p>
  * Ported: extension animation (CE :63-70), per-tick {@code networkPackNT(300)} (CE :72-73),
  * entity lifting on both sides with server-side player skip (CE :83-97), toggleElevator (CE :100-108),
- * lower elevator merging (CE :43-60), client interpol (CE :74-80, :111-125).
- * TODO(CE): ROR {@code setextension} (CE :170-185), custom rendering.
+ * lower elevator merging (CE :43-60), client interpol (CE :74-80, :111-125),
+ * ROR {@code setextension} (CE :170-176) + {@code getFunctionInfo} (CE :180-185).
+ * {@link IRORValueProvider} is the CE torch stay-check ({@code RadioTorchController.java:55}) —
+ * CE advertises {@code VAL:extension} but omitted the interface, so the controller cannot attach.
+ * TODO(CE): custom rendering.
  */
-public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity implements ITickableBE {
+public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity
+        implements ITickableBE, IRORInteractive, IRORValueProvider {
 
     public int height = 0; // CE :26 - number of additional blocks above base
     public int targetExtension = 0; // CE :28 - target platform height
@@ -171,5 +177,31 @@ public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity implements I
         if (this.syncExtension > 0 && this.syncExtension < this.height) {
             this.sync = 3;
         }
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :180-185
+        return new String[]{
+                PREFIX_VALUE + "extension",
+                PREFIX_FUNCTION + "setextension"
+        };
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :170-176
+        if ((PREFIX_FUNCTION + "setextension").equals(name) && params.length > 0) {
+            targetExtension = IRORInteractive.parseInt(params[0], 0, height);
+            setChanged();
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        if ((PREFIX_VALUE + "extension").equals(name)) return String.valueOf((int) this.extension);
+        return null;
     }
 }
