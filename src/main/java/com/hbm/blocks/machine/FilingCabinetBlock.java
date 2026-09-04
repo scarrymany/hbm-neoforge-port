@@ -30,7 +30,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * CE {@code BlockDecoContainer} {@code filing_cabinet} — one registry id (no extra variant ids),
- * 8-slot container. TESR drawer animation skipped.
+ * 8-slot container. Lock via {@link com.hbm.api.block.ILockable} Exact CE
+ * {@code BlockDecoContainer.java:120-127}. TESR drawer animation skipped.
  */
 public class FilingCabinetBlock extends BaseEntityBlock {
 
