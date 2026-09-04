@@ -5,6 +5,7 @@ import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.standard.BlockAllocatorBulkie;
 import com.hbm.explosion.vanillant.standard.BlockAllocatorStandard;
+import com.hbm.explosion.vanillant.standard.BlockMutatorDebris;
 import com.hbm.explosion.vanillant.standard.BlockProcessorStandard;
 import com.hbm.explosion.vanillant.standard.EntityProcessorCrossSmooth;
 import com.hbm.explosion.vanillant.standard.ExplosionEffectWeapon;
@@ -44,13 +45,14 @@ import net.minecraft.world.phys.Vec3;
  * then {@code setDead}; foam/sand stack {@code foam_layer}/{@code sand_boron_layer} (layers &lt; 6
  * increment, else {@code block_foam}/{@code sand_boron}). Entity {@link LivingEntity#clearFire()}
  * stays. {@code IRepairable}/{@code CompatExternal} and volcanic-lava {@code onUpdate} stay skipped
- * (not ported). Client dust VFX skipped.
+ * (not registered). Client dust VFX skipped.
+ * <p>
+ * Mortar-charge slag litter is Exact CE {@code XFactoryTool.java:256-266}
+ * {@code BlockMutatorDebris(block_slag)} — {@code block_slag} is registered (single-state; CE meta 1
+ * is moot). {@code ExplosionCreator.composeEffectSmall} stays skipped (VFX).
  * <p>
  * <b>Forward references (documented, not silently dropped):</b>
  * <ul>
- *     <li>{@code ct_mortar_charge}'s {@code BlockMutatorDebris(ModBlocks.block_slag, 1)} block-litter
- *     effect is dropped - {@code block_slag} is not a registered block anywhere in this port yet
- *     (confirmed by grep); the blast itself (crater, damage, knockback) is unaffected.</li>
  *     <li>{@code ItemGunChargeThrower.setLastHook}/the reel-in mechanic (a per-stack "which hook
  *     entity is mine" NBT link plus grapple pull) is not ported - the hook still embeds itself in the
  *     world via the real, already-ported {@code EntityThrowableNT#getStuck(BlockPos, int)} (confirmed
@@ -256,12 +258,11 @@ public final class XFactoryTool {
         Vec3 loc = hit.getLocation();
         ExplosionVNT vnt = new ExplosionVNT(bullet.level(), loc.x, loc.y, loc.z, 15, bullet.getThrower());
         vnt.setBlockAllocator(new BlockAllocatorStandard());
-        vnt.setBlockProcessor(new BlockProcessorStandard().setNoDrop());
+        vnt.setBlockProcessor(new BlockProcessorStandard().setNoDrop()
+                .withBlockEffect(new BlockMutatorDebris(hbm("block_slag"))));
         vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, bullet.damage).setupPiercing(bullet.config.armorThresholdNegation, bullet.config.armorPiercingPercent));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
         bullet.discard();
-        // TODO(blocks-generic): CE's BlockMutatorDebris(ModBlocks.block_slag, 1) litter effect and the
-        // client-only ExplosionCreator.composeEffectSmall VFX are dropped - see class javadoc.
     }
 }
