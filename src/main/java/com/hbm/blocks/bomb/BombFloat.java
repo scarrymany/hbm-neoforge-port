@@ -1,8 +1,8 @@
 package com.hbm.blocks.bomb;
 
 import com.hbm.entity.effect.EntityEMPBlast;
+import com.hbm.explosion.ExplosionChaos;
 import com.hbm.explosion.ExplosionNukeGeneric;
-import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.interfaces.IBomb;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
@@ -14,15 +14,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Ported from CE's {@code com.hbm.blocks.bomb.BombFloat} (59 lines, read in full) -
- * {@code docs/phase3/bomb_blocks_and_detonators.md} Section A. Two registered variants
- * ({@link BombBlocks#FLOAT_BOMB}/{@link BombBlocks#EMP_BOMB}) differentiated by identity, matching
- * CE. The {@code emp_bomb} branch is fully real ({@link ExplosionNukeGeneric#empBlast} and
- * {@link EntityEMPBlast} are both already committed in this port's foundation wave); the plain
- * {@code float_bomb} branch's {@code ExplosionChaos.floater}/{@code move} dependency is not ported
- * (out of this task's read scope, flagged as a forward reference by the research report) and is
- * approximated here with a documented {@link ExplosionVNT} standin per this task's explicit
- * instruction.
+ * Exact CE {@code BombFloat.java:37-56}. {@code float_bomb}: {@code floater}/{@code move}.
+ * {@code emp_bomb}: {@code empBlast} + {@link EntityEMPBlast}.
  */
 public class BombFloat extends Block implements IBomb {
 
@@ -46,13 +39,8 @@ public class BombFloat extends Block implements IBomb {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
 
             if (this == BombBlocks.FLOAT_BOMB.get()) {
-                // TODO(ExplosionChaos, forward reference): CE calls ExplosionChaos.floater(world,
-                // detonator, pos, 15, 50) then .move(world, pos, 15, 0, 50, 0) here - neither
-                // ExplosionChaos nor its floating-island-relocation behavior is ported. Approximated
-                // with an equivalent-size standard explosion so the block remains a functioning bomb.
-                ExplosionVNT vnt = new ExplosionVNT(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 15F, detonator);
-                vnt.makeStandard();
-                vnt.explode();
+                ExplosionChaos.floater(level, detonator, pos, 15, 50);
+                ExplosionChaos.move(level, pos, 15, 0, 50, 0);
             }
             if (this == BombBlocks.EMP_BOMB.get()) {
                 ExplosionNukeGeneric.empBlast(level, detonator, pos.getX(), pos.getY(), pos.getZ(), 50);
