@@ -1,9 +1,12 @@
 package com.hbm.blockentity.machine.fusion;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
+import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.lib.DirPos;
@@ -17,10 +20,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * CE {@code TileEntityFusionMHDT}.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityFusionMHDT.java:67-69} ({@code mhd-turbine}).
  * TODO(CE: TileEntityFusionMHDT.java:134): AudioWrapper largeTurbineRunning — VFX last.
  * TODO(CE: TileEntityFusionMHDT.java:284): OpenComputers ntm_fusion_mhdt.
  */
@@ -169,5 +174,32 @@ public class FusionMHDTBlockEntity extends LoadedBaseBlockEntity
     @Override
     public List<FluidTankNTM> getSendingTanks() {
         return List.of(tanks[1]);
+    }
+
+    static void readMhdt(JsonObject obj) {
+        // CE TileEntityFusionMHDT.java:68
+        MINIMUM_PLASMA = IConfigurableMachine.grab(obj, "L:minimumPlasma", MINIMUM_PLASMA);
+    }
+
+    static void writeMhdt(JsonWriter writer) throws IOException {
+        // CE TileEntityFusionMHDT.java:69
+        writer.name("L:minimumPlasma").value(MINIMUM_PLASMA);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "mhd-turbine";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readMhdt(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeMhdt(writer);
+        }
     }
 }

@@ -14,8 +14,11 @@ import com.hbm.blockentity.machine.dummyable.HeaterOvenBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineAshpitBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineChungusBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineForceFieldBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachinePumpBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineRotaryFurnaceBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
+import com.hbm.blockentity.machine.fusion.FusionMHDTBlockEntity;
+import com.hbm.blockentity.machine.fusion.IcfControllerBlockEntity;
 import com.hbm.blockentity.machine.oil.MachineFrackingTowerBlockEntity;
 import com.hbm.blockentity.machine.oil.MachineOilWellBlockEntity;
 import com.hbm.blockentity.machine.oil.MachinePumpjackBlockEntity;
@@ -61,6 +64,9 @@ public final class AutoRegistry {
             configurableMachineClasses.add(MachineAshpitBlockEntity.ConfigDummy.class);
             configurableMachineClasses.add(MachineCrucibleBlockEntity.ConfigDummy.class);
             configurableMachineClasses.add(MachineRotaryFurnaceBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(IcfControllerBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(FusionMHDTBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachinePumpBlockEntity.ConfigDummy.class);
         }
         MachineDynConfig.initialize();
         MainRegistry.logger.debug("Successfully loaded {} configurable machine classes.", configurableMachineClasses.size());

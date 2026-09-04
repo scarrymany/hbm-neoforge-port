@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.fusion;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
@@ -7,48 +9,104 @@ import com.hbm.blockentity.LoadedBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.machine.fusion.IcfControllerBlock;
 import com.hbm.blocks.machine.fusion.IcfReactorBlock;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
- * Ported from CE's {@code TileEntityICFController}: a single-block laser accumulator that charges
- * from the HE power network ({@link IEnergyReceiverMK2}, exactly like CE's {@code CapabilityEnergy}
- * bridge, but native HE this time per this port's own energy-system rule) and, once charged, fires
- * its accumulated power in a straight line out of its facing side, feeding whichever
- * {@link IcfReactorBlockEntity} it first hits.
- *
- * <h2>Simplification versus CE (documented, not accidental)</h2>
- * CE's controller counts a dedicated sub-multiblock of {@code icf_cell}/{@code icf_emitter}/
- * {@code icf_capacitor}/{@code icf_turbocharger} blocks strung out behind it to derive
- * {@code getMaxPower()} ({@code sqrt(capacitorCount) * capacitorPower + sqrt(turbochargerCount) *
- * turboPower}), and separately requires a fully-assembled reactor-side {@code icf_component}
- * lattice before {@code assembled} goes true at all. This port keeps the real gameplay mechanic -
- * an HE-charged laser that fires down a line, burns through weak blocks, damages/ignites entities in
- * its path, and feeds a reactor multiblock - but with a flat {@link #MAX_POWER} capacity instead of
- * porting the capacitor/turbocharger sub-multiblock counter. Restoring that counter (once a
- * capacitor/turbocharger block family exists for this area to reference) is flagged as a follow-up.
+ * CE {@code TileEntityICFController}. Capacitor/turbo count Exact CE {@code :49-104}/{@code :264-265}.
+ * {@link IConfigurableMachine} Exact CE {@code :269-282} ({@code icfLaser}).
+ * BlockICF placeholder proxy skipped — components stay in place after assemble.
  */
 public class IcfControllerBlockEntity extends LoadedBaseBlockEntity implements IEnergyReceiverMK2, ITickableBE, IPersistentNBT {
 
-    public static final long MAX_POWER = 25_000_000L;
+    // CE TileEntityICFController.java:35-36
+    public static int capacitorPower = 2_500_000;
+    public static int turboPower = 5_000_000;
+
     private static final int MAX_RANGE = 48;
 
+    private final List<BlockPos> ports = new ArrayList<>();
     public long power;
     public int laserLength;
+    public boolean assembled;
+    private int cellCount;
+    private int emitterCount;
+    private int capacitorCount;
+    private int turbochargerCount;
     private boolean destroyedByCreativePlayer;
 
     public IcfControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
+
+    public void setup(HashSet<BlockPos> ports, HashSet<BlockPos> cells, HashSet<BlockPos> emitters,
+                      HashSet<BlockPos> capacitors, HashSet<BlockPos> turbochargers) {
+        // CE TileEntityICFController.java:49-103
+        this.cellCount = 0;
+        this.emitterCount = 0;
+        this.capacitorCount = 0;
+        this.turbochargerCount = 0;
+
+        if (level == null) return;
+        BlockState controllerState = level.getBlockState(worldPosition);
+        if (!(controllerState.getBlock() instanceof IcfControllerBlock)) return;
+        Direction structureDirection = controllerState.getValue(IcfControllerBlock.FACING).getOpposite();
+        HashSet<BlockPos> validCells = new HashSet<>();
+        HashSet<BlockPos> validEmitters = new HashSet<>();
+        HashSet<BlockPos> validCapacitors = new HashSet<>();
+
+        for (int i = 1; i <= cells.size(); i++) {
+            BlockPos currentCellPos = worldPosition.relative(structureDirection, i);
+            if (cells.contains(currentCellPos)) {
+                this.cellCount++;
+                validCells.add(currentCellPos);
+            } else {
+                break;
+            }
+        }
+
+        for (BlockPos emitterPos : emitters) {
+            for (Direction facing : Direction.values()) {
+                if (validCells.contains(emitterPos.relative(facing))) {
+                    this.emitterCount++;
+                    validEmitters.add(emitterPos);
+                    break;
+                }
+            }
+        }
+        for (BlockPos capacitorPos : capacitors) {
+            for (Direction facing : Direction.values()) {
+                if (validEmitters.contains(capacitorPos.relative(facing))) {
+                    this.capacitorCount++;
+                    validCapacitors.add(capacitorPos);
+                    break;
+                }
+            }
+        }
+        for (BlockPos turboPos : turbochargers) {
+            for (Direction facing : Direction.values()) {
+                if (validCapacitors.contains(turboPos.relative(facing))) {
+                    this.turbochargerCount++;
+                    break;
+                }
+            }
+        }
+        this.ports.clear();
+        this.ports.addAll(ports);
+        setChanged();
     }
 
     @Override
@@ -57,14 +115,22 @@ public class IcfControllerBlockEntity extends LoadedBaseBlockEntity implements I
 
         Direction dir = getBlockState().getValue(IcfControllerBlock.FACING);
 
-        if (level.getGameTime() % 20 == 0) {
-            BlockPos behind = worldPosition.relative(dir.getOpposite());
-            trySubscribe(level, behind, dir.getOpposite());
-        }
+        if (this.assembled) {
+            // CE TileEntityICFController.java:118-124
+            for (BlockPos port : ports) {
+                for (Direction face : Direction.values()) {
+                    if (this.getMaxPower() > 0) {
+                        trySubscribe(level, port.relative(face), face);
+                    }
+                }
+            }
 
-        if (this.power > 0) {
-            fireLaser(dir);
-            this.power = 0;
+            if (this.power > 0) {
+                fireLaser(dir);
+                this.power = 0;
+            } else {
+                this.laserLength = 0;
+            }
         } else {
             this.laserLength = 0;
         }
@@ -132,25 +198,29 @@ public class IcfControllerBlockEntity extends LoadedBaseBlockEntity implements I
 
     @Override
     public long getMaxPower() {
-        return MAX_POWER;
+        // CE TileEntityICFController.java:265
+        return (long) (Math.sqrt(capacitorCount) * capacitorPower
+                + Math.sqrt(Math.min(turbochargerCount, capacitorCount)) * turboPower);
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.putLong("power", power);
+        writeNBT(tag);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
-        this.power = tag.getLong("power");
+        readNBT(tag);
     }
 
     @Override
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeLong(power);
+        buf.writeInt(capacitorCount);
+        buf.writeInt(turbochargerCount);
         buf.writeInt(laserLength);
     }
 
@@ -158,17 +228,41 @@ public class IcfControllerBlockEntity extends LoadedBaseBlockEntity implements I
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         this.power = buf.readLong();
+        this.capacitorCount = buf.readInt();
+        this.turbochargerCount = buf.readInt();
         this.laserLength = buf.readInt();
     }
 
     @Override
     public void writeNBT(CompoundTag nbt) {
+        // CE TileEntityICFController.java:234-249
         nbt.putLong("power", power);
+        nbt.putBoolean("assembled", assembled);
+        nbt.putInt("cellCount", cellCount);
+        nbt.putInt("emitterCount", emitterCount);
+        nbt.putInt("capacitorCount", capacitorCount);
+        nbt.putInt("turbochargerCount", turbochargerCount);
+        nbt.putInt("portCount", ports.size());
+        for (int i = 0; i < ports.size(); i++) {
+            BlockPos p = ports.get(i);
+            nbt.putIntArray("p" + i, new int[]{p.getX(), p.getY(), p.getZ()});
+        }
     }
 
     @Override
     public void readNBT(CompoundTag nbt) {
         this.power = nbt.getLong("power");
+        this.assembled = nbt.getBoolean("assembled");
+        this.cellCount = nbt.getInt("cellCount");
+        this.emitterCount = nbt.getInt("emitterCount");
+        this.capacitorCount = nbt.getInt("capacitorCount");
+        this.turbochargerCount = nbt.getInt("turbochargerCount");
+        ports.clear();
+        int portCount = nbt.getInt("portCount");
+        for (int i = 0; i < portCount; i++) {
+            int[] port = nbt.getIntArray("p" + i);
+            if (port.length >= 3) ports.add(new BlockPos(port[0], port[1], port[2]));
+        }
     }
 
     @Override
@@ -179,5 +273,34 @@ public class IcfControllerBlockEntity extends LoadedBaseBlockEntity implements I
     @Override
     public boolean isDestroyedByCreativePlayer() {
         return destroyedByCreativePlayer;
+    }
+
+    static void readLaser(JsonObject obj) {
+        // CE TileEntityICFController.java:275-276
+        capacitorPower = IConfigurableMachine.grab(obj, "I:capacitorPower", capacitorPower);
+        turboPower = IConfigurableMachine.grab(obj, "I:turboPower", turboPower);
+    }
+
+    static void writeLaser(JsonWriter writer) throws IOException {
+        // CE TileEntityICFController.java:281-282
+        writer.name("I:capacitorPower").value(capacitorPower);
+        writer.name("I:turboPower").value(turboPower);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "icfLaser";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readLaser(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeLaser(writer);
+        }
     }
 }

@@ -1,9 +1,12 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.lib.DirPos;
@@ -21,20 +24,23 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 /**
  * CE {@code TileEntityMachinePumpBase}/{@code PumpSteam}/{@code PumpElectric}.
- * Config JSON skipped. Rotor audio client-side skipped.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityMachinePumpBase.java:66-84} ({@code waterpump}).
+ * Rotor audio client-side skipped.
  */
 public class MachinePumpBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE {
 
-    public static final int GROUND_HEIGHT = 70;
-    public static final int GROUND_DEPTH = 4;
-    public static final int STEAM_SPEED = 1_000;
-    public static final int ELECTRIC_SPEED = 10_000;
+    // CE TileEntityMachinePumpBase.java:59-63
+    public static int groundHeight = 70;
+    public static int groundDepth = 4;
+    public static int steamSpeed = 1_000;
+    public static int electricSpeed = 10_000;
     public static final int NON_WATER_DEBUFF = 100;
     public static final long MAX_POWER = 10_000L;
 
@@ -61,7 +67,7 @@ public class MachinePumpBlockEntity extends MachineBaseBlockEntity
     public MachinePumpBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, boolean electric) {
         super(type, pos, state, 0, true, electric);
         this.electric = electric;
-        int speed = electric ? ELECTRIC_SPEED : STEAM_SPEED;
+        int speed = electric ? electricSpeed : steamSpeed;
         this.water = new FluidTankNTM(Fluids.WATER, speed * 100).withOwner(this);
         this.steam = electric ? null : new FluidTankNTM(Fluids.STEAM, 1_000).withOwner(this);
         this.lps = electric ? null : new FluidTankNTM(Fluids.SPENTSTEAM, 10).withOwner(this);
@@ -93,7 +99,7 @@ public class MachinePumpBlockEntity extends MachineBaseBlockEntity
         }
 
         isOn = false;
-        if (canOperate() && worldPosition.getY() <= GROUND_HEIGHT && onGround) {
+        if (canOperate() && worldPosition.getY() <= groundHeight && onGround) {
             isOn = true;
             operate();
         }
@@ -107,7 +113,7 @@ public class MachinePumpBlockEntity extends MachineBaseBlockEntity
         int valid = 0;
         int invalid = 0;
         for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y >= -GROUND_DEPTH; y--) {
+            for (int y = -1; y >= -groundDepth; y--) {
                 for (int z = -1; z <= 1; z++) {
                     BlockPos p = worldPosition.offset(x, y, z);
                     BlockState st = level.getBlockState(p);
@@ -142,7 +148,7 @@ public class MachinePumpBlockEntity extends MachineBaseBlockEntity
             steam.setFill(steam.getFill() - 100);
             lps.setFill(lps.getFill() + 1);
         }
-        int base = electric ? ELECTRIC_SPEED : STEAM_SPEED;
+        int base = electric ? electricSpeed : steamSpeed;
         int speed = water.getTankType() == Fluids.WATER ? base : base / NON_WATER_DEBUFF;
         water.setFill(Math.min(water.getFill() + speed, water.getMaxFill()));
     }
@@ -227,5 +233,38 @@ public class MachinePumpBlockEntity extends MachineBaseBlockEntity
         water.deserialize(buf);
         if (steam != null) steam.deserialize(buf);
         if (lps != null) lps.deserialize(buf);
+    }
+
+    static void readPump(JsonObject obj) {
+        // CE TileEntityMachinePumpBase.java:72-75
+        groundHeight = IConfigurableMachine.grab(obj, "I:groundHeight", groundHeight);
+        groundDepth = IConfigurableMachine.grab(obj, "I:groundDepth", groundDepth);
+        steamSpeed = IConfigurableMachine.grab(obj, "I:steamSpeed", steamSpeed);
+        electricSpeed = IConfigurableMachine.grab(obj, "I:electricSpeed", electricSpeed);
+    }
+
+    static void writePump(JsonWriter writer) throws IOException {
+        // CE TileEntityMachinePumpBase.java:80-83
+        writer.name("I:groundHeight").value(groundHeight);
+        writer.name("I:groundDepth").value(groundDepth);
+        writer.name("I:steamSpeed").value(steamSpeed);
+        writer.name("I:electricSpeed").value(electricSpeed);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "waterpump";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readPump(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writePump(writer);
+        }
     }
 }
