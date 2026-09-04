@@ -7,11 +7,17 @@ import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.BlockDummyable;
+import com.hbm.explosion.vanillant.ExplosionVNT;
+import com.hbm.explosion.vanillant.standard.EntityProcessorStandard;
+import com.hbm.explosion.vanillant.standard.ExplosionEffectStandard;
+import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
 import com.hbm.inventory.container.machine.dummyable.HeatBoilerMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.saveddata.TomSaveData;
 import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,11 +25,13 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +43,8 @@ import java.util.List;
 /**
  * CE {@code TileEntityHeatBoiler} / {@code TileEntityHeatBoilerIndustrial} —
  * pull heat from {@link IHeatSource} below, {@link FT_Heatable} BOILER convert.
- * Explosion / Tom fire / audio skipped.
+ * Overpressure explode Exact CE {@code TileEntityHeatBoiler.java:273-293} (small only,
+ * {@code canExplode}); Tom fire heat {@code :82-85}. Groan audio stay skipped.
  * {@link IConfigurableMachine} Exact CE {@code boiler}/{@code boilerIndustrial}
  * ({@code TileEntityHeatBoiler.java:359-375}, {@code TileEntityHeatBoilerIndustrial.java:315-328}).
  * ROR: CE {@code TileEntityHeatBoiler.java:396-412} / industrial {@code :348-360}.
@@ -53,24 +62,28 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
     public final FluidTankNTM steam;
     public final int maxHeat;
     public final double heatDiffusion;
+    /** CE small boiler only — industrial has no explode path. */
+    public final boolean explodable;
     public int heat;
     public boolean isOn;
+    public boolean hasExploded;
 
     public static HeatBoilerBlockEntity small(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new HeatBoilerBlockEntity(type, pos, state, 16_000, 16_000 * 100, maxHeatCfg, diffusion);
+        return new HeatBoilerBlockEntity(type, pos, state, 16_000, 16_000 * 100, maxHeatCfg, diffusion, true);
     }
 
     public static HeatBoilerBlockEntity industrial(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new HeatBoilerBlockEntity(type, pos, state, 64_000, 64_000 * 100, maxHeatIndustrial, diffusionIndustrial);
+        return new HeatBoilerBlockEntity(type, pos, state, 64_000, 64_000 * 100, maxHeatIndustrial, diffusionIndustrial, false);
     }
 
     public HeatBoilerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,
-                                 int waterCap, int steamCap, int maxHeat, double heatDiffusion) {
+                                 int waterCap, int steamCap, int maxHeat, double heatDiffusion, boolean explodable) {
         super(type, pos, state, 1, true, false);
         this.water = new FluidTankNTM(Fluids.WATER, waterCap).withOwner(this);
         this.steam = new FluidTankNTM(Fluids.STEAM, steamCap).withOwner(this);
         this.maxHeat = maxHeat;
         this.heatDiffusion = heatDiffusion;
+        this.explodable = explodable;
     }
 
     @Override
@@ -87,22 +100,31 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        ItemStack id = inventory.getStackInSlot(0);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            water.setTankType(ident.getType(level, worldPosition, id));
-        }
-
-        tryPullHeat();
-        isOn = false;
-        tryConvert();
-
-        if (level.getGameTime() % 20 == 0) {
-            for (Direction d : Direction.Plane.HORIZONTAL) {
-                trySubscribe(water.getTankType(), level, worldPosition.relative(d, 2), d);
-                if (steam.getFill() > 0) tryProvide(steam, level, worldPosition.relative(d, 2), d);
+        if (!hasExploded) {
+            ItemStack id = inventory.getStackInSlot(0);
+            if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
+                water.setTankType(ident.getType(level, worldPosition, id));
             }
-            trySubscribe(water.getTankType(), level, worldPosition.above(4), Direction.UP);
-            if (steam.getFill() > 0) tryProvide(steam, level, worldPosition.above(4), Direction.UP);
+
+            tryPullHeat();
+            // CE TileEntityHeatBoiler.java:82-85
+            if (level instanceof ServerLevel server) {
+                int light = level.getBrightness(LightLayer.SKY, worldPosition);
+                if (light > 7 && TomSaveData.forWorld(server).fire > 1e-5) {
+                    this.heat += (int) ((maxHeat - heat) * 0.000005D);
+                }
+            }
+            isOn = false;
+            tryConvert();
+
+            if (level.getGameTime() % 20 == 0) {
+                for (Direction d : Direction.Plane.HORIZONTAL) {
+                    trySubscribe(water.getTankType(), level, worldPosition.relative(d, 2), d);
+                    if (steam.getFill() > 0) tryProvide(steam, level, worldPosition.relative(d, 2), d);
+                }
+                trySubscribe(water.getTankType(), level, worldPosition.above(4), Direction.UP);
+                if (steam.getFill() > 0) tryProvide(steam, level, worldPosition.above(4), Direction.UP);
+            }
         }
 
         dataChanged();
@@ -134,12 +156,36 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         int outputOps = (steam.getMaxFill() - steam.getFill()) / entry.amountProduced;
         int heatOps = heat / heatReq;
         int ops = Math.min(inputOps, Math.min(outputOps, heatOps));
-        if (ops <= 0) return;
         water.setFill(water.getFill() - entry.amountReq * ops);
         steam.setFill(steam.getFill() + entry.amountProduced * ops);
         steam.setTankType(entry.typeProduced);
         heat -= heatReq * ops;
-        isOn = true;
+        if (ops > 0) isOn = true;
+        // CE TileEntityHeatBoiler.java:273-293 — industrial has no explode
+        if (outputOps == 0 && canExplode && explodable) {
+            explode();
+        }
+    }
+
+    private void explode() {
+        if (level == null) return;
+        this.hasExploded = true;
+        BlockDummyable.safeRem = true;
+        BlockPos base = worldPosition;
+        for (int x = base.getX() - 1; x <= base.getX() + 1; x++) {
+            for (int y = base.getY() + 2; y <= base.getY() + 3; y++) {
+                for (int z = base.getZ() - 1; z <= base.getZ() + 1; z++) {
+                    level.removeBlock(new BlockPos(x, y, z), false);
+                }
+            }
+        }
+        level.removeBlock(base.above(), false);
+        ExplosionVNT xnt = new ExplosionVNT(level, base.getX() + 0.5D, base.getY() + 2D, base.getZ() + 0.5D, 5F);
+        xnt.setEntityProcessor(new EntityProcessorStandard().withRangeMod(3F));
+        xnt.setPlayerProcessor(new PlayerProcessorStandard());
+        xnt.setSFX(new ExplosionEffectStandard());
+        xnt.explode();
+        BlockDummyable.safeRem = false;
     }
 
     @Override
@@ -163,6 +209,7 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         water.writeToNBT(tag, "water");
         steam.writeToNBT(tag, "steam");
         tag.putInt("heat", heat);
+        tag.putBoolean("exploded", hasExploded);
     }
 
     @Override
@@ -171,6 +218,7 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         water.readFromNBT(tag, "water");
         steam.readFromNBT(tag, "steam");
         heat = tag.getInt("heat");
+        hasExploded = tag.getBoolean("exploded");
     }
 
     @Override
@@ -180,6 +228,7 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         steam.serialize(buf);
         buf.writeInt(heat);
         buf.writeBoolean(isOn);
+        buf.writeBoolean(hasExploded);
     }
 
     @Override
@@ -189,6 +238,7 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         steam.deserialize(buf);
         heat = buf.readInt();
         isOn = buf.readBoolean();
+        hasExploded = buf.readBoolean();
     }
 
     @Override
@@ -207,7 +257,12 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public String provideRORValue(String name) {
-        // CE tanks[0]/[1] → water/steam. Explosion skipped → never the hasExploded zero-path.
+        // CE TileEntityHeatBoiler.java:405-412
+        if (hasExploded) {
+            if ((PREFIX_VALUE + "input").equals(name)) return "0";
+            if ((PREFIX_VALUE + "output").equals(name)) return "0";
+            return null;
+        }
         if ((PREFIX_VALUE + "input").equals(name)) return "" + water.getFill();
         if ((PREFIX_VALUE + "output").equals(name)) return "" + steam.getFill();
         return null;
