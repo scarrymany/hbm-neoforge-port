@@ -10,6 +10,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.container.machine.MachineLargeTurbineMenu;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
@@ -38,22 +39,28 @@ import java.util.List;
  * "burn at most 20% of the input buffer per tick" cap (CE's own comment: "amount of cycles by the
  * 'at least 20%' rule"), rather than the small turbine's fixed 6000-heat-equivalent cap.
  * <p>
- * Same scope trims as {@link MachineTurbineBlockEntity}: no fluid-identifier retyping, no
- * item-container fill/drain slots (both would need infrastructure this port doesn't have yet - see
- * that class's javadoc); only the battery-charging slot survives.
+ * {@code setType(0,1)} / {@code loadTank(2,3)} / {@code unloadTank(5,6)} Exact CE
+ * {@code TileEntityMachineLargeTurbine.java:103-129}. 7-slot layout Exact CE
+ * {@code ContainerMachineLargeTurbine.java:37-46}.
  */
 public class MachineLargeTurbineBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
 
     public static final long MAX_POWER = 100_000_000L;
-    private static final int BATTERY_SLOT = 0;
+    private static final int SLOT_ID = 0;
+    private static final int SLOT_ID_OUT = 1;
+    private static final int SLOT_LOAD = 2;
+    private static final int SLOT_LOAD_OUT = 3;
+    private static final int SLOT_BATTERY = 4;
+    private static final int SLOT_UNLOAD = 5;
+    private static final int SLOT_UNLOAD_OUT = 6;
 
     public final FluidTankNTM[] tanks;
     public float rotor;
     private long power;
 
     public MachineLargeTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1, true, true);
+        super(type, pos, state, 7, true, true);
         tanks = new FluidTankNTM[]{
                 new FluidTankNTM(Fluids.STEAM, 512_000).withOwner(this),
                 new FluidTankNTM(Fluids.SPENTSTEAM, 10_240_000).withOwner(this)
@@ -67,7 +74,10 @@ public class MachineLargeTurbineBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return i == BATTERY_SLOT && Library.isBattery(stack);
+        // Same slot rules as CE TileEntityMachineTurbine.java:80-88 (large TE has no override)
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        if (i == SLOT_BATTERY) return Library.isBattery(stack);
+        return true;
     }
 
     private Direction coreDirection() {
@@ -107,7 +117,10 @@ public class MachineLargeTurbineBlockEntity extends MachineBaseBlockEntity
             this.tryProvide(tanks[1], level, dirPos.getPos(), dirPos.getDir());
         }
 
-        power = Library.chargeItemsFromTE(inventory, BATTERY_SLOT, power, MAX_POWER);
+        // CE TileEntityMachineLargeTurbine.java:103-106
+        tanks[0].setType(SLOT_ID, SLOT_ID_OUT, inventory);
+        tanks[0].loadTank(SLOT_LOAD, SLOT_LOAD_OUT, inventory);
+        power = Library.chargeItemsFromTE(inventory, SLOT_BATTERY, power, MAX_POWER);
 
         FluidType in = tanks[0].getTankType();
         boolean valid = false;
@@ -130,6 +143,9 @@ public class MachineLargeTurbineBlockEntity extends MachineBaseBlockEntity
         }
         if (!valid) tanks[1].setTankType(Fluids.NONE);
         if (power > MAX_POWER) power = MAX_POWER;
+
+        // CE TileEntityMachineLargeTurbine.java:129
+        tanks[1].unloadTank(SLOT_UNLOAD, SLOT_UNLOAD_OUT, inventory);
 
         rotor = (rotor + (shouldTurn ? 6F : 0F)) % 360F;
 
