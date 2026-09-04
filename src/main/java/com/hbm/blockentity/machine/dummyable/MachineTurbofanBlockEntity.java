@@ -1,15 +1,19 @@
 package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.energymk2.IEnergyProviderMK2;
-import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
+import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.TurbofanMenu;
+import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
 import com.hbm.inventory.fluid.trait.FT_Combustible.FuelGrade;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.recipes.EngineRecipes;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
@@ -31,18 +35,27 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * CE {@code TileEntityMachineTurbofan}: AERO fuel, AFTERBURN upgrade. Pollution/particles skipped.
+ * CE {@code TileEntityMachineTurbofan}: AERO fuel, AFTERBURN upgrade.
  * {@code setType(4)} / {@code loadTank(0,1)} Exact CE {@code TileEntityMachineTurbofan.java:156-157}.
+ * {@code pollute(BURN, amountToBurn*5)} every 20t Exact CE {@code :194}.
+ * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:53-76}.
+ * Blood / audio / particles stay skipped.
  */
 public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
 
     public static final long MAX_POWER = 1_000_000;
 
     public final FluidTankNTM tank;
+    /** CE {@code TileEntityMachinePolluting} buffer 150 from {@code super(0, 150, true, true)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
     public long power;
     public boolean wasOn;
     public int afterburner;
@@ -50,6 +63,9 @@ public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
     public MachineTurbofanBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, true, true);
         this.tank = new FluidTankNTM(Fluids.KEROSENE, 24_000).withOwner(this);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 150).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 150).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 150).withOwner(this);
     }
 
     @Override
@@ -113,6 +129,10 @@ public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
             long out = (long) (burnValue * burn * (1 + Math.min(afterburner / 3D, 4)));
             power = Math.min(MAX_POWER, power + out);
             wasOn = true;
+            // CE TileEntityMachineTurbofan.java:193-194
+            if (level.getGameTime() % 20 == 0) {
+                pollute(tank.getTankType(), FluidTrait.FluidReleaseType.BURN, burn * 5);
+            }
         }
 
         power = Library.chargeItemsFromTE(inventory, 3, power, MAX_POWER);
@@ -120,9 +140,43 @@ public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
         for (DirPos pos : getConPos()) {
             tryProvide(level, pos.getPos(), pos.getDir());
             trySubscribe(tank.getTankType(), level, pos);
+            // CE TileEntityMachineTurbofan.java:203
+            sendSmoke(pos);
         }
         dataChanged();
         networkPackMK2(50);
+    }
+
+    /** CE {@code TileEntityMachinePolluting#sendSmoke}. */
+    private void sendSmoke(DirPos pos) {
+        if (smoke.getFill() > 0) tryProvide(smoke, level, pos);
+        if (smokeLeaded.getFill() > 0) tryProvide(smokeLeaded, level, pos);
+        if (smokePoison.getFill() > 0) tryProvide(smokePoison, level, pos);
+    }
+
+    /**
+     * Exact CE {@code TileEntityMachinePolluting#pollute(FluidType, FluidReleaseType, float)}
+     * {@code :53-76}. Fire-extinguish sound stay skipped.
+     */
+    public void pollute(FluidType type, FluidTrait.FluidReleaseType release, float amount) {
+        FT_Polluting trait = type.getTrait(FT_Polluting.class);
+        if (trait == null) return;
+        if (release == FluidTrait.FluidReleaseType.VOID) return;
+
+        HashMap<PollutionHandler.PollutionType, Float> map = release == FluidTrait.FluidReleaseType.BURN
+                ? trait.burnMap : trait.releaseMap;
+
+        for (Map.Entry<PollutionHandler.PollutionType, Float> entry : map.entrySet()) {
+            FluidTankNTM dest = entry.getKey() == PollutionHandler.PollutionType.SOOT ? smoke
+                    : entry.getKey() == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+            int fluidAmount = (int) Math.ceil(entry.getValue() * amount * 100);
+            dest.setFill(dest.getFill() + fluidAmount);
+            if (dest.getFill() > dest.getMaxFill()) {
+                int overflow = dest.getFill() - dest.getMaxFill();
+                dest.setFill(dest.getMaxFill());
+                PollutionHandler.incrementPollution(level, worldPosition, entry.getKey(), overflow / 100F);
+            }
+        }
     }
 
     public DirPos[] getConPos() {
@@ -160,8 +214,15 @@ public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public @NotNull List<FluidTankNTM> getSendingTanks() {
+        // CE TileEntityMachineTurbofan.java:481-483 is blood-only; blood stay skipped → getSmokeTanks.
+        return List.of(smoke, smokeLeaded, smokePoison);
+    }
+
+    @Override
     public @NotNull List<FluidTankNTM> getAllTanks() {
-        return List.of(tank);
+        // CE TileEntityMachineTurbofan.java:486-488 minus blood (stay skipped).
+        return List.of(tank, smoke, smokeLeaded, smokePoison);
     }
 
     @Override
@@ -169,6 +230,9 @@ public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
         tank.writeToNBT(tag, "t0");
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
     }
 
     @Override
@@ -176,6 +240,9 @@ public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
         tank.readFromNBT(tag, "t0");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
     }
 
     @Override
