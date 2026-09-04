@@ -14,6 +14,7 @@ import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ItemEnums.EnumCokeType;
 import com.hbm.items.ModItems;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.items.tool.ItemModDoor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -365,11 +366,11 @@ public final class GenericBlocks {
     }
 
     private static void registerDoors() {
-        ModBlocks.DOOR_RED = registerBlock("door_red", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()), null);
+        ModBlocks.DOOR_RED = registerModDoor("door_red", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()));
         registerBlock("stone_keyhole", () -> new BlockKeyhole(BlockBehaviour.Properties.of().strength(1.5F, 6.0F).sound(SoundType.STONE)), null);
-        registerBlock("door_metal", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(5.0F, 5.0F).sound(SoundType.METAL).noOcclusion()), null);
-        registerBlock("door_office", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 10.0F).sound(SoundType.METAL).noOcclusion()), null);
-        registerBlock("door_bunker", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()), null);
+        registerModDoor("door_metal", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(5.0F, 5.0F).sound(SoundType.METAL).noOcclusion()));
+        registerModDoor("door_office", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 10.0F).sound(SoundType.METAL).noOcclusion()));
+        registerModDoor("door_bunker", () -> new BlockModDoor(BlockBehaviour.Properties.of().strength(10.0F, 100.0F).sound(SoundType.METAL).noOcclusion()));
 
         VAULT_DOOR = registerBlock("vault_door", () -> new BlockDoorGeneric(doorProps(500.0F, 1000.0F), DoorDecl.VAULT_DOOR, true), ModCreativeTabs.MACHINE);
         BLAST_DOOR = registerBlock("blast_door", () -> new BlastDoor(doorProps(250.0F, 1000.0F)), ModCreativeTabs.MACHINE);
@@ -679,6 +680,13 @@ public final class GenericBlocks {
         if (tab != null) {
             CreativeTabContents.add(tab, block);
         }
+        return block;
+    }
+
+    /** Exact CE {@code ItemModDoor} — {@code DoorItem} two-tall place, stack 1. Tab stays null. */
+    private static DeferredBlock<BlockModDoor> registerModDoor(String name, Supplier<BlockModDoor> factory) {
+        DeferredBlock<BlockModDoor> block = ModBlocks.BLOCKS.register(name, factory);
+        ModItems.ITEMS.register(name, () -> new ItemModDoor(block.get(), new Item.Properties()));
         return block;
     }
 }
