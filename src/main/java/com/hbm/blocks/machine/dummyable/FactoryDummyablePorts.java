@@ -74,6 +74,20 @@ public final class FactoryDummyablePorts {
         };
     }
 
+    /** CE {@code TileEntityMachineChemicalFactory.getIOPos}/{:501-510} == assem factory {:157-167}. */
+    public static DirPos[] getIOPos(BlockPos pos, Direction dir) {
+        Direction rot = dir.getClockWise();
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        return new DirPos[]{
+                new DirPos(x + dir.getStepX() + rot.getStepX() * 3, y, z + dir.getStepZ() + rot.getStepZ() * 3, rot),
+                new DirPos(x - dir.getStepX() + rot.getStepX() * 3, y, z - dir.getStepZ() + rot.getStepZ() * 3, rot),
+                new DirPos(x + dir.getStepX() - rot.getStepX() * 3, y, z + dir.getStepZ() - rot.getStepZ() * 3, rot.getOpposite()),
+                new DirPos(x - dir.getStepX() - rot.getStepX() * 3, y, z - dir.getStepZ() - rot.getStepZ() * 3, rot.getOpposite()),
+        };
+    }
+
     public static DirPos[] getCoolPos(BlockPos pos, Direction dir) {
         Direction rot = dir.getClockWise();
         int x = pos.getX();

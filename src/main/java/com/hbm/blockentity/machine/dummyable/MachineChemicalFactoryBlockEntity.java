@@ -160,6 +160,10 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
         return FactoryDummyablePorts.getCoolPos(worldPosition, FactoryDummyablePorts.coreFacing(getBlockState()));
     }
 
+    public DirPos[] getIOPos() {
+        return FactoryDummyablePorts.getIOPos(worldPosition, FactoryDummyablePorts.coreFacing(getBlockState()));
+    }
+
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
