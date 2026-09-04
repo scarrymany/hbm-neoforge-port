@@ -7,14 +7,14 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.MachineMixerMenu;
-import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.MixerRecipes;
-import com.hbm.inventory.recipes.MixerRecipes.Match;
 import com.hbm.inventory.recipes.MixerRecipes.MixerRecipe;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
+import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -36,34 +36,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Ported from CE's {@code com.hbm.tileentity.machine.TileEntityMachineMixer} (387 lines, read in
- * full) - see {@code docs/phase2/machines_shredder_assembler_crystallizer_mixer.md}'s per-machine
- * detail for the full slot/power/recipe breakdown.
- * <p>
- * <b>Slot trim vs. CE</b> (documented, matching the precedent every other machine in this pass
- * already sets for the same missing subsystem): CE's slot 2 ({@code tanks[2].setType(2, inventory)},
- * an {@code IItemFluidIdentifier} output-fluid selector) is dropped - see
- * {@link MixerRecipes#findMatch}'s own javadoc for how recipe selection is auto-detected instead.
- * This class's inventory is 4 slots: 0 battery, 1 solid-ingredient input, 2-3 upgrade slots (CE: 5
- * slots, 0 battery/1 solid/2 fluid-id/3-4 upgrades).
- * <p>
- * <b>Recipe selection</b>: CE picks one of possibly several competing recipes for a given output
- * fluid via a player-cyclable {@code recipeIndex} (advanced by {@code receiveControl}'s "toggle"
- * field), then re-derives {@code tanks[0]}/{@code tanks[1]}'s expected type from whichever recipe is
- * "loaded". This class instead scans every registered recipe each tick via {@link MixerRecipes#findMatch}
- * against whatever the two reagent tanks/solid slot already contain - see that method's own javadoc
- * for why (no output-fluid-selector item exists yet to drive CE's manual flow). The output tank's
- * type locks in on first successful process, matching {@link FluidTankNTM#fill}'s own
- * "NONE-typed tank accepts anything, typed tank only matches its own type" contract - once
- * {@code tanks[2]} has a real fluid in it, only recipes producing that exact fluid can match/output
- * further, exactly matching CE's own single-output-type-per-machine-instance behavior.
- * <p>
- * <b>Power/duration formulas</b> (ported from CE exactly, <i>not</i> cached across ticks - CE
- * recomputes both every tick, this class does too): consumption {@code = 50 + speedLevel*150},
- * <i>then</i> {@code -= consumption*powerLevel*0.25} (POWER discount applied after the SPEED
- * surcharge, not just to the base - order matters, see the research report's own flag on this),
- * <i>then</i> {@code *= (overLevel*3 + 1)} (OVERDRIVE multiplies last). {@code processTime}
- * similarly: {@code -= processTime*speedLevel/4}, then {@code /= (overLevel+1)}, floored at 1 tick.
+ * Ported from CE's {@code TileEntityMachineMixer}.
+ * {@code tanks[2].setType(2, inventory)} Exact CE {@code TileEntityMachineMixer.java:95}.
+ * {@code recipeIndex} cycle Exact CE {@code :184-193}/{@code :351-353}.
+ * Slots Exact CE {@code ContainerMixer.java:32-40} (5 slots: battery/solid/ID/upgrades 3-4).
  */
 public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
@@ -74,15 +50,16 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
 
     public static final int BATTERY_SLOT = 0;
     public static final int SOLID_INPUT = 1;
-    public static final int UPGRADE_START = 2;
-    public static final int UPGRADE_END = 3;
+    public static final int SLOT_ID = 2;
+    public static final int UPGRADE_START = 3;
+    public static final int UPGRADE_END = 4;
 
     private static final Map<UpgradeType, Integer> VALID_UPGRADES = new EnumMap<>(UpgradeType.class);
 
     static {
         VALID_UPGRADES.put(UpgradeType.SPEED, 3);
         VALID_UPGRADES.put(UpgradeType.POWER, 3);
-        VALID_UPGRADES.put(UpgradeType.OVERDRIVE, 3);
+        VALID_UPGRADES.put(UpgradeType.OVERDRIVE, 6);
     }
 
     private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(VALID_UPGRADES);
@@ -95,11 +72,12 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
 
     private long power;
     public int progress;
-    public int processTime; // CE: processTime
-    public int recipeIndex; // CE: recipeIndex - player-cyclable recipe selector for competing recipes
+    public int processTime;
+    public int recipeIndex;
+    private int consumption = 50;
 
     public MachineMixerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 4, true, true);
+        super(type, pos, state, 5, true, true);
     }
 
     @Override
@@ -109,76 +87,91 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        // CE :253-261 is solid-only (and hopper is {1}). MenuBase.tile is getCheckedInventory(),
+        // so battery/ID/upgrade GUI insert dies without this.
         if (slot == BATTERY_SLOT) return Library.isBattery(stack);
-        if (slot == SOLID_INPUT) return true;
-        return slot >= UPGRADE_START && slot <= UPGRADE_END && stack.getItem() instanceof ItemMachineUpgrade;
+        if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        if (slot >= UPGRADE_START && slot <= UPGRADE_END) {
+            return stack.getItem() instanceof ItemMachineUpgrade;
+        }
+        if (slot != SOLID_INPUT) return false;
+        MixerRecipe[] recipes = MixerRecipes.getOutput(tanks.get(2).getTankType());
+        if (recipes == null || recipes.length <= 0) return false;
+        MixerRecipe recipe = recipes[this.recipeIndex % recipes.length];
+        if (recipe == null || recipe.solidInput == null) return false;
+        return recipe.solidInput.matchesRecipe(stack, true);
     }
 
-    private int speedLevel() {
-        return Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 3);
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        return new int[]{SOLID_INPUT};
     }
 
-    private int powerLevel() {
-        return Math.min(upgradeManager.getLevel(UpgradeType.POWER), 3);
+    public DirPos[] getConPos() {
+        int x = worldPosition.getX();
+        int y = worldPosition.getY();
+        int z = worldPosition.getZ();
+        return new DirPos[]{
+                new DirPos(x, y - 1, z, Direction.DOWN),
+                new DirPos(x + 1, y, z, Direction.EAST),
+                new DirPos(x - 1, y, z, Direction.WEST),
+                new DirPos(x, y, z + 1, Direction.SOUTH),
+                new DirPos(x, y, z - 1, Direction.NORTH),
+        };
     }
 
-    private int overLevel() {
-        return Math.min(upgradeManager.getLevel(UpgradeType.OVERDRIVE), 3);
-    }
-
-    /** See class javadoc's "Power/duration formulas" - recomputed every tick, not cached, matching CE. */
-    private long getConsumption() {
-        double consumption = 50.0 + speedLevel() * 150.0;
-        consumption -= consumption * powerLevel() * 0.25;
-        consumption *= overLevel() * 3 + 1;
-        return (long) consumption;
-    }
-
-    private int getEffectiveProcessTime(int base) {
-        int time = base - base * speedLevel() / 4;
-        time /= overLevel() + 1;
-        return Math.max(1, time);
+    public int getConsumption() {
+        return consumption;
     }
 
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        for (Direction dir : Direction.values()) {
-            BlockPos target = worldPosition.relative(dir);
-            trySubscribe(level, target.getX(), target.getY(), target.getZ(), dir);
-            trySubscribe(tanks.get(0).getTankType(), level, target.getX(), target.getY(), target.getZ(), dir);
-            trySubscribe(tanks.get(1).getTankType(), level, target.getX(), target.getY(), target.getZ(), dir);
-            if (tanks.get(2).getFill() > 0) tryProvide(tanks.get(2), level, target, dir);
-        }
+        this.power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, getMaxPower());
+        // CE TileEntityMachineMixer.java:95
+        tanks.get(2).setType(SLOT_ID, inventory);
 
         upgradeManager.checkSlots(inventory, UPGRADE_START, UPGRADE_END);
-        power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+        int speedLevel = upgradeManager.getLevel(UpgradeType.SPEED);
+        int powerLevel = upgradeManager.getLevel(UpgradeType.POWER);
+        int overLevel = upgradeManager.getLevel(UpgradeType.OVERDRIVE);
 
-        Match match = MixerRecipes.findMatch(tanks.get(0).getTankType(), tanks.get(0).getFill(),
-                tanks.get(1).getTankType(), tanks.get(1).getFill(), inventory.getStackInSlot(SOLID_INPUT));
+        this.consumption = 50;
+        this.consumption += speedLevel * 150;
+        this.consumption -= (int) (this.consumption * powerLevel * 0.25);
+        this.consumption *= (overLevel * 3 + 1);
 
-        long req = getConsumption();
-        if (match == null || power < req || !outputAccepts(match.outputType(), match.recipe().output)) {
-            progress = 0;
+        for (DirPos pos : getConPos()) {
+            this.trySubscribe(level, pos);
+            if (tanks.get(0).getTankType() != Fluids.NONE) {
+                this.trySubscribe(tanks.get(0).getTankType(), level, pos);
+            }
+            if (tanks.get(1).getTankType() != Fluids.NONE) {
+                this.trySubscribe(tanks.get(1).getTankType(), level, pos);
+            }
+        }
+
+        if (this.canProcess()) {
+            this.progress++;
+            this.power -= this.getConsumption();
+
+            this.processTime -= this.processTime * speedLevel / 4;
+            this.processTime /= (overLevel + 1);
+            if (processTime <= 0) this.processTime = 1;
+
+            if (this.progress >= this.processTime) {
+                this.process();
+                this.progress = 0;
+            }
         } else {
-            processTime = getEffectiveProcessTime(match.recipe().processTime);
-            power -= req;
-            progress++;
+            this.progress = 0;
+        }
 
-            if (progress >= processTime) {
-                progress = 0;
-                MixerRecipe recipe = match.recipe();
-                if (recipe.input1 != null) tanks.get(0).setFill(tanks.get(0).getFill() - recipe.input1.fill);
-                if (recipe.input2 != null) tanks.get(1).setFill(tanks.get(1).getFill() - recipe.input2.fill);
-                if (recipe.solidInput != null) inventory.getStackInSlot(SOLID_INPUT).shrink(recipe.solidInput.count());
-
-                // First successful process locks the output tank's type in (FluidTankNTM.setFill/
-                // fill() already refuses a foreign type once typed - setTankType here is a one-time
-                // NONE->real-type transition, matching CE's own IItemFluidIdentifier-driven behavior
-                // without needing that item - see class javadoc's "Recipe selection".
-                if (tanks.get(2).getTankType() == Fluids.NONE) tanks.get(2).setTankType(match.outputType());
-                tanks.get(2).setFill(tanks.get(2).getFill() + recipe.output);
+        for (DirPos pos : getConPos()) {
+            if (tanks.get(2).getFill() > 0) {
+                this.tryProvide(tanks.get(2), level, pos);
             }
         }
 
@@ -186,10 +179,52 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         networkPackMK2(50);
     }
 
-    private boolean outputAccepts(FluidType outputType, int amount) {
-        FluidTankNTM out = tanks.get(2);
-        if (out.getTankType() != Fluids.NONE && out.getTankType() != outputType) return false;
-        return out.getFill() + amount <= out.getMaxFill();
+    /** Exact CE {@code TileEntityMachineMixer.canProcess} :184-219. */
+    public boolean canProcess() {
+        MixerRecipe[] recipes = MixerRecipes.getOutput(tanks.get(2).getTankType());
+        if (recipes == null || recipes.length <= 0) {
+            this.recipeIndex = 0;
+            return false;
+        }
+
+        this.recipeIndex = this.recipeIndex % recipes.length;
+        MixerRecipe recipe = recipes[this.recipeIndex];
+        if (recipe == null) {
+            this.recipeIndex = 0;
+            return false;
+        }
+
+        tanks.get(0).setTankType(recipe.input1 != null ? recipe.input1.type : Fluids.NONE);
+        tanks.get(1).setTankType(recipe.input2 != null ? recipe.input2.type : Fluids.NONE);
+
+        if (recipe.input1 != null && tanks.get(0).getFill() < recipe.input1.fill) return false;
+        if (recipe.input2 != null && tanks.get(1).getFill() < recipe.input2.fill) return false;
+        if (this.power < getConsumption()) return false;
+        if (recipe.output + tanks.get(2).getFill() > tanks.get(2).getMaxFill()) return false;
+
+        if (recipe.solidInput != null) {
+            if (inventory.getStackInSlot(SOLID_INPUT).isEmpty()) return false;
+            if (!recipe.solidInput.matchesRecipe(inventory.getStackInSlot(SOLID_INPUT), true)
+                    || recipe.solidInput.getStack().getCount() > inventory.getStackInSlot(SOLID_INPUT).getCount()) {
+                return false;
+            }
+        }
+
+        this.processTime = recipe.processTime;
+        return true;
+    }
+
+    /** Exact CE {@code TileEntityMachineMixer.process} :222-232. */
+    protected void process() {
+        MixerRecipe[] recipes = MixerRecipes.getOutput(tanks.get(2).getTankType());
+        MixerRecipe recipe = recipes[this.recipeIndex % recipes.length];
+
+        if (recipe.input1 != null) tanks.get(0).setFill(tanks.get(0).getFill() - recipe.input1.fill);
+        if (recipe.input2 != null) tanks.get(1).setFill(tanks.get(1).getFill() - recipe.input2.fill);
+        if (recipe.solidInput != null) {
+            inventory.extractItem(SOLID_INPUT, recipe.solidInput.getStack().getCount(), false);
+        }
+        tanks.get(2).setFill(tanks.get(2).getFill() + recipe.output);
     }
 
     @Override
@@ -270,13 +305,11 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean hasPermission(Player player) {
-        return true;
+        // CE TileEntityMachineMixer.java:347
+        return player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5) <= 256.0;
     }
 
-    /**
-     * CE TileEntityMachineMixer.receiveControl - cycles {@link #recipeIndex} to select
-     * next competing recipe for the same output fluid.
-     */
+    /** Exact CE {@code TileEntityMachineMixer.receiveControl} :351-353. */
     @Override
     public void receiveControl(CompoundTag data) {
         if (data.contains("toggle")) {
