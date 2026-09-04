@@ -18,6 +18,7 @@ import com.hbm.items.machine.ItemZirnoxRodDepleted.EnumZirnoxTypeDepleted;
 import com.hbm.items.machine.MachineItems;
 import com.hbm.items.weapon.WeaponMeleeItems;
 import com.hbm.lib.DirPos;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -46,7 +47,7 @@ import java.util.Map;
  * IConnectionAnchors + checkTilt(CONFIG) / 3×3 floor / standardFloor5x5 Exact CE
  *   TileEntityReactorZirnox.java:229 + :658-659. CE :198-235 = getNeighbouringSlots
  *   + updateConnections (no own FluidNode).
- * TODO(CE: TileEntityReactorZirnox.java:267-268): SatelliteRayScan INFO_NUCLEAR.
+ * SatelliteRayScan.INFO_NUCLEAR Exact CE TileEntityReactorZirnox.java:267-268.
  * TODO(CE: TileEntityReactorZirnox.java:354-431): EntityZirnoxDebris / zirnox_destroyed / AuxParticle / ExplosionNukeGeneric.waste / achZIRNOXBoom / elementals.
  * ROR: CE {@code TileEntityReactorZirnox.java:617-656}.
  * TODO(CE: TileEntityReactorZirnox.java:508-605): OpenComputers callbacks.
@@ -190,6 +191,12 @@ public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
                 this.heat -= (int) ((float) this.heat * (float) this.pressure / 1_000_000F);
             } else {
                 this.heat -= 10;
+            }
+
+            // CE TileEntityReactorZirnox.java:267-268
+            if (level.getGameTime() % 100 == 0) {
+                SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                        SatelliteRayScan.RayEvent.INFO_NUCLEAR, 200);
             }
         }
 

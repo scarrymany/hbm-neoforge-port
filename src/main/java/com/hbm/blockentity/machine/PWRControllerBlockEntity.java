@@ -21,6 +21,7 @@ import com.hbm.items.machine.ItemPWRFuel.EnumPWRFuel;
 import com.hbm.items.machine.PWRHotFuelItems;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import com.hbm.util.EnumUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -73,9 +74,7 @@ import java.util.Map;
  *   dropped - already flagged Deferred in both {@code docs/phase1/items_machine.md} and this
  *   package's own research report ("port the controller's normal serialize/deserialize path first").
  *   {@link #serialize}/{@link #deserialize} below are the plain, always-real-state path only.</li>
- *   <li>{@code SatelliteRayScan.reportEvent} (orbital-satellite visibility ping) is dropped - the
- *   research report's own framing: "safe to stub as a no-op ... should not block porting the rest of
- *   the controller" (the satellite save-data system is Phase 4+ scope per PORT_SPEC).</li>
+ *   <li>SatelliteRayScan.INFO_NUCLEAR Exact CE {@code TileEntityPWRController.java:265-266}.</li>
  *   <li>OpenComputers (@Callback methods) dropped. ROR: CE {@code TileEntityPWRController.java:609-640}.</li>
  * </ul>
  */
@@ -278,7 +277,11 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
                         this.setChanged();
                     }
 
-                    // CE: SatelliteRayScan.reportEvent(...) every 100 ticks - dropped, see class javadoc.
+                    // CE TileEntityPWRController.java:265-266
+                    if (level.getGameTime() % 100 == 0) {
+                        SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                                SatelliteRayScan.RayEvent.INFO_NUCLEAR, 200);
+                    }
                 }
 
                 if (this.amountLoaded <= 0) this.typeLoaded = -1;

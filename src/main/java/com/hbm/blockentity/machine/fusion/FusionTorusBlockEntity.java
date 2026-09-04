@@ -15,6 +15,7 @@ import com.hbm.items.machine.ItemBlueprints;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
 import com.hbm.modules.machine.ModuleMachineFusion;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import com.hbm.uninos.INetworkProvider;
 import com.hbm.uninos.UniNodespace;
 import com.hbm.uninos.networkproviders.KlystronNetwork;
@@ -39,7 +40,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityFusionTorus}. CooledBase inlined.
- * TODO(CE: TileEntityFusionTorus.java:193): SatelliteRayScan.INFO_PARTICLE — SatelliteRayScan not ported.
+ * SatelliteRayScan.INFO_PARTICLE Exact CE TileEntityFusionTorus.java:193-195.
  * TODO(CE: TileEntityFusionTorus.java:239): AudioWrapper fusionReactorRunning loop — VFX last.
  * TODO(CE: TileEntityFusionTorus.java:520): OpenComputers ntm_fusion_torus.
  * TODO(CE: MachineFusionTorus.java:87): TileEntityFusionTorusAE2 / ProxyCombo META≥6.
@@ -195,7 +196,11 @@ public class FusionTorusBlockEntity extends MachineBaseBlockEntity
         if (didProcess && recipe != null) {
             this.plasmaEnergy = (long) Math.ceil(recipe.outputTemp * factor);
             this.fuelConsumption = factor;
-            // TODO(CE: TileEntityFusionTorus.java:193): SatelliteRayScan.reportEvent INFO_PARTICLE.
+            // CE TileEntityFusionTorus.java:193-195
+            if (level.getGameTime() % 20 == 15) {
+                SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                        SatelliteRayScan.RayEvent.INFO_PARTICLE, 200);
+            }
         }
 
         double outputIntensity = getOuputIntensity(receiverCount);
