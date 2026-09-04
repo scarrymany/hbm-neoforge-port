@@ -12,6 +12,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes;
 import com.hbm.inventory.recipes.chem.GasCentrifugeRecipes.PseudoFluidType;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
@@ -44,22 +45,14 @@ import java.util.List;
  * ({@link #enrich()}/{@link #canEnrich()}, and every number in {@link GasCentrifugeRecipes}) is
  * preserved exactly; see that recipe class's own header for the one documented item substitution.
  * <p>
- * <b>Scope trims from CE</b> (documented):
- * <ul>
- *   <li>No item-based fluid-identifier slot: CE reads an {@code IItemFluidIdentifier} item in slot 5
- *   to retype {@code tank} between {@code UF6}/{@code PUF6}/{@code WATZ}. That item/interface family
- *   is not ported yet anywhere in this port (see {@code FluidTankBlockEntity}'s own javadoc - "the
- *   item-canister loading subsystem is left out"). {@link #tank} is therefore fixed to CE's own
- *   constructor default, {@link Fluids#UF6} (matching CE's {@code new FluidTankNTM(Fluids.UF6, 2000)}
- *   exactly), rather than starting empty: a receiving tank's type must already match the feed fluid
- *   for the fluid network's demand check to ever report nonzero ({@code IFluidStandardReceiverMK2}'s
- *   {@code getDemand} requires {@code tank.getTankType() == type}), so an empty ({@code NONE}-typed)
- *   tank can never actually receive anything through the pipe network - the uranium (UF6) enrichment
- *   chain works fully through pipes; plutonium (PUF6) and irradiated-water (WATZ) processing need the
- *   dropped item-identifier mechanic to retype the tank and are not reachable until it lands.
- *   Inventory is renumbered to 6 slots (0-3 output, 4 battery, 5 upgrade) instead of CE's 7.</li>
- *   <li>No looped centrifuge audio (same precedent as {@code MachineRefineryBlockEntity}).</li>
- * </ul>
+ * Slot 5 fluid-ID is Exact CE {@code TileEntityMachineGasCent.java:193}/{@code :346-362}:
+ * {@code setTankType(5)} retypes {@code tank} + pseudo in/out from {@link IItemFluidIdentifier}
+ * when {@link GasCentrifugeRecipes#FLUID_CONVERSIONS} has the type (UF6/PUF6/WATZ).
+ * Slot 5 @ 91,15 / upgrade slot 6 Exact CE {@code ContainerMachineGasCent.java:48-51}.
+ * {@code gui_centrifuge_gas.png} is not in this tree — do not invent it.
+ * <p>
+ * <b>Scope trims from CE</b>: no looped centrifuge audio (same precedent as
+ * {@code MachineRefineryBlockEntity}).
  */
 public class GasCentrifugeBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
@@ -68,8 +61,9 @@ public class GasCentrifugeBlockEntity extends MachineBaseBlockEntity
     public static final int PROCESSING_SPEED = 150;
     private static final int[] SLOTS_IO = new int[]{0, 1, 2, 3};
 
-    private static final int BATTERY_SLOT = 4;
-    private static final int UPGRADE_SLOT = 5;
+    public static final int BATTERY_SLOT = 4;
+    public static final int SLOT_ID = 5;
+    public static final int UPGRADE_SLOT = 6;
 
     public final FluidTankNTM tank = new FluidTankNTM(Fluids.UF6, 2000).withOwner(this);
     public final PseudoFluidTank inputTank = new PseudoFluidTank(GasCentrifugeRecipes.PseudoFluidType.NUF6, 8000);
@@ -82,7 +76,7 @@ public class GasCentrifugeBlockEntity extends MachineBaseBlockEntity
     private static Item gcSpeedUpgrade;
 
     public GasCentrifugeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 6, true, true);
+        super(type, pos, state, 7, true, true);
     }
 
     @Override
@@ -112,6 +106,7 @@ public class GasCentrifugeBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
         if (i == BATTERY_SLOT) return Library.isBattery(stack);
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
         if (i == UPGRADE_SLOT) return stack.getItem() instanceof ItemMachineUpgrade;
         return false;
     }
@@ -193,6 +188,19 @@ public class GasCentrifugeBlockEntity extends MachineBaseBlockEntity
         }
     }
 
+    /** CE {@code TileEntityMachineGasCent.setTankType} :346-362. */
+    public void setTankType(int in) {
+        ItemStack stack = inventory.getStackInSlot(in);
+        if (stack.isEmpty() || !(stack.getItem() instanceof IItemFluidIdentifier id)) return;
+        FluidType newType = id.getType(level, worldPosition, stack);
+        if (tank.getTankType() == newType) return;
+        PseudoFluidType pseudo = GasCentrifugeRecipes.FLUID_CONVERSIONS.get(newType);
+        if (pseudo == null) return;
+        inputTank.setTankType(pseudo);
+        outputTank.setTankType(pseudo.getOutputType());
+        tank.setTankType(newType);
+    }
+
     /** Adopts the real tank's feed fluid as this stage's pseudo-fluid the moment a matching fluid arrives. */
     private void syncPseudoTypeFromTank() {
         PseudoFluidType pseudo = GasCentrifugeRecipes.FLUID_CONVERSIONS.get(tank.getTankType());
@@ -249,6 +257,7 @@ public class GasCentrifugeBlockEntity extends MachineBaseBlockEntity
         }
 
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+        setTankType(SLOT_ID);
 
         syncPseudoTypeFromTank();
 

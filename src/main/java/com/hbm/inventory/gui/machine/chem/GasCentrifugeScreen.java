@@ -29,7 +29,7 @@ public class GasCentrifugeScreen extends GuiInfoContainer<GasCentrifugeMenu> {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         var be = this.getMenu().be;
         drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 6, 160, 12, be.getPower(), be.getMaxPower());
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 20, 160, 20,
+        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 36, 80, 20,
                 Component.literal(be.isProgressing ? "Enriching" : "Idle"),
                 Component.literal("Stage: " + be.inputTank.getTankType().name),
                 Component.literal("Feed: " + be.tank.getFill() + "/" + be.tank.getMaxFill() + "mB"));
