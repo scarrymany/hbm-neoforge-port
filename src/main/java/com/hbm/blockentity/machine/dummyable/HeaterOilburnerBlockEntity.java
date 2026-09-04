@@ -31,7 +31,8 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityHeaterOilburner.java}:59-103 — FT_Flammable tank, setting mB/t,
- * maxHeat 100_000. Canister loadTank / pollution skipped. ROR: CE {@code :247-279}.
+ * maxHeat 100_000. Pollution skipped. {@code loadTank(0,1)}/{@code setType(2)} Exact CE {@code :63-64}.
+ * ROR: CE {@code :247-279}.
  */
 public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
         implements IHeatSource, IFluidStandardReceiverMK2, ITickableBE, MenuProvider,
@@ -74,10 +75,9 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        ItemStack id = inventory.getStackInSlot(2);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            tank.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityHeaterOilburner.java:63-64
+        tank.loadTank(0, 1, inventory);
+        tank.setType(2, inventory);
 
         for (DirPos pos : getConPos()) {
             if (level.getGameTime() % 20 == 0) trySubscribe(tank.getTankType(), level, pos);
