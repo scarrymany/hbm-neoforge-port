@@ -1,5 +1,10 @@
 package com.hbm.items.weapon.sedna;
 
+import com.hbm.blocks.bomb.BlockDetonatable;
+import com.hbm.blocks.generic.BlockDecoCRT;
+import com.hbm.blocks.generic.GenericCrateBlocks;
+import com.hbm.blocks.generic.GenericDecoBlocks;
+import com.hbm.blocks.generic.RedBarrel;
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.entity.projectile.EntityBulletBeamBase;
@@ -23,6 +28,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -128,13 +134,6 @@ public class BulletConfig implements Cloneable {
         BlockState state = level.getBlockState(pos);
         Vec3 hitLoc = bhr.getLocation();
 
-        // TODO(phase3-blocks/explosions): CE's ricochet lambda also special-cases ModBlocks.red_barrel
-        // (trigger its own explosion), BlockDetonatable (an interface hook for shootable-triggered
-        // blocks), and deco_crt (cycle a decorative CRT block's meta state) - none of those
-        // blocks/interfaces exist in this port yet (owned by docs/phase3/bomb_blocks_and_detonators.md
-        // / explosion_engine.md, not this ballistics-core package). Once they land, re-add those
-        // branches here following CE's exact behavior.
-
         // CE's check is `b.getMaterial() == Material.GLASS && ... getExplosionResistance(null) < 0.6f`
         // to avoid destroying reinforced/special glass while still letting bullets shatter weak vanilla-
         // like glass. 1.21's BlockState has no Material.GLASS concept any more; SoundType.GLASS is the
@@ -145,6 +144,8 @@ public class BulletConfig implements Cloneable {
             bullet.setPos(hitLoc);
             return;
         }
+
+        applyRicochetBlockHooks(level, pos, state, true);
 
         Direction dir = bhr.getDirection();
         Vec3 face = new Vec3(dir.getStepX(), dir.getStepY(), dir.getStepZ());
@@ -180,6 +181,28 @@ public class BulletConfig implements Cloneable {
             bullet.discard();
         }
     };
+
+    /**
+     * Exact CE {@code BulletConfig.java:55-63} / shredder {@code XFactory12ga.java:166-171}.
+     * Standard ricochet explodes {@code red_barrel} only (not pink). Shredder skips that branch.
+     * Flattened {@code deco_crt_*} smash is CE {@code meta % 4 + 4} (always the broken variant).
+     */
+    public static void applyRicochetBlockHooks(Level level, BlockPos pos, BlockState state, boolean explodeRedBarrel) {
+        Block block = state.getBlock();
+        if (explodeRedBarrel && block == GenericCrateBlocks.RED_BARREL.get()) {
+            ((RedBarrel) block).explode(level, pos.getX(), pos.getY(), pos.getZ());
+        }
+        if (block instanceof BlockDetonatable detonatable) {
+            detonatable.onShot(level, pos);
+        }
+        if (block instanceof BlockDecoCRT crt && crt.getVariant() != BlockDecoCRT.Variant.BROKEN) {
+            BlockState smashed = GenericDecoBlocks.DECO_CRT_BROKEN.get().defaultBlockState();
+            if (state.hasProperty(BlockDecoCRT.FACING)) {
+                smashed = smashed.setValue(BlockDecoCRT.FACING, state.getValue(BlockDecoCRT.FACING));
+            }
+            level.setBlock(pos, smashed, 3);
+        }
+    }
 
     public static final BiConsumer<EntityBulletBaseMK4, EntityHitResult> LAMBDA_STANDARD_ENTITY_HIT = (bullet, ehr) -> {
 

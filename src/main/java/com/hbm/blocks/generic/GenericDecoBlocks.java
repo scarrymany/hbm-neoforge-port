@@ -44,6 +44,8 @@ public final class GenericDecoBlocks {
     public static Supplier<BlockEntityType<DecoBlockAlt.StatuePulseBlockEntity>> STATUE_PULSE_ENTITY_TYPE;
     public static Supplier<BlockEntityType<LanternBlockEntity>> LANTERN_ENTITY_TYPE;
     public static Supplier<BlockEntityType<LanternBehemothBlockEntity>> LANTERN_BEHEMOTH_ENTITY_TYPE;
+    /** Flattened CE {@code deco_crt} meta 4–7. Ricochet smash target ({@code meta % 4 + 4}). */
+    public static DeferredBlock<BlockDecoCRT> DECO_CRT_BROKEN;
 
     private GenericDecoBlocks() {
     }
@@ -137,7 +139,13 @@ public final class GenericDecoBlocks {
     private static void registerDecoCRT() {
         for (BlockEnums.DecoCRTEnum value : BlockEnums.DecoCRTEnum.VALUES) {
             BlockDecoCRT.Variant variant = BlockDecoCRT.Variant.valueOf(value.name());
-            registerBlock("deco_crt_" + value.name().toLowerCase(java.util.Locale.ROOT), () -> new BlockDecoCRT(deco10Props(), variant), ModCreativeTabs.BLOCKS);
+            DeferredBlock<BlockDecoCRT> registered = registerBlock(
+                    "deco_crt_" + value.name().toLowerCase(java.util.Locale.ROOT),
+                    () -> new BlockDecoCRT(deco10Props(), variant),
+                    ModCreativeTabs.BLOCKS);
+            if (variant == BlockDecoCRT.Variant.BROKEN) {
+                DECO_CRT_BROKEN = registered;
+            }
         }
     }
 

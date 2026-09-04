@@ -64,16 +64,10 @@ import java.util.function.BiConsumer;
  * {@code IllegalStateException} if evaluated at class-load time; {@link GunShotgunItems} wraps each
  * in a method-reference {@code Supplier} for {@code DeferredRegister} instead.
  * <p>
- * <b>{@code makeShredderConfig}/{@code makeShredderSubmunition} - ported with 2 documented
- * simplifications, both matching precedent already set elsewhere in this package.</b> CE's real
- * versions (1) broadcast a {@code PlasmaBlast} particle pulse over the network on every
- * beam-impact/ricochet (pure client VFX, zero gameplay effect - dropped with a TODO, matching
- * {@code Lego}'s own javadoc precedent for dropping {@code BlackPowderCreator}/smoke-particle calls),
- * and (2) the ricochet lambda's block-special-case branches ({@code ModBlocks.red_barrel},
- * {@code BlockDetonatable}, {@code deco_crt}) are dropped for the same reason
- * {@link BulletConfig#LAMBDA_STANDARD_RICOCHET} already documents doing so - none of those
- * blocks/interfaces exist in this port yet. Both are documented forward-reference TODOs inline, not
- * silent omissions. Every damage-dealing/ricochet-physics/submunition-spawning behavior is preserved.
+ * <b>{@code makeShredderConfig}/{@code makeShredderSubmunition}.</b> Ricochet block hooks
+ * ({@code BlockDetonatable}, {@code deco_crt}; no {@code red_barrel}) are Exact CE
+ * {@code XFactory12ga.java:166-171} via {@link BulletConfig#applyRicochetBlockHooks}.
+ * PlasmaBlast spawnPulse VFX stays skipped (client-only, {@code Lego} BlackPowderCreator precedent).
  */
 public final class XFactory12ga {
 
@@ -205,9 +199,8 @@ public final class XFactory12ga {
             return;
         }
 
-        // TODO(phase3-blocks/explosions): CE's shredder ricochet also special-cases BlockDetonatable
-        // (onShot hook) and ModBlocks.deco_crt (meta-cycling) here - neither exists in this port yet,
-        // see BulletConfig.LAMBDA_STANDARD_RICOCHET's own javadoc for the identical precedent.
+        // Exact CE shredder: detonatable + deco_crt only — no red_barrel (XFactory12ga.java:166-171).
+        BulletConfig.applyRicochetBlockHooks(level, pos, state, false);
 
         Direction dir = bhr.getDirection();
         Vec3 face = new Vec3(dir.getStepX(), dir.getStepY(), dir.getStepZ());
