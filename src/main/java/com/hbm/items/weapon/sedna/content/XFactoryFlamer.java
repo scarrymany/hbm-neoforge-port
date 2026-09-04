@@ -46,7 +46,7 @@ import java.util.function.BiFunction;
  * {@link MagazineFluid}-backed). See {@code docs/phase3/guns_and_ammo.md}'s {@code XFactoryFlamer}
  * table.
  * <p>
- * Diesel ricochet linger is Exact CE {@code LAMBDA_LINGER_DIESEL} {@code :77} via registered
+ * Diesel/napalm/balefire ricochet linger is Exact CE {@code :77-80} via registered
  * {@link EntityFireLingering}. Direct ignite on living hits is {@link HbmLivingAttachment}.
  * {@code flame_nograv} Exact CE {@code :123}. FlameCreator trail VFX skipped.
  * <p>
@@ -91,10 +91,12 @@ public final class XFactoryFlamer {
             .setOnImpact(XFactoryFlamer::igniteFire);
     public static final BulletConfig flame_napalm = new BulletConfig("flame_napalm").setItem(() -> ITEM_FLAME_NAPALM)
             .setupDamageClass(DamageClass.FIRE).setLife(200).setVel(1F).setGrav(0.02).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
-            .setOnImpact(XFactoryFlamer::igniteFire);
+            .setOnImpact(XFactoryFlamer::igniteFire)
+            .setOnRicochet(XFactoryFlamer::lingerNapalm);
     public static final BulletConfig flame_balefire = new BulletConfig("flame_balefire").setItem(() -> ITEM_FLAME_BALEFIRE)
             .setupDamageClass(DamageClass.FIRE).setLife(200).setVel(1F).setGrav(0.02).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
-            .setOnImpact(XFactoryFlamer::igniteBalefire);
+            .setOnImpact(XFactoryFlamer::igniteBalefire)
+            .setOnRicochet(XFactoryFlamer::lingerBalefire);
 
     public static final BulletConfig flame_topaz_diesel = flame_diesel.clone("flame_topaz_diesel").setProjectiles(2).setSpread(0.05F).setLife(60).setGrav(0);
     public static final BulletConfig flame_topaz_gas = flame_gas.clone("flame_topaz_gas").setProjectiles(2).setSpread(0.05F);
@@ -231,6 +233,16 @@ public final class XFactoryFlamer {
         if (!igniteIfPossible(bullet, mop)) spawnFire(bullet, mop, 2F, 1F, 100, EntityFireLingering.TYPE_DIESEL);
     }
 
+    /** CE {@code XFactoryFlamer.java:79} {@code LAMBDA_LINGER_NAPALM}. */
+    public static void lingerNapalm(EntityBulletBaseMK4 bullet, BlockHitResult mop) {
+        if (!igniteIfPossible(bullet, mop)) spawnFire(bullet, mop, 2.5F, 1F, 200, EntityFireLingering.TYPE_DIESEL);
+    }
+
+    /** CE {@code XFactoryFlamer.java:80} {@code LAMBDA_LINGER_BALEFIRE}. */
+    public static void lingerBalefire(EntityBulletBaseMK4 bullet, BlockHitResult mop) {
+        spawnFire(bullet, mop, 3F, 1F, 300, EntityFireLingering.TYPE_BALEFIRE);
+    }
+
     /** CE {@code XFactoryFlamer.java:82-97}. */
     public static boolean igniteIfPossible(EntityBulletBaseMK4 bullet, BlockHitResult mop) {
         Level world = bullet.level();
@@ -268,6 +280,6 @@ public final class XFactoryFlamer {
                 living.setData(ModAttachments.LIVING_ATTACHMENT, props);
             }
         }
-        // TODO(entity-effect-fire-lingering): same forward reference as igniteFire, TYPE_BALEFIRE variant.
+        // Block linger is onRicochet — Exact CE {@code LAMBDA_LINGER_BALEFIRE} :80.
     }
 }
