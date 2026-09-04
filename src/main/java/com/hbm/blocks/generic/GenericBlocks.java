@@ -263,8 +263,8 @@ public final class GenericBlocks {
     }
 
     private static void registerLayering() {
-        registerBlock("foam_layer", () -> new BlockLayering(BlockBehaviour.Properties.of().strength(0.1F).sound(SoundType.SNOW).noOcclusion()), null);
-        registerBlock("sand_boron_layer", () -> new BlockLayering(BlockBehaviour.Properties.of().strength(0.1F).sound(SoundType.SAND).noOcclusion()), null);
+        registerBlock("foam_layer", () -> new BlockLayering(BlockBehaviour.Properties.of().strength(0.1F).sound(SoundType.SNOW).noOcclusion().replaceable()), null);
+        registerBlock("sand_boron_layer", () -> new BlockLayering(BlockBehaviour.Properties.of().strength(0.1F).sound(SoundType.SAND).noOcclusion().replaceable()), null);
         registerBlock("leaves_layer", () -> new BlockLayering(BlockBehaviour.Properties.of().strength(0.1F).sound(SoundType.GRASS).noOcclusion()), null);
         registerBlock("oil_spill", () -> new BlockLayering(BlockBehaviour.Properties.of().strength(0.1F).sound(SoundType.SNOW).noOcclusion()), null);
     }
