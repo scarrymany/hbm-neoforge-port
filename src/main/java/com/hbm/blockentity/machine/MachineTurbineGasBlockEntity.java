@@ -7,6 +7,7 @@ import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -49,9 +50,8 @@ import java.util.Map;
  * {@link FT_Combustible} {@code FuelGrade.GAS}. Not {@code setType} — CE does not call it here.
  * Slot 1 @ 36,17 Exact CE {@code ContainerMachineTurbineGas.java:28}.
  * <p>
- * <b>Scope trims vs. CE</b>: no pollution call (CE calls {@code PollutionHandler.incrementPollution}
- * directly here, not via {@code TileEntityMachinePolluting} - Phase 4 scope, stubbed as a no-op);
- * no OpenComputers. ROR: CE {@code TileEntityMachineTurbineGas.java:716-783}.
+ * {@code incrementPollution(SOOT, SOOT_PER_SECOND*3)} Exact CE {@code :352}
+ * (skip OXYHYDROGEN). No OpenComputers. ROR: CE {@code TileEntityMachineTurbineGas.java:716-783}.
  * {@code gui_turbinegas.png} is not in this tree — do not invent it.
  */
 public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
@@ -200,6 +200,11 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
         }
 
         double consMax = FUEL_MAX_CONS.getOrDefault(tanks[0].getTankType(), 5D);
+        // CE TileEntityMachineTurbineGas.java:352
+        if (level.getGameTime() % 20 == 0 && tanks[0].getTankType() != Fluids.OXYHYDROGEN) {
+            PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                    PollutionHandler.SOOT_PER_SECOND * 3);
+        }
         makePower(consMax);
     }
 
