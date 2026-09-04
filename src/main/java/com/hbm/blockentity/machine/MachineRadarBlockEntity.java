@@ -57,7 +57,8 @@ import java.util.List;
  * SatelliteRayScan.INFO_RADAR + Detector MEDIUM Exact CE :451-454.
  * Slot 8 linker → screen entries Exact CE :290-304. Inventory 10 Exact CE :118.
  * Slots 0–7 sat_relay / linker launch Exact CE :536-594.
- * Scans {@link IRadarDetectableNT} + players. Map GUI skipped — no CE {@code gui_radar_nt.png}.
+ * Scan toggles / redMode Exact CE :100-104 + :428 + :457-496 + :525-530.
+ * Scans {@link IRadarDetectableNT} + players. Map GUI / showMap / clear skipped — no CE {@code gui_radar_nt.png}.
  */
 public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
@@ -70,7 +71,12 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
     /** CE {@code TileEntityMachineRadarNT.java:88-89}. */
     public static int radarBuffer = 30;
     public static int radarAltitude = 55;
-    public static final RadarScanParams SCAN_PARAMS = new RadarScanParams(true, true, true, true);
+    /** CE {@code TileEntityMachineRadarNT.java:100-104}. */
+    public boolean scanMissiles = true;
+    public boolean scanShells = true;
+    public boolean scanPlayers = true;
+    public boolean smartMode = true;
+    public boolean redMode = true;
 
     /** CE {@code TileEntityMachineRadarNT} {@code super(10)}: linker=8, battery=9. */
     public static final int LINKER_SLOT = 8;
@@ -183,16 +189,17 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         AABB box = new AABB(
                 worldPosition.getX() - range, level.getMinBuildHeight(), worldPosition.getZ() - range,
                 worldPosition.getX() + range + 1, level.getMaxBuildHeight() + 1, worldPosition.getZ() + range + 1);
+        RadarScanParams params = getScanParams();
         for (Entity entity : level.getEntitiesOfClass(Entity.class, box)) {
             // CE TileEntityMachineRadarNT.java:432 — must be above radar + buffer
             if (entity.getY() - worldPosition.getY() <= radarBuffer) continue;
             if (entity instanceof IRadarDetectableNT radar) {
-                if (!radar.paramsApplicable(SCAN_PARAMS) || !radar.canBeSeenBy(this)) continue;
+                if (!radar.paramsApplicable(params) || !radar.canBeSeenBy(this)) continue;
                 double dx = entity.getX() - worldPosition.getX();
                 double dz = entity.getZ() - worldPosition.getZ();
                 if (dx * dx + dz * dz > (double) range * range) continue;
-                entries.add(new RadarEntry(radar, entity, radar.suppliesRedstone(SCAN_PARAMS)));
-            } else if (entity instanceof Player player && SCAN_PARAMS.scanPlayers && !player.isSpectator()) {
+                entries.add(new RadarEntry(radar, entity, radar.suppliesRedstone(params)));
+            } else if (entity instanceof Player player && params.scanPlayers && !player.isSpectator()) {
                 double dx = player.getX() - worldPosition.getX();
                 double dz = player.getZ() - worldPosition.getZ();
                 if (dx * dx + dz * dz > (double) range * range) continue;
@@ -211,18 +218,30 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         }
     }
 
-    /** CE TileEntityMachineRadarNT.java:457-472 proximity mode. */
+    /** CE {@code TileEntityMachineRadarNT.java:428}. */
+    public RadarScanParams getScanParams() {
+        return new RadarScanParams(scanMissiles, scanShells, scanPlayers, smartMode);
+    }
+
+    /** CE {@code TileEntityMachineRadarNT.java:457-496} proximity vs tier. */
     private int computeRedPower() {
         if (entries.isEmpty()) return 0;
-        double maxRange = getRange() * Math.sqrt(2D);
         int powerOut = 0;
-        for (RadarEntry e : entries) {
-            if (!e.redstone) continue;
-            double dist = Math.sqrt(Math.pow(e.posX - worldPosition.getX(), 2) + Math.pow(e.posZ - worldPosition.getZ(), 2));
-            int p = 15 - (int) Math.floor(dist / maxRange * 15);
-            if (p > powerOut) powerOut = p;
+        if (redMode) {
+            double maxRange = getRange() * Math.sqrt(2D);
+            for (RadarEntry e : entries) {
+                if (!e.redstone) continue;
+                double dist = Math.sqrt(Math.pow(e.posX - worldPosition.getX(), 2) + Math.pow(e.posZ - worldPosition.getZ(), 2));
+                int p = 15 - (int) Math.floor(dist / maxRange * 15);
+                if (p > powerOut) powerOut = p;
+            }
+        } else {
+            for (RadarEntry e : entries) {
+                if (!e.redstone) continue;
+                if (e.blipLevel + 1 > powerOut) powerOut = e.blipLevel + 1;
+            }
         }
-        return Math.max(0, Math.min(15, powerOut));
+        return powerOut;
     }
 
     @Override
@@ -246,6 +265,11 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         tag.putLong("power", power);
         tag.putInt("contacts", contacts);
         tag.putInt("redPower", redPower);
+        tag.putBoolean("scanMissiles", scanMissiles);
+        tag.putBoolean("scanShells", scanShells);
+        tag.putBoolean("scanPlayers", scanPlayers);
+        tag.putBoolean("smartMode", smartMode);
+        tag.putBoolean("redMode", redMode);
     }
 
     @Override
@@ -254,6 +278,12 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         power = tag.getLong("power");
         contacts = tag.getInt("contacts");
         redPower = tag.getInt("redPower");
+        // hasKey so pre-toggle worlds keep CE defaults (true); CE :397-401 is getBoolean
+        if (tag.contains("scanMissiles")) scanMissiles = tag.getBoolean("scanMissiles");
+        if (tag.contains("scanShells")) scanShells = tag.getBoolean("scanShells");
+        if (tag.contains("scanPlayers")) scanPlayers = tag.getBoolean("scanPlayers");
+        if (tag.contains("smartMode")) smartMode = tag.getBoolean("smartMode");
+        if (tag.contains("redMode")) redMode = tag.getBoolean("redMode");
     }
 
     @Override
@@ -262,6 +292,11 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(power);
         buf.writeInt(contacts);
         buf.writeInt(redPower);
+        buf.writeBoolean(scanMissiles);
+        buf.writeBoolean(scanShells);
+        buf.writeBoolean(scanPlayers);
+        buf.writeBoolean(smartMode);
+        buf.writeBoolean(redMode);
         buf.writeInt(entries.size());
         for (RadarEntry entry : entries) entry.toBytes(buf);
     }
@@ -272,6 +307,11 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         power = buf.readLong();
         contacts = buf.readInt();
         redPower = buf.readInt();
+        scanMissiles = buf.readBoolean();
+        scanShells = buf.readBoolean();
+        scanPlayers = buf.readBoolean();
+        smartMode = buf.readBoolean();
+        redMode = buf.readBoolean();
         int count = buf.readInt();
         entries.clear();
         for (int i = 0; i < count; i++) {
@@ -293,7 +333,13 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public void receiveControl(ServerPlayer player, CompoundTag data) {
-        // CE TileEntityMachineRadarNT.java:523-594
+        // CE TileEntityMachineRadarNT.java:525-530. map/clear/gui1 skipped — no map png / slots already here.
+        if (data.contains("missiles")) this.scanMissiles = !this.scanMissiles;
+        if (data.contains("shells")) this.scanShells = !this.scanShells;
+        if (data.contains("players")) this.scanPlayers = !this.scanPlayers;
+        if (data.contains("smart")) this.smartMode = !this.smartMode;
+        if (data.contains("red")) this.redMode = !this.redMode;
+
         if (data.contains("link") && level != null) {
             int id = data.getInt("link");
             if (id < 0 || id > 7) return;
