@@ -1736,8 +1736,7 @@ public class ModRecipeProvider extends RecipeProvider {
         //   crafting ingredient - NeoForge/vanilla recipes have no native "any filled fluid container"
         //   Ingredient; would need a custom Ingredient built on this port's FluidContainerRegistry, out
         //   of this task's plain-recipe scope even where the output item exists (ingot_c4).
-        // - Other: powder_bakelite needs the same fluid-container Ingredient (Fluids.AROMATICS +
-        //   Fluids.PETROLEUM), same reasoning.
+        // - Other: powder_bakelite live in FluidContainerCraftingRecipe (PowderRecipes.java:37).
         // - Gunpowder: all 4 calls blocked, see this method's own javadoc (S/KNO dust missing).
         // - Metal powders (ItemScraps.create(MaterialStack, ...)): this port's ItemScraps is a
         //   one-item-per-material family (scrap_<material>) carrying its amount/liquid state as
@@ -1917,8 +1916,7 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_powder_fire", has(item("powder_fire")))
                 .save(output, id("powder/powder_fertilizer_ash"));
 
-        // SKIP: CE PowderRecipes.java:37 powder_bakelite x2 <- Fluids.AROMATICS.getDict(1000) + Fluids.PETROLEUM.getDict(1000) + KEY_TOOL_CHEMISTRYSET
-        //   (requires fluid dict ingredients + chemistry set tool — defer until fluid crafting ported)
+        // CE PowderRecipes.java:37 powder_bakelite x2 — live in FluidContainerCraftingRecipe (getDict 1000 + KEY_TOOL_CHEMISTRYSET)
 
         // CE CraftingManager.java:218 — motor x2 <- MINGRADE.wireFine() + coil_copper_torus + IRON.plate() + coil_copper
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("motor"), 2)

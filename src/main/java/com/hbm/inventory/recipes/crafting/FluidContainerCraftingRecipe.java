@@ -33,6 +33,7 @@ import net.minecraft.world.level.Level;
  *   <li>{@code :644} dalekanium + lava barrel + black_hole → {@code ams_core_eyeofharmony}</li>
  *   <li>{@code :491} barbed_wire + peroxide tank → {@code barbed_wire_acid} ×8</li>
  *   <li>{@code ArmorRecipes:76} lunar plate + xenon tanks + {@code mp_thruster_10_xenon} → {@code bj_plate_jetpack}</li>
+ *   <li>{@code PowderRecipes.java:37} AROMATICS 1000 + PETROLEUM 1000 + chemistry set → {@code powder_bakelite} ×2</li>
  * </ul>
  */
 public final class FluidContainerCraftingRecipe implements CraftingRecipe {
@@ -54,6 +55,8 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
     }
 
     private static Kind kind(CraftingInput in) {
+        // CE PowderRecipes.java:37 shapeless — 2×2 inventory is enough
+        if (bakelite(in)) return Kind.BAKELITE;
         if (in.width() < 3 || in.height() < 3) return null;
         if (amatNine(in)) return Kind.PELLET;
         if (itemAt(in, 1, 1, "singularity")
@@ -91,6 +94,42 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
             return Kind.BJ_JETPACK;
         }
         return null;
+    }
+
+    /** CE {@code Fluids.*.getDict(1000) + KEY_TOOL_CHEMISTRYSET} — any 1000 mB tank, either chem set. */
+    private static boolean bakelite(CraftingInput in) {
+        boolean arom = false, petr = false, tool = false;
+        int n = 0;
+        for (int i = 0; i < in.size(); i++) {
+            ItemStack s = in.getItem(i);
+            if (s.isEmpty()) continue;
+            n++;
+            if (!arom && tank1000(s, Fluids.AROMATICS)) {
+                arom = true;
+                continue;
+            }
+            if (!petr && tank1000(s, Fluids.PETROLEUM)) {
+                petr = true;
+                continue;
+            }
+            if (!tool && isChemSet(s)) {
+                tool = true;
+                continue;
+            }
+            return false;
+        }
+        return n == 3 && arom && petr && tool;
+    }
+
+    private static boolean tank1000(ItemStack stack, FluidType type) {
+        if (!(stack.getItem() instanceof ItemFluidTank tank)) return false;
+        if (tank.getCapacity() != 1000) return false;
+        return ItemFluidTank.getFluidType(stack) == type && tank.getFill(stack) >= 1000;
+    }
+
+    private static boolean isChemSet(ItemStack stack) {
+        Item it = stack.getItem();
+        return it == item("chemistry_set") || it == item("chemistry_set_boron");
     }
 
     private static boolean amatNine(CraftingInput in) {
@@ -138,7 +177,8 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
         SING,
         EYE,
         ACID,
-        BJ_JETPACK;
+        BJ_JETPACK,
+        BAKELITE;
 
         ItemStack result() {
             return switch (this) {
@@ -147,13 +187,14 @@ public final class FluidContainerCraftingRecipe implements CraftingRecipe {
                 case EYE -> stack("ams_core_eyeofharmony", 1);
                 case ACID -> stack("barbed_wire_acid", 8);
                 case BJ_JETPACK -> stack("bj_plate_jetpack", 1);
+                case BAKELITE -> stack("powder_bakelite", 2);
             };
         }
     }
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
-        return width >= 3 && height >= 3;
+        return width * height >= 3;
     }
 
     @Override
