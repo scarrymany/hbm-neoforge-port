@@ -7,6 +7,7 @@ import com.hbm.handler.ability.IToolHarvestAbility;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ModItems;
 import com.hbm.items.tool.ItemToolAbility.ToolRole;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PickaxeItem;
@@ -282,10 +283,10 @@ public final class ToolItems {
     /** Stubbed pending {@code PollutionHandler} - see class javadoc. */
     public static final DeferredItem<Item> POLLUTION_DETECTOR = ModItems.ITEMS.register("pollution_detector", () -> new ItemPollutionDetector(new Item.Properties().stacksTo(1)));
 
-    // ==================== repair kits (ItemRepairKit; stubbed pending ConsumableHandler) ====================
+    // ==================== repair kits (Exact CE ConsumableHandler.handleGunKit) ====================
 
-    public static final DeferredItem<Item> GUN_KIT_1 = ModItems.ITEMS.register("gun_kit_1", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(9)));
-    public static final DeferredItem<Item> GUN_KIT_2 = ModItems.ITEMS.register("gun_kit_2", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(99)));
+    public static final DeferredItem<Item> GUN_KIT_1 = ModItems.ITEMS.register("gun_kit_1", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(9), HBMSoundHandler.spray));
+    public static final DeferredItem<Item> GUN_KIT_2 = ModItems.ITEMS.register("gun_kit_2", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(99), HBMSoundHandler.repair));
 
     // ==================== fluid containers (ItemCanister/ItemGasCanister/ItemFluidContainerInfinite/ItemPipette) ====================
 
