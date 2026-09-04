@@ -2,15 +2,19 @@ package com.hbm.blockentity.machine.chem;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.container.machine.chem.ChemPlantMenu;
 import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.recipes.ChemicalPlantRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes.ChemPlantRecipe;
 import com.hbm.lib.DirPos;
@@ -46,9 +50,13 @@ import java.util.List;
  * 3 item input / 3 item output slots, 3x24000mB fluid input tanks / 3x24000mB fluid output tanks -
  * matching CE's per-module tank count and capacity, renumbered inventory (no fluid-ID/canister slots,
  * same pre-existing gap as every other machine in this pass).
+ * <p>
+ * ROR + named recipe: CE {@code TileEntityMachineChemicalPlant.java:303-311, :358-383}.
+ * {@code recipe=="null"} keeps first-match; GUI/ROR lock a name.
  */
 public class ChemPlantBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, IPersistentNBT,
+        MenuProvider, IControlReceiver, IRORValueProvider, IRORInteractive {
 
     private static final int ITEM_IN_START = 0;
     private static final int ITEM_OUT_START = 3;
@@ -64,6 +72,9 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     public long maxPower = MIN_MAX_POWER;
     public int progress;
     public boolean isProcessing;
+    public boolean didProcess;
+    public boolean restrictedMode;
+    public String recipe = "null";
     private String activeRecipeName;
 
     public ChemPlantBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -96,14 +107,20 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     }
 
     public int getProgressScaled(int i) {
-        ChemPlantRecipe recipe = findRecipe();
-        int duration = recipe == null ? 1 : recipe.duration;
+        ChemPlantRecipe matched = findRecipe();
+        int duration = matched == null ? 1 : matched.duration;
+        if (restrictedMode) duration = Math.max(1, duration * 4);
         return (progress * i) / Math.max(1, duration);
     }
 
     private ChemPlantRecipe findRecipe() {
-        for (ChemPlantRecipe recipe : ChemPlantRecipes.RECIPES) {
-            if (matchesItems(recipe) && matchesFluids(recipe)) return recipe;
+        ChemPlantRecipe named = ChemicalPlantRecipes.byName(recipe);
+        if (named != null) {
+            return matchesItems(named) && matchesFluids(named) ? named : null;
+        }
+        if (recipe != null && !recipe.isEmpty() && !"null".equals(recipe)) return null;
+        for (ChemPlantRecipe found : ChemPlantRecipes.RECIPES) {
+            if (matchesItems(found) && matchesFluids(found)) return found;
         }
         return null;
     }
@@ -241,23 +258,26 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
             for (FluidTankNTM tank : outputTanks) if (tank.getFill() > 0) tryProvide(tank, level, dp);
         }
 
-        ChemPlantRecipe recipe = findRecipe();
-        if (recipe == null) {
+        didProcess = false;
+        ChemPlantRecipe matched = findRecipe();
+        if (matched == null) {
             progress = 0;
             isProcessing = false;
             activeRecipeName = null;
             maxPower = Math.max(power, MIN_MAX_POWER);
         } else {
-            activeRecipeName = recipe.name;
-            maxPower = Math.max(Math.max(power, recipe.power * 100), MIN_MAX_POWER);
+            activeRecipeName = matched.name;
+            maxPower = Math.max(Math.max(power, matched.power * 100), MIN_MAX_POWER);
+            int duration = restrictedMode ? Math.max(1, matched.duration * 4) : matched.duration;
 
-            if (power >= recipe.power && hasOutputSpace(recipe)) {
+            if (power >= matched.power && hasOutputSpace(matched)) {
                 isProcessing = true;
+                didProcess = true;
                 progress++;
-                power -= recipe.power;
+                power -= matched.power;
 
-                if (progress >= recipe.duration) {
-                    process(recipe);
+                if (progress >= duration) {
+                    process(matched);
                     progress = 0;
                 }
             } else {
@@ -349,6 +369,8 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         tag.putLong("power", power);
         tag.putLong("maxPower", maxPower);
         tag.putInt("progress", progress);
+        tag.putString("recipe0", recipe);
+        tag.putBoolean("restrictedMode0", restrictedMode);
         for (int i = 0; i < 3; i++) {
             inputTanks[i].writeToNBT(tag, "i" + i);
             outputTanks[i].writeToNBT(tag, "o" + i);
@@ -361,6 +383,8 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         power = tag.getLong("power");
         maxPower = Math.max(tag.getLong("maxPower"), MIN_MAX_POWER);
         progress = tag.getInt("progress");
+        recipe = tag.contains("recipe0") ? tag.getString("recipe0") : "null";
+        restrictedMode = tag.getBoolean("restrictedMode0");
         for (int i = 0; i < 3; i++) {
             inputTanks[i].readFromNBT(tag, "i" + i);
             outputTanks[i].readFromNBT(tag, "o" + i);
@@ -375,7 +399,10 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(power);
         buf.writeLong(maxPower);
         buf.writeBoolean(isProcessing);
+        buf.writeBoolean(didProcess);
+        buf.writeBoolean(restrictedMode);
         buf.writeInt(progress);
+        buf.writeUtf(recipe);
     }
 
     @Override
@@ -386,7 +413,10 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         power = buf.readLong();
         maxPower = buf.readLong();
         isProcessing = buf.readBoolean();
+        didProcess = buf.readBoolean();
+        restrictedMode = buf.readBoolean();
         progress = buf.readInt();
+        recipe = buf.readUtf();
     }
 
     @Override
@@ -403,6 +433,57 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
             inputTanks[i].readFromNBT(nbt, "ni" + i);
             outputTanks[i].readFromNBT(nbt, "no" + i);
         }
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    @Override
+    public void receiveControl(CompoundTag data) {
+        // CE :303-311
+        if (data.contains("index") && data.contains("selection")) {
+            int index = data.getInt("index");
+            String selection = data.getString("selection");
+            if (index == 0) {
+                this.recipe = selection;
+                this.restrictedMode = false;
+                setChanged();
+            }
+        }
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :358-364
+        return new String[]{
+                PREFIX_VALUE + "progress",
+                PREFIX_VALUE + "recipe",
+                PREFIX_VALUE + "active",
+                PREFIX_FUNCTION + "setrecipe" + NAME_SEPARATOR + "name"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :368-372
+        if ((PREFIX_VALUE + "progress").equals(name)) return "" + getProgressScaled(100);
+        if ((PREFIX_VALUE + "recipe").equals(name)) return this.recipe;
+        if ((PREFIX_VALUE + "active").equals(name)) return "" + (this.didProcess ? 1 : 0);
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :376-382
+        if ((PREFIX_FUNCTION + "setrecipe").equals(name) && params.length == 1) {
+            this.recipe = params[0];
+            this.restrictedMode = true;
+            setChanged();
+            return null;
+        }
+        return null;
     }
 
     @Nullable
