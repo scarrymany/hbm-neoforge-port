@@ -1,14 +1,19 @@
 package com.hbm.blockentity.machine.oil;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.lib.DirPos;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.io.IOException;
 
 /**
  * Ported from CE's {@code TileEntityMachinePumpjack} (239 lines, read in full). Adds
@@ -18,15 +23,15 @@ import net.minecraft.world.level.block.state.BlockState;
  * {@code ByteBuf} payload - the speed value itself, not a raw angle, so each client free-runs its own
  * interpolation between packets).
  */
-public class MachinePumpjackBlockEntity extends OilDrillBaseBlockEntity {
+public class MachinePumpjackBlockEntity extends OilDrillBaseBlockEntity implements IConfigurableMachine {
 
-    private static final long MAX_POWER = 250_000L;
-    private static final int POWER_REQ = 200;
-    private static final int DELAY = 25;
-    private static final int OIL_PER_DEPOSIT = 750;
-    private static final int GAS_PER_DEPOSIT_MIN = 50;
-    private static final int GAS_PER_DEPOSIT_MAX = 250;
-    private static final double DRAIN_CHANCE = 0.025D;
+    public static int maxPower = 250_000;
+    public static int consumption = 200;
+    public static int delay = 25;
+    public static int oilPerDeposit = 750;
+    public static int gasPerDepositMin = 50;
+    public static int gasPerDepositMax = 250;
+    public static double drainChance = 0.025D;
 
     /** Client-side-only cosmetic rotation state - never persisted, only ever set from {@link #deserialize}. */
     public float rot = 0;
@@ -44,17 +49,17 @@ public class MachinePumpjackBlockEntity extends OilDrillBaseBlockEntity {
 
     @Override
     public long getMaxPower() {
-        return MAX_POWER;
+        return maxPower;
     }
 
     @Override
     public int getPowerReq() {
-        return POWER_REQ;
+        return consumption;
     }
 
     @Override
     public int getDelay() {
-        return DELAY;
+        return delay;
     }
 
     @Override
@@ -95,11 +100,11 @@ public class MachinePumpjackBlockEntity extends OilDrillBaseBlockEntity {
         getOilTank().setTankType(Fluids.OIL);
         getGasTank().setTankType(Fluids.GAS);
 
-        getOilTank().setFill(getOilTank().getFill() + OIL_PER_DEPOSIT);
-        getGasTank().setFill(getGasTank().getFill() + GAS_PER_DEPOSIT_MIN
-                + level.getRandom().nextInt(GAS_PER_DEPOSIT_MAX - GAS_PER_DEPOSIT_MIN + 1));
+        getOilTank().setFill(getOilTank().getFill() + oilPerDeposit);
+        getGasTank().setFill(getGasTank().getFill() + gasPerDepositMin
+                + level.getRandom().nextInt(gasPerDepositMax - gasPerDepositMin + 1));
 
-        if (level.getRandom().nextDouble() < DRAIN_CHANCE) {
+        if (level.getRandom().nextDouble() < drainChance) {
             level.setBlock(pos, oreOilEmpty().defaultBlockState(), 3);
         }
     }
@@ -128,5 +133,59 @@ public class MachinePumpjackBlockEntity extends OilDrillBaseBlockEntity {
                 new DirPos(x + rot.getStepX() * 4 - dir.getStepX() * 2, y, z + rot.getStepZ() * 4 + dir.getStepZ() * 2, dir),
                 new DirPos(x + rot.getStepX() * 4 - dir.getStepX() * 2, y, z + rot.getStepZ() * 2 - dir.getStepZ() * 2, dir.getOpposite())
         };
+    }
+
+    @Override
+    public String getConfigName() {
+        return "pumpjack";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityMachinePumpjack.java:191-197
+        maxPower = IConfigurableMachine.grab(obj, "I:powerCap", maxPower);
+        consumption = IConfigurableMachine.grab(obj, "I:consumption", consumption);
+        delay = IConfigurableMachine.grab(obj, "I:delay", delay);
+        oilPerDeposit = IConfigurableMachine.grab(obj, "I:oilPerDeposit", oilPerDeposit);
+        gasPerDepositMin = IConfigurableMachine.grab(obj, "I:gasPerDepositMin", gasPerDepositMin);
+        gasPerDepositMax = IConfigurableMachine.grab(obj, "I:gasPerDepositMax", gasPerDepositMax);
+        drainChance = IConfigurableMachine.grab(obj, "D:drainChance", drainChance);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityMachinePumpjack.java:202-208
+        writer.name("I:powerCap").value(maxPower);
+        writer.name("I:consumption").value(consumption);
+        writer.name("I:delay").value(delay);
+        writer.name("I:oilPerDeposit").value(oilPerDeposit);
+        writer.name("I:gasPerDepositMin").value(gasPerDepositMin);
+        writer.name("I:gasPerDepositMax").value(gasPerDepositMax);
+        writer.name("D:drainChance").value(drainChance);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "pumpjack";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 }

@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
@@ -7,6 +9,7 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
 import com.hbm.inventory.container.machine.dummyable.StirlingMenu;
 import com.hbm.items.machine.ItemGear;
+import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,18 +27,21 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.IOException;
+
 /**
  * CE {@code TileEntityStirling.java}:59-181 — heat pull diffusion 0.1, efficiency 0.5,
  * maxHeat 300/1500, overspeed 300. EntityCog spawn skipped.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityStirling.java:233-253} ({@code stirling}).
  */
 public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, ITickableBE, MenuProvider, IConfigurableMachine {
 
-    public static final double DIFFUSION = 0.1D;
-    public static final double EFFICIENCY = 0.5D;
-    public static final int MAX_HEAT_NORMAL = 300;
-    public static final int MAX_HEAT_STEEL = 1500;
-    public static final int OVERSPEED_LIMIT = 300;
+    public static double diffusion = 0.1D;
+    public static double efficiency = 0.5D;
+    public static int maxHeatNormal = 300;
+    public static int maxHeatSteel = 1500;
+    public static int overspeedLimit = 300;
 
     public long powerBuffer;
     public int heat;
@@ -60,7 +66,7 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
     }
 
     public int maxHeat() {
-        return getBlockState().is(DummyableProcessBlocks.MACHINE_STIRLING.get()) ? MAX_HEAT_NORMAL : MAX_HEAT_STEEL;
+        return getBlockState().is(DummyableProcessBlocks.MACHINE_STIRLING.get()) ? maxHeatNormal : maxHeatSteel;
     }
 
     public ItemGear.GearType requiredGear() {
@@ -74,11 +80,11 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
         if (hasCog) {
             powerBuffer = 0;
             tryPullHeat();
-            powerBuffer = (long) (heat * (isCreative() ? 1D : EFFICIENCY));
+            powerBuffer = (long) (heat * (isCreative() ? 1D : efficiency));
             if (!isCreative()) {
                 if (heat > maxHeat()) {
                     overspeed++;
-                    if (overspeed > OVERSPEED_LIMIT) {
+                    if (overspeed > overspeedLimit) {
                         hasCog = false;
                         powerBuffer = 0;
                         level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
@@ -106,7 +112,7 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
         if (level == null) return;
         BlockEntity below = level.getBlockEntity(worldPosition.below());
         if (below instanceof IHeatSource source && below != this) {
-            int heatSrc = (int) (source.getHeatStored() * DIFFUSION);
+            int heatSrc = (int) (source.getHeatStored() * diffusion);
             if (heatSrc > 0) {
                 source.useUpHeat(heatSrc);
                 heat += heatSrc;
@@ -147,7 +153,57 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return Math.max(1L, (long) (maxHeat() * (isCreative() ? 1D : EFFICIENCY)));
+        return Math.max(1L, (long) (maxHeat() * (isCreative() ? 1D : efficiency)));
+    }
+
+    @Override
+    public String getConfigName() {
+        return "stirling";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityStirling.java:239-243
+        diffusion = IConfigurableMachine.grab(obj, "D:diffusion", diffusion);
+        efficiency = IConfigurableMachine.grab(obj, "D:efficiency", efficiency);
+        maxHeatNormal = IConfigurableMachine.grab(obj, "I:maxHeatNormal", maxHeatNormal);
+        maxHeatSteel = IConfigurableMachine.grab(obj, "I:maxHeatSteel", maxHeatSteel);
+        overspeedLimit = IConfigurableMachine.grab(obj, "I:overspeedLimit", overspeedLimit);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityStirling.java:248-252
+        writer.name("D:diffusion").value(diffusion);
+        writer.name("D:efficiency").value(efficiency);
+        writer.name("I:maxHeatNormal").value(maxHeatNormal);
+        writer.name("I:maxHeatSteel").value(maxHeatSteel);
+        writer.name("I:overspeedLimit").value(overspeedLimit);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "stirling";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 
     @Override

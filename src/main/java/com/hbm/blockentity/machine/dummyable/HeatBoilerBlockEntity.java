@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.api.tile.IHeatSource;
@@ -10,6 +12,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -26,40 +29,48 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * CE {@code TileEntityHeatBoiler} / {@code TileEntityHeatBoilerIndustrial} —
  * pull heat from {@link IHeatSource} below, {@link FT_Heatable} BOILER convert.
  * Explosion / Tom fire / audio skipped.
+ * {@link IConfigurableMachine} Exact CE {@code boiler}/{@code boilerIndustrial}
+ * ({@code TileEntityHeatBoiler.java:359-375}, {@code TileEntityHeatBoilerIndustrial.java:315-328}).
  * ROR: CE {@code TileEntityHeatBoiler.java:396-412} / industrial {@code :348-360}.
  */
 public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IRORValueProvider {
 
-    public static final int MAX_HEAT = 12_800_000;
-    public static final double DIFFUSION = 0.1D;
+    public static int maxHeatCfg = 12_800_000;
+    public static double diffusion = 0.1D;
+    public static boolean canExplode = true;
+    public static int maxHeatIndustrial = 12_800_000;
+    public static double diffusionIndustrial = 0.1D;
 
     public final FluidTankNTM water;
     public final FluidTankNTM steam;
     public final int maxHeat;
+    public final double heatDiffusion;
     public int heat;
     public boolean isOn;
 
     public static HeatBoilerBlockEntity small(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new HeatBoilerBlockEntity(type, pos, state, 16_000, 16_000 * 100, MAX_HEAT);
+        return new HeatBoilerBlockEntity(type, pos, state, 16_000, 16_000 * 100, maxHeatCfg, diffusion);
     }
 
     public static HeatBoilerBlockEntity industrial(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new HeatBoilerBlockEntity(type, pos, state, 64_000, 64_000 * 100, MAX_HEAT);
+        return new HeatBoilerBlockEntity(type, pos, state, 64_000, 64_000 * 100, maxHeatIndustrial, diffusionIndustrial);
     }
 
     public HeatBoilerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,
-                                 int waterCap, int steamCap, int maxHeat) {
+                                 int waterCap, int steamCap, int maxHeat, double heatDiffusion) {
         super(type, pos, state, 1, true, false);
         this.water = new FluidTankNTM(Fluids.WATER, waterCap).withOwner(this);
         this.steam = new FluidTankNTM(Fluids.STEAM, steamCap).withOwner(this);
         this.maxHeat = maxHeat;
+        this.heatDiffusion = heatDiffusion;
     }
 
     @Override
@@ -104,7 +115,7 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         if (below instanceof IHeatSource source) {
             int diff = source.getHeatStored() - heat;
             if (diff > 0) {
-                diff = (int) Math.ceil(diff * DIFFUSION);
+                diff = (int) Math.ceil(diff * heatDiffusion);
                 source.useUpHeat(diff);
                 heat = Math.min(heat + diff, maxHeat);
                 return;
@@ -200,5 +211,65 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         if ((PREFIX_VALUE + "input").equals(name)) return "" + water.getFill();
         if ((PREFIX_VALUE + "output").equals(name)) return "" + steam.getFill();
         return null;
+    }
+
+    static void readBoiler(JsonObject obj) {
+        // CE TileEntityHeatBoiler.java:365-367
+        maxHeatCfg = IConfigurableMachine.grab(obj, "I:maxHeat", maxHeatCfg);
+        diffusion = IConfigurableMachine.grab(obj, "D:diffusion", diffusion);
+        canExplode = IConfigurableMachine.grab(obj, "B:canExplode", canExplode);
+    }
+
+    static void writeBoiler(JsonWriter writer) throws IOException {
+        // CE TileEntityHeatBoiler.java:372-374
+        writer.name("I:maxHeat").value(maxHeatCfg);
+        writer.name("D:diffusion").value(diffusion);
+        writer.name("B:canExplode").value(canExplode);
+    }
+
+    static void readIndustrial(JsonObject obj) {
+        // CE TileEntityHeatBoilerIndustrial.java:321-322
+        maxHeatIndustrial = IConfigurableMachine.grab(obj, "I:maxHeat", maxHeatIndustrial);
+        diffusionIndustrial = IConfigurableMachine.grab(obj, "D:diffusion", diffusionIndustrial);
+    }
+
+    static void writeIndustrial(JsonWriter writer) throws IOException {
+        // CE TileEntityHeatBoilerIndustrial.java:327-328
+        writer.name("I:maxHeat").value(maxHeatIndustrial);
+        writer.name("D:diffusion").value(diffusionIndustrial);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "boiler";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readBoiler(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeBoiler(writer);
+        }
+    }
+
+    public static final class ConfigDummyIndustrial implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "boilerIndustrial";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readIndustrial(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeIndustrial(writer);
+        }
     }
 }

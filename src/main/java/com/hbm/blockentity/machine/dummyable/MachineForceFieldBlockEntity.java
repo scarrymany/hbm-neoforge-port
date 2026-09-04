@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -7,6 +9,7 @@ import com.hbm.inventory.container.machine.dummyable.ForceFieldMenu;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -29,16 +32,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * CE {@code TileEntityForceField} (460 lines). Live bounce field.
- * TODO(CE: TileEntityForceField.java:436-458): IConfigurableMachine JSON.
- * TODO(CE: RenderMachineForceField.java:20): TESR sphere. Do not invent.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityForceField.java:71}/{@code :436-458}
+ * ({@code forcefield}). TODO(CE: RenderMachineForceField.java:20): TESR sphere. Do not invent.
  */
 public class MachineForceFieldBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, ITickableBE, MenuProvider, IConfigurableMachine {
 
     public static int baseCon = 1000;
     public static int radCon = 500;
@@ -47,6 +51,7 @@ public class MachineForceFieldBlockEntity extends MachineBaseBlockEntity
     public static int baseRadius = 16;
     public static int radUpgrade = 16;
     public static int shUpgrade = 50;
+    public static double cooldownModif = 1;
     public static double healthRegenModif = 1;
 
     public int health = 100;
@@ -321,5 +326,63 @@ public class MachineForceFieldBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new ForceFieldMenu(id, inv, this);
+    }
+
+    @Override
+    public String getConfigName() {
+        return "forcefield";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityForceField.java:437-445
+        maxPower = IConfigurableMachine.grab(obj, "L:powerCap", maxPower);
+        baseCon = IConfigurableMachine.grab(obj, "I:baseConsumption", baseCon);
+        radCon = IConfigurableMachine.grab(obj, "I:radiusConsumption", radCon);
+        shCon = IConfigurableMachine.grab(obj, "I:shieldConsumption", shCon);
+        baseRadius = IConfigurableMachine.grab(obj, "I:baseRadius", baseRadius);
+        radUpgrade = IConfigurableMachine.grab(obj, "I:radiusUpgrade", radUpgrade);
+        shUpgrade = IConfigurableMachine.grab(obj, "I:shieldUpgrade", shUpgrade);
+        cooldownModif = IConfigurableMachine.grab(obj, "D:cooldownModifier", cooldownModif);
+        healthRegenModif = IConfigurableMachine.grab(obj, "D:healthRegenModifier", healthRegenModif);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityForceField.java:450-458
+        writer.name("L:powerCap").value(maxPower);
+        writer.name("I:baseConsumption").value(baseCon);
+        writer.name("I:radiusConsumption").value(radCon);
+        writer.name("I:shieldConsumption").value(shCon);
+        writer.name("I:baseRadius").value(baseRadius);
+        writer.name("I:radiusUpgrade").value(radUpgrade);
+        writer.name("I:shieldUpgrade").value(shUpgrade);
+        writer.name("D:cooldownModifier").value(cooldownModif);
+        writer.name("D:healthRegenModifier").value(healthRegenModif);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "forcefield";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 }

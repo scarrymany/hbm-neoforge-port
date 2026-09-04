@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.entity.IRadarDetectableNT;
 import com.hbm.api.entity.IRadarDetectableNT.RadarScanParams;
@@ -23,6 +25,7 @@ import com.hbm.saveddata.satellites.SatelliteLaser;
 import com.hbm.saveddata.satellites.SatelliteRayScan;
 import com.hbm.saveddata.satellites.SatelliteResonator;
 import com.hbm.saveddata.satellites.SatelliteSavedData;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -47,6 +50,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,14 +63,17 @@ import java.util.List;
  * Slots 0–7 sat_relay / linker launch Exact CE :536-594.
  * Scan toggles / redMode Exact CE :100-104 + :428 + :457-496 + :525-530.
  * Scans {@link IRadarDetectableNT} + players. Map GUI / showMap / clear skipped — no CE {@code gui_radar_nt.png}.
+ * {@link IConfigurableMachine} Exact CE {@code radar}/{@code radar_large}
+ * ({@code TileEntityMachineRadarNT.java:190-213}, {@code TileEntityMachineRadarLarge.java:19-31}).
  */
 public class MachineRadarBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
+        implements IEnergyReceiverMK2, ITickableBE, MenuProvider, IControlReceiver, IConfigurableMachine {
 
-    public static final long MAX_POWER = 100_000L;
-    public static final int CONSUMPTION = 500;
-    public static final int RANGE = 1_000;
-    public static final int RANGE_LARGE = 3_000;
+    public static int maxPower = 100_000;
+    public static int consumption = 500;
+    public static int radarRange = 1_000;
+    public static int radarLargeRange = 3_000;
+    public static boolean generateChunks = false;
     public static final int PING_INTERVAL = 80;
     /** CE {@code TileEntityMachineRadarNT.java:88-89}. */
     public static int radarBuffer = 30;
@@ -99,7 +106,7 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
     }
 
     public int getRange() {
-        return large ? RANGE_LARGE : RANGE;
+        return large ? radarLargeRange : radarRange;
     }
 
     public int getContacts() {
@@ -131,8 +138,8 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         }
 
         // CE TileEntityMachineRadarNT.java:231 + :239
-        power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
-        power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
+        power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, maxPower);
+        power = Library.chargeTEFromItems(inventory, 0, power, maxPower);
 
         int prevRed = redPower;
         // CE TileEntityMachineRadarNT.java:422 — no consume / scan / sat ping below altitude
@@ -140,8 +147,8 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
             entries.clear();
             contacts = 0;
             redPower = 0;
-        } else if (power >= CONSUMPTION) {
-            power -= CONSUMPTION;
+        } else if (power >= consumption) {
+            power -= consumption;
             allocateTargets();
             pingTimer++;
             if (pingTimer >= PING_INTERVAL) {
@@ -256,7 +263,88 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return MAX_POWER;
+        return maxPower;
+    }
+
+    @Override
+    public String getConfigName() {
+        return large ? "radar_large" : "radar";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        if (large) readLarge(obj);
+        else readNt(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        if (large) writeLarge(writer);
+        else writeNt(writer);
+    }
+
+    static void readNt(JsonObject obj) {
+        // CE TileEntityMachineRadarNT.java:196-202 — writeConfig omits chunkLoadCap
+        maxPower = IConfigurableMachine.grab(obj, "L:powerCap", maxPower);
+        consumption = IConfigurableMachine.grab(obj, "L:consumption", consumption);
+        radarRange = IConfigurableMachine.grab(obj, "I:radarRange", radarRange);
+        radarBuffer = IConfigurableMachine.grab(obj, "I:radarBuffer", radarBuffer);
+        radarAltitude = IConfigurableMachine.grab(obj, "I:radarAltitude", radarAltitude);
+        generateChunks = IConfigurableMachine.grab(obj, "B:generateChunks", generateChunks);
+    }
+
+    static void writeNt(JsonWriter writer) throws IOException {
+        // CE TileEntityMachineRadarNT.java:207-212
+        writer.name("L:powerCap").value(maxPower);
+        writer.name("L:consumption").value(consumption);
+        writer.name("I:radarRange").value(radarRange);
+        writer.name("I:radarBuffer").value(radarBuffer);
+        writer.name("I:radarAltitude").value(radarAltitude);
+        writer.name("B:generateChunks").value(generateChunks);
+    }
+
+    static void readLarge(JsonObject obj) {
+        // CE TileEntityMachineRadarLarge.java:25
+        radarLargeRange = IConfigurableMachine.grab(obj, "I:radarLargeRange", radarLargeRange);
+    }
+
+    static void writeLarge(JsonWriter writer) throws IOException {
+        // CE TileEntityMachineRadarLarge.java:30
+        writer.name("I:radarLargeRange").value(radarLargeRange);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "radar";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readNt(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeNt(writer);
+        }
+    }
+
+    public static final class ConfigDummyLarge implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "radar_large";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readLarge(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeLarge(writer);
+        }
     }
 
     @Override

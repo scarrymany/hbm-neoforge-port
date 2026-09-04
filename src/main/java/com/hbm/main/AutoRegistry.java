@@ -2,11 +2,18 @@ package com.hbm.main;
 
 import com.hbm.blockentity.machine.MachineDieselBlockEntity;
 import com.hbm.blockentity.machine.MachineIndustrialTurbineBlockEntity;
+import com.hbm.blockentity.machine.MachineRadarBlockEntity;
 import com.hbm.blockentity.machine.MachineSteamEngineBlockEntity;
 import com.hbm.blockentity.machine.chem.CentrifugeBlockEntity;
 import com.hbm.blockentity.machine.dummyable.CondenserBlockEntity;
 import com.hbm.blockentity.machine.dummyable.CondenserPoweredBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineChungusBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineForceFieldBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
+import com.hbm.blockentity.machine.oil.MachineFrackingTowerBlockEntity;
+import com.hbm.blockentity.machine.oil.MachineOilWellBlockEntity;
+import com.hbm.blockentity.machine.oil.MachinePumpjackBlockEntity;
 import com.hbm.config.MachineDynConfig;
 import com.hbm.tileentity.IConfigurableMachine;
 
@@ -35,6 +42,15 @@ public final class AutoRegistry {
             configurableMachineClasses.add(CondenserBlockEntity.ConfigDummyTowerSmall.class);
             configurableMachineClasses.add(CondenserBlockEntity.ConfigDummyTowerLarge.class);
             configurableMachineClasses.add(CondenserPoweredBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachineRadarBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachineRadarBlockEntity.ConfigDummyLarge.class);
+            configurableMachineClasses.add(MachineForceFieldBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachineStirlingBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(HeatBoilerBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(HeatBoilerBlockEntity.ConfigDummyIndustrial.class);
+            configurableMachineClasses.add(MachineOilWellBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachinePumpjackBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachineFrackingTowerBlockEntity.ConfigDummy.class);
         }
         MachineDynConfig.initialize();
         MainRegistry.logger.debug("Successfully loaded {} configurable machine classes.", configurableMachineClasses.size());
