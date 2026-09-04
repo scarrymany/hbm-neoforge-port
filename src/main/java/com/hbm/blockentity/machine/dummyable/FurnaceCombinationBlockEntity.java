@@ -6,6 +6,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.capability.NTMFluidCapabilityHandler;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.FurnaceCombinationMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -33,6 +34,9 @@ import java.util.List;
 /**
  * CE {@code TileEntityFurnaceCombination}: heat-driven, processTime 20_000, maxHeat 100_000.
  * {@code unloadTank(2,3)} Exact CE {@code TileEntityFurnaceCombination.java:93}.
+ * {@code pollute(SOOT, SOOT_PER_SECOND*3)} every 20t while burning Exact CE {@code :129}.
+ * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:39-48}.
+ * Audio / particles stay skipped.
  */
 public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardSenderMK2, ITickableBE, MenuProvider {
@@ -45,6 +49,10 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
     public static final int SLOT_OUT = 1;
 
     public final FluidTankNTM tank;
+    /** CE {@code TileEntityMachinePolluting} buffer 50 from {@code super(4, 50)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
     public boolean wasOn;
     public int progress;
     public int heat;
@@ -52,6 +60,9 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
     public FurnaceCombinationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 4, true, false);
         this.tank = new FluidTankNTM(Fluids.NONE, 24_000).withOwner(this);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 50).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 50).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 50).withOwner(this);
     }
 
     @Override
@@ -92,14 +103,17 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
                     for (int j = -1; j <= 1; j++) {
                         BlockPos p = worldPosition.relative(dir, 2).relative(rot, j).above(y);
                         if (tank.getFill() > 0) tryProvide(tank, level, p, dir);
+                        // CE TileEntityFurnaceCombination.java:78
+                        sendSmoke(p, dir);
                     }
                 }
             }
             for (int x = -1; x <= 1; x++) {
                 for (int z = -1; z <= 1; z++) {
-                    if (tank.getFill() > 0) {
-                        tryProvide(tank, level, worldPosition.offset(x, 2, z), Direction.UP);
-                    }
+                    BlockPos up = worldPosition.offset(x, 2, z);
+                    if (tank.getFill() > 0) tryProvide(tank, level, up, Direction.UP);
+                    // CE TileEntityFurnaceCombination.java:86
+                    sendSmoke(up, Direction.UP);
                 }
             }
         }
@@ -128,12 +142,36 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
                 AABB box = new AABB(worldPosition.getX() - 0.5, worldPosition.getY() + 2, worldPosition.getZ() - 0.5,
                         worldPosition.getX() + 1.5, worldPosition.getY() + 4, worldPosition.getZ() + 1.5);
                 for (Entity e : level.getEntitiesOfClass(Entity.class, box)) e.igniteForSeconds(5);
+                // CE TileEntityFurnaceCombination.java:129
+                if (level.getGameTime() % 20 == 0) {
+                    pollute(PollutionHandler.PollutionType.SOOT, PollutionHandler.SOOT_PER_SECOND * 3);
+                }
             }
         } else {
             progress = 0;
         }
         dataChanged();
         networkPackMK2(50);
+    }
+
+    /** CE {@code TileEntityMachinePolluting#sendSmoke}. */
+    private void sendSmoke(BlockPos pos, Direction dir) {
+        if (smoke.getFill() > 0) tryProvide(smoke, level, pos, dir);
+        if (smokeLeaded.getFill() > 0) tryProvide(smokeLeaded, level, pos, dir);
+        if (smokePoison.getFill() > 0) tryProvide(smokePoison, level, pos, dir);
+    }
+
+    /** Exact CE {@code TileEntityMachinePolluting#pollute(PollutionType, float)} {@code :39-48}. */
+    public void pollute(PollutionHandler.PollutionType type, float amount) {
+        FluidTankNTM dest = type == PollutionHandler.PollutionType.SOOT ? smoke
+                : type == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+        int fluidAmount = (int) Math.ceil(amount * 100);
+        dest.setFill(dest.getFill() + fluidAmount);
+        if (dest.getFill() > dest.getMaxFill()) {
+            int overflow = dest.getFill() - dest.getMaxFill();
+            dest.setFill(dest.getMaxFill());
+            PollutionHandler.incrementPollution(level, worldPosition, type, overflow / 100F);
+        }
     }
 
     private boolean canSmelt() {
@@ -165,7 +203,8 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public @NotNull List<FluidTankNTM> getSendingTanks() {
-        return List.of(tank);
+        // CE TileEntityFurnaceCombination.java:273-274
+        return List.of(tank, smoke, smokeLeaded, smokePoison);
     }
 
     @Override
@@ -177,6 +216,9 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tank.writeToNBT(tag, "tank");
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
         tag.putInt("prog", progress);
         tag.putInt("heat", heat);
     }
@@ -185,6 +227,9 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         tank.readFromNBT(tag, "tank");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
         progress = tag.getInt("prog");
         heat = tag.getInt("heat");
     }
