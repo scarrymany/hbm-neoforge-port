@@ -8,9 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * Ported (visually, from CE's {@code GUIMachineRefinery}) as a plain panel - see
- * {@code MachineRTGScreen}'s javadoc for the no-texture-yet rationale. Renders all five tanks
- * (input {@code HOTOIL} plus the four cracked outputs).
+ * Painted panel, CE {@code GUIMachineRefinery} size kept 216×230 (port already-painted; CE 210×231).
+ * No invented {@code gui_refinery.png}. Tank blit Exact CE {@code GUIMachineRefinery.java:89}/
+ * {@code :135-138} so canister columns at x=8 / y=99 stay clear.
  */
 public class MachineRefineryScreen extends GuiInfoContainer<MachineRefineryMenu> {
 
@@ -29,11 +29,13 @@ public class MachineRefineryScreen extends GuiInfoContainer<MachineRefineryMenu>
         guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
 
         var be = this.getMenu().be;
-        be.tanks.get(0).renderTank(x + 8, y + 99, 0, 16, 54);
-        be.tanks.get(1).renderTank(x + 86, y + 99, 0, 16, 54);
-        be.tanks.get(2).renderTank(x + 106, y + 99, 0, 16, 54);
-        be.tanks.get(3).renderTank(x + 126, y + 99, 0, 16, 54);
-        be.tanks.get(4).renderTank(x + 146, y + 99, 0, 16, 54);
+        // CE :89 — input column (33,130) 16×101, not x=8 (canisters sit there).
+        be.tanks.get(0).renderTank(x + 33, y + 130, 0, 16, 101);
+        // CE :135-138
+        be.tanks.get(1).renderTank(x + 86, y + 95, 0, 16, 52);
+        be.tanks.get(2).renderTank(x + 106, y + 95, 0, 16, 52);
+        be.tanks.get(3).renderTank(x + 126, y + 95, 0, 16, 52);
+        be.tanks.get(4).renderTank(x + 146, y + 95, 0, 16, 52);
     }
 
     @Override
@@ -45,9 +47,11 @@ public class MachineRefineryScreen extends GuiInfoContainer<MachineRefineryMenu>
                 Component.literal(be.isOn ? "Refining" : "Idle"),
                 Component.literal("Sulfur cycle: " + be.sulfur + "/" + MachineRefineryBlockEntity.MAX_SULFUR));
 
-        int[] xs = {8, 86, 106, 126, 146};
-        for (int i = 0; i < 5; i++) {
-            be.tanks.get(i).renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + xs[i], topPos + 99 - 54, 16, 54);
+        // CE :38-42
+        be.tanks.get(0).renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 30, topPos + 27, 21, 104);
+        int[] xs = {86, 106, 126, 146};
+        for (int i = 0; i < 4; i++) {
+            be.tanks.get(i + 1).renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + xs[i], topPos + 42, 16, 52);
         }
     }
 }

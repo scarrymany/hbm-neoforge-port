@@ -1,16 +1,20 @@
 package com.hbm.blockentity.machine.oil;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.capability.NTMFluidCapabilityHandler;
+import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.container.machine.oil.MachineRefineryMenu;
 import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.RefineryRecipes;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
 import com.hbm.util.Tuple;
@@ -40,11 +44,13 @@ import java.util.List;
  * {@code PETROLEUM} out) driven by {@link RefineryRecipes} (the cracking recipe data this task calls
  * fully in-scope), plus a sulfur item byproduct every {@link #MAX_SULFUR} successful refine cycles.
  *
+ * Inventory is 13 slots Exact CE {@code TileEntityMachineRefinery.java:69}. Canister trim Exact CE
+ * {@code :136-145}: {@code tanks[0].setType(12)} / {@code loadTank(1, 2)} then four
+ * {@code unloadTank} pairs after {@code refine()}. Sulfur byproduct is slot 11 ({@code :303-309}).
+ * Hopper Exact CE {@code :323-329}: accessible {@code 0..11}, extract {@code 2,4,6,8,10,11}.
+ *
  * <h2>Scope trims vs. CE</h2>
  * <ul>
- *   <li><b>No item-container fluid loading</b> - same pre-existing gap as every other machine in this
- *   area, see {@link OilDrillBaseBlockEntity}'s javadoc. Inventory renumbered to battery (0) + sulfur
- *   output (1) only (CE: 13 slots - battery, 5 canister in/out pairs, sulfur out, fluid-ID slot).</li>
  *   <li><b>No {@code IOverpressurable}/{@code IRepairable} explosion-and-repair state machine</b>
  *   (CE's {@code hasExploded}/{@code onFire}/{@code explode}/{@code tryExtinguish}/{@code repair}) -
  *   neither interface is ported (no explosion-system package exists in this port yet, and this is a
@@ -72,8 +78,19 @@ public class MachineRefineryBlockEntity extends MachineBaseBlockEntity
     public static final int MAX_SULFUR = 100;
     public static final long MAX_POWER = 1000L;
 
-    private static final int BATTERY_SLOT = 0;
-    private static final int SULFUR_SLOT = 1;
+    private static final int SLOT_BATTERY = 0;
+    private static final int SLOT_LOAD = 1;
+    private static final int SLOT_LOAD_OUT = 2;
+    private static final int SLOT_HEAVY = 3;
+    private static final int SLOT_HEAVY_OUT = 4;
+    private static final int SLOT_NAPHTHA = 5;
+    private static final int SLOT_NAPHTHA_OUT = 6;
+    private static final int SLOT_LIGHT = 7;
+    private static final int SLOT_LIGHT_OUT = 8;
+    private static final int SLOT_PETROLEUM = 9;
+    private static final int SLOT_PETROLEUM_OUT = 10;
+    private static final int SLOT_SULFUR = 11;
+    private static final int SLOT_ID = 12;
 
     public final List<FluidTankNTM> tanks = new ArrayList<>();
     public long power;
@@ -81,7 +98,7 @@ public class MachineRefineryBlockEntity extends MachineBaseBlockEntity
     public boolean isOn;
 
     public MachineRefineryBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 2, true, true);
+        super(type, pos, state, 13, true, true);
         tanks.add(new FluidTankNTM(Fluids.HOTOIL, 64_000).withOwner(this));
         tanks.add(new FluidTankNTM(Fluids.HEAVYOIL, 24_000).withOwner(this));
         tanks.add(new FluidTankNTM(Fluids.NAPHTHA, 24_000).withOwner(this));
@@ -96,12 +113,34 @@ public class MachineRefineryBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return i == BATTERY_SLOT && Library.isBattery(stack);
+        if (stack.isEmpty()) return false;
+        // CE has no override (defaults true). MenuBase.tile is getCheckedInventory(),
+        // so ID/canister GUI insert dies without this.
+        if (i == SLOT_BATTERY) return Library.isBattery(stack);
+        if (i == SLOT_LOAD) {
+            if (FluidContainerRegistry.getFluidContent(stack, tanks.get(0).getTankType()) > 0) return true;
+            // Port ItemCanister is IFillableItem, not in FluidContainerRegistry (CE metadata canisters).
+            return stack.getItem() instanceof IFillableItem fill && fill.providesFluid(tanks.get(0).getTankType(), stack);
+        }
+        if (i == SLOT_HEAVY || i == SLOT_NAPHTHA || i == SLOT_LIGHT || i == SLOT_PETROLEUM) {
+            return NTMFluidCapabilityHandler.isEmptyNtmFluidContainer(stack.getItem())
+                    || stack.getItem() instanceof IFillableItem;
+        }
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        return false;
     }
 
     @Override
     public boolean canExtractItem(int slot, ItemStack itemStack, int amount) {
-        return slot == SULFUR_SLOT;
+        // CE TileEntityMachineRefinery.java:328-329
+        return slot == SLOT_LOAD_OUT || slot == SLOT_HEAVY_OUT || slot == SLOT_NAPHTHA_OUT
+                || slot == SLOT_LIGHT_OUT || slot == SLOT_PETROLEUM_OUT || slot == SLOT_SULFUR;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        // CE :323-324 — ID 12 is GUI-only
+        return new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
     }
 
     public DirPos[] getConPos() {
@@ -131,9 +170,17 @@ public class MachineRefineryBlockEntity extends MachineBaseBlockEntity
             trySubscribe(tanks.get(0).getTankType(), level, dp);
         }
 
-        power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+        power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, power, MAX_POWER);
+        // CE TileEntityMachineRefinery.java:137-145
+        tanks.get(0).setType(SLOT_ID, inventory);
+        tanks.get(0).loadTank(SLOT_LOAD, SLOT_LOAD_OUT, inventory);
 
         refine();
+
+        tanks.get(1).unloadTank(SLOT_HEAVY, SLOT_HEAVY_OUT, inventory);
+        tanks.get(2).unloadTank(SLOT_NAPHTHA, SLOT_NAPHTHA_OUT, inventory);
+        tanks.get(3).unloadTank(SLOT_LIGHT, SLOT_LIGHT_OUT, inventory);
+        tanks.get(4).unloadTank(SLOT_PETROLEUM, SLOT_PETROLEUM_OUT, inventory);
 
         for (DirPos dp : getConPos()) {
             for (int i = 1; i < 5; i++) {
@@ -174,14 +221,14 @@ public class MachineRefineryBlockEntity extends MachineBaseBlockEntity
             ItemStack out = recipe.getZ();
 
             if (out != null && !out.isEmpty()) {
-                ItemStack current = inventory.getStackInSlot(SULFUR_SLOT);
+                ItemStack current = inventory.getStackInSlot(SLOT_SULFUR);
                 if (current.isEmpty()) {
-                    inventory.setStackInSlot(SULFUR_SLOT, out.copy());
+                    inventory.setStackInSlot(SLOT_SULFUR, out.copy());
                 } else if (ItemStack.isSameItemSameComponents(current, out)
                         && current.getCount() + out.getCount() <= current.getMaxStackSize()) {
                     ItemStack grown = current.copy();
                     grown.grow(out.getCount());
-                    inventory.setStackInSlot(SULFUR_SLOT, grown);
+                    inventory.setStackInSlot(SLOT_SULFUR, grown);
                 }
             }
         }
