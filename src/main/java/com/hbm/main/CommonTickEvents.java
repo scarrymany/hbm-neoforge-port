@@ -1,9 +1,12 @@
 package com.hbm.main;
 
 import com.hbm.damage.ModDamageTypes;
+import com.hbm.handler.ArmorModHandler;
 import com.hbm.hazard.HazardSystem;
+import com.hbm.items.armor.ItemArmorMod;
 import com.hbm.items.food.FoodDataComponents;
 import com.hbm.potion.HbmPotionEffects;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -40,6 +43,7 @@ public class CommonTickEvents {
         }
         if(entity instanceof LivingEntity livingEntity) {
             HazardSystem.updateLivingInventory(livingEntity);
+            tickArmorMods(livingEntity);
         }
     }
 
@@ -63,6 +67,20 @@ public class CommonTickEvents {
         Boolean redPill = stack.get(FoodDataComponents.RED_PILL.get());
         if (redPill != null && redPill) {
             event.getEntity().addEffect(new MobEffectInstance(HbmPotionEffects.DEATH, 60 * 60 * 20, 0));
+        }
+    }
+
+    /** Exact CE {@code ModEventHandler.onLivingUpdate} armor-mod tick ({@code :1229-1234}). */
+    private static void tickArmorMods(LivingEntity living) {
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (!slot.isArmor()) continue;
+            ItemStack armor = living.getItemBySlot(slot);
+            if (armor.isEmpty() || !ArmorModHandler.hasMods(armor)) continue;
+            for (ItemStack mod : ArmorModHandler.pryMods(armor)) {
+                if (!mod.isEmpty() && mod.getItem() instanceof ItemArmorMod armorMod) {
+                    armorMod.modUpdate(living, armor);
+                }
+            }
         }
     }
 }

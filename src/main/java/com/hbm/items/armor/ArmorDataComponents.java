@@ -60,6 +60,13 @@ public final class ArmorDataComponents {
                     .networkSynchronized(ByteBufCodecs.INT)
                     .build());
 
+    /** CE {@code ItemModNightVision} NBT {@code ITEM_MOD_NV_ACTIVE} on the host helmet. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> NIGHT_VISION_ACTIVE =
+            DATA_COMPONENT_TYPES.register("night_vision_active", () -> DataComponentType.<Boolean>builder()
+                    .persistent(Codec.BOOL)
+                    .networkSynchronized(ByteBufCodecs.BOOL)
+                    .build());
+
     /** {@code JetpackGlider}'s {@code FluidTankNTM}-in-NBT (CE key {@code "fuelTank"}) - see {@link JetpackTankState}. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<JetpackTankState>> JETPACK_GLIDER_TANK =
             DATA_COMPONENT_TYPES.register("jetpack_glider_tank", () -> DataComponentType.<JetpackTankState>builder()

@@ -40,13 +40,10 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
  *     outright (except explosions, which still knock back) and incoming damage is zeroed (except
  *     explosions, reduced to 0.1%) - CE: {@code handleAttack}/{@code handleHurt}.</li>
  * </ul>
- * <b>Not ported</b> (documented TODO): the passive-glide branch's extra forward-look-vector nudge
- * scaled by the raw {@code EntityPlayer#moveForward} input - same unconfirmed-accessor gap as
- * {@link ArmorEnvsuit} (see its javadoc); the rest of the glide branch (fall-speed clamp, drag,
- * thruster sound) is ported in full. CE's {@code AuxParticlePacketNT}/{@code HbmEffectNT.
- * Jetpack_DNS} particle trail is wired via {@link com.hbm.particle.HbmEffect#JETPACK_DNS}, matching
- * CE's own {@code hasFSBArmor && (isJetpackActive || gliding)} gate 1:1
- * ({@code upstream/hbm-ce/.../ArmorDNT.java:89-93}).
+ * Glide look-nudge is {@code player.zza} (CE {@code moveForward}, {@code ArmorDNT.java:123-126}).
+ * CE's {@code AuxParticlePacketNT}/{@code HbmEffectNT.Jetpack_DNS} trail is wired via
+ * {@link com.hbm.particle.HbmEffect#JETPACK_DNS}, matching CE's
+ * {@code hasFSBArmor && (isJetpackActive || gliding)} gate 1:1.
  */
 public class ArmorDNT extends ArmorFSBPowered {
 
@@ -107,8 +104,13 @@ public class ArmorDNT extends ArmorFSBPowered {
 
             player.setDeltaMovement(player.getDeltaMovement().x * 1.05D, vy, player.getDeltaMovement().z * 1.05D);
 
-            // TODO(unconfirmed 1.21.1 accessor): CE also adds lookVec * 0.25 * moveForward here -
-            // see class javadoc.
+            if (player.zza != 0) {
+                var look = player.getLookAngle();
+                player.setDeltaMovement(
+                        player.getDeltaMovement().x + look.x * 0.25 * player.zza,
+                        player.getDeltaMovement().y,
+                        player.getDeltaMovement().z + look.z * 0.25 * player.zza);
+            }
 
             if (level.getGameTime() % 4 == 0) {
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), HBMSoundHandler.immolatorShoot.get(), SoundSource.PLAYERS, 0.125F, 1.5F);

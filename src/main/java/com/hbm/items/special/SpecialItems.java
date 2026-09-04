@@ -435,10 +435,8 @@ public final class SpecialItems {
             register("gas_mask_filter_mono", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(12000)));
     public static final DeferredItem<com.hbm.items.armor.ItemModV1> V1 =
             register("v1", () -> new com.hbm.items.armor.ItemModV1(new Item.Properties().stacksTo(1)));
-    // CE ModItems.java:242 ItemModNightVision helmet-only armor mod. Slot type only — no invented NV tick.
     public static final DeferredItem<com.hbm.items.armor.ItemArmorMod> NIGHT_VISION =
-            register("night_vision", () -> new com.hbm.items.armor.ItemArmorMod(
-                    new Item.Properties(), com.hbm.handler.ArmorModHandler.helmet_only, true, false, false, false));
+            register("night_vision", () -> new com.hbm.items.armor.ItemModNightVision(new Item.Properties()));
     static {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_MASKMAN);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER);
