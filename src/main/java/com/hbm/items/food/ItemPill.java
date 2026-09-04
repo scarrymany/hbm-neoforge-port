@@ -1,10 +1,14 @@
 package com.hbm.items.food;
 
+import com.hbm.capability.HbmLivingAttachment;
+import com.hbm.capability.HbmLivingProps;
 import com.hbm.config.VersatileConfig;
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.potion.HbmPotionEffects;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -22,20 +26,15 @@ import java.util.List;
  * one class, each with a hardcoded effect branch dispatched (here) off the item's own registry path,
  * same technique as {@link ItemEnergy}/the existing {@link ItemLemon}.
  * <p>
- * <b>Not ported (see docs/phase1/items_food_gear.md finding #2 - flagged per-branch below, not
- * silently dropped):</b> most branches also read/write {@code HbmLivingProps}' asbestos/black-lung/
- * radiation/digamma state, which does not exist in this port yet - those specific calls are TODO'd
- * next to the vanilla-only/potion pieces of each branch, which are ported directly. Every
- * {@code HbmPotion}-equivalent branch ({@code pill_iodine}'s radiation removal, {@code pill_red}'s
- * {@code death} grant, {@code radx}'s {@code radx} grant, {@code pill_herbal}'s
- * {@code potionsickness} grant, {@code five_htp}'s {@code stability} grant, and the
- * {@code VersatileConfig.applyPotionSickness(player, 5)} call CE makes before every branch) is now
- * wired against {@code com.hbm.potion.HbmPotionEffects} - except {@code pill_herbal}'s milk-curative
- * immunity, which docs/phase4/hbm_potion_system.md's own Open questions section flags as having no
- * confirmed 1.21.1 equivalent (see that branch's own TODO below). {@code plan_c} and
- * {@code chocolate}'s self-damage branches use the already-ported {@link ModDamageTypes#EUTHANIZED_SELF}/
- * {@link ModDamageTypes#EUTHANIZED_SELF_2}/{@link ModDamageTypes#OVERDOSE} damage types in place of
- * CE's unported {@code com.hbm.lib.ModDamageSource} singletons of (almost) the same name.
+ * {@code HbmLivingProps} asbestos/black-lung/radiation/digamma writes are wired 1:1 now that the
+ * facade exists: {@code siox}/{@code pill_herbal} zero asbestos and cap black lung at
+ * {@code MAX_BLACKLUNG / 5}; {@code pill_herbal} also {@code incrementRadiation(-100F)};
+ * {@code xanax} subtracts 0.5 digamma floored at 0; {@code fmn} caps digamma at 2D (2000mDRX);
+ * {@code five_htp} zeroes digamma. {@code VersatileConfig.hasPotionSickness} gates {@link #use}.
+ * {@code pill_herbal}'s milk-curative immunity stays skipped (no 1.21 per-application
+ * {@code setCurativeItems}). {@code plan_c}/{@code chocolate} self-damage use
+ * {@link ModDamageTypes#EUTHANIZED_SELF}/{@link ModDamageTypes#EUTHANIZED_SELF_2}/
+ * {@link ModDamageTypes#OVERDOSE}.
  */
 public class ItemPill extends Item {
 
@@ -77,12 +76,15 @@ public class ItemPill extends Item {
             case "pill_red" -> player.addEffect(new MobEffectInstance(HbmPotionEffects.DEATH, 60 * 60 * 20, 0));
             case "radx" -> player.addEffect(new MobEffectInstance(HbmPotionEffects.RADX, 3 * 60 * 20, 3));
             case "siox" -> {
-                // TODO(HbmLivingProps follow-up): CE zeroes asbestos and caps black lung to 1/5 max here -
-                // HbmLivingProps doesn't exist in this port yet.
+                HbmLivingProps.setAsbestos(player, 0);
+                HbmLivingProps.setBlackLung(player, Math.min(HbmLivingProps.getBlackLung(player),
+                        HbmLivingAttachment.MAX_BLACKLUNG / 5));
             }
             case "pill_herbal" -> {
-                // TODO(HbmLivingProps follow-up): CE also zeroes asbestos, caps black lung to 1/5 max, and
-                // decrements radiation by 100 here - HbmLivingProps doesn't exist in this port yet.
+                HbmLivingProps.setAsbestos(player, 0);
+                HbmLivingProps.setBlackLung(player, Math.min(HbmLivingProps.getBlackLung(player),
+                        HbmLivingAttachment.MAX_BLACKLUNG / 5));
+                HbmLivingProps.incrementRadiation(player, -100F);
                 player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 10 * 20, 0));
                 player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 10 * 60 * 20, 2));
                 player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 10 * 60 * 20, 2));
@@ -96,8 +98,8 @@ public class ItemPill extends Item {
                 player.addEffect(new MobEffectInstance(HbmPotionEffects.POTIONSICKNESS, 10 * 60 * 20, 0));
             }
             case "xanax" -> {
-                // TODO(HbmLivingProps follow-up): CE reduces digamma by 0.5 (floored at 0) here - digamma
-                // tracking doesn't exist in this port yet.
+                double digamma = HbmLivingProps.getDigamma(player);
+                HbmLivingProps.setDigamma(player, Math.max(digamma - 0.5D, 0D));
             }
             case "chocolate" -> {
                 if (level.getRandom().nextInt(25) == 0) {
@@ -108,11 +110,12 @@ public class ItemPill extends Item {
                 player.addEffect(new MobEffectInstance(MobEffects.JUMP, 60 * 20, 3));
             }
             case "fmn" -> {
-                // TODO(HbmLivingProps follow-up): CE caps digamma at 2,000mDRX here - unported.
+                double digamma = HbmLivingProps.getDigamma(player);
+                HbmLivingProps.setDigamma(player, Math.min(digamma, 2D));
                 player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 60, 0));
             }
             case "five_htp" -> {
-                // TODO(HbmLivingProps follow-up): CE also zeroes digamma here - unported.
+                HbmLivingProps.setDigamma(player, 0D);
                 player.addEffect(new MobEffectInstance(HbmPotionEffects.STABILITY, 10 * 60 * 20, 0));
             }
             default -> {
@@ -120,6 +123,14 @@ public class ItemPill extends Item {
         }
 
         return result;
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        if (VersatileConfig.hasPotionSickness(player)) {
+            return InteractionResultHolder.fail(player.getItemInHand(hand));
+        }
+        return super.use(level, player, hand);
     }
 
     @Override

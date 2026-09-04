@@ -1,7 +1,13 @@
 package com.hbm.items.food;
 
+import com.hbm.capability.HbmLivingProps;
+import com.hbm.config.VersatileConfig;
+import com.hbm.explosion.ExplosionLarge;
 import com.hbm.items.gear.GearItems;
 import com.hbm.items.special.ItemSimpleConsumable;
+import com.hbm.util.ContaminationUtil;
+import com.hbm.util.ContaminationUtil.ContaminationType;
+import com.hbm.util.ContaminationUtil.HazardType;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -31,14 +37,11 @@ import java.util.function.Supplier;
  * item's own registry path instead (same technique as the existing {@link ItemLemon}), since every
  * CE field is already its own distinct registered item post-flattening.
  * <p>
- * <b>Not ported (see docs/phase1/items_food_gear.md finding #2 - flagged per-branch below, not
- * silently dropped):</b> every CE branch called {@code VersatileConfig.applyPotionSickness(player, 5)}
- * unconditionally before its own effects; the radiation-flavored branches additionally called
- * {@code ContaminationUtil.contaminate(...)} or {@code HbmLivingProps.incrementRadiation(...)}. None of
- * {@code HbmPotion}, {@code HbmLivingProps}, or {@code ContaminationUtil} exist in this port yet, so
- * those specific calls are left as TODOs next to the vanilla effects they would have accompanied. CE's
- * {@code chocolate_milk} branch (a 50-power {@code ExplosionLarge.explode(...)}) is TODO'd for the same
- * reason (this area does not own the explosion system).
+ * CE's {@code VersatileConfig.applyPotionSickness(player, 5)},
+ * {@code ContaminationUtil.contaminate(..., RADIATION, RAD_BYPASS, ...)} on the nuka/cherry/sparkle
+ * (5.0) and quantum/rad (15.0) bottles, {@code HbmLivingProps.incrementRadiation(player, 500F)} on
+ * {@code coffee_radium}, and {@code ExplosionLarge.explode(..., 50, true, false, false)} on
+ * {@code chocolate_milk} are wired here 1:1. Polaroid-ID tooltip forks stay skipped (no invent).
  */
 public class ItemEnergy extends Item {
 
@@ -110,9 +113,7 @@ public class ItemEnergy extends Item {
             CriteriaTriggers.CONSUME_ITEM.trigger(serverPlayer, stack);
         }
 
-        // TODO(VersatileConfig follow-up, docs/phase1/items_food_gear.md finding #2): CE calls
-        // VersatileConfig.applyPotionSickness(player, 5) here before every branch below - not ported,
-        // since neither that method nor the HbmPotion.potionsickness effect it grants exist yet.
+        VersatileConfig.applyPotionSickness(player, 5);
 
         String path = BuiltInRegistries.ITEM.getKey(this).getPath();
         switch (path) {
@@ -160,21 +161,20 @@ public class ItemEnergy extends Item {
                 player.heal(4F);
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 30 * 20, 1));
                 player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 30 * 20, 1));
-                // TODO(ContaminationUtil follow-up): CE contaminates the drinker with 5.0 RAD_BYPASS
-                // radiation here (ContaminationUtil.contaminate(player, RADIATION, RAD_BYPASS, 5.0F)).
+                ContaminationUtil.contaminate(player, HazardType.RADIATION, ContaminationType.RAD_BYPASS, 5.0F);
             }
             case "bottle_cherry" -> {
                 player.heal(6F);
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 30 * 20, 0));
                 player.addEffect(new MobEffectInstance(MobEffects.JUMP, 30 * 20, 2));
-                // TODO(ContaminationUtil follow-up): see bottle_nuka above (5.0 RAD_BYPASS radiation).
+                ContaminationUtil.contaminate(player, HazardType.RADIATION, ContaminationType.RAD_BYPASS, 5.0F);
             }
             case "bottle_quantum" -> {
                 player.heal(10F);
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 30 * 20, 1));
                 player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 30 * 20, 2));
                 player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 30 * 20, 1));
-                // TODO(ContaminationUtil follow-up): see bottle_nuka above (15.0 RAD_BYPASS radiation).
+                ContaminationUtil.contaminate(player, HazardType.RADIATION, ContaminationType.RAD_BYPASS, 15.0F);
             }
             case "bottle_sparkle" -> {
                 player.heal(10F);
@@ -182,7 +182,7 @@ public class ItemEnergy extends Item {
                 player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 120 * 20, 2));
                 player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 120 * 20, 2));
                 player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 120 * 20, 1));
-                // TODO(ContaminationUtil follow-up): see bottle_nuka above (5.0 RAD_BYPASS radiation).
+                ContaminationUtil.contaminate(player, HazardType.RADIATION, ContaminationType.RAD_BYPASS, 5.0F);
             }
             case "bottle_rad" -> {
                 player.heal(10F);
@@ -191,7 +191,7 @@ public class ItemEnergy extends Item {
                 player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 120 * 20, 0));
                 player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 120 * 20, 4));
                 player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 120 * 20, 1));
-                // TODO(ContaminationUtil follow-up): see bottle_nuka above (15.0 RAD_BYPASS radiation).
+                ContaminationUtil.contaminate(player, HazardType.RADIATION, ContaminationType.RAD_BYPASS, 15.0F);
             }
             case "coffee" -> {
                 player.heal(10F);
@@ -200,8 +200,7 @@ public class ItemEnergy extends Item {
             case "coffee_radium" -> {
                 player.heal(10F);
                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 60 * 20, 2));
-                // TODO(HbmLivingProps follow-up): CE calls HbmLivingProps.incrementRadiation(player, 500F)
-                // here - HbmLivingProps doesn't exist in this port yet.
+                HbmLivingProps.incrementRadiation(player, 500F);
             }
             case "bottle2_korl" -> {
                 player.heal(6F);
@@ -234,10 +233,8 @@ public class ItemEnergy extends Item {
                 player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 60 * 20, 2));
                 player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 60 * 20, 2));
             }
-            case "chocolate_milk" -> {
-                // TODO(explosion-system follow-up): CE detonates a 50-power ExplosionLarge.explode(...)
-                // here - out of this area's scope (owned by whichever Phase area ports the explosion system).
-            }
+            case "chocolate_milk" ->
+                    ExplosionLarge.explode(level, player, player.getX(), player.getY(), player.getZ(), 50, true, false, false);
             default -> {
             }
         }
