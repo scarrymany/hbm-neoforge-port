@@ -127,6 +127,7 @@ public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity
             }
 
             moveHeat();
+            boilWater();
             boolean overheated = this.heat > this.maxHeat();
             checkMeltdown(serverLevel);
 
@@ -155,6 +156,7 @@ public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity
             this.fluxFastRatio = 0;
             hasRod = false;
             moveHeat();
+            boilWater();
             checkMeltdown(serverLevel);
         }
 

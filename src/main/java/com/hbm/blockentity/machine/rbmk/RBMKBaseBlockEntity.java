@@ -41,6 +41,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * Melt Exact CE {@code TileEntityRBMKBase.java:463-597} playable: {@code dropLids} gate,
  * {@code rbmk_explosion} vol 50, {@code achRBMKBoom} ±50 AABB. pribris/EntityRBMKDebris /
  * overpressure pipes / RBMKMush / EntitySpear stay skipped.
+ * ReaSim boilers Exact CE {@code :74-77}/{@code :159-176}/{@code :190-280}: {@code reasimWater}/{@code reasimSteam}
+ * tanks, {@code boilWater()}, neighbor fluid equalize. {@code rbmk_loader} stays skipped.
  */
 public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implements IRBMKColumn, ITickableBE {
 
@@ -50,6 +52,12 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
     private static final IRBMKMeltdownHandler MELTDOWN_HANDLER = RBMKBaseBlockEntity::runMeltdown;
 
     public double heat = 20.0D;
+    /** CE {@code TileEntityRBMKBase.reasimWater}/{@code maxWater}. */
+    public int reasimWater;
+    public static final int maxWater = 16_000;
+    /** CE {@code TileEntityRBMKBase.reasimSteam}/{@code maxSteam}. */
+    public int reasimSteam;
+    public static final int maxSteam = 16_000;
     /** CE {@code TileEntityRBMKBase.diag} — skip super NBT when flushing DODD. */
     public boolean diag;
 
@@ -100,9 +108,10 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
      */
     @Override
     public void updateEntity() {
-        if (level == null || level.isClientSide || !(level instanceof ServerLevel serverLevel)) return;
+        if (level == null || level.isClientSide || !(level instanceof ServerLevel)) return;
 
         moveHeat();
+        boilWater();
         networkPackNT(trackingRange());
     }
 
@@ -149,9 +158,61 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
                     neighbor.setChanged();
                 }
             }
+
+            // CE :222-277 reasim water/steam integer equalize (heat math stays in RBMKColumnHeatMath).
+            if (RBMKDials.getReasimBoilers((ServerLevel) level)) {
+                int waterTot = this.reasimWater;
+                int steamTot = this.reasimSteam;
+                for (RBMKBaseBlockEntity neighbor : neighborCache) {
+                    if (neighbor != null) {
+                        waterTot += neighbor.reasimWater;
+                        steamTot += neighbor.reasimSteam;
+                    }
+                }
+                int tWater = waterTot / members;
+                int rWater = waterTot % members;
+                int tSteam = steamTot / members;
+                int rSteam = steamTot % members;
+                for (RBMKBaseBlockEntity neighbor : neighborCache) {
+                    if (neighbor != null) {
+                        neighbor.reasimWater = tWater;
+                        neighbor.reasimSteam = tSteam;
+                        if (rWater > 0) { neighbor.reasimWater++; rWater--; }
+                        if (rSteam > 0) { neighbor.reasimSteam++; rSteam--; }
+                    }
+                }
+                this.reasimWater = tWater;
+                this.reasimSteam = tSteam;
+                if (rWater > 0) this.reasimWater += rWater;
+                if (rSteam > 0) this.reasimSteam += rSteam;
+            }
         }
 
         coolPassively(members - 1);
+    }
+
+    /**
+     * CE {@code TileEntityRBMKBase.boilWater()} {@code :159-176}. Every column boils when
+     * {@link RBMKDials#getReasimBoilers} is on.
+     */
+    protected void boilWater() {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!RBMKDials.getReasimBoilers(serverLevel)) return;
+        if (heat < 100D) return;
+
+        double heatConsumption = RBMKDials.getBoilerHeatConsumption(serverLevel);
+        double availableHeat = (this.heat - 100) / heatConsumption;
+        double availableWater = this.reasimWater;
+        double availableSpace = maxSteam - this.reasimSteam;
+
+        double speed = Math.max(0D, Math.min(1D, RBMKDials.getReaSimBoilerSpeed(serverLevel)));
+        int processedWater = (int) Math.floor(Math.min(availableHeat, Math.min(availableWater, availableSpace)) * speed);
+
+        if (processedWater <= 0) return;
+
+        this.reasimWater -= processedWater;
+        this.reasimSteam += processedWater;
+        this.heat -= processedWater * heatConsumption;
     }
 
     protected void coolPassively(int neighbors) {
@@ -286,6 +347,8 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
         col.heat = this.heat;
         col.maxHeat = this.maxHeat();
         col.moderated = this.isModerated();
+        col.reasimWater = this.reasimWater;
+        col.reasimSteam = this.reasimSteam;
         return col;
     }
 
@@ -295,6 +358,8 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         this.heat = tag.getDouble("heat");
+        this.reasimWater = tag.getInt("realSimWater");
+        this.reasimSteam = tag.getInt("realSimSteam");
     }
 
     @Override
@@ -303,6 +368,8 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
             super.saveAdditional(tag, registries);
         }
         tag.putDouble("heat", this.heat);
+        tag.putInt("realSimWater", this.reasimWater);
+        tag.putInt("realSimSteam", this.reasimSteam);
     }
 
     /** CE {@code TileEntityRBMKBase.getDiagData}. */
@@ -316,12 +383,16 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeDouble(this.heat);
+        buf.writeInt(this.reasimWater);
+        buf.writeInt(this.reasimSteam);
     }
 
     @Override
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         this.heat = buf.readDouble();
+        this.reasimWater = buf.readInt();
+        this.reasimSteam = buf.readInt();
     }
 
     /** CE: {@code TileEntityRBMKBase.getRBMKType()}, default {@code OTHER} - see {@link IRBMKColumn#getRBMKType()}. */
