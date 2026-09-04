@@ -30,8 +30,8 @@ import java.util.List;
  * source of behavior/numbers): real CE's elemental roll additionally requires a per-player
  * {@code "radMark"} persisted-NBT boolean flag to already be {@code true} before it will ever fire -
  * confirmed by direct read of {@code BossSpawnHandler.java:128-161}. CE only ever sets that flag from
- * {@code TileEntityReactorResearch}/{@code TileEntityReactorZirnox} (reactor-meltdown escalation, Phase 2
- * territory not touched by this package - neither tile entity is ported in this port yet). This is the
+ * {@code TileEntityReactorResearch}/{@code TileEntityReactorZirnox}. Research-reactor melt now writes
+ * the flag (Exact CE {@code :335-341}). Zirnox melt stays skipped. This is the
  * exact same "escalation flag set by a different, not-yet-ported subsystem" shape as
  * {@code BossSpawnHandler.markFBI}, which {@code docs/phase4/entities_bosses.md}'s own Deferred scope
  * already names for the FBI-raid roll - preserved here for the same reason (silently dropping the gate
@@ -39,11 +39,8 @@ import java.util.List;
  * preserving it correctly-but-currently-unreachable matches this port's established convention for
  * mechanics gated on a sibling package that hasn't landed yet, e.g. {@code EntityCreeperTainted}'s
  * {@code BlockTaint}-gated spawn path). {@link net.minecraft.world.entity.Entity#getPersistentData()}
- * (the exact 1:1 modern replacement for CE's {@code EntityPlayer.PERSISTED_NBT_TAG} pattern) is a
- * long-stable Forge/NeoForge patch, not verified against a compiled jar in this sandbox - same
- * confidence tier this task's own foundation-wave code already accepts for e.g. {@code ServerBossEvent}.
- * Once reactor-meltdown content lands and starts setting this flag, this roll starts firing with zero
- * further changes needed here.
+ * is the 1:1 modern replacement for CE's {@code EntityPlayer.PERSISTED_NBT_TAG} nest.
+ * Zirnox melt still does not write the flag.
  * <p>
  * <b>Real CE bug found and fixed</b>: CE's own elemental-roll spawn-position vector reuses
  * {@code MobConfig.raidAttackDistance} (the <em>FBI raid</em> system's distance field) instead of its
@@ -83,8 +80,7 @@ public final class RadiationElementalSpawnHandler {
 
         ServerPlayer player = players.get(random.nextInt(players.size()));
 
-        // CE: player.getEntityData().getCompoundTag(PERSISTED_NBT_TAG).getBoolean("radMark") - see
-        // class javadoc for why this flag never currently gets set to true in this port.
+        // CE: player.getEntityData().getCompoundTag(PERSISTED_NBT_TAG).getBoolean("radMark")
         CompoundTag persisted = player.getPersistentData();
         if (!persisted.getBoolean("radMark")) return;
         persisted.putBoolean("radMark", false);

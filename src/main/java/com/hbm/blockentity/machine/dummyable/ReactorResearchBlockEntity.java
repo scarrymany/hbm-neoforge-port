@@ -5,6 +5,7 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.MaterialBlockGenerator;
 import com.hbm.blocks.machine.PWRBlocks;
 import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
+import com.hbm.config.MobConfig;
 import com.hbm.inventory.material.Mats;
 import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.inventory.container.machine.dummyable.ReactorResearchMenu;
@@ -30,6 +31,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -42,7 +44,6 @@ import java.util.Map;
 /**
  * CE {@code TileEntityReactorResearch}: 12 plate-fuel slots, maxHeat 50000, rod speed 0.04.
  * TODO(CE: TileEntityReactorResearch.java:420-478): OpenComputers callbacks.
- * TODO(CE: TileEntityReactorResearch.java:335-341): MobConfig.enableElementals radMark.
  * {@code block_lead}/{@code block_desh} → port {@code lead_block}/{@code workersalloy_block}
  * Exact CE {@code TileEntityReactorResearch.java:232}.
  */
@@ -241,6 +242,18 @@ public class ReactorResearchBlockEntity extends MachineBaseBlockEntity implement
         }
         level.setBlock(origin.above(), PWRBlocks.CORIUM_BLOCK.get().defaultBlockState(), 3);
         ChunkRadiationManager.proxy.incrementRad(level, origin, 50F, 15000F);
+
+        // Exact CE TileEntityReactorResearch.java:335-341 — radMark players in 100-block inflate
+        // so RadiationElementalSpawnHandler can roll RAD-beast waves.
+        if (MobConfig.ENABLE_MELTDOWN_ELEMENTALS.get()) {
+            AABB box = new AABB(
+                    origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5,
+                    origin.getX() + 0.5, origin.getY() + 0.5, origin.getZ() + 0.5
+            ).inflate(100, 100, 100);
+            for (Player player : level.getEntitiesOfClass(Player.class, box)) {
+                player.getPersistentData().putBoolean("radMark", true);
+            }
+        }
     }
 
     public void setTarget(double target) {
