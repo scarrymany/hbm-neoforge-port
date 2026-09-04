@@ -5,6 +5,7 @@ import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.WoodBurnerMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -34,6 +35,9 @@ import java.util.List;
  * CE {@code TileEntityMachineWoodBurner.java}:72-136 — vanilla burn-time + optional
  * {@code FT_Flammable} tank. Ash ({@code powder_ash}) skipped (unregistered).
  * {@code setType(2)} / {@code loadTank(3,4)} Exact CE {@code :79-80}.
+ * Solid {@code incrementPollution(SOOT, SOOT_PER_SECOND)} every 20t Exact CE {@code :117}.
+ * Liquid {@code SOOT_PER_SECOND * toBurn / 2F} every 20t Exact CE {@code :132}.
+ * Smoke particles stay skipped (VFX).
  */
 public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -105,6 +109,11 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
             } else if (power < MAX_POWER && isOn) {
                 burnTime--;
                 powerGen += 100;
+                // CE TileEntityMachineWoodBurner.java:117
+                if (level.getGameTime() % 20 == 0) {
+                    PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                            PollutionHandler.SOOT_PER_SECOND);
+                }
             }
         } else if (power < MAX_POWER && tank.getFill() > 0 && isOn) {
             FT_Flammable trait = tank.getTankType().getTrait(FT_Flammable.class);
@@ -113,6 +122,11 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
                 if (toBurn > 0) {
                     powerGen += (int) (trait.getHeatEnergy() * toBurn / 2_000L);
                     tank.setFill(tank.getFill() - toBurn);
+                    // CE TileEntityMachineWoodBurner.java:132
+                    if (level.getGameTime() % 20 == 0) {
+                        PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                                PollutionHandler.SOOT_PER_SECOND * toBurn / 2F);
+                    }
                 }
             }
         }
