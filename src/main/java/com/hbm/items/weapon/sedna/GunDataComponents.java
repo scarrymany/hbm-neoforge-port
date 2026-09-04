@@ -71,6 +71,10 @@ public final class GunDataComponents {
                     .build());
     /** CE {@code KEY_LOCKEDON}. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LOCKED_ON = bool("gun_locked_on");
+    /** CE {@code ItemGunStinger.KEY_LOCKINGON}. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LOCKING_ON = bool("gun_locking_on");
+    /** CE {@code ItemGunStinger.KEY_LOCKONPROGRESS}. Absent ≡ {@code 0} like {@code getValueInt}. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LOCKON_PROGRESS = integer("gun_lockon_progress");
     /** CE {@code KEY_CANCELRELOAD}. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> RELOAD_CANCEL = bool("gun_reload_cancel");
     /** CE {@code KEY_EQUIPPED} (CE's own key literally misspells "equipped" as {@code eqipped"} - not preserved here, this is a component name not a wire-compatible NBT key). */

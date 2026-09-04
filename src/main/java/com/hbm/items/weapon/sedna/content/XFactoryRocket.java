@@ -14,6 +14,7 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.Receiver;
 import com.hbm.items.weapon.sedna.factory.Lego;
+import com.hbm.items.weapon.sedna.impl.ItemGunStinger;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
 import com.hbm.items.weapon.sedna.mags.MagazineSingleReload;
 import com.hbm.lib.HBMSoundHandler;
@@ -23,13 +24,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -54,17 +53,9 @@ import java.util.function.Consumer;
  * {@link EntityFireLingering} (6×2, 300t DIESEL / 600t PHOSPHORUS) plus the 5×5×5
  * adjacent-flammable ignite loop.
  * <p>
- * <b>Forward references (documented, not silently dropped):</b>
- * <ul>
- *     <li>{@code gun_stinger}/{@code gun_missile_launcher}'s target lock-on acquisition - CE drives
- *     this through {@code com.hbm.items.weapon.sedna.impl.ItemGunStinger}, a bespoke subclass with its
- *     own tick-based locking-progress state machine that does not exist in this port. Both guns are
- *     registered as plain {@link ItemGunBaseNT}s with a real, self-contained lock-on scan
- *     ({@link #findLockonTarget}, a nearest-entity-in-cone search) substituted for
- *     {@code ItemGunStinger.getLockonTarget} - same observable behavior (aim near a target, it locks,
- *     the fired round homes in via {@link EntityBulletBaseMK4}'s already-ported {@code lockonTarget}
- *     field), without the missing subclass's own multi-tick "locking..." progress readout.</li>
- * </ul>
+ * Stinger lock-on is Exact CE {@code ItemGunStinger.java:36-76} (60-tick progress, ADS + secondary)
+ * plus {@code getLockonTarget :87-124}. Missile-launcher ADS primary uses the same scan at
+ * {@code 150D}/{@code 20D} ({@code XFactoryRocket.java:220-230}). HUD lock-on bar skipped.
  */
 public final class XFactoryRocket {
 
@@ -115,7 +106,7 @@ public final class XFactoryRocket {
     }
 
     public static ItemGunBaseNT gun_stinger() {
-        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+        return new ItemGunStinger(new Item.Properties(), WeaponQuality.A_SIDE,
                 new GunConfig()
                         .dura(300).draw(7).inspect(40).crosshair(Crosshair.L_BOX_OUTLINE)
                         .rec(new Receiver(0)
@@ -124,7 +115,7 @@ public final class XFactoryRocket {
                                 .offset(1, -0.09375, -0.1875D)
                                 .setupLockonFire())
                         .setupStandardConfiguration()
-                        .ps(LAMBDA_STINGER_LOCKON).rs((stack, ctx) -> ItemGunBaseNT.setIsLockedOn(stack, false)));
+                        .ps(LAMBDA_STINGER_SECONDARY_PRESS).rs(LAMBDA_STINGER_SECONDARY_RELEASE));
         // default ammo (not yet wired): ROCKET_HEAT x3
     }
 
@@ -156,18 +147,16 @@ public final class XFactoryRocket {
 
     // ==================== lock-on ====================
 
-    private static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_STINGER_LOCKON = (stack, ctx) -> {
-        if (!(ctx.getPlayer() instanceof Player player)) return;
-        int target = findLockonTarget(player, 150D, 20D);
-        if (target != -1) {
-            ItemGunBaseNT.setLockonTarget(stack, target);
-            ItemGunBaseNT.setIsLockedOn(stack, true);
-        }
-    };
+    /** Exact CE {@code XFactoryRocket.java:217-218}. */
+    public static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_STINGER_SECONDARY_PRESS =
+            (stack, ctx) -> ItemGunStinger.setIsLockingOn(stack, true);
+    public static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_STINGER_SECONDARY_RELEASE =
+            (stack, ctx) -> ItemGunStinger.setIsLockingOn(stack, false);
 
-    private static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_MISSILE_LAUNCHER_PRIMARY_PRESS = (stack, ctx) -> {
-        if (ItemGunBaseNT.getIsAiming(stack) && ctx.getPlayer() instanceof Player player) {
-            int target = findLockonTarget(player, 150D, 20D);
+    /** Exact CE {@code XFactoryRocket.java:220-230}. */
+    public static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_MISSILE_LAUNCHER_PRIMARY_PRESS = (stack, ctx) -> {
+        if (ItemGunBaseNT.getIsAiming(stack)) {
+            int target = ItemGunStinger.getLockonTarget(ctx.getPlayer(), 150D, 20D);
             if (target != -1) {
                 ItemGunBaseNT.setLockonTarget(stack, target);
                 ItemGunBaseNT.setIsLockedOn(stack, true);
@@ -176,34 +165,6 @@ public final class XFactoryRocket {
         Lego.LAMBDA_STANDARD_CLICK_PRIMARY.accept(stack, ctx);
         ItemGunBaseNT.setIsLockedOn(stack, false);
     };
-
-    /**
-     * Self-contained replacement for {@code ItemGunStinger.getLockonTarget} (see class javadoc) -
-     * nearest {@link LivingEntity} within {@code range} blocks whose direction from the player's eye
-     * falls within {@code coneDegrees} of the look vector. Returns the target's entity id, or -1.
-     */
-    private static int findLockonTarget(Player player, double range, double coneDegrees) {
-        Vec3 eye = player.getEyePosition();
-        Vec3 look = player.getLookAngle();
-        double cosThreshold = Math.cos(Math.toRadians(coneDegrees));
-
-        Entity best = null;
-        double bestDist = Double.MAX_VALUE;
-
-        for (LivingEntity candidate : player.level().getEntitiesOfClass(LivingEntity.class, new AABB(eye.x, eye.y, eye.z, eye.x, eye.y, eye.z).inflate(range))) {
-            if (candidate == player || !candidate.isAlive()) continue;
-            Vec3 toTarget = candidate.getEyePosition().subtract(eye);
-            double dist = toTarget.length();
-            if (dist < 0.5 || dist > range) continue;
-            if (toTarget.normalize().dot(look) < cosThreshold) continue;
-            if (dist < bestDist) {
-                bestDist = dist;
-                best = candidate;
-            }
-        }
-
-        return best != null ? best.getId() : -1;
-    }
 
     // ==================== impact lambdas ====================
 
