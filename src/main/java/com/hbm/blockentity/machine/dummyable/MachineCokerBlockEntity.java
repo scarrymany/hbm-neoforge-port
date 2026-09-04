@@ -4,6 +4,7 @@ import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.CokerMenu;
 import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.Fluids;
@@ -33,6 +34,8 @@ import java.util.List;
 /**
  * CE {@code TileEntityMachineCoker}: heat-driven, 20k TU/cycle, 100k heat, ΔT×0.25 from below.
  * {@code tanks[0].setType(0)} Exact CE {@code :75}.
+ * {@code incrementPollution(SOOT, SOOT_PER_SECOND*5)} every 5t when {@code wasOn} Exact CE {@code :118}.
+ * Tower VFX stay skipped.
  */
 public class MachineCokerBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -114,6 +117,12 @@ public class MachineCokerBlockEntity extends MachineBaseBlockEntity
                     }
                     input.setFill(input.getFill() - fillReq);
                 }
+            }
+
+            // CE TileEntityMachineCoker.java:118
+            if (wasOn && level.getGameTime() % 5 == 0) {
+                PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                        PollutionHandler.SOOT_PER_SECOND * 5);
             }
         }
 
