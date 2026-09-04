@@ -12,6 +12,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.ArcWelderRecipes;
 import com.hbm.inventory.recipes.ArcWelderRecipes.ArcWelderRecipe;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
@@ -34,13 +35,15 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineArcWelder}: maxPower 2_000 (grows with recipe), 3 inputs + out + battery.
- * Upgrades skipped — base duration/consumption.
+ * {@code tank.setType(5)} Exact CE {@code :121}. Slot 5 Exact CE
+ * {@code ContainerMachineArcWelder.java:43}. Upgrades 6-7 skipped.
  */
 public class ArcWelderBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
 
     public static final int SLOT_OUT = 3;
     public static final int SLOT_BATTERY = 4;
+    public static final int SLOT_ID = 5;
     public static final long BASE_MAX = 2_000L;
     public static final int TANK_CAPACITY = 24_000;
 
@@ -52,7 +55,7 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
     public boolean isProcessing;
 
     public ArcWelderBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 5, true, true);
+        super(type, pos, state, 6, true, true);
         tank = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
     }
 
@@ -64,6 +67,8 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot == SLOT_BATTERY) return Library.isBattery(stack);
+        // CE :372-374 returns false for slot 5; without this the ID never lands and setType is dead.
+        if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
         return slot < SLOT_OUT;
     }
 
@@ -85,6 +90,8 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
         power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, power, getMaxPower());
+        // CE TileEntityMachineArcWelder.java:121
+        this.tank.setType(SLOT_ID, inventory);
         for (Direction d : Direction.values()) {
             trySubscribe(level, worldPosition.relative(d), d);
             if (tank.getTankType() != Fluids.NONE) {
