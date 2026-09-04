@@ -2,8 +2,10 @@ package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.MaterialBlockGenerator;
 import com.hbm.blocks.machine.PWRBlocks;
 import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
+import com.hbm.inventory.material.Mats;
 import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.inventory.container.machine.dummyable.ReactorResearchMenu;
 import com.hbm.items.PlateCrystalWasteItems;
@@ -41,7 +43,8 @@ import java.util.Map;
  * CE {@code TileEntityReactorResearch}: 12 plate-fuel slots, maxHeat 50000, rod speed 0.04.
  * TODO(CE: TileEntityReactorResearch.java:420-478): OpenComputers callbacks.
  * TODO(CE: TileEntityReactorResearch.java:335-341): MobConfig.enableElementals radMark.
- * TODO(CE: TileEntityReactorResearch.java:232): block_lead / block_desh (not registered).
+ * {@code block_lead}/{@code block_desh} → port {@code lead_block}/{@code workersalloy_block}
+ * Exact CE {@code TileEntityReactorResearch.java:232}.
  */
 public class ReactorResearchBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -158,6 +161,11 @@ public class ReactorResearchBlockEntity extends MachineBaseBlockEntity implement
         if (b == DummyableProcessBlocks.REACTOR_RESEARCH.get() || b == PWRBlocks.REACTOR_BREEDING.get()) {
             return true;
         }
+        // CE :232 ModBlocks.block_lead / block_desh — suffix-first autogen ids
+        var lead = MaterialBlockGenerator.get(Mats.MAT_LEAD);
+        var desh = MaterialBlockGenerator.get(Mats.MAT_DESH);
+        if (lead != null && b == lead.get()) return true;
+        if (desh != null && b == desh.get()) return true;
         return b.getExplosionResistance() >= 100;
     }
 
