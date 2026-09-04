@@ -19,6 +19,15 @@ public final class FusionCapabilities {
         event.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, FusionBlockEntities.ICF_BLOCK.get(),
                 (be, side) -> be.getEnergyStorageCapability(side));
 
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, FusionBlockEntities.ICF_REACTOR.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, FusionBlockEntities.ICF_REACTOR.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, FusionBlockEntities.ICF_PRESS.get(),
+                (be, side) -> be.getItemHandlerCapability(side));
+        event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, FusionBlockEntities.ICF_PRESS.get(),
+                (be, side) -> be.getFluidHandlerCapability(side));
+
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, FusionBlockEntities.FUSION_TORUS.get(),
                 (be, side) -> be.getItemHandlerCapability(side));
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, FusionBlockEntities.FUSION_TORUS.get(),
