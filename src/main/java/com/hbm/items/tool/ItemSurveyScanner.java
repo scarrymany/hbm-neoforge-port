@@ -1,6 +1,13 @@
 package com.hbm.items.tool;
 
+import com.hbm.blocks.generic.BlockBedrockOreTE;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.main.MainRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -10,26 +17,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
- * Wide-area resource survey: scans a grid of columns for several named ores plus any bedrock-ore
- * tile entity nearby. Ported from CE's {@code com.hbm.items.tool.ItemSurveyScanner}.
- *
- * <p><b>Stubbed pending several missing world-gen blocks.</b> CE's {@code onItemRightClick} checks a
- * grid of columns against {@code ModBlocks.ore_oil}/{@code ore_coltan}/{@code stone_depth}/
- * {@code stone_depth_nether}/{@code stone_gneiss}/{@code ore_australium} and a
- * {@code BlockBedrockOreTE.TileEntityBedrockOre} lookup against {@code ModBlocks.ore_bedrock_block}.
- * None of these exist in this port yet: {@code com.hbm.blocks.ModBlocks} is still the Phase 0
- * registry skeleton (no such fields at all), and this port's own bedrock-ore system
- * ({@code com.hbm.blocks.generic.BlockBedrockOre} + {@code com.hbm.items.special.BedrockOre*}) is a
- * different, simpler design than CE's TE-backed feature and has no equivalent
- * "resource"-bearing tile entity to query. (Note: {@link ItemOreDensityScanner} in this same package
- * is genuinely portable today because its dependency, the noise-scan side of that cluster, does not
- * need a placed tile entity - see that class's javadoc.) CE's Nether-portal easter egg
- * ({@code block_beryllium} + {@code entanglement_kit}) is dropped for the same reason - neither item
- * nor block exists yet. Per the port plan's "stub with a documented TODO rather than blocking" rule,
- * the item is registered and keeps CE's genuine tactile feedback (detector sound + arm swing) on
- * right-click; the survey and easter-egg block-use are both left explicit TODOs.
+ * Exact CE {@code com.hbm.items.tool.ItemSurveyScanner} {@code :30-87}: 11×11 column grid
+ * ({@code a,b ∈ [-5,5]}, {@code y+15} down by 2) for {@code ore_oil}/{@code ore_coltan}/
+ * {@code stone_depth}/{@code stone_depth_nether}/{@code stone_gneiss}/{@code ore_australium},
+ * plus {@code ore_bedrock_block} TE {@code resource} at {@code y=0}. Easter egg
+ * {@code block_beryllium}+{@code entanglement_kit} stays skipped ({@code block_beryllium}
+ * is not registered).
  */
 public class ItemSurveyScanner extends Item {
 
@@ -40,22 +37,86 @@ public class ItemSurveyScanner extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+
         if (!level.isClientSide()) {
-            // TODO(cross-area follow-up): once the relevant ore/stone blocks exist in ModBlocks,
-            // port CE's 11x11 column grid survey (oil/coltan/depth-stone/schist/australium) plus the
-            // bedrock-ore tile-entity lookup here, reporting each via chat as CE's
-            // onItemRightClick does.
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), HBMSoundHandler.techBleep.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+            // CE ItemSurveyScanner.java:34-80
+            BlockPos playerPos = player.blockPosition();
+            int x = playerPos.getX();
+            int y = playerPos.getY();
+            int z = playerPos.getZ();
+
+            boolean hasOil = false;
+            boolean hasColtan = false;
+            boolean hasDepth = false;
+            boolean hasSchist = false;
+            boolean hasAussie = false;
+            BlockBedrockOreTE.BedrockOreBlockEntity tile = null;
+
+            Block oreOil = hbmBlock("ore_oil");
+            Block oreColtan = hbmBlock("ore_coltan");
+            Block stoneDepth = hbmBlock("stone_depth");
+            Block stoneDepthNether = hbmBlock("stone_depth_nether");
+            Block stoneGneiss = hbmBlock("stone_gneiss");
+            Block oreAustralium = hbmBlock("ore_australium");
+            Block oreBedrock = hbmBlock("ore_bedrock_block");
+
+            for (int a = -5; a <= 5; a++) {
+                for (int b = -5; b <= 5; b++) {
+                    for (int i = y + 15; i > 1; i -= 2) {
+                        Block block = level.getBlockState(new BlockPos(x + a * 5, i, z + b * 5)).getBlock();
+
+                        if (block == oreOil) hasOil = true;
+                        else if (block == oreColtan) hasColtan = true;
+                        else if (block == stoneDepth) hasDepth = true;
+                        else if (block == stoneDepthNether) hasDepth = true;
+                        else if (block == stoneGneiss) hasSchist = true;
+                        else if (block == oreAustralium) hasAussie = true;
+                    }
+
+                    Block bedrockBlock = level.getBlockState(new BlockPos(x + a * 2, 0, z + b * 2)).getBlock();
+                    if (bedrockBlock == oreBedrock) {
+                        BlockEntity te = level.getBlockEntity(new BlockPos(x + a * 2, 0, z + b * 2));
+                        if (te instanceof BlockBedrockOreTE.BedrockOreBlockEntity ore) {
+                            tile = ore;
+                        }
+                    }
+                }
+            }
+
+            if (hasOil) {
+                player.sendSystemMessage(Component.translatable("chat.surveyscanner.oil").withStyle(ChatFormatting.BLACK));
+            }
+            if (hasColtan) {
+                player.sendSystemMessage(Component.translatable("chat.surveyscanner.coltan").withStyle(ChatFormatting.GOLD));
+            }
+            if (hasDepth) {
+                player.sendSystemMessage(Component.translatable("chat.surveyscanner.depth").withStyle(ChatFormatting.GRAY));
+            }
+            if (hasSchist) {
+                player.sendSystemMessage(Component.translatable("chat.surveyscanner.schist").withStyle(ChatFormatting.DARK_AQUA));
+            }
+            if (hasAussie) {
+                player.sendSystemMessage(Component.translatable("chat.surveyscanner.australium").withStyle(ChatFormatting.YELLOW));
+            }
+            if (tile != null && !tile.resource.isEmpty()) {
+                player.sendSystemMessage(Component.translatable("chat.surveyscanner.bedrock", tile.resource.getHoverName())
+                        .withStyle(ChatFormatting.RED));
+            }
         }
+
+        // CE :83-85 — sound + swing on both sides
+        level.playSound(null, player.getX(), player.getY(), player.getZ(), HBMSoundHandler.techBleep.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
         player.swing(hand);
         return InteractionResultHolder.success(stack);
     }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        // TODO(cross-area follow-up): CE's Nether-portal easter egg (right-clicking
-        // ModBlocks.block_beryllium while holding ModItems.entanglement_kit teleports the player to
-        // the Nether) depends on both an item and a block that do not exist in this port yet.
+        // CE ItemSurveyScanner.java:91-98 — block_beryllium is not registered
         return InteractionResult.PASS;
+    }
+
+    private static Block hbmBlock(String path) {
+        return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
     }
 }

@@ -278,7 +278,7 @@ public final class ToolItems {
     public static final DeferredItem<Item> ORE_DENSITY_SCANNER = ModItems.ITEMS.register("ore_density_scanner", () -> new ItemOreDensityScanner(new Item.Properties().stacksTo(1)));
     /** Stubbed pending {@code ModBlocks.ore_oil}/{@code ore_bedrock_oil} - see class javadoc. */
     public static final DeferredItem<Item> OIL_DETECTOR = ModItems.ITEMS.register("oil_detector", () -> new ItemOilDetector(new Item.Properties().stacksTo(1)));
-    /** Stubbed pending several missing world-gen blocks - see class javadoc. */
+    /** Exact CE ItemSurveyScanner :30-87 grid (ores registered). Easter egg skipped. */
     public static final DeferredItem<Item> SURVEY_SCANNER = ModItems.ITEMS.register("survey_scanner", () -> new ItemSurveyScanner(new Item.Properties().stacksTo(1)));
     /** Stubbed pending {@code PollutionHandler} - see class javadoc. */
     public static final DeferredItem<Item> POLLUTION_DETECTOR = ModItems.ITEMS.register("pollution_detector", () -> new ItemPollutionDetector(new Item.Properties().stacksTo(1)));
