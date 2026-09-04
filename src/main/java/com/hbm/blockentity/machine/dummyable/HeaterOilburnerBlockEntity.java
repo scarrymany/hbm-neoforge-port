@@ -1,15 +1,19 @@
 package com.hbm.blockentity.machine.dummyable;
 
-import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
+import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.OilburnerMenu;
+import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Flammable;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
@@ -27,20 +31,28 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CE {@code TileEntityHeaterOilburner.java}:59-103 — FT_Flammable tank, setting mB/t,
- * maxHeat 100_000. Pollution skipped. {@code loadTank(0,1)}/{@code setType(2)} Exact CE {@code :63-64}.
- * ROR: CE {@code :247-279}.
+ * maxHeat 100_000. {@code loadTank(0,1)}/{@code setType(2)} Exact CE {@code :63-64}.
+ * {@code pollute(BURN, toBurn*5)} every 5t Exact CE {@code :87-88}.
+ * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:53-76}.
+ * ROR: CE {@code :247-279}. Audio stay skipped.
  */
 public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
-        implements IHeatSource, IFluidStandardReceiverMK2, ITickableBE, MenuProvider,
+        implements IHeatSource, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
         IRORValueProvider, IRORInteractive {
 
     public static final int MAX_HEAT = 100_000;
 
     public final FluidTankNTM tank;
+    /** CE {@code TileEntityMachinePolluting} buffer 1000 from {@code super(3, 1000)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
     public boolean isOn;
     public int setting = 1;
     public int heatEnergy;
@@ -48,6 +60,9 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
     public HeaterOilburnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 3, true, false);
         this.tank = new FluidTankNTM(Fluids.HEATINGOIL, 16_000).withOwner(this);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 1000).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 1000).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 1000).withOwner(this);
     }
 
     @Override
@@ -81,6 +96,8 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
 
         for (DirPos pos : getConPos()) {
             if (level.getGameTime() % 20 == 0) trySubscribe(tank.getTankType(), level, pos);
+            // CE TileEntityHeaterOilburner.java:68
+            sendSmoke(pos);
         }
 
         boolean shouldCool = true;
@@ -88,11 +105,13 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
             FT_Flammable trait = tank.getTankType().getTrait(FT_Flammable.class);
             if (trait != null) {
                 int toBurn = Math.min(setting, tank.getFill());
-                if (toBurn > 0) {
-                    tank.setFill(tank.getFill() - toBurn);
-                    heatEnergy += (int) (trait.getHeatEnergy() / 1000L) * toBurn;
-                    shouldCool = false;
+                tank.setFill(tank.getFill() - toBurn);
+                heatEnergy += (int) (trait.getHeatEnergy() / 1000L) * toBurn;
+                // CE TileEntityHeaterOilburner.java:87-88
+                if (level.getGameTime() % 5 == 0 && toBurn > 0) {
+                    pollute(tank.getTankType(), FluidTrait.FluidReleaseType.BURN, toBurn * 5);
                 }
+                shouldCool = false;
             }
         }
         if (heatEnergy >= MAX_HEAT) shouldCool = false;
@@ -100,6 +119,38 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
 
         dataChanged();
         networkPackMK2(25);
+    }
+
+    /** CE {@code TileEntityMachinePolluting#sendSmoke}. */
+    private void sendSmoke(DirPos pos) {
+        if (smoke.getFill() > 0) tryProvide(smoke, level, pos);
+        if (smokeLeaded.getFill() > 0) tryProvide(smokeLeaded, level, pos);
+        if (smokePoison.getFill() > 0) tryProvide(smokePoison, level, pos);
+    }
+
+    /**
+     * Exact CE {@code TileEntityMachinePolluting#pollute(FluidType, FluidReleaseType, float)}
+     * {@code :53-76}. Fire-extinguish sound stay skipped.
+     */
+    public void pollute(FluidType type, FluidTrait.FluidReleaseType release, float amount) {
+        FT_Polluting trait = type.getTrait(FT_Polluting.class);
+        if (trait == null) return;
+        if (release == FluidTrait.FluidReleaseType.VOID) return;
+
+        HashMap<PollutionHandler.PollutionType, Float> map = release == FluidTrait.FluidReleaseType.BURN
+                ? trait.burnMap : trait.releaseMap;
+
+        for (Map.Entry<PollutionHandler.PollutionType, Float> entry : map.entrySet()) {
+            FluidTankNTM dest = entry.getKey() == PollutionHandler.PollutionType.SOOT ? smoke
+                    : entry.getKey() == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+            int fluidAmount = (int) Math.ceil(entry.getValue() * amount * 100);
+            dest.setFill(dest.getFill() + fluidAmount);
+            if (dest.getFill() > dest.getMaxFill()) {
+                int overflow = dest.getFill() - dest.getMaxFill();
+                dest.setFill(dest.getMaxFill());
+                PollutionHandler.incrementPollution(level, worldPosition, entry.getKey(), overflow / 100F);
+            }
+        }
     }
 
     public void toggleOn() {
@@ -137,7 +188,14 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public @NotNull List<FluidTankNTM> getSendingTanks() {
+        // CE TileEntityHeaterOilburner.java:226-227
+        return List.of(smoke, smokeLeaded, smokePoison);
+    }
+
+    @Override
     public @NotNull List<FluidTankNTM> getAllTanks() {
+        // CE TileEntityHeaterOilburner.java:221-222 — fuel tank only
         return List.of(tank);
     }
 
@@ -148,6 +206,9 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
         tag.putInt("heat", heatEnergy);
         tag.putInt("set", setting);
         tank.writeToNBT(tag, "t");
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
     }
 
     @Override
@@ -157,6 +218,9 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
         heatEnergy = tag.getInt("heat");
         setting = Math.max(1, tag.getInt("set"));
         tank.readFromNBT(tag, "t");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
     }
 
     @Override
