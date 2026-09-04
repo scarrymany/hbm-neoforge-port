@@ -40,6 +40,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineRotaryFurnace}: 3-in + fluid-id + fuel, steam, crucible pour.
+ * {@code tanks[0].setType(3)} Exact CE {@code :105}.
  * {@link IConfigurableMachine} Exact CE {@code TileEntityMachineRotaryFurnace.java:474-489} ({@code rotaryfurnace}).
  */
 public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
@@ -101,10 +102,8 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        ItemStack id = inventory.getStackInSlot(3);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            process.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineRotaryFurnace.java:105
+        this.process.setType(3, inventory);
 
         Direction dir = coreFacing();
         Direction rot = dir.getClockWise();

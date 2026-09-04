@@ -7,6 +7,7 @@ import com.hbm.blocks.BlockDummyable;
 import com.hbm.inventory.container.machine.dummyable.AnnihilatorMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.saveddata.AnnihilatorSavedData;
 import net.minecraft.core.BlockPos;
@@ -29,6 +30,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineAnnihilator}: eats items/fluids into a named pool, pays milestones.
+ * {@code tank.setType(1)} Exact CE {@code :71}. Slot 1 Exact CE {@code :194}.
  */
 public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -50,6 +52,8 @@ public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot == 0) return true;
+        // CE TileEntityMachineAnnihilator.java:194
+        if (slot == 1) return stack.getItem() instanceof IItemFluidIdentifier;
         if (slot == 8 || slot == 9) return true;
         return false;
     }
@@ -67,6 +71,10 @@ public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
+
+        // CE TileEntityMachineAnnihilator.java:71
+        this.tank.setType(1, inventory);
+
         if (pool == null || pool.isEmpty()) return;
 
         for (DirPos pos : getConPos()) {
