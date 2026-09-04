@@ -5,6 +5,10 @@ import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.inventory.container.machine.rbmk.RBMKHeaterMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.fluid.trait.FT_Heatable;
+import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingStep;
+import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingType;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -15,6 +19,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -22,21 +27,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Heater column - the coolant-loop counterpart to {@link RBMKBoilerBlockEntity}: converts column
- * heat into hot coolant from a cold-coolant feed, instead of steam from water. Ported (simplified,
- * see {@link RBMKBoilerBlockEntity}'s javadoc for the same caveat) from CE's
- * {@code TileEntityRBMKHeater} (328 lines, signature-level survey).
+ * Heater column — CE {@code TileEntityRBMKHeater}.
+ * {@code feed.setType(0)} Exact CE {@code :66}. {@code FT_Heatable} HEATEXCHANGER Exact CE {@code :68-95}.
+ * Slot 0 Exact CE {@code ContainerRBMKHeater.java:24}.
  */
 public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity
         implements IFluidStandardTransceiverMK2, MenuProvider, IRORValueProvider {
-
-    private static final double HEAT_PER_MB = 2D;
 
     public final FluidTankNTM feed;
     public final FluidTankNTM steam;
 
     public RBMKHeaterBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 0);
+        super(type, pos, state, 1);
         feed = new FluidTankNTM(Fluids.COOLANT, 16_000).withOwner(this);
         steam = new FluidTankNTM(Fluids.COOLANT_HOT, 16_000).withOwner(this);
     }
@@ -47,19 +49,47 @@ public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity
     }
 
     @Override
-    public void updateEntity() {
-        if (level != null && !level.isClientSide && heat > 100D) {
-            int byHeat = (int) ((heat - 100D) / HEAT_PER_MB);
-            int process = Math.min(byHeat, Math.min(feed.getFill(), steam.getMaxFill() - steam.getFill()));
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        return slot == 0 && stack.getItem() instanceof IItemFluidIdentifier;
+    }
 
-            if (process > 0) {
-                feed.setFill(feed.getFill() - process);
-                steam.setFill(steam.getFill() + process);
-                heat -= process * HEAT_PER_MB;
+    @Override
+    public void updateEntity() {
+        if (level != null && !level.isClientSide) {
+            // CE TileEntityRBMKHeater.java:66
+            if (this.heat <= 50 || this.feed.getFill() <= 0) this.feed.setType(0, inventory);
+
+            if (feed.getTankType().hasTrait(FT_Heatable.class)) {
+                FT_Heatable trait = feed.getTankType().getTrait(FT_Heatable.class);
+                HeatingStep step = trait.getFirstStep();
+                steam.setTankType(step.typeProduced);
+                double tempRange = this.heat - steam.getTankType().temperature;
+                double eff = trait.getEfficiency(HeatingType.HEATEXCHANGER);
+
+                if (tempRange > 0 && eff > 0) {
+                    // CE :76 — 2000 TU/°C × HEATEXCHANGER eff
+                    double tuPerDegree = 2_000D * eff;
+                    int inputOps = feed.getFill() / step.amountReq;
+                    int outputOps = (steam.getMaxFill() - steam.getFill()) / step.amountProduced;
+                    int tempOps = (int) Math.floor((tempRange * tuPerDegree) / step.heatReq);
+                    int ops = Math.min(inputOps, Math.min(outputOps, tempOps));
+
+                    feed.setFill(feed.getFill() - step.amountReq * ops);
+                    steam.setFill(steam.getFill() + step.amountProduced * ops);
+                    this.heat -= (step.heatReq * ops / tuPerDegree) * eff;
+                }
+
+                if (eff <= 0) {
+                    feed.setTankType(Fluids.NONE);
+                    steam.setTankType(Fluids.NONE);
+                }
+            } else {
+                feed.setTankType(Fluids.NONE);
+                steam.setTankType(Fluids.NONE);
             }
 
             trySubscribe(feed.getTankType(), level, worldPosition.below(), Direction.UP);
-            tryProvide(steam, level, worldPosition.above(), Direction.DOWN);
+            if (steam.getFill() > 0) tryProvide(steam, level, worldPosition.above(), Direction.DOWN);
         }
 
         super.updateEntity();

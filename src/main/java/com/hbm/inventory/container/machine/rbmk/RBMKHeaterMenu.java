@@ -1,16 +1,18 @@
 package com.hbm.inventory.container.machine.rbmk;
 
 import com.hbm.blockentity.machine.rbmk.RBMKHeaterBlockEntity;
+import com.hbm.inventory.slot.SlotNonRetarded;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 
-/** Heater menu - no slots, tank fill read directly off {@link #be} by the matching Screen. */
+/** Exact CE {@code ContainerRBMKHeater.java:24}: fluid ID 41,45. Player inv +20 (186 GUI). */
 public class RBMKHeaterMenu extends RBMKSlottedMenuBase<RBMKHeaterBlockEntity> {
 
     public RBMKHeaterMenu(int id, Inventory playerInventory, RBMKHeaterBlockEntity be) {
         super(RBMKMenuTypes.HEATER.get(), id, be);
-        playerInv(playerInventory, 8, 84);
+        this.addSlot(new SlotNonRetarded(tile, 0, 41, 45));
+        playerInv(playerInventory, 8, 104);
     }
 
     public static RBMKHeaterMenu fromNetwork(int id, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
