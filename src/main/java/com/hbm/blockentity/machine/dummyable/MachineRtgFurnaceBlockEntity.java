@@ -25,7 +25,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.Optional;
 
 /**
- * CE {@code TileEntityRtgFurnace} — pellet heat + vanilla smelt. Decay / block-swap skipped.
+ * CE {@code TileEntityRtgFurnace} — pellet heat + vanilla smelt.
+ * {@code RTGUtil.updateRTGs} slots 1-3 Exact CE {@code :149} via already-ported
+ * {@link ItemRTGPellet#getScaledPower}/{@link ItemRTGPellet#handleDecay}.
+ * Block-swap stay skipped.
  */
 public class MachineRtgFurnaceBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -66,10 +69,13 @@ public class MachineRtgFurnaceBlockEntity extends MachineBaseBlockEntity impleme
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // CE TileEntityRtgFurnace.java:149 — RTGUtil.updateRTGs({1,2,3})
         heat = 0;
         for (int i = 1; i <= 3; i++) {
             ItemStack s = inventory.getStackInSlot(i);
-            if (s.getItem() instanceof ItemRTGPellet pellet) heat += pellet.getHeat();
+            if (!(s.getItem() instanceof ItemRTGPellet)) continue;
+            heat += ItemRTGPellet.getScaledPower(s);
+            inventory.setStackInSlot(i, ItemRTGPellet.handleDecay(s));
         }
 
         if (heat > 0 && canProcess()) {
