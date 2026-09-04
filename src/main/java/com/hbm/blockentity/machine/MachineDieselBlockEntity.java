@@ -6,14 +6,17 @@ import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IBatteryItem;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFillableItem;
-import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
+import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.container.machine.MachineDieselMenu;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.Library;
@@ -31,11 +34,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Ported from CE's {@code TileEntityMachineDiesel} (block {@code MachineDiesel}, regname
@@ -46,10 +51,13 @@ import java.util.List;
  * {@code setType(3)} / {@code loadTank(0,1)} Exact CE {@code TileEntityMachineDiesel.java:120-121}.
  * 4-slot layout Exact CE {@code ContainerMachineDiesel.java:38-41}.
  * {@link IConfigurableMachine} Exact CE {@code TileEntityMachineDiesel.java:282-315}
- * ({@code dieselgen}). Pollution/audio skipped.
+ * ({@code dieselgen}).
+ * {@code pollute(BURN, 5F)} every 5t while generating Exact CE {@code :233-234}.
+ * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:53-76}.
+ * Audio stay skipped.
  */
 public class MachineDieselBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider, IConfigurableMachine {
+        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IConfigurableMachine {
 
     public static int fuelCap = 16_000;
     public static long maxPower = 50_000L;
@@ -67,12 +75,19 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
     }
 
     public final FluidTankNTM tank;
+    /** CE {@code TileEntityMachinePolluting} buffer 100 from {@code super(4, 100)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
     public boolean isOn;
     private long power;
 
     public MachineDieselBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 4, true, true);
         tank = new FluidTankNTM(Fluids.DIESEL, fuelCap).withOwner(this);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 100).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 100).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 100).withOwner(this);
     }
 
     @Override
@@ -103,6 +118,8 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
         for (Direction dir : Direction.values()) {
             BlockPos target = worldPosition.relative(dir);
             this.tryProvide(level, target.getX(), target.getY(), target.getZ(), dir);
+            // CE TileEntityMachineDiesel.java:125
+            sendSmoke(target, dir);
             this.trySubscribe(tank.getTankType(), level, target.getX(), target.getY(), target.getZ(), dir);
         }
 
@@ -110,11 +127,47 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
 
         if (isOn && !level.hasNeighborSignal(worldPosition) && hasAcceptableFuel() && tank.getFill() > 0) {
             tank.setFill(Math.max(0, tank.getFill() - 1));
+            // CE TileEntityMachineDiesel.java:233-234
+            if (level.getGameTime() % 5 == 0) {
+                pollute(tank.getTankType(), FluidTrait.FluidReleaseType.BURN, 5F);
+            }
             power = Math.min(maxPower, power + getHEFromFuel(tank.getTankType()));
         }
 
         dataChanged();
         networkPackMK2(50);
+    }
+
+    /** CE {@code TileEntityMachinePolluting#sendSmoke}. */
+    private void sendSmoke(BlockPos pos, Direction dir) {
+        if (smoke.getFill() > 0) tryProvide(smoke, level, pos, dir);
+        if (smokeLeaded.getFill() > 0) tryProvide(smokeLeaded, level, pos, dir);
+        if (smokePoison.getFill() > 0) tryProvide(smokePoison, level, pos, dir);
+    }
+
+    /**
+     * Exact CE {@code TileEntityMachinePolluting#pollute(FluidType, FluidReleaseType, float)}
+     * {@code :53-76}. Fire-extinguish sound stay skipped.
+     */
+    public void pollute(FluidType type, FluidTrait.FluidReleaseType release, float amount) {
+        FT_Polluting trait = type.getTrait(FT_Polluting.class);
+        if (trait == null) return;
+        if (release == FluidTrait.FluidReleaseType.VOID) return;
+
+        HashMap<PollutionHandler.PollutionType, Float> map = release == FluidTrait.FluidReleaseType.BURN
+                ? trait.burnMap : trait.releaseMap;
+
+        for (Map.Entry<PollutionHandler.PollutionType, Float> entry : map.entrySet()) {
+            FluidTankNTM dest = entry.getKey() == PollutionHandler.PollutionType.SOOT ? smoke
+                    : entry.getKey() == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+            int fluidAmount = (int) Math.ceil(entry.getValue() * amount * 100);
+            dest.setFill(dest.getFill() + fluidAmount);
+            if (dest.getFill() > dest.getMaxFill()) {
+                int overflow = dest.getFill() - dest.getMaxFill();
+                dest.setFill(dest.getMaxFill());
+                PollutionHandler.incrementPollution(level, worldPosition, entry.getKey(), overflow / 100F);
+            }
+        }
     }
 
     public void setOn(boolean on) {
@@ -237,7 +290,14 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public @NotNull List<FluidTankNTM> getSendingTanks() {
+        // CE TileEntityMachineDiesel.java:267-269 getSmokeTanks
+        return List.of(smoke, smokeLeaded, smokePoison);
+    }
+
+    @Override
     public List<FluidTankNTM> getAllTanks() {
+        // CE TileEntityMachineDiesel.java:277-278 — fuel tank only
         return List.of(tank);
     }
 
@@ -247,6 +307,9 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
         tag.putBoolean("isOn", isOn);
         tag.putLong("powerTime", power);
         tank.writeToNBT(tag, "tank");
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
     }
 
     @Override
@@ -255,6 +318,9 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
         isOn = tag.getBoolean("isOn");
         power = tag.getLong("powerTime");
         tank.readFromNBT(tag, "tank");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
     }
 
     @Override
