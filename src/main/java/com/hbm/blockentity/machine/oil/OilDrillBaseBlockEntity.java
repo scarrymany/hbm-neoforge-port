@@ -1,10 +1,12 @@
 package com.hbm.blockentity.machine.oil;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.capability.NTMFluidCapabilityHandler;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.oil.MachineOilWellMenu;
 import com.hbm.inventory.fluid.Fluids;
@@ -68,15 +70,12 @@ import java.util.concurrent.ThreadLocalRandom;
  * pass's {@link com.hbm.blocks.machine.OilChainBlocks} (a cheap, non-Phase-4 gap the research report
  * explicitly calls out as safe to close now - see its Deferred scope #7).
  *
+ * {@code tanks[0].unloadTank(1, 2, inventory)} / {@code tanks[1].unloadTank(3, 4, inventory)} Exact CE
+ * {@code TileEntityOilDrillBase.java:110-111}. Inventory is 8 slots Exact CE {@code :45} (0 battery,
+ * 1-2 oil canister, 3-4 gas canister, 5-6 upgrades; slot 7 unused in the container, Exact CE).
+ *
  * <h2>Scope trims vs. CE</h2>
  * <ul>
- *   <li><b>No item-container fluid loading</b> (CE's {@code tanks[0].unloadTank(1,2,inventory)}/
- *   {@code tanks[1].unloadTank(3,4,inventory)}, i.e. draining a tank into an empty canister/gastank
- *   item): the same pre-existing, cross-cutting gap {@link FluidTankNTM}'s own javadoc and
- *   {@code MachineDieselBlockEntity}'s javadoc already document (no {@code FluidContainerRegistry}
- *   equivalent exists in this port yet). Fluid leaves purely over the pipe network. The inventory is
- *   therefore renumbered: slot 0 battery, slots 1-3 upgrades (CE: slot 0 battery, 1-4 canister
- *   in/out pairs, 5-6 upgrades, matching {@code TileEntityOilDrillBase}'s 8-slot layout).</li>
  *   <li><b>No {@code UpgradeManagerNT}-triggered "plug-in" sound effect</b> (CE's
  *   {@code SoundUtil.playUpgradePlugSound} call from a custom {@code setStackInSlot} override) and no
  *   {@code IUpgradeInfoProvider} GUI-tooltip integration - both purely cosmetic, dropped per
@@ -101,8 +100,8 @@ public abstract class OilDrillBaseBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
 
     protected static final int BATTERY_SLOT = 0;
-    protected static final int UPGRADE_SLOT_START = 1;
-    protected static final int UPGRADE_SLOT_END = 3;
+    protected static final int UPGRADE_SLOT_START = 5;
+    protected static final int UPGRADE_SLOT_END = 6;
 
     private static final Map<UpgradeType, Integer> VALID_UPGRADES = new EnumMap<>(UpgradeType.class);
 
@@ -132,7 +131,7 @@ public abstract class OilDrillBaseBlockEntity extends MachineBaseBlockEntity
     private static Block oilPipeCache;
 
     protected OilDrillBaseBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 4, true, true);
+        super(type, pos, state, 8, true, true);
         tanks.add(new FluidTankNTM(Fluids.OIL, 64_000).withOwner(this));
         tanks.add(new FluidTankNTM(Fluids.GAS, 64_000).withOwner(this));
     }
@@ -210,6 +209,10 @@ public abstract class OilDrillBaseBlockEntity extends MachineBaseBlockEntity
             trySubscribe(level, dp);
             trySubscribeFluids(dp);
         }
+
+        // CE TileEntityOilDrillBase.java:110-111
+        this.getOilTank().unloadTank(1, 2, this.inventory);
+        this.getGasTank().unloadTank(3, 4, this.inventory);
 
         upgradeManager.checkSlots(inventory, UPGRADE_SLOT_START, UPGRADE_SLOT_END);
         speedLevel = Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 3);
@@ -319,7 +322,14 @@ public abstract class OilDrillBaseBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        // CE TileEntityOilDrillBase has no override (defaults true). MenuBase.tile is
+        // getCheckedInventory(), so GUI insert dies without this.
         if (i == BATTERY_SLOT) return Library.isBattery(stack);
+        if (i == 1 || i == 3) {
+            return NTMFluidCapabilityHandler.isEmptyNtmFluidContainer(stack.getItem())
+                    || stack.getItem() instanceof IFillableItem;
+        }
         if (i >= UPGRADE_SLOT_START && i <= UPGRADE_SLOT_END) {
             return stack.getItem() instanceof ItemMachineUpgrade;
         }

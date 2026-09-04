@@ -15,9 +15,8 @@ import java.util.List;
 
 /**
  * Ported from CE's {@code TileEntityMachineFrackingTower} (246 lines, read in full). Adds a third
- * tank ({@code FRACKSOL}, consumed as an input over the pipe network - CE's own item-canister fill
- * path for it is dropped along with every other extractor's canister slots, see
- * {@link OilDrillBaseBlockEntity}'s javadoc), drills through bedrock ({@link #getDrillDepth()} = 0),
+ * tank ({@code FRACKSOL}, pipe-only input — Exact CE has no third {@code unloadTank} pair),
+ * drills through bedrock ({@link #getDrillDepth()} = 0),
  * can additionally suck {@code ore_bedrock_oil}, and - per CE - every successful suck calls
  * {@code OilSpot.generateOilSpot}, a Phase-2-safe block-mutation mechanic
  * (see {@link com.hbm.world.feature.OilSpot}, ported by this same pass per the task's "fracking's

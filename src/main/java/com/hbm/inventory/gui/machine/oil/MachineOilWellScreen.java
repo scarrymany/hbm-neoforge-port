@@ -20,7 +20,7 @@ public class MachineOilWellScreen extends GuiInfoContainer<MachineOilWellMenu> {
 
     public MachineOilWellScreen(MachineOilWellMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.imageWidth = 176;
+        this.imageWidth = 184;
         this.imageHeight = 202;
         this.inventoryLabelY = this.imageHeight - 94;
     }
@@ -32,16 +32,25 @@ public class MachineOilWellScreen extends GuiInfoContainer<MachineOilWellMenu> {
         guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
         guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
 
-        this.getMenu().be.getOilTank().renderTank(x + 94, y + 76, 0, 16, 54);
-        this.getMenu().be.getGasTank().renderTank(x + 118, y + 76, 0, 16, 54);
+        var be = this.getMenu().be;
+        // CE GUIMachineOilWell.java:78-82 — tanks sit left of canister slots 94/130.
+        be.getOilTank().renderTank(x + 76, y + 74, 0, 16, 52);
+        be.getGasTank().renderTank(x + 112, y + 74, 0, 16, 52);
+        if (be.tanks.size() >= 3) {
+            be.tanks.get(2).renderTank(x + 54, y + 77, 0, 6, 32);
+        }
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 6, 160, 12, this.getMenu().be.power, this.getMenu().be.getMaxPower());
-        this.getMenu().be.getOilTank().renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 94, topPos + 76 - 54, 16, 54);
-        this.getMenu().be.getGasTank().renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 118, topPos + 76 - 54, 16, 54);
+        var be = this.getMenu().be;
+        be.getOilTank().renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 76, topPos + 74 - 52, 16, 52);
+        be.getGasTank().renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 112, topPos + 74 - 52, 16, 52);
+        if (be.tanks.size() >= 3) {
+            be.tanks.get(2).renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 54, topPos + 45, 6, 32);
+        }
         drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 20, 160, 10, Component.literal(statusText()));
     }
 
