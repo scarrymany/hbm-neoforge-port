@@ -6,7 +6,7 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
-/** Ported from CE's {@code ContainerICFPress}: empty pellet in, pellet out, muon in, muon container out, 2 solid fuel inputs. */
+/** Exact CE {@code ContainerICFPress.java:35-48}: pellet/muon/fuel + ID 62,18 / 134,18. */
 public class IcfPressMenu extends MenuBase<IcfPressBlockEntity> {
 
     public IcfPressMenu(int id, Inventory playerInv, IcfPressBlockEntity be) {
@@ -18,6 +18,8 @@ public class IcfPressMenu extends MenuBase<IcfPressBlockEntity> {
         this.addSlot(new SlotTakeOnly(tile, 3, 8, 54));
         this.addSlot(new SlotNonRetarded(tile, 4, 62, 54));
         this.addSlot(new SlotNonRetarded(tile, 5, 134, 54));
+        this.addSlot(new SlotNonRetarded(tile, 6, 62, 18));
+        this.addSlot(new SlotNonRetarded(tile, 7, 134, 18));
 
         playerInv(playerInv, 8, 97);
     }

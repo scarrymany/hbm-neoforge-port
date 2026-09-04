@@ -25,8 +25,9 @@ public class IcfPressScreen extends GuiInfoContainer<IcfPressMenu> {
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         var be = this.getMenu().be;
-        be.tanks[0].renderTank(x + 62, y + 18, 0, 16, 34);
-        be.tanks[1].renderTank(x + 134, y + 18, 0, 16, 34);
+        // CE GUIICFPress.java:57-58 — tanks sit beside ID slots 6/7 at 62,18 / 134,18.
+        be.tanks[0].renderTank(x + 44, y + 70, 0, 16, 52);
+        be.tanks[1].renderTank(x + 152, y + 70, 0, 16, 52);
     }
 
     @Override
