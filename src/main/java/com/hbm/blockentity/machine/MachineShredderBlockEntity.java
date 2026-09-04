@@ -8,9 +8,12 @@ import com.hbm.inventory.recipes.HbmSimpleRecipe;
 import com.hbm.inventory.recipes.ProcessingRecipes;
 import com.hbm.items.machine.ItemBlades;
 import com.hbm.lib.Library;
+import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -18,7 +21,9 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -38,8 +43,8 @@ import java.util.Optional;
  * <b>Recipe lookup</b>: {@link ProcessingRecipes#SHREDDER_TYPE} ({@link HbmSimpleRecipe}, JSON-backed -
  * see that class's own javadoc), replacing CE's hardcoded {@code ShredderRecipes} HashMap.
  * {@code ModItems.scrap} is registered; the explicit {@code scrap → dust} row is JSON
- * ({@code ShredderRecipes.java:208}). Miss-fallback still rejects rather than silently emitting
- * scrap — TODO(CE: ShredderRecipes.java:103-115).
+ * ({@code ShredderRecipes.java:208}). Miss-fallback emits scrap Exact CE
+ * {@code ShredderRecipes.java:103-115}.
  * OreDict {@code registerPost} auto-dust is 1.12-integration, not ported —
  * TODO(CE: ShredderRecipes.java:119-201).
  * {@code dustLapis} members other than {@code powder_lapis} —
@@ -95,10 +100,27 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
                 .map(RecipeHolder::value);
     }
 
+    /** CE {@code ShredderRecipes.getShredderResult} — miss / empty → {@code scrap}. */
+    private ItemStack shredderResult(ItemStack stack) {
+        if (stack.isEmpty()) return scrapStack();
+        Optional<HbmSimpleRecipe> recipe = recipeFor(stack);
+        if (recipe.isPresent()) {
+            ItemStack out = recipe.get().getResultItem(level.registryAccess());
+            if (!out.isEmpty()) return out.copy();
+        }
+        return scrapStack();
+    }
+
+    private static ItemStack scrapStack() {
+        Item scrap = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "scrap"));
+        return scrap == Items.AIR ? ItemStack.EMPTY : new ItemStack(scrap);
+    }
+
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot >= INPUT_START && slot <= INPUT_END) {
-            return !(stack.getItem() instanceof ItemBlades) && recipeFor(stack).isPresent();
+            // CE TileEntityMachineShredder.java:78 — getShredderResult is never null
+            return !(stack.getItem() instanceof ItemBlades);
         }
         if (slot == BATTERY_SLOT) return Library.isBattery(stack);
         return (slot == BLADE_LEFT || slot == BLADE_RIGHT) && stack.getItem() instanceof ItemBlades;
@@ -172,9 +194,7 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
     }
 
     public boolean hasSpace(ItemStack stack) {
-        Optional<HbmSimpleRecipe> recipe = recipeFor(stack);
-        if (recipe.isEmpty()) return false;
-        ItemStack result = recipe.get().getResultItem(level.registryAccess());
+        ItemStack result = shredderResult(stack);
         if (result.isEmpty()) return false;
 
         int spaceLeft = 0;
@@ -194,7 +214,7 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
             ItemStack inp = inventory.getStackInSlot(inSlot);
             if (inp.isEmpty() || !hasSpace(inp)) continue;
 
-            ItemStack outp = recipeFor(inp).orElseThrow().getResultItem(level.registryAccess()).copy();
+            ItemStack outp = shredderResult(inp);
             int itemsLeft = outp.getCount();
 
             for (int outSlot = OUTPUT_START; outSlot <= OUTPUT_END && itemsLeft > 0; outSlot++) {
