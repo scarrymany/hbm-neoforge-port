@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "item": "hbm:coke_petroleum"
+    },
+    "T": {
+      "tag": "hbm:any_tar"
+    }
+  },
+  "pattern": [
+    "C",
+    "T",
+    "C"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:arc_electrode_graphite"
+  }
+}

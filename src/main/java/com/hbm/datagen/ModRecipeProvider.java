@@ -4170,7 +4170,15 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_graphite", has(MaterialShapes.INGOT.commonTag(Mats.MAT_GRAPHITE)))
                 .save(output, id("item/arc_electrode_graphite"));
 
-        // SKIP: GRAPHITE alt (PETCOKE.gem + ANY_TAR) — powder_petroleum_coke not registered
+        // CE CraftingManager.java:354 GRAPHITE alt: PETCOKE.gem x2 + ANY_TAR.any() → arc_electrode_graphite
+        // PETCOKE.gem() = coke_petroleum (CE coke PETROLEUM flatten). ANY_TAR = hbm:any_tar.
+        TagKey<Item> anyTarElectrode = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_tar"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("arc_electrode_graphite"))
+                .pattern("C").pattern("T").pattern("C")
+                .define('C', item("coke_petroleum"))
+                .define('T', anyTarElectrode)
+                .unlockedBy("has_petcoke", has(item("coke_petroleum")))
+                .save(output, id("item/arc_electrode_graphite_petcoke"));
 
         // LANTHANIUM: LA.ingot x2 + KEY_BRICK → arc_electrode_lanthanium
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("arc_electrode_lanthanium"))
