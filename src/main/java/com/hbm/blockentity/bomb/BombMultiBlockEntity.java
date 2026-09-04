@@ -4,6 +4,7 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.bomb.BombMultiMenu;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.machine.Phase11ProcessItems;
+import com.hbm.items.special.SpecialItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -66,10 +67,12 @@ public class BombMultiBlockEntity extends MachineBaseBlockEntity implements Menu
         if (stack.isEmpty()) return 0;
         if (stack.is(Items.GUNPOWDER)) return 1;
         if (stack.is(Blocks.TNT.asItem())) return 2;
-        // TODO(CE: pellet_cluster not ported yet) return 3;
+        // CE TileEntityBombMulti.java:102-105 / :139-142
+        if (stack.is(Phase11ProcessItems.PELLET_CLUSTER.get())) return 3;
         if (stack.is(BilletPowderItems.POWDER_FIRE.get())) return 4;
         if (stack.is(BilletPowderItems.POWDER_POISON.get())) return 5;
-        // TODO(CE: pellet_gas not ported yet) return 6;
+        // CE TileEntityBombMulti.java:117-120 / :154-157
+        if (stack.is(SpecialItems.PELLET_GAS.get())) return 6;
         return 0;
     }
 
@@ -78,10 +81,12 @@ public class BombMultiBlockEntity extends MachineBaseBlockEntity implements Menu
         if (stack.isEmpty()) return 0;
         if (stack.is(Items.GUNPOWDER)) return 1;
         if (stack.is(Blocks.TNT.asItem())) return 2;
-        // TODO(CE: pellet_cluster not ported yet) return 3;
+        // CE TileEntityBombMulti.java:102-105 / :139-142
+        if (stack.is(Phase11ProcessItems.PELLET_CLUSTER.get())) return 3;
         if (stack.is(BilletPowderItems.POWDER_FIRE.get())) return 4;
         if (stack.is(BilletPowderItems.POWDER_POISON.get())) return 5;
-        // TODO(CE: pellet_gas not ported yet) return 6;
+        // CE TileEntityBombMulti.java:117-120 / :154-157
+        if (stack.is(SpecialItems.PELLET_GAS.get())) return 6;
         return 0;
     }
 

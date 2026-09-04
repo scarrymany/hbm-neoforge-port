@@ -57,6 +57,7 @@ public final class Phase11ProcessItems {
     public static DeferredItem<Item> PART_PLUTONIUM;
     public static DeferredItem<Item> SOLINIUM_IGNITER;
     public static DeferredItem<Item> SOLINIUM_PROPELLANT;
+    public static DeferredItem<Item> PELLET_CLUSTER;
 
     private Phase11ProcessItems() {
     }
@@ -188,7 +189,7 @@ public final class Phase11ProcessItems {
         parts("tank_steel");
         // CE ModItems.java:1281 / :1289 — cluster/buckshot leftover assembler
         parts("pellet_buckshot");
-        parts("pellet_cluster");
+        PELLET_CLUSTER = parts("pellet_cluster");
         // CE ModItems.java:2530-2532 — mp_* assembler inputs
         parts("seg_10");
         parts("seg_15");
