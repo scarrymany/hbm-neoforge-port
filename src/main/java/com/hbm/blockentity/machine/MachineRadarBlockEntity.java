@@ -33,10 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CE {@code TileEntityMachineRadarNT.java}:85-87 / :220-258 / :423-424 / :457-472
+ * CE {@code TileEntityMachineRadarNT.java}:85-89 / :220-258 / :422-424 / :457-472
  * and {@code TileEntityMachineRadarLarge.java:16} (range 3000).
+ * radarAltitude 55 / radarBuffer 30 Exact CE :88-89 + :422 + :432.
  * SatelliteRayScan.INFO_RADAR + Detector MEDIUM Exact CE :451-454.
- * Scans {@link IRadarDetectableNT} + players. Map GUI / satellite link not ported.
+ * Scans {@link IRadarDetectableNT} + players. Map GUI skipped — no CE {@code gui_radar_nt.png}.
  */
 public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
@@ -46,6 +47,9 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
     public static final int RANGE = 1_000;
     public static final int RANGE_LARGE = 3_000;
     public static final int PING_INTERVAL = 80;
+    /** CE {@code TileEntityMachineRadarNT.java:88-89}. */
+    public static int radarBuffer = 30;
+    public static int radarAltitude = 55;
     public static final RadarScanParams SCAN_PARAMS = new RadarScanParams(true, true, true, true);
 
     public static final int BATTERY_SLOT = 0;
@@ -100,7 +104,12 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
 
         int prevRed = redPower;
-        if (power >= CONSUMPTION) {
+        // CE TileEntityMachineRadarNT.java:422 — no consume / scan / sat ping below altitude
+        if (worldPosition.getY() < radarAltitude) {
+            entries.clear();
+            contacts = 0;
+            redPower = 0;
+        } else if (power >= CONSUMPTION) {
             power -= CONSUMPTION;
             allocateTargets();
             pingTimer++;
@@ -129,6 +138,8 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
                 worldPosition.getX() - range, level.getMinBuildHeight(), worldPosition.getZ() - range,
                 worldPosition.getX() + range + 1, level.getMaxBuildHeight() + 1, worldPosition.getZ() + range + 1);
         for (Entity entity : level.getEntitiesOfClass(Entity.class, box)) {
+            // CE TileEntityMachineRadarNT.java:432 — must be above radar + buffer
+            if (entity.getY() - worldPosition.getY() <= radarBuffer) continue;
             if (entity instanceof IRadarDetectableNT radar) {
                 if (!radar.paramsApplicable(SCAN_PARAMS) || !radar.canBeSeenBy(this)) continue;
                 double dx = entity.getX() - worldPosition.getX();
