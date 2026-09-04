@@ -1,6 +1,7 @@
 package com.hbm.items.weapon.grenade;
 
 import com.hbm.entity.effect.EntityCloudFleija;
+import com.hbm.entity.effect.EntityFireLingering;
 import com.hbm.entity.grenade.EntityGrenadeUniversal;
 import com.hbm.entity.logic.EntityNukeExplosionMK3;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
@@ -19,11 +20,14 @@ import com.hbm.lib.HBMSoundHandler;
 import com.hbm.particle.HbmEffect;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -40,20 +44,13 @@ import java.util.List;
  * one of these via a plain method handle rather than a shared {@code public static final} lambda
  * field.
  * <p>
+ * INC/WP linger is Exact CE {@code ItemGrenadeFilling.java:139-154} via registered
+ * {@link EntityFireLingering} (6×2, 200t DIESEL / 600t PHOSPHORUS) plus
+ * {@code igniteAround} {@code :233-247}.
+ * <p>
  * <b>Forward references (documented, not silently dropped) - each one is called out again at its
  * exact call site below:</b>
  * <ul>
- *     <li>{@code com.hbm.entity.effect.EntityFireLingering} (INC/WP's lingering-fire payload) is
- *     confirmed not ported anywhere in this tree. The WP/energy-filling {@code AuxParticlePacketNT}
- *     VFX broadcasts ({@link #explodeWp}'s {@link com.hbm.particle.HbmEffect#HAZE} x3,
- *     {@link #explodeStandardEnergy}'s {@link com.hbm.particle.HbmEffect#PLASMA_BLAST} x3,
- *     {@link #spawnMush}'s {@link com.hbm.particle.HbmEffect#MUKE}) are now wired - see
- *     {@code docs/phase5/particle_engine_and_generic_vfx.md}.</li>
- *     <li>{@code igniteAround}'s "ignite a flammable-adjacent air block" branch - CE's
- *     {@code Block#isFlammable(IBlockAccess,BlockPos,EnumFacing)} has no single confirmed 1.21.1
- *     replacement; dropped rather than guessed at, matching
- *     {@code com.hbm.explosion.ExplosionNukeGeneric#vaporDest}'s identical documented gap for the
- *     same CE API.</li>
  *     <li>{@code EntityProcessorCrossSmooth#setDamageClass(DamageClass)} does not exist on this
  *     port's {@code EntityProcessorCrossSmooth} yet (the {@code DamageClass}-to-{@code DamageType}
  *     mapping {@code docs/phase3/gun_framework.md} already flagged as missing a
@@ -115,22 +112,27 @@ public final class GrenadeFillingActions {
         vnt.explode();
     }
 
+    /** Exact CE {@code ItemGrenadeFilling.java:139-146}. */
     static void explodeInc(EntityGrenadeUniversal grenade) {
+        Level world = grenade.level();
         standardExplode(grenade, 3F, 10F);
-        // forward reference: EntityFireLingering(6x2 area, 200t, TYPE_DIESEL) - see class javadoc.
-        // forward reference: igniteAround(...,2) - see class javadoc.
+        EntityFireLingering.spawn(world, grenade.getX(), grenade.getY(), grenade.getZ(), 6F, 2F,
+                EntityFireLingering.TYPE_DIESEL, 200);
+        igniteAround(world, grenade.getX(), grenade.getY(), grenade.getZ(), 2);
     }
 
+    /** Exact CE {@code ItemGrenadeFilling.java:148-163}. */
     static void explodeWp(EntityGrenadeUniversal grenade) {
+        Level world = grenade.level();
         standardExplode(grenade, 3F, 10F);
-        // forward reference: EntityFireLingering(6x2 area, 600t, TYPE_PHOSPHORUS) - see class javadoc.
-        // forward reference: igniteAround(...,3) - see class javadoc.
+        EntityFireLingering.spawn(world, grenade.getX(), grenade.getY(), grenade.getZ(), 6F, 2F,
+                EntityFireLingering.TYPE_PHOSPHORUS, 600);
+        igniteAround(world, grenade.getX(), grenade.getY(), grenade.getZ(), 3);
 
-        Level level = grenade.level();
         for (int i = 0; i < 3; i++) {
-            double hx = grenade.getX() + level.getRandom().nextGaussian() * 4;
-            double hz = grenade.getZ() + level.getRandom().nextGaussian() * 4;
-            HbmEffect.sendPacket(level, HbmEffect.HAZE, hx, grenade.getY(), hz, 150, null);
+            double hx = grenade.getX() + world.getRandom().nextGaussian() * 4;
+            double hz = grenade.getZ() + world.getRandom().nextGaussian() * 4;
+            HbmEffect.sendPacket(world, HbmEffect.HAZE, hx, grenade.getY(), hz, 150, null);
         }
     }
 
@@ -330,6 +332,26 @@ public final class GrenadeFillingActions {
     }
 
     // ==================== shared ExplosionVNT presets ====================
+
+    /** Exact CE {@code ItemGrenadeFilling.java:233-247}. */
+    private static void igniteAround(Level world, double px, double py, double pz, int radius) {
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dy = -radius; dy <= radius; dy++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    BlockPos bp = new BlockPos((int) Math.floor(px) + dx, (int) Math.floor(py) + dy, (int) Math.floor(pz) + dz);
+                    if (!world.getBlockState(bp).isAir()) continue;
+                    for (Direction dir : Direction.values()) {
+                        BlockPos np = bp.relative(dir);
+                        BlockState neighbor = world.getBlockState(np);
+                        if (neighbor.isFlammable(world, np, dir.getOpposite())) {
+                            world.setBlock(bp, Blocks.FIRE.defaultBlockState(), 3);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     static void standardExplode(EntityGrenadeUniversal grenade, float range, float damage) {
         standardExplode(grenade, range, damage, 0F, 0F);
