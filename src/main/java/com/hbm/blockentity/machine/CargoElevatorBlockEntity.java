@@ -10,9 +10,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -22,9 +25,10 @@ import java.util.List;
  * <p>
  * CE: upstream/hbm-ce/src/main/java/com/hbm/tileentity/machine/TileEntityCargoElevator.java
  * <p>
- * Ported: extension animation (CE :63-70), entity lifting (CE :83-97), toggleElevator (CE :100-108),
- * lower elevator merging (CE :43-60), client sync (CE :74-80, :111-125) via LoadedBaseBlockEntity.
- * TODO(CE): ROR integration (CE :170-185), custom rendering.
+ * Ported: extension animation (CE :63-70), per-tick {@code networkPackNT(300)} (CE :72-73),
+ * entity lifting on both sides with server-side player skip (CE :83-97), toggleElevator (CE :100-108),
+ * lower elevator merging (CE :43-60), client interpol (CE :74-80, :111-125).
+ * TODO(CE): ROR {@code setextension} (CE :170-185), custom rendering.
  */
 public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity implements ITickableBE {
 
@@ -50,52 +54,53 @@ public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity implements I
 
         this.prevExtension = this.extension;
 
-        // CE :74-80 - client-side smooth interpolation
-        if (level.isClientSide) {
+        if (!level.isClientSide) {
+            // CE :43-60: Merge with lower elevator if placed on top of another cargo_elevator
+            BlockState downState = level.getBlockState(worldPosition.below());
+            if (downState.getBlock() == ModBlocks.CARGO_ELEVATOR.get()) {
+                BlockPos lowerCore = ((BlockDummyable) ModBlocks.CARGO_ELEVATOR.get()).findCore(level, worldPosition.below());
+                if (lowerCore != null && lowerCore.getX() == worldPosition.getX() && lowerCore.getZ() == worldPosition.getZ()) {
+                    BlockEntity lowerTile = level.getBlockEntity(lowerCore);
+                    if (lowerTile instanceof CargoElevatorBlockEntity lower) {
+                        lower.height += this.height + 1;
+                        for (int x = worldPosition.getX() - 1; x < worldPosition.getX() + 2; x++) {
+                            for (int z = worldPosition.getZ() - 1; z < worldPosition.getZ() + 2; z++) {
+                                for (int y = worldPosition.getY(); y <= worldPosition.getY() + this.height; y++) {
+                                    level.setBlock(new BlockPos(x, y, z),
+                                            ModBlocks.CARGO_ELEVATOR.get().defaultBlockState().setValue(BlockDummyable.META, 1), 3);
+                                }
+                            }
+                        }
+                        lower.setChanged();
+                        return;
+                    }
+                }
+            }
+
+            // CE :63-70: Extension animation (move platform up/down towards target)
+            if (this.extension < this.targetExtension) {  // go up
+                this.extension += SPEED;
+                this.extension = Mth.clamp(this.extension, 0D, this.targetExtension);
+            } else if (this.extension > this.targetExtension) {  // go down
+                this.extension -= SPEED;
+                this.extension = Mth.clamp(this.extension, this.targetExtension, this.height);
+            }
+
+            this.extension = Mth.clamp(this.extension, 0D, this.height);
+            // CE :72-73 — clients interpolate the moving platform; skip-identical in networkPackNT
+            this.renderPlatform = true;
+            this.networkPackNT(300);
+        } else {
+            // CE :74-80 - client-side smooth interpolation
             if (this.sync > 0) {
                 this.extension = this.extension + ((this.syncExtension - this.extension) / (float) this.sync);
                 --this.sync;
             } else {
                 this.extension = this.syncExtension;
             }
-            return;
         }
 
-        // CE :43-60: Merge with lower elevator if placed on top of another cargo_elevator
-        BlockState downState = level.getBlockState(worldPosition.below());
-        if (downState.getBlock() == ModBlocks.CARGO_ELEVATOR.get()) {
-            BlockPos lowerCore = ((BlockDummyable) ModBlocks.CARGO_ELEVATOR.get()).findCore(level, worldPosition.below());
-            if (lowerCore != null && lowerCore.getX() == worldPosition.getX() && lowerCore.getZ() == worldPosition.getZ()) {
-                BlockEntity lowerTile = level.getBlockEntity(lowerCore);
-                if (lowerTile instanceof CargoElevatorBlockEntity lower) {
-                    lower.height += this.height + 1;
-                    // Convert this elevator's blocks to dummy parts of the lower elevator
-                    for (int x = worldPosition.getX() - 1; x < worldPosition.getX() + 2; x++) {
-                        for (int z = worldPosition.getZ() - 1; z < worldPosition.getZ() + 2; z++) {
-                            for (int y = worldPosition.getY(); y <= worldPosition.getY() + this.height; y++) {
-                                level.setBlock(new BlockPos(x, y, z),
-                                        ModBlocks.CARGO_ELEVATOR.get().defaultBlockState().setValue(BlockDummyable.META, 1), 3);
-                            }
-                        }
-                    }
-                    lower.setChanged();
-                    return;
-                }
-            }
-        }
-
-        // CE :63-70: Extension animation (move platform up/down towards target)
-        if (this.extension < this.targetExtension) {  // go up
-            this.extension += SPEED;
-            this.extension = Mth.clamp(this.extension, 0D, this.targetExtension);
-        } else if (this.extension > this.targetExtension) {  // go down
-            this.extension -= SPEED;
-            this.extension = Mth.clamp(this.extension, this.targetExtension, this.height);
-        }
-
-        this.extension = Mth.clamp(this.extension, 0D, this.height);
-
-        // CE :83-97: Entity lifting - move entities standing on the platform
+        // CE :83-97: lift on both sides. Server skips players (client owns local player motion).
         if (this.extension != this.prevExtension) {
             double liftUpper = this.worldPosition.getY() + 1D + Math.max(this.extension, this.prevExtension);
             double liftLower = this.worldPosition.getY() + 1D + Math.min(this.extension, this.prevExtension);
@@ -107,17 +112,16 @@ public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity implements I
             List<Entity> toLift = level.getEntities((Entity) null, liftBox);
 
             for (Entity entity : toLift) {
+                if (entity instanceof Player && !level.isClientSide) continue; // CE :89
                 AABB entityBox = entity.getBoundingBox();
                 if (entityBox.minY >= liftLower && entityBox.minY <= liftUpper) {
                     double delta = entityBox.minY - (this.worldPosition.getY() + 1D + this.extension);
-                    entity.setPos(entity.getX(), entity.getY() - delta, entity.getZ());
+                    entity.move(MoverType.SELF, new Vec3(0.0D, -delta, 0.0D)); // CE :92
                     entity.setOnGround(true);
-                    entity.setPos(entity.getX(), entity.getY() - 0.125D, entity.getZ());
+                    entity.move(MoverType.SELF, new Vec3(0.0D, -0.125D, 0.0D)); // CE :94
                 }
             }
         }
-
-        setChanged();
     }
 
     // CE :100-108: Toggle elevator between retracted (0) and extended (height)
@@ -128,9 +132,7 @@ public class CargoElevatorBlockEntity extends LoadedBaseBlockEntity implements I
             this.targetExtension = 0;
         }
         setChanged();
-        if (this.level != null && !this.level.isClientSide) {
-            this.networkPackNT(20); // CE :106-107 - sync to clients within 20 blocks
-        }
+        // CE :106-107 markDirty/markChanged only — per-tick networkPackNT(300) carries extension
     }
 
     @Override
