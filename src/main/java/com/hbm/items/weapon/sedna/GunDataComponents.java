@@ -75,11 +75,22 @@ public final class GunDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> RELOAD_CANCEL = bool("gun_reload_cancel");
     /** CE {@code KEY_EQUIPPED} (CE's own key literally misspells "equipped" as {@code eqipped"} - not preserved here, this is a component name not a wire-compatible NBT key). */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> EQUIPPED = bool("gun_equipped");
+    /** CE {@code ItemGunNI4NI.KEY_COIN_COUNT}. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COIN_COUNT = integer("gun_coin_count");
+    /** CE {@code ItemGunNI4NI.KEY_COIN_CHARGE}. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COIN_CHARGE = integer("gun_coin_charge");
 
     private static DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> bool(String name) {
         return DATA_COMPONENT_TYPES.register(name, () -> DataComponentType.<Boolean>builder()
                 .persistent(Codec.BOOL)
                 .networkSynchronized(ByteBufCodecs.BOOL)
+                .build());
+    }
+
+    private static DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> integer(String name) {
+        return DATA_COMPONENT_TYPES.register(name, () -> DataComponentType.<Integer>builder()
+                .persistent(Codec.INT)
+                .networkSynchronized(ByteBufCodecs.INT)
                 .build());
     }
 

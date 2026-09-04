@@ -69,9 +69,8 @@ public class EntityCoin extends EntityThrowableInterp {
      * PRESS} (read in full): position at eye height minus the coin's own height minus 0.125, motion
      * from the thrower's look vector scaled 0.8 with +0.5 added vertical lift, yaw copied from the
      * thrower. {@code ItemGunNI4NI}'s own per-stack coin economy (count/charge NBT, upgrade checks)
-     * is a separate, still-unbuilt {@code ItemGunBaseNT} subclass - out of this entity package's
-     * scope per the report's Deferred scope - so nothing currently calls this yet; provided as the
-     * real, faithful landing spot for whichever future pass builds that item.
+     * is {@link com.hbm.items.weapon.sedna.impl.ItemGunNI4NI} — called from
+     * {@code XFactoryAccelerator.LAMBDA_NI4NI_SECONDARY_PRESS}.
      */
     public static EntityCoin throwFrom(LivingEntity thrower) {
         Level level = thrower.level();
