@@ -1,6 +1,8 @@
 package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.machine.FluidBarrelBlock;
@@ -31,9 +33,11 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityBarrel} — transceiver + mode. Canister load/unload / UniNodespace buffer skipped.
+ * ROR: CE {@code TileEntityBarrel.java:473-504}.
  */
 public class FluidBarrelBlockEntity extends MachineBaseBlockEntity
-        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final int MODE_BOTH = 0;
     public static final int MODE_IN = 1;
@@ -163,5 +167,43 @@ public class FluidBarrelBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new FluidBarrelMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :473-475
+        return new String[]{
+                PREFIX_VALUE + "type", PREFIX_VALUE + "fill", PREFIX_VALUE + "fillpercent",
+                PREFIX_FUNCTION + "setmode" + NAME_SEPARATOR + "mode (0-3)",
+                PREFIX_FUNCTION + "setmode" + NAME_SEPARATOR + "mode" + PARAM_SEPARATOR + "fallback (0-3)",
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :478-482
+        if ((PREFIX_VALUE + "type").equals(name)) return tank.getTankType().getName();
+        if ((PREFIX_VALUE + "fill").equals(name)) return "" + tank.getFill();
+        if ((PREFIX_VALUE + "fillpercent").equals(name)) return "" + (tank.getFill() * 100 / tank.getMaxFill());
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :486-504
+        if ((PREFIX_FUNCTION + "setmode").equals(name) && params.length > 0) {
+            int next = IRORInteractive.parseInt(params[0], 0, 3);
+            if (next != this.mode) {
+                this.mode = next;
+                setChanged();
+                return null;
+            } else if (params.length > 1) {
+                this.mode = IRORInteractive.parseInt(params[1], 0, 3);
+                setChanged();
+                return null;
+            }
+            return null;
+        }
+        return null;
     }
 }

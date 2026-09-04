@@ -2,6 +2,8 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
@@ -46,10 +48,11 @@ import java.util.Map;
  * into {@code tanks[0]}, matching every other turbine in this pass); no pollution call (CE calls
  * {@code PollutionHandler.incrementPollution} directly here, not via
  * {@code TileEntityMachinePolluting} - Phase 4 scope per the research report, stubbed as a no-op);
- * no OpenComputers/Redstone-over-Radio. The battery-charging slot (CE's slot 0) is kept.
+ * no OpenComputers. ROR: CE {@code TileEntityMachineTurbineGas.java:716-783}.
  */
 public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final long MAX_POWER = 1_000_000L;
     private static final int BATTERY_SLOT = 0;
@@ -442,5 +445,81 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new MachineTurbineGasMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :716-732
+        return new String[]{
+                PREFIX_VALUE + "turbinepercent",
+                PREFIX_VALUE + "turbinespeed",
+                PREFIX_VALUE + "output",
+                PREFIX_VALUE + "state",
+                PREFIX_VALUE + "automode",
+                PREFIX_VALUE + "temp",
+                PREFIX_VALUE + "power",
+                PREFIX_VALUE + "fuel",
+                PREFIX_VALUE + "lubricant",
+                PREFIX_VALUE + "water",
+                PREFIX_VALUE + "steam",
+                PREFIX_FUNCTION + "setauto" + NAME_SEPARATOR + "auto",
+                PREFIX_FUNCTION + "setthrottle" + NAME_SEPARATOR + "percent",
+                PREFIX_FUNCTION + "setstate" + NAME_SEPARATOR + "state"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :736-748
+        if ((PREFIX_VALUE + "turbinepercent").equals(name)) return "" + (int) (this.powerSliderPos * 100D / 60D);
+        if ((PREFIX_VALUE + "turbinespeed").equals(name)) return "" + this.rpm;
+        if ((PREFIX_VALUE + "output").equals(name)) return "" + (this.instantPowerOutput * 20);
+        if ((PREFIX_VALUE + "state").equals(name)) return "" + this.state;
+        if ((PREFIX_VALUE + "automode").equals(name)) return "" + (this.autoMode ? 1 : 0);
+        if ((PREFIX_VALUE + "temp").equals(name)) return "" + this.temp;
+        if ((PREFIX_VALUE + "power").equals(name)) return "" + this.power;
+        if ((PREFIX_VALUE + "fuel").equals(name)) return "" + tanks[0].getFill();
+        if ((PREFIX_VALUE + "lubricant").equals(name)) return "" + tanks[1].getFill();
+        if ((PREFIX_VALUE + "water").equals(name)) return "" + tanks[2].getFill();
+        if ((PREFIX_VALUE + "steam").equals(name)) return "" + tanks[3].getFill();
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :752-783
+        if ((PREFIX_FUNCTION + "setauto").equals(name) && params.length > 0) {
+            try {
+                this.autoMode = Integer.parseInt(params[0]) == 1;
+                setChanged();
+            } catch (NumberFormatException ignored) {
+            }
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "setthrottle").equals(name) && params.length > 0) {
+            try {
+                int percent = Integer.parseInt(params[0]);
+                if (percent < 0) percent = 0;
+                if (percent > 100) percent = 100;
+                this.powerSliderPos = percent * 60 / 100;
+                setChanged();
+            } catch (NumberFormatException ignored) {
+            }
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "setstate").equals(name) && params.length > 0) {
+            try {
+                int newState = Integer.parseInt(params[0]);
+                if (newState == 1) {
+                    if (this.state == 0) this.state = -1;
+                } else if (newState == 0) {
+                    if (this.state == 1) this.state = 0;
+                }
+                setChanged();
+            } catch (NumberFormatException ignored) {
+            }
+            return null;
+        }
+        return null;
     }
 }

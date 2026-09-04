@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -31,9 +32,10 @@ import java.util.List;
  * CE {@code TileEntityHeatBoiler} / {@code TileEntityHeatBoilerIndustrial} —
  * pull heat from {@link IHeatSource} below, {@link FT_Heatable} BOILER convert.
  * Explosion / Tom fire / audio skipped.
+ * ROR: CE {@code TileEntityHeatBoiler.java:396-412} / industrial {@code :348-360}.
  */
 public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
-        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IRORValueProvider {
 
     public static final int MAX_HEAT = 12_800_000;
     public static final double DIFFUSION = 0.1D;
@@ -181,5 +183,22 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new HeatBoilerMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE HeatBoiler :396-401 / Industrial :348-353
+        return new String[]{
+                PREFIX_VALUE + "input",
+                PREFIX_VALUE + "output"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE tanks[0]/[1] → water/steam. Explosion skipped → never the hasExploded zero-path.
+        if ((PREFIX_VALUE + "input").equals(name)) return "" + water.getFill();
+        if ((PREFIX_VALUE + "output").equals(name)) return "" + steam.getFill();
+        return null;
     }
 }
