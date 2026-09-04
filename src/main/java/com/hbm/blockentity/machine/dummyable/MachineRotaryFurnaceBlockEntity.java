@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -14,6 +16,8 @@ import com.hbm.inventory.material.NTMMaterial;
 import com.hbm.inventory.recipes.RotaryFurnaceRecipes;
 import com.hbm.inventory.recipes.RotaryFurnaceRecipes.RotaryFurnaceRecipe;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.modules.ModuleBurnTime;
+import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.util.CrucibleUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,21 +30,32 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * CE {@code TileEntityMachineRotaryFurnace}: 3-in + fluid-id + fuel, steam, crucible pour.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityMachineRotaryFurnace.java:474-489} ({@code rotaryfurnace}).
  */
 public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
 
     public static final int MAX_OUTPUT = MaterialShapes.BLOCK.q(16);
+
+    /** CE {@code TileEntityMachineRotaryFurnace.java:75-82} — heat mod scales progress, not stored heat. */
+    public static ModuleBurnTime burnModule = new ModuleBurnTime()
+            .setCokeTimeMod(1.25)
+            .setRocketTimeMod(1.5)
+            .setSolidTimeMod(1.5)
+            .setBalefireTimeMod(1.5)
+            .setSolidHeatMod(1.5)
+            .setRocketHeatMod(3)
+            .setBalefireHeatMod(10);
 
     public final FluidTankNTM process;
     public final FluidTankNTM steam;
@@ -48,6 +63,7 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
     public boolean isProgressing;
     public float progress;
     public int burnTime;
+    public double burnHeat = 1D;
     public int maxBurnTime;
     public int steamUsed;
     public Mats.MaterialStack output;
@@ -67,7 +83,7 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot == 3) return stack.getItem() instanceof IItemFluidIdentifier;
-        if (slot == 4) return stack.getBurnTime(RecipeType.SMELTING) > 0;
+        if (slot == 4) return burnModule.getBurnTime(stack) > 0;
         return slot < 3;
     }
 
@@ -118,17 +134,23 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
 
         if (recipe != null) {
             if (burnTime <= 0 && !inventory.getStackInSlot(4).isEmpty()) {
-                int bt = inventory.getStackInSlot(4).getBurnTime(RecipeType.SMELTING);
+                // CE TileEntityMachineRotaryFurnace.java:152-156
+                ItemStack fuel = inventory.getStackInSlot(4);
+                int bt = burnModule.getBurnTime(fuel);
                 if (bt > 0) {
+                    burnHeat = burnModule.getMod(fuel, burnModule.getModHeat());
                     maxBurnTime = burnTime = bt / 2;
                     inventory.extractItem(4, 1, false);
                     setChanged();
                 }
             }
-            if (canProcess(recipe)) {
-                progress += 1F / recipe.duration;
-                steam.setFill(steam.getFill() - recipe.steam);
-                steamUsed += recipe.steam;
+            float processSpeed = Math.max((float) burnHeat, 1);
+            float steamUseMult = (float) (10 * Math.log10(processSpeed) + 1);
+            if (canProcess(recipe, steamUseMult)) {
+                // CE TileEntityMachineRotaryFurnace.java:159-167
+                progress += processSpeed / recipe.duration;
+                steam.setFill((int) (steam.getFill() - recipe.steam * steamUseMult));
+                steamUsed += (int) (recipe.steam * steamUseMult);
                 isProgressing = true;
                 if (progress >= 1F) {
                     progress -= 1F;
@@ -154,13 +176,20 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         networkPackMK2(50);
     }
 
-    private boolean canProcess(RotaryFurnaceRecipe recipe) {
+    private boolean canProcess(RotaryFurnaceRecipe recipe, float steamUseMult) {
+        // CE TileEntityMachineRotaryFurnace.java:338-356
         if (burnTime <= 0) return false;
-        if (steam.getFill() < recipe.steam) return false;
         if (recipe.fluid != null) {
-            if (process.getTankType() != recipe.fluid.type || process.getFill() < recipe.fluid.fill) return false;
+            if (process.getTankType() != recipe.fluid.type) return false;
+            if (process.getFill() < recipe.fluid.fill) return false;
         }
-        if (output != null && output.amount + recipe.output.amount > MAX_OUTPUT) return false;
+        if (steam.getFill() < recipe.steam * steamUseMult) return false;
+        if (spent.getMaxFill() - spent.getFill() < recipe.steam * steamUseMult / 100) return false;
+        if (steamUsed > 100) return false;
+        if (output != null) {
+            if (output.material != recipe.output.material) return false;
+            return output.amount + recipe.output.amount <= MAX_OUTPUT;
+        }
         return true;
     }
 
@@ -256,5 +285,36 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new RotaryFurnaceMenu(id, inv, this);
+    }
+
+    static void readRotary(JsonObject obj) {
+        // CE TileEntityMachineRotaryFurnace.java:480-482
+        if (obj.has("M:burnModule")) {
+            burnModule.readIfPresent(obj.get("M:burnModule").getAsJsonObject());
+        }
+    }
+
+    static void writeRotary(JsonWriter writer) throws IOException {
+        // CE TileEntityMachineRotaryFurnace.java:487-489
+        writer.name("M:burnModule").beginObject();
+        burnModule.writeConfig(writer);
+        writer.endObject();
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "rotaryfurnace";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readRotary(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeRotary(writer);
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.hbm.main;
 
+import com.hbm.blockentity.machine.MachineCrucibleBlockEntity;
 import com.hbm.blockentity.machine.MachineDieselBlockEntity;
 import com.hbm.blockentity.machine.MachineIndustrialTurbineBlockEntity;
 import com.hbm.blockentity.machine.MachineRadarBlockEntity;
@@ -8,8 +9,12 @@ import com.hbm.blockentity.machine.chem.CentrifugeBlockEntity;
 import com.hbm.blockentity.machine.dummyable.CondenserBlockEntity;
 import com.hbm.blockentity.machine.dummyable.CondenserPoweredBlockEntity;
 import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeaterFireboxBlockEntity;
+import com.hbm.blockentity.machine.dummyable.HeaterOvenBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineAshpitBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineChungusBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineForceFieldBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineRotaryFurnaceBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
 import com.hbm.blockentity.machine.oil.MachineFrackingTowerBlockEntity;
 import com.hbm.blockentity.machine.oil.MachineOilWellBlockEntity;
@@ -51,6 +56,11 @@ public final class AutoRegistry {
             configurableMachineClasses.add(MachineOilWellBlockEntity.ConfigDummy.class);
             configurableMachineClasses.add(MachinePumpjackBlockEntity.ConfigDummy.class);
             configurableMachineClasses.add(MachineFrackingTowerBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(HeaterFireboxBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(HeaterOvenBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachineAshpitBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachineCrucibleBlockEntity.ConfigDummy.class);
+            configurableMachineClasses.add(MachineRotaryFurnaceBlockEntity.ConfigDummy.class);
         }
         MachineDynConfig.initialize();
         MainRegistry.logger.debug("Successfully loaded {} configurable machine classes.", configurableMachineClasses.size());

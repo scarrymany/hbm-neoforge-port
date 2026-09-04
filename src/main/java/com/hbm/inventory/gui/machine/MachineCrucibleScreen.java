@@ -60,17 +60,17 @@ public class MachineCrucibleScreen extends GuiInfoContainer<MachineCrucibleMenu>
 
         MachineCrucibleBlockEntity be = this.getMenu().be;
 
-        int pGauge = (int) (33L * be.getProgress() / MachineCrucibleBlockEntity.PROCESS_TIME);
+        int pGauge = (int) (33L * be.getProgress() / MachineCrucibleBlockEntity.processTime);
         if (pGauge > 0) guiGraphics.fill(x + 126, y + 82, x + 126 + pGauge, y + 87, 0xFF00A000);
 
-        int hGauge = (int) (33L * be.getHeat() / MachineCrucibleBlockEntity.MAX_HEAT);
+        int hGauge = (int) (33L * be.getHeat() / MachineCrucibleBlockEntity.maxHeat);
         if (hGauge > 0) guiGraphics.fill(x + 126, y + 91, x + 126 + hGauge, y + 96, 0xFFFF4500);
 
         // Recipe-select zone.
         guiGraphics.fill(x + RECIPE_ZONE_X, y + RECIPE_ZONE_Y, x + RECIPE_ZONE_X + RECIPE_ZONE_SIZE, y + RECIPE_ZONE_Y + RECIPE_ZONE_SIZE, 0xFF4A4A4A);
 
-        drawStackBar(guiGraphics, be.getRecipeStack(), MachineCrucibleBlockEntity.RECIPE_Z_CAPACITY, x + 62, y + 97);
-        drawStackBar(guiGraphics, be.getWasteStack(), MachineCrucibleBlockEntity.WASTE_Z_CAPACITY, x + 17, y + 97);
+        drawStackBar(guiGraphics, be.getRecipeStack(), MachineCrucibleBlockEntity.recipeZCapacity, x + 62, y + 97);
+        drawStackBar(guiGraphics, be.getWasteStack(), MachineCrucibleBlockEntity.wasteZCapacity, x + 17, y + 97);
     }
 
     /** CE: {@code GUICrucible.drawStack} (textured) - re-expressed as solid-color rectangles per material layer, keyed off {@link NTMMaterial#moltenColor}. */
@@ -102,9 +102,9 @@ public class MachineCrucibleScreen extends GuiInfoContainer<MachineCrucibleMenu>
         drawCustomInfoStat(guiGraphics, mouseX, mouseY, 61, 17, 36, 81, mouseX, mouseY, stackTooltip(be.getRecipeStack()));
 
         drawCustomInfoStat(guiGraphics, mouseX, mouseY, 126, 82, 33, 5, mouseX, mouseY,
-                Component.literal(be.getProgress() + " / " + MachineCrucibleBlockEntity.PROCESS_TIME + " TU"));
+                Component.literal(be.getProgress() + " / " + MachineCrucibleBlockEntity.processTime + " TU"));
         drawCustomInfoStat(guiGraphics, mouseX, mouseY, 126, 91, 33, 5, mouseX, mouseY,
-                Component.literal(be.getHeat() + " / " + MachineCrucibleBlockEntity.MAX_HEAT + " TU"));
+                Component.literal(be.getHeat() + " / " + MachineCrucibleBlockEntity.maxHeat + " TU"));
 
         if (RECIPE_ZONE_X <= mouseX && RECIPE_ZONE_X + RECIPE_ZONE_SIZE > mouseX && RECIPE_ZONE_Y < mouseY && RECIPE_ZONE_Y + RECIPE_ZONE_SIZE >= mouseY) {
             CrucibleRecipe loaded = CrucibleRecipes.getRecipe(be.getRecipeName());

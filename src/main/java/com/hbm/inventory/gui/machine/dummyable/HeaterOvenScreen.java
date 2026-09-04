@@ -29,7 +29,7 @@ public class HeaterOvenScreen extends GuiInfoContainer<HeaterOvenMenu> {
         HeaterOvenBlockEntity be = this.getMenu().be;
         int bh = be.maxBurnTime <= 0 ? 0 : be.burnTime * 14 / be.maxBurnTime;
         if (bh > 0) guiGraphics.blit(TEXTURE, x + 80, y + 54 + (14 - bh), 176, 14 - bh, 14, bh);
-        int hh = be.heatEnergy * 52 / HeaterOvenBlockEntity.OVEN_MAX_HEAT;
+        int hh = be.heatEnergy * 52 / HeaterOvenBlockEntity.maxHeatEnergy;
         guiGraphics.fill(x + 143, y + 70 - hh, x + 159, y + 70, 0xFFFF4400);
     }
 

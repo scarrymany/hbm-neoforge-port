@@ -1,10 +1,13 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.AshpitMenu;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.ItemEnums.EnumAshType;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -19,9 +22,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.IOException;
+
 /**
  * CE {@code TileEntityAshpit} — 5 output slots, door animation, ash→powder conversion.
  * All 5 ash types: wood/coal/misc/fly/soot (fullerene not used by CE ashpit).
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityAshpit.java:55-76} ({@code ashpit}).
  */
 public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, MenuProvider {
@@ -37,12 +43,12 @@ public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
     public int ashLevelFly = 0;
     public int ashLevelSoot = 0;
 
-    // CE TileEntityAshpit.java:45-49: configurable thresholds
-    public static final int THRESHOLD_WOOD = 2000;
-    public static final int THRESHOLD_COAL = 2000;
-    public static final int THRESHOLD_MISC = 2000;
-    public static final int THRESHOLD_FLY = 2000;
-    public static final int THRESHOLD_SOOT = 8000;
+    // CE TileEntityAshpit.java:45-49
+    public static int thresholdWood = 2000;
+    public static int thresholdCoal = 2000;
+    public static int thresholdMisc = 2000;
+    public static int thresholdFly = 2000;
+    public static int thresholdSoot = 8000;
 
     public MachineAshpitBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, false, false);
@@ -74,11 +80,11 @@ public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
 
         if (!level.isClientSide) {
             // CE TileEntityAshpit.java:89-93: process all 5 ash types
-            if (processAsh(ashLevelWood, EnumAshType.WOOD, THRESHOLD_WOOD)) ashLevelWood -= THRESHOLD_WOOD;
-            if (processAsh(ashLevelCoal, EnumAshType.COAL, THRESHOLD_COAL)) ashLevelCoal -= THRESHOLD_COAL;
-            if (processAsh(ashLevelMisc, EnumAshType.MISC, THRESHOLD_MISC)) ashLevelMisc -= THRESHOLD_MISC;
-            if (processAsh(ashLevelFly, EnumAshType.FLY, THRESHOLD_FLY)) ashLevelFly -= THRESHOLD_FLY;
-            if (processAsh(ashLevelSoot, EnumAshType.SOOT, THRESHOLD_SOOT)) ashLevelSoot -= THRESHOLD_SOOT;
+            if (processAsh(ashLevelWood, EnumAshType.WOOD, thresholdWood)) ashLevelWood -= thresholdWood;
+            if (processAsh(ashLevelCoal, EnumAshType.COAL, thresholdCoal)) ashLevelCoal -= thresholdCoal;
+            if (processAsh(ashLevelMisc, EnumAshType.MISC, thresholdMisc)) ashLevelMisc -= thresholdMisc;
+            if (processAsh(ashLevelFly, EnumAshType.FLY, thresholdFly)) ashLevelFly -= thresholdFly;
+            if (processAsh(ashLevelSoot, EnumAshType.SOOT, thresholdSoot)) ashLevelSoot -= thresholdSoot;
 
             // CE TileEntityAshpit.java:95-99: isFull flag
             isFull = false;
@@ -147,5 +153,40 @@ public class MachineAshpitBlockEntity extends MachineBaseBlockEntity
         ashLevelMisc = tag.getInt("ashLevelMisc");
         ashLevelFly = tag.getInt("ashLevelFly");
         ashLevelSoot = tag.getInt("ashLevelSoot");
+    }
+
+    static void readAshpit(JsonObject obj) {
+        // CE TileEntityAshpit.java:62-66
+        thresholdWood = IConfigurableMachine.grab(obj, "I:thresholdWood", thresholdWood);
+        thresholdCoal = IConfigurableMachine.grab(obj, "I:thresholdCoal", thresholdCoal);
+        thresholdMisc = IConfigurableMachine.grab(obj, "I:thresholdMisc", thresholdMisc);
+        thresholdFly = IConfigurableMachine.grab(obj, "I:thresholdFly", thresholdFly);
+        thresholdSoot = IConfigurableMachine.grab(obj, "I:thresholdSoot", thresholdSoot);
+    }
+
+    static void writeAshpit(JsonWriter writer) throws IOException {
+        // CE TileEntityAshpit.java:71-75
+        writer.name("I:thresholdWood").value(thresholdWood);
+        writer.name("I:thresholdCoal").value(thresholdCoal);
+        writer.name("I:thresholdMisc").value(thresholdMisc);
+        writer.name("I:thresholdFly").value(thresholdFly);
+        writer.name("I:thresholdSoot").value(thresholdSoot);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "ashpit";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readAshpit(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeAshpit(writer);
+        }
     }
 }
