@@ -4,6 +4,8 @@ import com.hbm.api.energymk2.IEnergyConductorMK2;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.energymk2.Nodespace;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -60,13 +62,12 @@ import net.minecraft.world.level.block.state.BlockState;
  *   this port's precedent of dropping other Forge-1.12-era optional-mod integrations with no confirmed
  *   NeoForge 1.21 build, e.g. Galacticraft), CE's {@code @Optional.Interface}-gated
  *   {@code SimpleComponent}/{@code @Callback} methods are not ported.</li>
- *   <li><b>No redstone-over-radio.</b> {@code IRORValueProvider}/{@code IRORInteractive} are a small,
- *   separate cross-cutting system (query side already ported per Phase 0, interactive side not);
- *   omitted here as a narrow, documented follow-up rather than guessed at.</li>
  * </ul>
+ * ROR: CE {@code TileEntityMachineBattery.java:362-415}.
  */
 public class BatteryBlockEntity extends MachineBaseBlockEntity
-        implements ITickableBE, IEnergyConductorMK2, IEnergyProviderMK2, IEnergyReceiverMK2, IPersistentNBT {
+        implements ITickableBE, IEnergyConductorMK2, IEnergyProviderMK2, IEnergyReceiverMK2, IPersistentNBT,
+        IRORValueProvider, IRORInteractive {
 
     public static final int MODE_INPUT = 0;
     public static final int MODE_BUFFER = 1;
@@ -330,7 +331,63 @@ public class BatteryBlockEntity extends MachineBaseBlockEntity
         priority = IEnergyReceiverMK2.ConnectionPriority.VALUES[data.getInt("priority")];
     }
 
-    // setDestroyedByCreativePlayer()/isDestroyedByCreativePlayer() are not overridden here -
-    // MachineBaseBlockEntity already implements both concretely, satisfying IPersistentNBT's two
-    // abstract methods without a second, shadowing flag on this subclass.
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :362-364
+        return new String[]{
+                PREFIX_VALUE + "fill", PREFIX_VALUE + "fillpercent", PREFIX_VALUE + "delta",
+                PREFIX_FUNCTION + "setmode" + NAME_SEPARATOR + "mode (0-3)",
+                PREFIX_FUNCTION + "setmode" + NAME_SEPARATOR + "mode" + PARAM_SEPARATOR + "fallback (0-3)",
+                PREFIX_FUNCTION + "setredmode" + NAME_SEPARATOR + "mode (0-3)",
+                PREFIX_FUNCTION + "setredmode" + NAME_SEPARATOR + "mode" + PARAM_SEPARATOR + "fallback (0-3)",
+                PREFIX_FUNCTION + "setpriority" + NAME_SEPARATOR + "priority (0-2)",
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :367-371
+        if ((PREFIX_VALUE + "fill").equals(name)) return "" + power;
+        if ((PREFIX_VALUE + "fillpercent").equals(name)) return "" + getPowerRemainingScaled(100);
+        if ((PREFIX_VALUE + "delta").equals(name)) return "" + delta;
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :375-415
+        if ((PREFIX_FUNCTION + "setmode").equals(name) && params.length > 0) {
+            int next = IRORInteractive.parseInt(params[0], 0, 3);
+            if (next != this.redLow) {
+                this.redLow = (short) next;
+                setChanged();
+                return null;
+            } else if (params.length > 1) {
+                this.redLow = (short) IRORInteractive.parseInt(params[1], 0, 3);
+                setChanged();
+                return null;
+            }
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "setredmode").equals(name) && params.length > 0) {
+            int next = IRORInteractive.parseInt(params[0], 0, 3);
+            if (next != this.redHigh) {
+                this.redHigh = (short) next;
+                setChanged();
+                return null;
+            } else if (params.length > 1) {
+                this.redHigh = (short) IRORInteractive.parseInt(params[1], 0, 3);
+                setChanged();
+                return null;
+            }
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "setpriority").equals(name) && params.length > 0) {
+            int p = IRORInteractive.parseInt(params[0], 0, 2) + 1;
+            this.priority = IEnergyReceiverMK2.ConnectionPriority.VALUES[p];
+            setChanged();
+            return null;
+        }
+        return null;
+    }
 }

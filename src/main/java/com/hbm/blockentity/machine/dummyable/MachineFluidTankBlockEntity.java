@@ -1,6 +1,8 @@
 package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.MachineFluidTankMenu;
@@ -41,9 +43,11 @@ import java.util.List;
  * TODO(CE: TileEntityMachineFluidTank.java:343): ExplosionVNT.makeAmat().setBlockAllocator(null).setBlockProcessor(null).
  * TODO(CE: TileEntityMachineFluidTank.java:348): ParticleUtil.spawnGasFlame particle.
  * TODO(CE: TileEntityMachineFluidTank.java:356-365): AuxParticlePacketNT Tower particle.
+ * ROR: CE {@code TileEntityMachineFluidTank.java:652-682}.
  */
 public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
-        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final int CAPACITY = 256_000;
     public static final short MODES = 4;
@@ -217,6 +221,44 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new MachineFluidTankMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :652-654
+        return new String[]{
+                PREFIX_VALUE + "type", PREFIX_VALUE + "fill", PREFIX_VALUE + "fillpercent",
+                PREFIX_FUNCTION + "setmode" + NAME_SEPARATOR + "mode (0-3)",
+                PREFIX_FUNCTION + "setmode" + NAME_SEPARATOR + "mode" + PARAM_SEPARATOR + "fallback (0-3)",
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :657-661
+        if ((PREFIX_VALUE + "type").equals(name)) return tank.getTankType().getName();
+        if ((PREFIX_VALUE + "fill").equals(name)) return "" + tank.getFill();
+        if ((PREFIX_VALUE + "fillpercent").equals(name)) return "" + (tank.getFill() * 100 / tank.getMaxFill());
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :665-682
+        if ((PREFIX_FUNCTION + "setmode").equals(name) && params.length > 0) {
+            int next = IRORInteractive.parseInt(params[0], 0, 3);
+            if (next != this.mode) {
+                this.mode = (short) next;
+                setChanged();
+                return null;
+            } else if (params.length > 1) {
+                this.mode = (short) IRORInteractive.parseInt(params[1], 0, 3);
+                setChanged();
+                return null;
+            }
+            return null;
+        }
+        return null;
     }
 
     /**
