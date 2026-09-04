@@ -4,6 +4,8 @@ import com.hbm.api.fluidmk2.IFluidStandardSenderMK2;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.api.fluidmk2.IFillableItem;
+import com.hbm.capability.NTMFluidCapabilityHandler;
 import com.hbm.inventory.container.machine.dummyable.FurnaceCombinationMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -30,6 +32,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityFurnaceCombination}: heat-driven, processTime 20_000, maxHeat 100_000.
+ * {@code unloadTank(2,3)} Exact CE {@code TileEntityFurnaceCombination.java:93}.
  */
 public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardSenderMK2, ITickableBE, MenuProvider {
@@ -58,7 +61,13 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return slot == SLOT_IN && CombinationRecipes.getOutput(stack) != null;
+        if (slot == SLOT_IN) return CombinationRecipes.getOutput(stack) != null;
+        // CE :213 returns false for slot 2; without this the empty canister never lands and unloadTank is dead.
+        if (slot == 2) {
+            return NTMFluidCapabilityHandler.isEmptyNtmFluidContainer(stack.getItem())
+                    || stack.getItem() instanceof IFillableItem;
+        }
+        return false;
     }
 
     @Override
@@ -96,6 +105,8 @@ public class FurnaceCombinationBlockEntity extends MachineBaseBlockEntity
         }
 
         wasOn = false;
+        // CE TileEntityFurnaceCombination.java:93
+        tank.unloadTank(2, 3, inventory);
         if (canSmelt()) {
             int burn = heat / 100;
             if (burn > 0) {
