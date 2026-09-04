@@ -33,6 +33,7 @@ import java.util.List;
 /**
  * CE {@code TileEntityMachineWoodBurner.java}:72-136 — vanilla burn-time + optional
  * {@code FT_Flammable} tank. Ash ({@code powder_ash}) skipped (unregistered).
+ * {@code setType(2)} / {@code loadTank(3,4)} Exact CE {@code :79-80}.
  */
 public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -81,10 +82,9 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
 
         powerGen = 0;
 
-        ItemStack id = inventory.getStackInSlot(2);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            tank.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineWoodBurner.java:79-80
+        this.tank.setType(2, inventory);
+        this.tank.loadTank(3, 4, inventory);
 
         power = Library.chargeItemsFromTE(inventory, 5, power, MAX_POWER);
 

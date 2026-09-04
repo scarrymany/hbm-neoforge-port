@@ -31,7 +31,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * CE {@code TileEntityMachineVacuumDistill}: 10k HE / 100 mB @ PU2. Canister unload skipped.
+ * CE {@code TileEntityMachineVacuumDistill}: 10k HE / 100 mB @ PU2.
+ * {@code setType(9)} / four {@code unloadTank} Exact CE {@code :75-82}.
  */
 public class MachineVacuumDistillBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -89,11 +90,13 @@ public class MachineVacuumDistillBlockEntity extends MachineBaseBlockEntity
             }
         }
         power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
-        ItemStack id = inventory.getStackInSlot(9);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            input.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineVacuumDistill.java:75-82
+        input.setType(9, inventory);
         refine();
+        heavy.unloadTank(1, 2, inventory);
+        reformate.unloadTank(3, 4, inventory);
+        light.unloadTank(5, 6, inventory);
+        gas.unloadTank(7, 8, inventory);
         for (DirPos pos : getConPos()) {
             if (heavy.getFill() > 0) tryProvide(heavy, level, pos);
             if (reformate.getFill() > 0) tryProvide(reformate, level, pos);
