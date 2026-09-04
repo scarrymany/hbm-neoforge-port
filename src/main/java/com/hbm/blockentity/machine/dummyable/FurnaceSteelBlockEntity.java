@@ -3,6 +3,7 @@ package com.hbm.blockentity.machine.dummyable;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.FurnaceSteelMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,7 +28,9 @@ import java.util.Optional;
 
 /**
  * CE {@code TileEntityFurnaceSteel.java}:59-111 — 3-lane heat smelter, processTime 40_000,
- * maxHeat 100_000, diffusion 0.05. Ore bonus / pollution / particles skipped.
+ * maxHeat 100_000, diffusion 0.05. Ore bonus skipped.
+ * {@code incrementPollution(SOOT, SOOT_PER_SECOND*2)} every 20t per smelting lane Exact CE {@code :80}.
+ * Smoke particles stay skipped (VFX).
  */
 public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -79,6 +82,11 @@ public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements I
             progress[i] += burn;
             heat -= burn;
             wasOn = true;
+            // CE TileEntityFurnaceSteel.java:80
+            if (level.getGameTime() % 20 == 0) {
+                PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                        PollutionHandler.SOOT_PER_SECOND * 2);
+            }
             if (progress[i] >= PROCESS_TIME) {
                 Optional<ItemStack> result = smeltResult(inventory.getStackInSlot(i));
                 if (result.isPresent()) {
