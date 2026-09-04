@@ -11,6 +11,7 @@ import com.hbm.handler.neutron.RBMKNeutronHandler;
 import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.items.machine.ItemRBMKRod;
 import com.hbm.items.machine.rbmk.RBMKRods;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -26,7 +27,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * the sibling {@code rbmk_core_logic} package's {@code com.hbm.api.rbmk} (reconciled against the real
  * classes, not a forward-referenced guess).
  * <p>
- * <b>Not ported</b>: OpenComputers, satellite-scan. ROR: CE {@code TileEntityRBMKRod.java:554-577}.
+ * <b>Not ported</b>: OpenComputers. ROR: CE {@code TileEntityRBMKRod.java:554-577}.
+ * SatelliteRayScan Exact CE {@code TileEntityRBMKRod.java:132-133}.
  * {@code ChunkRadiationManager} un-lidded irradiation (Phase 4) is now wired in {@link #updateEntity}.
  */
 public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity
@@ -100,6 +102,12 @@ public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity
 
         ItemStack stack = inventory.getStackInSlot(0).copy();
         if (stack.getItem() instanceof ItemRBMKRod rod) {
+            // Exact CE TileEntityRBMKRod.java:132-133 — before burn zeroes fluxQuantity
+            if (this.fluxQuantity > 0 && level.getGameTime() % 200 == 0) {
+                SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                        SatelliteRayScan.RayEvent.INFO_NUCLEAR, 300);
+            }
+
             this.rodColor = rod.colorTint;
 
             double fluxIn = fluxFromType(rod.nType);

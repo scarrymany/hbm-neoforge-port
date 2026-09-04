@@ -14,6 +14,7 @@ import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingType;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemICFPellet;
 import com.hbm.lib.DirPos;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -61,6 +62,7 @@ import java.util.List;
  *
  * {@code tanks[0].setType(11)} Exact CE {@code TileEntityICF.java:82}. Slot 11 Exact CE
  * {@code ContainerICF.java:23}. Hopper {@code io} excludes 11 — CE {@code :52}.
+ * SatelliteRayScan Exact CE {@code TileEntityICF.java:126-128}.
  */
 public class IcfReactorBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, IFluidStandardTransceiverMK2, IPersistentNBT, MenuProvider {
@@ -165,6 +167,12 @@ public class IcfReactorBlockEntity extends MachineBaseBlockEntity
             this.heatup = ItemICFPellet.react(copy, this.laser);
             inventory.setStackInSlot(ACTIVE_SLOT, copy);
             this.heat += heatup;
+
+            // Exact CE TileEntityICF.java:126-128 — react-path ping; Hadron VFX skipped
+            if (level.getGameTime() % 20 == 15) {
+                SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                        SatelliteRayScan.RayEvent.INFO_PARTICLE, 200);
+            }
 
             // stellar-flux byproduct only accrues on an actual reaction tick, matching CE
             tanks[2].setFill(tanks[2].getFill() + (int) Math.ceil(this.heat * 10.0D / MAX_HEAT));
