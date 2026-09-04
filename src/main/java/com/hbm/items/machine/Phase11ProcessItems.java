@@ -58,6 +58,7 @@ public final class Phase11ProcessItems {
     public static DeferredItem<Item> SOLINIUM_IGNITER;
     public static DeferredItem<Item> SOLINIUM_PROPELLANT;
     public static DeferredItem<Item> PELLET_CLUSTER;
+    public static DeferredItem<Item> PARTICLE_EMPTY;
 
     private Phase11ProcessItems() {
     }
@@ -130,8 +131,10 @@ public final class Phase11ProcessItems {
             parts("chunk_ore_" + type.name().toLowerCase());
         }
 
+        // CE ModItems.java:2314 — particle_muon.setContainerItem(particle_empty)
+        PARTICLE_EMPTY = control("particle_empty");
         String[] particles = {
-                "particle_empty", "particle_hydrogen", "particle_copper", "particle_lead",
+                "particle_hydrogen", "particle_copper", "particle_lead",
                 "particle_amat", "particle_aschrab", "particle_dark", "particle_higgs",
                 "particle_tachyon", "particle_strange", "particle_sparkticle"
         };

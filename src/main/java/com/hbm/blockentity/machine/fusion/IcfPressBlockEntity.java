@@ -42,6 +42,7 @@ import java.util.List;
  * bonus ({@link ItemICFPellet#getFusingDifficulty}).
  * {@code tanks[0].setType(6)} / {@code tanks[1].setType(7)} Exact CE {@code TileEntityICFPress.java:57-58}.
  * Slots 6/7 Exact CE {@code ContainerICFPress.java:47-48}.
+ * Muon {@code getContainerItem} → slot 3 Exact CE {@code TileEntityICFPress.java:67-85}.
  */
 public class IcfPressBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, IFluidStandardReceiverMK2, IPersistentNBT, MenuProvider {
@@ -90,9 +91,27 @@ public class IcfPressBlockEntity extends MachineBaseBlockEntity
 
         ItemStack muonStack = inventory.getStackInSlot(SLOT_MUON);
         if (muon <= 0 && !muonStack.isEmpty() && muonStack.getItem() == IcfPressItems.PARTICLE_MUON.get()) {
-            muonStack.shrink(1);
-            this.muon = MAX_MUON;
-            setChanged();
+            // CE TileEntityICFPress.java:67-85 — getContainerItem → slot 3
+            ItemStack container = muonStack.getCraftingRemainingItem();
+            ItemStack outputContainerStack = inventory.getStackInSlot(SLOT_MUON_CONTAINER_OUT);
+            boolean canStore = false;
+
+            if (container.isEmpty()) {
+                canStore = true;
+            } else if (outputContainerStack.isEmpty()) {
+                inventory.setStackInSlot(SLOT_MUON_CONTAINER_OUT, container.copy());
+                canStore = true;
+            } else if (ItemStack.isSameItem(outputContainerStack, container)
+                    && outputContainerStack.getCount() < outputContainerStack.getMaxStackSize()) {
+                outputContainerStack.grow(1);
+                canStore = true;
+            }
+
+            if (canStore) {
+                this.muon = MAX_MUON;
+                muonStack.shrink(1);
+                setChanged();
+            }
         }
 
         press();

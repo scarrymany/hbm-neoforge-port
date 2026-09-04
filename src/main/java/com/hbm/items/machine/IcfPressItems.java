@@ -19,8 +19,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * {@code <Family>Blocks}/{@code <Family>Items} class in this Phase 2 wave) rather than folding into
  * {@code MachineItems} - avoids two parallel Phase 2 packages racing on that one shared file, per
  * this task's own package-isolation instruction. Both items are plain data-less {@link ItemBase}
- * instances (CE's own {@code ModItems.icf_pellet_empty}/{@code particle_muon} carry no NBT/behavior
- * beyond stack size), so no dedicated item subclass is needed.
+ * instances (CE's own {@code ModItems.icf_pellet_empty} is plain; {@code particle_muon} has
+ * {@code setContainerItem(particle_empty)} — Exact CE {@code ModItems.java:2317}).
  */
 public final class IcfPressItems {
 
@@ -34,7 +34,8 @@ public final class IcfPressItems {
         ICF_PELLET_EMPTY = ModItems.ITEMS.register("icf_pellet_empty", () -> new ItemBase(new Item.Properties()));
         CreativeTabContents.add(ModCreativeTabs.CONTROL, ICF_PELLET_EMPTY);
 
-        PARTICLE_MUON = ModItems.ITEMS.register("particle_muon", () -> new ItemBase(new Item.Properties()));
+        PARTICLE_MUON = ModItems.ITEMS.register("particle_muon", () -> new ItemBase(
+                new Item.Properties().craftRemainder(Phase11ProcessItems.PARTICLE_EMPTY.get())));
         CreativeTabContents.add(ModCreativeTabs.CONTROL, PARTICLE_MUON);
     }
 }
