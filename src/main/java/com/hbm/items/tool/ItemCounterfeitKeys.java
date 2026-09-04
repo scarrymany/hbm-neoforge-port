@@ -16,13 +16,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Cuts a counterfeit {@link ItemKeyPin} from an {@link ILockable} target's current pin combination,
- * ported from CE's {@code com.hbm.items.tool.ItemCounterfeitKeys} (read in full). The produced key
- * is a plain pin-matching {@link ItemKeyPin} stack (CE: {@code ModItems.key_fake}, itself an
- * {@code ItemKeyPin} instance, not the universal {@link ItemKey} master key), fetched from
- * {@link CouplingToolItems#KEY_PIN} - a lazy supplier reference rather than a compile-time constant
- * so this file has no static-init-order dependency on {@code CouplingToolItems} (which itself
- * references this class to build its registrations).
+ * Exact CE {@code ItemCounterfeitKeys} {@code :30-66}: cheesable lock → replace held tool with
+ * pin-key then add a second copy (drop if full). {@code !cheesable} → two chat lines.
  */
 public class ItemCounterfeitKeys extends Item {
 
@@ -42,10 +37,12 @@ public class ItemCounterfeitKeys extends Item {
         if (!(te instanceof ILockable lockable)) return InteractionResult.PASS;
         if (level.isClientSide || player == null) return InteractionResult.SUCCESS;
 
+        // CE ItemCounterfeitKeys.java:37-56
         if (lockable.isLocked() && lockable.isCheesable()) {
             ItemStack fake = new ItemStack(fakeKeySupplier.get());
             ItemKeyPin.setPins(fake, lockable.getPins());
 
+            player.setItemInHand(context.getHand(), fake.copy());
             if (!player.getInventory().add(fake.copy())) {
                 player.drop(fake.copy(), false);
             }
@@ -53,8 +50,9 @@ public class ItemCounterfeitKeys extends Item {
             return InteractionResult.SUCCESS;
         }
 
-        if (lockable.isLocked()) {
+        if (!lockable.isCheesable()) {
             player.displayClientMessage(Component.literal("This lock is too elaborate for a counterfeit key to be made").withStyle(ChatFormatting.LIGHT_PURPLE), false);
+            player.displayClientMessage(Component.literal("Perhaps there is another way around here to unlock it").withStyle(ChatFormatting.LIGHT_PURPLE), false);
         }
 
         return InteractionResult.PASS;
@@ -62,6 +60,6 @@ public class ItemCounterfeitKeys extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.literal("Use on a locked container to create a counterfeit key!").withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.literal("Use on a locked container to create two counterfeit keys!"));
     }
 }
