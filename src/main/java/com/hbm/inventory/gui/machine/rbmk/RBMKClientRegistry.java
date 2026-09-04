@@ -32,7 +32,7 @@ public final class RBMKClientRegistry {
         SafeMenuScreens.bind(event, RBMKMenuTypes.CONTROL, RBMKControlScreen::new);
         SafeMenuScreens.bind(event, RBMKMenuTypes.CONTROL_AUTO, RBMKControlAutoScreen::new);
         SafeMenuScreens.bind(event, RBMKMenuTypes.STORAGE, RBMKStorageScreen::new);
-        SafeMenuScreens.bind(event, RBMKMenuTypes.BOILER, RBMKBoilerScreen::new);
+        SafeMenuScreens.bind(event, RBMKMenuTypes.BOILER, com.hbm.client.gui.screens.rbmk.RBMKBoilerScreen::new);
         SafeMenuScreens.bind(event, RBMKMenuTypes.HEATER, RBMKHeaterScreen::new);
         SafeMenuScreens.bind(event, RBMKMenuTypes.AUTOLOADER, RBMKAutoloaderScreen::new);
         SafeMenuScreens.bind(event, RBMKMenuTypes.OUTGASSER, RBMKOutgasserScreen::new);
