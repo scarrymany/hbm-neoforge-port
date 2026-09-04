@@ -16,6 +16,7 @@ import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingStep;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingType;
 import com.hbm.inventory.fluid.trait.FT_PWRModerator;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemPWRFuel;
 import com.hbm.items.machine.ItemPWRFuel.EnumPWRFuel;
 import com.hbm.items.machine.PWRHotFuelItems;
@@ -57,19 +58,12 @@ import java.util.Map;
  * formulas themselves (heat-capacity scaling, the connection-efficiency curve, core/hull heat
  * equalization, the 0.999 per-tick decay).
  *
- * <h2>3-slot inventory, slot 2 unused</h2>
- * Kept at CE's own {@code super(3, true, false)} shape even though slot 2 is never read or written
- * anywhere in this class either (matching CE bit for bit) - see the research report's "open question"
- * on this: it may be a vestigial slot from an earlier CE revision, or a slot {@code ContainerPWR}
- * itself uses. Not resolved here, faithfully preserved rather than silently dropped to 2 slots.
+ * <h2>3-slot inventory</h2>
+ * Slot 2 is the coolant {@link IItemFluidIdentifier} — Exact CE {@code TileEntityPWRController.java:183}
+ * {@code tanks[0].setType(2, inventory)} when {@code amountLoaded <= 0}.
  *
  * <h2>Deliberate drops from CE, each independently justified</h2>
  * <ul>
- *   <li>The item-canister coolant-loading line ({@code tanks[0].setType(2, inventory)}) is dropped -
- *   {@link FluidTankNTM}'s own javadoc already documents that CE's item-canister loading subsystem
- *   ({@code loadTank}/{@code unloadTank}/{@code setType(int, IInventory)}) was not ported (neither
- *   exists in this port yet). The coolant tank fills only through the fluid pipe network
- *   ({@link #updateEntity()}'s {@code trySubscribe} calls below), not from an inventory slot.</li>
  *   <li>The {@code isPrinting}/{@link com.hbm.items.machine.ItemPWRPrinter} sync-channel hijack is
  *   dropped - already flagged Deferred in both {@code docs/phase1/items_machine.md} and this
  *   package's own research report ("port the controller's normal serialize/deserialize path first").
@@ -192,8 +186,8 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        // CE's item-canister coolant-loading line (tanks[0].setType(2, inventory)) is dropped - see
-        // class javadoc "Deliberate drops from CE".
+        // CE TileEntityPWRController.java:183
+        if (this.amountLoaded <= 0) this.tanks[0].setType(2, inventory);
         setupTanks();
 
         if (unloadDelay > 0) unloadDelay--;
@@ -419,7 +413,10 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return slot == 0 && stack.getItem() instanceof ItemPWRFuel;
+        if (slot == 0) return stack.getItem() instanceof ItemPWRFuel;
+        // CE :483-486 returns false for slot 2; without this the ID never lands and setType is dead.
+        if (slot == 2) return stack.getItem() instanceof IItemFluidIdentifier;
+        return false;
     }
 
     @Override
