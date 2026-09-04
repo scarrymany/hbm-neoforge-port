@@ -12,7 +12,8 @@ import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
-import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
+import com.hbm.interfaces.IControlReceiver;
+import com.hbm.inventory.recipes.ChemicalPlantRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes.ChemPlantRecipe;
 import com.hbm.items.machine.ItemBlueprints;
 import com.hbm.items.machine.ItemMachineUpgrade;
@@ -44,7 +45,7 @@ import java.util.Map;
 /**
  * CE {@code TileEntityMachineChemicalFactory}: 32 slots, 4 chemplant lanes, 12+12 tanks @ 24000 +
  * water/lps 4000. Upgrade then {@code speed*2D, pow*2D}. Recipes = {@link ChemPlantRecipes}.
- * TODO(CE: GUIMachineChemicalFactory.java:63): GUIScreenRecipeSelector / named recipe / receiveControl.
+ * Named recipe + {@code receiveControl} index/selection — CE {@code TileEntityMachineChemicalFactory.java:428-436}.
  * TODO(CE: TileEntityMachineChemicalFactory.java:168-174): loadTank(10,13) leftover chem-plant slot
  * numbers overlap module outputs — factory container has no canister slots. Not copied.
  * TODO(CE: TileEntityMachineChemicalFactory.java:235-250): AudioWrapper chemicalPlant loop.
@@ -54,7 +55,7 @@ import java.util.Map;
  * TODO(CE: TileEntityMachineChemicalFactory.java:525-544): IRORValueProvider.
  */
 public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
 
     public static final int LANES = 4;
     public static final long BASE_MAX_POWER = 1_000_000L;
@@ -89,6 +90,7 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
     public long maxPower = BASE_MAX_POWER;
     public boolean[] didProcess = new boolean[LANES];
     public double[] progress = new double[LANES];
+    public String[] recipes = new String[]{"null", "null", "null", "null"};
 
     public MachineChemicalFactoryBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 32, true, true);
@@ -192,8 +194,11 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
 
         long nextMax = 0;
         for (int i = 0; i < LANES; i++) {
-            ChemPlantRecipe itemOnly = findItemOnlyRecipe(i);
-            if (itemOnly != null) retargetEmptyTanks(i, itemOnly);
+            ChemPlantRecipe selected = ChemicalPlantRecipes.byName(recipes[i]);
+            if (selected != null) {
+                nextMax += selected.power * 100;
+                retargetEmptyTanks(i, selected);
+            }
             ChemPlantRecipe recipe = findRecipe(i);
             didProcess[i] = false;
             if (recipe == null) {
@@ -234,18 +239,10 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
     }
 
     @Nullable
-    private ChemPlantRecipe findItemOnlyRecipe(int lane) {
-        for (ChemPlantRecipe recipe : ChemPlantRecipes.RECIPES) {
-            if (matchesItems(lane, recipe)) return recipe;
-        }
-        return null;
-    }
-
-    @Nullable
     private ChemPlantRecipe findRecipe(int lane) {
-        for (ChemPlantRecipe recipe : ChemPlantRecipes.RECIPES) {
-            if (matchesItems(lane, recipe) && matchesFluids(lane, recipe)) return recipe;
-        }
+        ChemPlantRecipe recipe = ChemicalPlantRecipes.byName(recipes[lane]);
+        if (recipe == null) return null;
+        if (matchesItems(lane, recipe) && matchesFluids(lane, recipe)) return recipe;
         return null;
     }
 
@@ -439,7 +436,10 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
             inputTanks[i].writeToNBT(tag, "i" + i);
             outputTanks[i].writeToNBT(tag, "o" + i);
         }
-        for (int i = 0; i < LANES; i++) tag.putDouble("progress" + i, progress[i]);
+        for (int i = 0; i < LANES; i++) {
+            tag.putDouble("progress" + i, progress[i]);
+            tag.putString("recipe" + i, recipes[i]);
+        }
         water.writeToNBT(tag, "w");
         lps.writeToNBT(tag, "s");
         tag.putLong("power", power);
@@ -453,7 +453,10 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
             inputTanks[i].readFromNBT(tag, "i" + i);
             outputTanks[i].readFromNBT(tag, "o" + i);
         }
-        for (int i = 0; i < LANES; i++) progress[i] = tag.getDouble("progress" + i);
+        for (int i = 0; i < LANES; i++) {
+            progress[i] = tag.getDouble("progress" + i);
+            recipes[i] = tag.contains("recipe" + i) ? tag.getString("recipe" + i) : "null";
+        }
         water.readFromNBT(tag, "w");
         lps.readFromNBT(tag, "s");
         power = tag.getLong("power");
@@ -472,6 +475,7 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < LANES; i++) {
             buf.writeBoolean(didProcess[i]);
             buf.writeDouble(progress[i]);
+            buf.writeUtf(recipes[i]);
         }
     }
 
@@ -487,6 +491,24 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < LANES; i++) {
             didProcess[i] = buf.readBoolean();
             progress[i] = buf.readDouble();
+            recipes[i] = buf.readUtf();
+        }
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("index") && data.contains("selection")) {
+            int index = data.getInt("index");
+            String selection = data.getString("selection");
+            if (index >= 0 && index < LANES) {
+                this.recipes[index] = selection;
+                setChanged();
+            }
         }
     }
 

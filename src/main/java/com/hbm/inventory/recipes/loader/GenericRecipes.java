@@ -33,6 +33,7 @@ import java.util.Map;
 public final class GenericRecipes {
 
     public final Map<String, GenericRecipe> recipeNameMap = new LinkedHashMap<>();
+    public final List<GenericRecipe> recipeOrderedList = new ArrayList<>();
     public final Map<String, List<GenericRecipe>> autoSwitchGroups = new HashMap<>();
 
     public GenericRecipes() {

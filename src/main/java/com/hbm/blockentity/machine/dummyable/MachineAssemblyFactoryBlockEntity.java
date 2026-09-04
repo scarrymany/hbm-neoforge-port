@@ -11,8 +11,9 @@ import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.recipes.AssemblerRecipe;
-import com.hbm.inventory.recipes.ProcessingRecipes;
+import com.hbm.inventory.recipes.AssemblyMachineRecipes;
 import com.hbm.items.machine.ItemBlueprints;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
@@ -31,7 +32,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * CE {@code TileEntityMachineAssemblyFactory}: 60 slots, 4 assembler lanes, tanks 4+4 @ 4000 +
  * water/lps 4000. Upgrade then {@code speed*2D, pow*2D}. Recipes = {@link ProcessingRecipes#ASSEMBLER_TYPE}.
- * TODO(CE: GUIMachineAssemblyFactory.java:62): GUIScreenRecipeSelector / named recipe / receiveControl.
+ * Named recipe + {@code receiveControl} index/selection — CE {@code TileEntityMachineAssemblyFactory.java:390-398}.
  * TODO(CE: TileEntityMachineAssemblyFactory.java:213): CE passes blueprint slot {@code 4+i*7} (chem-factory
  * copy-paste); container/isItemValid use {@code 4+i*14} — this port uses 14.
  * TODO(CE: TileEntityMachineAssemblyFactory.java:228-266): AudioWrapper motor loop + AssemfacArm.
@@ -53,7 +53,7 @@ import java.util.Map;
  * TODO(CE: TileEntityMachineAssemblyFactory.java:744-763): IRORValueProvider.
  */
 public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
 
     public static final int LANES = 4;
     public static final long BASE_MAX_POWER = 1_000_000L;
@@ -87,6 +87,7 @@ public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
     public long maxPower = BASE_MAX_POWER;
     public boolean[] didProcess = new boolean[LANES];
     public double[] progress = new double[LANES];
+    public String[] recipes = new String[]{"null", "null", "null", "null"};
 
     public MachineAssemblyFactoryBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 60, true, true);
@@ -188,8 +189,11 @@ public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
 
         long nextMax = 0;
         for (int i = 0; i < LANES; i++) {
-            AssemblerRecipe itemOnly = findItemOnlyRecipe(i);
-            if (itemOnly != null) retargetInputTank(i, itemOnly);
+            AssemblerRecipe selected = AssemblyMachineRecipes.byName(level, recipes[i]);
+            if (selected != null) {
+                nextMax += selected.getPower() * 100;
+                retargetInputTank(i, selected);
+            }
             AssemblerRecipe recipe = findMatchingRecipe(i);
             didProcess[i] = false;
             if (recipe == null) {
@@ -225,26 +229,13 @@ public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
     }
 
     @Nullable
-    private AssemblerRecipe findItemOnlyRecipe(int lane) {
-        if (level == null) return null;
-        AssemblerRecipe.Input input = AssemblerRecipe.Input.of(laneInputs(lane));
-        for (RecipeHolder<AssemblerRecipe> holder : level.getRecipeManager().getAllRecipesFor(ProcessingRecipes.ASSEMBLER_TYPE.get())) {
-            if (holder.value().matches(input, level)) return holder.value();
-        }
-        return null;
-    }
-
-    @Nullable
     private AssemblerRecipe findMatchingRecipe(int lane) {
-        if (level == null) return null;
+        AssemblerRecipe recipe = AssemblyMachineRecipes.byName(level, recipes[lane]);
+        if (recipe == null) return null;
         AssemblerRecipe.Input input = AssemblerRecipe.Input.of(laneInputs(lane));
-        for (RecipeHolder<AssemblerRecipe> holder : level.getRecipeManager().getAllRecipesFor(ProcessingRecipes.ASSEMBLER_TYPE.get())) {
-            AssemblerRecipe recipe = holder.value();
-            if (!recipe.matches(input, level)) continue;
-            if (!matchesFluids(lane, recipe)) continue;
-            return recipe;
-        }
-        return null;
+        if (!recipe.matches(input, level)) return null;
+        if (!matchesFluids(lane, recipe)) return null;
+        return recipe;
     }
 
     private boolean matchesFluids(int lane, AssemblerRecipe recipe) {
@@ -418,6 +409,7 @@ public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
             inputTanks[i].writeToNBT(tag, "i" + i);
             outputTanks[i].writeToNBT(tag, "o" + i);
             tag.putDouble("progress" + i, progress[i]);
+            tag.putString("recipe" + i, recipes[i]);
         }
         water.writeToNBT(tag, "w");
         lps.writeToNBT(tag, "s");
@@ -432,6 +424,7 @@ public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
             inputTanks[i].readFromNBT(tag, "i" + i);
             outputTanks[i].readFromNBT(tag, "o" + i);
             progress[i] = tag.getDouble("progress" + i);
+            recipes[i] = tag.contains("recipe" + i) ? tag.getString("recipe" + i) : "null";
         }
         water.readFromNBT(tag, "w");
         lps.readFromNBT(tag, "s");
@@ -451,6 +444,7 @@ public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < LANES; i++) {
             buf.writeBoolean(didProcess[i]);
             buf.writeDouble(progress[i]);
+            buf.writeUtf(recipes[i]);
         }
     }
 
@@ -466,6 +460,24 @@ public class MachineAssemblyFactoryBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < LANES; i++) {
             didProcess[i] = buf.readBoolean();
             progress[i] = buf.readDouble();
+            recipes[i] = buf.readUtf();
+        }
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("index") && data.contains("selection")) {
+            int index = data.getInt("index");
+            String selection = data.getString("selection");
+            if (index >= 0 && index < LANES) {
+                this.recipes[index] = selection;
+                setChanged();
+            }
         }
     }
 

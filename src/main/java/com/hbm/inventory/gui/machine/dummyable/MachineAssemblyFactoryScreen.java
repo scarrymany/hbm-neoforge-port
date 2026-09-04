@@ -2,8 +2,15 @@ package com.hbm.inventory.gui.machine.dummyable;
 
 import com.hbm.blockentity.machine.dummyable.MachineAssemblyFactoryBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.MachineAssemblyFactoryMenu;
+import com.hbm.inventory.gui.GUIScreenRecipeSelector;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.inventory.recipes.AssemblerRecipe;
+import com.hbm.inventory.recipes.AssemblyMachineRecipes;
+import com.hbm.inventory.recipes.loader.GenericRecipe;
+import com.hbm.items.machine.ItemBlueprints;
 import com.hbm.main.MainRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -11,8 +18,8 @@ import net.minecraft.world.entity.player.Inventory;
 
 /**
  * CE {@code GUIMachineAssemblyFactory} — {@code gui_assembly_factory.png} 256×240 (atlas 256×256).
- * TODO(CE: GUIMachineAssemblyFactory.java:62): GUIScreenRecipeSelector click 6+(i%2)*109, 53+(i/2)*56.
- * TODO(CE: GUIMachineAssemblyFactory.java:107-130): recipe icon / ghost inputs.
+ * Recipe click {@code 6+(i%2)*109, 53+(i/2)*56} opens {@link GUIScreenRecipeSelector}
+ * (CE {@code GUIMachineAssemblyFactory.java:62}).
  */
 public class MachineAssemblyFactoryScreen extends GuiInfoContainer<MachineAssemblyFactoryMenu> {
 
@@ -39,19 +46,30 @@ public class MachineAssemblyFactoryScreen extends GuiInfoContainer<MachineAssemb
             int p = (int) (be.power * 92 / be.maxPower);
             if (p > 0) guiGraphics.blit(TEXTURE, x + 234, y + 110 - p, 0, 232 - p, 16, p);
         }
+        if (this.minecraft != null && this.minecraft.level != null
+                && AssemblyMachineRecipes.INSTANCE.recipeOrderedList.isEmpty()) {
+            AssemblyMachineRecipes.rebuild(this.minecraft.level.getRecipeManager());
+        }
         for (int i = 0; i < 4; i++) {
+            GenericRecipe recipe = AssemblyMachineRecipes.INSTANCE.recipeNameMap.get(be.recipes[i]);
+            AssemblerRecipe selected = AssemblyMachineRecipes.byName(
+                    this.minecraft != null ? this.minecraft.level : null, be.recipes[i]);
             if (be.progress[i] > 0) {
                 int j = (int) Math.ceil(37 * be.progress[i]);
                 guiGraphics.blit(TEXTURE, x + 45 + (i % 2) * 109, y + 63 + (i / 2) * 56, 0, 240, j, 6);
             }
             if (be.didProcess[i]) {
                 guiGraphics.blit(TEXTURE, x + 45 + (i % 2) * 109, y + 55 + (i / 2) * 56, 4, 236, 4, 4);
-                guiGraphics.blit(TEXTURE, x + 53 + (i % 2) * 109, y + 55 + (i / 2) * 56, 4, 236, 4, 4);
-            } else if (be.progress[i] > 0 || be.canCool()) {
+            } else if (recipe != null) {
                 guiGraphics.blit(TEXTURE, x + 45 + (i % 2) * 109, y + 55 + (i / 2) * 56, 0, 236, 4, 4);
-                if (be.canCool()) {
-                    guiGraphics.blit(TEXTURE, x + 53 + (i % 2) * 109, y + 55 + (i / 2) * 56, 0, 236, 4, 4);
-                }
+            }
+            if (be.didProcess[i]) {
+                guiGraphics.blit(TEXTURE, x + 53 + (i % 2) * 109, y + 55 + (i / 2) * 56, 4, 236, 4, 4);
+            } else if (selected != null && be.power >= selected.getPower() && be.canCool()) {
+                guiGraphics.blit(TEXTURE, x + 53 + (i % 2) * 109, y + 55 + (i / 2) * 56, 0, 236, 4, 4);
+            }
+            if (recipe != null) {
+                guiGraphics.renderItem(recipe.getIcon(), x + 7 + (i % 2) * 109, y + 54 + (i / 2) * 56);
             }
         }
         for (int j = 0; j < 4; j++) {
@@ -73,5 +91,37 @@ public class MachineAssemblyFactoryScreen extends GuiInfoContainer<MachineAssemb
         be.water.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 232, topPos + 149, 7, 52);
         be.lps.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 241, topPos + 149, 7, 52);
         drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 234, topPos + 18, 16, 92, be.power, be.maxPower);
+        for (int i = 0; i < 4; i++) {
+            if (!isHovered(mouseX, mouseY, 6 + (i % 2) * 109, 53 + (i / 2) * 56, 18, 18)) continue;
+            GenericRecipe recipe = AssemblyMachineRecipes.INSTANCE.recipeNameMap.get(be.recipes[i]);
+            if (recipe != null) {
+                guiGraphics.renderComponentTooltip(this.font, recipe.print(), mouseX, mouseY);
+            } else {
+                guiGraphics.renderTooltip(this.font,
+                        Component.translatable("gui.recipe.setRecipe").withStyle(ChatFormatting.YELLOW),
+                        mouseX, mouseY);
+            }
+        }
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        MachineAssemblyFactoryBlockEntity be = this.getMenu().be;
+        for (int i = 0; i < 4; i++) {
+            if (!isHovered(mouseX, mouseY, 6 + (i % 2) * 109, 53 + (i / 2) * 56, 18, 18)) continue;
+            click();
+            if (Minecraft.getInstance().level != null) {
+                AssemblyMachineRecipes.rebuild(Minecraft.getInstance().level.getRecipeManager());
+            }
+            GUIScreenRecipeSelector.openSelector(
+                    AssemblyMachineRecipes.INSTANCE,
+                    be.getBlockPos(),
+                    be.recipes[i],
+                    i,
+                    ItemBlueprints.grabPool(be.inventory.getStackInSlot(MachineAssemblyFactoryBlockEntity.blueprintSlot(i))),
+                    this);
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

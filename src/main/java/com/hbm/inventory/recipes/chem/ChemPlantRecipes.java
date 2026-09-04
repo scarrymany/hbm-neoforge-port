@@ -537,6 +537,8 @@ public final class ChemPlantRecipes {
                 new FluidStack[]{new FluidStack(Fluids.PEROXIDE, 1_000)},
                 new ItemStack[0],
                 new FluidStack(Fluids.DEATH, 1_000)));
+
+        com.hbm.inventory.recipes.ChemicalPlantRecipes.rebuild();
     }
 
     private static Item item(String id) {
