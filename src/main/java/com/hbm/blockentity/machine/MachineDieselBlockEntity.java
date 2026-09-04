@@ -1,14 +1,18 @@
 package com.hbm.blockentity.machine;
 
+import com.hbm.api.energymk2.IBatteryItem;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
 import com.hbm.inventory.container.machine.MachineDieselMenu;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -35,28 +39,18 @@ import java.util.Map;
  * dummyable). Per-tick HE yield is {@code FT_Combustible.getCombustionEnergy()/1000 *
  * fuelEfficiency[grade]}, burning exactly 1 mB/tick while {@link #isOn} and not redstone-powered -
  * CE's own static {@code fuelEfficiency} table is reproduced unchanged below.
- * <p>
- * <b>Scope trim vs. CE</b> (documented, not silent): CE's slot 0 fills the tank from a held fluid
- * container item via {@code FluidContainerRegistry}/{@code tank.loadTank} - that registry class is
- * referenced by several already-shipped Phase 0/1 capability files
- * ({@code NTMFluidCapabilityHandler}, {@code NTMFluidContainerWrapper}, {@code ItemCanister},
- * {@code ItemFluidTank}/{@code V2}) but does not exist anywhere in this port (confirmed by search) -
- * a real, pre-existing compile-blocking gap, not one this pass introduces. Building it is a
- * cross-cutting item-fluid-container project outside this power-generation pass's scope (see
- * {@code docs/phase2/machines_power_generation.md}'s own deferred-scope framing for the analogous
- * pollution gap). This class therefore has no item-fill slot at all: fuel arrives purely over the
- * fluid network ({@link IFluidStandardReceiverMK2}, exactly like every other tank-only NTM machine's
- * pipe input) - CE's slot 1 (empty-container output) is dropped along with it. The battery-charging
- * slot (CE's slot 2) is kept, using the storage-machines package's now-shipped
- * {@link Library#chargeItemsFromTE}/{@link Library#isBattery} (CE's own {@code Library} helpers,
- * ported by that concurrent pass).
+ * {@code setType(3)} / {@code loadTank(0,1)} Exact CE {@code TileEntityMachineDiesel.java:120-121}.
+ * 4-slot layout Exact CE {@code ContainerMachineDiesel.java:38-41}. Pollution/audio skipped.
  */
 public class MachineDieselBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
 
     public static final int FUEL_CAP = 16_000;
     public static final long MAX_POWER = 50_000L;
-    private static final int BATTERY_SLOT = 0;
+    private static final int SLOT_CANISTER = 0;
+    private static final int SLOT_EMPTY = 1;
+    private static final int SLOT_BATTERY = 2;
+    private static final int SLOT_ID = 3;
 
     private static final Map<FT_Combustible.FuelGrade, Double> FUEL_EFFICIENCY = new EnumMap<>(FT_Combustible.FuelGrade.class);
 
@@ -71,7 +65,7 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
     private long power;
 
     public MachineDieselBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1, true, true);
+        super(type, pos, state, 4, true, true);
         tank = new FluidTankNTM(Fluids.DIESEL, FUEL_CAP).withOwner(this);
     }
 
@@ -96,13 +90,17 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // CE TileEntityMachineDiesel.java:120-121
+        tank.setType(SLOT_ID, inventory);
+        tank.loadTank(SLOT_CANISTER, SLOT_EMPTY, inventory);
+
         for (Direction dir : Direction.values()) {
             BlockPos target = worldPosition.relative(dir);
             this.tryProvide(level, target.getX(), target.getY(), target.getZ(), dir);
             this.trySubscribe(tank.getTankType(), level, target.getX(), target.getY(), target.getZ(), dir);
         }
 
-        power = Library.chargeItemsFromTE(inventory, BATTERY_SLOT, power, MAX_POWER);
+        power = Library.chargeItemsFromTE(inventory, SLOT_BATTERY, power, MAX_POWER);
 
         if (isOn && !level.hasNeighborSignal(worldPosition) && hasAcceptableFuel() && tank.getFill() > 0) {
             tank.setFill(Math.max(0, tank.getFill() - 1));
@@ -121,7 +119,31 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return i == BATTERY_SLOT && Library.isBattery(stack);
+        if (i == SLOT_CANISTER) {
+            if (FluidContainerRegistry.getFluidContent(stack, tank.getTankType()) > 0) return true;
+            // Port ItemCanister is IFillableItem, not in FluidContainerRegistry (CE metadata canisters).
+            return stack.getItem() instanceof IFillableItem fill && fill.providesFluid(tank.getTankType(), stack);
+        }
+        if (i == SLOT_BATTERY) return Library.isChargeableBattery(stack);
+        // CE :245-248 returns false for slot 3; without this the ID never lands and setType is dead.
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        return false;
+    }
+
+    @Override
+    public boolean canExtractItem(int slot, ItemStack stack, int amount) {
+        if (slot == SLOT_EMPTY) return true;
+        if (slot == SLOT_BATTERY && stack.getItem() instanceof IBatteryItem bat) {
+            return bat.getCharge(stack) == bat.getMaxCharge(stack);
+        }
+        return false;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        if (side == Direction.DOWN) return new int[]{SLOT_EMPTY, SLOT_BATTERY};
+        if (side == Direction.UP) return new int[]{SLOT_CANISTER};
+        return new int[]{SLOT_BATTERY};
     }
 
     @Override

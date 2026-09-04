@@ -3,15 +3,13 @@ package com.hbm.inventory.container.machine;
 import com.hbm.blockentity.machine.MachineDieselBlockEntity;
 import com.hbm.inventory.container.MenuBase;
 import com.hbm.inventory.slot.SlotNonRetarded;
+import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * Ported (slot layout trimmed, see {@link MachineDieselBlockEntity}'s javadoc) from CE's
- * {@code ContainerMachineDiesel}: only the battery-charging slot survives, kept at CE's own pixel
- * position. Button id 0 is the on/off toggle, wired through vanilla's own
- * {@link net.minecraft.world.inventory.AbstractContainerMenu#clickMenuButton} plumbing (the same
- * mechanism vanilla's loom/stonecutter/enchanting-table buttons use) rather than a bespoke packet.
+ * Exact CE {@code ContainerMachineDiesel.java:38-41}: canister 17,17 / empty 17,53 / battery 141,71 / ID 35,71.
+ * {@code setType(3)} / {@code loadTank(0,1)} Exact CE {@code TileEntityMachineDiesel.java:120-121}.
  */
 public class MachineDieselMenu extends MenuBase<MachineDieselBlockEntity> {
 
@@ -20,7 +18,10 @@ public class MachineDieselMenu extends MenuBase<MachineDieselBlockEntity> {
     public MachineDieselMenu(int id, Inventory playerInv, MachineDieselBlockEntity be) {
         super(PowerGenMenus.MACHINE_DIESEL.get(), id, be);
 
-        this.addSlot(new SlotNonRetarded(tile, 0, 141, 71));
+        this.addSlot(new SlotNonRetarded(tile, 0, 17, 17));
+        this.addSlot(new SlotTakeOnly(tile, 1, 17, 53));
+        this.addSlot(new SlotNonRetarded(tile, 2, 141, 71));
+        this.addSlot(new SlotNonRetarded(tile, 3, 35, 71));
 
         playerInv(playerInv, 8, 121, 179);
     }
