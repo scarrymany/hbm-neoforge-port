@@ -32,9 +32,12 @@ public RadarScreenScreen(RadarScreenMenu menu, Inventory inventory, Component ti
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         RadarScreenBlockEntity be = this.getMenu().be;
-        String link = be.linkedValid
-                ? be.linked.getX() + " " + be.linked.getY() + " " + be.linked.getZ()
-                : "unlinked";
-        guiGraphics.drawString(this.font, link, 8, 20, 0x80FF80, false);
+        if (be.linked) {
+            guiGraphics.drawString(this.font, be.refX + " " + be.refY + " " + be.refZ, 8, 20, 0x80FF80, false);
+            guiGraphics.drawString(this.font, "Range: " + be.range, 8, 32, 0x80FF80, false);
+            guiGraphics.drawString(this.font, "Contacts: " + be.entries.size(), 8, 44, 0x80FF80, false);
+        } else {
+            guiGraphics.drawString(this.font, "unlinked", 8, 20, 0xFF8080, false);
+        }
     }
 }

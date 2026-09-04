@@ -6,7 +6,10 @@ import com.hbm.api.entity.IRadarDetectableNT.RadarScanParams;
 import com.hbm.api.entity.RadarEntry;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blockentity.machine.dummyable.RadarScreenBlockEntity;
 import com.hbm.inventory.container.machine.RadarMenu;
+import com.hbm.items.tool.ItemCoordinateBase;
+import com.hbm.items.tool.MilitaryC2Items;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import com.hbm.saveddata.satellites.SatelliteDetector;
@@ -37,6 +40,7 @@ import java.util.List;
  * and {@code TileEntityMachineRadarLarge.java:16} (range 3000).
  * radarAltitude 55 / radarBuffer 30 Exact CE :88-89 + :422 + :432.
  * SatelliteRayScan.INFO_RADAR + Detector MEDIUM Exact CE :451-454.
+ * Slot 8 linker → screen entries Exact CE :290-304. Inventory 10 Exact CE :118.
  * Scans {@link IRadarDetectableNT} + players. Map GUI skipped — no CE {@code gui_radar_nt.png}.
  */
 public class MachineRadarBlockEntity extends MachineBaseBlockEntity
@@ -52,21 +56,23 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
     public static int radarAltitude = 55;
     public static final RadarScanParams SCAN_PARAMS = new RadarScanParams(true, true, true, true);
 
-    public static final int BATTERY_SLOT = 0;
+    /** CE {@code TileEntityMachineRadarNT} {@code super(10)}: linker=8, battery=9. */
+    public static final int LINKER_SLOT = 8;
+    public static final int BATTERY_SLOT = 9;
 
     private final boolean large;
     private long power;
     private int contacts;
     private int redPower;
     private int pingTimer;
-    private final List<RadarEntry> entries = new ArrayList<>();
+    public final List<RadarEntry> entries = new ArrayList<>();
 
     public MachineRadarBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, false);
     }
 
     public MachineRadarBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, boolean large) {
-        super(type, pos, state, 1, true, true);
+        super(type, pos, state, 10, true, true);
         this.large = large;
     }
 
@@ -89,7 +95,8 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return slot == BATTERY_SLOT && Library.isBattery(stack);
+        if (slot == BATTERY_SLOT) return Library.isBattery(stack);
+        return true;
     }
 
     @Override
@@ -101,7 +108,9 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
             trySubscribe(level, target.getX(), target.getY(), target.getZ(), dir);
         }
 
+        // CE TileEntityMachineRadarNT.java:231 + :239
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+        power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
 
         int prevRed = redPower;
         // CE TileEntityMachineRadarNT.java:422 — no consume / scan / sat ping below altitude
@@ -127,8 +136,29 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
             level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
         }
 
+        // CE TileEntityMachineRadarNT.java:290-304
+        pushEntriesToScreen();
+
         dataChanged();
         networkPackMK2(50);
+    }
+
+    private void pushEntriesToScreen() {
+        ItemStack link = inventory.getStackInSlot(LINKER_SLOT);
+        if (link.isEmpty() || link.getItem() != MilitaryC2Items.RADAR_LINKER.get()) return;
+        BlockPos target = ItemCoordinateBase.getPosition(link);
+        if (target == null) return;
+        if (level.getBlockEntity(target) instanceof RadarScreenBlockEntity screen) {
+            screen.entries.clear();
+            screen.entries.addAll(this.entries);
+            screen.refX = worldPosition.getX();
+            screen.refY = worldPosition.getY();
+            screen.refZ = worldPosition.getZ();
+            screen.range = this.getRange();
+            screen.linked = true;
+            screen.dataChanged();
+            screen.networkPackMK2(25);
+        }
     }
 
     private void allocateTargets() {

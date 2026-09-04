@@ -32,6 +32,7 @@ public class RadarScreen extends GuiInfoContainer<RadarMenu> {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         guiGraphics.drawString(this.font, "Contacts: " + this.getMenu().be.getContacts(), 32, 20, 0x404040, false);
         guiGraphics.drawString(this.font, "Redstone: " + this.getMenu().be.getRedPower(), 32, 32, 0x404040, false);
+        guiGraphics.drawString(this.font, "Linker", 26, 98, 0x404040, false);
         drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 18, 16, 88, this.getMenu().be.getPower(), this.getMenu().be.getMaxPower());
     }
 }
