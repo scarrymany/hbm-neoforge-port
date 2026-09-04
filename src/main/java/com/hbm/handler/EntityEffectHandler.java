@@ -23,6 +23,7 @@ import com.hbm.entity.mob.Phase4BossEntityTypes2;
 import com.hbm.entity.mob.RadBeastEntityTypes;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.handler.pollution.PollutionHandler.PollutionType;
+import com.hbm.main.AdvancementManager;
 import com.hbm.main.MainRegistry;
 import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ArmorRegistry;
@@ -35,6 +36,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -84,7 +86,8 @@ import java.util.Random;
  * {@link #handleDashing} / {@link #handlePlinking} are Exact CE {@code :655-754}, dispatched from
  * {@code CommonTickEvents#onPlayerTick} (both sides). Dash-bar HUD stays skipped.
  * {@link #handleContamination}/{@link #handleLungDisease}/{@link #handleOil}/{@link #handleTemperature}
- * / {@link #handleContagion} are Exact CE server ticks. Vomit/sweat/FlameCreator/Confetti packets stay skipped.
+ * / {@link #handleContagion} / {@link #handleRadiationSickness} are Exact CE server ticks.
+ * Vomit/sweat/FlameCreator/Confetti packets stay skipped.
  * <p>
  * <b>Review pass finding (not fixed here)</b>: CE's real {@code handleRadiationEffect} table actually has
  * a <em>6th</em> branch this file's own scope list above omits - {@code eRad >= 800 && entity instanceof
@@ -177,52 +180,113 @@ public final class EntityEffectHandler {
     // ==================== radiation-mutation cascade (CE handleRadiationEffect, lines 233-285) =======
 
     private static void handleMutationCascade(LivingEntity entity, ServerLevel level) {
-        // CE: handleRadiationEffect's own top-level gate - `if (!GeneralConfig.enableRads ...) return;`
-        // ([CE: 1.16_enableRadiation], this port's GeneralConfig.ENABLE_RADIATION) - was missing here,
-        // meaning the whole mutation cascade would still fire even with radiation disabled server-wide.
+        // CE handleRadiationEffect :236-237 — enableRads / invulnerable(RADIATION) / spectator.
+        // CE does NOT skip creative (ladder + mutations both run). Mutations keep the existing
+        // creative skip below; the potion/death ladder still fires for creative (Exact CE).
         if (!GeneralConfig.ENABLE_RADIATION.get()) return;
         if (!entity.isAlive()) return;
-        if (entity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
+        if (entity instanceof Player player && player.isSpectator()) return;
+        if (entity.isInvulnerableTo(entity.damageSources().source(ModDamageTypes.RADIATION))) return;
 
         double eRad = HbmLivingProps.getRadiation(entity);
         if (eRad < 50D) return;
+        // CE :241 — one 21000-draw shared by creeper mutate and the sickness ladder.
+        int rng = level.random.nextInt(21000);
 
-        // See class javadoc: CE's real condition is `instanceof EntityCreeper` (broader than "vanilla
-        // Creeper"), guarded here against remutating an already-Nuclear creeper (a harmless no-op in
-        // real CE too, since Nuclear Creepers are radiation-immune and never reach this threshold).
-        if (entity instanceof Creeper creeper && !(creeper instanceof EntityCreeperNuclear) && eRad >= 200D) {
-            if (level.random.nextInt(3) == 0) {
-                EntityCreeperNuclear mutated = new EntityCreeperNuclear(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), level);
-                mutate(creeper, mutated, level);
-            } else {
-                entity.hurt(entity.damageSources().source(ModDamageTypes.RADIATION), 100F);
+        boolean creative = entity instanceof Player player && player.isCreative();
+        if (!creative) {
+            // See class javadoc: CE's real condition is `instanceof EntityCreeper` (broader than "vanilla
+            // Creeper"), guarded here against remutating an already-Nuclear creeper (a harmless no-op in
+            // real CE too, since Nuclear Creepers are radiation-immune and never reach this threshold).
+            if (entity instanceof Creeper creeper && !(creeper instanceof EntityCreeperNuclear) && eRad >= 200D) {
+                if (rng % 3 == 0) {
+                    EntityCreeperNuclear mutated = new EntityCreeperNuclear(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), level);
+                    mutate(creeper, mutated, level);
+                } else {
+                    entity.hurt(entity.damageSources().source(ModDamageTypes.RADIATION), 100F);
+                }
+                return;
             }
-            return;
+
+            if (entity instanceof Cow cow && !(cow instanceof MushroomCow) && eRad >= 50D) {
+                MushroomCow mooshroom = new MushroomCow(EntityType.MOOSHROOM, level);
+                mutate(cow, mooshroom, level);
+                return;
+            }
+
+            if (entity instanceof Villager villager && eRad >= 500D) {
+                ZombieVillager zombie = new ZombieVillager(EntityType.ZOMBIE_VILLAGER, level);
+                zombie.setVillagerData(villager.getVillagerData());
+                zombie.setBaby(villager.isBaby());
+                mutate(villager, zombie, level);
+                return;
+            }
+
+            if (entity instanceof Blaze && eRad >= 700D) {
+                EntityRADBeast beast = new EntityRADBeast(RadBeastEntityTypes.RAD_BEAST.get(), level);
+                mutate(entity, beast, level);
+                return;
+            }
+
+            if (entity instanceof EntityDuck duck && !(duck instanceof EntityQuackos) && eRad >= 200D) {
+                EntityQuackos quacc = new EntityQuackos(Phase4BossEntityTypes2.QUACKOS.get(), level);
+                mutate(duck, quacc, level);
+                return;
+            }
         }
 
-        if (entity instanceof Cow cow && !(cow instanceof MushroomCow) && eRad >= 50D) {
-            MushroomCow mooshroom = new MushroomCow(EntityType.MOOSHROOM, level);
-            mutate(cow, mooshroom, level);
-            return;
-        }
+        handleRadiationSickness(entity, eRad, rng);
+    }
 
-        if (entity instanceof Villager villager && eRad >= 500D) {
-            ZombieVillager zombie = new ZombieVillager(EntityType.ZOMBIE_VILLAGER, level);
-            zombie.setVillagerData(villager.getVillagerData());
-            zombie.setBaby(villager.isBaby());
-            mutate(villager, zombie, level);
-            return;
-        }
+    /**
+     * Exact CE {@code handleRadiationEffect} {@code :287-329} potion/death ladder after mutations.
+     * Horse zombify ({@code :269-279}) stays skipped — no verified 1.21 {@code temper}/{@code makeMad}.
+     * CE {@code eRad > 2500000} cap is a no-op here: {@link com.hbm.capability.HbmLivingAttachment}
+     * already clamps writes to {@code MAX_RADS=2500}.
+     */
+    private static void handleRadiationSickness(LivingEntity entity, double eRad, int rng) {
+        if (eRad < 200D) return;
+        if (eRad > 2_500_000D) HbmLivingProps.setRadiation(entity, 2_500_000D);
 
-        if (entity instanceof Blaze && eRad >= 700D) {
-            EntityRADBeast beast = new EntityRADBeast(RadBeastEntityTypes.RAD_BEAST.get(), level);
-            mutate(entity, beast, level);
-            return;
-        }
-
-        if (entity instanceof EntityDuck duck && !(duck instanceof EntityQuackos) && eRad >= 200D) {
-            EntityQuackos quacc = new EntityQuackos(Phase4BossEntityTypes2.QUACKOS.get(), level);
-            mutate(duck, quacc, level);
+        if (eRad >= 1000D) {
+            entity.hurt(entity.damageSources().source(ModDamageTypes.RADIATION), 1000F);
+            HbmLivingProps.setRadiation(entity, 0);
+            if (entity.getHealth() > 0) {
+                entity.setHealth(0);
+                entity.die(entity.damageSources().source(ModDamageTypes.RADIATION));
+            }
+            if (entity instanceof ServerPlayer player) {
+                AdvancementManager.grantAchievement(player, AdvancementManager.achRadDeath);
+            }
+        } else if (eRad >= 800D) {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 30, 0));
+            if (rng % 300 == 50) entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10 * 20, 2));
+            if (rng % 300 == 100) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 10 * 20, 2));
+            if (rng % 500 == 0) entity.addEffect(new MobEffectInstance(MobEffects.POISON, 3 * 20, 2));
+            if (rng % 700 == 0) entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 3 * 20, 1));
+            if (rng % 300 == 150) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 5 * 20, 3));
+            if (rng % 300 == 200) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5 * 20, 3));
+        } else if (eRad >= 600D) {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 30, 0));
+            if (rng % 300 == 50) entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10 * 20, 2));
+            if (rng % 300 == 100) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 10 * 20, 2));
+            if (rng % 500 == 0) entity.addEffect(new MobEffectInstance(MobEffects.POISON, 3 * 20, 1));
+            if (rng % 300 == 150) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 3 * 20, 3));
+            if (rng % 400 == 0) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 6 * 20, 2));
+        } else if (eRad >= 400D) {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 30, 0));
+            if (rng % 500 == 50) entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5 * 20, 0));
+            if (rng % 300 == 100) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 5 * 20, 1));
+            if (rng % 500 == 150) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 3 * 20, 2));
+            if (rng % 600 == 0) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 4 * 20, 1));
+        } else {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 20, 0));
+            if (rng % 500 == 0) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 5 * 20, 0));
+            if (rng % 700 == 0) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 3 * 20, 2));
+            if (rng % 800 == 0) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 4 * 20, 0));
+            if (entity instanceof ServerPlayer player) {
+                AdvancementManager.grantAchievement(player, AdvancementManager.achRadPoison);
+            }
         }
     }
 
