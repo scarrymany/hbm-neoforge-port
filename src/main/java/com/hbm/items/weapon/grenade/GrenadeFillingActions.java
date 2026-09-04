@@ -52,11 +52,8 @@ import java.util.List;
  * <b>Forward references (documented, not silently dropped) - each one is called out again at its
  * exact call site below:</b>
  * <ul>
- *     <li>{@code EntityProcessorCrossSmooth#setDamageClass(DamageClass)} does not exist on this
- *     port's {@code EntityProcessorCrossSmooth} yet (the {@code DamageClass}-to-{@code DamageType}
- *     mapping {@code docs/phase3/gun_framework.md} already flagged as missing a
- *     {@code SEDNA_PLASMA}-family entry) - EMP/PLASMA fall back to the processor's own plain
- *     explosion-damage source until that lands.</li>
+ *     <li>{@code explodeStandardEnergy} {@code setDamageClass} is Exact CE
+ *     {@code ItemGrenadeFilling.java:272-274} (EMP ELECTRIC / PLASMA PLASMA).</li>
  *     <li>{@code SatelliteDetector.reportEvent} on nuclear grenade {@code spawnMush} is Exact CE
  *     {@code ItemGrenadeFilling.java:262}.</li>
  * </ul>
@@ -159,24 +156,20 @@ public final class GrenadeFillingActions {
     }
 
     static void explodeEmp(EntityGrenadeUniversal grenade) {
-        // CE: explodeStandardEnergy(grenade, 30F, 3F, DamageClass.ELECTRIC, 0.5F, 0.5F, 1F, 3F) - a
-        // pale blue burst.
-        explodeStandardEnergy(grenade, 30F, 3F, 0.5F, 0.5F, 1F, 3F);
+        explodeStandardEnergy(grenade, 30F, 3F, DamageClass.ELECTRIC, 0.5F, 0.5F, 1F, 3F);
     }
 
     static void explodePlasma(EntityGrenadeUniversal grenade) {
         // CE's own code comment: "TODO: unique effect because this sucks" - CE itself flags this
         // filling's VFX as a placeholder; not worth over-polishing beyond parity here either.
-        // CE: explodeStandardEnergy(grenade, 50F, 5F, DamageClass.PLASMA, 0.5F, 1F, 0.5F, 4F) - a
-        // pale green burst.
-        explodeStandardEnergy(grenade, 50F, 5F, 0.5F, 1F, 0.5F, 4F);
+        explodeStandardEnergy(grenade, 50F, 5F, DamageClass.PLASMA, 0.5F, 1F, 0.5F, 4F);
     }
 
-    private static void explodeStandardEnergy(EntityGrenadeUniversal grenade, float damage, float range, float r, float g, float b, float scale) {
+    /** Exact CE {@code ItemGrenadeFilling.java:272-274}. */
+    private static void explodeStandardEnergy(EntityGrenadeUniversal grenade, float damage, float range, DamageClass damageClass, float r, float g, float b, float scale) {
         Level level = grenade.level();
         ExplosionVNT vnt = new ExplosionVNT(level, grenade.getX(), grenade.getY(), grenade.getZ(), range, grenade.getThrower());
-        // forward reference: EntityProcessorCrossSmooth#setDamageClass(...) - see class javadoc.
-        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, damage));
+        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, damage).setDamageClass(damageClass));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
         level.playSound(null, grenade.getX(), grenade.getY(), grenade.getZ(),

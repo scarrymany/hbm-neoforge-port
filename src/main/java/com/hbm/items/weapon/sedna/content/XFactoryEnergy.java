@@ -64,10 +64,8 @@ import java.util.function.BiConsumer;
  * <ul>
  *     <li>{@code SatelliteDetector.reportEvent} on fatman nukes is Exact CE
  *     {@code XFactoryCatapult.java:99}/{@code :116}/{@code :134}.</li>
- *     <li>{@code EntityProcessorCrossSmooth#setDamageClass(DamageClass)} does not exist on this port's
- *     {@code EntityProcessorCrossSmooth} - same confirmed gap {@code GrenadeFillingActions} already
- *     documented; every {@code ExplosionVNT} blast below falls back to the processor's own plain
- *     explosion damage source.</li>
+ *     <li>Lightning {@code setDamageClass(beam.config.dmgClass)} is Exact CE
+ *     {@code XFactoryEnergy.java:76}.</li>
  * </ul>
  * Everything else (the {@code ExplosionVNT} blasts, {@link EntityNukeExplosionMK5}/{@link EntityNukeTorex}
  * spawns, the lightning-fanout sub-beam) is a real, fully-wired port against this port's own already-
@@ -215,7 +213,7 @@ public final class XFactoryEnergy {
         Vec3 loc = resolveImpactPoint(hit);
 
         ExplosionVNT vnt = new ExplosionVNT(beam.level(), loc.x, loc.y, loc.z, 2F, beam.getThrower());
-        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, beam.damage));
+        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, beam.damage).setDamageClass(beam.config.dmgClass));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
 

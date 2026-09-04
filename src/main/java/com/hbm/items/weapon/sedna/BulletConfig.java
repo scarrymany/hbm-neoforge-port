@@ -75,25 +75,26 @@ public class BulletConfig implements Cloneable {
     private static final Map<ResourceLocation, BulletConfig> REGISTRY = new LinkedHashMap<>();
 
     /**
-     * Builds the {@link DamageSource} an ammo type's damage class maps onto. CE's
-     * {@code DamageSourceSednaNoAttacker}/{@code WithAttacker} custom {@code DamageSource} subclasses
-     * cannot be ported as classes (1.21's {@code DamageSource} cannot be subclassed) - this replaces
-     * them with datapack {@link DamageType} keys from this port's already-committed
-     * {@link ModDamageTypes} {@code SEDNA_*} entries, exactly as
-     * {@code docs/phase3/gun_framework.md}'s "Key design/API decisions" specifies. With a shooter,
-     * {@code directEntity = projectile, causingEntity = shooter} (matching
-     * {@code DamageSourceSednaWithAttacker.getImmediateSource()}/{@code getTrueSource()} 1:1 - vanilla's
-     * own {@code DamageSources.arrow(AbstractArrow, Entity)} convenience method confirms this
-     * direct-then-causing argument order via {@code source(type, arrow, owner)}); with no shooter, no
-     * entity is attached at all (matching {@code DamageSourceSednaNoAttacker}, which never references
-     * the projectile either).
+     * Exact CE {@code BulletConfig.java:225-239}. Projectile may be {@code null} (VNT CrossSmooth
+     * {@code getDamage(null, exploder, clazz)}). 1.21 {@code DamageSources} needs a {@link Level};
+     * the 4-arg overload takes the victim's level when both args are null.
      */
-    public static DamageSource getDamage(Entity projectile, @Nullable LivingEntity shooter, DamageClass dmgClass) {
-        Level level = projectile.level();
+    public static DamageSource getDamage(@Nullable Entity projectile, @Nullable LivingEntity shooter, DamageClass dmgClass) {
+        Level level = projectile != null ? projectile.level() : (shooter != null ? shooter.level() : null);
+        if (level == null) {
+            throw new IllegalArgumentException("BulletConfig.getDamage needs a projectile or shooter");
+        }
+        return getDamage(level, projectile, shooter, dmgClass);
+    }
+
+    public static DamageSource getDamage(Level level, @Nullable Entity projectile, @Nullable LivingEntity shooter, DamageClass dmgClass) {
         ResourceKey<DamageType> type = damageType(dmgClass);
-        return shooter != null
-                ? level.damageSources().source(type, projectile, shooter)
-                : level.damageSources().source(type);
+        if (shooter != null) {
+            return projectile != null
+                    ? level.damageSources().source(type, projectile, shooter)
+                    : level.damageSources().source(type, shooter);
+        }
+        return level.damageSources().source(type);
     }
 
     private static ResourceKey<DamageType> damageType(DamageClass dmgClass) {
