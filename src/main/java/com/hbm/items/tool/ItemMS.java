@@ -1,24 +1,25 @@
 package com.hbm.items.tool;
 
+import com.hbm.blocks.generic.PlantBlocks;
+import com.hbm.items.IngotNuggetItems;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
- * "Meteor sample" tool: breaks a specific world-gen block and drops unique ingots. Ported from
- * CE's {@code com.hbm.items.tool.ItemMS} ({@code mysteryshovel}).
- *
- * <p><b>Stubbed pending {@code ModBlocks.ntm_dirt}.</b> CE's {@code onItemUse} checks the clicked
- * block against {@code ModBlocks.ntm_dirt} (a world-gen-only block) and, on a match, destroys it and
- * drops three {@code ingot_u238m2} variants. No {@code ntm_dirt} block (or {@code ModItems.ingot_u238m2})
- * exists anywhere in this port yet - {@code com.hbm.blocks.ModBlocks} is still the Phase 0 registry
- * skeleton. Per the port plan's "stub with a documented TODO rather than blocking" rule, the item is
- * registered (tooltip included) with its use-behavior left a no-op {@link InteractionResult#PASS}.
+ * Exact CE {@code ItemMS} ({@code mysteryshovel}) {@code :36-65}: server hit on
+ * {@code ntm_dirt} {@code destroyBlock(false)}, then drop CE meta 1/2/3
+ * ({@code ingot_u238m2_elements}/{@code _arsenic}/{@code _vault}) with CE scatter.
  */
 public class ItemMS extends Item {
 
@@ -33,9 +34,36 @@ public class ItemMS extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        // TODO(cross-area follow-up): once ModBlocks.ntm_dirt and ModItems.ingot_u238m2 exist, port
-        // CE's behavior here - on a server-side hit against ntm_dirt, destroy the block and spawn
-        // three ingot_u238m2 variant item entities with CE's randomized velocity/offset.
+        Level level = context.getLevel();
+        // CE ItemMS.java:36-65
+        if (!level.isClientSide()) {
+            BlockPos pos = context.getClickedPos();
+            if (level.getBlockState(pos).getBlock() == PlantBlocks.NTM_DIRT.get()) {
+                level.destroyBlock(pos, false);
+
+                Random rand = new Random();
+                List<ItemStack> list = new ArrayList<>();
+                list.add(new ItemStack(IngotNuggetItems.INGOT_U238M2_ELEMENTS.get()));
+                list.add(new ItemStack(IngotNuggetItems.INGOT_U238M2_ARSENIC.get()));
+                list.add(new ItemStack(IngotNuggetItems.INGOT_U238M2_VAULT.get()));
+
+                for (ItemStack sta : list) {
+                    float f = rand.nextFloat() * 0.8F + 0.1F;
+                    float f1 = rand.nextFloat() * 0.8F + 0.1F;
+                    float f2 = rand.nextFloat() * 0.8F + 0.1F;
+                    ItemEntity entityitem = new ItemEntity(level, pos.getX() + f, pos.getY() + f1, pos.getZ() + f2, sta);
+
+                    float f3 = 0.05F;
+                    entityitem.setDeltaMovement(
+                            rand.nextGaussian() * f3,
+                            rand.nextGaussian() * f3 + 0.2F,
+                            rand.nextGaussian() * f3);
+                    level.addFreshEntity(entityitem);
+                }
+                return InteractionResult.SUCCESS;
+            }
+        }
+
         return InteractionResult.PASS;
     }
 }

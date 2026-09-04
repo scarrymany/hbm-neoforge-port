@@ -311,7 +311,7 @@ public final class ToolItems {
     public static final DeferredItem<Item> BALEFIRE_AND_STEEL = ModItems.ITEMS.register("balefire_and_steel", () -> new ItemBalefireMatch(new Item.Properties().stacksTo(1).durability(256)));
     /** Stubbed place-behavior pending an accessible registered crate block - see class javadoc. */
     public static final DeferredItem<Item> CRATE_CALLER = ModItems.ITEMS.register("crate_caller", () -> new ItemCrateCaller(new Item.Properties().stacksTo(1).durability(4)));
-    /** Stubbed break-behavior pending {@code ModBlocks.ntm_dirt} - see class javadoc. */
+    /** Exact CE ItemMS :36-65 ntm_dirt → u238m2 elements/arsenic/vault. */
     public static final DeferredItem<Item> MYSTERYSHOVEL = ModItems.ITEMS.register("mysteryshovel", () -> new ItemMS(new Item.Properties().stacksTo(1)));
 
     // ==================== GUI-shell items (ItemBook pattern - menu-opening interaction deferred) ====================
