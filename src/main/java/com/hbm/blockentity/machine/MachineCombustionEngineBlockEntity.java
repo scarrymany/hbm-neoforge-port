@@ -3,16 +3,20 @@ package com.hbm.blockentity.machine;
 import com.hbm.api.energymk2.IBatteryItem;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFillableItem;
-import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
+import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.FluidContainerRegistry;
+import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.container.machine.MachineCombustionEngineMenu;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemPistons;
@@ -33,9 +37,12 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Ported from CE's {@code TileEntityMachineCombustionEngine} (block {@code MachineCombustionEngine},
@@ -47,16 +54,13 @@ import java.util.List;
  * exactly (burning fractional mB/tick at low throttle would otherwise round to zero forever).
  * {@code loadTank(0,1)} / {@code setType(4)} Exact CE {@code :96-99}. 5-slot layout Exact CE
  * {@code ContainerCombustionEngine.java:37-41}.
- * <p>
- * <b>Scope trims vs. CE</b> (see {@link MachineDieselBlockEntity}'s javadoc for the shared
- * rationale): no smoke/pollution tanks ({@code TileEntityMachinePolluting}'s bookkeeping —
- * {@code PollutionHandler} is Phase 4 scope per the research report, and the smoke tanks have no
- * other consumer once the mechanic itself is stubbed, so they are omitted rather than built inert);
- * no OpenComputers. ROR: CE {@code TileEntityMachineCombustionEngine.java:538-584}. Piston is slot 2
- * / {@link ItemPistons} instance (CE slot 2 / {@code piston_set} meta).
+ * {@code pollute(BURN, toBurn*0.5F)} every 5t Exact CE {@code :126-127}.
+ * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:53-76}.
+ * No OpenComputers. ROR: CE {@code TileEntityMachineCombustionEngine.java:538-584}. Piston is slot 2
+ * / {@link ItemPistons} instance (CE slot 2 / {@code piston_set} meta). Audio loop stay skipped.
  */
 public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider,
+        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
         IRORValueProvider, IRORInteractive {
 
     public static final long MAX_POWER = 2_500_000L;
@@ -67,6 +71,10 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
     private static final int SLOT_ID = 4;
 
     public final FluidTankNTM tank;
+    /** CE {@code TileEntityMachinePolluting} buffer 50 from {@code super(5, 50)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
     public boolean isOn;
     public int setting;
     private long power;
@@ -75,6 +83,9 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
     public MachineCombustionEngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, true, true);
         tank = new FluidTankNTM(Fluids.DIESEL, 24_000).withOwner(this);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 50).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 50).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 50).withOwner(this);
     }
 
     @Override
@@ -157,6 +168,10 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
                 int toBurn = Math.min(fill, speed);
                 power += (long) (toBurn * (trait.getCombustionEnergy() / 10_000D) * eff);
                 fill -= toBurn;
+                // CE TileEntityMachineCombustionEngine.java:126-127
+                if (level.getGameTime() % 5 == 0 && toBurn > 0) {
+                    pollute(tank.getTankType(), FluidTrait.FluidReleaseType.BURN, toBurn * 0.5F);
+                }
                 wasOn = toBurn > 0;
 
                 tank.setFill(fill / 10);
@@ -170,6 +185,8 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
             BlockPos p = dirPos.getPos();
             this.tryProvide(level, p.getX(), p.getY(), p.getZ(), dirPos.getDir());
             this.trySubscribe(tank.getTankType(), level, p.getX(), p.getY(), p.getZ(), dirPos.getDir());
+            // CE TileEntityMachineCombustionEngine.java:158-162
+            sendSmoke(dirPos);
         }
 
         if (power > MAX_POWER) power = MAX_POWER;
@@ -184,6 +201,38 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
 
         if (wasOn) dataChanged();
         networkPackMK2(50);
+    }
+
+    /** CE {@code TileEntityMachinePolluting#sendSmoke}. */
+    private void sendSmoke(DirPos pos) {
+        if (smoke.getFill() > 0) tryProvide(smoke, level, pos);
+        if (smokeLeaded.getFill() > 0) tryProvide(smokeLeaded, level, pos);
+        if (smokePoison.getFill() > 0) tryProvide(smokePoison, level, pos);
+    }
+
+    /**
+     * Exact CE {@code TileEntityMachinePolluting#pollute(FluidType, FluidReleaseType, float)}
+     * {@code :53-76}. Fire-extinguish sound stay skipped.
+     */
+    public void pollute(FluidType type, FluidTrait.FluidReleaseType release, float amount) {
+        FT_Polluting trait = type.getTrait(FT_Polluting.class);
+        if (trait == null) return;
+        if (release == FluidTrait.FluidReleaseType.VOID) return;
+
+        HashMap<PollutionHandler.PollutionType, Float> map = release == FluidTrait.FluidReleaseType.BURN
+                ? trait.burnMap : trait.releaseMap;
+
+        for (Map.Entry<PollutionHandler.PollutionType, Float> entry : map.entrySet()) {
+            FluidTankNTM dest = entry.getKey() == PollutionHandler.PollutionType.SOOT ? smoke
+                    : entry.getKey() == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+            int fluidAmount = (int) Math.ceil(entry.getValue() * amount * 100);
+            dest.setFill(dest.getFill() + fluidAmount);
+            if (dest.getFill() > dest.getMaxFill()) {
+                int overflow = dest.getFill() - dest.getMaxFill();
+                dest.setFill(dest.getMaxFill());
+                PollutionHandler.incrementPollution(level, worldPosition, entry.getKey(), overflow / 100F);
+            }
+        }
     }
 
     public void setOn(boolean on) {
@@ -219,7 +268,14 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public @NotNull List<FluidTankNTM> getSendingTanks() {
+        // CE TileEntityMachineCombustionEngine.java:354-355 getSmokeTanks
+        return List.of(smoke, smokeLeaded, smokePoison);
+    }
+
+    @Override
     public List<FluidTankNTM> getAllTanks() {
+        // CE TileEntityMachineCombustionEngine.java:344-345 — fuel tank only
         return List.of(tank);
     }
 
@@ -231,6 +287,9 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
         tag.putBoolean("isOn", isOn);
         tag.putInt("tenth", tenth);
         tank.writeToNBT(tag, "tank");
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
     }
 
     @Override
@@ -241,6 +300,9 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
         isOn = tag.getBoolean("isOn");
         tenth = tag.getInt("tenth");
         tank.readFromNBT(tag, "tank");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
     }
 
     @Override
