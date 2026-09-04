@@ -35,6 +35,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineTurbofan}: AERO fuel, AFTERBURN upgrade. Pollution/particles skipped.
+ * {@code setType(4)} / {@code loadTank(0,1)} Exact CE {@code TileEntityMachineTurbofan.java:156-157}.
  */
 public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -78,10 +79,9 @@ public class MachineTurbofanBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        ItemStack id = inventory.getStackInSlot(4);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            tank.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineTurbofan.java:156-157
+        tank.setType(4, inventory);
+        tank.loadTank(0, 1, inventory);
 
         afterburner = 0;
         ItemStack up = inventory.getStackInSlot(2);
