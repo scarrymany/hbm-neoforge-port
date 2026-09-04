@@ -229,8 +229,8 @@ public final class SpecialArmorItems {
 
     // ==================== Schrabidium (4) - real live CE behavior is ArmorFSB + 4 full-suit effects ====================
     // CE ModItems.java:534-541: helmet gets 4 .addEffect(...) calls (Haste II, Strength II, Jump
-    // Boost I, Speed II, each a 20-tick refresh via ArmorFSB.handleTick - not yet wired to any tick
-    // event by the ArmorFSB package itself, see that class's own javadoc); plate/legs/boots
+    // Boost I, Speed II, each a 20-tick refresh via ArmorFSB.handleTick);
+    // plate/legs/boots
     // .cloneStats(helmet) in CE. Reproduced here as identical per-piece .addEffect calls (via
     // schrabidiumEffects) rather than a live .cloneStats(...) call against the helmet's
     // DeferredItem, to avoid relying on cross-item DeferredItem#get() succeeding before the

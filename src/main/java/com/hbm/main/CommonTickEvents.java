@@ -5,7 +5,9 @@ import com.hbm.handler.ArmorModHandler;
 import com.hbm.hazard.HazardSystem;
 import com.hbm.items.armor.ItemArmorMod;
 import com.hbm.items.food.FoodDataComponents;
+import com.hbm.items.gear.ArmorFSB;
 import com.hbm.potion.HbmPotionEffects;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -16,7 +18,11 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerFlyableFallEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.Random;
 
@@ -45,6 +51,47 @@ public class CommonTickEvents {
             HazardSystem.updateLivingInventory(livingEntity);
             tickArmorMods(livingEntity);
         }
+    }
+
+    /**
+     * Exact CE {@code ModEventHandler.onPlayerTick} {@code :871-873} — {@code PlayerTickEvent}
+     * Phase.START. Port {@link PlayerTickEvent.Pre} is that phase.
+     */
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Pre event) {
+        Player player = event.getEntity();
+        if (player.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof ArmorFSB) {
+            ArmorFSB.handleTick(player);
+        }
+    }
+
+    /**
+     * Exact CE {@code ModEventHandler.onEntityJump} {@code :1255-1257}.
+     */
+    @SubscribeEvent
+    public static void onEntityJump(LivingEvent.LivingJumpEvent event) {
+        if (event.getEntity() instanceof Player player
+                && player.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof ArmorFSB) {
+            ArmorFSB.handleJump(player);
+        }
+    }
+
+    /**
+     * Exact CE {@code ModEventHandler.onEntityFall} {@code :814-816} — {@code EntityPlayerMP} only.
+     */
+    @SubscribeEvent
+    public static void onEntityFall(LivingFallEvent event) {
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            ArmorFSB.handleFall(serverPlayer);
+        }
+    }
+
+    /**
+     * Exact CE {@code ModEventHandler.onPlayerFall} {@code :809-810} ({@code PlayerFlyableFallEvent}).
+     */
+    @SubscribeEvent
+    public static void onPlayerFlyableFall(PlayerFlyableFallEvent event) {
+        ArmorFSB.handleFall(event.getEntity());
     }
 
     /**

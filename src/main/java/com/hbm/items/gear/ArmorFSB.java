@@ -63,13 +63,10 @@ import java.util.Set;
  *     {@link LivingIncomingDamageEvent}/{@link LivingDamageEvent.Pre} respectively (the confirmed
  *     real 1.21.1 replacements for CE's {@code LivingAttackEvent}/{@code LivingHurtEvent} - see
  *     {@code docs/phase3/armor_equippable_framework.md} Key design decision #2).</li>
- *     <li>{@link #handleTick}/{@link #handleJump}/{@link #handleFall} - static dispatch hooks for
- *     the full-suit potion effects, jump sound, and hard-landing knockback+fall sound. <b>Not</b>
- *     wired to any NeoForge event by this package - {@code com.hbm.handler.ArmorDamageHandler}'s
- *     confirmed event-dispatch scope (per this package's task brief) covers only damage/attack, not
- *     per-tick/jump/fall player events; wiring these three belongs to whichever later package first
- *     needs a general player-tick/fall listener. The methods exist now so that wiring is a one-line
- *     call, matching CE's own shape exactly.</li>
+ *     <li>{@link #handleTick}/{@link #handleJump}/{@link #handleFall} - full-suit potion effects,
+ *     jump sound, hard-landing knockback+fall sound. Dispatched from
+ *     {@code CommonTickEvents} Exact CE {@code ModEventHandler} {@code :871-873}/{@code :1255-1257}/
+ *     {@code :809-816}.</li>
  *     <li>{@link #disablesPart} ({@link IArmorDisableModel}) - body-part hiding for custom-modeled
  *     pieces, consumed by the (Phase 5) player render layer.</li>
  *     <li>{@link #setHazardClass} - self-registration into the already-ported
@@ -236,7 +233,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
      * CE: {@code ArmorFSB#handleTick(TickEvent.PlayerTickEvent)} - applies the full-suit potion
      * effect list every tick a matching set is worn. See the class javadoc's "Simplified relative
      * to CE" note for what is intentionally left out of this port (the footstep-sound cadence).
-     * Not wired to any event by this package - see the class javadoc.
+     * Wired from {@code CommonTickEvents#onPlayerTick} (CE {@code ModEventHandler:871-873}).
      */
     public static void handleTick(Player player) {
         if (!hasFSBArmor(player)) return;
@@ -251,7 +248,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
         }
     }
 
-    /** CE: {@code ArmorFSB#handleJump(EntityPlayer)}. Not wired to any event by this package - see the class javadoc. */
+    /** CE: {@code ArmorFSB#handleJump(EntityPlayer)}. Wired from {@code CommonTickEvents#onEntityJump}. */
     public static void handleJump(Player player) {
         if (hasFSBArmor(player)) {
             ArmorFSB chestplate = (ArmorFSB) player.getItemBySlot(EquipmentSlot.CHEST).getItem();
@@ -262,7 +259,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
         }
     }
 
-    /** CE: {@code ArmorFSB#handleFall(EntityPlayer)}. Not wired to any event by this package - see the class javadoc. */
+    /** CE: {@code ArmorFSB#handleFall(EntityPlayer)}. Wired from {@code CommonTickEvents} fall events. */
     public static void handleFall(Player player) {
         if (hasFSBArmor(player)) {
             ArmorFSB chestplate = (ArmorFSB) player.getItemBySlot(EquipmentSlot.CHEST).getItem();
