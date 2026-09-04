@@ -128,15 +128,14 @@ public final class PedestalRecipes {
         ));
 
         // 7. gun_flamer_daybreaker (SUN, set 0)
-        // CE :105-113. Ring: GOLD.plateCast() corners, canned_conserve(JIZZ)/P_WHITE.ingot()/stick_dynamite edges
-        // TODO(CE: PedestalRecipes.java:107-109): canned_conserve(JIZZ) not registered (no meta variants).
-        // Use canned_conserve_tube as placeholder.
+        // CE PedestalRecipes.java:67-71. GOLD.plateCast corners; N=canned_conserve(JIZZ);
+        // W/E=P_WHITE.ingot; S=stick_dynamite. Flattened JIZZ → canned_jizz (FoodItems).
         register(new PedestalRecipe(
                 gun("gun_flamer"),
                 new AStack[] {
-                        plate("gold_cast"), item("canned_conserve_tube"), plate("gold_cast"),
-                        ingot("phosphorus_white"), null, item("stick_dynamite"),
-                        plate("gold_cast"), item("canned_conserve_tube"), plate("gold_cast")
+                        plate("gold_cast"), item("canned_jizz"), plate("gold_cast"),
+                        ingot("phosphorus_white"), ingot("phosphorus_white"),
+                        plate("gold_cast"), item("stick_dynamite"), plate("gold_cast")
                 },
                 gun("gun_flamer_daybreaker"),
                 ExtraCondition.SUN, 0
