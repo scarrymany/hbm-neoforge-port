@@ -7,7 +7,10 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blockentity.network.IConnectionAnchors;
 import com.hbm.blocks.BlockDummyable;
-import com.hbm.handler.radiation.ChunkRadiationManager;
+import com.hbm.config.MobConfig;
+import com.hbm.explosion.ExplosionNukeGeneric;
+import com.hbm.lib.HBMSoundHandler;
+import com.hbm.main.AdvancementManager;
 import com.hbm.inventory.container.machine.dummyable.ReactorZirnoxMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -25,6 +28,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -32,6 +37,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +55,8 @@ import java.util.Map;
  *   TileEntityReactorZirnox.java:229 + :658-659. CE :198-235 = getNeighbouringSlots
  *   + updateConnections (no own FluidNode).
  * SatelliteRayScan.INFO_NUCLEAR Exact CE TileEntityReactorZirnox.java:267-268.
- * TODO(CE: TileEntityReactorZirnox.java:354-431): EntityZirnoxDebris / zirnox_destroyed / AuxParticle / ExplosionNukeGeneric.waste / achZIRNOXBoom / elementals.
+ * Melt Exact CE {@code :395-431} playable: waste 35 / rbmk_explosion / air-clear / achZIRNOXBoom / radMark.
+ * EntityZirnoxDebris / {@code zirnox_destroyed} fillSpace / RBMKMush AuxParticle stay skipped.
  * ROR: CE {@code TileEntityReactorZirnox.java:617-656}.
  * TODO(CE: TileEntityReactorZirnox.java:508-605): OpenComputers callbacks.
  */
@@ -267,9 +275,32 @@ public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
         for (int i = 0; i < inventory.getSlots(); i++) {
             inventory.setStackInSlot(i, ItemStack.EMPTY);
         }
-        level.explode(null, worldPosition.getX(), worldPosition.getY() + 3, worldPosition.getZ(),
+        // CE :399-402 AuxParticle RBMKMush — VFX skip.
+        BlockPos origin = worldPosition;
+        for (int ox = -2; ox <= 2; ox++) {
+            for (int oz = -2; oz <= 2; oz++) {
+                for (int oy = 2; oy <= 5; oy++) {
+                    level.setBlock(origin.offset(ox, oy, oz), Blocks.AIR.defaultBlockState(), 3);
+                }
+            }
+        }
+        // CE :414-415 zirnox_destroyed + MultiblockHandlerXR.fillSpace — block unregistered, skip invent.
+        level.playSound(null, origin.getX(), origin.getY() + 2, origin.getZ(),
+                HBMSoundHandler.rbmk_explosion.get(), SoundSource.BLOCKS, 10.0F, 1.0F);
+        level.explode(null, origin.getX(), origin.getY() + 3, origin.getZ(),
                 12.0F, true, Level.ExplosionInteraction.TNT);
-        ChunkRadiationManager.proxy.incrementRad(level, worldPosition, 50F, 15000F);
+        // CE :419 zirnoxDebris / EntityZirnoxDebris — class not ported (EntityThrownTail stub), skip invent.
+        ExplosionNukeGeneric.waste(level, origin.getX(), origin.getY(), origin.getZ(), 35);
+
+        AABB box = new AABB(origin).inflate(100);
+        for (Player player : level.getEntitiesOfClass(Player.class, box)) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                AdvancementManager.grantAchievement(serverPlayer, AdvancementManager.achZIRNOXBoom);
+            }
+            if (MobConfig.ENABLE_MELTDOWN_ELEMENTALS.get()) {
+                player.getPersistentData().putBoolean("radMark", true);
+            }
+        }
     }
 
     private void updateConnections() {
