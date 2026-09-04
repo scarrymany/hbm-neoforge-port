@@ -10,8 +10,13 @@ import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.FireboxMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.modules.ModuleBurnTime;
 import com.hbm.tileentity.IConfigurableMachine;
+import com.hbm.util.ItemStackUtil;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -28,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +42,7 @@ import java.util.List;
  * {@code pollute(SOOT, SOOT_PER_SECOND*3)} every 20t while burning Exact CE {@code :99}.
  * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:39-48}.
  * {@link IConfigurableMachine} Exact CE {@code TileEntityHeaterFirebox.java:86-108} ({@code firebox}).
- * Ashpit / door anim / crackle / particles stay skipped.
+ * Ashpit dump Exact CE {@code :71-79}. Door anim / crackle / particles stay skipped.
  */
 public class HeaterFireboxBlockEntity extends MachineBaseBlockEntity
         implements IHeatSource, IFluidStandardSenderMK2, ITickableBE, MenuProvider {
@@ -91,6 +97,47 @@ public class HeaterFireboxBlockEntity extends MachineBaseBlockEntity
         return burnModule;
     }
 
+    /**
+     * Exact CE {@code TileEntityFireboxBase.java}:138-152.
+     * Tag path / last-segment so {@code contains("Coal")}/{@code startsWith("log")} still hit 1.21 tags.
+     */
+    public static EnumAshType getAshFromFuel(ItemStack stack) {
+        for (String name : ashOreNames(stack)) {
+            if (name.contains("Coke")) return EnumAshType.COAL;
+            if (name.contains("Coal")) return EnumAshType.COAL;
+            if (name.contains("Lignite")) return EnumAshType.COAL;
+            if (name.startsWith("log")) return EnumAshType.WOOD;
+            if (name.contains("Wood")) return EnumAshType.WOOD;
+            if (name.contains("Sapling")) return EnumAshType.WOOD;
+        }
+        return EnumAshType.MISC;
+    }
+
+    /** Same expansion as {@link ModuleBurnTime} oreNames — CE ore-dict fragments on 1.21 tags. */
+    private static List<String> ashOreNames(ItemStack stack) {
+        List<String> raw = ItemStackUtil.getOreDictNames(stack);
+        List<String> out = new ArrayList<>(raw);
+        for (String name : raw) {
+            int colon = name.indexOf(':');
+            String path = colon >= 0 ? name.substring(colon + 1) : name;
+            out.add(path);
+            int slash = path.lastIndexOf('/');
+            String last = slash >= 0 ? path.substring(slash + 1) : path;
+            if (!last.isEmpty()) {
+                out.add(Character.toUpperCase(last.charAt(0)) + last.substring(1));
+            }
+        }
+        ResourceLocation key = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        if (key != null) {
+            String p = key.getPath();
+            out.add(p);
+            if (!p.isEmpty()) {
+                out.add(Character.toUpperCase(p.charAt(0)) + p.substring(1));
+            }
+        }
+        return out;
+    }
+
     public int getBaseHeat() {
         return baseHeat;
     }
@@ -130,6 +177,14 @@ public class HeaterFireboxBlockEntity extends MachineBaseBlockEntity
                 ItemStack fuel = inventory.getStackInSlot(i);
                 int base = getModule().getBurnTime(fuel);
                 if (base > 0) {
+                    // Exact CE TileEntityFireboxBase.java:71-79 — classify then dump to ashpit below
+                    BlockEntity below = level.getBlockEntity(worldPosition.below());
+                    if (below instanceof MachineAshpitBlockEntity ashpit) {
+                        EnumAshType type = getAshFromFuel(fuel);
+                        if (type == EnumAshType.WOOD) ashpit.ashLevelWood += base;
+                        if (type == EnumAshType.COAL) ashpit.ashLevelCoal += base;
+                        if (type == EnumAshType.MISC) ashpit.ashLevelMisc += base;
+                    }
                     maxBurnTime = burnTime = Math.max(1, (int) (base * getTimeMult()));
                     burnHeat = getModule().getBurnHeat(getBaseHeat(), fuel);
                     inventory.extractItem(i, 1, false);

@@ -6,7 +6,7 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code ContainerFurnaceBrick}: in / fuel / out. Ash slot unused. */
+/** CE {@code ContainerFurnaceBrick}: in / fuel / out. Ash slot 3 hopper-only (no GUI invent). */
 public class BrickFurnaceMenu extends MenuBase<MachineBrickFurnaceBlockEntity> {
 
     public BrickFurnaceMenu(int id, Inventory playerInv, MachineBrickFurnaceBlockEntity be) {
