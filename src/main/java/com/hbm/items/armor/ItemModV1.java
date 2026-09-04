@@ -26,12 +26,8 @@ import java.util.List;
  * {@link #getModifiers} carries CE's real +50% multiplicative movement-speed bonus ("V1 SPEED" - CE's
  * {@code AttributeModifier.Operation} value {@code 2} is 1.12's {@code MULTIPLY_TOTAL}, the direct
  * predecessor of this port's {@link AttributeModifier.Operation#ADD_MULTIPLIED_TOTAL}, same ordinal
- * position and semantics). Like every {@link ItemArmorMod} subclass in this port so far, nothing yet
- * calls {@link ItemArmorMod#getModifiers(ItemStack)} anywhere (confirmed by a repo-wide grep: zero
- * real call sites for any subclass's override) - that generic hook is a pre-existing, not-yet-consumed
- * forward reference from this port's own Phase 3 armor-mod foundation, not a gap introduced by this
- * package. The data below is wired correctly and ready for whichever future pass builds the mod-slot
- * dynamic-attribute application system.
+ * position and semantics). Dispatched from {@code CommonTickEvents#tickArmorMods} Exact CE
+ * {@code ModEventHandler:1220-1241}.
  */
 public class ItemModV1 extends ItemArmorMod implements IArmorModDash {
 

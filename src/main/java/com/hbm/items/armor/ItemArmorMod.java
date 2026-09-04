@@ -93,6 +93,7 @@ public class ItemArmorMod extends Item {
     public void modDamage(LivingDamageEvent.Pre event, ItemStack armor) {
     }
 
+    /** CE: {@code ItemArmorMod#getModifiers(EntityEquipmentSlot, ItemStack)}. Slot dropped — no leaf uses it. Applied/removed from {@code CommonTickEvents#tickArmorMods}. */
     @Nullable
     public <K, V> Multimap<K, V> getModifiers(ItemStack armor) {
         return null;
