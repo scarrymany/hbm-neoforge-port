@@ -2,10 +2,14 @@ package com.hbm.blocks.machine;
 
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
+import com.hbm.items.tool.ItemCounterfeitKeys;
+import com.hbm.items.tool.ItemLock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -81,12 +85,34 @@ public class FilingCabinetBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        // CE BlockDecoContainer.java:122 — ItemLock / key_kit handle themselves
+        if (stack.getItem() instanceof ItemLock || stack.getItem() instanceof ItemCounterfeitKeys) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (player.isShiftKeyDown()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        if (level.getBlockEntity(pos) instanceof FilingCabinetBlockEntity be && be.canAccess(player)) {
+            player.openMenu(be, pos);
+            return ItemInteractionResult.SUCCESS;
+        }
+        return ItemInteractionResult.FAIL;
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(pos) instanceof FilingCabinetBlockEntity be) {
-            player.openMenu(be, pos);
+        ItemStack held = player.getMainHandItem();
+        if (held.getItem() instanceof ItemLock || held.getItem() instanceof ItemCounterfeitKeys) {
+            return InteractionResult.PASS;
         }
-        return InteractionResult.CONSUME;
+        if (player.isShiftKeyDown()) return InteractionResult.PASS;
+        if (level.getBlockEntity(pos) instanceof FilingCabinetBlockEntity be && be.canAccess(player)) {
+            player.openMenu(be, pos);
+            return InteractionResult.CONSUME;
+        }
+        return InteractionResult.FAIL;
     }
 
     @Override
