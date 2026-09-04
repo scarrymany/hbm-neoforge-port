@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.FurnaceIronMenu;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
@@ -27,7 +28,9 @@ import java.util.Optional;
 
 /**
  * CE {@code TileEntityFurnaceIron.java}:61-116 — coal-fuel vanilla smelt, baseTime 160,
- * SPEED upgrade slot scan. Pollution / particles skipped.
+ * SPEED upgrade slot scan.
+ * {@code incrementPollution(SOOT, SOOT_PER_SECOND)} every 20t while smelting Exact CE {@code :116}.
+ * Smoke particles stay skipped (VFX).
  */
 public class FurnaceIronBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -101,6 +104,11 @@ public class FurnaceIronBlockEntity extends MachineBaseBlockEntity implements IT
                 }
                 progress = 0;
                 setChanged();
+            }
+            // CE TileEntityFurnaceIron.java:116
+            if (level.getGameTime() % 20 == 0) {
+                PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                        PollutionHandler.SOOT_PER_SECOND);
             }
         } else {
             progress = 0;
