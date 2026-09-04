@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.inventory.container.machine.rbmk.RBMKHeaterMenu;
 import com.hbm.inventory.fluid.Fluids;
@@ -9,12 +10,14 @@ import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingStep;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingType;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,8 +30,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Heater column — CE {@code TileEntityRBMKHeater}.
- * {@code feed.setType(0)} Exact CE {@code :66}. {@code FT_Heatable} HEATEXCHANGER Exact CE {@code :68-95}.
+ * Heater column. Exact CE {@code TileEntityRBMKHeater.java:66-130}: {@code feed.setType(0)},
+ * {@code FT_Heatable} HEATEXCHANGER, subscribe below {@code NEG_Y}, default {@code getConPos}
+ * column-top {@code POS_Y}. {@code rbmk_loader} branches stay skipped.
  * Slot 0 Exact CE {@code ContainerRBMKHeater.java:24}.
  */
 public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity
@@ -88,11 +92,24 @@ public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity
                 steam.setTankType(Fluids.NONE);
             }
 
-            trySubscribe(feed.getTankType(), level, worldPosition.below(), Direction.UP);
-            if (steam.getFill() > 0) tryProvide(steam, level, worldPosition.above(), Direction.DOWN);
+            // CE :97 — below + NEG_Y
+            trySubscribe(feed.getTankType(), level, worldPosition.below(), Direction.DOWN);
+            if (this.steam.getFill() > 0) {
+                for (DirPos pos : getConPos()) {
+                    tryProvide(steam, level, pos);
+                }
+            }
         }
 
         super.updateEntity();
+    }
+
+    /** CE {@code :126-129} default (no {@code rbmk_loader}). */
+    public DirPos[] getConPos() {
+        int height = level instanceof ServerLevel serverLevel ? RBMKDials.getColumnHeight(serverLevel) : 0;
+        return new DirPos[]{
+                new DirPos(worldPosition.getX(), worldPosition.getY() + height + 1, worldPosition.getZ(), Direction.UP)
+        };
     }
 
     @Override
