@@ -3,6 +3,7 @@ package com.hbm.blockentity.machine.dummyable;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
+import com.hbm.blockentity.LoadedBaseBlockEntity.TiltType;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.GasFlareMenu;
 import com.hbm.inventory.fluid.Fluids;
@@ -34,7 +35,8 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineGasFlare}: vent 50 mB/t or burn 10 mB/t. Upgrades via slot scan
- * ({@code UpgradeManagerNT} not ported). Pollution / particles / tilt skipped.
+ * ({@code UpgradeManagerNT} not ported). Pollution / particles skipped.
+ * checkTilt(CONFIG) / 2×2 floor / standardFloor3x3 Exact CE {@code :125} / {@code :141} / {@code :383-384}.
  */
 public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -75,8 +77,21 @@ public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public int getFloorCount() {
+        return 2 * 2;
+    }
+
+    @Override
+    public BlockPos getFloorPosFromIndex(int index) {
+        return standardFloor3x3(index);
+    }
+
+    @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
+
+        // CE TileEntityMachineGasFlare.java:125
+        checkTilt(TiltType.CONFIG, false);
 
         for (DirPos pos : getConPos()) {
             tryProvide(level, pos.getPos(), pos.getDir());
@@ -90,7 +105,8 @@ public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
 
         int maxVent = 50;
         int maxBurn = 10;
-        if (isOn && tank.getFill() > 0) {
+        // CE TileEntityMachineGasFlare.java:141
+        if (isOn && tank.getFill() > 0 && !this.tilted) {
             int burn = upgradeLevel(UpgradeType.SPEED);
             int yield = upgradeLevel(UpgradeType.EFFECT);
             maxVent += maxVent * burn;
