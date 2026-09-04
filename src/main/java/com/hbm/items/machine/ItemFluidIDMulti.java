@@ -1,5 +1,6 @@
 package com.hbm.items.machine;
 
+import com.hbm.blockentity.network.PipeBaseBlockEntity;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.IItemControlReceiver;
@@ -11,12 +12,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,14 +37,13 @@ import java.util.List;
  *   <li>Tooltip: shows primary + secondary fluid names (CE :111-117)</li>
  *   <li>{@link IItemFluidIdentifier#getType}: returns primary type (CE :129-131)</li>
  *   <li>NBT storage: {@code fluid1}/{@code fluid2} for primary/secondary (CE :189-203)</li>
- *   <li>Use on pipe: set pipe type to primary (CE :206-218, pipe integration deferred)</li>
+ *   <li>Use on pipe: set type / sneak-spread (CE :206-218, :220-236)</li>
  * </ul>
  * <p>
  * <b>Deferred</b> (cite TODO(CE)):
  * <ul>
  *   <li>Creative subtypes for every fluid (CE :63-75) - NeoForge 1.21 uses different API</li>
  *   <li>Custom model with tinted overlay (CE :140-186) - simplified to basic item + ComponentPatch color</li>
- *   <li>Pipe type spreading (CE :220-236) - {@code TileEntityPipeBaseNT} not yet ported</li>
  * </ul>
  */
 public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier, IItemControlReceiver {
@@ -121,9 +123,41 @@ public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier, IIte
         return Fluids.fromID(id);
     }
 
-    // CE :206-218: onItemUse for pipe type setting
-    // TODO(CE): Port pipe type setting when TileEntityPipeBaseNT is ported (CE :206-218, :220-236).
-    // Requires fluid pipe BlockEntity with setType(FluidType) method.
+    /** CE {@code ItemFluidIDMulti.onItemUse} :206-218. */
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        if (!(level.getBlockEntity(pos) instanceof PipeBaseBlockEntity duct)) {
+            return InteractionResult.PASS;
+        }
+        if (!level.isClientSide) {
+            FluidType handType = getType(level, pos, context.getItemInHand());
+            if (handType != duct.getFluidType()) {
+                Player player = context.getPlayer();
+                if (player != null && player.isCrouching()) {
+                    spreadType(level, pos, handType, duct.getFluidType(), 256);
+                } else {
+                    duct.setType(handType);
+                }
+            }
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    /** CE {@code ItemFluidIDMulti.spreadType} :220-236. */
+    public static void spreadType(Level level, BlockPos pos, FluidType hand, FluidType pipe, int remaining) {
+        if (remaining <= 0) return;
+        if (!(level.getBlockEntity(pos) instanceof PipeBaseBlockEntity duct)) return;
+        if (duct.getFluidType() != pipe) return;
+        duct.setType(hand);
+        spreadType(level, pos.offset(1, 0, 0), hand, pipe, remaining - 1);
+        spreadType(level, pos.offset(0, 1, 0), hand, pipe, remaining - 1);
+        spreadType(level, pos.offset(0, 0, 1), hand, pipe, remaining - 1);
+        spreadType(level, pos.offset(-1, 0, 0), hand, pipe, remaining - 1);
+        spreadType(level, pos.offset(0, -1, 0), hand, pipe, remaining - 1);
+        spreadType(level, pos.offset(0, 0, -1), hand, pipe, remaining - 1);
+    }
 
     /**
      * CE ItemFluidIDMulti.receiveControl (CE :101-109) — GUI writes {@code primary}/{@code secondary}
