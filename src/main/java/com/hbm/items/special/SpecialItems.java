@@ -419,28 +419,20 @@ public final class SpecialItems {
     // ==================== MaskMan boss loot (docs/phase4/entities_bosses.md) ====================
     // coin_maskman: CE ModItems.java:1419, ItemCustomLore, UNCOMMON, consumableTab - same pattern as
     // coin_worm/the ItemSiegeCoin family above.
-    // gas_mask_filter: CE ModItems.java:180 ItemFilter 18000. Same inert-durability stand-in as combo.
-    // gas_mask_filter_combo: CE ModItems.java:181, `new ItemFilter("gas_mask_filter_combo", 24000)
-    // .setMaxStackSize(1).setCreativeTab(MainRegistry.consumableTab)`. Ported here as a minimal plain
-    // Item (durability only) purely so EntityMaskMan's death loot can pre-install a real filter stack
-    // via the already-real ArmorUtil.installGasMaskFilter. CE's full ItemFilter mechanic (player
-    // right-click swap onto a worn IGasMask helmet, with an ArmorModHandler mod-slot cross-check) is a
-    // wider "armor items/attachments" scope already flagged as a deferred TODO in ArmorUtil.java
-    // (register(), ~lines 104-109) and is NOT reproduced here - this item is otherwise inert.
+    // gas_mask_filter*: Exact CE ItemFilter (durability + right-click install).
 
     public static final DeferredItem<ItemCustomLore> COIN_MASKMAN =
             register("coin_maskman", () -> new ItemCustomLore(new Item.Properties().rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
     public static final DeferredItem<Item> GAS_MASK_FILTER =
-            register("gas_mask_filter", () -> new Item(new Item.Properties().stacksTo(1).durability(18000)));
+            register("gas_mask_filter", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(18000)));
     public static final DeferredItem<Item> GAS_MASK_FILTER_COMBO =
-            register("gas_mask_filter_combo", () -> new Item(new Item.Properties().stacksTo(1).durability(24000)));
-    // CE ModItems.java:177-179 ItemFilter 4000/4000/12000. Same inert-durability stand-in as the two above.
+            register("gas_mask_filter_combo", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(24000)));
     public static final DeferredItem<Item> GAS_MASK_FILTER_RAG =
-            register("gas_mask_filter_rag", () -> new Item(new Item.Properties().stacksTo(1).durability(4000)));
+            register("gas_mask_filter_rag", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(4000)));
     public static final DeferredItem<Item> GAS_MASK_FILTER_PISS =
-            register("gas_mask_filter_piss", () -> new Item(new Item.Properties().stacksTo(1).durability(4000)));
+            register("gas_mask_filter_piss", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(4000)));
     public static final DeferredItem<Item> GAS_MASK_FILTER_MONO =
-            register("gas_mask_filter_mono", () -> new Item(new Item.Properties().stacksTo(1).durability(12000)));
+            register("gas_mask_filter_mono", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(12000)));
     public static final DeferredItem<com.hbm.items.armor.ItemModV1> V1 =
             register("v1", () -> new com.hbm.items.armor.ItemModV1(new Item.Properties().stacksTo(1)));
     // CE ModItems.java:242 ItemModNightVision helmet-only armor mod. Slot type only — no invented NV tick.

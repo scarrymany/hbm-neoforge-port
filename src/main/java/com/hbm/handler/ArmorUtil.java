@@ -2,7 +2,9 @@ package com.hbm.handler;
 
 import com.hbm.api.item.IGasMask;
 import com.hbm.items.HbmDataComponents;
+import com.hbm.items.armor.PoweredArmorItems;
 import com.hbm.items.gear.SpecialArmorItems;
+import com.hbm.items.special.SpecialItems;
 import com.hbm.lib.Library;
 import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ArmorRegistry;
@@ -78,12 +80,12 @@ public final class ArmorUtil {
      * real call-site timing Neo Edition's own {@code CommonEvents.commonSetup} uses.
      */
     public static void register() {
-        // CE's real concrete-item block (docs/phase3/armor_special_sets.md-scoped items only - see
-        // that package's structured report for the full ~20-call table). The gas_mask_filter*/
-        // mask_rag/mask_piss/goggles/ashglasses/attachment_mask/liquidator_helmet entries and the
-        // GregTech "registerIfExists" compat hook are still forward references: none of those items
-        // exist in this port yet (a wider "armor items"/attachments scope than this package), and
-        // GregTech compat is out of this NeoForge port's scope entirely.
+        ArmorRegistry.registerHazard(SpecialItems.GAS_MASK_FILTER.get(), HazardClass.PARTICLE_COARSE, HazardClass.PARTICLE_FINE, HazardClass.GAS_LUNG, HazardClass.GAS_BLISTERING, HazardClass.BACTERIA);
+        ArmorRegistry.registerHazard(SpecialItems.GAS_MASK_FILTER_MONO.get(), HazardClass.PARTICLE_COARSE, HazardClass.GAS_MONOXIDE);
+        ArmorRegistry.registerHazard(SpecialItems.GAS_MASK_FILTER_COMBO.get(), HazardClass.PARTICLE_COARSE, HazardClass.PARTICLE_FINE, HazardClass.GAS_LUNG, HazardClass.GAS_BLISTERING, HazardClass.BACTERIA, HazardClass.GAS_MONOXIDE);
+        ArmorRegistry.registerHazard(SpecialItems.GAS_MASK_FILTER_RAG.get(), HazardClass.PARTICLE_COARSE);
+        ArmorRegistry.registerHazard(SpecialItems.GAS_MASK_FILTER_PISS.get(), HazardClass.PARTICLE_COARSE, HazardClass.GAS_LUNG);
+
         ArmorRegistry.registerHazard(SpecialArmorItems.GAS_MASK.get(), HazardClass.SAND, HazardClass.LIGHT);
         ArmorRegistry.registerHazard(SpecialArmorItems.GAS_MASK_M65.get(), HazardClass.SAND);
 
@@ -92,8 +94,7 @@ public final class ArmorUtil {
         ArmorRegistry.registerHazard(SpecialArmorItems.HAZMAT_HELMET_RED.get(), HazardClass.SAND);
         ArmorRegistry.registerHazard(SpecialArmorItems.HAZMAT_HELMET_GREY.get(), HazardClass.SAND);
         ArmorRegistry.registerHazard(SpecialArmorItems.HAZMAT_PAA_HELMET.get(), HazardClass.LIGHT, HazardClass.SAND);
-        // TODO(liquidator armor not yet ported): CE also registers liquidator_helmet here
-        // (HazardClass.LIGHT, HazardClass.SAND) - a wider "armor items" scope than this package.
+        ArmorRegistry.registerHazard(PoweredArmorItems.LIQUIDATOR_HELMET.get(), HazardClass.LIGHT, HazardClass.SAND);
         ArmorRegistry.registerHazard(SpecialArmorItems.SCHRABIDIUM_HELMET.get(), FULL_PACKAGE);
         ArmorRegistry.registerHazard(SpecialArmorItems.EUPHEMIUM_HELMET.get(), FULL_PACKAGE);
 
@@ -101,12 +102,8 @@ public final class ArmorUtil {
             ArmorRegistry.registerHazard(pair.getKey(), pair.getValue());
         }
 
-        // TODO(wider "armor items"/attachments scope): CE also registers gas_mask_filter/
-        // gas_mask_filter_mono/gas_mask_filter_combo/gas_mask_filter_rag/gas_mask_filter_piss
-        // (ItemFilter items), mask_rag/mask_piss (ArmorModel-based items), goggles/ashglasses
-        // (ArmorModel-based), attachment_mask, and a GregTech "registerIfExists" compat hook (3
-        // cross-mod hazmat helmets) here - none of those items exist in this port yet, and GregTech
-        // compat is out of this NeoForge port's scope entirely.
+        // TODO(wider armor attachments): CE mask_piss / goggles / attachment_mask / GregTech
+        // registerIfExists. ashglasses registered but CE hazard stays with ArmorModel helmets.
     }
 
     public static boolean checkForFaraday(Player player) {
