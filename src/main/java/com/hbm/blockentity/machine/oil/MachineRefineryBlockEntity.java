@@ -7,6 +7,7 @@ import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.capability.NTMFluidCapabilityHandler;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.container.machine.oil.MachineRefineryMenu;
 import com.hbm.inventory.fluid.FluidStack;
@@ -48,6 +49,8 @@ import java.util.List;
  * {@code :136-145}: {@code tanks[0].setType(12)} / {@code loadTank(1, 2)} then four
  * {@code unloadTank} pairs after {@code refine()}. Sulfur byproduct is slot 11 ({@code :303-309}).
  * Hopper Exact CE {@code :323-329}: accessible {@code 0..11}, extract {@code 2,4,6,8,10,11}.
+ * {@code refine()} {@code incrementPollution(SOOT, SOOT_PER_SECOND*5)} every 20t Exact CE {@code :318}.
+ * {@code onFire} {@code SOOT*70} stay skipped ({@code IRepairable} not ported).
  *
  * <h2>Scope trims vs. CE</h2>
  * <ul>
@@ -56,8 +59,6 @@ import java.util.List;
  *   neither interface is ported (no explosion-system package exists in this port yet, and this is a
  *   Phase 3 "weapons & destruction" concern per this project's own phase list, not Phase 2 machines).
  *   The refinery therefore never explodes and never needs repairing; it just keeps refining.</li>
- *   <li><b>No pollution bookkeeping</b> ({@code PollutionHandler.incrementPollution}) - Phase 4 scope,
- *   same precedent as {@code MachineCombustionEngineBlockEntity}.</li>
  *   <li><b>No looped boiler audio</b> ({@code AudioWrapper}/{@code getLoopedSound}) - the research
  *   report flagged this as an unverified dependency (whether {@code AudioWrapper}/looped-sound
  *   support exists in this port's current sound registry was never confirmed); dropped rather than
@@ -233,6 +234,11 @@ public class MachineRefineryBlockEntity extends MachineBaseBlockEntity
             }
         }
 
+        // CE TileEntityMachineRefinery.java:318
+        if (level != null && level.getGameTime() % 20 == 0) {
+            PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                    PollutionHandler.SOOT_PER_SECOND * 5);
+        }
         this.power -= 5;
     }
 
