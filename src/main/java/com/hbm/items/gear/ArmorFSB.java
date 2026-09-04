@@ -2,6 +2,7 @@ package com.hbm.items.gear;
 
 import com.hbm.config.PotionConfig;
 import com.hbm.handler.ArmorUtil;
+import com.hbm.handler.HazmatRegistry;
 import com.hbm.items.armor.IArmorDisableModel;
 import com.hbm.items.tool.ToolItems;
 import com.hbm.lib.HBMSoundHandler;
@@ -73,12 +74,9 @@ import java.util.Set;
  *     pieces, consumed by the (Phase 5) player render layer.</li>
  *     <li>{@link #setHazardClass} - self-registration into the already-ported
  *     {@link ArmorRegistry}.</li>
- *     <li>{@link #setRadResist} - stubbed with a documented forward-reference TODO: CE's real body
- *     registers into {@code com.hbm.handler.HazmatRegistry}, which does not exist anywhere in this
- *     port yet (a separate, not-yet-ported per-item radiation-resistance table - see this package's
- *     task brief item 2 and {@code docs/phase3/armor_equippable_framework.md} finding #4). The
- *     {@link #radResist} field itself is still stored so a future port of {@code HazmatRegistry} has
- *     the value to register.</li>
+ *     <li>{@link #setRadResist} - Exact CE {@code ArmorFSB.java:394-402}: stores {@link #radResist}
+ *     and, when {@code fullSet > 0}, queues {@code fullSet * HazmatRegistry.<slot>} into
+ *     {@code HazmatRegistry.external} for the {@code FMLCommonSetupEvent} flush.</li>
  * </ul>
  *
  * <p>{@link #onArmorTick}'s geiger-tick sound cue (Phase 4) is now wired against
@@ -454,14 +452,19 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
     }
 
     /**
-     * CE: {@code ArmorFSB#setRadResist(double)}. TODO(HazmatRegistry): CE's real body also
-     * registers {@code fullSet * HazmatRegistry.<slot>} into {@code HazmatRegistry.external}; that
-     * class does not exist anywhere in this port yet (a separate, not-yet-ported per-item
-     * radiation-resistance table - see class javadoc). {@link #radResist} is still stored so a
-     * future port of that registry has the value.
+     * CE: {@code ArmorFSB#setRadResist(double)} ({@code ArmorFSB.java:394-402}). Slot multiplier
+     * uses {@link Type} (1.21 stand-in for CE {@code EntityEquipmentSlot}); else-boots matches CE.
      */
     public ArmorFSB setRadResist(double fullSet) {
         this.radResist = fullSet;
+        if (fullSet > 0) {
+            Type type = this.getType();
+            double mult = type == Type.HELMET ? HazmatRegistry.helmet
+                    : type == Type.CHESTPLATE ? HazmatRegistry.chest
+                    : type == Type.LEGGINGS ? HazmatRegistry.legs
+                    : HazmatRegistry.boots;
+            HazmatRegistry.external.add(new Tuple.Pair<>(this, fullSet * mult));
+        }
         return this;
     }
 

@@ -130,9 +130,7 @@ public final class ArmorUtil {
             if (name.contains(metal)) return true;
         }
 
-        // HazmatRegistry (com.hbm.handler.HazmatRegistry) now exists - getCladding itself is still a
-        // documented stub pending ItemModCladding (see that method's own javadoc), so this remains
-        // behavior-identical to the previous inline stub, just centralized into the real engine.
+        // Exact CE ArmorUtil.java:95 — cladding > 0 is Faraday (lead/desh/ghiorsium mods).
         return HazmatRegistry.getCladding(item) > 0;
     }
 

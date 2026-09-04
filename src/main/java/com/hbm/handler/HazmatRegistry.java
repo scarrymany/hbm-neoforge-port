@@ -1,5 +1,9 @@
 package com.hbm.handler;
 
+import com.hbm.items.armor.ItemModCladding;
+import com.hbm.items.armor.PoweredArmorItems;
+import com.hbm.items.gear.BasicArmorItems;
+import com.hbm.items.gear.SpecialArmorItems;
 import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ShadyUtil;
 import com.hbm.util.Tuple;
@@ -8,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,29 +21,13 @@ import java.util.Map;
 
 /**
  * Ported from CE's {@code com.hbm.handler.HazmatRegistry} - the per-item radiation-resistance
- * coefficient table {@code com.hbm.items.gear.ArmorFSB#setRadResist} and
- * {@code com.hbm.handler.ArmorUtil#isFaradayArmor} already forward-reference (see those classes'
- * own TODO comments, both now resolved to call into this class for real).
+ * coefficient table consumed by {@code ArmorFSB#setRadResist} and
+ * {@code ArmorUtil#isFaradayArmor}.
  *
- * <p>Per this package's task brief: only the small "engine" itself is ported here
- * ({@link #external}, {@link #helmet}/{@link #chest}/{@link #legs}/{@link #boots},
- * {@link #registerHazmat}, {@link #getResistance(ItemStack)}, {@link #getCladding},
- * {@link #getResistance(LivingEntity)}) - CE's real {@link #initDefault()} body is a ~90-line
- * hardcoded wiring block naming roughly 40 concrete armor items across steel/titanium/alloy/cobalt/
- * cmb/security/starmetal/liquidator/rpa/fau/dns/jackt/vanilla-iron/vanilla-gold sets, most of which
- * belong to other, not-yet-scheduled Phase 3 "armor items" work packages (only the hazmat/gas-mask/
- * schrabidium/euphemium items this package itself registers are in scope here). Left empty per the
- * task's explicit instruction rather than half-wiring a table this package can't fully populate -
- * whoever ports the remaining armor sets should fill this in with the full CE table (reproduced
- * below in a comment for reference) once every named item exists.
- *
- * <p>CE also persists {@link #entries} to a per-world {@code hbmRadResist.json} config file
- * ({@code registerHazmats}/{@code writeDefault}/{@code readConfig}, Gson-backed) - not ported here;
- * out of this package's named scope ("the engine itself... registerHazmat/getResistance/
- * getCladding"), and this port's established config-loading pattern (see
- * {@code com.hbm.inventory.recipes}) is JSON-recipe-shaped, not a 1:1 fit for this ad-hoc format.
- * {@link #initDefault()} should still be called once (CE: {@code FMLPreInitializationEvent} time)
- * once it has real content to wire.
+ * <p>{@link #initDefault()} is Exact CE {@code HazmatRegistry.java:41-160} for every named item
+ * that is already registered. Skipped (do not invent): {@code alloy_*} armor,
+ * {@code jackt}/{@code jackt2}, {@code Compat.registerCompatHazmat()}, Gson
+ * {@code hbmRadResist.json} persistence.
  */
 public final class HazmatRegistry {
 
@@ -55,37 +44,125 @@ public final class HazmatRegistry {
     private static final Map<Item, Double> entries = new HashMap<>();
 
     /**
-     * CE's real body first flushes {@link #external} (restored here, depends on no concrete item -
-     * same idiom as {@code ArmorUtil.register()}'s own {@code external} flush), then hardcodes
-     * ~40 {@code registerHazmat(ModItems.<item>, <coefficient>)} calls for armor sets outside this
-     * package's scope (hazmat/gas-mask/schrabidium/euphemium - the sets this package itself owns -
-     * plus steel/titanium/alloy/cobalt/cmb/security/starmetal/liquidator/rpa/fau/dns/jackt/vanilla
-     * iron+gold, which do not). Left as a TODO per the task brief rather than populated here.
+     * Exact CE {@code HazmatRegistry.java:41-160}. Flush {@link #external} first (ArmorFSB
+     * {@code setRadResist} queue), then the hardcoded per-item table. {@code alloy_*},
+     * {@code jackt}/{@code jackt2}, {@code Compat.registerCompatHazmat()} stay skipped —
+     * those items/hooks are not registered here.
      */
     public static void initDefault() {
         for (Tuple.Pair<Item, Double> pair : external) {
             registerHazmat(pair.getKey(), pair.getValue());
         }
 
-        // TODO(wider "armor items" scope): CE's real body additionally hardcodes, with
-        // helmet=0.2/chest=0.4/legs=0.3/boots=0.1 as the per-slot multiplier and
-        // hazYellow=0.6/hazRed=1.0/hazGray=2.0/paa=1.7/liquidator=2.4/security=0.825/star=1.0/
-        // cmb=1.3/schrab=3.0/euph=10.0/iron=0.0225/gold=0.0225/steel=0.045/titanium=0.045/
-        // alloy=0.07/cobalt=0.125 as the per-material coefficients:
-        //   hazmat_helmet/_plate/_legs/_boots            -> hazYellow * <slot>
-        //   hazmat_helmet_red/_plate_red/_legs_red/_boots_red   -> hazRed * <slot>
-        //   hazmat_helmet_grey/_plate_grey/_legs_grey/_boots_grey -> hazGray * <slot>
-        //   hazmat_paa_helmet/_plate/_legs/_boots, paa_plate/_legs/_boots -> paa * <slot>
-        //   schrabidium_helmet/_plate/_legs/_boots        -> schrab * <slot>
-        //   euphemium_helmet/_plate/_legs/_boots          -> euph * <slot>
-        //   gas_mask -> 0.07 (flat), gas_mask_m65 -> 0.095 (flat)
-        //   liquidator_helmet/_plate/_legs/_boots, security_*, starmetal_*, steel_*, titanium_*,
-        //   cobalt_*, alloy_*, cmb_*, jackt/jackt2 (flat 0.1), vanilla IRON_*/GOLDEN_* armor
-        // None of the non-hazmat/gas-mask/schrabidium/euphemium items above exist in this port yet
-        // (a wider "armor items" scope than this package) - this package registers the hazmat/gas-
-        // mask/schrabidium/euphemium items themselves (com.hbm.items.gear.SpecialArmorItems) but,
-        // per the task brief, deliberately leaves this table itself for whoever finishes the rest
-        // of the armor-item catalog to populate in one pass rather than half-filling it here.
+        // assuming coefficient of 10
+        // real coefficient turned out to be 5
+        // oops
+
+        double iron = 0.0225D; // 5%
+        double gold = 0.0225D; // 5%
+        double steel = 0.045D; // 10%
+        double titanium = 0.045D; // 10%
+        double cobalt = 0.125D; // 25%
+
+        double hazYellow = 0.6D; // 50%
+        double hazRed = 1.0D; // 90%
+        double hazGray = 2D; // 99%
+        double paa = 1.7D; // 97%
+        double liquidator = 2.4D; // 99.6%
+
+        double security = 0.825D; // 85%
+        double star = 1D; // 90%
+        double cmb = 1.3D; // 95%
+        double schrab = 3D; // 99.9%
+        double euph = 10D; // <100%
+
+        registerHazmat(SpecialArmorItems.HAZMAT_HELMET.get(), hazYellow * helmet);
+        registerHazmat(SpecialArmorItems.HAZMAT_PLATE.get(), hazYellow * chest);
+        registerHazmat(SpecialArmorItems.HAZMAT_LEGS.get(), hazYellow * legs);
+        registerHazmat(SpecialArmorItems.HAZMAT_BOOTS.get(), hazYellow * boots);
+
+        registerHazmat(SpecialArmorItems.HAZMAT_HELMET_RED.get(), hazRed * helmet);
+        registerHazmat(SpecialArmorItems.HAZMAT_PLATE_RED.get(), hazRed * chest);
+        registerHazmat(SpecialArmorItems.HAZMAT_LEGS_RED.get(), hazRed * legs);
+        registerHazmat(SpecialArmorItems.HAZMAT_BOOTS_RED.get(), hazRed * boots);
+
+        registerHazmat(SpecialArmorItems.HAZMAT_HELMET_GREY.get(), hazGray * helmet);
+        registerHazmat(SpecialArmorItems.HAZMAT_PLATE_GREY.get(), hazGray * chest);
+        registerHazmat(SpecialArmorItems.HAZMAT_LEGS_GREY.get(), hazGray * legs);
+        registerHazmat(SpecialArmorItems.HAZMAT_BOOTS_GREY.get(), hazGray * boots);
+
+        registerHazmat(PoweredArmorItems.LIQUIDATOR_HELMET.get(), liquidator * helmet);
+        registerHazmat(PoweredArmorItems.LIQUIDATOR_PLATE.get(), liquidator * chest);
+        registerHazmat(PoweredArmorItems.LIQUIDATOR_LEGS.get(), liquidator * legs);
+        registerHazmat(PoweredArmorItems.LIQUIDATOR_BOOTS.get(), liquidator * boots);
+
+        registerHazmat(SpecialArmorItems.PAA_PLATE.get(), paa * chest);
+        registerHazmat(SpecialArmorItems.PAA_LEGS.get(), paa * legs);
+        registerHazmat(SpecialArmorItems.PAA_BOOTS.get(), paa * boots);
+
+        registerHazmat(SpecialArmorItems.HAZMAT_PAA_HELMET.get(), paa * helmet);
+        registerHazmat(SpecialArmorItems.HAZMAT_PAA_PLATE.get(), paa * chest);
+        registerHazmat(SpecialArmorItems.HAZMAT_PAA_LEGS.get(), paa * legs);
+        registerHazmat(SpecialArmorItems.HAZMAT_PAA_BOOTS.get(), paa * boots);
+
+        registerHazmat(BasicArmorItems.SECURITY_HELMET.get(), security * helmet);
+        registerHazmat(BasicArmorItems.SECURITY_PLATE.get(), security * chest);
+        registerHazmat(BasicArmorItems.SECURITY_LEGS.get(), security * legs);
+        registerHazmat(BasicArmorItems.SECURITY_BOOTS.get(), security * boots);
+
+        registerHazmat(BasicArmorItems.STARMETAL_HELMET.get(), star * helmet);
+        registerHazmat(BasicArmorItems.STARMETAL_PLATE.get(), star * chest);
+        registerHazmat(BasicArmorItems.STARMETAL_LEGS.get(), star * legs);
+        registerHazmat(BasicArmorItems.STARMETAL_BOOTS.get(), star * boots);
+
+        // TODO(CE:HazmatRegistry.java:109-110): jackt/jackt2 — unregistered, skip invent.
+
+        registerHazmat(SpecialArmorItems.GAS_MASK.get(), 0.07);
+        registerHazmat(SpecialArmorItems.GAS_MASK_M65.get(), 0.095);
+
+        registerHazmat(BasicArmorItems.STEEL_HELMET.get(), steel * helmet);
+        registerHazmat(BasicArmorItems.STEEL_PLATE.get(), steel * chest);
+        registerHazmat(BasicArmorItems.STEEL_LEGS.get(), steel * legs);
+        registerHazmat(BasicArmorItems.STEEL_BOOTS.get(), steel * boots);
+
+        registerHazmat(BasicArmorItems.TITANIUM_HELMET.get(), titanium * helmet);
+        registerHazmat(BasicArmorItems.TITANIUM_PLATE.get(), titanium * chest);
+        registerHazmat(BasicArmorItems.TITANIUM_LEGS.get(), titanium * legs);
+        registerHazmat(BasicArmorItems.TITANIUM_BOOTS.get(), titanium * boots);
+
+        registerHazmat(BasicArmorItems.COBALT_HELMET.get(), cobalt * helmet);
+        registerHazmat(BasicArmorItems.COBALT_PLATE.get(), cobalt * chest);
+        registerHazmat(BasicArmorItems.COBALT_LEGS.get(), cobalt * legs);
+        registerHazmat(BasicArmorItems.COBALT_BOOTS.get(), cobalt * boots);
+
+        registerHazmat(Items.IRON_HELMET, iron * helmet);
+        registerHazmat(Items.IRON_CHESTPLATE, iron * chest);
+        registerHazmat(Items.IRON_LEGGINGS, iron * legs);
+        registerHazmat(Items.IRON_BOOTS, iron * boots);
+
+        registerHazmat(Items.GOLDEN_HELMET, gold * helmet);
+        registerHazmat(Items.GOLDEN_CHESTPLATE, gold * chest);
+        registerHazmat(Items.GOLDEN_LEGGINGS, gold * legs);
+        registerHazmat(Items.GOLDEN_BOOTS, gold * boots);
+
+        // TODO(CE:HazmatRegistry.java:140-143): alloy_* armor — unregistered, skip invent.
+
+        registerHazmat(BasicArmorItems.CMB_HELMET.get(), cmb * helmet);
+        registerHazmat(BasicArmorItems.CMB_PLATE.get(), cmb * chest);
+        registerHazmat(BasicArmorItems.CMB_LEGS.get(), cmb * legs);
+        registerHazmat(BasicArmorItems.CMB_BOOTS.get(), cmb * boots);
+
+        registerHazmat(SpecialArmorItems.SCHRABIDIUM_HELMET.get(), schrab * helmet);
+        registerHazmat(SpecialArmorItems.SCHRABIDIUM_PLATE.get(), schrab * chest);
+        registerHazmat(SpecialArmorItems.SCHRABIDIUM_LEGS.get(), schrab * legs);
+        registerHazmat(SpecialArmorItems.SCHRABIDIUM_BOOTS.get(), schrab * boots);
+
+        registerHazmat(SpecialArmorItems.EUPHEMIUM_HELMET.get(), euph * helmet);
+        registerHazmat(SpecialArmorItems.EUPHEMIUM_PLATE.get(), euph * chest);
+        registerHazmat(SpecialArmorItems.EUPHEMIUM_LEGS.get(), euph * legs);
+        registerHazmat(SpecialArmorItems.EUPHEMIUM_BOOTS.get(), euph * boots);
+
+        // TODO(CE:HazmatRegistry.java:160): Compat.registerCompatHazmat() — unported.
     }
 
     public static void registerHazmat(Item item, double resistance) {
@@ -102,18 +179,17 @@ public final class HazmatRegistry {
     }
 
     /**
-     * TODO(ItemModCladding not yet ported): CE's real body first checks a per-stack persistent
-     * "hfr_cladding" float (a rarely-used direct stat override, e.g. for admin/creative-set gear)
-     * and then, failing that, {@code ArmorModHandler.pryMods(stack)[ArmorModHandler.cladding]}'s
-     * item for an {@code ItemModCladding} instance's {@code .rad} field. Neither the persistent
-     * float (no {@code HbmDataComponents} entry exists for it) nor {@code ItemModCladding} (a
-     * concrete {@code ItemArmorMod} leaf) exist anywhere in this port yet - both belong to a wider
-     * "armor items"/armor-mod-chip scope than this package. Stubbed to 0, matching this port's own
-     * established null-safety fallback idiom for this exact gap
-     * ({@code ArmorUtil.isFaradayArmor} used to inline this same stub before this class existed).
+     * Exact CE {@code HazmatRegistry.java:185-201} {@code pryMods} cladding-slot path.
+     * {@code hfr_cladding} NBT override stays skipped — no DataComponent, do not invent.
      */
     public static double getCladding(ItemStack stack) {
-        return 0D;
+        if (ArmorModHandler.hasMods(stack)) {
+            ItemStack cladding = ArmorModHandler.pryMods(stack)[ArmorModHandler.cladding];
+            if (!cladding.isEmpty() && cladding.getItem() instanceof ItemModCladding itemModCladding) {
+                return itemModCladding.rad;
+            }
+        }
+        return 0;
     }
 
     /**

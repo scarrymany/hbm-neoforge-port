@@ -127,8 +127,8 @@ public class CommonEvents {
             ArmorUtil.register();
             // CE: FMLPreInitializationEvent-time HazmatRegistry.registerHazmats() call. This port
             // splits out just the initDefault() half (registerHazmats()'s Gson config-file
-            // persistence is not ported - see HazmatRegistry's own javadoc); currently a no-op
-            // beyond flushing HazmatRegistry.external, since nothing populates that list yet.
+            // persistence is not ported - see HazmatRegistry's own javadoc). Flushes
+            // ArmorFSB.setRadResist's external queue, then the Exact CE per-item table.
             HazmatRegistry.initDefault();
             // Package C (weapon-mod eval chain) - must run after every Item/BulletConfig in
             // com.hbm.items.weapon.sedna.** has registered (RegisterEvent has already fully fired by
