@@ -3,15 +3,16 @@ package com.hbm.inventory.container.machine;
 import com.hbm.blockentity.machine.MachineCombustionEngineBlockEntity;
 import com.hbm.inventory.container.MenuBase;
 import com.hbm.inventory.slot.SlotNonRetarded;
+import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * Ported (slot layout trimmed, see {@link MachineCombustionEngineBlockEntity}'s javadoc) from CE's
- * {@code ContainerCombustionEngine}: piston + battery slots kept at CE's own pixel positions,
- * fill/output item slots dropped along with the fluid-container-item mechanic. Buttons: 0 = on/off,
- * 1/2 = throttle down/up (CE's GUI used a scrollbar-style slider; a stepped button pair reaches the
- * same 0-30 range without needing custom widget/drag code this pass doesn't have time to build).
+ * Exact CE {@code ContainerCombustionEngine.java:37-41}: canister 17,17 / empty 17,53 / piston 88,71
+ * / battery 143,71 / ID 35,71. {@code loadTank(0,1)} / {@code setType(4)} Exact CE
+ * {@code TileEntityMachineCombustionEngine.java:96-99}. Buttons: 0 = on/off, 1/2 = throttle down/up
+ * (CE's GUI used a scrollbar-style slider; a stepped button pair reaches the same 0-30 range
+ * without needing custom widget/drag code).
  */
 public class MachineCombustionEngineMenu extends MenuBase<MachineCombustionEngineBlockEntity> {
 
@@ -22,8 +23,11 @@ public class MachineCombustionEngineMenu extends MenuBase<MachineCombustionEngin
     public MachineCombustionEngineMenu(int id, Inventory playerInv, MachineCombustionEngineBlockEntity be) {
         super(PowerGenMenus.COMBUSTION_ENGINE.get(), id, be);
 
-        this.addSlot(new SlotNonRetarded(tile, 0, 88, 71));
-        this.addSlot(new SlotNonRetarded(tile, 1, 143, 71));
+        this.addSlot(new SlotNonRetarded(tile, 0, 17, 17));
+        this.addSlot(new SlotTakeOnly(tile, 1, 17, 53));
+        this.addSlot(new SlotNonRetarded(tile, 2, 88, 71));
+        this.addSlot(new SlotNonRetarded(tile, 3, 143, 71));
+        this.addSlot(new SlotNonRetarded(tile, 4, 35, 71));
 
         playerInv(playerInv, 8, 121, 179);
     }

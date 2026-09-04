@@ -24,7 +24,7 @@ public class MachineCombustionEngineScreen extends GuiInfoContainer<MachineCombu
     public MachineCombustionEngineScreen(MachineCombustionEngineMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 202;
+        this.imageHeight = 203;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -32,15 +32,16 @@ public class MachineCombustionEngineScreen extends GuiInfoContainer<MachineCombu
     protected void init() {
         super.init();
         int containerId = this.getMenu().containerId;
+        // CE ignition 79,13 / slider 80,38 — keep off Exact CE canister column 17,17.
         this.addRenderableWidget(Button.builder(Component.literal("On/Off"), b ->
                 this.minecraft.gameMode.handleInventoryButtonClick(containerId, MachineCombustionEngineMenu.BUTTON_TOGGLE_ON)
-        ).bounds(leftPos + 8, topPos + 17, 40, 20).build());
+        ).bounds(leftPos + 79, topPos + 13, 35, 15).build());
         this.addRenderableWidget(Button.builder(Component.literal("-"), b ->
                 this.minecraft.gameMode.handleInventoryButtonClick(containerId, MachineCombustionEngineMenu.BUTTON_THROTTLE_DOWN)
-        ).bounds(leftPos + 52, topPos + 17, 20, 20).build());
+        ).bounds(leftPos + 79, topPos + 36, 16, 12).build());
         this.addRenderableWidget(Button.builder(Component.literal("+"), b ->
                 this.minecraft.gameMode.handleInventoryButtonClick(containerId, MachineCombustionEngineMenu.BUTTON_THROTTLE_UP)
-        ).bounds(leftPos + 74, topPos + 17, 20, 20).build());
+        ).bounds(leftPos + 97, topPos + 36, 16, 12).build());
     }
 
     @Override
@@ -50,13 +51,14 @@ public class MachineCombustionEngineScreen extends GuiInfoContainer<MachineCombu
         guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
         guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
 
-        this.getMenu().be.tank.renderTank(x + 143, y + 71, 0, 16, 54);
+        // Exact CE GUICombustionEngine.java:199 — tank at 35,69 (bottom origin, 16×52).
+        this.getMenu().be.tank.renderTank(x + 35, y + 69, 0, 16, 52);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 42, 160, 12, this.getMenu().be.getPower(), this.getMenu().be.getMaxPower());
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 60, 160, 10, Component.literal("Throttle: " + this.getMenu().be.setting + "/30"));
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, 143, 17, 16, 52, this.getMenu().be.getPower(), this.getMenu().be.getMaxPower());
+        drawCustomInfo(guiGraphics, mouseX, mouseY, 79, 50, 35, 14, Component.literal("Throttle: " + this.getMenu().be.setting + "/30"));
     }
 }

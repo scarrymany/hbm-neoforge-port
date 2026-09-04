@@ -1,16 +1,20 @@
 package com.hbm.blockentity.machine;
 
+import com.hbm.api.energymk2.IBatteryItem;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
 import com.hbm.inventory.container.machine.MachineCombustionEngineMenu;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemPistons;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
@@ -36,27 +40,31 @@ import java.util.List;
 /**
  * Ported from CE's {@code TileEntityMachineCombustionEngine} (block {@code MachineCombustionEngine},
  * regname {@code machine_combustion_engine}, read in full): a multiblock diesel-burning HE engine
- * with a real inventory + GUI. Slot 0 must hold an {@link ItemPistons} (this port's four registered
+ * with a real inventory + GUI. Slot 2 must hold an {@link ItemPistons} (this port's four registered
  * {@code piston_set_*} items replace CE's single item + 4 metadata grades - see
  * {@link ItemPistons.EnumPistonType#eff}); {@link #setting} (0-30, redstone/GUI-controlled) is the
  * throttle. {@code fill}/{@code tenth} preserve CE's tenth-of-a-millibucket burn-rate precision
  * exactly (burning fractional mB/tick at low throttle would otherwise round to zero forever).
+ * {@code loadTank(0,1)} / {@code setType(4)} Exact CE {@code :96-99}. 5-slot layout Exact CE
+ * {@code ContainerCombustionEngine.java:37-41}.
  * <p>
  * <b>Scope trims vs. CE</b> (see {@link MachineDieselBlockEntity}'s javadoc for the shared
- * rationale): no item-fill slot (fuel arrives purely by pipe); no smoke/pollution tanks
- * ({@code TileEntityMachinePolluting}'s bookkeeping - {@code PollutionHandler} is Phase 4 scope per
- * the research report, and the smoke tanks have no other consumer once the mechanic itself is
- * stubbed, so they are omitted rather than built inert); no OpenComputers. ROR: CE
- * {@code TileEntityMachineCombustionEngine.java:538-584}. Piston is slot 0 / {@link ItemPistons}
- * instance (CE slot 2 / {@code piston_set} meta).
+ * rationale): no smoke/pollution tanks ({@code TileEntityMachinePolluting}'s bookkeeping —
+ * {@code PollutionHandler} is Phase 4 scope per the research report, and the smoke tanks have no
+ * other consumer once the mechanic itself is stubbed, so they are omitted rather than built inert);
+ * no OpenComputers. ROR: CE {@code TileEntityMachineCombustionEngine.java:538-584}. Piston is slot 2
+ * / {@link ItemPistons} instance (CE slot 2 / {@code piston_set} meta).
  */
 public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider,
         IRORValueProvider, IRORInteractive {
 
     public static final long MAX_POWER = 2_500_000L;
-    private static final int PISTON_SLOT = 0;
-    private static final int BATTERY_SLOT = 1;
+    private static final int SLOT_CANISTER = 0;
+    private static final int SLOT_EMPTY = 1;
+    private static final int SLOT_PISTON = 2;
+    private static final int SLOT_BATTERY = 3;
+    private static final int SLOT_ID = 4;
 
     public final FluidTankNTM tank;
     public boolean isOn;
@@ -65,7 +73,7 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
     private int tenth;
 
     public MachineCombustionEngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 2, true, true);
+        super(type, pos, state, 5, true, true);
         tank = new FluidTankNTM(Fluids.DIESEL, 24_000).withOwner(this);
     }
 
@@ -76,9 +84,31 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        if (i == PISTON_SLOT) return stack.getItem() instanceof ItemPistons;
-        if (i == BATTERY_SLOT) return Library.isBattery(stack);
+        if (i == SLOT_CANISTER) {
+            if (FluidContainerRegistry.getFluidContent(stack, tank.getTankType()) > 0) return true;
+            return stack.getItem() instanceof IFillableItem fill && fill.providesFluid(tank.getTankType(), stack);
+        }
+        if (i == SLOT_PISTON) return stack.getItem() instanceof ItemPistons;
+        if (i == SLOT_BATTERY) return Library.isChargeableBattery(stack);
+        // CE has no isItemValid; without this the ID never lands and setType is dead.
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
         return false;
+    }
+
+    @Override
+    public boolean canExtractItem(int slot, ItemStack stack, int amount) {
+        if (slot == SLOT_EMPTY) return true;
+        if (slot == SLOT_BATTERY && stack.getItem() instanceof IBatteryItem bat) {
+            return bat.getCharge(stack) == bat.getMaxCharge(stack);
+        }
+        return false;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        if (side == Direction.DOWN) return new int[]{SLOT_EMPTY, SLOT_BATTERY};
+        if (side == Direction.UP) return new int[]{SLOT_CANISTER};
+        return new int[]{SLOT_PISTON, SLOT_BATTERY};
     }
 
     private Direction coreDirection() {
@@ -107,8 +137,14 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // CE TileEntityMachineCombustionEngine.java:96-99
+        this.tank.loadTank(SLOT_CANISTER, SLOT_EMPTY, inventory);
+        if (this.tank.setType(SLOT_ID, inventory)) {
+            this.tenth = 0;
+        }
+
         int fill = tank.getFill() * 10 + tenth;
-        ItemStack pistonStack = inventory.getStackInSlot(PISTON_SLOT);
+        ItemStack pistonStack = inventory.getStackInSlot(SLOT_PISTON);
 
         boolean wasOn = false;
         if (isOn && setting > 0 && pistonStack.getItem() instanceof ItemPistons piston
@@ -128,7 +164,7 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
             }
         }
 
-        power = Library.chargeItemsFromTE(inventory, BATTERY_SLOT, power, MAX_POWER);
+        power = Library.chargeItemsFromTE(inventory, SLOT_BATTERY, power, MAX_POWER);
 
         for (DirPos dirPos : getConPos()) {
             BlockPos p = dirPos.getPos();
@@ -252,13 +288,13 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public String provideRORValue(String name) {
-        // CE :551-568 — piston slot 0 / ItemPistons instance (CE slot 2 / piston_set meta)
+        // CE :551-568 — piston slot 2 / ItemPistons instance (CE slot 2 / piston_set meta)
         if ((PREFIX_VALUE + "state").equals(name)) return "" + (isOn ? 1 : 0);
         if ((PREFIX_VALUE + "throttle").equals(name)) return "" + setting;
         if ((PREFIX_VALUE + "power").equals(name)) return "" + power;
         if ((PREFIX_VALUE + "fuel").equals(name)) return "" + tank.getFill();
         if ((PREFIX_VALUE + "efficiency").equals(name)) {
-            ItemStack stack = inventory.getStackInSlot(PISTON_SLOT);
+            ItemStack stack = inventory.getStackInSlot(SLOT_PISTON);
             if (!stack.isEmpty()
                     && stack.getItem() instanceof ItemPistons piston
                     && tank.getTankType().hasTrait(FT_Combustible.class)) {
