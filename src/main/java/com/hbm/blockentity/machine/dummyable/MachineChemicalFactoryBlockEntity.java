@@ -47,8 +47,9 @@ import java.util.Map;
  * CE {@code TileEntityMachineChemicalFactory}: 32 slots, 4 chemplant lanes, 12+12 tanks @ 24000 +
  * water/lps 4000. Upgrade then {@code speed*2D, pow*2D}. Recipes = {@link ChemPlantRecipes}.
  * Named recipe + {@code receiveControl} index/selection — CE {@code TileEntityMachineChemicalFactory.java:428-436}.
- * TODO(CE: TileEntityMachineChemicalFactory.java:168-174): loadTank(10,13) leftover chem-plant slot
- * numbers overlap module outputs — factory container has no canister slots. Not copied.
+ * TODO(CE: TileEntityMachineChemicalFactory.java:168-174): leftover chem-plant {@code loadTank(10,13)}
+ * — CE factory container has no canister slots; 10/13 collide with lane-0 out / lane-1 in.
+ * ChemPlant (22-slot) is the real home for those indices.
  * TODO(CE: TileEntityMachineChemicalFactory.java:235-250): AudioWrapper chemicalPlant loop.
  * TODO(CE: TileEntityMachineChemicalFactory.java:351): NBT key collision {@code "i"+i} for in+out.
  * TODO(CE: TileEntityMachineChemicalFactory.java:382-416): CapabilityContextProvider coolant accessor.

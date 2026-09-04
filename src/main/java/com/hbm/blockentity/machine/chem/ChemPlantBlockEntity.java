@@ -47,9 +47,10 @@ import java.util.List;
  * (this port matches by current input contents, not CE's player-selected-by-name GUI dropdown) and
  * scope trim (representative recipe subset).
  * <p>
- * 3 item input / 3 item output slots, 3x24000mB fluid input tanks / 3x24000mB fluid output tanks -
- * matching CE's per-module tank count and capacity, renumbered inventory (no fluid-ID/canister slots,
- * same pre-existing gap as every other machine in this pass).
+ * 3 item in / 3 item out stay on port indices 0-5 / battery 6 (recipe matching unchanged).
+ * Canister slots 10-21 Exact CE {@code TileEntityMachineChemicalPlant.java:123-131} /
+ * {@code ContainerMachineChemicalPlant.java:47-52}. Factory leftover {@code loadTank(10,13)} is
+ * not copied — CE factory container has no canister slots and those indices collide with item-out.
  * <p>
  * ROR + named recipe: CE {@code TileEntityMachineChemicalPlant.java:303-311, :358-383}.
  * {@code recipe=="null"} keeps first-match; GUI/ROR lock a name.
@@ -61,6 +62,12 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     private static final int ITEM_IN_START = 0;
     private static final int ITEM_OUT_START = 3;
     private static final int BATTERY_SLOT = 6;
+    /** Exact CE fluid-in load / empty-out. */
+    private static final int SLOT_FLUID_IN = 10;
+    private static final int SLOT_FLUID_IN_EMPTY = 13;
+    /** Exact CE fluid-out empty / filled. */
+    private static final int SLOT_FLUID_OUT = 16;
+    private static final int SLOT_FLUID_OUT_FULL = 19;
 
     public static final long MIN_MAX_POWER = 100_000L;
     public static final int TANK_CAPACITY = 24_000;
@@ -78,7 +85,7 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     private String activeRecipeName;
 
     public ChemPlantBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 7, true, true);
+        super(type, pos, state, 22, true, true);
         for (int i = 0; i < 3; i++) {
             inputTanks[i] = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
             outputTanks[i] = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
@@ -92,12 +99,17 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        if (stack.isEmpty()) return false;
         if (slot == BATTERY_SLOT) return Library.isBattery(stack);
+        // CE :270-276 — canister columns accept any stack; hopper is solids-only (:285-286).
+        if (slot >= SLOT_FLUID_IN && slot <= SLOT_FLUID_IN + 2) return true;
+        if (slot >= SLOT_FLUID_OUT && slot <= SLOT_FLUID_OUT + 2) return true;
         return slot >= ITEM_IN_START && slot < ITEM_IN_START + 3;
     }
 
     @Override
     public boolean canExtractItem(int slot, ItemStack stack, int amount) {
+        // CE :280-281 is solid-out only. Menu takeOnly still lets the player pull empties/filled.
         return slot >= ITEM_OUT_START && slot < ITEM_OUT_START + 3;
     }
 
@@ -251,6 +263,20 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
 
         ChemPlantRecipe itemOnly = findItemOnlyRecipe();
         if (itemOnly != null) retargetEmptyTanks(itemOnly);
+
+        // CE TileEntityMachineChemicalPlant.java:123-131
+        ChemPlantRecipe selected = ChemicalPlantRecipes.byName(recipe);
+        if (selected == null && (recipe == null || recipe.isEmpty() || "null".equals(recipe))) {
+            selected = itemOnly;
+        }
+        if (selected != null && selected.inputFluids.length > 0) {
+            for (int i = 0; i < Math.min(3, selected.inputFluids.length); i++) {
+                inputTanks[i].loadTank(SLOT_FLUID_IN + i, SLOT_FLUID_IN_EMPTY + i, inventory);
+            }
+        }
+        outputTanks[0].unloadTank(SLOT_FLUID_OUT, SLOT_FLUID_OUT_FULL, inventory);
+        outputTanks[1].unloadTank(SLOT_FLUID_OUT + 1, SLOT_FLUID_OUT_FULL + 1, inventory);
+        outputTanks[2].unloadTank(SLOT_FLUID_OUT + 2, SLOT_FLUID_OUT_FULL + 2, inventory);
 
         for (DirPos dp : getConPos()) {
             trySubscribe(level, dp);
