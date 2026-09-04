@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -21,10 +23,10 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * CE {@code TileEntityMassStorage}: 3 slots (in / filter / out), stockpile, output toggle.
- * Lock / OC / ROR skipped (same as crates).
+ * Lock / OC skipped. ROR: CE {@code :293-317}.
  */
 public class MassStorageBlockEntity extends MachineBaseBlockEntity
-        implements ITickableBE, MenuProvider, IPersistentNBT {
+        implements ITickableBE, MenuProvider, IPersistentNBT, IRORValueProvider, IRORInteractive {
 
     public static final int SLOT_IN = 0;
     public static final int SLOT_FILTER = 1;
@@ -267,5 +269,36 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new MassStorageMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :293-295
+        return new String[]{
+                PREFIX_VALUE + "type", PREFIX_VALUE + "fill", PREFIX_VALUE + "fillpercent",
+                PREFIX_FUNCTION + "toggleoutput"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :298-306
+        if ((PREFIX_VALUE + "fill").equals(name)) return "" + this.stack;
+        if ((PREFIX_VALUE + "fillpercent").equals(name)) return "" + this.stack * 100 / this.capacity;
+        if ((PREFIX_VALUE + "type").equals(name)) {
+            if (inventory.getStackInSlot(SLOT_FILTER).isEmpty()) return "None";
+            return inventory.getStackInSlot(SLOT_FILTER).getHoverName().getString();
+        }
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :310-316
+        if ((PREFIX_FUNCTION + "toggleoutput").equals(name)) {
+            this.output = !this.output;
+            setChanged();
+        }
+        return null;
     }
 }

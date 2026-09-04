@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.reprocess;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -34,10 +35,11 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachinePUREX.java}: 1M HE floor, recipe.power*100 cap, 3×24k in / 1×24k out.
- * Auto-detects from inventory+tanks (no CE dropdown / blueprint).
+ * Auto-detects from inventory+tanks (no CE dropdown / blueprint). ROR: CE {@code :320-333}.
  */
 public class PurexBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, IPersistentNBT,
+        MenuProvider, IRORValueProvider {
 
     private static final int ITEM_IN_START = 0;
     private static final int ITEM_OUT_START = 3;
@@ -365,5 +367,24 @@ public class PurexBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new PurexMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :320-325
+        return new String[]{
+                PREFIX_VALUE + "progress",
+                PREFIX_VALUE + "recipe",
+                PREFIX_VALUE + "active"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :329-333 — module.progress 0-1 → getProgressScaled(100); didProcess → isProcessing
+        if ((PREFIX_VALUE + "progress").equals(name)) return "" + getProgressScaled(100);
+        if ((PREFIX_VALUE + "recipe").equals(name)) return this.activeRecipeName != null ? this.activeRecipeName : "null";
+        if ((PREFIX_VALUE + "active").equals(name)) return "" + (this.isProcessing ? 1 : 0);
+        return null;
     }
 }

@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -27,13 +28,16 @@ import java.util.List;
  * shape (heat-limited, water-limited, steam-space-limited - the same three-way clamp CE's own
  * {@code TileEntityRBMKBase.boilWater()} ReaSim path uses, which was read in full).
  */
-public class RBMKBoilerBlockEntity extends RBMKSlottedBlockEntity implements IFluidStandardTransceiverMK2, IControlReceiver {
+public class RBMKBoilerBlockEntity extends RBMKSlottedBlockEntity
+        implements IFluidStandardTransceiverMK2, IControlReceiver, IRORValueProvider {
 
     private static final double HEAT_PER_MB = 2D;
 
     public final FluidTankNTM feed;
     public final FluidTankNTM steam;
     public boolean locked = false;
+    /** CE {@code TileEntityRBMKBoiler.consumption} — water used this tick. */
+    protected int consumption;
 
     public RBMKBoilerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 0);
@@ -48,18 +52,22 @@ public class RBMKBoilerBlockEntity extends RBMKSlottedBlockEntity implements IFl
 
     @Override
     public void updateEntity() {
-        if (level != null && !level.isClientSide && !locked && heat > 100D) {
-            int byHeat = (int) ((heat - 100D) / HEAT_PER_MB);
-            int process = Math.min(byHeat, Math.min(feed.getFill(), steam.getMaxFill() - steam.getFill()));
+        if (level != null && !level.isClientSide) {
+            this.consumption = 0;
+            if (!locked && heat > 100D) {
+                int byHeat = (int) ((heat - 100D) / HEAT_PER_MB);
+                int process = Math.min(byHeat, Math.min(feed.getFill(), steam.getMaxFill() - steam.getFill()));
 
-            if (process > 0) {
-                feed.setFill(feed.getFill() - process);
-                steam.setFill(steam.getFill() + process);
-                heat -= process * HEAT_PER_MB;
+                if (process > 0) {
+                    feed.setFill(feed.getFill() - process);
+                    steam.setFill(steam.getFill() + process);
+                    heat -= process * HEAT_PER_MB;
+                    this.consumption = process;
+                }
+
+                trySubscribe(feed.getTankType(), level, worldPosition.below(), Direction.UP);
+                tryProvide(steam, level, worldPosition.above(), Direction.DOWN);
             }
-
-            trySubscribe(feed.getTankType(), level, worldPosition.below(), Direction.UP);
-            tryProvide(steam, level, worldPosition.above(), Direction.DOWN);
         }
 
         super.updateEntity();
@@ -148,5 +156,24 @@ public class RBMKBoilerBlockEntity extends RBMKSlottedBlockEntity implements IFl
         locked = buf.readBoolean();
         feed.deserialize(buf);
         steam.deserialize(buf);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :402-407
+        return new String[]{
+                PREFIX_VALUE + "feed",
+                PREFIX_VALUE + "steam",
+                PREFIX_VALUE + "consumption"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :411-415
+        if ((PREFIX_VALUE + "feed").equals(name)) return "" + this.feed.getFill();
+        if ((PREFIX_VALUE + "steam").equals(name)) return "" + this.steam.getFill();
+        if ((PREFIX_VALUE + "consumption").equals(name)) return "" + this.consumption;
+        return null;
     }
 }

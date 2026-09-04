@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.fusion;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -44,7 +45,8 @@ import java.util.List;
  * TODO(CE: MachineFusionTorus.java:87): TileEntityFusionTorusAE2 / ProxyCombo META≥6.
  */
 public class FusionTorusBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IControlReceiver, IRORValueProvider {
 
     public static final float KELVIN = 273F;
     public static final float TEMPERATURE_TARGET = KELVIN - 150F;
@@ -417,6 +419,23 @@ public class FusionTorusBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new FusionTorusMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityFusionTorus.java:496-500
+        return new String[]{
+                PREFIX_VALUE + "plasma",
+                PREFIX_VALUE + "consumption"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :504-507
+        if ((PREFIX_VALUE + "plasma").equals(name)) return "" + this.plasmaEnergy;
+        if ((PREFIX_VALUE + "consumption").equals(name)) return "" + (int) (this.fuelConsumption * 100);
+        return null;
     }
 
 }

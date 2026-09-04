@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -31,9 +32,11 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityHeaterHeatex.java}:89-157 — COOLANT_HOT → COOLANT via FT_Coolable HEATEXCHANGER.
+ * ROR: CE {@code :286-299}. tanksNew[0]/[1] → hot/cold.
  */
 public class HeaterHeatexBlockEntity extends MachineBaseBlockEntity
-        implements IHeatSource, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IHeatSource, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IRORValueProvider {
 
     public final FluidTankNTM hot;
     public final FluidTankNTM cold;
@@ -187,5 +190,24 @@ public class HeaterHeatexBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new HeaterHeatexMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :286-291
+        return new String[]{
+                PREFIX_VALUE + "hotfluid",
+                PREFIX_VALUE + "coldfluid",
+                PREFIX_VALUE + "heat"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :295-299
+        if ((PREFIX_VALUE + "hotfluid").equals(name)) return "" + hot.getFill();
+        if ((PREFIX_VALUE + "coldfluid").equals(name)) return "" + cold.getFill();
+        if ((PREFIX_VALUE + "heat").equals(name)) return "" + heatEnergy;
+        return null;
     }
 }

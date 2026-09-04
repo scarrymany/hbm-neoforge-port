@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.rbmk.IRBMKFluxReceiver;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.api.rbmk.IRBMKLoadable;
 import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.blocks.machine.rbmk.RBMKBaseBlock;
@@ -25,11 +26,11 @@ import net.minecraft.world.level.block.state.BlockState;
  * the sibling {@code rbmk_core_logic} package's {@code com.hbm.api.rbmk} (reconciled against the real
  * classes, not a forward-referenced guess).
  * <p>
- * <b>Not ported</b>: OpenComputers, satellite-scan, and redstone-over-radio integration (see prior
- * revision's note - left for a follow-up pass). {@code ChunkRadiationManager} un-lidded irradiation
- * (Phase 4) is now wired in {@link #updateEntity}.
+ * <b>Not ported</b>: OpenComputers, satellite-scan. ROR: CE {@code TileEntityRBMKRod.java:554-577}.
+ * {@code ChunkRadiationManager} un-lidded irradiation (Phase 4) is now wired in {@link #updateEntity}.
  */
-public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity implements IRBMKFluxReceiver, IRBMKLoadable {
+public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity
+        implements IRBMKFluxReceiver, IRBMKLoadable, IRORValueProvider {
 
     public double fluxFastRatio;
     public double fluxQuantity;
@@ -286,5 +287,34 @@ public class RBMKRodBlockEntity extends RBMKSlottedBlockEntity implements IRBMKF
         this.lastFluxRatio = buf.readDouble();
         this.hasRod = buf.readBoolean();
         this.rodColor = buf.readInt();
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :554-563
+        return new String[]{
+                PREFIX_VALUE + "columnheat",
+                PREFIX_VALUE + "rodheat",
+                PREFIX_VALUE + "depletion",
+                PREFIX_VALUE + "xenon",
+                PREFIX_VALUE + "fastflux",
+                PREFIX_VALUE + "slowflux",
+                PREFIX_VALUE + "flux"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :567-577
+        if ((PREFIX_VALUE + "columnheat").equals(name)) return "" + (int) this.heat;
+        if (inventory.getStackInSlot(0).getItem() instanceof ItemRBMKRod) {
+            if ((PREFIX_VALUE + "rodheat").equals(name)) return "" + (int) ItemRBMKRod.getHullHeat(inventory.getStackInSlot(0));
+            if ((PREFIX_VALUE + "depletion").equals(name)) return "" + (int) (100 - ItemRBMKRod.getEnrichment(inventory.getStackInSlot(0)) * 100);
+            if ((PREFIX_VALUE + "xenon").equals(name)) return "" + (int) (ItemRBMKRod.getPoison(inventory.getStackInSlot(0)));
+        }
+        if ((PREFIX_VALUE + "fastflux").equals(name)) return "" + (int) (lastFluxQuantity * lastFluxRatio);
+        if ((PREFIX_VALUE + "slowflux").equals(name)) return "" + (int) (lastFluxQuantity * (1 - lastFluxRatio));
+        if ((PREFIX_VALUE + "flux").equals(name)) return "" + ((int) (lastFluxQuantity * lastFluxRatio) + (int) (lastFluxQuantity * (1 - lastFluxRatio)));
+        return null;
     }
 }

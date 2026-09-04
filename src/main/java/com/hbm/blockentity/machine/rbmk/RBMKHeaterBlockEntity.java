@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.inventory.container.machine.rbmk.RBMKHeaterMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -26,7 +27,8 @@ import java.util.List;
  * see {@link RBMKBoilerBlockEntity}'s javadoc for the same caveat) from CE's
  * {@code TileEntityRBMKHeater} (328 lines, signature-level survey).
  */
-public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity implements IFluidStandardTransceiverMK2, MenuProvider {
+public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity
+        implements IFluidStandardTransceiverMK2, MenuProvider, IRORValueProvider {
 
     private static final double HEAT_PER_MB = 2D;
 
@@ -138,5 +140,22 @@ public class RBMKHeaterBlockEntity extends RBMKSlottedBlockEntity implements IFl
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new RBMKHeaterMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityRBMKHeater.java:315-319
+        return new String[]{
+                PREFIX_VALUE + "in",
+                PREFIX_VALUE + "out"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :323-326
+        if ((PREFIX_VALUE + "in").equals(name)) return "" + this.feed.getFill();
+        if ((PREFIX_VALUE + "out").equals(name)) return "" + this.steam.getFill();
+        return null;
     }
 }
