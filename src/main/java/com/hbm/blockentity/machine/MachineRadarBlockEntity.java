@@ -9,6 +9,8 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.RadarMenu;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
+import com.hbm.saveddata.satellites.SatelliteDetector;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -33,6 +35,7 @@ import java.util.List;
 /**
  * CE {@code TileEntityMachineRadarNT.java}:85-87 / :220-258 / :423-424 / :457-472
  * and {@code TileEntityMachineRadarLarge.java:16} (range 3000).
+ * SatelliteRayScan.INFO_RADAR + Detector MEDIUM Exact CE :451-454.
  * Scans {@link IRadarDetectableNT} + players. Map GUI / satellite link not ported.
  */
 public class MachineRadarBlockEntity extends MachineBaseBlockEntity
@@ -141,6 +144,14 @@ public class MachineRadarBlockEntity extends MachineBaseBlockEntity
         }
         contacts = entries.size();
         redPower = computeRedPower();
+
+        // CE TileEntityMachineRadarNT.java:451-454 — after a powered scan
+        if (level.getGameTime() % 20 == 0) {
+            SatelliteDetector.reportEvent(level, SatelliteDetector.DURATION_MEDIUM,
+                    SatelliteDetector.BurstIntensity.MEDIUM, worldPosition.getX(), worldPosition.getZ());
+            SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                    SatelliteRayScan.RayEvent.INFO_RADAR, 200);
+        }
     }
 
     /** CE TileEntityMachineRadarNT.java:457-472 proximity mode. */
