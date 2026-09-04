@@ -3,6 +3,7 @@ package com.hbm.blockentity.machine.rbmk;
 import com.hbm.api.fluidmk2.IFluidStandardSenderMK2;
 import com.hbm.api.rbmk.IRBMKFluxReceiver;
 import com.hbm.api.rbmk.IRBMKLoadable;
+import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.handler.neutron.NeutronStream;
 import com.hbm.handler.neutron.RBMKNeutronHandler;
 import com.hbm.inventory.container.machine.rbmk.RBMKOutgasserMenu;
@@ -10,12 +11,15 @@ import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.OutgasserRecipes;
+import com.hbm.lib.DirPos;
+import com.hbm.util.ContaminationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,14 +31,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.List;
 
 /**
- * Outgasser column - absorbs flux (like a rod) into an inserted item over {@link #duration} ticks
- * worth of accumulated flux, producing tritium gas. Ported (simplified fill logic; tank/duration
- * constants CE-confirmed) from CE's {@code TileEntityRBMKOutgasser} (391 lines, signature-level
- * survey). {@code receiveFlux} terminates the stream exactly like a fuel rod - see CE's
- * {@code RBMKNeutronHandler.RBMKNeutronStream.runStreamInteraction}'s {@code OUTGASSER} branch
- * (forward reference).
+ * Outgasser column. Exact CE {@code TileEntityRBMKOutgasser.java:68-140}: flux efficiency
+ * {@code min(1 - fluxRatio * 0.8, 1)} × {@code getOutgasserMod}, progress in {@code receiveFlux},
+ * {@code lastUsedFlux} per-tick accumulate, item-change progress reset, neutron-activate fallback,
+ * default {@code getConPos} column-top + below. {@code rbmk_loader} branches stay skipped.
  * <p>
- * Recipe table: {@link OutgasserRecipes} (CE {@code TileEntityRBMKOutgasser}:150-187).
+ * Recipe table: {@link OutgasserRecipes} (CE {@code :145-187}).
  */
 public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements IRBMKFluxReceiver, IFluidStandardSenderMK2, IRBMKLoadable, MenuProvider {
 
@@ -42,7 +44,8 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
     public double progress = 0;
     public int duration = 10_000;
     public double lastUsedFlux = 0;
-    public double fluxQuantity;
+    private long lastFluxTick = -1;
+    private ItemStack previousStack = ItemStack.EMPTY;
 
     public RBMKOutgasserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 2);
@@ -64,10 +67,34 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
         return Component.translatable("container.rbmkOutgasser");
     }
 
-    // implements IRBMKFluxReceiver.receiveFlux(NeutronStream) - CE: TileEntityRBMKOutgasser.receiveFlux
+    // CE TileEntityRBMKOutgasser.java:117-140
     @Override
     public void receiveFlux(NeutronStream stream) {
-        this.fluxQuantity += stream.fluxQuantity;
+        double efficiency = Math.min(1 - stream.fluxRatio * 0.8, 1);
+
+        if (canProcess()) {
+            double usedFlux = stream.fluxQuantity * efficiency
+                    * (level instanceof ServerLevel serverLevel ? RBMKDials.getOutgasserMod(serverLevel) : 1D);
+            progress += usedFlux;
+
+            long now = level != null ? level.getGameTime() : 0L;
+            if (now != lastFluxTick) {
+                lastFluxTick = now;
+                lastUsedFlux = 0;
+            }
+            lastUsedFlux += usedFlux;
+
+            if (progress > duration) {
+                process();
+                setChanged();
+            }
+        } else if (!inventory.getStackInSlot(0).isEmpty()) {
+            ContaminationUtil.neutronActivateItem(
+                    inventory.getStackInSlot(0),
+                    (float) (stream.fluxQuantity * efficiency * 0.001),
+                    1F);
+            setChanged();
+        }
     }
 
     public boolean canProcess() {
@@ -110,22 +137,33 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
     @Override
     public void updateEntity() {
         if (level != null && !level.isClientSide) {
-            this.lastUsedFlux = this.fluxQuantity;
-
-            if (canProcess() && fluxQuantity > 0) {
-                progress += fluxQuantity;
-                if (progress >= duration) {
-                    process();
-                }
-            } else if (!canProcess()) {
-                progress = 0;
+            // CE :71-73
+            if (level.getGameTime() != lastFluxTick) {
+                lastUsedFlux = 0;
             }
-            this.fluxQuantity = 0;
+            // CE :75-77 — reset when unprocessable or input item changed
+            if (!canProcess() || !ItemStack.isSameItem(previousStack, inventory.getStackInSlot(0))) {
+                this.progress = 0;
+            }
 
-            tryProvide(gas, level, worldPosition.above(), Direction.UP);
+            if (this.gas.getFill() > 0) {
+                for (DirPos pos : getConPos()) {
+                    tryProvide(gas, level, pos);
+                }
+            }
+            previousStack = inventory.getStackInSlot(0).copy();
         }
 
         super.updateEntity();
+    }
+
+    /** CE {@code :108-113} default (no {@code rbmk_loader}). */
+    public DirPos[] getConPos() {
+        int height = level instanceof ServerLevel serverLevel ? RBMKDials.getColumnHeight(serverLevel) : 0;
+        return new DirPos[]{
+                new DirPos(worldPosition.getX(), worldPosition.getY() + height + 1, worldPosition.getZ(), Direction.UP),
+                new DirPos(worldPosition.getX(), worldPosition.getY() - 1, worldPosition.getZ(), Direction.DOWN)
+        };
     }
 
     @Override
@@ -157,12 +195,13 @@ public class RBMKOutgasserBlockEntity extends RBMKSlottedBlockEntity implements 
 
     @Override
     public boolean canLoad(ItemStack toLoad) {
-        return !toLoad.isEmpty() && inventory.getStackInSlot(0).isEmpty();
+        // CE :260-262
+        return toLoad != null && inventory.insertItem(0, toLoad.copy(), true).isEmpty();
     }
 
     @Override
     public void load(ItemStack toLoad) {
-        inventory.setStackInSlot(0, toLoad.copy());
+        inventory.insertItem(0, toLoad.copy(), false);
         setChanged();
     }
 
