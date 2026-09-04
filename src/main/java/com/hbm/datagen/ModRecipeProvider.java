@@ -434,6 +434,68 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_blade", has(bladeMeteorite))
                 .save(output, id("tool/meteorite_sword"));
 
+        // CE ToolRecipes.java:188-198 else-branch (enableLBSM && enableLBSMSimpleToolRecipes == false).
+        // LBSM addSword(CO.block(), cobalt_decorated_*) / addSword(STAR.ingot(), starmetal_*) stay
+        // skipped — CE default is off. cobalt_decorated_* itself is anvil smithHot, not a table craft.
+        TagKey<Item> anyPlasticIngotTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("hbm", "any_plastic"));
+        Item ingotStarmetal = item("ingot_starmetal");
+        Item ringStarmetal = item("ring_starmetal");
+        Item schrabidiumBlock = item("schrabidium_block");
+        Item bladesDesh = item("blades_desh");
+        Item ingotSchrabidium = item("ingot_schrabidium");
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("starmetal_sword"))
+                .pattern(" I ").pattern(" B ").pattern("ISI")
+                .define('I', ingotStarmetal).define('S', ringStarmetal).define('B', item("cobalt_decorated_sword"))
+                .unlockedBy("has_decorated", has(item("cobalt_decorated_sword")))
+                .save(output, id("tool/starmetal_sword"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("starmetal_pickaxe"))
+                .pattern("ISI").pattern(" B ").pattern(" I ")
+                .define('I', ingotStarmetal).define('S', ringStarmetal).define('B', item("cobalt_decorated_pickaxe"))
+                .unlockedBy("has_decorated", has(item("cobalt_decorated_pickaxe")))
+                .save(output, id("tool/starmetal_pickaxe"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("starmetal_axe"))
+                .pattern("IS").pattern("IB").pattern(" I")
+                .define('I', ingotStarmetal).define('S', ringStarmetal).define('B', item("cobalt_decorated_axe"))
+                .unlockedBy("has_decorated", has(item("cobalt_decorated_axe")))
+                .save(output, id("tool/starmetal_axe"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("starmetal_shovel"))
+                .pattern("I").pattern("B").pattern("I")
+                .define('I', ingotStarmetal).define('B', item("cobalt_decorated_shovel"))
+                .unlockedBy("has_decorated", has(item("cobalt_decorated_shovel")))
+                .save(output, id("tool/starmetal_shovel"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("starmetal_hoe"))
+                .pattern("IS").pattern(" B").pattern(" I")
+                .define('I', ingotStarmetal).define('S', ringStarmetal).define('B', item("cobalt_decorated_hoe"))
+                .unlockedBy("has_decorated", has(item("cobalt_decorated_hoe")))
+                .save(output, id("tool/starmetal_hoe"));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, item("schrabidium_sword"))
+                .pattern("I").pattern("W").pattern("S")
+                .define('I', schrabidiumBlock).define('W', item("desh_sword")).define('S', anyPlasticIngotTag)
+                .unlockedBy("has_desh", has(item("desh_sword")))
+                .save(output, id("tool/schrabidium_sword"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("schrabidium_pickaxe"))
+                .pattern("BSB").pattern(" W ").pattern(" P ")
+                .define('B', bladesDesh).define('S', schrabidiumBlock).define('W', item("desh_pickaxe")).define('P', anyPlasticIngotTag)
+                .unlockedBy("has_desh", has(item("desh_pickaxe")))
+                .save(output, id("tool/schrabidium_pickaxe"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("schrabidium_axe"))
+                .pattern("BS").pattern("BW").pattern(" P")
+                .define('B', bladesDesh).define('S', schrabidiumBlock).define('W', item("desh_axe")).define('P', anyPlasticIngotTag)
+                .unlockedBy("has_desh", has(item("desh_axe")))
+                .save(output, id("tool/schrabidium_axe"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("schrabidium_shovel"))
+                .pattern("B").pattern("W").pattern("P")
+                .define('B', schrabidiumBlock).define('W', item("desh_shovel")).define('P', anyPlasticIngotTag)
+                .unlockedBy("has_desh", has(item("desh_shovel")))
+                .save(output, id("tool/schrabidium_shovel"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("schrabidium_hoe"))
+                .pattern("IW").pattern(" S").pattern(" S")
+                .define('I', ingotSchrabidium).define('W', item("desh_hoe")).define('S', anyPlasticIngotTag)
+                .unlockedBy("has_desh", has(item("desh_hoe")))
+                .save(output, id("tool/schrabidium_hoe"));
+
         // Deliberately not ported (see class javadoc for the full reasoning):
         // - elec_sword/_pickaxe/_axe/_shovel, centri_stick, smashing_hammer, chainsaw, matchstick,
         //   carts, lead_gavel, pipe_lead, designator/designator_manual/designator_arty_range and the
@@ -441,22 +503,9 @@ public class ModRecipeProvider extends RecipeProvider {
         //   geiger_counter, dosimeter, digamma_diagnostic, pollution_detector, ore_density_scanner,
         //   defuser, reacher, sat_designator, sat_relay, settings_tool, pipette*, siphon, boat_rubber,
         //   analysis_tool, screwdriver_desh, hand_drill_desh, chemistry_set, blowtorch*, boltgun,
-        //   rebar_placer) - each needs at least one of: this port's still-unbuilt circuit-component
-        //   family, a "motor"/"canister_empty"/"piston_selenium"/"ducttape"/"tank_steel" item that
-        //   does not exist under any name this class could confirm, or a plain resource item (sulfur,
-        //   dust, block_steel/block_tungsten) likewise not found registered anywhere.
-        // - starmetal_sword/_pickaxe/_axe/_shovel/_hoe, schrabidium_sword/_pickaxe/_axe/_shovel/_hoe,
-        //   cobalt_decorated_sword/_pickaxe/_axe/_shovel/_hoe - CE gates the simple version of these
-        //   behind GeneralConfig.enableLBSM, which defaults to false
-        //   (upstream/hbm-ce/src/main/java/com/hbm/config/GeneralConfig.java:107,274). The real CE
-        //   default (the "else" branch, ToolRecipes.java:184-193) crafts starmetal_* FROM
-        //   cobalt_decorated_* - but cobalt_decorated_* has no recipe at all in that same default
-        //   branch (it only gets one under the LBSM-enabled branch), making the whole chain
-        //   uncraftable in CE's own out-of-the-box config. Skipping this branch entirely is therefore
-        //   the most faithful choice, not a scope cut: it reproduces CE's real default behavior
-        //   (no crafting path) rather than picking one config side to hard-code.
-        // - schrabidium_sword/etc. also transitively need ModItems.ring_starmetal and
-        //   ModBlocks.block_schrabidium, neither of which exists in this port under any name found.
+        //   rebar_placer) - rebar_placer still needs ModBlocks.rebar (CE BlockRebar TESR/UniNodespace).
+        // - LBSM-only table crafts for cobalt_decorated_* / simple starmetal_* / simple schrabidium_*
+        //   (GeneralConfig.enableLBSM && enableLBSMSimpleToolRecipes, default false).
     }
 
     private static void sword(RecipeOutput output, Item ingot, Item result, String path) {

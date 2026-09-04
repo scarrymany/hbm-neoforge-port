@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "hbm:cobalt_decorated_sword"
+    },
+    "I": {
+      "item": "hbm:ingot_starmetal"
+    },
+    "S": {
+      "item": "hbm:ring_starmetal"
+    }
+  },
+  "pattern": [
+    " I ",
+    " B ",
+    "ISI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:starmetal_sword"
+  }
+}
