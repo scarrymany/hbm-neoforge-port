@@ -43,11 +43,11 @@ import java.util.Map;
  * {@code HbmLivingCapability} fire-effect lambdas from the gun-content/flamethrower package (Package
  * D, out of this turret package's scope - see {@code docs/phase3/turret_system.md}). Until that
  * lands, {@link #getFlameConfig()} returns {@code null} and firing is a documented no-op, matching
- * every other bullet-firing turret's ammo-gated inert state. CE's item-canister
- * {@code tank.setType(9, 9, inventory)}/ammo-slot-fill loop is also dropped, matching this port's
- * already-established precedent ({@code MachineDieselBlockEntity}'s own documented scope trim - the
- * item-canister loading subsystem isn't ported anywhere in this port yet): fuel arrives purely over
- * the fluid network.
+ * every other bullet-firing turret's ammo-gated inert state.
+ * {@code tank.setType(9, 9, inventory)} Exact CE {@code TileEntityTurretFritz.java:178}.
+ * Slot 9 is the last ammo-grid cell (CE {@code ContainerTurretBase} 3×3). Hopper excludes 9
+ * Exact CE {@code :242-244}. {@code ammo_standard} FLAME_DIESEL fill loop ({@code :181-189})
+ * stays skipped — flattened ammo item is not wired as CE metadata.
  */
 public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFluidStandardReceiverMK2 {
 
@@ -139,6 +139,14 @@ public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFl
                 HBMSoundHandler.flamethrowerShoot.get(), SoundSource.BLOCKS, 2F, 1F + level.random.nextFloat() * 0.5F);
 
         // TODO(phase3-gun-vfx): CE spawns a flame-burst particle effect here - deferred.
+    }
+
+    @Override
+    public void updateEntity() {
+        super.updateEntity();
+        if (level == null || level.isClientSide) return;
+        // CE TileEntityTurretFritz.java:178
+        tank.setType(9, 9, inventory);
     }
 
     @Override
