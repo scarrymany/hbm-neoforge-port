@@ -1,9 +1,8 @@
 package com.hbm.items.machine;
 
-import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
-import com.hbm.main.MainRegistry;
+import com.hbm.items.IItemControlReceiver;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -12,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -20,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -33,7 +30,7 @@ import java.util.List;
  * <b>Core behavior</b> (ported):
  * <ul>
  *   <li>Right-click (not sneaking): swap primary ↔ secondary, play sound, show toast (CE :79-90)</li>
- *   <li>Sneak + right-click: open GUI for direct fluid selection (CE :92-95, deferred GUI to TODO)</li>
+ *   <li>Sneak + right-click: open {@code GUIScreenFluid} for direct fluid selection (CE :92-95, :239-247)</li>
  *   <li>Tooltip: shows primary + secondary fluid names (CE :111-117)</li>
  *   <li>{@link IItemFluidIdentifier#getType}: returns primary type (CE :129-131)</li>
  *   <li>NBT storage: {@code fluid1}/{@code fluid2} for primary/secondary (CE :189-203)</li>
@@ -42,14 +39,12 @@ import java.util.List;
  * <p>
  * <b>Deferred</b> (cite TODO(CE)):
  * <ul>
- *   <li>GUI screen for direct fluid selection (CE :92-95, :239-247) - {@code GUIScreenFluid}</li>
  *   <li>Creative subtypes for every fluid (CE :63-75) - NeoForge 1.21 uses different API</li>
  *   <li>Custom model with tinted overlay (CE :140-186) - simplified to basic item + ComponentPatch color</li>
  *   <li>Pipe type spreading (CE :220-236) - {@code TileEntityPipeBaseNT} not yet ported</li>
- *   <li>Anvil recipe ingredient via {@code Fluids.*.getDict()} (blocked until anvil recipe wiring)</li>
  * </ul>
  */
-public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier, IControlReceiver {
+public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier, IItemControlReceiver {
 
     public ItemFluidIDMulti(Properties props) {
         super(props);
@@ -58,6 +53,12 @@ public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier, ICon
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+
+        // CE :92-95: sneak + right-click opens GUIScreenFluid (client-only Screen, no Menu)
+        if (level.isClientSide && player.isCrouching()) {
+            com.hbm.client.ClientScreens.fluidIdentifier(player);
+            return InteractionResultHolder.sidedSuccess(stack, true);
+        }
 
         // CE :79-90: right-click swaps primary ↔ secondary
         if (!level.isClientSide && !player.isCrouching()) {
@@ -71,10 +72,6 @@ public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier, ICon
                 serverPlayer.displayClientMessage(secondary.getLocalizedName(), true);
             }
         }
-
-        // CE :92-95: sneak + right-click opens GUI for direct selection
-        // TODO(CE): Port GUIScreenFluid (CE GUIScreenFluid.java) for direct fluid type selection via GUI.
-        // For now, cycling via non-sneak right-click is the only method.
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
@@ -128,19 +125,17 @@ public class ItemFluidIDMulti extends Item implements IItemFluidIdentifier, ICon
     // TODO(CE): Port pipe type setting when TileEntityPipeBaseNT is ported (CE :206-218, :220-236).
     // Requires fluid pipe BlockEntity with setType(FluidType) method.
 
-    @Override
-    public boolean hasPermission(Player player) {
-        return true;
-    }
-
     /**
-     * CE ItemFluidIDMulti.receiveControl (CE :101-109) - packet-based fluid type update from GUI.
-     * Sets primary/secondary types from NBT data sent by client GUI.
+     * CE ItemFluidIDMulti.receiveControl (CE :101-109) — GUI writes {@code primary}/{@code secondary}
+     * fluid IDs onto the held identifier via {@link com.hbm.packet.toserver.ItemControlPacket}.
      */
     @Override
-    public void receiveControl(CompoundTag data) {
-        // This is called on the ItemStack holder (player inventory), not the item itself.
-        // Actual implementation requires inventory context - deferred to GUI port.
-        // TODO(CE): Wire receiveControl when GUIScreenFluid is ported (CE :101-109).
+    public void receiveControl(ItemStack stack, CompoundTag data) {
+        if (data.contains("primary")) {
+            setType(stack, Fluids.fromID(data.getInt("primary")), true);
+        }
+        if (data.contains("secondary")) {
+            setType(stack, Fluids.fromID(data.getInt("secondary")), false);
+        }
     }
 }
