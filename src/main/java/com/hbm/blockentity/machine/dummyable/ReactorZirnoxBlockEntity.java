@@ -1,6 +1,8 @@
 package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
@@ -44,10 +46,12 @@ import java.util.Map;
  * TODO(CE: TileEntityReactorZirnox.java:198-235): UniNodespace pipe-node (trySubscribe path lives).
  * TODO(CE: TileEntityReactorZirnox.java:267-268): SatelliteRayScan INFO_NUCLEAR.
  * TODO(CE: TileEntityReactorZirnox.java:354-431): EntityZirnoxDebris / zirnox_destroyed / AuxParticle / ExplosionNukeGeneric.waste / achZIRNOXBoom / elementals.
- * TODO(CE: TileEntityReactorZirnox.java:508-656): OC + ROR.
+ * ROR: CE {@code TileEntityReactorZirnox.java:617-656}.
+ * TODO(CE: TileEntityReactorZirnox.java:508-605): OpenComputers callbacks.
  */
 public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
-        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final int MAX_HEAT = 100_000;
     public static final int MAX_PRESSURE = 100_000;
@@ -380,6 +384,50 @@ public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
         steam.deserialize(buf);
         carbonDioxide.deserialize(buf);
         water.deserialize(buf);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :618-628
+        return new String[]{
+                PREFIX_VALUE + "heat",
+                PREFIX_VALUE + "pressure",
+                PREFIX_VALUE + "water",
+                PREFIX_VALUE + "steam",
+                PREFIX_VALUE + "co2",
+                PREFIX_VALUE + "state",
+                PREFIX_FUNCTION + "setState" + NAME_SEPARATOR + "active (0 or 1)",
+                PREFIX_FUNCTION + "ventCO2"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :632-639
+        if ((PREFIX_VALUE + "heat").equals(name)) return "" + (int) Math.round(heat * 1.0E-5D * 780.0D + 20.0D);
+        if ((PREFIX_VALUE + "pressure").equals(name)) return "" + (int) Math.round(pressure * 1.0E-5D * 30.0D);
+        if ((PREFIX_VALUE + "water").equals(name)) return "" + water.getFill();
+        if ((PREFIX_VALUE + "steam").equals(name)) return "" + steam.getFill();
+        if ((PREFIX_VALUE + "co2").equals(name)) return "" + carbonDioxide.getFill();
+        if ((PREFIX_VALUE + "state").equals(name)) return isOn ? "1" : "0";
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :643-655
+        if ((PREFIX_FUNCTION + "setState").equals(name) && params.length > 0) {
+            if (redstonePowered) return null;
+            this.isOn = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "ventCO2").equals(name)) {
+            carbonDioxide.setFill(Math.max(carbonDioxide.getFill() - 1000, 0));
+            setChanged();
+            return null;
+        }
+        return null;
     }
 
     @Nullable
