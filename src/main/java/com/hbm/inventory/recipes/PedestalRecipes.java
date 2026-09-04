@@ -143,11 +143,18 @@ public final class PedestalRecipes {
         ));
 
         // 8. gun_autoshotgun_sexy (no extra, set 0)
-        // CE :115-123. Ring: bolt_spike×16 corners, wild_p/card_qos/card_aos/STAR.ingot()×16 edges
-        // TODO(CE: PedestalRecipes.java:117-119): bolt_spike not registered (commented out in CE bolt pool).
-        // TODO(CE): wild_p/card_qos/card_aos exist in ItemPoolsRedRoom but not as discrete items yet.
-        // Skip for now.
-        
+        // CE PedestalRecipes.java:73-76. Ring: bolt_spike×16 corners, wild_p / card_qos / card_aos / STAR.ingot()×16 edges
+        register(new PedestalRecipe(
+                gun("gun_autoshotgun"),
+                new AStack[] {
+                        item("bolt_spike").copy(16), item("wild_p"), item("bolt_spike").copy(16),
+                        item("card_qos"), null, item("card_aos"),
+                        item("bolt_spike").copy(16), ingot("starmetal").copy(16), item("bolt_spike").copy(16)
+                },
+                gun("gun_autoshotgun_sexy"),
+                null, 0
+        ));
+
         // 9. gun_minigun_lacunae (FULL_MOON, set 0)
         // CE :125-133. Ring: null corners, powder_magic×4 / item_secret(SELENIUM_STEEL)×4 edges
         // item_secret_selenium_steel registered Phase11ProcessItems.java:289 (hidden, tab=null).
@@ -294,6 +301,7 @@ public final class PedestalRecipes {
             case "gun_flamer" -> new ComparableStack(GunHeavyItems.GUN_FLAMER.get());
             case "gun_flamer_daybreaker" -> new ComparableStack(GunHeavyItems.GUN_FLAMER_DAYBREAKER.get());
             case "gun_autoshotgun" -> new ComparableStack(GunShotgunItems.GUN_AUTOSHOTGUN.get());
+            case "gun_autoshotgun_sexy" -> new ComparableStack(GunShotgunItems.GUN_AUTOSHOTGUN_SEXY.get());
             case "gun_minigun" -> new ComparableStack(GunRifleItems.GUN_MINIGUN.get());
             case "gun_minigun_lacunae" -> new ComparableStack(GunRifleItems.GUN_MINIGUN_LACUNAE.get());
             case "gun_laser_pistol" -> new ComparableStack(GunEnergyItems.GUN_LASER_PISTOL.get());
