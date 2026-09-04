@@ -75,6 +75,8 @@ public class MainRegistry {
         if(!configHbmDir.exists()) configHbmDir.mkdirs();
 
         HbmConfig.register(modContainer);
+        // CE AutoRegistry.loadAuxiliaryData — MachineDynConfig hbmMachines.json
+        AutoRegistry.loadAuxiliaryData();
 
         HBMSoundHandler.register(modEventBus);
         ModParticleTypes.register(modEventBus);
