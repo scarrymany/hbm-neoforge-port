@@ -1,13 +1,16 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.hbm.api.fluidmk2.FluidNode;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.MachineFluidTankMenu;
+import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.uninos.UniNodespace;
 import com.hbm.inventory.fluid.trait.FT_Corrosive;
 import com.hbm.inventory.fluid.trait.FT_Flammable;
 import com.hbm.inventory.fluid.trait.FT_Polluting;
@@ -32,12 +35,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.List;
 
 /**
  * CE {@code TileEntityMachineFluidTank}: 6 slots, 256000, mode 0=in / 1=both / 2=out / 3=off.
  * CE :263-370 — post-explode leak/fire/pollute ✓ (FT_Polluting, updateLeak).
- * TODO(CE: TileEntityMachineFluidTank.java:198-235): UniNodespace pipe-mode node.
+ * UniNodespace buffer (mode==1): CE {@code TileEntityMachineFluidTank.java:198-235}.
  * TODO(CE: TileEntityMachineFluidTank.java:70): OC / IControllable / IClimbable / IRepairable.
  * TODO(CE: TileEntityMachineFluidTank.java:253-256): ExplosionVNT.makeAmat.
  * TODO(CE: TileEntityMachineFluidTank.java:343): ExplosionVNT.makeAmat().setBlockAllocator(null).setBlockProcessor(null).
@@ -56,6 +60,8 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
     public short mode;
     public boolean hasExploded;
     public boolean onFire;
+    protected FluidNode node;
+    protected FluidType lastType = Fluids.NONE;
 
     public MachineFluidTankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 6, true, false);
@@ -138,15 +144,68 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         }
 
         if (!hasExploded) {
-            for (DirPos pos : getConPos()) {
-                if (mode == 0 || mode == 1) trySubscribe(tank.getTankType(), level, pos);
-                if ((mode == 1 || mode == 2) && tank.getFill() > 0) tryProvide(tank, level, pos);
+            // CE TileEntityMachineFluidTank.java:198-235 — mode 1 = own pipe node; else neighbor nets
+            if (mode == 1) {
+                if (this.node == null || this.node.expired || tank.getTankType() != lastType) {
+                    this.node = UniNodespace.getNode(level, worldPosition, tank.getTankType().getNetworkProvider());
+                    if (this.node == null || this.node.expired || tank.getTankType() != lastType) {
+                        this.node = this.createNode(tank.getTankType());
+                        UniNodespace.createNode(level, this.node);
+                        lastType = tank.getTankType();
+                    }
+                }
+                if (node != null && node.hasValidNet()) {
+                    node.net.addProvider(this);
+                    node.net.addReceiver(this);
+                }
+            } else {
+                if (this.node != null) {
+                    UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
+                    this.node = null;
+                }
+                for (DirPos pos : getConPos()) {
+                    FluidNode dirNode = UniNodespace.getNode(level, pos.getPos(), tank.getTankType().getNetworkProvider());
+                    if (mode == 2) {
+                        tryProvide(tank, level, pos);
+                    } else if (dirNode != null && dirNode.hasValidNet()) {
+                        dirNode.net.removeProvider(this);
+                    }
+                    if (mode == 0) {
+                        if (dirNode != null && dirNode.hasValidNet()) dirNode.net.addReceiver(this);
+                    } else if (dirNode != null && dirNode.hasValidNet()) {
+                        dirNode.net.removeReceiver(this);
+                    }
+                }
             }
+        } else if (this.node != null) {
+            UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
+            this.node = null;
         }
 
         tank.unloadTank(4, 5, inventory);
         dataChanged();
         networkPackMK2(150);
+    }
+
+    /** CE {@code TileEntityMachineFluidTank.java:300-311}. */
+    protected FluidNode createNode(FluidType type) {
+        DirPos[] conPos = getConPos();
+        HashSet<BlockPos> posSet = new HashSet<>();
+        posSet.add(worldPosition);
+        for (DirPos p : conPos) {
+            Direction dir = p.getDir();
+            posSet.add(p.getPos().relative(dir.getOpposite()));
+        }
+        return new FluidNode(type.getNetworkProvider(), posSet.toArray(new BlockPos[0])).setConnections(conPos);
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (level != null && !level.isClientSide && this.node != null) {
+            UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
+            this.node = null;
+        }
     }
 
     public DirPos[] getConPos() {
