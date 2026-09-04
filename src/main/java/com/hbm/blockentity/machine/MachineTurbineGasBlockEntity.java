@@ -12,6 +12,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.container.machine.MachineTurbineGasMenu;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
@@ -43,19 +44,23 @@ import java.util.Map;
  * {@code tanks[2]} (water) into {@code tanks[3]} (hot steam) while separately producing HE directly
  * off the fuel via an RPM/temperature/throttle state machine ({@link #startup}/{@link #run}/
  * {@link #shutdown}, CE's own numeric tuning constants reproduced unchanged).
+ * Slot 1 fluid-ID is Exact CE {@code TileEntityMachineTurbineGas.java:109-114}: manual
+ * {@link IItemFluidIdentifier#getType} then {@code tanks[0].setTankType} only when the fluid is
+ * {@link FT_Combustible} {@code FuelGrade.GAS}. Not {@code setType} — CE does not call it here.
+ * Slot 1 @ 36,17 Exact CE {@code ContainerMachineTurbineGas.java:28}.
  * <p>
- * <b>Scope trims vs. CE</b>: no fluid-identifier item slot (fuel type is fixed by whatever's piped
- * into {@code tanks[0]}, matching every other turbine in this pass); no pollution call (CE calls
- * {@code PollutionHandler.incrementPollution} directly here, not via
- * {@code TileEntityMachinePolluting} - Phase 4 scope per the research report, stubbed as a no-op);
+ * <b>Scope trims vs. CE</b>: no pollution call (CE calls {@code PollutionHandler.incrementPollution}
+ * directly here, not via {@code TileEntityMachinePolluting} - Phase 4 scope, stubbed as a no-op);
  * no OpenComputers. ROR: CE {@code TileEntityMachineTurbineGas.java:716-783}.
+ * {@code gui_turbinegas.png} is not in this tree — do not invent it.
  */
 public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
         IRORValueProvider, IRORInteractive {
 
     public static final long MAX_POWER = 1_000_000L;
-    private static final int BATTERY_SLOT = 0;
+    public static final int BATTERY_SLOT = 0;
+    public static final int SLOT_ID = 1;
     private static final int RPM_IDLE = 10;
     private static final int TEMP_IDLE = 300;
 
@@ -85,7 +90,7 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
     private double fuelToConsume;
 
     public MachineTurbineGasBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1, true, true);
+        super(type, pos, state, 2, true, true);
         tanks = new FluidTankNTM[]{
                 new FluidTankNTM(Fluids.GAS, 100_000).withOwner(this),
                 new FluidTankNTM(Fluids.LUBRICANT, 16_000).withOwner(this),
@@ -101,7 +106,9 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return i == BATTERY_SLOT && Library.isBattery(stack);
+        if (i == BATTERY_SLOT) return Library.isBattery(stack);
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        return false;
     }
 
     private Direction coreDirection() {
@@ -261,6 +268,16 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         throttle = powerSliderPos * 100 / 60;
+
+        // CE TileEntityMachineTurbineGas.java:109-114 — GAS-grade identifier only, not setType.
+        ItemStack idStack = inventory.getStackInSlot(SLOT_ID);
+        if (!idStack.isEmpty() && idStack.getItem() instanceof IItemFluidIdentifier identifier) {
+            FluidType fluid = identifier.getType(level, worldPosition, idStack);
+            if (fluid.hasTrait(FT_Combustible.class)
+                    && fluid.getTrait(FT_Combustible.class).getGrade() == FT_Combustible.FuelGrade.GAS) {
+                tanks[0].setTankType(fluid);
+            }
+        }
 
         if (autoMode) {
             int target = 60 - (int) (60 * power / MAX_POWER);
