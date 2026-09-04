@@ -1,10 +1,15 @@
 package com.hbm.handler;
 
 import com.hbm.capability.HbmLivingProps;
+import com.hbm.capability.HbmPlayerAttachment;
 import com.hbm.config.GeneralConfig;
 import com.hbm.config.RadiationConfig;
 import com.hbm.config.WorldConfig;
 import com.hbm.damage.ModDamageTypes;
+import com.hbm.handler.HbmKeybinds.EnumKeybind;
+import com.hbm.interfaces.IArmorModDash;
+import com.hbm.items.gear.ArmorFSB;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.entity.mob.CreeperVariantEntityTypes;
 import com.hbm.entity.mob.EntityCreeperNuclear;
 import com.hbm.entity.mob.EntityDuck;
@@ -36,7 +41,10 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -56,10 +64,11 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
  *     <li>the lead-poisoning-on-ore-break hook, from CE's real {@code ModEventHandler.blockBreak}
  *     (lines 1294-1307, read in full).</li>
  * </ol>
- * Every other branch of the real file (contamination-effect ticking, digamma, lung disease, oil,
- * temperature, dashing, plinking, the full 200-2,500,000 rad sickness-effect ladder beyond the mutation
- * thresholds) is out of this package's scope per this task's own brief - not reproduced here, and not
- * claimed as done.
+ * {@link #handleDashing} / {@link #handlePlinking} are Exact CE {@code :655-754}, dispatched from
+ * {@code CommonTickEvents#onPlayerTick} (both sides). Dash-bar HUD stays skipped. Every other
+ * remaining branch (contamination-effect ticking, digamma, lung disease, oil, temperature, the
+ * full 200-2,500,000 rad sickness-effect ladder beyond the mutation thresholds) is still out of
+ * this file's original scope.
  * <p>
  * <b>Review pass finding (not fixed here)</b>: CE's real {@code handleRadiationEffect} table actually has
  * a <em>6th</em> branch this file's own scope list above omits - {@code eRad >= 800 && entity instanceof
@@ -259,5 +268,113 @@ public final class EntityEffectHandler {
         else amplifier = 2;
 
         player.addEffect(new MobEffectInstance(HbmPotionEffects.LEAD, 100, amplifier));
+    }
+
+    // ==================== dash / plink (CE EntityEffectHandler :655-754) ====================
+
+    private static final EquipmentSlot[] DASH_ARMOR_SLOTS = {
+            EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD
+    };
+
+    /**
+     * Exact CE {@code handleDashing} {@code :655-743}. LSHIFT via {@code EnumKeybind.DASH} /
+     * {@code KeybindPacket}; stamina 30/dash; cooldown {@link HbmPlayerAttachment#DASH_COOLDOWN_LENGTH}.
+     * Dash-bar overlay stays skipped.
+     */
+    public static void handleDashing(LivingEntity entity) {
+        if (!(entity instanceof Player player)) return;
+
+        HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
+        props.setDashCount(0);
+
+        ArmorFSB chestplate = null;
+        int armorDashCount = 0;
+        int armorModDashCount = 0;
+
+        if (ArmorFSB.hasFSBArmor(player)) {
+            ItemStack plate = player.getItemBySlot(EquipmentSlot.CHEST);
+            chestplate = (ArmorFSB) plate.getItem();
+        }
+
+        if (chestplate != null) {
+            armorDashCount = chestplate.dashCount;
+        }
+
+        for (EquipmentSlot armorSlot : DASH_ARMOR_SLOTS) {
+            ItemStack armorStack = player.getItemBySlot(armorSlot);
+            if (!armorStack.isEmpty() && armorStack.getItem() instanceof ArmorItem) {
+                ItemStack[] mods = ArmorModHandler.pryMods(armorStack);
+                // CE loops modSlot < 8 — battery slot 8 is excluded.
+                int limit = Math.min(8, mods.length);
+                for (int modSlot = 0; modSlot < limit; modSlot++) {
+                    ItemStack mod = mods[modSlot];
+                    if (!mod.isEmpty() && mod.getItem() instanceof IArmorModDash dashMod) {
+                        armorModDashCount += dashMod.getDashes();
+                    }
+                }
+            }
+        }
+
+        int dashCount = armorDashCount + armorModDashCount;
+        boolean dashActivated = props.getKeyPressed(EnumKeybind.DASH);
+
+        if (dashCount * 30 < props.getStamina()) {
+            props.setStamina(dashCount * 30);
+        }
+
+        if (dashCount > 0) {
+            int perDash = 30;
+            int stamina = props.getStamina();
+
+            props.setDashCount(dashCount);
+
+            if (props.getDashCooldown() <= 0) {
+                if (dashActivated && stamina >= perDash) {
+                    Vec3 lookingIn = player.getLookAngle();
+                    Vec3 strafeVec = lookingIn.yRot((float) Math.PI * 0.5F);
+
+                    int forward = (int) Math.signum(player.zza);
+                    int strafe = (int) Math.signum(player.xxa);
+                    if (forward == 0 && strafe == 0) {
+                        forward = 1;
+                    }
+
+                    player.push(
+                            lookingIn.x * forward + strafeVec.x * strafe,
+                            0,
+                            lookingIn.z * forward + strafeVec.z * strafe);
+                    var mot = player.getDeltaMovement();
+                    player.setDeltaMovement(mot.x, 0, mot.z);
+                    player.fallDistance = 0F;
+                    player.playSound(HBMSoundHandler.rocketFlame.get(), 1.0F, 1.0F);
+
+                    props.setDashCooldown(HbmPlayerAttachment.DASH_COOLDOWN_LENGTH);
+                    stamina -= perDash;
+                }
+            } else {
+                props.setDashCooldown(props.getDashCooldown() - 1);
+                props.setKeyPressed(EnumKeybind.DASH, false);
+            }
+
+            if (stamina < props.getDashCount() * perDash) {
+                stamina++;
+                if (stamina % perDash == perDash - 1) {
+                    player.playSound(HBMSoundHandler.techBoop.get(), 1.0F,
+                            1.0F + ((1F / 12F) * (stamina / perDash)));
+                    stamina++;
+                }
+            }
+
+            props.setStamina(stamina);
+        }
+    }
+
+    /** Exact CE {@code handlePlinking} {@code :745-754}. */
+    public static void handlePlinking(LivingEntity entity) {
+        if (!(entity instanceof Player player)) return;
+        HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
+        if (props.getPlinkCooldown() > 0) {
+            props.setPlinkCooldown(props.getPlinkCooldown() - 1);
+        }
     }
 }

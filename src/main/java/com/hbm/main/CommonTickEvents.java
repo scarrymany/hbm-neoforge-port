@@ -3,6 +3,7 @@ package com.hbm.main;
 import com.google.common.collect.Multimap;
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.handler.ArmorModHandler;
+import com.hbm.handler.EntityEffectHandler;
 import com.hbm.hazard.HazardSystem;
 import com.hbm.items.armor.ItemArmorMod;
 import com.hbm.items.food.FoodDataComponents;
@@ -75,6 +76,9 @@ public class CommonTickEvents {
         if (player.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof ArmorFSB) {
             ArmorFSB.handleTick(player);
         }
+        // Exact CE EntityEffectHandler.onUpdate :132-133 — both sides, same as LivingUpdateEvent.
+        EntityEffectHandler.handleDashing(player);
+        EntityEffectHandler.handlePlinking(player);
     }
 
     /**
