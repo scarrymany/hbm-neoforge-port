@@ -86,8 +86,9 @@ import java.util.Random;
  * {@link #handleDashing} / {@link #handlePlinking} are Exact CE {@code :655-754}, dispatched from
  * {@code CommonTickEvents#onPlayerTick} (both sides). Dash-bar HUD stays skipped.
  * {@link #handleContamination}/{@link #handleLungDisease}/{@link #handleOil}/{@link #handleTemperature}
- * / {@link #handleContagion} / {@link #handleRadiationSickness} are Exact CE server ticks.
- * Vomit/sweat/FlameCreator/Confetti packets stay skipped.
+ * / {@link #handleContagion} / {@link #handleRadiationSickness} / {@link #handleRadBufSnapshot}
+ * / {@link #handleNetherBurn} / {@link #handleShieldRegen} are Exact CE server ticks.
+ * Vomit/sweat/FlameCreator/Confetti / {@code HbmPlayerSyncPacket} stay skipped.
  * <p>
  * <b>Review pass finding (not fixed here)</b>: CE's real {@code handleRadiationEffect} table actually has
  * a <em>6th</em> branch this file's own scope list above omits - {@code eRad >= 800 && entity instanceof
@@ -138,7 +139,10 @@ public final class EntityEffectHandler {
         if (!(event.getEntity() instanceof LivingEntity entity)) return;
         if (!(entity.level() instanceof ServerLevel level)) return;
 
+        handleRadBufSnapshot(entity);
+        handleNetherBurn(entity, level);
         handleCraterRadiation(entity, level);
+        handleShieldRegen(entity);
         handleMutationCascade(entity, level);
         handlePollution(entity, level);
         handleContamination(entity);
@@ -146,6 +150,48 @@ public final class EntityEffectHandler {
         handleLungDisease(entity);
         handleOil(entity);
         handleTemperature(entity);
+    }
+
+    // ==================== CE onUpdate server block (lines 74-109) ====================================
+
+    /**
+     * Exact CE {@code onUpdate} {@code :76-79}. Copies this second's accumulated {@code radEnv}
+     * (written by {@link ContaminationUtil#contaminate}) into {@code radBuf} and zeroes env.
+     * Geiger/dosimeter read {@code radBuf} — without this snapshot they stay at 0.
+     */
+    private static void handleRadBufSnapshot(LivingEntity entity) {
+        if (entity.tickCount % 20 != 0) return;
+        HbmLivingProps.setRadBuf(entity, HbmLivingProps.getRadEnv(entity));
+        HbmLivingProps.setRadEnv(entity, 0);
+    }
+
+    /**
+     * Exact CE {@code onUpdate} {@code :84-86}. CE post-load forces {@code enable528NetherBurn=false}
+     * when {@code !enable528} ({@code GeneralConfig.java:291-294}); port gates both flags instead of
+     * mutating config. {@code HbmPlayerSyncPacket} stays skipped (unported).
+     */
+    private static void handleNetherBurn(LivingEntity entity, ServerLevel level) {
+        if (!GeneralConfig.enable528() || !GeneralConfig.X528_ENABLE_NETHER_BURN.get()) return;
+        if (!(entity instanceof Player)) return;
+        if (entity.fireImmune()) return;
+        if (level.dimension() != Level.NETHER) return;
+        entity.igniteForSeconds(5);
+    }
+
+    /**
+     * Exact CE {@code onUpdate} {@code :96-105}. Shield regen 60 ticks after last hit, 0.005F * tsd
+     * per tick, clamp to {@link HbmPlayerAttachment#getEffectiveMaxShield}. Sync packet skipped.
+     */
+    private static void handleShieldRegen(LivingEntity entity) {
+        if (!(entity instanceof ServerPlayer player)) return;
+        HbmPlayerAttachment cap = HbmPlayerAttachment.getData(player);
+        float max = cap.getEffectiveMaxShield(player);
+        float shield = cap.getShield();
+        if (shield < max && entity.tickCount > cap.getLastDamage() + 60) {
+            int tsd = entity.tickCount - (cap.getLastDamage() + 60);
+            cap.setShield(shield + Math.min(max - shield, 0.005F * tsd));
+        }
+        if (cap.getShield() > max) cap.setShield(max);
     }
 
     // ==================== crater-biome ambient radiation (CE onUpdate, lines 81-94) ====================
