@@ -1,9 +1,11 @@
 package com.hbm.blockentity.machine.chem;
 
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.container.machine.chem.SilexMenu;
 import com.hbm.inventory.fluid.FluidType;
@@ -11,6 +13,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.chem.SILEXRecipes;
 import com.hbm.inventory.recipes.chem.SILEXRecipes.SILEXRecipe;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemFELCrystal.EnumWavelengths;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.WeightedRandom;
@@ -42,11 +45,11 @@ import java.util.List;
  * wavelength tier above the recipe's minimum required strength doubles the per-tick progress
  * increment.
  * <p>
+ * {@code tank.setType(1, 1)} / {@code tank.loadTank(2, 3)} Exact CE {@code TileEntitySILEX.java:73-74}.
+ * Inventory is 11 slots Exact CE {@code :58} (0 input, 1 ID, 2-3 canister, 4 output, 5-10 queue).
+ * <p>
  * <b>Scope trims from CE</b> (documented):
  * <ul>
- *   <li>No item-container fluid loading (canister/gas-icon item slots 2-3 in CE) - same pre-existing
- *   gap as every other machine in this area (see {@code MachineRefineryBlockEntity}'s javadoc). The
- *   acid tank fills only through the pipe network.</li>
  *   <li>{@link #loadFluid()} is CE {@code TileEntitySILEX.java:169-222}: UF6/PUF6/DEATH
  *   {@code fluidConversion} plus any tank type that has a {@code fluid_icon} SILEX row
  *   (VITRIOL/REDMUD/FULLERENE) convert 50 mB/tick with no peroxide consume. Peroxide + item-slot
@@ -63,10 +66,13 @@ import java.util.List;
 public class SilexBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
 
-    private static final int INPUT_SLOT = 0;
-    private static final int OUTPUT_SLOT = 1;
-    private static final int QUEUE_START = 2;
-    private static final int QUEUE_END = 7;
+    public static final int INPUT_SLOT = 0;
+    public static final int SLOT_ID = 1;
+    public static final int SLOT_CANISTER = 2;
+    public static final int SLOT_EMPTY = 3;
+    public static final int OUTPUT_SLOT = 4;
+    public static final int QUEUE_START = 5;
+    public static final int QUEUE_END = 10;
 
     public static final int MAX_FILL = 16000;
     public static final int PROCESS_TIME = 80;
@@ -81,7 +87,7 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
     private int loadDelay;
 
     public SilexBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 8, true, false);
+        super(type, pos, state, 11, true, false);
     }
 
     @Override
@@ -96,17 +102,28 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack itemStack) {
-        return i == INPUT_SLOT && SILEXRecipes.getOutput(itemStack) != null;
+        if (itemStack.isEmpty()) return false;
+        if (i == INPUT_SLOT) return SILEXRecipes.getOutput(itemStack) != null;
+        // CE :289-293 is input-only. MenuBase.tile is getCheckedInventory(),
+        // so ID/canister GUI insert dies without this.
+        if (i == SLOT_ID) return itemStack.getItem() instanceof IItemFluidIdentifier;
+        if (i == SLOT_CANISTER) {
+            if (FluidContainerRegistry.getFluidContent(itemStack, tank.getTankType()) > 0) return true;
+            return itemStack.getItem() instanceof IFillableItem fill && fill.providesFluid(tank.getTankType(), itemStack);
+        }
+        return false;
     }
 
     @Override
     public boolean canExtractItem(int slot, ItemStack itemStack, int amount) {
+        // CE TileEntitySILEX.java:297-298
         return slot >= QUEUE_START;
     }
 
     @Override
     public int[] getAccessibleSlotsFromSide(Direction side) {
-        return new int[]{INPUT_SLOT, QUEUE_START, QUEUE_START + 1, QUEUE_START + 2, QUEUE_START + 3, QUEUE_END - 1, QUEUE_END};
+        // CE :284-285
+        return new int[]{INPUT_SLOT, 5, 6, 7, 8, 9, 10};
     }
 
     public int getProgressScaled(int i) {
@@ -228,6 +245,10 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
+
+        // CE TileEntitySILEX.java:73-74
+        tank.setType(SLOT_ID, SLOT_ID, inventory);
+        tank.loadTank(SLOT_CANISTER, SLOT_EMPTY, inventory);
 
         for (Direction dir : Direction.values()) {
             BlockPos neighbor = worldPosition.relative(dir);

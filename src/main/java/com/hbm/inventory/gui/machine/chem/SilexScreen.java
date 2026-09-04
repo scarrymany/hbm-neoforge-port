@@ -7,13 +7,16 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-/** Ported (visually, from CE's {@code GUISILEX}) as a plain panel. No upgrade slots, matching CE. */
+/**
+ * Painted panel, CE {@code GUISILEX} size 176×222. No invented {@code gui_silex.png}.
+ * Acid bar at CE {@code GUISILEX.java:47}/{@code :102} (8,42) so ID/canister slots at y=24 stay clear.
+ */
 public class SilexScreen extends GuiInfoContainer<SilexMenu> {
 
     public SilexScreen(SilexMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.imageWidth = 232;
-        this.imageHeight = 166;
+        this.imageWidth = 176;
+        this.imageHeight = 222;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -25,16 +28,17 @@ public class SilexScreen extends GuiInfoContainer<SilexMenu> {
         guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
 
         var be = this.getMenu().be;
-        be.tank.renderTank(x + 8, y + 90, 0, 16, 54);
+        // CE GUISILEX.java:102 — horizontal acid bar under ID/canister row (8,24 / 26,24 / 44,24).
+        be.tank.renderTank(x + 8, y + 49, 0, 52, 7);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         super.renderLabels(guiGraphics, mouseX, mouseY);
         var be = this.getMenu().be;
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 6, 220, 10,
+        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 6, 160, 10,
                 Component.literal("Laser: " + be.mode),
                 Component.literal("Charge: " + be.currentFill + "/" + SilexBlockEntity.MAX_FILL));
-        be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 90 - 54, 16, 54);
+        be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 42, 52, 7);
     }
 }
