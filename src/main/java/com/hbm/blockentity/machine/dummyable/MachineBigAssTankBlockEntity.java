@@ -34,7 +34,8 @@ import java.util.List;
 /**
  * CE {@code TileEntityMachineBigAssTank} extends {@code TileEntityBarrel} — 16M, barrel GUI.
  * UniNodespace buffer: CE {@code TileEntityBarrel.java:247-286} (inherited in CE).
- * TODO(CE: TileEntityBarrel.java): tilt / floor pollute.
+ * checkTilt(UNAVOIDABLE) / 4×4 floor / standardFloor7x7 Exact CE
+ *   TileEntityMachineBigAssTank.java:31 + :36-37.
  * TODO(CE: RenderBigAssTank.java:1): TESR.
  */
 public class MachineBigAssTankBlockEntity extends MachineBaseBlockEntity
@@ -105,7 +106,8 @@ public class MachineBigAssTankBlockEntity extends MachineBaseBlockEntity
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
-        // TODO(CE: TileEntityMachineBigAssTank.java:31): checkTilt(UNAVOIDABLE)
+        // CE TileEntityMachineBigAssTank.java:31 — UNAVOIDABLE before inherited barrel IO
+        checkTilt(TiltType.UNAVOIDABLE, true);
 
         tank.setType(0, 1, inventory);
         tank.loadTank(2, 3, inventory);
@@ -138,7 +140,8 @@ public class MachineBigAssTankBlockEntity extends MachineBaseBlockEntity
                 UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
                 this.node = null;
             }
-            for (DirPos pos : getConPos()) {
+            // CE TileEntityBarrel.java:271 — neighbor IO only when not tilted
+            if (!this.tilted) for (DirPos pos : getConPos()) {
                 FluidNode dirNode = UniNodespace.getNode(level, pos.getPos(), tank.getTankType().getNetworkProvider());
                 if (mode == 2) {
                     tryProvide(tank, level, pos);
@@ -176,6 +179,16 @@ public class MachineBigAssTankBlockEntity extends MachineBaseBlockEntity
             UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
             this.node = null;
         }
+    }
+
+    @Override
+    public int getFloorCount() {
+        return 4 * 4;
+    }
+
+    @Override
+    public BlockPos getFloorPosFromIndex(int index) {
+        return standardFloor7x7(index);
     }
 
     public DirPos[] getConPos() {

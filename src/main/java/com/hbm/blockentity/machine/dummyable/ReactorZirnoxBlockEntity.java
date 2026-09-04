@@ -5,6 +5,7 @@ import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blockentity.network.IConnectionAnchors;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.inventory.container.machine.dummyable.ReactorZirnoxMenu;
@@ -42,15 +43,16 @@ import java.util.Map;
 /**
  * CE {@code TileEntityReactorZirnox}: 28 slots, SHS 8000 / CO2 16000 / water 32000,
  * maxHeat/maxPressure 100000.
- * TODO(CE: TileEntityReactorZirnox.java:229): checkTilt + IConnectionAnchors floor.
- * TODO(CE: TileEntityReactorZirnox.java:198-235): UniNodespace pipe-node (trySubscribe path lives).
+ * IConnectionAnchors + checkTilt(CONFIG) / 3×3 floor / standardFloor5x5 Exact CE
+ *   TileEntityReactorZirnox.java:229 + :658-659. CE :198-235 = getNeighbouringSlots
+ *   + updateConnections (no own FluidNode).
  * TODO(CE: TileEntityReactorZirnox.java:267-268): SatelliteRayScan INFO_NUCLEAR.
  * TODO(CE: TileEntityReactorZirnox.java:354-431): EntityZirnoxDebris / zirnox_destroyed / AuxParticle / ExplosionNukeGeneric.waste / achZIRNOXBoom / elementals.
  * ROR: CE {@code TileEntityReactorZirnox.java:617-656}.
  * TODO(CE: TileEntityReactorZirnox.java:508-605): OpenComputers callbacks.
  */
 public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
-        implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        implements IFluidStandardTransceiverMK2, IConnectionAnchors, ITickableBE, MenuProvider,
         IRORValueProvider, IRORInteractive {
 
     public static final int MAX_HEAT = 100_000;
@@ -151,12 +153,15 @@ public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // CE TileEntityReactorZirnox.java:229 — CONFIG gravity before rods / fluid IO
+        checkTilt(TiltType.CONFIG, true);
+
         if (redstonePowered) {
             isOn = true;
         }
         this.output = 0;
 
-        if (level.getGameTime() % 20 == 0) {
+        if (!this.tilted && level.getGameTime() % 20 == 0) {
             updateConnections();
         }
 
@@ -268,6 +273,17 @@ public class ReactorZirnoxBlockEntity extends MachineBaseBlockEntity
         }
     }
 
+    @Override
+    public int getFloorCount() {
+        return 3 * 3;
+    }
+
+    @Override
+    public BlockPos getFloorPosFromIndex(int index) {
+        return standardFloor5x5(index);
+    }
+
+    @Override
     public DirPos[] getConPos() {
         Direction dir = coreFacing();
         Direction rot = dir.getClockWise();
