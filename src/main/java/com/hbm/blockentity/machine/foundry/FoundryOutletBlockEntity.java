@@ -11,6 +11,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -24,7 +27,8 @@ import org.jetbrains.annotations.NotNull;
  * CE: upstream/hbm-ce/src/main/java/com/hbm/tileentity/machine/TileEntityFoundryOutlet.java
  * <p>
  * Accepts flow from channels and pours down to crucible acceptors below (CE :76-105).
- * Filter + redstone control deferred (TODO CE :25-36, :56-60).
+ * Filter + inverted-redstone gate live (CE :33-36, :56-60). Client barrier re-render and
+ * foundry particle packet stay deferred.
  */
 public class FoundryOutletBlockEntity extends FoundryBaseBlockEntity implements ITickableBE {
 
@@ -36,6 +40,12 @@ public class FoundryOutletBlockEntity extends FoundryBaseBlockEntity implements 
         super(FoundryBlockEntities.FOUNDRY_OUTLET_BE_TYPE.get(), pos, state);
     }
 
+    /** CE :33-36 — blocked when invertRedstone XOR neighbor power. */
+    public boolean isClosed() {
+        if (level == null) return invertRedstone;
+        return invertRedstone ^ level.hasNeighborSignal(worldPosition);
+    }
+
     @Override
     public void updateEntity() {
         // TODO(CE: TileEntityFoundryOutlet.java:42-49): client-side re-render on filter/redstone change
@@ -43,7 +53,9 @@ public class FoundryOutletBlockEntity extends FoundryBaseBlockEntity implements 
 
     @Override
     public boolean canAcceptPartialFlow(Level world, BlockPos p, Direction side, Mats.MaterialStack stack) {
-        // TODO(CE: TileEntityFoundryOutlet.java:56-60): filter + redstone check
+        // CE TileEntityFoundryOutlet.java:58-60
+        if (filter != null && ((filter != stack.material) ^ invertFilter)) return false;
+        if (isClosed()) return false;
         BlockState state = world.getBlockState(p);
         if (!(state.getBlock() instanceof BlockFoundryOutlet)) return false;
         
@@ -107,6 +119,26 @@ public class FoundryOutletBlockEntity extends FoundryBaseBlockEntity implements 
         if (tag.contains("filter")) {
             int id = tag.getShort("filter");
             this.filter = (id == -1) ? null : Mats.matById.get(id);
+        }
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
+    @Override
+    public @NotNull CompoundTag getUpdateTag(HolderLookup.@NotNull Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        saveAdditional(tag, registries);
+        return tag;
+    }
+
+    public void markAndSync() {
+        setChanged();
+        if (level != null) {
+            BlockState state = getBlockState();
+            level.sendBlockUpdated(worldPosition, state, state, 3);
         }
     }
 }
