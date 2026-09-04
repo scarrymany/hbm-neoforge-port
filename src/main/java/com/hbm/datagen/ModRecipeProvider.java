@@ -2659,7 +2659,7 @@ public class ModRecipeProvider extends RecipeProvider {
     // ================================================================================================
     // docs/phase7/crafting_weapon_rod_consumable.md assignment. The overwhelming majority of this CE
     // file (weapon mods table, SEDNA Parts, SEDNA Ammo, Secrets, Missiles, missile fins/warhead/chips,
-    // Turrets, most Guns-misc, Ammo assemblies, 240mm/Artillery Shells, DGK Belts, Fire-ext tanks, every
+    // Turrets (except turret_sentry, I/O now registered), most Guns-misc, Ammo assemblies, 240mm/Artillery Shells, DGK Belts, Fire-ext tanks, every
     // Grenade section, Sticks/Blocks of explosives, Mines, most Nuke parts) is blocked on this port's
     // still-missing circuit/ducttape/motor/piston_selenium/safety_fuse/ball_x/steel_scaffold family -
     // matching the research report's overall picture. What follows corrects and narrows that report on
@@ -2967,6 +2967,21 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern("CCC").pattern("CTC").pattern("CCC")
                 .define('C', MaterialShapes.CASTPLATE.commonTag(Mats.MAT_COPPER)).define('T', mpThrusterLarge)
                 .unlockedBy("has_thruster", has(mpThrusterLarge)).save(output, id("weapon/mp_thruster_15_balefire_large_rad"));
+
+        // CE WeaponRecipes.java:211 turret_sentry. Previously leftover-obtain blocked on
+        // motor / circuit_basic / steel_scaffold / crt_display / GUNMETAL.mechanism(); all registered.
+        // Pattern "PPL"," MD"," SC": P=STEEL.plate(), L=GUNMETAL.mechanism(), M=motor, D=crt_display,
+        // S=steel_scaffold, C=circuit BASIC.
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, block("turret_sentry"))
+                .pattern("PPL").pattern(" MD").pattern(" SC")
+                .define('P', plateSteel)
+                .define('L', gunmetalMechanism)
+                .define('M', item("motor"))
+                .define('D', item("crt_display"))
+                .define('S', block("steel_scaffold"))
+                .define('C', item("circuit_basic"))
+                .unlockedBy("has_motor", has(item("motor")))
+                .save(output, id("weapon/turret_sentry"));
 
         // ---- weapon_mod_special (WeaponRecipes.java:137-163). 18 of CE's 29 - LAS_SHOTGUN/
         // LAS_CAPACITOR/LAS_AUTO (circuit) and ENGINE_DIESEL/ENGINE_AVIATION/ENGINE_TURBO/CANISTERS
