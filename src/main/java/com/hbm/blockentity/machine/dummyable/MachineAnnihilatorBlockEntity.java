@@ -7,6 +7,8 @@ import com.hbm.blocks.BlockDummyable;
 import com.hbm.inventory.container.machine.dummyable.AnnihilatorMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.saveddata.AnnihilatorSavedData;
@@ -31,6 +33,8 @@ import java.util.List;
 /**
  * CE {@code TileEntityMachineAnnihilator}: eats items/fluids into a named pool, pays milestones.
  * {@code tank.setType(1)} Exact CE {@code :71}. Slot 1 Exact CE {@code :194}.
+ * {@code FT_Polluting.pollute(BURN, fill*2)} Exact CE {@code :91}.
+ * Flame / audio stay skipped.
  */
 public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -88,6 +92,9 @@ public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
             inventory.setStackInSlot(0, ItemStack.EMPTY);
         }
         if (tank.getFill() > 0) {
+            // CE TileEntityMachineAnnihilator.java:91
+            FT_Polluting.pollute(level, worldPosition, tank.getTankType(),
+                    FluidTrait.FluidReleaseType.BURN, tank.getFill() * 2);
             tryAddPayout(data.pushToPool(pool, tank.getTankType(), tank.getFill(), false));
             tank.setFill(0);
         }
