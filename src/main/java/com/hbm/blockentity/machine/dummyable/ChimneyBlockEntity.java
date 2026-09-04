@@ -13,6 +13,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityChimneyBase}/{@code Brick}/{@code Industrial}.
- * Ashpit fly-ash feed TODO(CE: TileEntityChimneyBase.java:46-54) — ashpit BE has no ashLevel fields.
+ * Ashpit fly/soot dump Exact CE {@code TileEntityChimneyBase.java:44-54}.
  */
 public class ChimneyBlockEntity extends MachineBaseBlockEntity
         implements IFluidReceiverMK2, ITickableBE {
@@ -29,6 +30,8 @@ public class ChimneyBlockEntity extends MachineBaseBlockEntity
     private final double pollutionMod;
     private final boolean captureSoot;
     private final int particleY;
+    public long ashTick = 0;
+    public long sootTick = 0;
     public int onTicks;
 
     public static ChimneyBlockEntity brick(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -61,6 +64,17 @@ public class ChimneyBlockEntity extends MachineBaseBlockEntity
             for (FluidType type : types) {
                 for (DirPos pos : getConPos()) trySubscribe(type, level, pos);
             }
+        }
+
+        // CE TileEntityChimneyBase.java:44-54 — dump captured smoke into ashpit under the core
+        if (ashTick > 0 || sootTick > 0) {
+            BlockEntity below = level.getBlockEntity(worldPosition.below());
+            if (below instanceof MachineAshpitBlockEntity ashpit) {
+                ashpit.ashLevelFly += (int) ashTick;
+                ashpit.ashLevelSoot += (int) sootTick;
+            }
+            ashTick = 0;
+            sootTick = 0;
         }
 
         if (onTicks > 0) {
@@ -96,6 +110,9 @@ public class ChimneyBlockEntity extends MachineBaseBlockEntity
     public long transferFluid(FluidType type, int pressure, long fluid) {
         if (type != Fluids.SMOKE && type != Fluids.SMOKE_LEADED && type != Fluids.SMOKE_POISON) return fluid;
         onTicks = 20;
+        // CE TileEntityChimneyBase.java:101-102 — brick always captures ash; industrial also soot
+        ashTick += fluid;
+        if (captureSoot) sootTick += fluid;
         long polluted = (long) (fluid * pollutionMod);
         if (type == Fluids.SMOKE) {
             PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT, polluted / 100F);
