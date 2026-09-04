@@ -4,6 +4,7 @@ import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.ArcFurnaceMenu;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
@@ -42,7 +43,9 @@ import java.util.Locale;
 
 /**
  * CE {@code TileEntityMachineArcFurnaceLarge}: 2.5M HE, 20-slot grid + 5 queue, liquid mode,
- * SPEED upgrade. Lid animation / pollution / particles skipped — process when electrodes+power.
+ * SPEED upgrade.
+ * {@code incrementPollution(SOOT, 10F)} on process complete Exact CE {@code :178}.
+ * Lid animation / particles stay skipped.
  */
 public class MachineArcFurnaceBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
@@ -130,6 +133,8 @@ public class MachineArcFurnaceBlockEntity extends MachineBaseBlockEntity
                 process();
                 progress = 0;
                 delay = (int) (120 / (upgrade * 0.5 + 1));
+                // CE TileEntityMachineArcFurnaceLarge.java:178
+                PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT, 10F);
                 setChanged();
             }
         } else {
