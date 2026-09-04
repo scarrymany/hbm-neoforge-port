@@ -28,7 +28,8 @@ import java.util.List;
 /**
  * CE {@code TileEntityICFController}. Capacitor/turbo count Exact CE {@code :49-104}/{@code :264-265}.
  * {@link IConfigurableMachine} Exact CE {@code :269-282} ({@code icfLaser}).
- * BlockICF placeholder proxy skipped — components stay in place after assemble.
+ * Assemble replaces parts with {@link com.hbm.blocks.machine.fusion.IcfBlock}.
+ * Break of any ICF proxy restores the original and sets {@code assembled=false}.
  */
 public class IcfControllerBlockEntity extends LoadedBaseBlockEntity implements IEnergyReceiverMK2, ITickableBE, IPersistentNBT {
 

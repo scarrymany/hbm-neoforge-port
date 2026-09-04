@@ -2,6 +2,7 @@ package com.hbm.blocks.machine.fusion;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.fusion.FusionBlockEntities;
+import com.hbm.blockentity.machine.fusion.IcfBlockEntity;
 import com.hbm.blockentity.machine.fusion.IcfControllerBlockEntity;
 import com.hbm.blocks.ILookOverlay;
 import com.hbm.util.BobMathUtil;
@@ -34,10 +35,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CE {@code MachineICFController} — RMB assemble floodFill Exact CE {@code :96-204}.
- * Placeholder {@code BlockICF} replace skipped (no inventing proxy TE).
+ * On success every scanned part is replaced with {@link IcfBlock} (ports keep {@code io=true}).
+ * CE {@code :115-131} / {@code BlockICF.java}.
  */
 public class IcfControllerBlock extends BaseEntityBlock implements ILookOverlay {
 
@@ -95,7 +98,7 @@ public class IcfControllerBlock extends BaseEntityBlock implements ILookOverlay 
     }
 
     public void assemble(Level world, BlockPos pos) {
-        // CE MachineICFController.java:96-144 — no BlockICF placeholder swap
+        // CE MachineICFController.java:96-144
         HashMap<BlockPos, BlockState> assembly = new HashMap<>();
         HashSet<BlockPos> casings = new HashSet<>();
         HashSet<BlockPos> ports = new HashSet<>();
@@ -112,6 +115,17 @@ public class IcfControllerBlock extends BaseEntityBlock implements ILookOverlay 
 
         if (world.getBlockEntity(pos) instanceof IcfControllerBlockEntity controller) {
             if (!errored[0]) {
+                // Exact CE MachineICFController.java:115-131 — replace scanned parts with BlockICF.
+                for (Map.Entry<BlockPos, BlockState> entry : assembly.entrySet()) {
+                    BlockPos partPos = entry.getKey();
+                    boolean isPort = ports.contains(partPos);
+                    BlockState placeholder = FusionBlocks.ICF_BLOCK.get().defaultBlockState()
+                            .setValue(IcfBlock.IO_ENABLED, isPort);
+                    world.setBlock(partPos, placeholder, 3);
+                    if (world.getBlockEntity(partPos) instanceof IcfBlockEntity icf) {
+                        icf.setOriginal(entry.getValue(), pos);
+                    }
+                }
                 controller.setup(ports, cells, emitters, capacitors, turbochargers);
             }
             controller.assembled = !errored[0];

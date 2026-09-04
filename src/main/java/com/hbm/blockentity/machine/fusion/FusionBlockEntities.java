@@ -10,6 +10,7 @@ public final class FusionBlockEntities {
 
     public static Supplier<BlockEntityType<IcfReactorBlockEntity>> ICF_REACTOR;
     public static Supplier<BlockEntityType<IcfControllerBlockEntity>> ICF_CONTROLLER;
+    public static Supplier<BlockEntityType<IcfBlockEntity>> ICF_BLOCK;
     public static Supplier<BlockEntityType<IcfPressBlockEntity>> ICF_PRESS;
     public static Supplier<BlockEntityType<WatzReactorBlockEntity>> WATZ_REACTOR;
     public static Supplier<BlockEntityType<PlasmaForgeBlockEntity>> FUSION_PLASMA_FORGE;
@@ -35,6 +36,10 @@ public final class FusionBlockEntities {
         ICF_CONTROLLER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_icf_controller", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new IcfControllerBlockEntity(ICF_CONTROLLER.get(), pos, state),
                 FusionBlocks.ICF_CONTROLLER.get()
+        ).build(null));
+        ICF_BLOCK = ModBlocks.BLOCK_ENTITY_TYPES.register("icf_block", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new IcfBlockEntity(ICF_BLOCK.get(), pos, state),
+                FusionBlocks.ICF_BLOCK.get()
         ).build(null));
         ICF_PRESS = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_icf_press", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new IcfPressBlockEntity(ICF_PRESS.get(), pos, state),

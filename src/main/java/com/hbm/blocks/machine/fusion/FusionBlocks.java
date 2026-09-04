@@ -26,6 +26,8 @@ public final class FusionBlocks {
 
     public static DeferredBlock<IcfReactorBlock> ICF_REACTOR;
     public static DeferredBlock<IcfControllerBlock> ICF_CONTROLLER;
+    /** Exact CE {@code BlockICF} — no BlockItem (CE creative tab {@code null}). */
+    public static DeferredBlock<IcfBlock> ICF_BLOCK;
     public static DeferredBlock<IcfPressBlock> ICF_PRESS;
     public static DeferredBlock<WatzReactorBlock> WATZ_REACTOR;
     public static DeferredBlock<PlasmaForgeBlock> FUSION_PLASMA_FORGE;
@@ -46,6 +48,9 @@ public final class FusionBlocks {
     public static void registerAll() {
         ICF_REACTOR = registerBlock("machine_icf_reactor", () -> new IcfReactorBlock(MACHINE_PROPS));
         ICF_CONTROLLER = registerBlock("machine_icf_controller", () -> new IcfControllerBlock(MACHINE_PROPS));
+        // Exact CE ModBlocks.java:1334 — hardness 5 / resistance 10 / creative tab null. No BlockItem.
+        ICF_BLOCK = ModBlocks.BLOCKS.register("icf_block", () -> new IcfBlock(
+                BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL).noLootTable()));
         ICF_PRESS = registerBlock("machine_icf_press", () -> new IcfPressBlock(MACHINE_PROPS));
         WATZ_REACTOR = registerBlock("machine_watz_reactor", () -> new WatzReactorBlock(MACHINE_PROPS));
         FUSION_PLASMA_FORGE = registerBlock("fusion_plasma_forge", () -> new PlasmaForgeBlock(MACHINE_PROPS));
