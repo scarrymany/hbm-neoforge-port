@@ -8,6 +8,8 @@ import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.container.machine.dummyable.BlastFurnaceMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.recipes.BlastFurnaceRecipesNT;
 import com.hbm.inventory.recipes.BlastFurnaceRecipesNT.BlastFurnaceRecipe;
 import com.hbm.lib.DirPos;
@@ -32,6 +34,8 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineBlastFurnace}: coal-fuel + airblast speed, 2-in 2-out.
+ * {@code FT_Polluting.pollute(SPILL, spill)} on flue overflow Exact CE {@code :113}.
+ * Audio / particles stay skipped.
  */
 public class MachineBlastFurnaceBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -105,7 +109,14 @@ public class MachineBlastFurnaceBlockEntity extends MachineBaseBlockEntity
                 progress = 0F;
                 fuel -= FUEL_RATE;
                 flue.setFill((int) (flue.getFill() + FLUE_GAS * (recipe.duration / Math.max(0.5F, speed))));
-                if (flue.getFill() > flue.getMaxFill()) flue.setFill(flue.getMaxFill());
+                if (flue.getFill() > flue.getMaxFill()) {
+                    int spill = flue.getFill() - flue.getMaxFill();
+                    // CE TileEntityMachineBlastFurnace.java:112-114
+                    flue.getTankType().onFluidRelease(level, worldPosition.above(7), flue, spill);
+                    FT_Polluting.pollute(level, worldPosition, flue.getTankType(),
+                            FluidTrait.FluidReleaseType.SPILL, spill);
+                    flue.setFill(flue.getMaxFill());
+                }
             }
         } else {
             isProgressing = false;
