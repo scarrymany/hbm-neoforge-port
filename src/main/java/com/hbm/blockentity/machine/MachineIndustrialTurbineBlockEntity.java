@@ -1,5 +1,6 @@
 package com.hbm.blockentity.machine;
 
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -28,9 +29,9 @@ import net.minecraft.world.level.block.state.BlockState;
  * drains the flywheel towards that target scaled by {@code spin} (dense steam types produce far
  * less energy per operation, so the flywheel of a turbine running e.g. ultra-hot steam spools up
  * much slower - CE's own comment). {@code consumptionPercent()}=0.2 (at most 20% of the input tank
- * per tick), {@code doesResizeCompressor()}=true.
+ * per tick), {@code doesResizeCompressor()}=true. ROR: CE {@code TileEntityMachineIndustrialTurbine.java:251-262}.
  */
-public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity {
+public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity implements IRORValueProvider {
 
     private static final double EFFICIENCY = 1D;
     private static final double FLYWHEEL_MAX_ENERGY = 0.5e8;
@@ -154,5 +155,22 @@ public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity 
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         spin = buf.readDouble();
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :251-255
+        return new String[]{
+                PREFIX_VALUE + "output",
+                PREFIX_VALUE + "flywheel"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :259-262
+        if ((PREFIX_VALUE + "output").equals(name)) return "" + (int) this.powerBuffer;
+        if ((PREFIX_VALUE + "flywheel").equals(name)) return "" + (int) (spin * 100);
+        return null;
     }
 }

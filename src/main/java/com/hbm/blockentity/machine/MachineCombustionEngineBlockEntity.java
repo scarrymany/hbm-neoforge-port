@@ -2,6 +2,8 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
@@ -44,11 +46,13 @@ import java.util.List;
  * rationale): no item-fill slot (fuel arrives purely by pipe); no smoke/pollution tanks
  * ({@code TileEntityMachinePolluting}'s bookkeeping - {@code PollutionHandler} is Phase 4 scope per
  * the research report, and the smoke tanks have no other consumer once the mechanic itself is
- * stubbed, so they are omitted rather than built inert); no OpenComputers/Redstone-over-Radio
- * integration (report recommends dropping both - neither mod has a confirmed NeoForge 1.21 build).
+ * stubbed, so they are omitted rather than built inert); no OpenComputers. ROR: CE
+ * {@code TileEntityMachineCombustionEngine.java:538-584}. Piston is slot 0 / {@link ItemPistons}
+ * instance (CE slot 2 / {@code piston_set} meta).
  */
 public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final long MAX_POWER = 2_500_000L;
     private static final int PISTON_SLOT = 0;
@@ -230,5 +234,55 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new MachineCombustionEngineMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :538-547
+        return new String[]{
+                PREFIX_VALUE + "state",
+                PREFIX_VALUE + "throttle",
+                PREFIX_VALUE + "power",
+                PREFIX_VALUE + "fuel",
+                PREFIX_VALUE + "efficiency",
+                PREFIX_FUNCTION + "setstate" + NAME_SEPARATOR + "state",
+                PREFIX_FUNCTION + "setthrottle" + NAME_SEPARATOR + "throttle"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :551-568 — piston slot 0 / ItemPistons instance (CE slot 2 / piston_set meta)
+        if ((PREFIX_VALUE + "state").equals(name)) return "" + (isOn ? 1 : 0);
+        if ((PREFIX_VALUE + "throttle").equals(name)) return "" + setting;
+        if ((PREFIX_VALUE + "power").equals(name)) return "" + power;
+        if ((PREFIX_VALUE + "fuel").equals(name)) return "" + tank.getFill();
+        if ((PREFIX_VALUE + "efficiency").equals(name)) {
+            ItemStack stack = inventory.getStackInSlot(PISTON_SLOT);
+            if (!stack.isEmpty()
+                    && stack.getItem() instanceof ItemPistons piston
+                    && tank.getTankType().hasTrait(FT_Combustible.class)) {
+                FT_Combustible trait = tank.getTankType().getTrait(FT_Combustible.class);
+                return "" + (int) Math.round(piston.getType().eff[trait.getGrade().ordinal()] * 100);
+            }
+            return "0";
+        }
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :572-583
+        if ((PREFIX_FUNCTION + "setstate").equals(name) && params.length > 0) {
+            this.isOn = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "setthrottle").equals(name) && params.length > 0) {
+            this.setting = IRORInteractive.parseInt(params[0], 0, 30);
+            setChanged();
+            return null;
+        }
+        return null;
     }
 }

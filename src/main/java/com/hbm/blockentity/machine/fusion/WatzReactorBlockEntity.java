@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.fusion;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -75,7 +76,8 @@ import java.util.List;
  * </ul>
  */
 public class WatzReactorBlockEntity extends MachineBaseBlockEntity
-        implements ITickableBE, IFluidStandardTransceiverMK2, IPersistentNBT, MenuProvider {
+        implements ITickableBE, IFluidStandardTransceiverMK2, IPersistentNBT, MenuProvider,
+        IRORValueProvider {
 
     public static final int SEGMENT_HEIGHT = 3;
     private static final int PELLET_SLOTS = 24;
@@ -429,5 +431,28 @@ public class WatzReactorBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new WatzReactorMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityWatz.java:703-713
+        return new String[]{
+                PREFIX_VALUE + "heat",
+                PREFIX_VALUE + "flux",
+                PREFIX_VALUE + "mud",
+                PREFIX_VALUE + "coolant_hot",
+                PREFIX_VALUE + "coolant_cold",
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :717-723
+        if ((PREFIX_VALUE + "heat").equals(name)) return "" + this.heat;
+        if ((PREFIX_VALUE + "flux").equals(name)) return "" + (int) (this.fluxLastBase + this.fluxLastReaction);
+        if ((PREFIX_VALUE + "mud").equals(name)) return "" + this.tanks[2].getFill();
+        if ((PREFIX_VALUE + "coolant_hot").equals(name)) return "" + this.tanks[1].getFill();
+        if ((PREFIX_VALUE + "coolant_cold").equals(name)) return "" + this.tanks[0].getFill();
+        return null;
     }
 }

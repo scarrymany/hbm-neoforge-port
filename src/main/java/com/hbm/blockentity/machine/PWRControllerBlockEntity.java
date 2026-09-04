@@ -1,6 +1,8 @@
 package com.hbm.blockentity.machine;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blockentity.network.IConnectionAnchors;
@@ -74,14 +76,12 @@ import java.util.Map;
  *   <li>{@code SatelliteRayScan.reportEvent} (orbital-satellite visibility ping) is dropped - the
  *   research report's own framing: "safe to stub as a no-op ... should not block porting the rest of
  *   the controller" (the satellite save-data system is Phase 4+ scope per PORT_SPEC).</li>
- *   <li>OpenComputers (@Callback methods) and {@code IRORValueProvider}/{@code IRORInteractive}
- *   (redstone-over-radio) are dropped - both cross-cutting undecided gaps flagged by this package's
- *   research report and (independently) {@code docs/phase2/machines_power_generation.md}; nothing
- *   about the core PWR simulation depends on either.</li>
+ *   <li>OpenComputers (@Callback methods) dropped. ROR: CE {@code TileEntityPWRController.java:609-640}.</li>
  * </ul>
  */
 public class PWRControllerBlockEntity extends MachineBaseBlockEntity
-        implements IFluidStandardTransceiverMK2, IConnectionAnchors, ITickableBE, MenuProvider {
+        implements IFluidStandardTransceiverMK2, IConnectionAnchors, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final long CORE_HEAT_CAPACITY_BASE = 10_000_000L;
     public static final long HULL_HEAT_CAPACITY_BASE = 10_000_000L;
@@ -572,5 +572,48 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
         this.coreHeatCapacity = buf.readLong();
         tanks[0].deserialize(buf);
         tanks[1].deserialize(buf);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :609-611
+        return new String[]{
+                PREFIX_VALUE + "rods",
+                PREFIX_VALUE + "coreheat",
+                PREFIX_VALUE + "hullheat",
+                PREFIX_VALUE + "flux",
+                PREFIX_VALUE + "depletion",
+                PREFIX_FUNCTION + "setrods" + NAME_SEPARATOR + "percent",
+                PREFIX_FUNCTION + "jettison"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :614-620
+        if ((PREFIX_VALUE + "rods").equals(name)) return "" + (int) this.rodLevel;
+        if ((PREFIX_VALUE + "coreheat").equals(name)) return "" + this.coreHeat;
+        if ((PREFIX_VALUE + "hullheat").equals(name)) return "" + this.hullHeat;
+        if ((PREFIX_VALUE + "flux").equals(name)) return "" + (int) this.flux;
+        if ((PREFIX_VALUE + "depletion").equals(name)) return "" + (int) (this.progress * 100 / this.processTime);
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :624-640
+        if ((PREFIX_FUNCTION + "setrods").equals(name) && params.length > 0) {
+            this.rodTarget = IRORInteractive.parseInt(params[0], 0, 100);
+            setChanged();
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "jettison").equals(name)) {
+            this.typeLoaded = -1;
+            this.amountLoaded = 0;
+            this.progress = 0;
+            setChanged();
+            return null;
+        }
+        return null;
     }
 }
