@@ -6,6 +6,7 @@ import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.container.machine.dummyable.RotaryFurnaceMenu;
 import com.hbm.inventory.fluid.Fluids;
@@ -41,7 +42,10 @@ import java.util.List;
 /**
  * CE {@code TileEntityMachineRotaryFurnace}: 3-in + fluid-id + fuel, steam, crucible pour.
  * {@code tanks[0].setType(3)} Exact CE {@code :105}.
+ * {@code pollute(SOOT, SOOT_PER_SECOND/10F)} while burning Exact CE {@code :182}.
+ * Smoke-tank overflow {@code incrementPollution(type, overflow/100F)} Exact CE {@code :378-390}.
  * {@link IConfigurableMachine} Exact CE {@code TileEntityMachineRotaryFurnace.java:474-489} ({@code rotaryfurnace}).
+ * Audio / particles stay skipped.
  */
 public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -61,7 +65,12 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
     public final FluidTankNTM process;
     public final FluidTankNTM steam;
     public final FluidTankNTM spent;
+    /** CE {@code TileEntityMachinePolluting} buffer 50 from {@code super(5, 50)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
     public boolean isProgressing;
+    public boolean isVenting;
     public float progress;
     public int burnTime;
     public double burnHeat = 1D;
@@ -74,6 +83,9 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         this.process = new FluidTankNTM(Fluids.NONE, 16_000).withOwner(this);
         this.steam = new FluidTankNTM(Fluids.STEAM, 12_000).withOwner(this);
         this.spent = new FluidTankNTM(Fluids.SPENTSTEAM, 120).withOwner(this);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 50).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 50).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 50).withOwner(this);
     }
 
     @Override
@@ -118,6 +130,11 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
             }
         }
 
+        // CE TileEntityMachineRotaryFurnace.java:119-120 — smoke vent UP at +rot Y+5
+        if (smoke.getFill() > 0) {
+            tryProvide(smoke, level, worldPosition.offset(rot.getStepX(), 5, rot.getStepZ()), Direction.UP);
+        }
+
         if (output != null) {
             List<Mats.MaterialStack> buf = new ArrayList<>();
             buf.add(output);
@@ -158,7 +175,11 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
                     else output.amount += recipe.output.amount;
                     setChanged();
                 }
-                if (burnTime > 0) burnTime--;
+                if (burnTime > 0) {
+                    // CE TileEntityMachineRotaryFurnace.java:182
+                    pollute(PollutionHandler.PollutionType.SOOT, PollutionHandler.SOOT_PER_SECOND / 10F);
+                    burnTime--;
+                }
             } else {
                 progress = 0;
             }
@@ -170,6 +191,9 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         } else {
             progress = 0;
         }
+
+        // CE TileEntityMachineRotaryFurnace.java:202
+        this.isVenting = false;
 
         dataChanged();
         networkPackMK2(50);
@@ -205,6 +229,20 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         if (recipe.fluid != null) process.setFill(process.getFill() - recipe.fluid.fill);
     }
 
+    /** CE {@code TileEntityMachineRotaryFurnace.java:378-390}. */
+    public void pollute(PollutionHandler.PollutionType type, float amount) {
+        FluidTankNTM tank = type == PollutionHandler.PollutionType.SOOT ? smoke
+                : type == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+        int fluidAmount = (int) Math.ceil(amount * 100);
+        tank.setFill(tank.getFill() + fluidAmount);
+        if (tank.getFill() > tank.getMaxFill()) {
+            int overflow = tank.getFill() - tank.getMaxFill();
+            tank.setFill(tank.getMaxFill());
+            PollutionHandler.incrementPollution(level, worldPosition, type, overflow / 100F);
+            this.isVenting = true;
+        }
+    }
+
     private Direction coreFacing() {
         int meta = getBlockState().getValue(BlockDummyable.META);
         return meta >= 12 ? Direction.from3DDataValue(meta - BlockDummyable.offset) : Direction.NORTH;
@@ -217,12 +255,14 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public @NotNull List<FluidTankNTM> getSendingTanks() {
-        return List.of(spent);
+        // CE TileEntityMachineRotaryFurnace.java:453
+        return List.of(spent, smoke);
     }
 
     @Override
     public @NotNull List<FluidTankNTM> getAllTanks() {
-        return List.of(process, steam, spent);
+        // CE TileEntityMachineRotaryFurnace.java:448
+        return List.of(process, steam, spent, smoke);
     }
 
     @Override
@@ -231,6 +271,9 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         process.writeToNBT(tag, "p");
         steam.writeToNBT(tag, "s");
         spent.writeToNBT(tag, "w");
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
         tag.putFloat("prog", progress);
         tag.putInt("burn", burnTime);
         tag.putInt("maxBurn", maxBurnTime);
@@ -247,6 +290,9 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         process.readFromNBT(tag, "p");
         steam.readFromNBT(tag, "s");
         spent.readFromNBT(tag, "w");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
         progress = tag.getFloat("prog");
         burnTime = tag.getInt("burn");
         maxBurnTime = tag.getInt("maxBurn");
@@ -260,6 +306,7 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
     @Override
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
+        buf.writeBoolean(isVenting);
         buf.writeBoolean(isProgressing);
         buf.writeFloat(progress);
         buf.writeInt(burnTime);
@@ -272,6 +319,7 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
     @Override
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
+        isVenting = buf.readBoolean();
         isProgressing = buf.readBoolean();
         progress = buf.readFloat();
         burnTime = buf.readInt();
