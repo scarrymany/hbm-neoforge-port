@@ -8,11 +8,14 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.GasFlareMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.recipes.FlareRecipes;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,21 +26,26 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 /**
  * CE {@code TileEntityMachineGasFlare}: vent 50 mB/t or burn 10 mB/t. Upgrades via slot scan
- * ({@code UpgradeManagerNT} not ported). Pollution / particles skipped.
+ * ({@code UpgradeManagerNT} not ported).
  * checkTilt(CONFIG) / 2×2 floor / standardFloor3x3 Exact CE {@code :125} / {@code :141} / {@code :383-384}.
  * {@code setType(3)} / {@code loadTank(1,2)} Exact CE {@code :135-136}.
+ * Vent {@code onFluidRelease} + {@code FT_Polluting.pollute(SPILL, eject*5)} Exact CE {@code :156-162}.
+ * Burn fire box + {@code pollute(BURN, eject*5)} Exact CE {@code :188-199}.
+ * Tower / {@code spawnGasFlame} / VanillaExt_Smoke stay skipped (VFX).
  */
 public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -116,8 +124,19 @@ public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
                 if (FlareRecipes.canVent(tank.getTankType())) {
                     int eject = Math.min(maxVent, tank.getFill());
                     tank.setFill(tank.getFill() - eject);
-                    if (eject > 0 && level.getGameTime() % 7 == 0) {
-                        level.playSound(null, worldPosition.above(11), SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.5F, 0.5F);
+                    // CE TileEntityMachineGasFlare.java:156
+                    tank.getTankType().onFluidRelease(this, tank, eject);
+
+                    // CE TileEntityMachineGasFlare.java:158-159
+                    if (level.getGameTime() % 7 == 0) {
+                        level.playSound(null, worldPosition.above(11), SoundEvents.FIRE_EXTINGUISH,
+                                SoundSource.BLOCKS, getVolume(1.5F), 0.5F);
+                    }
+
+                    // CE TileEntityMachineGasFlare.java:161-162
+                    if (level.getGameTime() % 5 == 0 && eject > 0) {
+                        FT_Polluting.pollute(level, worldPosition, tank.getTankType(),
+                                FluidTrait.FluidReleaseType.SPILL, eject * 5);
                     }
                 }
             } else {
@@ -127,6 +146,29 @@ public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
                 long prod = FlareRecipes.burnEnergyPerMb(tank.getTankType()) * eject / penalty;
                 prod += prod * yield / 3;
                 power = Math.min(MAX_POWER, power + prod);
+
+                // CE TileEntityMachineGasFlare.java:186 ParticleUtil.spawnGasFlame — VFX skip
+
+                // CE TileEntityMachineGasFlare.java:188-192
+                AABB flame = new AABB(
+                        worldPosition.getX() - 1, worldPosition.getY() + 12, worldPosition.getZ() - 2,
+                        worldPosition.getX() + 2, worldPosition.getY() + 17, worldPosition.getZ() + 2);
+                for (Entity e : level.getEntitiesOfClass(Entity.class, flame)) {
+                    e.igniteForSeconds(5);
+                    e.hurt(level.damageSources().onFire(), 5F);
+                }
+
+                // CE TileEntityMachineGasFlare.java:194-195
+                if (level.getGameTime() % 3 == 0) {
+                    level.playSound(null, worldPosition.above(11), HBMSoundHandler.flamethrowerShoot.get(),
+                            SoundSource.BLOCKS, getVolume(1.5F), 0.75F);
+                }
+
+                // CE TileEntityMachineGasFlare.java:197-198
+                if (level.getGameTime() % 5 == 0 && eject > 0) {
+                    FT_Polluting.pollute(level, worldPosition, tank.getTankType(),
+                            FluidTrait.FluidReleaseType.BURN, eject * 5);
+                }
             }
         }
 
