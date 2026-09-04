@@ -6,14 +6,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Optional;
+
 /**
- * Partial port of CE's {@code com.hbm.util.EntityDamageUtil} (421 lines in CE). Only the two entry
+ * Partial port of CE's {@code com.hbm.util.EntityDamageUtil} (421 lines in CE). The entry
  * points the ballistics core's default hit-resolution lambdas call are ported here -
- * {@link #attackEntityFromIgnoreIFrame} and {@link #attackEntityFromNT} - not
- * {@code getMouseOver}/{@code rayTrace} (player look-vector raycasting, a melee/interaction-scope
- * concern unrelated to gun/turret ballistics) or the sound/reflection helpers CE's alternate
+ * {@link #attackEntityFromIgnoreIFrame}, {@link #attackEntityFromNT}, and
+ * {@link #getMouseOver} (Exact CE melee look-trace, {@code gun_drill}). Sound/reflection helpers CE's alternate
  * damage-pipeline branch needed only because 1.12/Forge left {@code EntityLivingBase}'s hurt-sound
  * methods {@code private}.
  * <p>
@@ -100,6 +106,58 @@ public class EntityDamageUtil {
 
     /** CE's own {@code damageArmorNT} is intentionally empty ("mlbv: yes this is empty") - ported as-is. */
     public static void damageArmorNT(LivingEntity living, float amount) {
+    }
+
+    /** Exact CE {@code EntityDamageUtil.java:97-156}. */
+    public static HitResult getMouseOver(Player attacker, double reach) {
+        return getMouseOver(attacker, reach, 0D);
+    }
+
+    public static HitResult getMouseOver(Player attacker, double reach, double threshold) {
+        Level level = attacker.level();
+        Vec3 pos = attacker.getEyePosition();
+        Vec3 look = attacker.getViewVector(1.0F);
+        Vec3 end = pos.add(look.scale(reach));
+        HitResult objectMouseOver = level.clip(new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, attacker));
+
+        Entity pointedEntity = null;
+        Vec3 hitvec = null;
+        double closest = reach;
+        AABB search = attacker.getBoundingBox().expandTowards(look.scale(reach)).inflate(1.0D);
+
+        for (Entity entity : level.getEntities(attacker, search)) {
+            if (!entity.isPickable()) continue;
+
+            AABB aabb = entity.getBoundingBox().inflate(threshold);
+            Optional<Vec3> intercept = aabb.clip(pos, end);
+
+            if (aabb.contains(pos)) {
+                if (0.0D <= closest) {
+                    pointedEntity = entity;
+                    hitvec = intercept.orElse(pos);
+                    closest = 0.0D;
+                }
+            } else if (intercept.isPresent()) {
+                double dist = pos.distanceTo(intercept.get());
+                if (dist < closest || closest == 0.0D) {
+                    if (entity == attacker.getVehicle()) {
+                        if (closest == 0.0D) {
+                            pointedEntity = entity;
+                            hitvec = intercept.get();
+                        }
+                    } else {
+                        pointedEntity = entity;
+                        hitvec = intercept.get();
+                        closest = dist;
+                    }
+                }
+            }
+        }
+
+        if (pointedEntity != null && (closest < reach || objectMouseOver.getType() == HitResult.Type.MISS)) {
+            return new EntityHitResult(pointedEntity, hitvec);
+        }
+        return objectMouseOver;
     }
 
     /**
