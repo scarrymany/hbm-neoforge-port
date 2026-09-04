@@ -4196,7 +4196,14 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_desh", has(MaterialShapes.INGOT.commonTag(Mats.MAT_DESH)))
                 .save(output, id("item/arc_electrode_desh_alt"));
 
-        // SKIP: SATURNITE (BIGMT.ingot + NB.ingot) — ingot_bigmt not registered
+        // CE CraftingManager.java:358 SATURNITE: BIGMT.ingot x2 + NB.ingot → arc_electrode_saturnite
+        // BIGMT = saturnite (discrete ingot_saturnite + c:ingots/saturnite)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, item("arc_electrode_saturnite"))
+                .pattern("C").pattern("T").pattern("C")
+                .define('C', MaterialShapes.INGOT.commonTag(Mats.MAT_SATURN))
+                .define('T', MaterialShapes.INGOT.commonTag(Mats.MAT_NIOBIUM))
+                .unlockedBy("has_saturnite", has(MaterialShapes.INGOT.commonTag(Mats.MAT_SATURN)))
+                .save(output, id("item/arc_electrode_saturnite"));
 
         // CE :333 = machine_siren = "SIS","ICI","SRS", S=STEEL.plate(), I=ANY_RUBBER.ingot(), C=circuit_vacuum, R=REDSTONE.dust()
         TagKey<Item> rubberIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_RUBBER);
