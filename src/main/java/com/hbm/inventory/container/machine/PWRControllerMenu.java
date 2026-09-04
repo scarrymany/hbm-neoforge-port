@@ -29,7 +29,6 @@ public class PWRControllerMenu extends MenuBase<PWRControllerBlockEntity> {
     public static final int BUTTON_ROD_UP = 1;
     public static final double ROD_STEP = 10D;
 
-    /**
     private static final int MACHINE_SLOTS = 3;
 
     public PWRControllerMenu(int id, Inventory playerInv, PWRControllerBlockEntity be) {
