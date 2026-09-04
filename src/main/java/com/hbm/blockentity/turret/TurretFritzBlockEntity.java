@@ -10,6 +10,7 @@ import com.hbm.inventory.fluid.trait.FT_Flammable;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.items.weapon.sedna.content.GunHeavyItems;
+import com.hbm.items.weapon.sedna.content.XFactoryFlamer;
 import com.hbm.lib.CapabilityContextProvider;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
@@ -39,13 +40,9 @@ import java.util.Map;
  * inventory - {@link #getAmmoList()} always returns an empty list here, matching CE's own
  * {@code getAmmoList() { return null; }}.
  * <p>
- * <b>Scope trim vs. CE, documented</b>: CE's flame projectile uses
- * {@code XFactoryFlamer.flame_nograv} ({@code flame_diesel.clone().setGrav(0)}), which itself pulls
- * in {@code EntityFireLingering}, {@code GunFactory.EnumAmmo.FLAME_DIESEL}, and
- * {@code HbmLivingCapability} fire-effect lambdas from the gun-content/flamethrower package (Package
- * D, out of this turret package's scope - see {@code docs/phase3/turret_system.md}). Until that
- * lands, {@link #getFlameConfig()} returns {@code null} and firing is a documented no-op, matching
- * every other bullet-firing turret's ammo-gated inert state.
+ * Fire uses Exact CE {@code XFactoryFlamer.flame_nograv} ({@code flame_diesel.clone().setGrav(0)},
+ * CE {@code :123}). Ricochet linger is Exact CE {@code LAMBDA_LINGER_DIESEL} {@code :77} via
+ * registered {@link com.hbm.entity.effect.EntityFireLingering}. Flame-burst particles skipped.
  * {@code tank.setType(9, 9, inventory)} Exact CE {@code TileEntityTurretFritz.java:178}.
  * Slot 9 is the last ammo-grid cell (CE {@code ContainerTurretBase} 3×3). Hopper excludes 9
  * Exact CE {@code :242-244}. FLAME_DIESEL fill loop Exact CE {@code :181-189} — flattened
@@ -72,13 +69,10 @@ public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFl
         return Collections.emptyList();
     }
 
-    /**
-     * TODO(phase3-gun-content): CE uses {@code XFactoryFlamer.flame_nograv} - not ported yet, see
-     * this class's own javadoc.
-     */
+    /** Exact CE {@code TileEntityTurretFritz.java:139} {@code XFactoryFlamer.flame_nograv}. */
     @Nullable
     protected BulletConfig getFlameConfig() {
-        return null;
+        return XFactoryFlamer.flame_nograv;
     }
 
     @Override

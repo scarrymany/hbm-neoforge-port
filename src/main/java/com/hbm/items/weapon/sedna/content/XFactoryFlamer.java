@@ -2,6 +2,7 @@ package com.hbm.items.weapon.sedna.content;
 
 import com.hbm.capability.HbmLivingAttachment;
 import com.hbm.capability.ModAttachments;
+import com.hbm.entity.effect.EntityFireLingering;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.items.weapon.sedna.BulletConfig;
@@ -19,6 +20,8 @@ import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import com.hbm.util.EntityDamageUtil;
 import com.hbm.weapon.anim.GunAnimationType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +29,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -40,9 +46,9 @@ import java.util.function.BiFunction;
  * {@link MagazineFluid}-backed). See {@code docs/phase3/guns_and_ammo.md}'s {@code XFactoryFlamer}
  * table.
  * <p>
- * <b>{@code EntityFireLingering}-based ground fire/direct-ignite is a documented forward reference</b>
- * (see {@code XFactoryEnergy}'s class javadoc for the same confirmed-missing dependency) - the direct
- * "set the entity on fire" impact effect <b>is</b> ported via {@link HbmLivingAttachment}.
+ * Diesel ricochet linger is Exact CE {@code LAMBDA_LINGER_DIESEL} {@code :77} via registered
+ * {@link EntityFireLingering}. Direct ignite on living hits is {@link HbmLivingAttachment}.
+ * {@code flame_nograv} Exact CE {@code :123}. FlameCreator trail VFX skipped.
  * <p>
  * <b>{@code gun_chemthrower} is a real but simplified port, not the bespoke {@code ItemGunChemthrower}
  * subclass</b>: CE's real class evaluates the tank's currently-loaded chemical against a large
@@ -76,7 +82,10 @@ public final class XFactoryFlamer {
 
     public static final BulletConfig flame_diesel = new BulletConfig("flame_diesel").setItem(() -> ITEM_FLAME_DIESEL)
             .setupDamageClass(DamageClass.FIRE).setLife(100).setVel(1F).setGrav(0.02).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
-            .setOnImpact(XFactoryFlamer::igniteFire);
+            .setOnImpact(XFactoryFlamer::igniteFire)
+            .setOnRicochet(XFactoryFlamer::lingerDiesel);
+    /** Exact CE {@code XFactoryFlamer.java:123}: {@code flame_diesel.clone().setGrav(0)}. Fritz fire. */
+    public static final BulletConfig flame_nograv = flame_diesel.clone("flame_nograv").setGrav(0);
     public static final BulletConfig flame_gas = new BulletConfig("flame_gas").setItem(() -> ITEM_FLAME_GAS)
             .setupDamageClass(DamageClass.FIRE).setLife(10).setSpread(0.05F).setVel(1F).setGrav(0).setReloadCount(500).setSelfDamageDelay(20).setKnockback(0F)
             .setOnImpact(XFactoryFlamer::igniteFire);
@@ -214,9 +223,41 @@ public final class XFactoryFlamer {
                 living.setData(ModAttachments.LIVING_ATTACHMENT, props);
             }
         }
-        // TODO(entity-effect-fire-lingering): CE's ricochet/block-hit branch spawns an
-        // EntityFireLingering ground-fire puddle or ignites an adjacent flammable block, see class
-        // javadoc's forward reference.
+        // Block linger is onRicochet — Exact CE {@code LAMBDA_LINGER_DIESEL} :77.
+    }
+
+    /** CE {@code XFactoryFlamer.java:77} {@code LAMBDA_LINGER_DIESEL}. */
+    public static void lingerDiesel(EntityBulletBaseMK4 bullet, BlockHitResult mop) {
+        if (!igniteIfPossible(bullet, mop)) spawnFire(bullet, mop, 2F, 1F, 100, EntityFireLingering.TYPE_DIESEL);
+    }
+
+    /** CE {@code XFactoryFlamer.java:82-97}. */
+    public static boolean igniteIfPossible(EntityBulletBaseMK4 bullet, BlockHitResult mop) {
+        Level world = bullet.level();
+        BlockPos pos = mop.getBlockPos();
+        Direction face = mop.getDirection();
+        BlockState state = world.getBlockState(pos);
+        if (state.isFlammable(world, pos, face.getOpposite())) {
+            BlockPos adj = pos.relative(face);
+            if (world.getBlockState(adj).isAir()) {
+                world.setBlock(adj, Blocks.FIRE.defaultBlockState(), 3);
+                return true;
+            }
+        }
+        bullet.discard();
+        return false;
+    }
+
+    /** CE {@code XFactoryFlamer.java:100-111}. */
+    public static void spawnFire(EntityBulletBaseMK4 bullet, BlockHitResult mop, float width, float height, int duration, int type) {
+        Vec3 hit = mop.getLocation();
+        Level world = bullet.level();
+        AABB box = new AABB(hit.x, hit.y, hit.z, hit.x, hit.y, hit.z)
+                .inflate(width / 2D + 0.5D, height / 2D + 0.5D, width / 2D + 0.5D);
+        if (world.getEntitiesOfClass(EntityFireLingering.class, box).isEmpty()) {
+            EntityFireLingering.spawn(world, hit.x, hit.y, hit.z, width, height, type, duration);
+        }
+        bullet.discard();
     }
 
     private static void igniteBalefire(EntityBulletBaseMK4 bullet, HitResult hit) {
