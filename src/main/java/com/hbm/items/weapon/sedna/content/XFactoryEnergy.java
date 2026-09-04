@@ -26,6 +26,7 @@ import com.hbm.items.weapon.sedna.mags.MagazineSingleReload;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.particle.HbmEffect;
 import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
+import com.hbm.saveddata.satellites.SatelliteDetector;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -61,11 +62,8 @@ import java.util.function.BiConsumer;
  * <p>
  * <b>Forward references (documented, not silently dropped):</b>
  * <ul>
- *     <li>{@code com.hbm.saveddata.satellites.SatelliteDetector} (the nuke rounds' satellite-ping
- *     calls) - confirmed not ported anywhere in this tree, matching {@code GrenadeFillingActions}'s
- *     identical documented gap for the same class. {@code ChunkRadiationManager}'s own
- *     {@code incrementRad} half of these same CE call sites (Phase 4) is wired below, via the local
- *     {@code incrementRad} helper.</li>
+ *     <li>{@code SatelliteDetector.reportEvent} on fatman nukes is Exact CE
+ *     {@code XFactoryCatapult.java:99}/{@code :116}/{@code :134}.</li>
  *     <li>{@code EntityProcessorCrossSmooth#setDamageClass(DamageClass)} does not exist on this port's
  *     {@code EntityProcessorCrossSmooth} - same confirmed gap {@code GrenadeFillingActions} already
  *     documented; every {@code ExplosionVNT} blast below falls back to the processor's own plain
@@ -312,9 +310,6 @@ public final class XFactoryEnergy {
     }
 
     // ==================== gun_fatman nuke-round impact lambdas ====================
-    // SatelliteDetector calls are still dropped (com.hbm.saveddata.satellites.SatelliteDetector is a
-    // separate, not-yet-ported system - documented forward reference, see class javadoc); incrementRad
-    // is now wired against Phase 4's real com.hbm.handler.radiation.ChunkRadiationManager.
 
     private static void nukeStandard(EntityBulletBaseMK4 bullet, HitResult hit) {
         if (skipSelfHit(bullet, hit)) return;
@@ -361,6 +356,8 @@ public final class XFactoryEnergy {
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
         incrementRad(bullet.level(), loc.x, loc.y, loc.z, 1.5F);
+        SatelliteDetector.reportEvent(bullet.level(), SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, bullet.getX(), bullet.getZ());
         bullet.level().playSound(null, loc.x, loc.y + 0.5, loc.z, HBMSoundHandler.mukeExplosion.get(), net.minecraft.sounds.SoundSource.HOSTILE, 15.0F, 1.0F);
         HbmEffect.sendPacket(bullet.level(), HbmEffect.MUKE, loc.x, loc.y + 0.5, loc.z, 250, null);
     }
@@ -374,6 +371,8 @@ public final class XFactoryEnergy {
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
         incrementRad(bullet.level(), loc.x, loc.y, loc.z, 0.25F);
+        SatelliteDetector.reportEvent(bullet.level(), SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, bullet.getX(), bullet.getZ());
         EntityNukeTorex.statFac(bullet.level(), loc.x, loc.y + 0.5, loc.z, 0.25F);
     }
 
@@ -405,7 +404,10 @@ public final class XFactoryEnergy {
         vnt.explode();
     }
 
+    /** Exact CE {@code XFactoryCatapult.java:115-116} — sat ping then Torex. polaroid bale skip. */
     private static void spawnMush(EntityBulletBaseMK4 bullet, Vec3 loc) {
+        SatelliteDetector.reportEvent(bullet.level(), SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, bullet.getX(), bullet.getZ());
         EntityNukeTorex.statFac(bullet.level(), loc.x, loc.y + 0.5, loc.z, 0.4F);
     }
 

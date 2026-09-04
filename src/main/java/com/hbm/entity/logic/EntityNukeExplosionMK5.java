@@ -7,6 +7,7 @@ import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.explosion.ExplosionNukeRayBatched;
 import com.hbm.interfaces.IExplosionRay;
 import com.hbm.main.MainRegistry;
+import com.hbm.saveddata.satellites.SatelliteDetector;
 import com.hbm.util.ContaminationUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -41,8 +42,8 @@ import java.util.UUID;
  * <p>
  * <b>Not ported (documented forward references, each a real dependency this port doesn't have
  * yet)</b>: {@code AdvancementManager.grantAchievement} (achievements, Phase 5), {@code
- * EntityGlowingOne.convertInRadiusToGlow} (mob-conversion, not this phase's scope), and {@code
- * SatelliteDetector.reportEvent} (Phase 4 world/simulation). Each is a no-op stub with a comment
+ * EntityGlowingOne.convertInRadiusToGlow} (mob-conversion, not this phase's scope). {@code
+ * SatelliteDetector.reportEvent} is Exact CE {@code EntityNukeExplosionMK5.java:121}. Each remaining stub has a comment
  * naming the real CE call it replaces; the core ray-based destruction, AoE damage, and
  * radiation-along-line-of-sight logic are all fully ported and functional. The {@code
  * EntityFalloutRain} spawn on completion ({@code docs/phase3/explosion_engine.md}'s "Fallout
@@ -135,7 +136,8 @@ public class EntityNukeExplosionMK5 extends EntityExplosionChunkloading {
             explosionStart = System.currentTimeMillis();
             explosion = new ExplosionNukeRayBatched(level, (int) getX(), (int) getY(), (int) getZ(), strength, radius);
             explosion.setDetonator(detonator);
-            // TODO(SatelliteDetector, Phase 4): CE reports a HIGH-intensity/HIGH-duration burst event here.
+            SatelliteDetector.reportEvent(level, SatelliteDetector.DURATION_HIGH,
+                    SatelliteDetector.BurstIntensity.HIGH, getX(), getZ());
             initialized = true;
         }
 

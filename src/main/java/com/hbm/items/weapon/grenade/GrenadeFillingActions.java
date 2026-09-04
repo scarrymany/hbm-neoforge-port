@@ -18,6 +18,7 @@ import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.particle.HbmEffect;
+import com.hbm.saveddata.satellites.SatelliteDetector;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -56,11 +57,8 @@ import java.util.List;
  *     mapping {@code docs/phase3/gun_framework.md} already flagged as missing a
  *     {@code SEDNA_PLASMA}-family entry) - EMP/PLASMA fall back to the processor's own plain
  *     explosion-damage source until that lands.</li>
- *     <li>{@code com.hbm.saveddata.satellites.SatelliteDetector} ({@code spawnMush}'s satellite ping) -
- *     confirmed not ported anywhere in this tree (missile-infra scope, per
- *     {@code docs/phase3/explosion_engine.md}'s identical finding for {@code EntityFalloutRain}).
- *     {@code com.hbm.handler.radiation.ChunkRadiationManager} (NUCLEAR/NUCLEAR_DEMO's
- *     {@code incrementRad}) is now real (Phase 4) and wired below.</li>
+ *     <li>{@code SatelliteDetector.reportEvent} on nuclear grenade {@code spawnMush} is Exact CE
+ *     {@code ItemGrenadeFilling.java:262}.</li>
  * </ul>
  * Every other call below (the {@code ExplosionVNT} blasts themselves, the CLUSTER/CLUSTER_HEAVY/LASER/
  * FRAG_SLEEVE submunitions, SCHRAB's Fleija spawn) is a real, fully-wired port - none of Phase 3's own
@@ -270,7 +268,8 @@ public final class GrenadeFillingActions {
 
     private static void spawnMush(EntityGrenadeUniversal grenade) {
         Level level = grenade.level();
-        // forward reference: SatelliteDetector.reportEvent(...) - see class javadoc. The sound below is real.
+        SatelliteDetector.reportEvent(level, SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, grenade.getX(), grenade.getZ());
         level.playSound(null, grenade.getX(), grenade.getY(), grenade.getZ(),
                 HBMSoundHandler.mukeExplosion, SoundSource.HOSTILE, 15.0F, 1.0F);
 

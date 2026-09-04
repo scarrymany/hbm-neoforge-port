@@ -10,6 +10,7 @@ import com.hbm.explosion.ExplosionNukeGeneric;
 import com.hbm.explosion.ExplosionSolinium;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.MainRegistry;
+import com.hbm.saveddata.satellites.SatelliteDetector;
 import com.hbm.particle.HbmEffect;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -184,7 +185,8 @@ public class EntityNukeExplosionMK3 extends EntityExplosionChunkloading {
                 }
             }
 
-            // TODO(SatelliteDetector, Phase 4): CE reports a HIGH-intensity/HIGH-duration burst event here.
+            SatelliteDetector.reportEvent(level, SatelliteDetector.DURATION_HIGH,
+                    SatelliteDetector.BurstIntensity.HIGH, getX(), getZ());
             this.did = true;
         }
 
