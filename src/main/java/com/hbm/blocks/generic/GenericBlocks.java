@@ -683,7 +683,7 @@ public final class GenericBlocks {
         return block;
     }
 
-    /** Exact CE {@code ItemModDoor} — {@code DoorItem} two-tall place, stack 1. Tab stays null. */
+    /** Exact CE {@code ItemModDoor} — 1.21 {@code DoubleHighBlockItem} two-tall place, stack 1. Tab stays null. */
     private static DeferredBlock<BlockModDoor> registerModDoor(String name, Supplier<BlockModDoor> factory) {
         DeferredBlock<BlockModDoor> block = ModBlocks.BLOCKS.register(name, factory);
         ModItems.ITEMS.register(name, () -> new ItemModDoor(block.get(), new Item.Properties()));
