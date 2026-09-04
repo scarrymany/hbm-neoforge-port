@@ -39,14 +39,11 @@ import java.util.Locale;
  * {@code com.hbm.items.gear.SpecialArmorItems}:</b> {@link #checkForAsbestos} is now fully wired
  * (all 4 {@code asbestos_*} items exist); {@link #checkForHazmatOnly}/{@link #checkForHaz2}/
  * {@link #checkForHazmat} are wired for the hazmat/hazmat_paa/euphemium/schrabidium sets that
- * package registers, with a per-branch TODO naming the still-missing {@code liquidator}/
- * {@code rpa}/{@code fau}/{@code dns} sets. {@link #checkForFiend}/{@link #checkForFiend2}
- * ({@code jackt}/{@code jackt2}) remain fully stubbed to CE's own "no match" return value
- * ({@code false}) - those armor pieces belong to a separate, not-yet-scheduled Phase 3 "armor items"
- * work package, and referencing a nonexistent static field would be a hard compile error.
- * {@link #checkForDigamma} ({@code fau}/{@code dns}) is the same story for its own armor-set
- * branch, but now falls back to {@code com.hbm.potion.HbmPotionEffects#STABILITY} instead of a bare
- * {@code false}, per CE's own {@code HbmPotion.stability} fallback. Every other method in this class (the gas-mask-filter
+ * package registers. {@link #checkForHaz2}/{@link #checkForHazmatOnly}/{@link #checkForDigamma}
+ * now also include the registered {@code liquidator}/{@code rpa}/{@code fau}/{@code dns} sets
+ * (Exact CE {@code ArmorUtil.java:165-172}/{@code :175-180}/{@code :308-316}).
+ * {@link #checkForFiend}/{@link #checkForFiend2} ({@code jackt}/{@code jackt2}) remain stubbed —
+ * those pieces are unregistered, do not invent. Every other method in this class (the gas-mask-filter
  * helpers, {@link #checkForFaraday}, {@link #checkArmorNull}, {@link #damageSuit}, {@link
  * #resetFlightTime}, {@link #checkArmor}, {@link #checkArmorPiece}) has no such dependency and is
  * ported in full.
@@ -177,38 +174,34 @@ public final class ArmorUtil {
         return false;
     }
 
-    /**
-     * {@code docs/phase3/armor_special_sets.md}-scoped sets ({@code hazmat_paa}, {@code euphemium})
-     * are wired for real; {@code liquidator}/{@code rpa}/{@code fau}/{@code dns} are a wider "armor
-     * items" scope than this package and remain a documented forward reference.
-     */
+    /** Exact CE {@code ArmorUtil.java:165-172}. */
     public static boolean checkForHaz2(LivingEntity entity) {
-        if (checkArmor(entity, SpecialArmorItems.HAZMAT_PAA_HELMET.get(), SpecialArmorItems.HAZMAT_PAA_PLATE.get(),
-                SpecialArmorItems.HAZMAT_PAA_LEGS.get(), SpecialArmorItems.HAZMAT_PAA_BOOTS.get())) return true;
-        if (checkArmor(entity, SpecialArmorItems.EUPHEMIUM_HELMET.get(), SpecialArmorItems.EUPHEMIUM_PLATE.get(),
-                SpecialArmorItems.EUPHEMIUM_LEGS.get(), SpecialArmorItems.EUPHEMIUM_BOOTS.get())) return true;
-
-        // TODO(liquidator/rpa/fau/dns armor sets not yet ported - a wider "armor items" scope than
-        // this package).
-        return false;
+        return checkArmor(entity, SpecialArmorItems.HAZMAT_PAA_HELMET.get(), SpecialArmorItems.HAZMAT_PAA_PLATE.get(),
+                SpecialArmorItems.HAZMAT_PAA_LEGS.get(), SpecialArmorItems.HAZMAT_PAA_BOOTS.get())
+                || checkArmor(entity, PoweredArmorItems.LIQUIDATOR_HELMET.get(), PoweredArmorItems.LIQUIDATOR_PLATE.get(),
+                        PoweredArmorItems.LIQUIDATOR_LEGS.get(), PoweredArmorItems.LIQUIDATOR_BOOTS.get())
+                || checkArmor(entity, SpecialArmorItems.EUPHEMIUM_HELMET.get(), SpecialArmorItems.EUPHEMIUM_PLATE.get(),
+                        SpecialArmorItems.EUPHEMIUM_LEGS.get(), SpecialArmorItems.EUPHEMIUM_BOOTS.get())
+                || checkArmor(entity, PoweredArmorItems.RPA_HELMET.get(), PoweredArmorItems.RPA_PLATE.get(),
+                        PoweredArmorItems.RPA_LEGS.get(), PoweredArmorItems.RPA_BOOTS.get())
+                || checkArmor(entity, PoweredArmorItems.FAU_HELMET.get(), PoweredArmorItems.FAU_PLATE.get(),
+                        PoweredArmorItems.FAU_LEGS.get(), PoweredArmorItems.FAU_BOOTS.get())
+                || checkArmor(entity, PoweredArmorItems.DNS_HELMET.get(), PoweredArmorItems.DNS_PLATE.get(),
+                        PoweredArmorItems.DNS_LEGS.get(), PoweredArmorItems.DNS_BOOTS.get());
     }
 
-    /**
-     * {@code docs/phase3/armor_special_sets.md}-scoped hazmat sets (base/red/grey/paa) are wired
-     * for real; {@code liquidator} is a wider "armor items" scope than this package.
-     */
+    /** Exact CE {@code ArmorUtil.java:175-180}. */
     public static boolean checkForHazmatOnly(LivingEntity entity) {
-        if (checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET.get(), SpecialArmorItems.HAZMAT_PLATE.get(),
-                SpecialArmorItems.HAZMAT_LEGS.get(), SpecialArmorItems.HAZMAT_BOOTS.get())) return true;
-        if (checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_RED.get(), SpecialArmorItems.HAZMAT_PLATE_RED.get(),
-                SpecialArmorItems.HAZMAT_LEGS_RED.get(), SpecialArmorItems.HAZMAT_BOOTS_RED.get())) return true;
-        if (checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_GREY.get(), SpecialArmorItems.HAZMAT_PLATE_GREY.get(),
-                SpecialArmorItems.HAZMAT_LEGS_GREY.get(), SpecialArmorItems.HAZMAT_BOOTS_GREY.get())) return true;
-        if (checkArmor(entity, SpecialArmorItems.HAZMAT_PAA_HELMET.get(), SpecialArmorItems.HAZMAT_PAA_PLATE.get(),
-                SpecialArmorItems.HAZMAT_PAA_LEGS.get(), SpecialArmorItems.HAZMAT_PAA_BOOTS.get())) return true;
-
-        // TODO(liquidator armor not yet ported - a wider "armor items" scope than this package).
-        return false;
+        return checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET.get(), SpecialArmorItems.HAZMAT_PLATE.get(),
+                SpecialArmorItems.HAZMAT_LEGS.get(), SpecialArmorItems.HAZMAT_BOOTS.get())
+                || checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_RED.get(), SpecialArmorItems.HAZMAT_PLATE_RED.get(),
+                        SpecialArmorItems.HAZMAT_LEGS_RED.get(), SpecialArmorItems.HAZMAT_BOOTS_RED.get())
+                || checkArmor(entity, SpecialArmorItems.HAZMAT_HELMET_GREY.get(), SpecialArmorItems.HAZMAT_PLATE_GREY.get(),
+                        SpecialArmorItems.HAZMAT_LEGS_GREY.get(), SpecialArmorItems.HAZMAT_BOOTS_GREY.get())
+                || checkArmor(entity, SpecialArmorItems.HAZMAT_PAA_HELMET.get(), SpecialArmorItems.HAZMAT_PAA_PLATE.get(),
+                        SpecialArmorItems.HAZMAT_PAA_LEGS.get(), SpecialArmorItems.HAZMAT_PAA_BOOTS.get())
+                || checkArmor(entity, PoweredArmorItems.LIQUIDATOR_HELMET.get(), PoweredArmorItems.LIQUIDATOR_PLATE.get(),
+                        PoweredArmorItems.LIQUIDATOR_LEGS.get(), PoweredArmorItems.LIQUIDATOR_BOOTS.get());
     }
 
     /**
@@ -313,9 +306,12 @@ public final class ArmorUtil {
         return filter == null ? ItemStack.EMPTY : filter;
     }
 
-    // TODO(fau/dns "digamma"/"deep null suit" armor sets not yet ported - same blocker as
-    // checkForHaz2 above).
+    /** Exact CE {@code ArmorUtil.java:308-316}. */
     public static boolean checkForDigamma(Player player) {
+        if (checkArmor(player, PoweredArmorItems.FAU_HELMET.get(), PoweredArmorItems.FAU_PLATE.get(),
+                PoweredArmorItems.FAU_LEGS.get(), PoweredArmorItems.FAU_BOOTS.get())) return true;
+        if (checkArmor(player, PoweredArmorItems.DNS_HELMET.get(), PoweredArmorItems.DNS_PLATE.get(),
+                PoweredArmorItems.DNS_LEGS.get(), PoweredArmorItems.DNS_BOOTS.get())) return true;
         return player.hasEffect(HbmPotionEffects.STABILITY);
     }
 
