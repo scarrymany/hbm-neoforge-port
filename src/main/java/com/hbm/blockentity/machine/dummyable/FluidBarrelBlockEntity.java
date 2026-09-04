@@ -38,7 +38,8 @@ import java.util.List;
 /**
  * CE {@code TileEntityBarrel} — transceiver + mode.
  * UniNodespace buffer: CE {@code TileEntityBarrel.java:247-286} / {@code createNode :296-307}.
- * Modes Exact CE: 0=in, 1=both/pipe, 2=out, 3=off. Canister 6-slot skipped (port is 1-slot ID).
+ * Modes Exact CE: 0=in, 1=both/pipe, 2=out, 3=off.
+ * {@code setType(0,1)} / {@code loadTank(2,3)} / {@code unloadTank(4,5)} Exact CE {@code :235-237}.
  * ROR: CE {@code TileEntityBarrel.java:473-504}.
  */
 public class FluidBarrelBlockEntity extends MachineBaseBlockEntity
@@ -51,6 +52,11 @@ public class FluidBarrelBlockEntity extends MachineBaseBlockEntity
     public static final int MODE_OUT = 2;
     public static final int MODE_NONE = 3;
 
+    // CE TileEntityBarrel.java:62-64
+    private static final int[] SLOTS_TOP = new int[]{2};
+    private static final int[] SLOTS_BOTTOM = new int[]{3, 5};
+    private static final int[] SLOTS_SIDE = new int[]{4};
+
     public final FluidTankNTM tank;
     public int mode;
     private final FluidBarrelBlock.Kind kind;
@@ -58,7 +64,7 @@ public class FluidBarrelBlockEntity extends MachineBaseBlockEntity
     protected FluidType lastType = Fluids.NONE;
 
     public FluidBarrelBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1, true, false);
+        super(type, pos, state, 6, true, false);
         FluidBarrelBlock block = state.getBlock() instanceof FluidBarrelBlock b ? b : null;
         int cap = block != null ? block.capacity : 16_000;
         this.kind = block != null ? block.kind : FluidBarrelBlock.Kind.STEEL;
@@ -72,7 +78,37 @@ public class FluidBarrelBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return slot == 0 && stack.getItem() instanceof IItemFluidIdentifier;
+        // CE TileEntityBarrel.java:446-453 (Library drain/fill helpers not ported — same as fluid tank)
+        return switch (slot) {
+            case 0, 1 -> stack.getItem() instanceof IItemFluidIdentifier;
+            default -> true;
+        };
+    }
+
+    @Override
+    public boolean canInsertItem(int slot, ItemStack itemStack) {
+        // CE TileEntityBarrel.java:457-462
+        return switch (slot) {
+            case 1, 3, 5 -> false;
+            default -> isItemValidForSlot(slot, itemStack);
+        };
+    }
+
+    @Override
+    public boolean canExtractItem(int slot, ItemStack itemStack, int amount) {
+        // CE TileEntityBarrel.java:465-470
+        return switch (slot) {
+            case 1, 3, 5 -> true;
+            default -> !isItemValidForSlot(slot, itemStack);
+        };
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        // CE TileEntityBarrel.java:440-443
+        if (side == Direction.DOWN) return SLOTS_BOTTOM;
+        if (side == Direction.UP) return SLOTS_TOP;
+        return SLOTS_SIDE;
     }
 
     public void cycleMode() {
@@ -84,10 +120,10 @@ public class FluidBarrelBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        ItemStack id = inventory.getStackInSlot(0);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            tank.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityBarrel.java:235-237
+        this.tank.setType(0, 1, inventory);
+        this.tank.loadTank(2, 3, inventory);
+        this.tank.unloadTank(4, 5, inventory);
 
         // CE TileEntityBarrel.java:247-286 — mode 1 = own pipe node; tilt skipped
         if (mode == 1) {
