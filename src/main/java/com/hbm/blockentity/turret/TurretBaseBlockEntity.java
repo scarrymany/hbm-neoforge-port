@@ -1,6 +1,8 @@
 package com.hbm.blockentity.turret;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
@@ -72,11 +74,11 @@ import java.util.List;
  *   <li>Casing-ejection/muzzle-flash VFX ({@code CasingEjector}, {@code SpentCasing},
  *   {@code AuxParticlePacketNT}) - shared gun-VFX substrate every hand-held gun also needs, not
  *   turret-specific; {@link #spawnCasing()} is a documented no-op until that package lands.</li>
- *   <li>OpenComputers / ROR on artillery — cited skip on {@code TurretBaseArtilleryBlockEntity}.</li>
+ *   <li>OpenComputers dropped. ROR: CE {@code TileEntityTurretBaseNT.java:1248-1299}.</li>
  * </ul>
  */
 public abstract class TurretBaseBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, ITickableBE, MenuProvider, IRORValueProvider, IRORInteractive {
 
     // this time we do all rotations in radians
     public double rotationYaw;
@@ -816,5 +818,78 @@ public abstract class TurretBaseBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new TurretMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityTurretBaseNT.java:1248
+        return new String[]{
+                PREFIX_FUNCTION + "setActive" + NAME_SEPARATOR + "active (0 or 1)",
+                PREFIX_FUNCTION + "targetPlayers" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "targetAnimals" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "targetMobs" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "targetMachines" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "addWhitelist" + NAME_SEPARATOR + "name",
+                PREFIX_FUNCTION + "removeWhitelist" + NAME_SEPARATOR + "name",
+                PREFIX_FUNCTION + "addMobFilter" + NAME_SEPARATOR + "name",
+                PREFIX_FUNCTION + "removeMobFilter" + NAME_SEPARATOR + "name",
+                PREFIX_FUNCTION + "toggleBlacklistMobFilter" + NAME_SEPARATOR + "enabled (0 or 1)"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :1253-1299
+        if ((PREFIX_FUNCTION + "setActive").equals(name) && params.length > 0) {
+            this.isOn = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "targetPlayers").equals(name) && params.length > 0) {
+            this.targetPlayers = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "targetAnimals").equals(name) && params.length > 0) {
+            this.targetAnimals = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "targetMobs").equals(name) && params.length > 0) {
+            this.targetMobs = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "targetMachines").equals(name) && params.length > 0) {
+            this.targetMachines = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "addWhitelist").equals(name) && params.length > 0) {
+            String playerName = params[0];
+            List<String> whitelist = this.getWhitelist();
+            if (whitelist == null || !whitelist.contains(playerName)) this.addName(playerName);
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "removeWhitelist").equals(name) && params.length > 0) {
+            String playerName = params[0];
+            List<String> whitelist = this.getWhitelist();
+            if (whitelist != null && whitelist.contains(playerName)) this.removeName(whitelist.indexOf(playerName));
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "toggleBlacklistMobFilter").equals(name) && params.length > 0) {
+            this.isBlacklistMobFilter = IRORInteractive.parseInt(params[0], 0, 1) == 1;
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "addMobFilter").equals(name) && params.length > 0) {
+            String mobName = params[0];
+            if (!mobFilter.contains(mobName)) mobFilter.add(mobName);
+            setChanged();
+        }
+        if ((PREFIX_FUNCTION + "removeMobFilter").equals(name) && params.length > 0) {
+            mobFilter.remove(params[0]);
+            setChanged();
+        }
+        return null;
     }
 }

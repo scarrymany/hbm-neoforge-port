@@ -1,5 +1,6 @@
 package com.hbm.blockentity.turret;
 
+import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.blockentity.IRadarCommandReceiver;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.items.weapon.sedna.BulletConfig;
@@ -17,7 +18,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityTurretBaseArtillery}. Radar queue + no-LOS sky check + larger HE subscribe.
- * TODO(CE: TileEntityTurretBaseArtillery.java:85-129): OpenComputers / ROR enqueue.
+ * ROR enqueue: CE {@code :103-126}.
  */
 public abstract class TurretBaseArtilleryBlockEntity extends TurretBaseBlockEntity implements IRadarCommandReceiver {
 
@@ -89,5 +90,34 @@ public abstract class TurretBaseArtilleryBlockEntity extends TurretBaseBlockEnti
                 trySubscribe(level, x + dir.getStepX() * 3 + rot.getStepX() * (1 - j), y + i, z + dir.getStepZ() * 3 + rot.getStepZ() * (1 - j), Direction.WEST);
             }
         }
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityTurretBaseArtillery.java:103-113 — no mob-filter keys
+        return new String[]{
+                PREFIX_FUNCTION + "setActive" + NAME_SEPARATOR + "active (0 or 1)",
+                PREFIX_FUNCTION + "targetPlayers" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "targetAnimals" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "targetMobs" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "targetMachines" + NAME_SEPARATOR + "enabled (0 or 1)",
+                PREFIX_FUNCTION + "addWhitelist" + NAME_SEPARATOR + "name",
+                PREFIX_FUNCTION + "removeWhitelist" + NAME_SEPARATOR + "name",
+                PREFIX_FUNCTION + "enqueue" + NAME_SEPARATOR + "x" + PARAM_SEPARATOR + "y" + PARAM_SEPARATOR + "z",
+        };
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :117-126
+        super.runRORFunction(name, params);
+        if ((PREFIX_FUNCTION + "enqueue").equals(name) && params.length > 2) {
+            int x = IRORInteractive.parseInt(params[0], Integer.MIN_VALUE, Integer.MAX_VALUE);
+            int y = IRORInteractive.parseInt(params[1], Integer.MIN_VALUE, Integer.MAX_VALUE);
+            int z = IRORInteractive.parseInt(params[2], Integer.MIN_VALUE, Integer.MAX_VALUE);
+            this.sendCommandPosition(x, y, z);
+            setChanged();
+        }
+        return null;
     }
 }

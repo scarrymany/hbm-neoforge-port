@@ -1,5 +1,6 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.machine.TurbineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.inventory.fluid.Fluids;
@@ -19,8 +20,9 @@ import net.minecraft.world.phys.AABB;
  * TODO(CE: TileEntityChungus.java:222-280): OpenComputers callbacks.
  * TODO(CE: TileEntityChungus.java:69-86): IConfigurableMachine JSON.
  * TODO(CE: RenderChungus.java:16): TESR.
+ * ROR: CE {@code TileEntityChungus.java:284-293}.
  */
-public class MachineChungusBlockEntity extends TurbineBaseBlockEntity {
+public class MachineChungusBlockEntity extends TurbineBaseBlockEntity implements IRORValueProvider {
 
     public static int inputTankSize = 1_000_000_000;
     public static int outputTankSize = 1_000_000_000;
@@ -105,5 +107,20 @@ public class MachineChungusBlockEntity extends TurbineBaseBlockEntity {
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         this.turnTimer = buf.readInt();
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :284-287
+        return new String[]{
+                PREFIX_VALUE + "output"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :291-293
+        if ((PREFIX_VALUE + "output").equals(name)) return "" + (int) this.powerBuffer;
+        return null;
     }
 }
