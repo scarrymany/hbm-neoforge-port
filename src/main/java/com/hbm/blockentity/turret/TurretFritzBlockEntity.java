@@ -9,6 +9,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Flammable;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple;
 import com.hbm.items.weapon.sedna.BulletConfig;
+import com.hbm.items.weapon.sedna.content.GunHeavyItems;
 import com.hbm.lib.CapabilityContextProvider;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
@@ -18,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -46,8 +48,9 @@ import java.util.Map;
  * every other bullet-firing turret's ammo-gated inert state.
  * {@code tank.setType(9, 9, inventory)} Exact CE {@code TileEntityTurretFritz.java:178}.
  * Slot 9 is the last ammo-grid cell (CE {@code ContainerTurretBase} 3×3). Hopper excludes 9
- * Exact CE {@code :242-244}. {@code ammo_standard} FLAME_DIESEL fill loop ({@code :181-189})
- * stays skipped — flattened ammo item is not wired as CE metadata.
+ * Exact CE {@code :242-244}. FLAME_DIESEL fill loop Exact CE {@code :181-189} — flattened
+ * {@link GunHeavyItems#FLAME_DIESEL} is the registered stand-in for CE {@code ammo_standard}
+ * + {@code EnumAmmo.FLAME_DIESEL}.
  */
 public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFluidStandardReceiverMK2 {
 
@@ -147,6 +150,17 @@ public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFl
         if (level == null || level.isClientSide) return;
         // CE TileEntityTurretFritz.java:178
         tank.setType(9, 9, inventory);
+
+        // CE TileEntityTurretFritz.java:181-189 — slots 1-9, +1000 diesel per flame_diesel.
+        for (int i = 1; i < 10; i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() == GunHeavyItems.FLAME_DIESEL.get()) {
+                if (this.tank.getTankType() == Fluids.DIESEL && this.tank.getFill() + 1000 <= this.tank.getMaxFill()) {
+                    this.tank.setFill(this.tank.getFill() + 1000);
+                    stack.shrink(1);
+                }
+            }
+        }
     }
 
     @Override
