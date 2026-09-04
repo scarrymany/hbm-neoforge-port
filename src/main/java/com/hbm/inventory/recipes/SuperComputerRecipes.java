@@ -4,6 +4,8 @@ import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.RecipesCommon.ComparableStack;
 import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.recipes.loader.GenericRecipe;
+import com.hbm.inventory.recipes.loader.GenericRecipes;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.machine.ItemDrive.EnumDriveType;
 import com.hbm.items.machine.MachineItems;
@@ -17,12 +19,15 @@ import net.minecraft.world.item.Items;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
- * CE {@code SuperComputerRecipes.java}. Dedicated table — port {@code GenericRecipe} is a
- * name/pool stub and cannot carry I/O. Numbers verbatim from CE {@code registerDefaults}.
+ * CE {@code SuperComputerRecipes.java}. Numbers verbatim from CE {@code registerDefaults}.
+ * {@link #INSTANCE} is the GenericRecipes view for {@code GUIScreenRecipeSelector}.
  */
 public final class SuperComputerRecipes {
 
+    public static final GenericRecipes INSTANCE = new GenericRecipes();
     public static final List<SuperComputerRecipe> RECIPES = new ArrayList<>();
 
     private static boolean registered = false;
@@ -102,6 +107,37 @@ public final class SuperComputerRecipes {
                 new FluidStack(Fluids.WATER, 1_000_000),
                 new ChanceOut[]{new ChanceOut(new ItemStack(drive(EnumDriveType.KLAUS)), 100)},
                 new FluidStack(Fluids.SLOP, 1_000)));
+
+        rebuildGeneric();
+    }
+
+    public static void rebuildGeneric() {
+        INSTANCE.recipeNameMap.clear();
+        INSTANCE.recipeOrderedList.clear();
+        for (SuperComputerRecipe recipe : RECIPES) {
+            GenericRecipe generic = new GenericRecipe(recipe.name)
+                    .setDuration(recipe.duration)
+                    .setPower(recipe.power);
+            if (recipe.inputItems.length > 0) generic.inputItem = recipe.inputItems;
+            if (recipe.inputFluid != null) generic.inputFluid = new FluidStack[]{recipe.inputFluid};
+            if (recipe.outputChoices.length > 0) {
+                ItemStack[] outs = new ItemStack[recipe.outputChoices.length];
+                for (int i = 0; i < outs.length; i++) outs[i] = recipe.outputChoices[i].stack();
+                generic.outputItems(outs);
+            }
+            if (recipe.outputFluid != null) generic.outputFluid = new FluidStack[]{recipe.outputFluid};
+            INSTANCE.recipeNameMap.put(recipe.name, generic);
+            INSTANCE.recipeOrderedList.add(generic);
+        }
+    }
+
+    @Nullable
+    public static SuperComputerRecipe byName(String name) {
+        if (name == null || name.isEmpty() || "null".equals(name)) return null;
+        for (SuperComputerRecipe recipe : RECIPES) {
+            if (recipe.name.equals(name)) return recipe;
+        }
+        return null;
     }
 
     private static void registerSimulation(EnumDriveType type, String name) {
