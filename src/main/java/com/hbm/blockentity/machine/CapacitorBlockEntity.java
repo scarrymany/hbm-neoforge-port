@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
@@ -28,10 +29,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * <p>Not an {@link com.hbm.api.energymk2.IEnergyConductorMK2}: a capacitor never joins a power
  * network as a cable segment the way a buffer-mode {@link BatteryBlockEntity} can, matching CE.
  *
+ * ROR: CE {@code MachineCapacitor.java:427-438} ({@code VAL:fill}/{@code VAL:fillpercent} only —
+ * provider, no interactive). OC callbacks not ported.
+ *
  * <h2>Deliberately narrowed scope vs. CE</h2>
  * <ul>
- *   <li>No OpenComputers callbacks and no redstone-over-radio interactive side - same reasoning as
- *   {@link BatteryBlockEntity}'s javadoc.</li>
+ *   <li>No OpenComputers callbacks.</li>
  *   <li><b>Facing/rotation simplified.</b> CE's {@code update()} derives its send direction as
  *   {@code ForgeDirection.getOrientation(meta).getRotation(ForgeDirection.DOWN).getOpposite()} before
  *   walking the bus chain, and its receive direction as the un-rotated
@@ -47,7 +50,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
  * </ul>
  */
 public class CapacitorBlockEntity extends LoadedBaseBlockEntity
-        implements ITickableBE, IEnergyProviderMK2, IEnergyReceiverMK2, IPersistentNBT {
+        implements ITickableBE, IEnergyProviderMK2, IEnergyReceiverMK2, IPersistentNBT, IRORValueProvider {
 
     private long power;
     /** Cached once from the owning {@link CapacitorBlock}, matching CE's own field of the same role. */
@@ -236,5 +239,23 @@ public class CapacitorBlockEntity extends LoadedBaseBlockEntity
     @Override
     public boolean isDestroyedByCreativePlayer() {
         return this.destroyedByCreativePlayer;
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE MachineCapacitor.java:427-431
+        return new String[]{
+                PREFIX_VALUE + "fill",
+                PREFIX_VALUE + "fillpercent"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE MachineCapacitor.java:435-438 — maxPower() is the port's field accessor
+        long max = maxPower();
+        if ((PREFIX_VALUE + "fill").equals(name)) return "" + this.power;
+        if ((PREFIX_VALUE + "fillpercent").equals(name)) return "" + (max > 0 ? this.power * 100 / max : 0);
+        return null;
     }
 }

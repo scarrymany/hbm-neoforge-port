@@ -3947,6 +3947,14 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_cable", has(redCable))
                 .save(output, id("block/cable_diode"));
 
+        // red_cable_gauge (CE CraftingManager.java:289) shapeless: red_wire_coated + STEEL.ingot() + circuit BASIC
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.REDSTONE, item("red_cable_gauge"))
+                .requires(redWireCoated)
+                .requires(steelIngotTag)
+                .requires(item("circuit_basic"))
+                .unlockedBy("has_wire", has(redWireCoated))
+                .save(output, id("block/red_cable_gauge"));
+
         // machine_detector (CE :286) = "IRI","CTC","IRI", I=plate_polymer, R=REDSTONE.dust(), C=MINGRADE.wireFine(), T=coil_tungsten
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, item("machine_detector"))
                 .pattern("IRI").pattern("CTC").pattern("IRI")

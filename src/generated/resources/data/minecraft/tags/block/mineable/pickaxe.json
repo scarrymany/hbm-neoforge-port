@@ -650,6 +650,7 @@
     "hbm:cable_switch",
     "hbm:cable_detector",
     "hbm:cable_diode",
+    "hbm:red_cable_gauge",
     "hbm:red_pylon",
     "hbm:red_pylon_steel_small",
     "hbm:red_pylon_large",

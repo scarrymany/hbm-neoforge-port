@@ -18,6 +18,7 @@ public final class EnergyNetworkBlockEntities {
     public static Supplier<BlockEntityType<CableBaseBlockEntity>> CABLE;
     public static Supplier<BlockEntityType<CableSwitchBlockEntity>> CABLE_SWITCH;
     public static Supplier<BlockEntityType<CableDiodeBlockEntity>> CABLE_DIODE;
+    public static Supplier<BlockEntityType<CableGaugeBlockEntity>> CABLE_GAUGE;
     public static Supplier<BlockEntityType<PylonBlockEntity>> PYLON;
     public static Supplier<BlockEntityType<PylonLargeBlockEntity>> PYLON_LARGE;
     public static Supplier<BlockEntityType<PylonMediumBlockEntity>> PYLON_MEDIUM;
@@ -44,6 +45,11 @@ public final class EnergyNetworkBlockEntities {
         CABLE_DIODE = ModBlocks.BLOCK_ENTITY_TYPES.register("cable_diode", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new CableDiodeBlockEntity(CABLE_DIODE.get(), pos, state),
                 EnergyNetworkBlocks.CABLE_DIODE.get()
+        ).build(null));
+
+        CABLE_GAUGE = ModBlocks.BLOCK_ENTITY_TYPES.register("red_cable_gauge", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new CableGaugeBlockEntity(CABLE_GAUGE.get(), pos, state),
+                EnergyNetworkBlocks.RED_CABLE_GAUGE.get()
         ).build(null));
 
         PYLON = ModBlocks.BLOCK_ENTITY_TYPES.register("red_pylon", () -> BlockEntityType.Builder.of(
