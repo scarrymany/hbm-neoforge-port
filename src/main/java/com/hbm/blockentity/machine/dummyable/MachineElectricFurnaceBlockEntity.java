@@ -3,6 +3,7 @@ package com.hbm.blockentity.machine.dummyable;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.ElectricFurnaceMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,7 +27,8 @@ import java.util.Optional;
 
 /**
  * CE {@code TileEntityMachineElectricFurnace} — 50 HE/t, 100 ticks.
- * UpgradeManager / battery charge / pollution / block-swap skipped. LIT left on the block.
+ * {@code incrementPollution(SOOT, SOOT_PER_SECOND)} every 20t while processing Exact CE {@code :188-189}.
+ * UpgradeManager / battery charge / block-swap skipped. LIT left on the block.
  */
 public class MachineElectricFurnaceBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
@@ -72,6 +74,11 @@ public class MachineElectricFurnaceBlockEntity extends MachineBaseBlockEntity
         if (power >= CONSUMPTION && canProcess()) {
             progress++;
             power -= CONSUMPTION;
+            // CE TileEntityMachineElectricFurnace.java:188-189
+            if (level.getGameTime() % 20 == 0) {
+                PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                        PollutionHandler.SOOT_PER_SECOND);
+            }
             if (progress >= MAX_PROGRESS) {
                 progress = 0;
                 process();
