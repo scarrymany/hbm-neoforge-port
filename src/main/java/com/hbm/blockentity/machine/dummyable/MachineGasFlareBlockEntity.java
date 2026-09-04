@@ -37,6 +37,7 @@ import java.util.List;
  * CE {@code TileEntityMachineGasFlare}: vent 50 mB/t or burn 10 mB/t. Upgrades via slot scan
  * ({@code UpgradeManagerNT} not ported). Pollution / particles skipped.
  * checkTilt(CONFIG) / 2×2 floor / standardFloor3x3 Exact CE {@code :125} / {@code :141} / {@code :383-384}.
+ * {@code setType(3)} / {@code loadTank(1,2)} Exact CE {@code :135-136}.
  */
 public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -98,10 +99,9 @@ public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
             trySubscribe(tank.getTankType(), level, pos);
         }
 
-        ItemStack id = inventory.getStackInSlot(3);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            tank.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineGasFlare.java:135-136
+        tank.setType(3, inventory);
+        tank.loadTank(1, 2, inventory);
 
         int maxVent = 50;
         int maxBurn = 10;
