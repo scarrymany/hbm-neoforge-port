@@ -121,8 +121,8 @@ public class BlockFoundryChannel extends Block implements EntityBlock, ICrucible
             return ((BlockFoundryOutlet) neighborBlock).getFacing(neighborState) == direction;
         }
 
-        // TODO(CE: FoundryChannel.java:125): foundry_mold connection - not ported yet
-        return neighborBlock instanceof BlockFoundryChannel;
+        // CE FoundryChannel.java:124 — channel or foundry_mold
+        return neighborBlock instanceof BlockFoundryChannel || neighborBlock instanceof BlockFoundryMold;
     }
 
     @Override

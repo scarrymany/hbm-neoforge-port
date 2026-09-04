@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.foundry;
 
 import com.hbm.api.block.ICrucibleAcceptor;
 import com.hbm.blockentity.ITickableBE;
+import com.hbm.blocks.machine.foundry.BlockFoundryChannel;
 import com.hbm.blocks.machine.foundry.BlockFoundryTank;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
@@ -75,8 +76,8 @@ public class FoundryTankBlockEntity extends FoundryBaseBlockEntity implements IT
                     BlockPos target = worldPosition.offset(dir.offsetX, 0, dir.offsetZ);
                     Block b = level.getBlockState(target).getBlock();
 
-                    // TODO(CE: TileEntityFoundryTank.java:62): exclude foundry_channel - BlockFoundryChannel not ported yet
-                    if (b instanceof ICrucibleAcceptor) {
+                    // CE TileEntityFoundryTank.java:62 — skip foundry_channel (own flow); outlet/mold only
+                    if (b instanceof ICrucibleAcceptor && !(b instanceof BlockFoundryChannel)) {
                         ICrucibleAcceptor acc = (ICrucibleAcceptor) b;
 
                         if (acc.canAcceptPartialFlow(level, target, dir.getOpposite().toDirection(), new Mats.MaterialStack(this.type, this.amount))) {

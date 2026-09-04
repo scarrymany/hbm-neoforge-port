@@ -80,7 +80,6 @@ public class BlockFoundryTank extends Block implements EntityBlock, ICrucibleAcc
     }
 
     private BlockState getUpdatedState(BlockState state, net.minecraft.world.level.BlockGetter level, BlockPos pos) {
-        // TODO(CE: FoundryTank.java:75-77): foundry_outlet detection - BlockFoundryOutlet not ported yet
         return state
                 .setValue(UP, isTank(level, pos.above()))
                 .setValue(DOWN, isTank(level, pos.below()))
@@ -88,14 +87,21 @@ public class BlockFoundryTank extends Block implements EntityBlock, ICrucibleAcc
                 .setValue(SOUTH, isTank(level, pos.south()))
                 .setValue(EAST, isTank(level, pos.east()))
                 .setValue(WEST, isTank(level, pos.west()))
-                .setValue(OUT_NORTH, false)
-                .setValue(OUT_SOUTH, false)
-                .setValue(OUT_EAST, false)
-                .setValue(OUT_WEST, false);
+                .setValue(OUT_NORTH, isOutlet(level, pos, Direction.NORTH))
+                .setValue(OUT_SOUTH, isOutlet(level, pos, Direction.SOUTH))
+                .setValue(OUT_EAST, isOutlet(level, pos, Direction.EAST))
+                .setValue(OUT_WEST, isOutlet(level, pos, Direction.WEST));
     }
 
     private static boolean isTank(BlockGetter level, BlockPos pos) {
         return level.getBlockState(pos).getBlock() instanceof BlockFoundryTank;
+    }
+
+    /** CE FoundryTank.java:84-88 — neighbor is FoundryOutlet facing {@code dir}. */
+    private static boolean isOutlet(BlockGetter level, BlockPos pos, Direction dir) {
+        BlockState neighbor = level.getBlockState(pos.relative(dir));
+        Block block = neighbor.getBlock();
+        return block instanceof BlockFoundryOutlet outlet && outlet.getFacing(neighbor) == dir;
     }
 
     @Override
