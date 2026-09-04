@@ -17,6 +17,7 @@ import com.hbm.inventory.fluid.trait.FT_Polluting;
 import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -42,9 +43,8 @@ import java.util.List;
  * CE {@code TileEntityMachineFluidTank}: 6 slots, 256000, mode 0=in / 1=both / 2=out / 3=off.
  * CE :263-370 — post-explode leak/fire/pollute ✓ (FT_Polluting, updateLeak).
  * UniNodespace buffer (mode==1): CE {@code TileEntityMachineFluidTank.java:198-235}.
+ * {@code makeAmat} Exact CE {@code :254}/{@code :343}. Particles / OC / IClimbable skipped.
  * TODO(CE: TileEntityMachineFluidTank.java:70): OC / IControllable / IClimbable / IRepairable.
- * TODO(CE: TileEntityMachineFluidTank.java:253-256): ExplosionVNT.makeAmat.
- * TODO(CE: TileEntityMachineFluidTank.java:343): ExplosionVNT.makeAmat().setBlockAllocator(null).setBlockProcessor(null).
  * TODO(CE: TileEntityMachineFluidTank.java:348): ParticleUtil.spawnGasFlame particle.
  * TODO(CE: TileEntityMachineFluidTank.java:356-365): AuxParticlePacketNT Tower particle.
  * ROR: CE {@code TileEntityMachineFluidTank.java:652-682}.
@@ -118,9 +118,8 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
 
         if (tank.getFill() > 0) {
             if (tank.getTankType().isAntimatter()) {
-                // TODO(CE: TileEntityMachineFluidTank.java:253-256): ExplosionVNT.makeAmat
-                level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
-                        5.0F, true, Level.ExplosionInteraction.TNT);
+                new ExplosionVNT(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5, 5F)
+                        .makeAmat().setBlockAllocator(null).setBlockProcessor(null).explode();
                 explode();
                 tank.setFill(0);
             }
@@ -342,9 +341,8 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         var type = tank.getTankType();
 
         if (type.hasTrait(FluidTraitSimple.FT_Amat.class)) {
-            // TODO(CE: TileEntityMachineFluidTank.java:343): ExplosionVNT.makeAmat().setBlockAllocator(null).setBlockProcessor(null)
-            level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
-                    5.0F, Level.ExplosionInteraction.TNT);
+            new ExplosionVNT(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5, 5F)
+                    .makeAmat().setBlockAllocator(null).setBlockProcessor(null).explode();
 
         } else if (type.hasTrait(FT_Flammable.class) && onFire) {
             var box = new AABB(
