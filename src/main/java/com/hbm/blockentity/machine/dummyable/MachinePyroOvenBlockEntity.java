@@ -5,6 +5,7 @@ import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.PyroOvenMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -34,7 +35,10 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachinePyroOven}: 10k HE base, 2×24k tanks, SPEED/POWER/OVERDRIVE via slot scan.
- * {@code tanks[0].setType(3)} Exact CE {@code :115}. Pollution / audio / particles skipped.
+ * {@code tanks[0].setType(3)} Exact CE {@code :115}.
+ * {@code pollute(SOOT, SOOT_PER_SECOND)} while processing Exact CE {@code :152}.
+ * Smoke-tank overflow {@code incrementPollution(type, overflow/100F)} Exact CE {@code :332-343}.
+ * Audio / particles stay skipped.
  */
 public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -44,8 +48,13 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
 
     public final FluidTankNTM input;
     public final FluidTankNTM output;
+    /** CE {@code TileEntityMachinePolluting} buffer 50 from {@code super(6, 50)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
     public long power;
     public boolean isProgressing;
+    public boolean isVenting;
     public float progress;
     private PyroOvenRecipe lastValidRecipe;
 
@@ -53,6 +62,9 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         super(type, pos, state, 6, true, true);
         this.input = new FluidTankNTM(Fluids.NONE, 24_000).withOwner(this);
         this.output = new FluidTankNTM(Fluids.NONE, 24_000).withOwner(this);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 50).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 50).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 50).withOwner(this);
     }
 
     @Override
@@ -92,6 +104,7 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         int overdrive = upgrade(UpgradeType.OVERDRIVE);
 
         isProgressing = false;
+        isVenting = false;
         if (canProcess(speed, powerSaving)) {
             PyroOvenRecipe recipe = getMatchingRecipe();
             progress += 1F / Math.max((recipe.duration - speed * (recipe.duration / 4)) / (overdrive * 2 + 1), 1);
@@ -102,8 +115,16 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
                 finishRecipe(recipe);
                 setChanged();
             }
+            // CE TileEntityMachinePyroOven.java:152
+            pollute(PollutionHandler.PollutionType.SOOT, PollutionHandler.SOOT_PER_SECOND);
         } else {
             progress = 0F;
+        }
+
+        // CE TileEntityMachinePyroOven.java:125 — smoke vent UP
+        if (smoke.getFill() > 0) {
+            Direction rot = coreFacing().getCounterClockWise();
+            tryProvide(smoke, level, worldPosition.offset(-rot.getStepX(), 3, -rot.getStepZ()), Direction.UP);
         }
 
         if (level.getGameTime() % 20 == 0) {
@@ -186,6 +207,20 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         if (recipe.inputFluid != null) input.setFill(input.getFill() - recipe.inputFluid.fill);
     }
 
+    /** CE {@code TileEntityMachinePyroOven.java:332-343}. */
+    public void pollute(PollutionHandler.PollutionType type, float amount) {
+        FluidTankNTM tank = type == PollutionHandler.PollutionType.SOOT ? smoke
+                : type == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+        int fluidAmount = (int) Math.ceil(amount * 100);
+        tank.setFill(tank.getFill() + fluidAmount);
+        if (tank.getFill() > tank.getMaxFill()) {
+            int overflow = tank.getFill() - tank.getMaxFill();
+            tank.setFill(tank.getMaxFill());
+            PollutionHandler.incrementPollution(level, worldPosition, type, overflow / 100F);
+            this.isVenting = true;
+        }
+    }
+
     public DirPos[] getConPos() {
         Direction dir = coreFacing();
         Direction rot = dir.getCounterClockWise();
@@ -225,12 +260,14 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public @NotNull List<FluidTankNTM> getSendingTanks() {
-        return List.of(output);
+        // CE TileEntityMachinePyroOven.java:379
+        return List.of(output, smoke);
     }
 
     @Override
     public @NotNull List<FluidTankNTM> getAllTanks() {
-        return List.of(input, output);
+        // CE TileEntityMachinePyroOven.java:378
+        return List.of(input, output, smoke);
     }
 
     @Override
@@ -240,6 +277,9 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         tag.putFloat("prog", progress);
         input.writeToNBT(tag, "t0");
         output.writeToNBT(tag, "t1");
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
     }
 
     @Override
@@ -249,12 +289,16 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         progress = tag.getFloat("prog");
         input.readFromNBT(tag, "t0");
         output.readFromNBT(tag, "t1");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
     }
 
     @Override
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeLong(power);
+        buf.writeBoolean(isVenting);
         buf.writeBoolean(isProgressing);
         buf.writeFloat(progress);
         input.serialize(buf);
@@ -265,6 +309,7 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         power = buf.readLong();
+        isVenting = buf.readBoolean();
         isProgressing = buf.readBoolean();
         progress = buf.readFloat();
         input.deserialize(buf);
