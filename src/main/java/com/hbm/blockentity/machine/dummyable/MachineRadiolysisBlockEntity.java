@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.energymk2.IEnergyProviderMK2;
+import com.hbm.handler.EntityEffectHandler;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -33,7 +34,8 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineRadiolysis}: RTG heat ×10 HE, crack 100 mB when heat&gt;100.
- * {@code tanks[0].setType(10, 11)} Exact CE {@code :118}. Sterilize ({@code ntmContagion}) skipped.
+ * {@code tanks[0].setType(10, 11)} Exact CE {@code :118}. {@code sterilize} Exact CE {@code :211-238}
+ * ({@code ntmContagion} via {@code CUSTOM_DATA}). Pancake food-exception skipped (item not registered).
  */
 public class MachineRadiolysisBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -99,6 +101,10 @@ public class MachineRadiolysisBlockEntity extends MachineBaseBlockEntity
         if (heat > 100) {
             int crackTime = (int) Math.max(-0.1 * (heat - 100) + 30, 5);
             if (level.getGameTime() % crackTime == 0) crack();
+            // Exact CE TileEntityMachineRadiolysis.java:127-128
+            if (heat >= 200 && level.getGameTime() % 100 == 0) {
+                sterilize();
+            }
         }
 
         for (DirPos pos : getConPos()) {
@@ -134,6 +140,29 @@ public class MachineRadiolysisBlockEntity extends MachineBaseBlockEntity
         input.setFill(input.getFill() - 100);
         out1.setFill(out1.getFill() + left);
         out2.setFill(out2.getFill() + right);
+    }
+
+    /** Exact CE {@code TileEntityMachineRadiolysis#sterilize} {@code :211-238}. */
+    private void sterilize() {
+        ItemStack in = inventory.getStackInSlot(12);
+        if (in.isEmpty()) {
+            return;
+        }
+        // CE destroys 1 ItemFood unless pancake — pancake is not registered here.
+        if (in.getFoodProperties(null) != null) {
+            inventory.extractItem(12, 1, false);
+        }
+        in = inventory.getStackInSlot(12);
+        if (in.isEmpty() || !EntityEffectHandler.hasNtmContagion(in)) {
+            return;
+        }
+        ItemStack output = in.copy();
+        EntityEffectHandler.setNtmContagion(output, false);
+        output.setCount(1);
+        if (inventory.insertItem(13, output, true).isEmpty()) {
+            inventory.extractItem(12, output.getCount(), false);
+            inventory.insertItem(13, output, false);
+        }
     }
 
     public DirPos[] getConPos() {

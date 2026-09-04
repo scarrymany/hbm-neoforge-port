@@ -7,6 +7,7 @@ import com.hbm.capability.HbmPlayerAttachment;
 import com.hbm.capability.ModAttachments;
 import com.hbm.config.GeneralConfig;
 import com.hbm.config.RadiationConfig;
+import com.hbm.config.ServerConfig;
 import com.hbm.config.WorldConfig;
 import com.hbm.damage.ModDamageTypes;
 import com.hbm.handler.HbmKeybinds.EnumKeybind;
@@ -30,6 +31,8 @@ import com.hbm.util.ContaminationUtil;
 import com.hbm.util.ContaminationUtil.ContaminationType;
 import com.hbm.util.ContaminationUtil.HazardType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -37,9 +40,12 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.animal.MushroomCow;
 import net.minecraft.world.entity.monster.Blaze;
@@ -49,6 +55,7 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.phys.Vec3;
@@ -77,7 +84,7 @@ import java.util.Random;
  * {@link #handleDashing} / {@link #handlePlinking} are Exact CE {@code :655-754}, dispatched from
  * {@code CommonTickEvents#onPlayerTick} (both sides). Dash-bar HUD stays skipped.
  * {@link #handleContamination}/{@link #handleLungDisease}/{@link #handleOil}/{@link #handleTemperature}
- * are Exact CE {@code :136-650} (server tick). Vomit/sweat/FlameCreator/Confetti packets stay skipped.
+ * / {@link #handleContagion} are Exact CE server ticks. Vomit/sweat/FlameCreator/Confetti packets stay skipped.
  * <p>
  * <b>Review pass finding (not fixed here)</b>: CE's real {@code handleRadiationEffect} table actually has
  * a <em>6th</em> branch this file's own scope list above omits - {@code eRad >= 800 && entity instanceof
@@ -132,6 +139,7 @@ public final class EntityEffectHandler {
         handleMutationCascade(entity, level);
         handlePollution(entity, level);
         handleContamination(entity);
+        handleContagion(entity);
         handleLungDisease(entity);
         handleOil(entity);
         handleTemperature(entity);
@@ -302,6 +310,121 @@ public final class EntityEffectHandler {
         if (dirty) {
             persistLiving(entity);
         }
+    }
+
+    /**
+     * Exact CE {@code handleContagion} {@code :354-461}. Item flag is CE {@code ntmContagion} NBT
+     * via {@link DataComponents#CUSTOM_DATA} (same key). Vomit AuxParticle stays skipped;
+     * vomit sound still plays.
+     */
+    private static void handleContagion(LivingEntity entity) {
+        if (!ServerConfig.ENABLE_MKU.get()) {
+            return;
+        }
+
+        RandomSource rand = entity.getRandom();
+        int minute = 60 * 20;
+        int hour = 60 * minute;
+        int contagion = HbmLivingProps.getContagion(entity);
+
+        if (entity instanceof Player player) {
+            var inv = player.getInventory();
+            ItemStack stack = inv.items.get(rand.nextInt(inv.items.size()));
+            if (rand.nextInt(100) == 0) {
+                stack = inv.armor.get(rand.nextInt(4));
+            }
+
+            if (!stack.isEmpty()
+                    && !ArmorUtil.checkForHazmatOnly(player)
+                    && !ArmorRegistry.hasProtection(player, EquipmentSlot.HEAD, HazardClass.BACTERIA)) {
+                if (contagion > 0) {
+                    if (!hasNtmContagion(stack)) {
+                        setNtmContagion(stack, true);
+                    }
+                } else if (hasNtmContagion(stack)) {
+                    HbmLivingProps.setContagion(player, 3 * hour);
+                }
+            }
+        }
+
+        if (contagion > 0) {
+            HbmLivingProps.setContagion(entity, contagion - 1);
+
+            if (contagion < (2 * hour + 55 * minute) && contagion % 20 == 0) {
+                double range = entity.isInWaterOrRain() ? 16D : 2D;
+                for (Entity ent : entity.level().getEntities(entity, entity.getBoundingBox().inflate(range))) {
+                    if (ent instanceof LivingEntity living) {
+                        if (HbmLivingProps.getContagion(living) <= 0
+                                && !ArmorUtil.checkForHazmatOnly(living)
+                                && !ArmorRegistry.hasProtection(living, EquipmentSlot.HEAD, HazardClass.BACTERIA)) {
+                            HbmLivingProps.setContagion(living, 3 * hour);
+                        }
+                    }
+                    if (ent instanceof ItemEntity itemEntity) {
+                        setNtmContagion(itemEntity.getItem(), true);
+                    }
+                }
+            }
+
+            if (contagion < 2 * hour && rand.nextInt(1000) == 0) {
+                entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+            }
+
+            if (contagion < hour && rand.nextInt(100) == 0) {
+                entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+                entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 300, 4));
+            }
+
+            if (contagion < 30 * minute && rand.nextInt(400) == 0) {
+                entity.hurt(entity.damageSources().source(ModDamageTypes.MKU), 1F);
+            }
+
+            if (contagion < 30 * minute && (contagion + entity.getId()) % 200 < 20 && canVomit(entity)) {
+                if ((contagion + entity.getId()) % 200 == 19) {
+                    entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(),
+                            HBMSoundHandler.vomit.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                }
+            }
+
+            if (contagion < 5 * minute && rand.nextInt(100) == 0) {
+                entity.hurt(entity.damageSources().source(ModDamageTypes.MKU), 2F);
+            }
+
+            if (contagion == 1) {
+                entity.hurt(entity.damageSources().source(ModDamageTypes.MKU), 100000F);
+            }
+        }
+    }
+
+    /** CE {@code ntmContagion} boolean on the stack compound. */
+    public static boolean hasNtmContagion(ItemStack stack) {
+        if (stack.isEmpty() || !stack.has(DataComponents.CUSTOM_DATA)) {
+            return false;
+        }
+        return stack.get(DataComponents.CUSTOM_DATA).copyTag().getBoolean("ntmContagion");
+    }
+
+    public static void setNtmContagion(ItemStack stack, boolean infected) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        if (infected) {
+            tag.putBoolean("ntmContagion", true);
+            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        } else {
+            tag.remove("ntmContagion");
+            if (tag.isEmpty()) {
+                stack.remove(DataComponents.CUSTOM_DATA);
+            } else {
+                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+            }
+        }
+    }
+
+    /** Exact CE {@code canVomit} {@code :756-758}. */
+    private static boolean canVomit(Entity e) {
+        return e.getType().getCategory() != MobCategory.WATER_CREATURE;
     }
 
     /**
