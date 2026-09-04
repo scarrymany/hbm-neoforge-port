@@ -14,7 +14,7 @@ public class SolderingScreen extends GuiInfoContainer<SolderingMenu> {
     public SolderingScreen(SolderingMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 186;
+        this.imageHeight = 204;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -23,16 +23,29 @@ public class SolderingScreen extends GuiInfoContainer<SolderingMenu> {
         int x = this.leftPos;
         int y = this.topPos;
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
-        this.getMenu().be.tank.renderTank(x + 152, y + 16, 0, 16, 70);
+
+        var be = this.getMenu().be;
+        int p = (int) (be.getPower() * 52 / Math.max(be.getMaxPower(), 1));
+        if (p > 0) {
+            guiGraphics.blit(TEXTURE, x + 152, y + 70 - p, 176, 52 - p, 16, p);
+        }
+        int prog = be.getProgressScaled(33);
+        if (prog > 0) {
+            guiGraphics.blit(TEXTURE, x + 72, y + 28, 192, 0, prog, 14);
+        }
+        if (be.getPower() >= be.consumption) {
+            guiGraphics.blit(TEXTURE, x + 156, y + 4, 176, 52, 9, 12);
+        }
+        // Exact CE GUIMachineSolderingStation.java:118 — horizontal tank at 35,79.
+        be.tank.renderTank(x + 35, y + 79, 0, 34, 16, 1);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
         var be = this.getMenu().be;
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 6, 140, 12, be.getPower(), be.getMaxPower());
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 20, 140, 10,
-                Component.literal(be.isProcessing ? "Soldering" : "Idle"),
-                Component.literal("Progress: " + be.getProgressScaled(100) + "%"));
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 152, topPos + 18, 16, 52, be.getPower(), be.getMaxPower());
+        be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 35, topPos + 63, 34, 16);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }

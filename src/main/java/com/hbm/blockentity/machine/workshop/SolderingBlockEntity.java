@@ -12,6 +12,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.SolderingRecipes;
 import com.hbm.inventory.recipes.SolderingRecipes.SolderingRecipe;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
@@ -32,13 +33,15 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineSolderingStation}: maxPower 2_000, slots 0-2 toppings / 3-4 pcb / 5 solder.
- * Upgrades skipped.
+ * {@code tank.setType(8)} Exact CE {@code :123}. Slot 8 Exact CE
+ * {@code ContainerMachineSolderingStation.java:38}. Upgrades 9-10 skipped.
  */
 public class SolderingBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
 
     public static final int SLOT_OUT = 6;
     public static final int SLOT_BATTERY = 7;
+    public static final int SLOT_ID = 8;
     public static final long BASE_MAX = 2_000L;
     public static final int TANK_CAPACITY = 8_000;
 
@@ -50,7 +53,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     public boolean isProcessing;
 
     public SolderingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 8, true, true);
+        super(type, pos, state, 9, true, true);
         tank = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
     }
 
@@ -62,6 +65,8 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot == SLOT_BATTERY) return Library.isBattery(stack);
+        // CE :281-301 returns false for slot 8; without this the ID never lands and setType is dead.
+        if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
         return slot < SLOT_OUT;
     }
 
@@ -83,6 +88,8 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
         power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, power, getMaxPower());
+        // CE TileEntityMachineSolderingStation.java:123
+        this.tank.setType(SLOT_ID, inventory);
         for (Direction d : Direction.values()) {
             trySubscribe(level, worldPosition.relative(d), d);
             if (tank.getTankType() != Fluids.NONE) {
