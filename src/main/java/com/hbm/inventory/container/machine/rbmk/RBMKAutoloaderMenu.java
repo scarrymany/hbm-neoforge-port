@@ -6,13 +6,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 
-/** Autoloader menu - 2-slot rod hopper, reuses the shared {@link MenuBase} ({@code MachineBaseBlockEntity}-backed). */
+/**
+ * Autoloader menu. Exact CE {@code ContainerRBMKAutoloader.java:17-19}: 3×3 in, 3×3 take-only out,
+ * player inv at 8,100.
+ */
 public class RBMKAutoloaderMenu extends MenuBase<RBMKAutoloaderBlockEntity> {
 
     public RBMKAutoloaderMenu(int id, Inventory playerInventory, RBMKAutoloaderBlockEntity be) {
         super(RBMKMenuTypes.AUTOLOADER.get(), id, be);
-        addSlots(be.getItemHandlerCapability(null), 0, 71, 20, 1, 2);
-        playerInv(playerInventory, 8, 84);
+        addSlots(be.inventory, 0, 17, 18, 3, 3);
+        addTakeOnlySlots(be.inventory, 9, 107, 18, 3, 3);
+        playerInv(playerInventory, 8, 100);
     }
 
     public static RBMKAutoloaderMenu fromNetwork(int id, Inventory playerInventory, RegistryFriendlyByteBuf buf) {
