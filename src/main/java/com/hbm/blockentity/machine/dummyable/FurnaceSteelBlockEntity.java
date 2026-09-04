@@ -5,10 +5,12 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.FurnaceSteelMenu;
+import com.hbm.util.ItemStackUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
@@ -28,7 +30,9 @@ import java.util.Optional;
 
 /**
  * CE {@code TileEntityFurnaceSteel.java}:59-111 — 3-lane heat smelter, processTime 40_000,
- * maxHeat 100_000, diffusion 0.05. Ore bonus skipped.
+ * maxHeat 100_000, diffusion 0.05.
+ * Ore/log/tar bonus Exact CE {@code :97-104}/{@code :188-196} via tag-path
+ * {@code ore*}/{@code log*}/{@code any_tar} ({@code c:ores*}, {@code minecraft:logs}, {@code hbm:any_tar}).
  * {@code incrementPollution(SOOT, SOOT_PER_SECOND*2)} every 20t per smelting lane Exact CE {@code :80}.
  * Smoke particles stay skipped (VFX).
  */
@@ -39,6 +43,8 @@ public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements I
     public static final double DIFFUSION = 0.05D;
 
     public final int[] progress = new int[3];
+    public final int[] bonus = new int[3];
+    private final ItemStack[] lastItems = new ItemStack[]{ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY};
     public int heat;
     public boolean wasOn;
 
@@ -75,25 +81,41 @@ public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements I
         int burn = Math.max(0, (heat - MAX_HEAT / 3) / 10);
 
         for (int i = 0; i < 3; i++) {
-            if (!canSmelt(i)) {
+            ItemStack input = inventory.getStackInSlot(i);
+            // CE TileEntityFurnaceSteel.java:71-74
+            if (input.isEmpty() || lastItems[i].isEmpty() || !ItemStack.isSameItem(input, lastItems[i])) {
                 progress[i] = 0;
-                continue;
+                bonus[i] = 0;
             }
-            progress[i] += burn;
-            heat -= burn;
-            wasOn = true;
-            // CE TileEntityFurnaceSteel.java:80
-            if (level.getGameTime() % 20 == 0) {
-                PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
-                        PollutionHandler.SOOT_PER_SECOND * 2);
+            if (canSmelt(i)) {
+                progress[i] += burn;
+                heat -= burn;
+                wasOn = true;
+                // CE TileEntityFurnaceSteel.java:80
+                if (level.getGameTime() % 20 == 0) {
+                    PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                            PollutionHandler.SOOT_PER_SECOND * 2);
+                }
             }
+            lastItems[i] = input.copy();
             if (progress[i] >= PROCESS_TIME) {
                 Optional<ItemStack> result = smeltResult(inventory.getStackInSlot(i));
                 if (result.isPresent()) {
                     ItemStack out = result.get();
                     ItemStack dest = inventory.getStackInSlot(i + 3);
-                    if (dest.isEmpty()) inventory.setStackInSlot(i + 3, out.copy());
-                    else dest.grow(out.getCount());
+                    if (dest.isEmpty()) {
+                        dest = out.copy();
+                        inventory.setStackInSlot(i + 3, dest);
+                    } else {
+                        dest.grow(out.getCount());
+                    }
+                    // CE TileEntityFurnaceSteel.java:97-104
+                    addBonus(inventory.getStackInSlot(i), i);
+                    dest = inventory.getStackInSlot(i + 3);
+                    while (bonus[i] >= 100) {
+                        dest.setCount(Math.min(dest.getMaxStackSize(), dest.getCount() + out.getCount()));
+                        bonus[i] -= 100;
+                    }
                     inventory.extractItem(i, 1, false);
                 }
                 progress[i] = 0;
@@ -103,6 +125,26 @@ public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements I
 
         dataChanged();
         networkPackMK2(50);
+    }
+
+    /** CE {@code TileEntityFurnaceSteel.java:188-196}. Tag path so {@code ore*}/{@code log*} still match. */
+    private void addBonus(ItemStack stack, int index) {
+        for (String name : ItemStackUtil.getOreDictNames(stack)) {
+            int colon = name.indexOf(':');
+            String path = colon >= 0 ? name.substring(colon + 1) : name;
+            if (path.startsWith("ore")) {
+                bonus[index] += 25;
+                return;
+            }
+            if (path.startsWith("log")) {
+                bonus[index] += 50;
+                return;
+            }
+            if ("anyTar".equals(name) || "any_tar".equals(path)) {
+                bonus[index] += 50;
+                return;
+            }
+        }
     }
 
     private boolean canSmelt(int lane) {
@@ -141,7 +183,16 @@ public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements I
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putIntArray("progress", progress);
+        tag.putIntArray("bonus", bonus);
         tag.putInt("heat", heat);
+        ListTag last = new ListTag();
+        for (int i = 0; i < lastItems.length; i++) {
+            if (lastItems[i].isEmpty()) continue;
+            CompoundTag nbt1 = new CompoundTag();
+            nbt1.putByte("lastItem", (byte) i);
+            last.add((CompoundTag) lastItems[i].save(registries, nbt1));
+        }
+        tag.put("lastItems", last);
     }
 
     @Override
@@ -149,13 +200,24 @@ public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements I
         super.loadAdditional(tag, registries);
         int[] p = tag.getIntArray("progress");
         System.arraycopy(p, 0, progress, 0, Math.min(p.length, 3));
+        int[] b = tag.getIntArray("bonus");
+        System.arraycopy(b, 0, bonus, 0, Math.min(b.length, 3));
         heat = tag.getInt("heat");
+        ListTag last = tag.getList("lastItems", 10);
+        for (int i = 0; i < last.size(); i++) {
+            CompoundTag nbt1 = last.getCompound(i);
+            byte slot = nbt1.getByte("lastItem");
+            if (slot >= 0 && slot < lastItems.length) {
+                lastItems[slot] = ItemStack.parseOptional(registries, nbt1);
+            }
+        }
     }
 
     @Override
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeVarIntArray(progress);
+        buf.writeVarIntArray(bonus);
         buf.writeInt(heat);
         buf.writeBoolean(wasOn);
     }
@@ -165,6 +227,8 @@ public class FurnaceSteelBlockEntity extends MachineBaseBlockEntity implements I
         super.deserialize(buf);
         int[] p = buf.readVarIntArray();
         System.arraycopy(p, 0, progress, 0, Math.min(p.length, 3));
+        int[] b = buf.readVarIntArray();
+        System.arraycopy(b, 0, bonus, 0, Math.min(b.length, 3));
         heat = buf.readInt();
         wasOn = buf.readBoolean();
     }
