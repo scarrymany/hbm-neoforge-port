@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.machine.dummyable.FactoryDummyablePorts;
@@ -52,10 +53,10 @@ import java.util.Map;
  * TODO(CE: TileEntityMachineChemicalFactory.java:351): NBT key collision {@code "i"+i} for in+out.
  * TODO(CE: TileEntityMachineChemicalFactory.java:382-416): CapabilityContextProvider coolant accessor.
  * TODO(CE: TileEntityMachineChemicalFactory.java:484-499): ProxyDyn coolant delegate.
- * TODO(CE: TileEntityMachineChemicalFactory.java:525-544): IRORValueProvider.
  */
 public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IControlReceiver, IRORValueProvider {
 
     public static final int LANES = 4;
     public static final long BASE_MAX_POWER = 1_000_000L;
@@ -510,6 +511,31 @@ public class MachineChemicalFactoryBlockEntity extends MachineBaseBlockEntity
                 setChanged();
             }
         }
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :526-532
+        return new String[]{
+                PREFIX_VALUE + "progress1", PREFIX_VALUE + "progress2", PREFIX_VALUE + "progress3", PREFIX_VALUE + "progress4",
+                PREFIX_VALUE + "recipe1", PREFIX_VALUE + "recipe2", PREFIX_VALUE + "recipe3", PREFIX_VALUE + "recipe4",
+                PREFIX_VALUE + "anyactive",
+                PREFIX_VALUE + "active1", PREFIX_VALUE + "active2", PREFIX_VALUE + "active3", PREFIX_VALUE + "active4"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :536-543 — chemplantModule.progress / getRecipeName() → port progress[] / recipes[]
+        if ((PREFIX_VALUE + "anyactive").equals(name)) {
+            return "" + ((this.didProcess[0] || this.didProcess[1] || this.didProcess[2] || this.didProcess[3]) ? 1 : 0);
+        }
+        for (int i = 0; i < 4; i++) {
+            if ((PREFIX_VALUE + "progress" + (i + 1)).equals(name)) return "" + (int) Math.round(this.progress[i] * 100);
+            if ((PREFIX_VALUE + "recipe" + (i + 1)).equals(name)) return this.recipes[i];
+            if ((PREFIX_VALUE + "active" + (i + 1)).equals(name)) return "" + (this.didProcess[i] ? 1 : 0);
+        }
+        return null;
     }
 
     @Nullable
