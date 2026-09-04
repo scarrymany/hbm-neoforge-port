@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineOreSlopper}: 100k HE, water→slop, bedrock_ore_base → BASE grades.
- * Animation / entity shred skipped.
+ * {@code tanks[0].setType(1)} Exact CE {@code :121}. Animation / entity shred skipped.
  */
 public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -87,10 +87,8 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
-        ItemStack id = inventory.getStackInSlot(1);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            water.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineOreSlopper.java:121
+        this.water.setType(1, inventory);
 
         int speed = upgrade(UpgradeType.SPEED);
         int effect = upgrade(UpgradeType.EFFECT);

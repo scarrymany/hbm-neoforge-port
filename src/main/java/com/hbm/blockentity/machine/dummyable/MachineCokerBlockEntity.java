@@ -32,6 +32,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineCoker}: heat-driven, 20k TU/cycle, 100k heat, ΔT×0.25 from below.
+ * {@code tanks[0].setType(0)} Exact CE {@code :75}.
  */
 public class MachineCokerBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -77,10 +78,8 @@ public class MachineCokerBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         tryPullHeat();
-        ItemStack id = inventory.getStackInSlot(0);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            input.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineCoker.java:75
+        this.input.setType(0, inventory);
 
         if (level.getGameTime() % 20 == 0) {
             for (DirPos pos : getConPos()) {

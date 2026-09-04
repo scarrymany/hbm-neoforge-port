@@ -34,7 +34,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachinePyroOven}: 10k HE base, 2×24k tanks, SPEED/POWER/OVERDRIVE via slot scan.
- * Pollution / audio / particles skipped.
+ * {@code tanks[0].setType(3)} Exact CE {@code :115}. Pollution / audio / particles skipped.
  */
 public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -84,10 +84,8 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
-        ItemStack id = inventory.getStackInSlot(3);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            input.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachinePyroOven.java:115
+        this.input.setType(3, inventory);
 
         int speed = upgrade(UpgradeType.SPEED);
         int powerSaving = upgrade(UpgradeType.POWER);
