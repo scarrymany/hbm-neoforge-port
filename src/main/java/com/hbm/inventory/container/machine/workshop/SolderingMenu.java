@@ -7,9 +7,8 @@ import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * Exact CE {@code ContainerMachineSolderingStation.java:29-38}: toppings / pcb / solder + out +
- * battery + fluid ID. Upgrades 9-10 skipped. {@code setType(8)} Exact CE
- * {@code TileEntityMachineSolderingStation.java:123}.
+ * Exact CE {@code ContainerMachineSolderingStation.java:29-41}: toppings / pcb / solder + out +
+ * battery + fluid ID + upgrades 9-10 at 89,63 / 107,63.
  */
 public class SolderingMenu extends MenuBase<SolderingBlockEntity> {
 
@@ -24,6 +23,8 @@ public class SolderingMenu extends MenuBase<SolderingBlockEntity> {
         this.addSlot(new SlotTakeOnly(tile, 6, 107, 27));
         this.addSlot(new SlotNonRetarded(tile, 7, 152, 72));
         this.addSlot(new SlotNonRetarded(tile, 8, 17, 63));
+        this.addSlot(new SlotNonRetarded(tile, 9, 89, 63));
+        this.addSlot(new SlotNonRetarded(tile, 10, 107, 63));
         playerInv(playerInv, 8, 122, 180);
     }
 }

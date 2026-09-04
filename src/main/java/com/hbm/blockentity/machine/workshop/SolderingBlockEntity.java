@@ -6,6 +6,7 @@ import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.RecipesCommon.AStack;
+import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.workshop.SolderingMenu;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
@@ -13,7 +14,10 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.SolderingRecipes;
 import com.hbm.inventory.recipes.SolderingRecipes.SolderingRecipe;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.items.machine.ItemMachineUpgrade;
+import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,6 +25,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,13 +33,16 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CE {@code TileEntityMachineSolderingStation}: maxPower 2_000, slots 0-2 toppings / 3-4 pcb / 5 solder.
- * {@code tank.setType(8)} Exact CE {@code :123}. Slot 8 Exact CE
- * {@code ContainerMachineSolderingStation.java:38}. Upgrades 9-10 skipped.
+ * {@code tank.setType(8)} Exact CE {@code :123}. Slots 9-10 upgrades Exact CE {@code :156-168}
+ * / {@code ContainerMachineSolderingStation.java:39-41}. Collision-prevention button / Tau VFX stay skipped.
  */
 public class SolderingBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
@@ -42,19 +50,58 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     public static final int SLOT_OUT = 6;
     public static final int SLOT_BATTERY = 7;
     public static final int SLOT_ID = 8;
+    public static final int SLOT_UPGRADE_A = 9;
+    public static final int SLOT_UPGRADE_B = 10;
     public static final long BASE_MAX = 2_000L;
     public static final int TANK_CAPACITY = 8_000;
 
+    private static final Map<UpgradeType, Integer> VALID_UPGRADES = new EnumMap<>(UpgradeType.class);
+
+    static {
+        VALID_UPGRADES.put(UpgradeType.SPEED, 3);
+        VALID_UPGRADES.put(UpgradeType.POWER, 3);
+        VALID_UPGRADES.put(UpgradeType.OVERDRIVE, 3);
+    }
+
     public final FluidTankNTM tank;
     public long power;
+    public long maxPower = BASE_MAX;
     public int progress;
     public int processTime = 1;
     public long consumption;
     public boolean isProcessing;
+    private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(VALID_UPGRADES);
 
     public SolderingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 9, true, true);
+        super(type, pos, state, 11, true, true);
         tank = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineSolderingStation.java:91-106
+                if (!stack.isEmpty() && slot >= SLOT_UPGRADE_A && slot <= SLOT_UPGRADE_B
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
@@ -67,6 +114,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         if (slot == SLOT_BATTERY) return Library.isBattery(stack);
         // CE :281-301 returns false for slot 8; without this the ID never lands and setType is dead.
         if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        if (slot == SLOT_UPGRADE_A || slot == SLOT_UPGRADE_B) return stack.getItem() instanceof ItemMachineUpgrade;
         return slot < SLOT_OUT;
     }
 
@@ -87,7 +135,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
-        power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, power, getMaxPower());
+        power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, getPower(), getMaxPower());
         // CE TileEntityMachineSolderingStation.java:123
         this.tank.setType(SLOT_ID, inventory);
         for (Direction d : Direction.values()) {
@@ -100,26 +148,40 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         ItemStack[] ins = new ItemStack[6];
         for (int i = 0; i < 6; i++) ins[i] = inventory.getStackInSlot(i);
         SolderingRecipe recipe = SolderingRecipes.getRecipe(ins);
-        if (recipe == null || !canOutput(recipe) || !hasFluid(recipe)) {
+
+        // CE TileEntityMachineSolderingStation.java:156-214
+        upgradeManager.checkSlots(inventory, SLOT_UPGRADE_A, SLOT_UPGRADE_B);
+        int redLevel = upgradeManager.getLevel(UpgradeType.SPEED);
+        int blueLevel = upgradeManager.getLevel(UpgradeType.POWER);
+        int blackLevel = upgradeManager.getLevel(UpgradeType.OVERDRIVE);
+
+        long intendedMaxPower;
+        if (recipe != null) {
+            processTime = recipe.duration - (recipe.duration * redLevel / 6) + (recipe.duration * blueLevel / 3);
+            consumption = recipe.consumption + (recipe.consumption * redLevel) - (recipe.consumption * blueLevel / 6);
+            consumption *= (long) Math.pow(2, blackLevel);
+            intendedMaxPower = consumption * 20;
+
+            if (canOutput(recipe) && hasFluid(recipe) && power >= consumption) {
+                isProcessing = true;
+                progress += (1 + blackLevel);
+                power -= consumption;
+                if (progress >= processTime) {
+                    progress = 0;
+                    consume(recipe);
+                    inventory.insertItem(SLOT_OUT, recipe.output.copy(), false);
+                }
+            } else {
+                progress = 0;
+                isProcessing = false;
+            }
+        } else {
             progress = 0;
             isProcessing = false;
-            consumption = 0;
-            return;
+            consumption = 100;
+            intendedMaxPower = BASE_MAX;
         }
-        processTime = recipe.duration;
-        consumption = recipe.consumption;
-        if (power < consumption) {
-            isProcessing = false;
-            return;
-        }
-        isProcessing = true;
-        power -= consumption;
-        progress++;
-        if (progress >= processTime) {
-            consume(recipe);
-            inventory.insertItem(SLOT_OUT, recipe.output.copy(), false);
-            progress = 0;
-        }
+        maxPower = Math.max(intendedMaxPower, power);
     }
 
     private boolean hasFluid(SolderingRecipe recipe) {
@@ -154,7 +216,8 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getPower() {
-        return power;
+        // CE TileEntityMachineSolderingStation.java:404-406
+        return Math.max(Math.min(power, maxPower), 0);
     }
 
     @Override
@@ -164,7 +227,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return Math.max(BASE_MAX, consumption * 100L);
+        return maxPower;
     }
 
     @Override
@@ -205,7 +268,9 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
+        tag.putLong("maxPower", maxPower);
         tag.putInt("progress", progress);
+        tag.putInt("processTime", processTime);
         tank.writeToNBT(tag, "t");
     }
 
@@ -213,7 +278,9 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
+        if (tag.contains("maxPower")) maxPower = tag.getLong("maxPower");
         progress = tag.getInt("progress");
+        if (tag.contains("processTime")) processTime = tag.getInt("processTime");
         tank.readFromNBT(tag, "t");
     }
 
@@ -225,6 +292,8 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         buf.writeBoolean(isProcessing);
         buf.writeInt(progress);
         buf.writeInt(processTime);
+        buf.writeLong(maxPower);
+        buf.writeLong(consumption);
     }
 
     @Override
@@ -235,6 +304,8 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         isProcessing = buf.readBoolean();
         progress = buf.readInt();
         processTime = buf.readInt();
+        maxPower = buf.readLong();
+        consumption = buf.readLong();
     }
 
     @Override
