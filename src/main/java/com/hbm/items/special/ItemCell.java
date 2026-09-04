@@ -1,10 +1,17 @@
 package com.hbm.items.special;
 
 import com.hbm.api.fluidmk2.IFillableItem;
+import com.hbm.config.BombConfig;
+import com.hbm.config.WeaponConfig;
+import com.hbm.entity.effect.EntityCloudFleija;
+import com.hbm.entity.logic.EntityNukeExplosionMK3;
+import com.hbm.entity.logic.NukeEntityTypes;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,6 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -24,11 +32,8 @@ import java.util.List;
  * component instead of one flattened item per fluid (which would create dozens/hundreds of registry
  * entries for what is conceptually one container type).
  * <p>
- * Not ported: CE's {@code onEntityItemUpdate} explosion when an antimatter ({@code Fluids.AMAT}) or
- * anti-schrabidium ({@code Fluids.ASCHRAB}) cell is dropped and burns/lands - both effects spawn
- * nuke-explosion entity classes that don't exist in the port yet (no entity system ported through
- * Phase 1, see docs/phase1/items_special.md finding 4's sibling systems). The tooltip warning for
- * both fluids is kept, since it carries no such dependency.
+ * Dangerous-drop Exact CE {@code ItemCell.java:116-160}: AMAT 10F explode, ASCHRAB MK3+Fleija
+ * (jammer-gated). {@link WeaponConfig#DROP_CELL} / {@link BombConfig#ASCHRAB_RADIUS}.
  */
 public class ItemCell extends Item implements IFillableItem {
 
@@ -173,7 +178,41 @@ public class ItemCell extends Item implements IFillableItem {
 
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-        // Dangerous-drop explosion deferred - see class javadoc.
+        // Exact CE ItemCell.java:116-160
+        if (!(entity.onGround() || entity.isOnFire())) return false;
+        if (!WeaponConfig.DROP_CELL.get()) return false;
+
+        FluidType type = getFluidType(stack);
+        if (type == null) return false;
+
+        Level level = entity.level();
+        if (type == Fluids.ASCHRAB) {
+            if (!level.isClientSide()) {
+                entity.discard();
+                level.playSound(null, entity.getX(), entity.getY(), entity.getZ(),
+                        SoundEvents.GENERIC_EXPLODE, SoundSource.AMBIENT, 100.0F,
+                        level.getRandom().nextFloat() * 0.1F + 0.9F);
+                EntityNukeExplosionMK3 nuke = new EntityNukeExplosionMK3(NukeEntityTypes.NUKE_MK3.get(), level);
+                nuke.setPos(entity.getX(), entity.getY(), entity.getZ());
+                if (!EntityNukeExplosionMK3.isJammed(level, nuke)) {
+                    nuke.destructionRange = BombConfig.ASCHRAB_RADIUS.get();
+                    nuke.speed = 25;
+                    nuke.coefficient = 1.0F;
+                    nuke.waste = false;
+                    level.addFreshEntity(nuke);
+                    level.addFreshEntity(EntityCloudFleija.create(level, entity.getX(), entity.getY(), entity.getZ(),
+                            BombConfig.ASCHRAB_RADIUS.get()));
+                }
+            }
+            return true;
+        }
+        if (type == Fluids.AMAT) {
+            if (!level.isClientSide()) {
+                entity.discard();
+                level.explode(entity, entity.getX(), entity.getY(), entity.getZ(), 10.0F, true, Level.ExplosionInteraction.TNT);
+            }
+            return true;
+        }
         return false;
     }
 
