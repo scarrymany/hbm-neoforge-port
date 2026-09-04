@@ -143,19 +143,14 @@ public final class ArmorUtil {
     }
 
     /**
-     * TODO(unconfirmed 1.21.1 Mojang mapping): CE resets {@code mp.connection.floatingTickCount =
-     * 0} here (the server connection's anti-cheat "hovering too long without falling" tick
-     * counter), called whenever a player is legitimately airborne under their own power (e.g.
-     * jetpacks) to prevent a bogus flight-kick. This port could not confirm the exact 1.21.1
-     * Mojang-mapped field name on {@code ServerGamePacketListenerImpl} against a real compiled
-     * class or a second source (no NeoForge/vanilla decompiled jar was reachable in this sandbox,
-     * and the Neo Edition reference port has no equivalent call to cross-check against - see this
-     * area's research report's Open questions section). Left as a documented no-op rather than
-     * guessing at a field name that could reference the wrong counter or fail to compile; confirm
-     * the real field before wiring this into real flight code.
+     * Exact CE {@code ArmorUtil.java:146-149}: {@code mp.connection.floatingTickCount = 0}.
+     * 1.21.1 field is {@code ServerGamePacketListenerImpl#aboveGroundTickCount} (AT'd, same role
+     * as CE's {@code hbm_at.cfg} {@code field_147365_f}).
      */
     public static void resetFlightTime(Player player) {
-        if (!(player instanceof ServerPlayer)) return;
+        if (player instanceof ServerPlayer mp) {
+            mp.connection.aboveGroundTickCount = 0;
+        }
     }
 
     // TODO(jackt/jackt2 "fiend" cloak chestplates not yet ported - unlike shimmer_axe/
