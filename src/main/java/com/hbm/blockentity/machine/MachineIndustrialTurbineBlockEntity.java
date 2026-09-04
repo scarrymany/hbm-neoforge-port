@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.inventory.fluid.Fluids;
@@ -7,6 +9,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -16,6 +19,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
+import java.io.IOException;
 
 /**
  * Ported from CE's {@code TileEntityMachineIndustrialTurbine} (block
@@ -29,11 +34,15 @@ import net.minecraft.world.level.block.state.BlockState;
  * drains the flywheel towards that target scaled by {@code spin} (dense steam types produce far
  * less energy per operation, so the flywheel of a turbine running e.g. ultra-hot steam spools up
  * much slower - CE's own comment). {@code consumptionPercent()}=0.2 (at most 20% of the input tank
- * per tick), {@code doesResizeCompressor()}=true. ROR: CE {@code TileEntityMachineIndustrialTurbine.java:251-262}.
+ * per tick), {@code doesResizeCompressor()}=true.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityMachineIndustrialTurbine.java:54-71}.
+ * ROR: CE {@code TileEntityMachineIndustrialTurbine.java:251-262}.
  */
-public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity implements IRORValueProvider {
+public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity implements IRORValueProvider, IConfigurableMachine {
 
-    private static final double EFFICIENCY = 1D;
+    public static int inputTankSize = 750_000;
+    public static int outputTankSize = 3_000_000;
+    public static double efficiency = 1D;
     private static final double FLYWHEEL_MAX_ENERGY = 0.5e8;
 
     public double spin;
@@ -43,8 +52,8 @@ public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity 
     public MachineIndustrialTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 0);
         tanks = new FluidTankNTM[]{
-                new FluidTankNTM(Fluids.STEAM, 750_000).withOwner(this),
-                new FluidTankNTM(Fluids.SPENTSTEAM, 3_000_000).withOwner(this)
+                new FluidTankNTM(Fluids.STEAM, inputTankSize).withOwner(this),
+                new FluidTankNTM(Fluids.SPENTSTEAM, outputTankSize).withOwner(this)
         };
     }
 
@@ -95,7 +104,55 @@ public class MachineIndustrialTurbineBlockEntity extends TurbineBaseBlockEntity 
 
     @Override
     public double getEfficiency() {
-        return EFFICIENCY;
+        return efficiency;
+    }
+
+    @Override
+    public String getConfigName() {
+        return "steamturbineIndustrialMk2";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityMachineIndustrialTurbine.java:60-62
+        inputTankSize = IConfigurableMachine.grab(obj, "I:inputTankSize", inputTankSize);
+        outputTankSize = IConfigurableMachine.grab(obj, "I:outputTankSize", outputTankSize);
+        efficiency = IConfigurableMachine.grab(obj, "D:efficiency", efficiency);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityMachineIndustrialTurbine.java:67-70 — CE typo "availible" kept
+        writer.name("INFO").value("industrial steam turbine consumes 20% of availible steam per tick");
+        writer.name("I:inputTankSize").value(inputTankSize);
+        writer.name("I:outputTankSize").value(outputTankSize);
+        writer.name("D:efficiency").value(efficiency);
+    }
+
+    /** NeoForge BE has no no-arg ctor. MachineDynConfig Exact CE :44-48. */
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "steamturbineIndustrialMk2";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 
     @Override

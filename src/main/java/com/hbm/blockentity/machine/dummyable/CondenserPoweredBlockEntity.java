@@ -1,6 +1,9 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -9,18 +12,23 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.IOException;
+
 /**
  * CE {@code TileEntityCondenserPowered} — 1M tanks, 10 HE/mB, 10M HE buffer.
- * Spin / particles skipped.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityCondenserPowered.java:51-68}
+ * ({@code condenserPowered}). Spin / particles skipped.
  */
-public class CondenserPoweredBlockEntity extends CondenserBlockEntity implements IEnergyReceiverMK2 {
+public class CondenserPoweredBlockEntity extends CondenserBlockEntity implements IEnergyReceiverMK2, IConfigurableMachine {
 
-    public static final long MAX_POWER = 10_000_000L;
-    public static final int POWER_PER_MB = 10;
+    public static long maxPower = 10_000_000L;
+    public static int inputTankSizeP = 1_000_000;
+    public static int outputTankSizeP = 1_000_000;
+    public static int powerConsumption = 10;
     public long power;
 
     public CondenserPoweredBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1_000_000, 1_000_000, true);
+        super(type, pos, state, inputTankSizeP, outputTankSizeP, true);
     }
 
     @Override
@@ -34,12 +42,12 @@ public class CondenserPoweredBlockEntity extends CondenserBlockEntity implements
 
     @Override
     protected boolean extraCondition(int convert) {
-        return power >= (long) convert * POWER_PER_MB;
+        return power >= (long) convert * powerConsumption;
     }
 
     @Override
     protected void postConvert(int convert) {
-        power = Math.max(0, power - (long) convert * POWER_PER_MB);
+        power = Math.max(0, power - (long) convert * powerConsumption);
     }
 
     @Override
@@ -54,7 +62,56 @@ public class CondenserPoweredBlockEntity extends CondenserBlockEntity implements
 
     @Override
     public long getMaxPower() {
-        return MAX_POWER;
+        return maxPower;
+    }
+
+    @Override
+    public String getConfigName() {
+        return "condenserPowered";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityCondenserPowered.java:56-59
+        maxPower = IConfigurableMachine.grab(obj, "L:maxPower", maxPower);
+        inputTankSizeP = IConfigurableMachine.grab(obj, "I:inputTankSize", inputTankSizeP);
+        outputTankSizeP = IConfigurableMachine.grab(obj, "I:outputTankSize", outputTankSizeP);
+        powerConsumption = IConfigurableMachine.grab(obj, "I:powerConsumption", powerConsumption);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityCondenserPowered.java:64-67
+        writer.name("L:maxPower").value(maxPower);
+        writer.name("I:inputTankSize").value(inputTankSizeP);
+        writer.name("I:outputTankSize").value(outputTankSizeP);
+        writer.name("I:powerConsumption").value(powerConsumption);
+    }
+
+    /** NeoForge BE has no no-arg ctor. MachineDynConfig Exact CE :44-48. */
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "condenserPowered";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 
     @Override

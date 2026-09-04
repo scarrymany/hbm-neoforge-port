@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.chem;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
@@ -11,6 +13,7 @@ import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.inventory.container.machine.chem.CentrifugeMenu;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -27,6 +30,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -38,13 +42,11 @@ import java.util.Map;
  * consumption penalty, POWER upgrade dividing consumption by {@code 1+level}) and the
  * recipe-driven progress loop are preserved from CE exactly.
  * <p>
- * <b>Not ported</b>: CE's {@code IConfigurableMachine} JSON-config-file override for
- * {@code maxPower}/{@code processingSpeed}/{@code baseConsumption} (a config-file layer separate from
- * the recipe/JSON system, out of this pass's scope - the three values are plain constants here) and
- * looped centrifuge audio (same precedent as {@code MachineRefineryBlockEntity}).
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityMachineCentrifuge.java:89-107}
+ * ({@code centrifuge} via {@link com.hbm.config.MachineDynConfig}). Audio loop skipped.
  */
 public class CentrifugeBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
+        implements IEnergyReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider, IConfigurableMachine {
 
     private static final int INPUT_SLOT = 0;
     private static final int BATTERY_SLOT = 1;
@@ -54,9 +56,10 @@ public class CentrifugeBlockEntity extends MachineBaseBlockEntity
     private static final int UPGRADE_END = 7;
     private static final int[] SLOT_IO = new int[]{0, 2, 3, 4, 5};
 
-    public static final long MAX_POWER = 100_000L;
-    public static final int PROCESSING_SPEED = 200;
-    public static final int BASE_CONSUMPTION = 200;
+    /** CE {@code TileEntityMachineCentrifuge} configurable statics. */
+    public static int maxPower = 100000;
+    public static int processingSpeed = 200;
+    public static int baseConsumption = 200;
 
     public final UpgradeManagerNT upgradeManager;
     public int progress;
@@ -97,11 +100,11 @@ public class CentrifugeBlockEntity extends MachineBaseBlockEntity
     }
 
     public int getCentrifugeProgressScaled(int i) {
-        return (progress * i) / PROCESSING_SPEED;
+        return (progress * i) / processingSpeed;
     }
 
     public long getPowerRemainingScaled(int i) {
-        return (power * i) / MAX_POWER;
+        return (power * i) / maxPower;
     }
 
     public boolean hasPower() {
@@ -145,17 +148,17 @@ public class CentrifugeBlockEntity extends MachineBaseBlockEntity
             trySubscribe(level, worldPosition.relative(dir), dir);
         }
 
-        power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+        power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, maxPower);
 
-        int consumption = BASE_CONSUMPTION;
+        int consumption = baseConsumption;
         int speed = 1;
 
         upgradeManager.checkSlots(inventory, UPGRADE_START, UPGRADE_END);
         speed += upgradeManager.getLevel(UpgradeType.SPEED);
-        consumption += upgradeManager.getLevel(UpgradeType.SPEED) * BASE_CONSUMPTION;
+        consumption += upgradeManager.getLevel(UpgradeType.SPEED) * baseConsumption;
 
         speed *= (1 + upgradeManager.getLevel(UpgradeType.OVERDRIVE) * 5);
-        consumption += upgradeManager.getLevel(UpgradeType.OVERDRIVE) * BASE_CONSUMPTION * 50;
+        consumption += upgradeManager.getLevel(UpgradeType.OVERDRIVE) * baseConsumption * 50;
 
         consumption /= (1 + upgradeManager.getLevel(UpgradeType.POWER));
 
@@ -168,7 +171,7 @@ public class CentrifugeBlockEntity extends MachineBaseBlockEntity
 
         if (isProgressing) {
             progress += speed;
-            if (progress >= PROCESSING_SPEED) {
+            if (progress >= processingSpeed) {
                 progress = 0;
                 processItem();
             }
@@ -200,7 +203,54 @@ public class CentrifugeBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return MAX_POWER;
+        return maxPower;
+    }
+
+    @Override
+    public String getConfigName() {
+        return "centrifuge";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityMachineCentrifuge.java:96-98
+        maxPower = IConfigurableMachine.grab(obj, "I:powerCap", maxPower);
+        processingSpeed = IConfigurableMachine.grab(obj, "I:timeToProcess", processingSpeed);
+        baseConsumption = IConfigurableMachine.grab(obj, "I:consumption", baseConsumption);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityMachineCentrifuge.java:104-106
+        writer.name("I:powerCap").value(maxPower);
+        writer.name("I:timeToProcess").value(processingSpeed);
+        writer.name("I:consumption").value(baseConsumption);
+    }
+
+    /** NeoForge BE has no no-arg ctor. MachineDynConfig Exact CE :44-48. */
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "centrifuge";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 
     @Override

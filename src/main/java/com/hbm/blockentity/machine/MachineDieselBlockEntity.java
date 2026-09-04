@@ -1,5 +1,8 @@
 package com.hbm.blockentity.machine;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IBatteryItem;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFillableItem;
@@ -14,6 +17,7 @@ import com.hbm.inventory.fluid.trait.FT_Combustible;
 import com.hbm.inventory.container.machine.MachineDieselMenu;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.Library;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -29,9 +33,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumMap;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Ported from CE's {@code TileEntityMachineDiesel} (block {@code MachineDiesel}, regname
@@ -40,24 +44,26 @@ import java.util.Map;
  * fuelEfficiency[grade]}, burning exactly 1 mB/tick while {@link #isOn} and not redstone-powered -
  * CE's own static {@code fuelEfficiency} table is reproduced unchanged below.
  * {@code setType(3)} / {@code loadTank(0,1)} Exact CE {@code TileEntityMachineDiesel.java:120-121}.
- * 4-slot layout Exact CE {@code ContainerMachineDiesel.java:38-41}. Pollution/audio skipped.
+ * 4-slot layout Exact CE {@code ContainerMachineDiesel.java:38-41}.
+ * {@link IConfigurableMachine} Exact CE {@code TileEntityMachineDiesel.java:282-315}
+ * ({@code dieselgen}). Pollution/audio skipped.
  */
 public class MachineDieselBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider, IConfigurableMachine {
 
-    public static final int FUEL_CAP = 16_000;
-    public static final long MAX_POWER = 50_000L;
+    public static int fuelCap = 16_000;
+    public static long maxPower = 50_000L;
     private static final int SLOT_CANISTER = 0;
     private static final int SLOT_EMPTY = 1;
     private static final int SLOT_BATTERY = 2;
     private static final int SLOT_ID = 3;
 
-    private static final Map<FT_Combustible.FuelGrade, Double> FUEL_EFFICIENCY = new EnumMap<>(FT_Combustible.FuelGrade.class);
+    public static HashMap<FT_Combustible.FuelGrade, Double> fuelEfficiency = new HashMap<>();
 
     static {
-        FUEL_EFFICIENCY.put(FT_Combustible.FuelGrade.MEDIUM, 0.5D);
-        FUEL_EFFICIENCY.put(FT_Combustible.FuelGrade.HIGH, 0.75D);
-        FUEL_EFFICIENCY.put(FT_Combustible.FuelGrade.AERO, 0.1D);
+        fuelEfficiency.put(FT_Combustible.FuelGrade.MEDIUM, 0.5D);
+        fuelEfficiency.put(FT_Combustible.FuelGrade.HIGH, 0.75D);
+        fuelEfficiency.put(FT_Combustible.FuelGrade.AERO, 0.1D);
     }
 
     public final FluidTankNTM tank;
@@ -66,7 +72,7 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
 
     public MachineDieselBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 4, true, true);
-        tank = new FluidTankNTM(Fluids.DIESEL, FUEL_CAP).withOwner(this);
+        tank = new FluidTankNTM(Fluids.DIESEL, fuelCap).withOwner(this);
     }
 
     @Override
@@ -78,7 +84,7 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
         if (!type.hasTrait(FT_Combustible.class)) return 0;
         FT_Combustible fuel = type.getTrait(FT_Combustible.class);
         if (fuel.getGrade() == FT_Combustible.FuelGrade.LOW) return 0;
-        double efficiency = FUEL_EFFICIENCY.getOrDefault(fuel.getGrade(), 0D);
+        double efficiency = fuelEfficiency.getOrDefault(fuel.getGrade(), 0D);
         return (long) (fuel.getCombustionEnergy() / 1000D * efficiency);
     }
 
@@ -100,11 +106,11 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
             this.trySubscribe(tank.getTankType(), level, target.getX(), target.getY(), target.getZ(), dir);
         }
 
-        power = Library.chargeItemsFromTE(inventory, SLOT_BATTERY, power, MAX_POWER);
+        power = Library.chargeItemsFromTE(inventory, SLOT_BATTERY, power, maxPower);
 
         if (isOn && !level.hasNeighborSignal(worldPosition) && hasAcceptableFuel() && tank.getFill() > 0) {
             tank.setFill(Math.max(0, tank.getFill() - 1));
-            power = Math.min(MAX_POWER, power + getHEFromFuel(tank.getTankType()));
+            power = Math.min(maxPower, power + getHEFromFuel(tank.getTankType()));
         }
 
         dataChanged();
@@ -158,7 +164,71 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return MAX_POWER;
+        return maxPower;
+    }
+
+    @Override
+    public String getConfigName() {
+        return "dieselgen";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityMachineDiesel.java:288-296
+        maxPower = IConfigurableMachine.grab(obj, "L:powerCap", maxPower);
+        fuelCap = IConfigurableMachine.grab(obj, "I:fuelCap", fuelCap);
+
+        if (obj.has("D[:efficiency")) {
+            JsonArray array = obj.get("D[:efficiency").getAsJsonArray();
+            for (FT_Combustible.FuelGrade grade : FT_Combustible.FuelGrade.VALUES) {
+                fuelEfficiency.put(grade, array.get(grade.ordinal()).getAsDouble());
+            }
+        }
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityMachineDiesel.java:301-314
+        writer.name("L:powerCap").value(maxPower);
+        writer.name("I:fuelCap").value(fuelCap);
+
+        String info = "Fuel grades in order: ";
+        for (FT_Combustible.FuelGrade grade : FT_Combustible.FuelGrade.VALUES) info += grade.name() + " ";
+        info = info.trim();
+        writer.name("INFO").value(info);
+
+        writer.name("D[:efficiency").beginArray().setIndent("");
+        for (FT_Combustible.FuelGrade grade : FT_Combustible.FuelGrade.VALUES) {
+            double d = fuelEfficiency.getOrDefault(grade, 0.0D);
+            writer.value(d);
+        }
+        writer.endArray().setIndent("  ");
+    }
+
+    /** NeoForge BE has no no-arg ctor. MachineDynConfig Exact CE :44-48. */
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "dieselgen";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 
     @Override

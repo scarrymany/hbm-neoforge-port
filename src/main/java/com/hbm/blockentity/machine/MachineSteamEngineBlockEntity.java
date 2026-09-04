@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
@@ -10,6 +12,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -20,6 +23,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -30,9 +34,8 @@ import java.util.List;
  * <p>
  * {@code ops}/efficiency math is CE's {@link FT_Coolable} trait read off tank 0's current fluid type
  * (steam -&gt; spent steam by default, {@code amountReq}=100, {@code amountProduced}=1,
- * {@code heatEnergy}=200 per {@link Fluids#STEAM}'s own trait registration), times a static 0.85
- * efficiency (CE's {@code IConfigurableMachine}-tunable {@code steam_engine.efficiency}; config
- * loading is out of this pass's scope, kept as CE's shipped default). {@code powerBuffer} is reset
+ * {@code heatEnergy}=200 per {@link Fluids#STEAM}'s own trait registration), times
+ * {@link #efficiency} (CE {@code IConfigurableMachine} {@code steam_engine}). {@code powerBuffer} is reset
  * to 0 and refilled every tick, exactly like CE - it is a same-tick push buffer, not a stored
  * reserve, hence {@link #getMaxPower()} returning the same value as {@link #getPower()}.
  * <p>
@@ -45,11 +48,11 @@ import java.util.List;
  * port yet), which this class does not depend on for the underlying HE/fluid push to function.
  */
 public class MachineSteamEngineBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE {
+        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, IConfigurableMachine {
 
-    private static final int STEAM_CAP = 2_000;
-    private static final int SPENT_CAP = 20;
-    private static final double EFFICIENCY = 0.85D;
+    public static int steamCap = 2_000;
+    public static int ldsCap = 20;
+    public static double efficiency = 0.85D;
 
     public final FluidTankNTM[] tanks;
     public long powerBuffer;
@@ -59,8 +62,8 @@ public class MachineSteamEngineBlockEntity extends MachineBaseBlockEntity
     public MachineSteamEngineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 0, true, true);
         tanks = new FluidTankNTM[]{
-                new FluidTankNTM(Fluids.STEAM, STEAM_CAP).withOwner(this),
-                new FluidTankNTM(Fluids.SPENTSTEAM, SPENT_CAP).withOwner(this)
+                new FluidTankNTM(Fluids.STEAM, steamCap).withOwner(this),
+                new FluidTankNTM(Fluids.SPENTSTEAM, ldsCap).withOwner(this)
         };
     }
 
@@ -100,7 +103,7 @@ public class MachineSteamEngineBlockEntity extends MachineBaseBlockEntity
 
         FT_Coolable trait = tanks[0].getTankType().getTrait(FT_Coolable.class);
         if (trait != null) {
-            double eff = trait.getEfficiency(FT_Coolable.CoolingType.TURBINE) * EFFICIENCY;
+            double eff = trait.getEfficiency(FT_Coolable.CoolingType.TURBINE) * efficiency;
             int inputOps = tanks[0].getFill() / trait.amountReq;
             int outputOps = (tanks[1].getMaxFill() - tanks[1].getFill()) / trait.amountProduced;
             int ops = Math.min(inputOps, outputOps);
@@ -128,6 +131,53 @@ public class MachineSteamEngineBlockEntity extends MachineBaseBlockEntity
 
         dataChanged();
         networkPackMK2(150);
+    }
+
+    @Override
+    public String getConfigName() {
+        return "steam_engine";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityMachineSteamEngine.java:83-85
+        steamCap = IConfigurableMachine.grab(obj, "I:steamCap", steamCap);
+        ldsCap = IConfigurableMachine.grab(obj, "I:ldsCap", ldsCap);
+        efficiency = IConfigurableMachine.grab(obj, "D:efficiency", efficiency);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityMachineSteamEngine.java:90-92
+        writer.name("I:steamCap").value(steamCap);
+        writer.name("I:ldsCap").value(ldsCap);
+        writer.name("D:efficiency").value(efficiency);
+    }
+
+    /** NeoForge BE has no no-arg ctor. MachineDynConfig Exact CE :44-48. */
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "steam_engine";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 
     @Override
