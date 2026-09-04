@@ -96,15 +96,17 @@ public class BedrockOreFeature extends Feature<NoneFeatureConfiguration> {
         return new Selection(resource, acid, 0xD78A16, tier, "stone_depth");
     }
 
-    private static int getTier(double density) {
+    /** CE {@code BedrockOre.getTier} {@code :97-101}. */
+    public static int getTier(double density) {
         if (density > 1.5) return 4;
         if (density > 1) return 3;
         if (density > 0.75) return 2;
         return 1;
     }
 
+    /** CE {@code BedrockOre.getBoreFluid} {@code :90-94}. */
     @Nullable
-    private static FluidStack getBoreFluid(double density) {
+    public static FluidStack getBoreFluid(double density) {
         if (density > 1.5) return new FluidStack(Fluids.SOLVENT, 2_000);
         if (density > 1) return new FluidStack(Fluids.SULFURIC_ACID, 1_000);
         if (density > 0.75) return new FluidStack(Fluids.WATER, 1_000);
