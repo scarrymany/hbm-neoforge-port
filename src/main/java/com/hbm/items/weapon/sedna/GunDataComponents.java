@@ -79,6 +79,8 @@ public final class GunDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COIN_COUNT = integer("gun_coin_count");
     /** CE {@code ItemGunNI4NI.KEY_COIN_CHARGE}. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COIN_CHARGE = integer("gun_coin_charge");
+    /** CE {@code ItemGunChargeThrower.KEY_LASTHOOK} ({@code "lasthook"}). Absent ≡ {@code 0} like {@code getValueInt}. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LAST_HOOK = integer("gun_last_hook");
 
     private static DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> bool(String name) {
         return DATA_COMPONENT_TYPES.register(name, () -> DataComponentType.<Boolean>builder()

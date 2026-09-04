@@ -15,6 +15,7 @@ import com.hbm.items.weapon.sedna.GunConfig;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.Receiver;
+import com.hbm.items.weapon.sedna.impl.ItemGunChargeThrower;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.MainRegistry;
@@ -24,8 +25,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -51,15 +55,8 @@ import net.minecraft.world.phys.Vec3;
  * {@code BlockMutatorDebris(block_slag)} — {@code block_slag} is registered (single-state; CE meta 1
  * is moot). {@code ExplosionCreator.composeEffectSmall} stays skipped (VFX).
  * <p>
- * <b>Forward references (documented, not silently dropped):</b>
- * <ul>
- *     <li>{@code ItemGunChargeThrower.setLastHook}/the reel-in mechanic (a per-stack "which hook
- *     entity is mine" NBT link plus grapple pull) is not ported - the hook still embeds itself in the
- *     world via the real, already-ported {@code EntityThrowableNT#getStuck(BlockPos, int)} (confirmed
- *     present on {@link EntityBulletBaseMK4}'s own ancestor - {@code EnumGrenadeExtra} already calls
- *     the same method on a grenade entity elsewhere in this tree); only the reel-in follow-up itself
- *     is a documented forward reference.</li>
- * </ul>
+ * Charge-thrower reel-in is Exact CE {@code ItemGunChargeThrower.java:25-69} plus
+ * {@code LAMBDA_SET_HOOK} ({@code XFactoryTool.java:225-233}). Orchestra rope VFX stays skipped.
  */
 public final class XFactoryTool {
 
@@ -92,7 +89,7 @@ public final class XFactoryTool {
 
     public static final BulletConfig ct_hook = new BulletConfig("ct_hook").setItem(() -> ITEM_CT_HOOK)
             .setRenderRotations(false).setLife(6_000).setVel(3F).setGrav(0.035).setDoesPenetrate(true).setDamageFalloffByPen(false)
-            .setOnImpact(XFactoryTool::hookImpact);
+            .setOnUpdate(XFactoryTool::setHook).setOnImpact(XFactoryTool::hookImpact);
     public static final BulletConfig ct_mortar = new BulletConfig("ct_mortar").setItem(() -> ITEM_CT_MORTAR)
             .setDamage(2.5F).setLife(200).setVel(3F).setGrav(0.035).setOnImpact(XFactoryTool::mortarImpact);
     public static final BulletConfig ct_mortar_charge = new BulletConfig("ct_mortar_charge").setItem(() -> ITEM_CT_MORTAR_CHARGE)
@@ -113,7 +110,7 @@ public final class XFactoryTool {
     }
 
     public static ItemGunBaseNT gun_charge_thrower() {
-        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.UTILITY,
+        return new ItemGunChargeThrower(new Item.Properties(), WeaponQuality.UTILITY,
                 new GunConfig()
                         .dura(3_000).draw(10).inspect(55).reloadChangeType(true).hideCrosshair(false).crosshair(Crosshair.L_CIRCUMFLEX)
                         .rec(new Receiver(0)
@@ -231,6 +228,18 @@ public final class XFactoryTool {
 
     private static Block hbm(String path) {
         return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+    }
+
+    /** Exact CE {@code XFactoryTool.java:225-233} {@code LAMBDA_SET_HOOK}. {@code ignoreFrustumCheck} → {@code noCulling}. */
+    private static void setHook(Entity entity) {
+        if (!(entity instanceof EntityBulletBaseMK4 bullet)) return;
+        if (!bullet.level().isClientSide && bullet.tickCount < 2 && bullet.getThrower() instanceof Player player) {
+            ItemStack held = player.getMainHandItem();
+            if (!held.isEmpty() && held.getItem() == GunHeavyItems.GUN_CHARGE_THROWER.get()) {
+                ItemGunChargeThrower.setLastHook(held, bullet.getId());
+            }
+        }
+        bullet.noCulling = true;
     }
 
     private static void hookImpact(EntityBulletBaseMK4 bullet, HitResult hit) {
