@@ -1,5 +1,6 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.hbm.api.fluidmk2.FluidNode;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -10,6 +11,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
+import com.hbm.uninos.UniNodespace;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -26,11 +28,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.List;
 
 /**
  * CE {@code TileEntityMachineBigAssTank} extends {@code TileEntityBarrel} — 16M, barrel GUI.
- * TODO(CE: TileEntityBarrel.java:247-286): UniNodespace buffer-mode node.
+ * UniNodespace buffer: CE {@code TileEntityBarrel.java:247-286} (inherited in CE).
  * TODO(CE: TileEntityBarrel.java): tilt / floor pollute.
  * TODO(CE: RenderBigAssTank.java:1): TESR.
  */
@@ -42,6 +45,8 @@ public class MachineBigAssTankBlockEntity extends MachineBaseBlockEntity
 
     public final FluidTankNTM tank;
     public short mode;
+    protected FluidNode node;
+    protected FluidType lastType = Fluids.NONE;
 
     public MachineBigAssTankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 6, true, false);
@@ -114,15 +119,63 @@ public class MachineBigAssTankBlockEntity extends MachineBaseBlockEntity
             return;
         }
 
-        if (mode != 3) {
+        // CE TileEntityBarrel.java:247-286 — BAT inherits this; getConPos is BAT :48-54
+        if (mode == 1) {
+            if (this.node == null || this.node.expired || tank.getTankType() != lastType) {
+                this.node = UniNodespace.getNode(level, worldPosition, tank.getTankType().getNetworkProvider());
+                if (this.node == null || this.node.expired || tank.getTankType() != lastType) {
+                    this.node = this.createNode(tank.getTankType());
+                    UniNodespace.createNode(level, this.node);
+                    lastType = tank.getTankType();
+                }
+            }
+            if (node != null && node.hasValidNet()) {
+                node.net.addProvider(this);
+                node.net.addReceiver(this);
+            }
+        } else {
+            if (this.node != null) {
+                UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
+                this.node = null;
+            }
             for (DirPos pos : getConPos()) {
-                if (mode == 0 || mode == 1) trySubscribe(tank.getTankType(), level, pos);
-                if ((mode == 1 || mode == 2) && tank.getFill() > 0) tryProvide(tank, level, pos);
+                FluidNode dirNode = UniNodespace.getNode(level, pos.getPos(), tank.getTankType().getNetworkProvider());
+                if (mode == 2) {
+                    tryProvide(tank, level, pos);
+                } else if (dirNode != null && dirNode.hasValidNet()) {
+                    dirNode.net.removeProvider(this);
+                }
+                if (mode == 0) {
+                    if (dirNode != null && dirNode.hasValidNet()) dirNode.net.addReceiver(this);
+                } else if (dirNode != null && dirNode.hasValidNet()) {
+                    dirNode.net.removeReceiver(this);
+                }
             }
         }
 
         dataChanged();
         networkPackMK2(50);
+    }
+
+    /** CE {@code TileEntityBarrel.java:296-307}. */
+    protected FluidNode createNode(FluidType type) {
+        DirPos[] conPos = getConPos();
+        HashSet<BlockPos> posSet = new HashSet<>();
+        posSet.add(worldPosition);
+        for (DirPos p : conPos) {
+            Direction dir = p.getDir();
+            posSet.add(p.getPos().relative(dir.getOpposite()));
+        }
+        return new FluidNode(type.getNetworkProvider(), posSet.toArray(new BlockPos[0])).setConnections(conPos);
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (level != null && !level.isClientSide && this.node != null) {
+            UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
+            this.node = null;
+        }
     }
 
     public DirPos[] getConPos() {
