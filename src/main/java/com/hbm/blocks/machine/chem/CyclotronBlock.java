@@ -6,6 +6,7 @@ import com.hbm.blockentity.machine.chem.CyclotronBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -23,7 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Ported from CE's {@code MachineCyclotron} (regname {@code machine_cyclotron}) - particle-accelerator transmutation.
- * Plug insert Exact CE {@code MachineCyclotron.java:47-57}. TESR stay skipped.
+ * Plug insert Exact CE {@code MachineCyclotron.java:47-57}.
+ * {@code fillSpace} extras Exact CE {@code :78-92}. TESR stay skipped.
  */
 public class CyclotronBlock extends BlockDummyable {
 
@@ -39,6 +41,25 @@ public class CyclotronBlock extends BlockDummyable {
     @Override
     public int getOffset() {
         return 2;
+    }
+
+    @Override
+    protected void fillSpace(Level level, BlockPos placedPos, Direction dir, int placementOffset) {
+        super.fillSpace(level, placedPos, dir, placementOffset);
+        // Exact CE MachineCyclotron.java:78-92 — extras around core, world-axis ±2 ring
+        BlockPos core = placedPos.relative(dir, placementOffset);
+        makeExtra(level, core.offset(2, 0, 1));
+        makeExtra(level, core.offset(2, 0, 0));
+        makeExtra(level, core.offset(2, 0, -1));
+        makeExtra(level, core.offset(-2, 0, 1));
+        makeExtra(level, core.offset(-2, 0, 0));
+        makeExtra(level, core.offset(-2, 0, -1));
+        makeExtra(level, core.offset(1, 0, 2));
+        makeExtra(level, core.offset(0, 0, 2));
+        makeExtra(level, core.offset(-1, 0, 2));
+        makeExtra(level, core.offset(1, 0, -2));
+        makeExtra(level, core.offset(0, 0, -2));
+        makeExtra(level, core.offset(-1, 0, -2));
     }
 
     @Nullable
