@@ -332,6 +332,20 @@ public class HazardRegistry {
         HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_corium_cobble"),
                 new HazardData().addEntry(RADIATION, 150F));
 
+        // CE HazardRegistry.java:298-304 debris_*. Skip debris_fuel (not registered).
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_graphite"),
+                new HazardData().addEntry(RADIATION, 70F).addEntry(HOT, 5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_metal"),
+                new HazardData().addEntry(RADIATION, 5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_concrete"),
+                new HazardData().addEntry(RADIATION, 30F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_exchanger"),
+                new HazardData().addEntry(RADIATION, 25F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_shrapnel"),
+                new HazardData().addEntry(RADIATION, 2.5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_element"),
+                new HazardData().addEntry(RADIATION, 100F));
+
         // items_billet_powder area (docs/phase1/moditems_generative.md section 3,
         // hazard_bindings_plan.md Pattern A/B): only the billet_/powder_ fields CE's own
         // HazardRegistry.registerItems() actually binds (upstream hbm-ce HazardRegistry.java
