@@ -6,6 +6,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.handler.pollution.PollutionHandler;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.machine.dummyable.WoodBurnerMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -43,7 +44,8 @@ import java.util.List;
  * Smoke particles stay skipped (VFX).
  */
 public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider,
+        IControlReceiver {
 
     public static final long MAX_POWER = 100_000;
     private static final int ASH_THRESHOLD = 2000;
@@ -184,6 +186,26 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
     public void toggleLiquid() {
         liquidBurn = !liquidBurn;
         setChanged();
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineWoodBurner.receiveControl} :229-237. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("toggle")) {
+            this.isOn = !this.isOn;
+            setChanged();
+            dataChanged();
+        }
+        if (data.contains("switch")) {
+            this.liquidBurn = !this.liquidBurn;
+            setChanged();
+            dataChanged();
+        }
     }
 
     public DirPos[] getConPos() {

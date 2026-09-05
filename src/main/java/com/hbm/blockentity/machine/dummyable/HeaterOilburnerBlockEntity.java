@@ -7,6 +7,7 @@ import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.handler.pollution.PollutionHandler;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.machine.dummyable.OilburnerMenu;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
@@ -44,7 +45,7 @@ import java.util.Map;
  */
 public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
         implements IHeatSource, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
-        IRORValueProvider, IRORInteractive {
+        IControlReceiver, IRORValueProvider, IRORInteractive {
 
     public static final int MAX_HEAT = 100_000;
 
@@ -161,6 +162,22 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
     public void bumpSetting(int delta) {
         setting = Math.max(1, Math.min(100, setting + delta));
         setChanged();
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        // Exact CE TileEntityHeaterOilburner.java:192-194
+        return player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) <= 256.0D;
+    }
+
+    /** Exact CE {@code TileEntityHeaterOilburner.receiveControl} :197-202. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("toggle")) {
+            this.isOn = !this.isOn;
+        }
+        setChanged();
+        dataChanged();
     }
 
     public DirPos[] getConPos() {
