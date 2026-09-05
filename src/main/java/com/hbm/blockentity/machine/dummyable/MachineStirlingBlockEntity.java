@@ -52,6 +52,7 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
     public boolean hasCog = true;
     public int overspeed;
     private int warnCooldown;
+    private int syncHeat;
 
     public MachineStirlingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 0, false, true);
@@ -115,10 +116,11 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
         if (powerBuffer > 0) {
             for (DirPos pos : getConPos()) tryProvide(level, pos.getPos(), pos.getDir());
         }
-        heat = 0;
-
+        // CE TileEntityStirling.java:101-114 — snapshot then pack then zero
+        syncHeat = heat;
         dataChanged();
         networkPackMK2(25);
+        heat = 0;
     }
 
     private void tryPullHeat() {
@@ -241,7 +243,7 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeLong(powerBuffer);
-        buf.writeInt(heat);
+        buf.writeInt(syncHeat);
         buf.writeBoolean(hasCog);
         buf.writeInt(overspeed);
     }
