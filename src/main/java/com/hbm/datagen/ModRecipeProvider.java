@@ -3032,10 +3032,9 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_motor", has(item("motor")))
                 .save(output, id("weapon/turret_sentry"));
 
-        // ---- weapon_mod_special (WeaponRecipes.java:137-163). 18 of CE's 29 - LAS_SHOTGUN/
-        // LAS_CAPACITOR/LAS_AUTO (circuit) and ENGINE_DIESEL/ENGINE_AVIATION/ENGINE_TURBO/CANISTERS
-        // (piston_selenium/canister_empty) not ported. Every weapon_mod_generic recipe (18, a separate
-        // CE section) needs ducttape and is not ported either. ----
+        // ---- weapon_mod_special (WeaponRecipes.java:137-163). LAS_* live in ce_craft/weapon.
+        // ENGINE_DIESEL/AVIATION/TURBO + CANISTERS: piston_selenium/canister_empty now registered.
+        // weapon_mod_generic (18) still needs ducttape — stay skipped. ----
         Item ingotDuraSteel = item("ingot_dura_steel");
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("weapon_mod_special_silencer"))
                 .pattern("P").pattern("B").pattern("P")
@@ -3114,11 +3113,32 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern(" IP").pattern("IIM").pattern(" IP")
                 .define('I', ingotSaturnite).define('P', anyHardplasticIngot).define('M', weaponsteelMechanism)
                 .unlockedBy("has_ingot", has(ingotSaturnite)).save(output, id("weapon/mod_special_drill_saturnite"));
+        Item pistonSelenium = item("piston_selenium");
+        TagKey<Item> steelPipe = MaterialShapes.PIPE.commonTag(Mats.MAT_STEEL);
+        TagKey<Item> duraCastplate = MaterialShapes.CASTPLATE.commonTag(Mats.MAT_DURA);
+        Ingredient anyBismoidBronzeCastplate = CompoundIngredient.of(
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_BBRONZE)),
+                Ingredient.of(MaterialShapes.CASTPLATE.commonTag(Mats.MAT_ABRONZE)));
+        // CE WeaponRecipes.java:157 ENGINE_DIESEL
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("weapon_mod_special_engine_diesel"))
+                .pattern("DSD").pattern("PPP").pattern("DSD")
+                .define('D', item("plate_dura_steel")).define('P', pistonSelenium).define('S', steelPipe)
+                .unlockedBy("has_piston", has(pistonSelenium)).save(output, id("weapon/mod_special_engine_diesel"));
+        // CE WeaponRecipes.java:158 ENGINE_AVIATION
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("weapon_mod_special_engine_aviation"))
+                .pattern("DSD").pattern("PPP").pattern("DSD")
+                .define('D', duraCastplate).define('P', pistonSelenium).define('S', gunmetalMechanism)
+                .unlockedBy("has_piston", has(pistonSelenium)).save(output, id("weapon/mod_special_engine_aviation"));
         Item capacitorGoldPack = item("capacitor_gold_pack");
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("weapon_mod_special_engine_electric"))
                 .pattern("DSD").pattern("PPP").pattern("DSD")
                 .define('D', anyPlasticIngot).define('P', goldDenseWireTag).define('S', capacitorGoldPack)
                 .unlockedBy("has_battery", has(capacitorGoldPack)).save(output, id("weapon/mod_special_engine_electric"));
+        // CE WeaponRecipes.java:160 ENGINE_TURBO
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("weapon_mod_special_engine_turbo"))
+                .pattern("DSD").pattern("PPP").pattern("DSD")
+                .define('D', anyBismoidBronzeCastplate).define('P', pistonSelenium).define('S', weaponsteelMechanism)
+                .unlockedBy("has_piston", has(pistonSelenium)).save(output, id("weapon/mod_special_engine_turbo"));
         Item niobiumBlock = item("niobium_block");
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("weapon_mod_special_magnet"))
                 .pattern("RGR").pattern("GBG").pattern("RGR")
@@ -3129,6 +3149,12 @@ public class ModRecipeProvider extends RecipeProvider {
                 .pattern("IGI").pattern("IGI")
                 .define('I', ingotDuraSteel).define('G', steelGrate)
                 .unlockedBy("has_grate", has(steelGrate)).save(output, id("weapon/mod_special_sifter"));
+        // CE WeaponRecipes.java:163 CANISTERS
+        Item canisterEmpty = item("canister_empty");
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, item("weapon_mod_special_canisters"))
+                .pattern(" R ").pattern("CCC").pattern("SSS")
+                .define('R', rubberPipe).define('C', canisterEmpty).define('S', plateSteel)
+                .unlockedBy("has_canister", has(canisterEmpty)).save(output, id("weapon/mod_special_canisters"));
 
         // ---- Custom nuke rods (WeaponRecipes.java:324, 327-329). ----
         Item plateCopper = item("plate_copper");

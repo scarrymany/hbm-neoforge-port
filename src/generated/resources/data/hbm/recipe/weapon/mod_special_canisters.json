@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "hbm:canister_empty"
+    },
+    "R": {
+      "tag": "c:pipes/rubber"
+    },
+    "S": {
+      "item": "hbm:plate_steel"
+    }
+  },
+  "pattern": [
+    " R ",
+    "CCC",
+    "SSS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:weapon_mod_special_canisters"
+  }
+}
