@@ -7220,6 +7220,7 @@ public class ModRecipeProvider extends RecipeProvider {
 
         // leftover obtain: parts_legendary. TODO(CE:CraftingManager.java:1003-1007)
         // Flattened EnumLegendaryType TIER1/2/3. I/O registered (chainsteel/asbestos/bismuth/smore/alexandrite).
+        // CE ItemEnumMulti default stack 64 — downgrade ×3 needs maxStackSize ≥ 3.
         Item chainsteelLegendary = item("ingot_chainsteel");
         Item alexandriteLegendary = item("gem_alexandrite");
         Item partsLegendary1 = item("parts_legendary_tier1");

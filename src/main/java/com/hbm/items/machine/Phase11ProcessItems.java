@@ -216,10 +216,11 @@ public final class Phase11ProcessItems {
         // CE ModItems.java:290 ItemBase controlTab
         control("piston_selenium");
         // CE ModItems.java:1765 ItemFluidIDMulti max1 templateTab — already registered in CouplingMachineItems as FLUID_ID_MULTI
-        // CE ModItems.java:1843 ItemEnumMulti parts_legendary / EnumLegendaryType (TIER1/TIER2/TIER3) - ArmorRecipes.java:95-98 RPA armor
-        parts1("parts_legendary_tier1");
-        parts1("parts_legendary_tier2");
-        parts1("parts_legendary_tier3");
+        // CE ModItems.java:1843 ItemEnumMulti parts_legendary / EnumLegendaryType — default stack 64
+        // (no setMaxStackSize). CraftingManager.java:1004/1006 downgrade outputs ×3.
+        parts("parts_legendary_tier1");
+        parts("parts_legendary_tier2");
+        parts("parts_legendary_tier3");
         // CE ModItems.java:399 ItemBase controlTab — t51/ajr/liquidator plate crafts
         control("gas_empty");
         // CE ModItems.java:1305 / :1307 ItemBase; :887 ItemHot(200). Mold/hot recipes stay cited.
