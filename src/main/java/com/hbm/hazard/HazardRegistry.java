@@ -393,6 +393,11 @@ public class HazardRegistry {
         HazardSystem.register(BilletPowderItems.POWDER_CAESIUM.get(),
                 new HazardData().addEntry(HYDROACTIVE, 1F).addEntry(HOT, 3F));
         HazardSystem.register(BilletPowderItems.POWDER_COLTAN_ORE.get(), new HazardData().addEntry(ASBESTOS, 3F));
+        // CE HazardRegistry.java:497-498
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "brick_asbestos"),
+                new HazardData().addEntry(ASBESTOS, 1F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "tile_lab_broken"),
+                new HazardData().addEntry(ASBESTOS, 1F));
 
         // items_ingot_nugget area (docs/phase1/moditems_generative.md section 3,
         // hazard_bindings_plan.md Pattern A/B): only the ingot_/nugget_ fields CE's own
