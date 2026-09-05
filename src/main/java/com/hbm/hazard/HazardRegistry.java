@@ -397,18 +397,30 @@ public class HazardRegistry {
         // invent radiation for them.
         HazardSystem.register(IngotNuggetItems.NUGGET_URANIUM_FUEL.get(), new HazardData().addEntry(RADIATION, uf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_URANIUM_FUEL.get(), new HazardData().addEntry(RADIATION, uf * ingot));
+        // CE HazardRegistry.java:309
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_uranium_fuel"),
+                new HazardData().addEntry(RADIATION, uf * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_PLUTONIUM_FUEL.get(), new HazardData().addEntry(RADIATION, puf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_PLUTONIUM_FUEL.get(), new HazardData().addEntry(RADIATION, puf * ingot));
+        // CE :315
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_plutonium_fuel"),
+                new HazardData().addEntry(RADIATION, puf * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_THORIUM_FUEL.get(), new HazardData().addEntry(RADIATION, thf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_THORIUM_FUEL.get(), new HazardData().addEntry(RADIATION, thf * ingot));
+        // CE :320
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_thorium_fuel"),
+                new HazardData().addEntry(RADIATION, thf * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_NEPTUNIUM_FUEL.get(), new HazardData().addEntry(RADIATION, npf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_NEPTUNIUM_FUEL.get(), new HazardData().addEntry(RADIATION, npf * ingot));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_MOX_FUEL.get(), new HazardData().addEntry(RADIATION, mox * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_MOX_FUEL.get(), new HazardData().addEntry(RADIATION, mox * ingot));
+        // CE :329
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_mox_fuel"),
+                new HazardData().addEntry(RADIATION, mox * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_AMERICIUM_FUEL.get(), new HazardData().addEntry(RADIATION, amf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_AMERICIUM_FUEL.get(), new HazardData().addEntry(RADIATION, amf * ingot));
@@ -417,6 +429,9 @@ public class HazardRegistry {
                 new HazardData().addEntry(RADIATION, saf * nugget).addEntry(BLINDING, 5F * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_SCHRABIDIUM_FUEL.get(),
                 new HazardData().addEntry(RADIATION, saf * ingot).addEntry(BLINDING, 5F * ingot));
+        // CE :338
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_schrabidium_fuel"),
+                new HazardData().addEntry(RADIATION, saf * block).addEntry(BLINDING, 5F * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_HES.get(), new HazardData().addEntry(RADIATION, saf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_HES.get(), new HazardData().addEntry(RADIATION, saf * ingot));
