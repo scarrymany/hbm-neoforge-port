@@ -6,6 +6,8 @@ import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.BlockDummyable;
+import com.hbm.interfaces.IClimbable;
 import com.hbm.inventory.container.machine.dummyable.MachineFluidTankMenu;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
@@ -26,6 +28,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -35,6 +38,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.List;
@@ -43,15 +47,16 @@ import java.util.List;
  * CE {@code TileEntityMachineFluidTank}: 6 slots, 256000, mode 0=in / 1=both / 2=out / 3=off.
  * CE :263-370 — post-explode leak/fire/pollute ✓ (FT_Polluting, updateLeak).
  * UniNodespace buffer (mode==1): CE {@code TileEntityMachineFluidTank.java:198-235}.
- * {@code makeAmat} Exact CE {@code :254}/{@code :343}. Particles / OC / IClimbable skipped.
- * TODO(CE: TileEntityMachineFluidTank.java:70): OC / IControllable / IClimbable / IRepairable.
+ * {@code makeAmat} Exact CE {@code :254}/{@code :343}.
+ * {@code IClimbable} Exact CE {@code :618-648} (ladder AABB + register/unregister).
+ * Particles / OC / IControllable / IRepairable stay skipped.
  * TODO(CE: TileEntityMachineFluidTank.java:348): ParticleUtil.spawnGasFlame particle.
  * TODO(CE: TileEntityMachineFluidTank.java:356-365): AuxParticlePacketNT Tower particle.
  * ROR: CE {@code TileEntityMachineFluidTank.java:652-682}.
  */
 public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
-        IRORValueProvider, IRORInteractive {
+        IRORValueProvider, IRORInteractive, IClimbable {
 
     public static final int CAPACITY = 256_000;
     public static final short MODES = 4;
@@ -62,6 +67,7 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
     public boolean onFire;
     protected FluidNode node;
     protected FluidType lastType = Fluids.NONE;
+    private AABB ladderAABB;
 
     public MachineFluidTankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 6, true, false);
@@ -201,10 +207,51 @@ public class MachineFluidTankBlockEntity extends MachineBaseBlockEntity
     @Override
     public void setRemoved() {
         super.setRemoved();
+        unregisterClimbable();
         if (level != null && !level.isClientSide && this.node != null) {
             UniNodespace.destroyNode(level, worldPosition, tank.getTankType().getNetworkProvider());
             this.node = null;
         }
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        registerClimbable();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        unregisterClimbable();
+        super.onChunkUnloaded();
+    }
+
+    /** CE TileEntityMachineFluidTank.java:620-626 — {@code pos..pos.add(1,3,1)} + dir/rot offset. */
+    private AABB getLadderAABB() {
+        if (ladderAABB == null) {
+            Direction dir = Direction.NORTH;
+            BlockState st = getBlockState();
+            if (st.hasProperty(BlockDummyable.META)) {
+                dir = Direction.from3DDataValue(st.getValue(BlockDummyable.META) - BlockDummyable.offset);
+            }
+            Direction rot = dir.getClockWise();
+            int x = worldPosition.getX();
+            int y = worldPosition.getY();
+            int z = worldPosition.getZ();
+            ladderAABB = new AABB(x, y, z, x + 1, y + 3, z + 1)
+                    .move(dir.getStepX() * 0.5 - rot.getStepX() * 2.25, 0, dir.getStepZ() * 0.5 - rot.getStepZ() * 2.25);
+        }
+        return ladderAABB;
+    }
+
+    @Override
+    public boolean isEntityInClimbAABB(@NotNull LivingEntity entity) {
+        return entity.getBoundingBox().intersects(getLadderAABB());
+    }
+
+    @Override
+    public @Nullable AABB getClimbAABBForIndexing() {
+        return getLadderAABB();
     }
 
     public DirPos[] getConPos() {
