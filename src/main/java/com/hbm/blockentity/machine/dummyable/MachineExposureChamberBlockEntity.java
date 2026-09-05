@@ -209,6 +209,7 @@ public class MachineExposureChamberBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(power);
         buf.writeInt(progress);
         buf.writeInt(processTime);
+        buf.writeInt(consumption);
         buf.writeInt(savedParticles);
         buf.writeBoolean(isOn);
     }
@@ -219,6 +220,7 @@ public class MachineExposureChamberBlockEntity extends MachineBaseBlockEntity
         power = buf.readLong();
         progress = buf.readInt();
         processTime = buf.readInt();
+        consumption = buf.readInt();
         savedParticles = buf.readInt();
         isOn = buf.readBoolean();
     }

@@ -5,20 +5,25 @@ import com.hbm.inventory.container.machine.dummyable.ExposureChamberMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code GUIMachineExposureChamber} 176×186 — power + progress + saved particles. */
+/**
+ * Exact CE {@code GUIMachineExposureChamber} on existing {@code gui_exposure_chamber.png} 176×186.
+ * Progress 36,39 from 192,0; particles 26,{@code 52-c} from 192,{@code 26-c}; power 152,{@code 52-e};
+ * pip 156,4. Invented {@code fill()} bars removed.
+ */
 public class ExposureChamberScreen extends GuiInfoContainer<ExposureChamberMenu> {
 
-        private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_exposure_chamber.png");
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_exposure_chamber.png");
 
-public ExposureChamberScreen(ExposureChamberMenu menu, Inventory inventory, Component title) {
+    public ExposureChamberScreen(ExposureChamberMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 186;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
@@ -28,25 +33,34 @@ public ExposureChamberScreen(ExposureChamberMenu menu, Inventory inventory, Comp
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineExposureChamberBlockEntity be = this.getMenu().be;
-        int ph = (int) (be.getPower() * 52 / Math.max(1, be.getMaxPower()));
-        guiGraphics.fill(x + 152, y + 52 - ph, x + 168, y + 52, 0xFFFFCC00);
-        int p = be.processTime <= 0 ? 0 : be.progress * 54 / be.processTime;
-        guiGraphics.fill(x + 26, y + 36, x + 26 + p, y + 44, be.isOn ? 0xFF66CCFF : 0xFF334466);
-        int dots = be.savedParticles;
-        for (int i = 0; i < 8; i++) {
-            guiGraphics.fill(x + 26 + i * 6, y + 20, x + 30 + i * 6, y + 24, i < dots ? 0xFFAA66FF : 0xFF333333);
+        // CE GUIMachineExposureChamber.java:50-61
+        int p = be.progress * 42 / (be.processTime + 1);
+        if (p > 0) {
+            guiGraphics.blit(TEXTURE, x + 36, y + 39, 192, 0, p, 10);
+        }
+        int c = be.savedParticles * 16 / MachineExposureChamberBlockEntity.MAX_PARTICLES;
+        if (c > 0) {
+            guiGraphics.blit(TEXTURE, x + 26, y + 52 - c, 192, 26 - c, 9, c);
+        }
+        int e = (int) (be.getPower() * 34 / Math.max(1L, be.getMaxPower()));
+        if (e > 0) {
+            guiGraphics.blit(TEXTURE, x + 152, y + 52 - e, 176, 34 - e, 16, e);
+        }
+        if (be.consumption <= be.getPower()) {
+            guiGraphics.blit(TEXTURE, x + 156, y + 4, 176, 34, 9, 12);
         }
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        // CE :39 — title centered on x=70
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, this.title, 70 - this.font.width(name) / 2, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+
         MachineExposureChamberBlockEntity be = this.getMenu().be;
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 152, 0, 16, 52, be.getPower(), be.getMaxPower());
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 26, topPos + 36, 54, 8,
-                Component.literal(be.isOn ? "Exposing" : "Idle"),
-                Component.literal(be.progress + "/" + be.processTime));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 26, topPos + 20, 48, 4,
-                Component.literal("Particles: " + be.savedParticles + "/" + MachineExposureChamberBlockEntity.MAX_PARTICLES));
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 152, topPos + 18, 16, 34, be.getPower(), be.getMaxPower());
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 26, topPos + 36, 9, 16, mouseX, mouseY,
+                Component.literal(be.savedParticles + " / " + MachineExposureChamberBlockEntity.MAX_PARTICLES));
     }
 }
