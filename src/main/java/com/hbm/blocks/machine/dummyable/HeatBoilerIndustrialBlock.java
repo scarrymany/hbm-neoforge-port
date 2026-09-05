@@ -5,6 +5,7 @@ import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.ChatFormatting;
@@ -14,7 +15,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -30,8 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :61-88}. printHook Exact CE {@code :119-153}. */
-public class HeatBoilerIndustrialBlock extends BlockDummyable implements ILookOverlay {
+/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :61-88}. printHook Exact CE {@code :119-153}. Tooltip Exact CE {@code :157-164}. */
+public class HeatBoilerIndustrialBlock extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
     public HeatBoilerIndustrialBlock(Properties properties) {
         super(properties);
@@ -118,5 +121,11 @@ public class HeatBoilerIndustrialBlock extends BlockDummyable implements ILookOv
                                 + String.format(Locale.US, "%,d", boiler.steam.getMaxFill())
                                 + "mB"))));
         ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE MachineHeatBoilerIndustrial.java:157-164
+        addStandardInfo(tooltip);
     }
 }
