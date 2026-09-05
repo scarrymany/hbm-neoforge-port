@@ -9,6 +9,7 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
 import com.hbm.inventory.container.machine.dummyable.StirlingMenu;
 import com.hbm.items.machine.ItemGear;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
@@ -17,6 +18,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +34,9 @@ import java.io.IOException;
 /**
  * CE {@code TileEntityStirling.java}:59-181 — heat pull diffusion 0.1, efficiency 0.5,
  * maxHeat 300/1500, overspeed 300. EntityCog spawn skipped.
- * {@link IConfigurableMachine} Exact CE {@code TileEntityStirling.java:233-253} ({@code stirling}).
+ * Overspeed warning Exact CE {@code :65-75}: {@code warnOverspeed} 2.0F/1.0F after
+ * {@code overspeed > 60}, cooldown 100t. {@link IConfigurableMachine} Exact CE
+ * {@code TileEntityStirling.java:233-253} ({@code stirling}).
  */
 public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, ITickableBE, MenuProvider, IConfigurableMachine {
@@ -47,6 +51,7 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
     public int heat;
     public boolean hasCog = true;
     public int overspeed;
+    private int warnCooldown;
 
     public MachineStirlingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 0, false, true);
@@ -81,20 +86,28 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
             powerBuffer = 0;
             tryPullHeat();
             powerBuffer = (long) (heat * (isCreative() ? 1D : efficiency));
-            if (!isCreative()) {
-                if (heat > maxHeat()) {
-                    overspeed++;
-                    if (overspeed > overspeedLimit) {
-                        hasCog = false;
-                        powerBuffer = 0;
-                        level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
-                                5.0F, false, Level.ExplosionInteraction.NONE);
-                    }
-                } else {
-                    overspeed = 0;
+            // CE TileEntityStirling.java:65-75
+            if (warnCooldown > 0) warnCooldown--;
+            if (heat > maxHeat() && !isCreative()) {
+                overspeed++;
+                if (overspeed > 60 && warnCooldown == 0) {
+                    warnCooldown = 100;
+                    level.playSound(null, worldPosition, HBMSoundHandler.warnOverspeed.get(),
+                            SoundSource.BLOCKS, 2.0F, 1.0F);
                 }
+                if (overspeed > overspeedLimit) {
+                    hasCog = false;
+                    powerBuffer = 0;
+                    level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
+                            5.0F, false, Level.ExplosionInteraction.NONE);
+                }
+            } else {
+                overspeed = 0;
             }
         } else {
+            // CE TileEntityStirling.java:97-99
+            overspeed = 0;
+            warnCooldown = 0;
             powerBuffer = 0;
             heat = Math.max(heat - Math.max(heat / 1000, 1), 0);
         }
