@@ -5,19 +5,25 @@ import com.hbm.inventory.container.machine.dummyable.BrickFurnaceMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+/**
+ * Exact CE {@code GUIFurnaceBrick} on existing {@code gui_furnace_brick.png} 176×166.
+ * Burn 62,{@code 54+12-b} from 176,{@code 12-b}; progress 85,34 from 176,14.
+ * Invented {@code fill()} bars removed. Labels {@code 0xffffff} Exact CE {@code :29-30}.
+ */
 public class BrickFurnaceScreen extends GuiInfoContainer<BrickFurnaceMenu> {
 
-        private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_furnace_brick.png");
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_furnace_brick.png");
 
-public BrickFurnaceScreen(BrickFurnaceMenu menu, Inventory inventory, Component title) {
+    public BrickFurnaceScreen(BrickFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 168;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.imageHeight = 166;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
@@ -27,19 +33,20 @@ public BrickFurnaceScreen(BrickFurnaceMenu menu, Inventory inventory, Component 
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineBrickFurnaceBlockEntity be = this.getMenu().be;
-        int bh = be.maxBurnTime <= 0 ? 0 : be.burnTime * 14 / be.maxBurnTime;
-        guiGraphics.fill(x + 56, y + 36 + (14 - bh), x + 70, y + 50, 0xFFFF6622);
-        int ph = be.progress * 24 / MachineBrickFurnaceBlockEntity.MAX_PROGRESS;
-        guiGraphics.fill(x + 79, y + 35, x + 79 + ph, y + 49, 0xFFFFFF55);
+        // CE GUIFurnaceBrick.java:42-46
+        if (be.burnTime > 0) {
+            int b = be.burnTime * 13 / Math.max(be.maxBurnTime, 1);
+            guiGraphics.blit(TEXTURE, x + 62, y + 54 + 12 - b, 176, 12 - b, 14, b + 1);
+            int p = be.progress * 24 / MachineBrickFurnaceBlockEntity.MAX_PROGRESS;
+            guiGraphics.blit(TEXTURE, x + 85, y + 34, 176, 14, p + 1, 16);
+        }
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
-        MachineBrickFurnaceBlockEntity be = this.getMenu().be;
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 56, topPos + 36, 14, 14,
-                Component.literal("Burn: " + be.burnTime + " / " + be.maxBurnTime));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 79, topPos + 35, 24, 14,
-                Component.literal(be.progress + " / " + MachineBrickFurnaceBlockEntity.MAX_PROGRESS));
+        // CE :29-30 — white labels
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, this.title, this.imageWidth / 2 - this.font.width(name) / 2, 6, 0xffffff, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0xffffff, false);
     }
 }

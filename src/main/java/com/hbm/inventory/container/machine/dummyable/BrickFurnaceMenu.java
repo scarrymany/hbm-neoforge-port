@@ -6,14 +6,17 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code ContainerFurnaceBrick}: in / fuel / out. Ash slot 3 hopper-only (no GUI invent). */
+/**
+ * Exact CE {@code ContainerFurnaceBrick}: in 62,35 / fuel 35,17 / out 116,35 / ash 35,53.
+ */
 public class BrickFurnaceMenu extends MenuBase<MachineBrickFurnaceBlockEntity> {
 
     public BrickFurnaceMenu(int id, Inventory playerInv, MachineBrickFurnaceBlockEntity be) {
         super(DummyableProcessMenus.MACHINE_BRICK_FURNACE.get(), id, be);
-        this.addSlot(new SlotNonRetarded(tile, 0, 56, 17));
-        this.addSlot(new SlotNonRetarded(tile, 1, 56, 53));
+        this.addSlot(new SlotNonRetarded(tile, 0, 62, 35));
+        this.addSlot(new SlotNonRetarded(tile, 1, 35, 17));
         this.addSlot(new SlotTakeOnly(tile, 2, 116, 35));
-        playerInv(playerInv, 8, 86);
+        this.addSlot(new SlotTakeOnly(tile, 3, 35, 53));
+        playerInv(playerInv, 8, 84);
     }
 }
