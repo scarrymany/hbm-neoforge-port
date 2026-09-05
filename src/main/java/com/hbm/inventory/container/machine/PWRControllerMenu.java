@@ -10,12 +10,8 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Menu for {@link PWRControllerBlockEntity}, ported from CE's {@code ContainerPWR}. Slots 0 (fresh
- * fuel in) and 1 (hot fuel out) are exposed; slot 2 is deliberately left off this Menu - see
- * {@link PWRControllerBlockEntity}'s own class javadoc "3-slot inventory, slot 2 unused" and
- * {@code docs/phase2/reactors_breeding_pwr.md}'s open question on it (CE never reads/writes it either,
- * and no confirmed purpose was found for this pass - safer to leave it inventory-only than guess a
- * GUI slot position for it).
+ * Menu for {@link PWRControllerBlockEntity}, ported from CE's {@code ContainerPWR}.
+ * Slot 2 coolant ID at CE {@code ContainerPWR.java:31} {@code (8, 59)}.
  *
  * <p><b>Rod-level control</b>: CE's {@code GUIPWR} used a draggable scrollbar-style slider sending
  * {@code IControlReceiver.receiveControl} NBT packets - no generic client-&gt;server
@@ -33,22 +29,14 @@ public class PWRControllerMenu extends MenuBase<PWRControllerBlockEntity> {
     public static final int BUTTON_ROD_UP = 1;
     public static final double ROD_STEP = 10D;
 
-    /**
-     * Real GUI slot count (2), deliberately smaller than {@code tile.getSlots()} (3 - see
-     * {@link PWRControllerBlockEntity}'s own "slot 2 unused" javadoc). {@link MenuBase#quickMoveStack}'s
-     * shared implementation assumes every {@code tile.getSlots()} index has a matching {@link Slot} at
-     * the front of {@link #slots}, which is not true here; {@link #quickMoveStack} below is overridden
-     * with that same reference logic but keyed off this constant instead, so shift-clicking the
-     * player's own first inventory slot (index 2 in {@link #slots}, immediately after this Menu's two
-     * real machine slots) is not miscategorized as a third machine slot.
-     */
-    private static final int MACHINE_SLOTS = 2;
+    private static final int MACHINE_SLOTS = 3;
 
     public PWRControllerMenu(int id, Inventory playerInv, PWRControllerBlockEntity be) {
         super(PWRMenus.PWR_CONTROLLER.get(), id, be);
 
         this.addSlot(new SlotNonRetarded(tile, 0, 62, 41));
         this.addSlot(new SlotTakeOnly(tile, 1, 98, 41));
+        this.addSlot(new SlotNonRetarded(tile, 2, 8, 59));
 
         playerInv(playerInv, 8, 84);
     }

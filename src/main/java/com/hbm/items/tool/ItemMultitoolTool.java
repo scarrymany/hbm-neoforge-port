@@ -1,12 +1,17 @@
 package com.hbm.items.tool;
 
 import com.hbm.items.ICustomItemModelRegister;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TieredItem;
@@ -22,18 +27,12 @@ import java.util.List;
 
 /**
  * Ported from CE's {@code com.hbm.items.tool.ItemMultitoolTool}, scoped to {@code multitool_dig}
- * and {@code multitool_silk} only (the two Phase-1-safe rungs of CE's sneak-right-click upgrade
- * ladder). {@code multitool_ext} and the rest of {@code ItemMultitoolPassive}'s AoE-lightning/
- * terrain-deletion/combat content are Phase 3 - see {@code docs/phase1/items_tool.md}'s explicit
- * recommendation to port the whole ladder together later rather than split it. Consequently the
- * sneak-right-click upgrade action itself is not ported here (its upgrade target, {@code
- * multitool_ext}, does not exist); each of these two items instead behaves like the terminal state
- * CE's ladder would have produced for it.
+ * and {@code multitool_silk} only. Sneak-right-click Exact CE {@code :37-46}: {@code techBoop}
+ * 2.0F/1.0F, {@code multitool_dig} → {@code multitool_silk} + {@code SILK_TOUCH} 3, same damage.
+ * silk→ext stay skipped — Passive ladder is a separate chain ({@code ItemMultitoolPassive}).
  *
- * <p>{@code multitool_silk} gets its always-on silk touch by temporarily applying the real vanilla
- * Silk Touch enchantment around the harvest (same mechanism {@link com.hbm.handler.ability.IToolHarvestAbility#SILK}
- * uses), rather than a hand-rolled "drop the block itself" shortcut - this way block-specific silk
- * touch drop rules (double slabs, ores with custom silk drops, etc.) stay correct automatically.
+ * <p>{@code multitool_silk} harvest silk is the real vanilla enchantment (CE swap + fallback
+ * around harvest for stacks that arrived without it).
  */
 public class ItemMultitoolTool extends TieredItem implements ICustomItemModelRegister {
 
@@ -55,17 +54,39 @@ public class ItemMultitoolTool extends TieredItem implements ICustomItemModelReg
     }
 
     @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (!player.isCrouching()) {
+            return InteractionResultHolder.pass(stack);
+        }
+        // CE ItemMultitoolTool.java:39-46
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.techBoop.get(), SoundSource.PLAYERS, 2.0F, 1.0F);
+        if (this == ToolItems.MULTITOOL_DIG.get()) {
+            ItemStack item = new ItemStack(ToolItems.MULTITOOL_SILK.get());
+            item.setDamageValue(stack.getDamageValue());
+            Holder<Enchantment> silk = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT)
+                    .getHolderOrThrow(Enchantments.SILK_TOUCH);
+            EnchantmentHelper.updateEnchantments(item, mutable -> mutable.set(silk, 3));
+            return InteractionResultHolder.success(item);
+        }
+        // silk→ext stay skipped — Passive ladder is a separate chain (CE :47-50)
+        return InteractionResultHolder.pass(stack);
+    }
+
+    @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miningEntity) {
         if (!silkTouch || level.isClientSide()) {
             return super.mineBlock(stack, level, state, pos, miningEntity);
         }
 
         Holder<Enchantment> silk = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolderOrThrow(Enchantments.SILK_TOUCH);
-        EnchantmentHelper.updateEnchantments(stack, mutable -> mutable.set(silk, 1));
+        int prev = EnchantmentHelper.getItemEnchantmentLevel(silk, stack);
+        EnchantmentHelper.updateEnchantments(stack, mutable -> mutable.set(silk, Math.max(prev, 1)));
         try {
             return super.mineBlock(stack, level, state, pos, miningEntity);
         } finally {
-            EnchantmentHelper.updateEnchantments(stack, mutable -> mutable.set(silk, 0));
+            EnchantmentHelper.updateEnchantments(stack, mutable -> mutable.set(silk, prev));
         }
     }
 

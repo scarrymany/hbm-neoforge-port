@@ -1,11 +1,18 @@
 package com.hbm.blockentity.machine.accel;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.generic.BlockBedrockOreTE;
 import com.hbm.inventory.container.machine.accel.ExcavatorMenu;
+import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.ItemEnums;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemDrillbit;
+import com.hbm.items.special.BedrockOreItems;
+import com.hbm.items.special.ItemBedrockOreBase;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,30 +31,34 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 /**
- * CE {@code TileEntityMachineExcavator.java}: maxPower 10_000_000, baseConsumption 10_000.
- * Mines a downward column; silk/vein/fortune come from the drillbit (CE {@code ItemDrillbit} flags).
+ * CE {@code TileEntityMachineExcavator.java}: maxPower 10_000_000, baseConsumption 10_000,
+ * acid tank 16_000 mB ({@code Fluids.NONE} + fluid-ID slot).
  */
 public class ExcavatorBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
 
     private static final int SLOT_DRILL = 0;
     private static final int SLOT_BATTERY = 1;
     private static final int SLOT_OUT_START = 2;
     private static final int SLOT_OUT_END = 10;
+    private static final int SLOT_FLUID_ID = 11;
     public static final long MAX_POWER = 10_000_000L;
     public static final long BASE_CONSUMPTION = 10_000L;
 
     public long power;
     public boolean drilling;
     public int depth;
+    public final FluidTankNTM tank;
 
     public ExcavatorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 11, true, true);
+        super(type, pos, state, 12, true, true);
+        this.tank = new FluidTankNTM(Fluids.NONE, 16_000).withOwner(this);
     }
 
     @Override
@@ -58,6 +69,7 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot == SLOT_BATTERY) return Library.isBattery(stack);
+        if (slot == SLOT_FLUID_ID) return stack.getItem() instanceof IItemFluidIdentifier;
         return slot == SLOT_DRILL && stack.getItem() instanceof ItemDrillbit;
     }
 
@@ -77,6 +89,13 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
 
         power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, power, MAX_POWER);
         trySubscribe(level, worldPosition.above(), Direction.UP);
+        this.tank.setType(SLOT_FLUID_ID, inventory);
+        if (level.getGameTime() % 20 == 0 && tank.getTankType() != Fluids.NONE) {
+            for (Direction dir : Direction.values()) {
+                if (dir == Direction.DOWN) continue;
+                trySubscribe(tank.getTankType(), level, worldPosition.relative(dir), dir);
+            }
+        }
 
         ItemStack bit = inventory.getStackInSlot(SLOT_DRILL);
         drilling = bit.getItem() instanceof ItemDrillbit && power >= BASE_CONSUMPTION;
@@ -98,6 +117,14 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
             BlockPos target = nextTarget(radius);
             if (target == null) break;
             BlockState state = server.getBlockState(target);
+            if (state.getBlock() instanceof BlockBedrockOreTE) {
+                if (!collectBedrock(server, target, type)) {
+                    depth++;
+                    continue;
+                }
+                power -= BASE_CONSUMPTION;
+                return;
+            }
             if (state.isAir() || state.getDestroySpeed(server, target) < 0) {
                 depth++;
                 continue;
@@ -117,6 +144,31 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
             power -= BASE_CONSUMPTION;
             depth++;
         }
+    }
+
+    /**
+     * CE {@code TileEntityMachineExcavator.collectBedrock}: copy TE resource, fortune via
+     * {@link ItemBedrockOreBase#setOreAmount}. Does not destroy the deposit. Acid-gated
+     * deposits consume {@code acidRequirement.fill} of matching tank type.
+     */
+    private boolean collectBedrock(ServerLevel server, BlockPos pos, ItemEnums.EnumDrillType drill) {
+        if (!(server.getBlockEntity(pos) instanceof BlockBedrockOreTE.BedrockOreBlockEntity ore)) return false;
+        if (ore.resource.isEmpty()) return false;
+        if (ore.tier > drill.tier) return false;
+        if (ore.acidRequirement != null) {
+            if (ore.acidRequirement.type != tank.getTankType() || ore.acidRequirement.fill > tank.getFill()) {
+                return false;
+            }
+            tank.setFill(tank.getFill() - ore.acidRequirement.fill);
+        }
+
+        ItemStack stack = ore.resource.copy();
+        if (stack.is(BedrockOreItems.BEDROCK_ORE_BASE.get())) {
+            ItemBedrockOreBase.setOreAmount(stack, pos.getX(), pos.getZ(), 1D + drill.fortune * 0.25D);
+        }
+        if (!canFit(List.of(stack))) return false;
+        insertOutput(stack);
+        return true;
     }
 
     private BlockPos nextTarget(int radius) {
@@ -175,10 +227,21 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public @NotNull List<FluidTankNTM> getReceivingTanks() {
+        return List.of(tank);
+    }
+
+    @Override
+    public @NotNull List<FluidTankNTM> getAllTanks() {
+        return List.of(tank);
+    }
+
+    @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
         tag.putInt("depth", depth);
+        tank.writeToNBT(tag, "tank");
     }
 
     @Override
@@ -186,6 +249,7 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
         depth = tag.getInt("depth");
+        tank.readFromNBT(tag, "tank");
     }
 
     @Override
@@ -194,6 +258,7 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(power);
         buf.writeBoolean(drilling);
         buf.writeInt(depth);
+        tank.serialize(buf);
     }
 
     @Override
@@ -202,6 +267,7 @@ public class ExcavatorBlockEntity extends MachineBaseBlockEntity
         power = buf.readLong();
         drilling = buf.readBoolean();
         depth = buf.readInt();
+        tank.deserialize(buf);
     }
 
     @Nullable

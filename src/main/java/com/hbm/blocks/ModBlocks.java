@@ -56,6 +56,24 @@ public final class ModBlocks {
     public static DeferredBlock<BlockRotatablePillar> BLOCK_SCHRABIDIUM_CLUSTER;
     public static DeferredBlock<BlockRotatablePillar> BLOCK_EUPHEMIUM_CLUSTER;
 
+    public static DeferredBlock<com.hbm.blocks.BlockBase> BRICK_OBSIDIAN;
+    public static DeferredBlock<com.hbm.blocks.machine.CrateBlock> CRATE_STEEL;
+    public static DeferredBlock<com.hbm.blocks.generic.BlockModDoor> DOOR_RED;
+
+    // Lighting machines
+    public static DeferredBlock<com.hbm.blocks.machine.Floodlight> FLOODLIGHT;
+    public static DeferredBlock<com.hbm.blocks.machine.FloodlightBeam> FLOODLIGHT_BEAM;
+    public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.FloodlightBlockEntity>> FLOODLIGHT_ENTITY;
+    public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.FloodlightBeamBlockEntity>> FLOODLIGHT_BEAM_ENTITY;
+
+    // Satellite machines
+    public static DeferredBlock<com.hbm.blocks.machine.MachineTapeDrive> MACHINE_TAPE_DRIVE;
+    public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.TapeDriveBlockEntity>> TAPE_DRIVE_ENTITY;
+
+    // Other machines
+    public static DeferredBlock<com.hbm.blocks.machine.BlockCargoElevator> CARGO_ELEVATOR;
+    public static net.neoforged.neoforge.registries.DeferredHolder<BlockEntityType<?>, BlockEntityType<com.hbm.blockentity.machine.CargoElevatorBlockEntity>> CARGO_ELEVATOR_ENTITY;
+
     private ModBlocks() {
     }
 
@@ -69,9 +87,12 @@ public final class ModBlocks {
         com.hbm.blocks.machine.StorageMachineBlocks.registerAll();
         com.hbm.blockentity.machine.StorageBlockEntities.registerAll();
         com.hbm.blocks.network.energy.EnergyNetworkBlocks.registerAll();
+        com.hbm.blocks.network.RadioNetworkBlocks.registerAll();
         com.hbm.blocks.network.FluidDuctBlocks.registerAll();
         com.hbm.blockentity.network.FluidDuctBlockEntities.registerAll();
         com.hbm.blocks.network.ConveyorBlocks.registerAll();
+        com.hbm.blocks.network.CraneBlocks.registerAll();
+        com.hbm.blocks.network.DroneBlocks.registerAll();
         com.hbm.blocks.machine.OilChainBlocks.registerAll();
         com.hbm.blocks.machine.ProcessingBlocks.registerAll();
         com.hbm.blocks.machine.chem.ChemIsotopeBlocks.registerAll();
@@ -88,8 +109,13 @@ public final class ModBlocks {
         com.hbm.blocks.machine.workshop.WorkshopBlocks.registerAll();
         com.hbm.blocks.machine.CrucibleBlocks.registerAll();
         com.hbm.blocks.generic.BallsSpawnerBlocks.registerAll();
+        com.hbm.blocks.machine.SealBlocks.registerAll();
+        com.hbm.blocks.machine.pile.PileBlocks.registerAll();
         com.hbm.blocks.machine.Phase11CasingBlocks.registerAll();
         com.hbm.blocks.machine.dummyable.DummyableProcessBlocks.registerAll();
+        com.hbm.blocks.machine.LightingBlocks.registerAll();
+        com.hbm.blocks.machine.SatelliteBlocks.registerAll();
+        com.hbm.blocks.machine.MachineBlocks.registerAll();
         BLOCKS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }

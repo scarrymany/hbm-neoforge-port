@@ -173,6 +173,7 @@ public class HbmJeiPlugin implements IModPlugin {
 
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_shredder")), ShredderCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_assembly_machine")), AssemblerCategory.RECIPE_TYPE);
+        registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_assembly_factory")), AssemblerCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_reactor_breeding")), BreederCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_crystallizer")), CrystallizerCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_centrifuge")), CentrifugeCategory.RECIPE_TYPE);
@@ -183,5 +184,6 @@ public class HbmJeiPlugin implements IModPlugin {
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_mixer")), MixerCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_refinery")), RefineryCategory.RECIPE_TYPE);
         registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_chemical_plant")), ChemPlantCategory.RECIPE_TYPE);
+        registration.addRecipeCatalyst(new net.minecraft.world.item.ItemStack(JeiUtil.hbmBlockItem("machine_chemical_factory")), ChemPlantCategory.RECIPE_TYPE);
     }
 }

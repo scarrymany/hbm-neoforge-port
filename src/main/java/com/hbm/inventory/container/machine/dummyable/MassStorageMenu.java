@@ -19,6 +19,17 @@ public class MassStorageMenu extends MenuBase<MassStorageBlockEntity> {
         this.addSlot(new SlotNonRetarded(tile, MassStorageBlockEntity.SLOT_FILTER, 61, 53));
         this.addSlot(new SlotTakeOnly(tile, MassStorageBlockEntity.SLOT_OUT, 61, 89));
         playerInv(playerInv, 8, 139, 197);
+        if (!playerInv.player.level().isClientSide()) {
+            be.openInventory(playerInv.player);
+        }
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        if (!player.level().isClientSide()) {
+            be.closeInventory(player);
+        }
     }
 
     @Override

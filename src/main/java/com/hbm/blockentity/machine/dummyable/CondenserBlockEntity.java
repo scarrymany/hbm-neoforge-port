@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -7,6 +9,7 @@ import com.hbm.inventory.container.machine.dummyable.CondenserMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -22,29 +25,40 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
  * CE {@code TileEntityCondenser} / {@code TileEntityTowerSmall} / {@code TileEntityTowerLarge} —
  * spentsteam → water 1:1. Particles skipped.
+ * Config Exact CE {@code condenser}/{@code condenserTowerSmall}/{@code condenserTowerLarge}
+ * ({@code TileEntityCondenser.java:45-59}, {@code TileEntityTowerSmall.java:37-50},
+ * {@code TileEntityTowerLarge.java:37-50}). One BE, three CE JSON names via ConfigDummy.
  */
 public class CondenserBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+
+    public static int inputTankSize = 100;
+    public static int outputTankSize = 100;
+    public static int inputTankSizeTS = 1_000;
+    public static int outputTankSizeTS = 1_000;
+    public static int inputTankSizeTL = 10_000;
+    public static int outputTankSizeTL = 10_000;
 
     public final FluidTankNTM input;
     public final FluidTankNTM output;
     public int waterTimer;
 
     public static CondenserBlockEntity cube(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new CondenserBlockEntity(type, pos, state, 100, 100);
+        return new CondenserBlockEntity(type, pos, state, inputTankSize, outputTankSize);
     }
 
     public static CondenserBlockEntity towerSmall(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new CondenserBlockEntity(type, pos, state, 1_000, 1_000);
+        return new CondenserBlockEntity(type, pos, state, inputTankSizeTS, outputTankSizeTS);
     }
 
     public static CondenserBlockEntity towerLarge(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        return new CondenserBlockEntity(type, pos, state, 10_000, 10_000);
+        return new CondenserBlockEntity(type, pos, state, inputTankSizeTL, outputTankSizeTL);
     }
 
     public CondenserBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int inCap, int outCap) {
@@ -153,5 +167,95 @@ public class CondenserBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new CondenserMenu(id, inv, this);
+    }
+
+    static void readCube(JsonObject obj) {
+        // CE TileEntityCondenser.java:51-52
+        inputTankSize = IConfigurableMachine.grab(obj, "I:inputTankSize", inputTankSize);
+        outputTankSize = IConfigurableMachine.grab(obj, "I:outputTankSize", outputTankSize);
+    }
+
+    static void writeCube(JsonWriter writer) throws IOException {
+        // CE TileEntityCondenser.java:57-58
+        writer.name("I:inputTankSize").value(inputTankSize);
+        writer.name("I:outputTankSize").value(outputTankSize);
+    }
+
+    static void readTowerSmall(JsonObject obj) {
+        // CE TileEntityTowerSmall.java:43-44
+        inputTankSizeTS = IConfigurableMachine.grab(obj, "I:inputTankSize", inputTankSizeTS);
+        outputTankSizeTS = IConfigurableMachine.grab(obj, "I:outputTankSize", outputTankSizeTS);
+    }
+
+    static void writeTowerSmall(JsonWriter writer) throws IOException {
+        // CE TileEntityTowerSmall.java:49-50
+        writer.name("I:inputTankSize").value(inputTankSizeTS);
+        writer.name("I:outputTankSize").value(outputTankSizeTS);
+    }
+
+    static void readTowerLarge(JsonObject obj) {
+        // CE TileEntityTowerLarge.java:43-44
+        inputTankSizeTL = IConfigurableMachine.grab(obj, "I:inputTankSize", inputTankSizeTL);
+        outputTankSizeTL = IConfigurableMachine.grab(obj, "I:outputTankSize", outputTankSizeTL);
+    }
+
+    static void writeTowerLarge(JsonWriter writer) throws IOException {
+        // CE TileEntityTowerLarge.java:49-50
+        writer.name("I:inputTankSize").value(inputTankSizeTL);
+        writer.name("I:outputTankSize").value(outputTankSizeTL);
+    }
+
+    /** CE {@code condenser}. */
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "condenser";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readCube(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeCube(writer);
+        }
+    }
+
+    /** CE {@code condenserTowerSmall}. */
+    public static final class ConfigDummyTowerSmall implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "condenserTowerSmall";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readTowerSmall(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeTowerSmall(writer);
+        }
+    }
+
+    /** CE {@code condenserTowerLarge}. */
+    public static final class ConfigDummyTowerLarge implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "condenserTowerLarge";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readTowerLarge(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeTowerLarge(writer);
+        }
     }
 }

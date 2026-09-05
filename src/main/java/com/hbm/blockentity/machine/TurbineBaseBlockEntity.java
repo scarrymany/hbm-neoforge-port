@@ -29,9 +29,8 @@ import java.util.List;
  * hook, then pushes HE/fluid over {@link #getPowerPos()}/{@link #getConPos()} (both subclass-
  * supplied, matching the multiblock's fixed connector geometry). CE's {@code onLeverPull} steam-
  * densification state machine (STEAM -&gt; HOTSTEAM -&gt; ... -&gt; back to STEAM) is kept as
- * {@link #onLeverPull()} even though nothing in this pass wires a lever/interaction to call it yet
- * (no multiblock connection-anchor/interaction package exists) - ported for completeness since it's
- * pure tank-state math with no missing dependency, ready for a future interaction hookup.
+ * {@link #onLeverPull()} — wired by {@link MachineIndustrialTurbineBlock} Exact CE
+ * {@code MachineIndustrialTurbine.java:53-78}.
  */
 public abstract class TurbineBaseBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE {

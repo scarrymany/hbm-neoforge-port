@@ -4,9 +4,15 @@ import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.radiation.ChunkRadiationManager;
+import com.hbm.hazard.HazardRegistry;
+import com.hbm.hazard.HazardSystem;
 import com.hbm.inventory.container.machine.dummyable.AnnihilatorMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.saveddata.AnnihilatorSavedData;
 import net.minecraft.core.BlockPos;
@@ -29,6 +35,10 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineAnnihilator}: eats items/fluids into a named pool, pays milestones.
+ * {@code tank.setType(1)} Exact CE {@code :71}. Slot 1 Exact CE {@code :194}.
+ * {@code FT_Polluting.pollute(BURN, fill*2)} Exact CE {@code :91}.
+ * {@code onDestroy} {@code incrementRad} Exact CE {@code :84}/{@code :139-144}.
+ * Flame / audio stay skipped.
  */
 public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -50,6 +60,8 @@ public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot == 0) return true;
+        // CE TileEntityMachineAnnihilator.java:194
+        if (slot == 1) return stack.getItem() instanceof IItemFluidIdentifier;
         if (slot == 8 || slot == 9) return true;
         return false;
     }
@@ -67,6 +79,10 @@ public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
+
+        // CE TileEntityMachineAnnihilator.java:71
+        this.tank.setType(1, inventory);
+
         if (pool == null || pool.isEmpty()) return;
 
         for (DirPos pos : getConPos()) {
@@ -76,10 +92,15 @@ public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
         AnnihilatorSavedData data = AnnihilatorSavedData.getData(level);
         ItemStack stack0 = inventory.getStackInSlot(0);
         if (!stack0.isEmpty()) {
+            // CE TileEntityMachineAnnihilator.java:84
+            onDestroy(stack0);
             tryAddPayout(data.pushToPool(pool, stack0, false));
             inventory.setStackInSlot(0, ItemStack.EMPTY);
         }
         if (tank.getFill() > 0) {
+            // CE TileEntityMachineAnnihilator.java:91
+            FT_Polluting.pollute(level, worldPosition, tank.getTankType(),
+                    FluidTrait.FluidReleaseType.BURN, tank.getFill() * 2);
             tryAddPayout(data.pushToPool(pool, tank.getTankType(), tank.getFill(), false));
             tank.setFill(0);
         }
@@ -107,6 +128,17 @@ public class MachineAnnihilatorBlockEntity extends MachineBaseBlockEntity
 
         dataChanged();
         networkPackMK2(25);
+    }
+
+    /** Exact CE {@code TileEntityMachineAnnihilator#onDestroy} {@code :139-144}. */
+    public void onDestroy(ItemStack stack) {
+        if (level == null) return;
+        double radiation = HazardSystem.getHazardLevelFromStack(stack, HazardRegistry.RADIATION);
+        if (radiation > 0) {
+            Direction dir = coreFacing();
+            BlockPos radPos = worldPosition.relative(dir.getOpposite(), 3).above(9);
+            ChunkRadiationManager.proxy.incrementRad(level, radPos, Math.min(radiation * 5F, 1_000F));
+        }
     }
 
     public DirPos[] getConPos() {

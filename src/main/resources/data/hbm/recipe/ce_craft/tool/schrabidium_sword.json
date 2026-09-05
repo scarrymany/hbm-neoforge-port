@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "I",
+    "W",
+    "S"
+  ],
+  "key": {
+    "I": { "item": "hbm:schrabidium_block" },
+    "W": { "item": "hbm:desh_sword" },
+    "S": { "item": "hbm:ingot_polymer" }
+  },
+  "result": { "id": "hbm:schrabidium_sword", "count": 1 }
+}

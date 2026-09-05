@@ -15,6 +15,7 @@ import com.hbm.blocks.machine.MachineKeyForgeBlock;
 import com.hbm.blocks.machine.MachineMicrowaveBlock;
 import com.hbm.blocks.machine.MachineRtgFurnaceBlock;
 import com.hbm.blocks.generic.BMPowerBoxBlock;
+import com.hbm.blocks.machine.MachineSatLinkerBlock;
 import com.hbm.blocks.machine.MachineTeleLinkerBlock;
 import com.hbm.blocks.machine.MachineForceFieldBlock;
 import com.hbm.blocks.machine.MachineTeleporterBlock;
@@ -49,7 +50,10 @@ import java.util.function.Supplier;
  * conveyor press / mass storage /
  * telelinker / soyuz capsule / filing cabinet /
  * pump steam/electric / chimney brick/industrial / thresher / bm_power_box /
- * mining laser / strand caster / forcefield / chungus / satlink / teleporter.
+ * mining laser / strand caster / forcefield / chungus / satlink / teleporter /
+ * fluidtank / bigasstank / compressor compact / satlinker /
+ * reactor_research / reactor_zirnox /
+ * assembly factory / chemical factory.
  */
 public final class DummyableProcessBlocks {
 
@@ -158,6 +162,14 @@ public final class DummyableProcessBlocks {
     public static DeferredBlock<MachineChungusBlock> MACHINE_CHUNGUS;
     public static DeferredBlock<MachineSatLinkBlock> MACHINE_SATLINK;
     public static DeferredBlock<MachineTeleporterBlock> MACHINE_TELEPORTER;
+    public static DeferredBlock<MachineFluidTankBlock> MACHINE_FLUIDTANK;
+    public static DeferredBlock<MachineBigAssTankBlock> MACHINE_BIGASSTANK;
+    public static DeferredBlock<MachineCompressorCompactBlock> MACHINE_COMPRESSOR_COMPACT;
+    public static DeferredBlock<MachineSatLinkerBlock> MACHINE_SATLINKER;
+    public static DeferredBlock<ReactorResearchBlock> REACTOR_RESEARCH;
+    public static DeferredBlock<ReactorZirnoxBlock> REACTOR_ZIRNOX;
+    public static DeferredBlock<MachineAssemblyFactoryBlock> MACHINE_ASSEMBLY_FACTORY;
+    public static DeferredBlock<MachineChemicalFactoryBlock> MACHINE_CHEMICAL_FACTORY;
 
     private DummyableProcessBlocks() {
     }
@@ -210,7 +222,8 @@ public final class DummyableProcessBlocks {
         MACHINE_INDUSTRIAL_BOILER = registerBlock("machine_industrial_boiler", () -> new HeatBoilerIndustrialBlock(MACHINE_PROPS));
         MACHINE_TOWER_SMALL = registerBlock("machine_tower_small", () -> new MachineTowerSmallBlock(MACHINE_PROPS));
         MACHINE_TOWER_LARGE = registerBlock("machine_tower_large", () -> new MachineTowerLargeBlock(MACHINE_PROPS));
-        RADIO_TELEX = registerBlock("radio_telex", () -> new RadioTelexBlock(MACHINE_PROPS));
+        RADIO_TELEX = registerBlock("radio_telex", () -> new RadioTelexBlock(
+                BlockBehaviour.Properties.of().strength(3.0F, 10.0F).sound(SoundType.WOOD).requiresCorrectToolForDrops()));
         RADAR_SCREEN = registerBlock("radar_screen", () -> new RadarScreenBlock(MACHINE_PROPS));
         MACHINE_SIREN = registerBlock("machine_siren", () -> new com.hbm.blocks.machine.MachineSirenBlock(MACHINE_PROPS));
         MACHINE_CONDENSER = registerBlock("machine_condenser", () -> new com.hbm.blocks.machine.MachineCondenserBlock(MACHINE_PROPS));
@@ -284,6 +297,35 @@ public final class DummyableProcessBlocks {
         MACHINE_TELEPORTER = registerBlock("machine_teleporter",
                 () -> new MachineTeleporterBlock(BlockBehaviour.Properties.of()
                         .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // CE ModBlocks.java:800 / :802 / :1087 / :958
+        MACHINE_FLUIDTANK = registerBlock("machine_fluidtank",
+                () -> new MachineFluidTankBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 20.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_BIGASSTANK = registerBlock("machine_bigasstank",
+                () -> new MachineBigAssTankBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_COMPRESSOR_COMPACT = registerBlock("machine_compressor_compact",
+                () -> new MachineCompressorCompactBlock(BlockBehaviour.Properties.of()
+                        .strength(10.0F, 20.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_SATLINKER = registerBlock("machine_satlinker",
+                () -> new MachineSatLinkerBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()),
+                ModCreativeTabs.MISSILE);
+        // CE ModBlocks.java:990 hardness 5 / resistance 10; Dummyable {2,0,0,0,0,0}
+        REACTOR_RESEARCH = registerBlock("reactor_research",
+                () -> new ReactorResearchBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 10.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // CE ModBlocks.java:995 hardness 5 / resistance 100; Dummyable {1,0,2,2,2,2} offset 2
+        REACTOR_ZIRNOX = registerBlock("reactor_zirnox",
+                () -> new ReactorZirnoxBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 100.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        // CE ModBlocks.java:1056 / :1064 hardness 5 / resistance 30; Dummyable {2,0,2,2,2,2} offset 2
+        MACHINE_ASSEMBLY_FACTORY = registerBlock("machine_assembly_factory",
+                () -> new MachineAssemblyFactoryBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 30.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
+        MACHINE_CHEMICAL_FACTORY = registerBlock("machine_chemical_factory",
+                () -> new MachineChemicalFactoryBlock(BlockBehaviour.Properties.of()
+                        .strength(5.0F, 30.0F).sound(SoundType.METAL).requiresCorrectToolForDrops()));
         DummyableProcessBlockEntities.registerAll();
         DummyableProcessMenus.registerAll();
     }

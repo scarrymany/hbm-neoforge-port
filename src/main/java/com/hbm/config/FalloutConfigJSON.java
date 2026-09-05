@@ -87,7 +87,7 @@ import javax.annotation.Nullable;
  * insertion order (first-match-wins list, order-sensitive - see the wood/leaves distance-banding
  * discussion in the research report), skipping only the entries whose <i>output</i> block is
  * genuinely absent from this port today (five distinct {@code ore_sellafield_*} ore-decoration
- * tiers, {@code sellafield_bedrock}, and {@code glyphid_spawner}'s irradiated variant) - each skip is
+ * tiers and {@code sellafield_bedrock}) - each skip is
  * called out at its exact former call site below rather than silently dropped. Every other entry's
  * target block was independently re-checked by name against this port's real registries (not
  * guessed) before being wired in.
@@ -204,8 +204,14 @@ public final class FalloutConfigJSON {
         if (glyphidBase != null && glyphidBaseRad != null) {
             add(FalloutEntry.builder().matchBlock(glyphidBase).addPrimary(glyphidBaseRad.defaultBlockState(), 1).solid(true));
         }
-        // glyphid_spawner (and its irradiated variant) is not registered anywhere in this port -
-        // CE's corresponding entry is skipped rather than invented (see class javadoc).
+        Block glyphidSpawner = resolveOurs("glyphid_spawner");
+        if (glyphidSpawner != null) {
+            add(FalloutEntry.builder().matchBlock(glyphidSpawner)
+                    .addPrimary(glyphidSpawner.defaultBlockState()
+                            .setValue(com.hbm.blocks.generic.BlockGlyphidSpawner.TYPE,
+                                    com.hbm.blocks.generic.BlockGlyphidSpawner.Type.RAD), 1)
+                    .solid(true));
+        }
 
         // CE's tiered "material -> decayed sellafield ore" loop (i=1..10, m=10-i). This port's real
         // decaying-ore analogue (com.hbm.blocks.generic.BlockSellafield, registry name "sellafield")

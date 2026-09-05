@@ -7,6 +7,7 @@ import com.hbm.handler.ability.IToolHarvestAbility;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ModItems;
 import com.hbm.items.tool.ItemToolAbility.ToolRole;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PickaxeItem;
@@ -275,17 +276,17 @@ public final class ToolItems {
     public static final DeferredItem<Item> LUNG_DIAGNOSTIC = ModItems.ITEMS.register("lung_diagnostic", () -> new ItemLungDiagnostic(new Item.Properties().stacksTo(1)));
     /** Real per-type density readout; overall tier/fluid summary stubbed - see class javadoc. */
     public static final DeferredItem<Item> ORE_DENSITY_SCANNER = ModItems.ITEMS.register("ore_density_scanner", () -> new ItemOreDensityScanner(new Item.Properties().stacksTo(1)));
-    /** Stubbed pending {@code ModBlocks.ore_oil}/{@code ore_bedrock_oil} - see class javadoc. */
+    /** Exact CE ItemOilDetector :40-101 (ore_oil + ore_bedrock_oil registered). */
     public static final DeferredItem<Item> OIL_DETECTOR = ModItems.ITEMS.register("oil_detector", () -> new ItemOilDetector(new Item.Properties().stacksTo(1)));
-    /** Stubbed pending several missing world-gen blocks - see class javadoc. */
+    /** Exact CE ItemSurveyScanner :30-87 grid (ores registered). Easter egg skipped. */
     public static final DeferredItem<Item> SURVEY_SCANNER = ModItems.ITEMS.register("survey_scanner", () -> new ItemSurveyScanner(new Item.Properties().stacksTo(1)));
     /** Stubbed pending {@code PollutionHandler} - see class javadoc. */
     public static final DeferredItem<Item> POLLUTION_DETECTOR = ModItems.ITEMS.register("pollution_detector", () -> new ItemPollutionDetector(new Item.Properties().stacksTo(1)));
 
-    // ==================== repair kits (ItemRepairKit; stubbed pending ConsumableHandler) ====================
+    // ==================== repair kits (Exact CE ConsumableHandler.handleGunKit) ====================
 
-    public static final DeferredItem<Item> GUN_KIT_1 = ModItems.ITEMS.register("gun_kit_1", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(9)));
-    public static final DeferredItem<Item> GUN_KIT_2 = ModItems.ITEMS.register("gun_kit_2", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(99)));
+    public static final DeferredItem<Item> GUN_KIT_1 = ModItems.ITEMS.register("gun_kit_1", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(9), HBMSoundHandler.spray));
+    public static final DeferredItem<Item> GUN_KIT_2 = ModItems.ITEMS.register("gun_kit_2", () -> new ItemRepairKit(new Item.Properties().stacksTo(1).durability(99), HBMSoundHandler.repair));
 
     // ==================== fluid containers (ItemCanister/ItemGasCanister/ItemFluidContainerInfinite/ItemPipette) ====================
 
@@ -310,7 +311,7 @@ public final class ToolItems {
     public static final DeferredItem<Item> BALEFIRE_AND_STEEL = ModItems.ITEMS.register("balefire_and_steel", () -> new ItemBalefireMatch(new Item.Properties().stacksTo(1).durability(256)));
     /** Stubbed place-behavior pending an accessible registered crate block - see class javadoc. */
     public static final DeferredItem<Item> CRATE_CALLER = ModItems.ITEMS.register("crate_caller", () -> new ItemCrateCaller(new Item.Properties().stacksTo(1).durability(4)));
-    /** Stubbed break-behavior pending {@code ModBlocks.ntm_dirt} - see class javadoc. */
+    /** Exact CE ItemMS :36-65 ntm_dirt → u238m2 elements/arsenic/vault. */
     public static final DeferredItem<Item> MYSTERYSHOVEL = ModItems.ITEMS.register("mysteryshovel", () -> new ItemMS(new Item.Properties().stacksTo(1)));
 
     // ==================== GUI-shell items (ItemBook pattern - menu-opening interaction deferred) ====================

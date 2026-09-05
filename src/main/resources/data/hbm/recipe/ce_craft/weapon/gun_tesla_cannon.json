@@ -1,0 +1,48 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "CCC",
+    "BRB",
+    "MGE"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:coil_copper"
+    },
+    "B": [
+      {
+        "tag": "c:heavy_barrels/tcalloy"
+      },
+      {
+        "tag": "c:heavy_barrels/cdalloy"
+      }
+    ],
+    "R": [
+      {
+        "tag": "c:heavy_receivers/tcalloy"
+      },
+      {
+        "tag": "c:heavy_receivers/cdalloy"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/weaponsteel"
+    },
+    "G": [
+      {
+        "tag": "c:grips/polymer"
+      },
+      {
+        "tag": "c:grips/bakelite"
+      }
+    ],
+    "E": {
+      "item": "hbm:circuit_advanced"
+    }
+  },
+  "result": {
+    "id": "hbm:gun_tesla_cannon",
+    "count": 1
+  }
+}

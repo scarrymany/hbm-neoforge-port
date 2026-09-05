@@ -11,8 +11,8 @@ import net.minecraft.world.item.Item;
  * {@link IPAWeaponsProvider} wiring below: a shared {@link ArmorRPAMelee} instance gated on the
  * full charged set being worn (CE: {@code hasFSBArmorIgnoreCharge}), no ranged component at all
  * (CE's own {@code getRangedComponent} unconditionally returns {@code null} - Remnant armor has no
- * built-in gun, only the melee "arm slam"). See {@link ArmorRPAMelee}'s javadoc for why its actual
- * click bodies are stubbed.
+ * built-in gun, only the melee "arm slam"). Melee click + orchestra are Exact CE
+ * ({@code ArmorRPAMelee.java:24-70}).
  */
 public class ArmorRPA extends ArmorFSBPowered implements IPAWeaponsProvider {
 

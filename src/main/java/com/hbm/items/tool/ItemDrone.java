@@ -1,11 +1,17 @@
 package com.hbm.items.tool;
 
+import com.hbm.entity.item.DroneEntityTypes;
+import com.hbm.entity.item.EntityDeliveryDrone;
+import com.hbm.entity.item.EntityRequestDrone;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 
@@ -54,9 +60,33 @@ public class ItemDrone extends Item {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        // TODO(cross-area follow-up): once com.hbm.entity.item.{EntityDroneBase,EntityDeliveryDrone}
-        // and the drone dock/waypoint/requester/provider block entities exist, port CE's
-        // right-click-up-face drone-spawn behavior here.
-        return InteractionResult.PASS;
+        Level level = context.getLevel();
+        if (level.isClientSide) return InteractionResult.SUCCESS;
+
+        Direction face = context.getClickedFace();
+        if (face != Direction.UP) return InteractionResult.PASS;
+
+        BlockPos pos = context.getClickedPos().above();
+        ItemStack stack = context.getItemInHand();
+
+        if (type == DroneType.REQUEST) {
+            EntityRequestDrone drone = new EntityRequestDrone(DroneEntityTypes.REQUEST_DRONE.get(), level);
+            drone.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+            level.addFreshEntity(drone);
+        } else {
+            EntityDeliveryDrone drone = new EntityDeliveryDrone(DroneEntityTypes.DELIVERY_DRONE.get(), level);
+            drone.setPos(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
+            drone.setExpress(type == DroneType.PATROL_EXPRESS || type == DroneType.PATROL_EXPRESS_CHUNKLOADING);
+            if (type == DroneType.PATROL_CHUNKLOADING || type == DroneType.PATROL_EXPRESS_CHUNKLOADING) {
+                drone.setChunkLoading();
+            }
+            level.addFreshEntity(drone);
+        }
+
+        if (!context.getPlayer().isCreative()) {
+            stack.shrink(1);
+        }
+
+        return InteractionResult.CONSUME;
     }
 }

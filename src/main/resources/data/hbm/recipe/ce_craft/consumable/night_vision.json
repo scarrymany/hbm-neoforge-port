@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P P",
+    "GCG"
+  ],
+  "key": {
+    "P": {
+      "tag": "hbm:any_plastic"
+    },
+    "G": {
+      "tag": "c:glass_blocks"
+    },
+    "C": {
+      "item": "hbm:circuit_basic"
+    }
+  },
+  "result": {
+    "id": "hbm:night_vision",
+    "count": 1
+  }
+}

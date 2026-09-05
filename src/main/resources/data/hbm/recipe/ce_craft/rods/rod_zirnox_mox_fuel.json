@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rod_zirnox_empty"
+    },
+    {
+      "item": "hbm:billet_mox_fuel"
+    },
+    {
+      "item": "hbm:billet_mox_fuel"
+    }
+  ],
+  "result": {
+    "id": "hbm:rod_zirnox_mox_fuel",
+    "count": 1
+  }
+}

@@ -2,6 +2,7 @@ package com.hbm.items.weapon.sedna.content;
 
 import com.hbm.capability.HbmLivingAttachment;
 import com.hbm.capability.ModAttachments;
+import com.hbm.entity.effect.EntityFireLingering;
 import com.hbm.entity.logic.EntityNukeExplosionMK5;
 import com.hbm.entity.effect.EntityNukeTorex;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
@@ -25,8 +26,10 @@ import com.hbm.items.weapon.sedna.mags.MagazineSingleReload;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.particle.HbmEffect;
 import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
+import com.hbm.saveddata.satellites.SatelliteDetector;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -35,6 +38,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -51,24 +56,16 @@ import java.util.function.BiConsumer;
  * with the energy-weapon family per {@code docs/phase3/guns_and_ammo.md}. See that report's
  * {@code XFactoryEnergy} table for the full stat card.
  * <p>
+ * Laser-IR linger is Exact CE {@code XFactoryEnergy.java:125-149} {@code LAMBDA_IR_HIT}: living
+ * {@code setFire(100)} plus the block branch (adjacent {@code isFlammable} → vanilla fire, else
+ * {@link EntityFireLingering} 2×1 / 100t / {@code TYPE_DIESEL}).
+ * <p>
  * <b>Forward references (documented, not silently dropped):</b>
  * <ul>
- *     <li>{@code EntityFireLingering} (the laser-IR round's lingering ground fire /
- *     {@code igniteAround}-style "ignite an adjacent flammable block" branch) - confirmed not ported
- *     anywhere in this tree, matching {@code GrenadeFillingActions}'s identical documented gap for
- *     the same CE class (Phase 5 client-VFX / a future incendiary-effects pass). The direct
- *     "set the entity on fire" half of the same lambda <b>is</b> ported (via
- *     {@link HbmLivingAttachment}, which is real and already carries CE's exact {@code fire}/
- *     {@code getFire}/{@code setFire} field).</li>
- *     <li>{@code com.hbm.saveddata.satellites.SatelliteDetector} (the nuke rounds' satellite-ping
- *     calls) - confirmed not ported anywhere in this tree, matching {@code GrenadeFillingActions}'s
- *     identical documented gap for the same class. {@code ChunkRadiationManager}'s own
- *     {@code incrementRad} half of these same CE call sites (Phase 4) is wired below, via the local
- *     {@code incrementRad} helper.</li>
- *     <li>{@code EntityProcessorCrossSmooth#setDamageClass(DamageClass)} does not exist on this port's
- *     {@code EntityProcessorCrossSmooth} - same confirmed gap {@code GrenadeFillingActions} already
- *     documented; every {@code ExplosionVNT} blast below falls back to the processor's own plain
- *     explosion damage source.</li>
+ *     <li>{@code SatelliteDetector.reportEvent} on fatman nukes is Exact CE
+ *     {@code XFactoryCatapult.java:99}/{@code :116}/{@code :134}.</li>
+ *     <li>Lightning {@code setDamageClass(beam.config.dmgClass)} is Exact CE
+ *     {@code XFactoryEnergy.java:76}.</li>
  * </ul>
  * Everything else (the {@code ExplosionVNT} blasts, {@link EntityNukeExplosionMK5}/{@link EntityNukeTorex}
  * spawns, the lightning-fanout sub-beam) is a real, fully-wired port against this port's own already-
@@ -216,7 +213,7 @@ public final class XFactoryEnergy {
         Vec3 loc = resolveImpactPoint(hit);
 
         ExplosionVNT vnt = new ExplosionVNT(beam.level(), loc.x, loc.y, loc.z, 2F, beam.getThrower());
-        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, beam.damage));
+        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, beam.damage).setDamageClass(beam.config.dmgClass));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
 
@@ -269,8 +266,11 @@ public final class XFactoryEnergy {
         }
     }
 
-    /** Port of CE's {@code LAMBDA_IR_HIT} - standard beam damage, then sets a hit living entity on fire (block-ignite branch is a documented forward reference, see class javadoc). */
-    private static void irHit(EntityBulletBeamBase beam, HitResult hit) {
+    /**
+     * Exact CE {@code XFactoryEnergy.java:125-149} {@code LAMBDA_IR_HIT}. Public so
+     * {@code XFactory762mm.energy_lacunae_ir} can bind the same handle (CE {@code XFactory762mm.java:61}).
+     */
+    public static void irHit(EntityBulletBeamBase beam, HitResult hit) {
         BulletConfig.LAMBDA_STANDARD_BEAM_HIT.accept(beam, hit);
 
         if (hit instanceof EntityHitResult ehr && ehr.getEntity() instanceof LivingEntity living) {
@@ -280,8 +280,23 @@ public final class XFactoryEnergy {
                 living.setData(ModAttachments.LIVING_ATTACHMENT, props);
             }
         }
-        // TODO(entity-effect-fire-lingering): CE also ignites an adjacent flammable block / spawns an
-        // EntityFireLingering ground-fire puddle on a block hit - see class javadoc's forward reference.
+
+        if (hit instanceof BlockHitResult bhr) {
+            Level world = beam.level();
+            BlockPos pos = bhr.getBlockPos();
+            Direction dir = bhr.getDirection();
+            BlockState state = world.getBlockState(pos);
+            if (state.isFlammable(world, pos, dir.getOpposite())) {
+                BlockPos adj = pos.relative(dir);
+                if (world.getBlockState(adj).isAir()) {
+                    world.setBlock(adj, Blocks.FIRE.defaultBlockState(), 3);
+                    return;
+                }
+            }
+            Vec3 loc = bhr.getLocation();
+            EntityFireLingering.spawn(world, loc.x, loc.y, loc.z, 2F, 1F,
+                    EntityFireLingering.TYPE_DIESEL, 100);
+        }
     }
 
     private static Vec3 resolveImpactPoint(HitResult hit) {
@@ -293,9 +308,6 @@ public final class XFactoryEnergy {
     }
 
     // ==================== gun_fatman nuke-round impact lambdas ====================
-    // SatelliteDetector calls are still dropped (com.hbm.saveddata.satellites.SatelliteDetector is a
-    // separate, not-yet-ported system - documented forward reference, see class javadoc); incrementRad
-    // is now wired against Phase 4's real com.hbm.handler.radiation.ChunkRadiationManager.
 
     private static void nukeStandard(EntityBulletBaseMK4 bullet, HitResult hit) {
         if (skipSelfHit(bullet, hit)) return;
@@ -342,6 +354,8 @@ public final class XFactoryEnergy {
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
         incrementRad(bullet.level(), loc.x, loc.y, loc.z, 1.5F);
+        SatelliteDetector.reportEvent(bullet.level(), SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, bullet.getX(), bullet.getZ());
         bullet.level().playSound(null, loc.x, loc.y + 0.5, loc.z, HBMSoundHandler.mukeExplosion.get(), net.minecraft.sounds.SoundSource.HOSTILE, 15.0F, 1.0F);
         HbmEffect.sendPacket(bullet.level(), HbmEffect.MUKE, loc.x, loc.y + 0.5, loc.z, 250, null);
     }
@@ -355,6 +369,8 @@ public final class XFactoryEnergy {
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
         incrementRad(bullet.level(), loc.x, loc.y, loc.z, 0.25F);
+        SatelliteDetector.reportEvent(bullet.level(), SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, bullet.getX(), bullet.getZ());
         EntityNukeTorex.statFac(bullet.level(), loc.x, loc.y + 0.5, loc.z, 0.25F);
     }
 
@@ -386,7 +402,10 @@ public final class XFactoryEnergy {
         vnt.explode();
     }
 
+    /** Exact CE {@code XFactoryCatapult.java:115-116} — sat ping then Torex. polaroid bale skip. */
     private static void spawnMush(EntityBulletBaseMK4 bullet, Vec3 loc) {
+        SatelliteDetector.reportEvent(bullet.level(), SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, bullet.getX(), bullet.getZ());
         EntityNukeTorex.statFac(bullet.level(), loc.x, loc.y + 0.5, loc.z, 0.4F);
     }
 

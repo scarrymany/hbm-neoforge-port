@@ -6,7 +6,8 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code ContainerMachineTurbofan}: canister 17,17 / empty 17,53 / upgrade 98,71 / bat 143,71 / ID 44,71. */
+/** CE {@code ContainerMachineTurbofan}: canister 17,17 / empty 17,53 / upgrade 98,71 / bat 143,71 / ID 44,71.
+ * Slot 0/1 {@code loadTank} + slot 4 {@code setType} Exact CE {@code :156-157}. */
 public class TurbofanMenu extends MenuBase<MachineTurbofanBlockEntity> {
 
     public TurbofanMenu(int id, Inventory playerInv, MachineTurbofanBlockEntity be) {

@@ -6,13 +6,18 @@ import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.RecipesCommon.AStack;
+import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.workshop.ArcWelderMenu;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.ArcWelderRecipes;
 import com.hbm.inventory.recipes.ArcWelderRecipes.ArcWelderRecipe;
+import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.items.machine.ItemMachineUpgrade;
+import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,6 +25,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,33 +33,77 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CE {@code TileEntityMachineArcWelder}: maxPower 2_000 (grows with recipe), 3 inputs + out + battery.
- * Upgrades skipped — base duration/consumption.
+ * {@code tank.setType(5)} Exact CE {@code :121}. Slot 5 Exact CE
+ * {@code ContainerMachineArcWelder.java:43}. Slots 6-7 upgrades Exact CE {@code :149-206}
+ * / {@code ContainerMachineArcWelder.java:45-46}. Tau/Hadron VFX / IUpgradeInfoProvider stay skipped.
  */
 public class ArcWelderBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
 
     public static final int SLOT_OUT = 3;
     public static final int SLOT_BATTERY = 4;
+    public static final int SLOT_ID = 5;
+    public static final int SLOT_UPGRADE_A = 6;
+    public static final int SLOT_UPGRADE_B = 7;
     public static final long BASE_MAX = 2_000L;
     public static final int TANK_CAPACITY = 24_000;
 
+    private static final Map<UpgradeType, Integer> VALID_UPGRADES = new EnumMap<>(UpgradeType.class);
+
+    static {
+        VALID_UPGRADES.put(UpgradeType.SPEED, 3);
+        VALID_UPGRADES.put(UpgradeType.POWER, 3);
+        VALID_UPGRADES.put(UpgradeType.OVERDRIVE, 3);
+    }
+
     public final FluidTankNTM tank;
     public long power;
+    public long maxPower = BASE_MAX;
     public int progress;
     public int processTime = 1;
     public long consumption;
     public boolean isProcessing;
+    private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(VALID_UPGRADES);
 
     public ArcWelderBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 5, true, true);
+        super(type, pos, state, 8, true, true);
         tank = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineArcWelder.java:91-104
+                if (!stack.isEmpty() && slot >= SLOT_UPGRADE_A && slot <= SLOT_UPGRADE_B
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
@@ -64,6 +114,9 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot == SLOT_BATTERY) return Library.isBattery(stack);
+        // CE :372-374 returns false for slot 5; without this the ID never lands and setType is dead.
+        if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        if (slot == SLOT_UPGRADE_A || slot == SLOT_UPGRADE_B) return stack.getItem() instanceof ItemMachineUpgrade;
         return slot < SLOT_OUT;
     }
 
@@ -84,7 +137,9 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
-        power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, power, getMaxPower());
+        power = Library.chargeTEFromItems(inventory, SLOT_BATTERY, getPower(), getMaxPower());
+        // CE TileEntityMachineArcWelder.java:121
+        this.tank.setType(SLOT_ID, inventory);
         for (Direction d : Direction.values()) {
             trySubscribe(level, worldPosition.relative(d), d);
             if (tank.getTankType() != Fluids.NONE) {
@@ -94,26 +149,48 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
 
         ArcWelderRecipe recipe = ArcWelderRecipes.getRecipe(
                 inventory.getStackInSlot(0), inventory.getStackInSlot(1), inventory.getStackInSlot(2));
-        if (recipe == null || !canOutput(recipe) || !hasFluid(recipe)) {
+
+        // CE TileEntityMachineArcWelder.java:149-206
+        upgradeManager.checkSlots(inventory, SLOT_UPGRADE_A, SLOT_UPGRADE_B);
+        int redLevel = upgradeManager.getLevel(UpgradeType.SPEED);
+        int blueLevel = upgradeManager.getLevel(UpgradeType.POWER);
+        int blackLevel = upgradeManager.getLevel(UpgradeType.OVERDRIVE);
+
+        long intendedMaxPower;
+        if (recipe != null) {
+            processTime = recipe.duration - (recipe.duration * redLevel / 6) + (recipe.duration * blueLevel / 3);
+            consumption = recipe.consumption + (recipe.consumption * redLevel) - (recipe.consumption * blueLevel / 6);
+            consumption *= (long) Math.pow(2, blackLevel);
+            intendedMaxPower = consumption * 20;
+
+            if (canProcess(recipe)) {
+                isProcessing = true;
+                progress += (1 + blackLevel);
+                power -= consumption;
+                if (progress >= processTime) {
+                    progress = 0;
+                    consume(recipe);
+                    ItemStack have = inventory.getStackInSlot(SLOT_OUT);
+                    if (have.isEmpty()) {
+                        inventory.setStackInSlot(SLOT_OUT, recipe.output.copy());
+                    } else {
+                        have.grow(recipe.output.getCount());
+                    }
+                }
+            } else {
+                progress = 0;
+                isProcessing = false;
+            }
+        } else {
             progress = 0;
             isProcessing = false;
-            consumption = 0;
-            return;
+            consumption = 100;
+            intendedMaxPower = BASE_MAX;
         }
-        processTime = recipe.duration;
-        consumption = recipe.consumption;
-        if (power < consumption) {
-            isProcessing = false;
-            return;
-        }
-        isProcessing = true;
-        power -= consumption;
-        progress++;
-        if (progress >= processTime) {
-            consume(recipe);
-            inventory.insertItem(SLOT_OUT, recipe.output.copy(), false);
-            progress = 0;
-        }
+        maxPower = Math.max(intendedMaxPower, power);
+        // CE :181-194 Tau/Hadron AuxParticle — VFX skip
+        dataChanged();
+        networkPackMK2(25);
     }
 
     private boolean hasFluid(ArcWelderRecipe recipe) {
@@ -121,8 +198,13 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
         return tank.getTankType() == recipe.fluid.type && tank.getFill() >= recipe.fluid.fill;
     }
 
-    private boolean canOutput(ArcWelderRecipe recipe) {
-        return inventory.insertItem(SLOT_OUT, recipe.output.copy(), true).isEmpty();
+    private boolean canProcess(ArcWelderRecipe recipe) {
+        if (power < consumption) return false;
+        if (!hasFluid(recipe)) return false;
+        ItemStack have = inventory.getStackInSlot(SLOT_OUT);
+        if (have.isEmpty()) return true;
+        return ItemStack.isSameItemSameComponents(have, recipe.output)
+                && have.getCount() + recipe.output.getCount() <= have.getMaxStackSize();
     }
 
     private void consume(ArcWelderRecipe recipe) {
@@ -143,7 +225,8 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getPower() {
-        return power;
+        // CE TileEntityMachineArcWelder.java:347-348
+        return Math.max(Math.min(power, maxPower), 0);
     }
 
     @Override
@@ -153,7 +236,7 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return Math.max(BASE_MAX, consumption * 100L);
+        return maxPower;
     }
 
     @Override
@@ -194,7 +277,9 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
+        tag.putLong("maxPower", maxPower);
         tag.putInt("progress", progress);
+        tag.putInt("processTime", processTime);
         tank.writeToNBT(tag, "t");
     }
 
@@ -202,7 +287,9 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
+        if (tag.contains("maxPower")) maxPower = tag.getLong("maxPower");
         progress = tag.getInt("progress");
+        if (tag.contains("processTime")) processTime = tag.getInt("processTime");
         tank.readFromNBT(tag, "t");
     }
 
@@ -214,6 +301,8 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
         buf.writeBoolean(isProcessing);
         buf.writeInt(progress);
         buf.writeInt(processTime);
+        buf.writeLong(maxPower);
+        buf.writeLong(consumption);
     }
 
     @Override
@@ -224,6 +313,8 @@ public class ArcWelderBlockEntity extends MachineBaseBlockEntity
         isProcessing = buf.readBoolean();
         progress = buf.readInt();
         processTime = buf.readInt();
+        maxPower = buf.readLong();
+        consumption = buf.readLong();
     }
 
     @Override

@@ -44,6 +44,13 @@ public final class SpecialItems {
     public static final DeferredItem<com.hbm.items.BrokenItem> BROKEN_ITEM = register("broken_item",
             () -> new com.hbm.items.BrokenItem(new Item.Properties()));
 
+    // Simple items (pellet_gas)
+    public static final DeferredItem<Item> PELLET_GAS = register("pellet_gas",
+            () -> new Item(new Item.Properties()));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.PARTS, PELLET_GAS);
+    }
+
     // ==================== ItemAMSCore (4 instances) ====================
 
     public static final DeferredItem<ItemAMSCore> AMS_CORE_SING = register("ams_core_sing",
@@ -95,13 +102,16 @@ public final class SpecialItems {
         CreativeTabContents.add(ModCreativeTabs.CONTROL, CELL);
     }
 
-    // ==================== ItemDemonCore / demon_core_closed (Pattern F, see HazardRegistry) =====
+    // ==================== ItemManMike (CE :2385) / ItemDemonCore / demon_core_closed (Pattern F, see HazardRegistry) =====
 
+    public static final DeferredItem<com.hbm.items.bomb.ItemManMike> MAN_CORE =
+            register("man_core", () -> new com.hbm.items.bomb.ItemManMike(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<ItemDemonCore> DEMON_CORE_OPEN =
             register("demon_core_open", () -> new ItemDemonCore(new Item.Properties()));
     public static final DeferredItem<ItemCustomLore> DEMON_CORE_CLOSED =
             register("demon_core_closed", () -> new ItemCustomLore(new Item.Properties()));
     static {
+        CreativeTabContents.add(ModCreativeTabs.NUKE, MAN_CORE);
         CreativeTabContents.add(ModCreativeTabs.NUKE, DEMON_CORE_OPEN);
         CreativeTabContents.add(ModCreativeTabs.NUKE, DEMON_CORE_CLOSED);
     }
@@ -164,6 +174,9 @@ public final class SpecialItems {
 
     public static final DeferredItem<ItemRag> RAG =
             register("rag", () -> new ItemRag(new Item.Properties(), "rag_damp", "rag_piss"));
+    // CE ModItems.java:1318-1319 ItemBase partsTab. ItemRag already swaps to these ids.
+    public static final DeferredItem<Item> RAG_DAMP = registerParts("rag_damp", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> RAG_PISS = registerParts("rag_piss", () -> new Item(new Item.Properties()));
     static {
         CreativeTabContents.add(ModCreativeTabs.PARTS, RAG);
     }
@@ -406,24 +419,33 @@ public final class SpecialItems {
     // ==================== MaskMan boss loot (docs/phase4/entities_bosses.md) ====================
     // coin_maskman: CE ModItems.java:1419, ItemCustomLore, UNCOMMON, consumableTab - same pattern as
     // coin_worm/the ItemSiegeCoin family above.
-    // gas_mask_filter_combo: CE ModItems.java:181, `new ItemFilter("gas_mask_filter_combo", 24000)
-    // .setMaxStackSize(1).setCreativeTab(MainRegistry.consumableTab)`. Ported here as a minimal plain
-    // Item (durability only) purely so EntityMaskMan's death loot can pre-install a real filter stack
-    // via the already-real ArmorUtil.installGasMaskFilter. CE's full ItemFilter mechanic (player
-    // right-click swap onto a worn IGasMask helmet, with an ArmorModHandler mod-slot cross-check) is a
-    // wider "armor items/attachments" scope already flagged as a deferred TODO in ArmorUtil.java
-    // (register(), ~lines 104-109) and is NOT reproduced here - this item is otherwise inert.
+    // gas_mask_filter*: Exact CE ItemFilter (durability + right-click install).
 
     public static final DeferredItem<ItemCustomLore> COIN_MASKMAN =
             register("coin_maskman", () -> new ItemCustomLore(new Item.Properties().rarity(net.minecraft.world.item.Rarity.UNCOMMON)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER =
+            register("gas_mask_filter", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(18000)));
     public static final DeferredItem<Item> GAS_MASK_FILTER_COMBO =
-            register("gas_mask_filter_combo", () -> new Item(new Item.Properties().stacksTo(1).durability(24000)));
+            register("gas_mask_filter_combo", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(24000)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER_RAG =
+            register("gas_mask_filter_rag", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(4000)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER_PISS =
+            register("gas_mask_filter_piss", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(4000)));
+    public static final DeferredItem<Item> GAS_MASK_FILTER_MONO =
+            register("gas_mask_filter_mono", () -> new com.hbm.items.tool.ItemFilter(new Item.Properties().stacksTo(1).durability(12000)));
     public static final DeferredItem<com.hbm.items.armor.ItemModV1> V1 =
             register("v1", () -> new com.hbm.items.armor.ItemModV1(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<com.hbm.items.armor.ItemArmorMod> NIGHT_VISION =
+            register("night_vision", () -> new com.hbm.items.armor.ItemModNightVision(new Item.Properties()));
     static {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, COIN_MASKMAN);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_COMBO);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_RAG);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_PISS);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, GAS_MASK_FILTER_MONO);
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, V1);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, NIGHT_VISION);
     }
 
     // ==================== RAD Beast leader loot (docs/phase4/entities_bosses.md RAD Beast section /
@@ -510,6 +532,21 @@ public final class SpecialItems {
     static {
         CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, LINKER);
     }
+
+    // ==================== Runes (CE ModItems:1986-1991, partsTab, maxStack=1) ====================
+
+    public static final DeferredItem<ItemCustomLore> RUNE_BLANK = registerParts("rune_blank",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_ISA = registerParts("rune_isa",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_DAGAZ = registerParts("rune_dagaz",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_HAGALAZ = registerParts("rune_hagalaz",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_JERA = registerParts("rune_jera",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<ItemCustomLore> RUNE_THURISAZ = registerParts("rune_thurisaz",
+            () -> new ItemCustomLore(new Item.Properties().stacksTo(1)));
 
     // ==================== helpers ====================
 

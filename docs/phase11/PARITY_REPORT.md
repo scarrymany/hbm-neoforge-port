@@ -9,8 +9,8 @@ Source: static read of `upstream/hbm-ce` vs this port. Script: `scripts/phase11_
 `src/main/resources` + `src/generated`. Quality bar: `docs/CE_PARITY_ADDENDUM.md`.
 
 Verified this wave: `compileJava` 0,
-`./gradlew runServer` **Done (5.197s)** on wiped world port 25566, **4052 recipes**.
-No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
+`./gradlew runServer` **Done (5.633s)** on wiped world port 25566, **4052 recipes**.
+No recipe parse errors. No Exception/ERROR. No new tag. `v0.0.1-rc2` stays.
 
 ## Top line
 
@@ -24,7 +24,7 @@ No recipe parse errors. No new tag. `v0.0.1-rc2` stays.
 Weighted is **above 99%** (need 7689). Gates: `compileJava` 0 + `runServer` Done.
 Tag `v0.0.1-rc2`. Existing `v0.0.1-rc1` / `beta-82` / `beta-82.1` stay.
 
-Largest remaining holes: **blocks 154**, **machine 85**, **vanilla 52**.
+Largest remaining holes: **blocks 154**, **machine 85**, **vanilla 51**.
 Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 99%+ tag: https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc2
 90% playtest (kept): https://github.com/scarrymany/hbm-neoforge-port/releases/tag/v0.0.1-rc1
@@ -34,7 +34,7 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 | Category | CE | Port | % | Method |
 |---|---:|---:|---:|---|
 | Items (flattened ids) | 1863 | 2613 | **140.3%** | +`linker` |
-| Blocks | 1169 | 1015 | **86.8%** | casings now live TE (same ids) |
+| Blocks | 1169 | 1016 | **86.9%** | +`toxic_block` |
 | Fluids | 162 | 162 | **100%** | `FluidType` fields |
 | Entities | 168 | 189 | **112.5%** | CE `@AutoRegister(name=)` under `entity/`. Port extras = spawn eggs + `entity_cloud_solinium` |
 | Sounds | 381 | 381 | **100%** | `SoundEvent` / `DeferredHolder` fields |
@@ -45,10 +45,10 @@ Weighted **106.2%**. Reachability **63.4%** — still the owner pain. Not a tag.
 Texture leftover after aliases (Phase 10, do **not** invent art): items **9.3%** (164/1771), blocks
 **16.6%** (96/579). See `docs/phase10/LEFTOVER_MISSES.md`.
 
-## What changed this wave (ItemTeleLink + landmine/NITAN)
+## What changed this wave (Dud + Barrel)
 
-Reachability **63.4% (1657 / 2613)**. strand_caster / forcefield / chungus /
-satlink live TEs stay accepted. No invented biomes / structures.
+Reachability **63.4% (1657 / 2613)**. No invented biomes / chances. `linker` /
+landmine / NITAN stay accepted.
 
 - **`linker`**: CE `ItemTeleLink` (`ModItems.java:106`). `DETONATOR_POS` =
   CE NBT `x/y/z`. Click any block → set + `chat.telelink.set`. Sneak on
@@ -64,13 +64,204 @@ satlink live TEs stay accepted. No invented biomes / structures.
 - **NITAN** (`HbmWorldGen.java:652-686` / `:744-753`): `enableNITAN` only (not
   dungeon-gated). 8 coords y=250: `(±10000,250,±10000)` + axes. Air → chest +
   `POOL_POWDER` × 29. Not generated in spawn (coords 10000).
-- Cited leftover (no port generator): hive 256 `GlyphidHive`; desert-atom
-  0:500 `!canRain && temp>=2`; barrel 0:5000 `temp>1.8`; satellite 0:500
-  `temp<1 || temp>1.8`; spaceship 0:1000; dud 0:500.
-  TODO(CE: HbmWorldGen.java:347-379).
+- **Dud** (`Dud.java` / `HbmWorldGen.java:379`): `enableDungeons`,
+  `dudStructure` default **0:500**, no biome. `EnumDudType` → four
+  `crashed_bomb_*` flags `2|16`. Sandstone OR spawn. `TOP_LAYER_MODIFICATION`.
+  Default 1/500: **0/841** (λ≈1.7). Forced `dudStructure=1`: **70** duds
+  (23/19/17/11 nuke/conv/salted/balefire).
+- **Barrel** (`Barrel.java` / `:370-371`): `enableDungeons`,
+  `barrelStructure` default **0:5000**, `getBaseTemperature()>1.8F` only.
+  289-cell schematic, `crate_steel` + `POOL_EXPENSIVE`×16. `toxic_block`
+  registered (still; flow/fog TODO(CE: ToxicBlock.java:26-105)). YellowBarrel
+  1-in-3 toxic branch live. Default spawn plains: miss. Forced 1/1:
+  **7** `crate_steel` / **9** `toxic_block` / **11** sellafield chunks.
+- **Spaceship** (`:377`): `enableDungeons`, **0:1000**, no biome, 1419-cell
+  schematic, `y+=1`. Forced 1/1: 14 `deco_tungsten` / 8 `pwr_fuelrod` /
+  1 `hadron_coil_alloy`. `fusion_core` item untouched (`fusion_core_block`).
+- **Satellite dish** (`:373-374`, not satlink): **0:500**, `temp<1||temp>1.8`.
+  Forced 1/1: 8 `deco_titanium` / 6 `deco_beryllium` / 1 `tape_recorder`.
+- FEATURES write-radius 0 clips overflow (no ServerLevel cascade).
+  Same Spaceship/Satellite skip — do not invent a write cascade.
+- **GlyphidHive** (`:347-358`): `enableHives`, overworld, `hiveSpawn` **256**.
+  Schematic 11×5×11. `glyphid_spawner` + glyphid entities. 1/10 infected.
+- **DesertAtom** (`:367-368`): `atomStructure` **0:500**,
+  `!hasPrecipitation && temp>=2`. 5162-cell schematic. Height point `(20,0,16)`
+  + sandstone/terracotta.
+- Forced 1/1 desert seed `1833280291927865410`, 841 chunks: hive 57
+  `glyphid_base` / 56 `glyphid_spawner` / 5 infested; atom 48
+  `reinforced_sand` / 10 `yellow_barrel` / 7 `lead_block`. Defaults 256/500.
 
-Honest E2E: no client — linker sneak-apply not clicked in-game. compileJava 0
-+ runServer Done + recipe + MCA palette scan.
+Honest E2E: no client. compileJava 0 + runServer Done + MCA palette scan.
+
+## This wave (leftover Dummyable casings → live TE)
+
+Phase11 `BlockBase` casings with CE TEs. Same ids. No invent.
+≠ already-live `machine_assembly_machine` / `machine_chemical_plant`.
+
+- **`machine_assembly_factory`**: Dummyable `{2,0,2,2,2,2}` offset 2 +
+  perimeter extras `|i|==2|||j|==2` at y + roof extras y+2 along ±rot*2
+  (`MachineAssemblyFactory.java:45-64`). META≥12 core TE. 60 slots,
+  4 lanes (`5+i*14` in / `17+i*14` out), tanks 4+4 @ **4000** + water/lps
+  **4000**. Upgrade then **`speed*2D, pow*2D`**. `canCool` 100 water → 100
+  lps/lane. maxPower `max(power, sum(recipe.power*100), 1_000_000)`.
+  Recipes: port `AssemblerRecipe` / `ProcessingRecipes.ASSEMBLER_TYPE`.
+  GUI `gui_assembly_factory.png` 256×240 + bind. Caps item+fluid+energy.
+  Auto-match per lane.
+  TODO(CE: MachineAssemblyFactory.java:36) ProxyDyn META≥6;
+  TODO(CE: MachineAssemblyFactory.java:72-99) ILookOverlay;
+  TODO(CE: GUIMachineAssemblyFactory.java:62) GUIScreenRecipeSelector;
+  TODO(CE: TileEntityMachineAssemblyFactory.java:213) CE blueprint slot
+  `4+i*7` typo — port uses container `4+i*14`;
+  TODO(CE: RenderAssemblyFactory.java:1) OBJ TESR + AssemfacArm;
+  TODO(CE: TileEntityMachineAssemblyFactory.java:744-763) ROR.
+- **`machine_chemical_factory`**: same Dummyable dims/extras
+  (`MachineChemicalFactory.java:45-64`). 32 slots, 4 lanes
+  (`5+i*7..7` in / `8+i*7..10` out), 12+12 tanks @ **24000** + water/lps
+  **4000**. Same upgrade `*2` + cool. Recipes: `ChemPlantRecipes`.
+  GUI `gui_chemical_factory.png` 248×216 + bind. Caps item+fluid+energy.
+  Same-type out→in 50 mB/tick. Auto-match per lane.
+  TODO(CE: MachineChemicalFactory.java:36) ProxyDyn META≥6;
+  TODO(CE: GUIMachineChemicalFactory.java:63) GUIScreenRecipeSelector;
+  TODO(CE: TileEntityMachineChemicalFactory.java:168-174) `loadTank(10,13)`
+  leftover chem-plant slots — not copied (no canister slots);
+  TODO(CE: RenderChemicalFactory.java:1) OBJ TESR;
+  TODO(CE: TileEntityMachineChemicalFactory.java:525-544) ROR.
+- **`turret_arty`**: Dummyable `{1,0,2,1,2,1}` offset 1
+  (`TurretArty.java:30-36`). META≥12 core TE. 11 slots (0 chip, 1–9 ammo,
+  10 battery). maxPower **100000**. Modes ARTILLERY/CANNON/MANUAL. Range
+  3000/250, grace 250/32, V0 50/20, delay 300/40, elevation 90, barrel 9,
+  height 3. Fires `EntityArtilleryShell` + existing `ammo_arty_normal`/
+  `chlorine`/`phosgene`/`mustard`. GUI `gui_turret_arty.png` 176×222 + bind.
+  TODO(CE: TurretArty.java:26) ProxyCombo;
+  TODO(CE: RenderTurretArty.java:1) OBJ TESR;
+  TODO(CE: ItemAmmoArty.java:54-67) missing 8 shell metas not invented.
+- **`turret_himars`**: same Dummyable dims (`TurretHIMARS.java:29-35`).
+  maxPower **1_000_000**. AUTO/MANUAL, crane ±0.0125, fire 40t, V0 25,
+  range 5000, grace 250, height 5, barrel 0.5. Reload pack → 6 or 1.
+  Fires `EntityArtilleryRocket` + existing 8 `ammo_himars_*`.
+  GUI `gui_turret_himars.png` 176×222 + bind.
+  TODO(CE: TurretHIMARS.java:25) ProxyCombo;
+  TODO(CE: RenderTurretHIMARS.java:1) OBJ TESR;
+  TODO(CE: ItemAmmoHIMARS.java:256) volcanic_lava → slag.
+- Fusion torus / klystron family not stubbed (`KlystronNetwork` /
+  `PlasmaNetwork` / `ModuleMachineFusion`). CE `fusion_core` is BlockBase.
+  `machine_watz_reactor` already live — no second Watz id.
+  `watz_element` / `watz_cooler` / `machine_transformer*` stay BlockBase
+  (CE ModBlocks.java:979-982 / :watz element-cooler).
+  Leftover later: fusion peripherals / `struct_torus_core` (no stub).
+
+## This wave (nuke_solinium / nuke_fstbmb / vitrified_barrel)
+
+- **`nuke_solinium`**: `NukeSolinium` + `TileEntityNukeSolinium`
+  (`tileentity_nuke_solinium`). 9 slots. MK3 `extType=1`, `waste=false`,
+  `coefficient=1.0`, radius **150** (`BombConfig.SOLINIUM_RADIUS`).
+  `EntityCloudSolinium`. GUI 176×222 CE slot coords.
+  TODO(CE: GUINukeSolinium.java:16) soliniumSchematic.png missing in tree.
+- **`nuke_fstbmb`**: CE `NukeBalefire` id (`ModBlocks.java:711`). Shares
+  live TE `nuke_balefire` + timer 18000 + `EntityBalefire` **250**.
+  `nuke_balefire` flatten stays. No invented yield.
+- **`vitrified_barrel`**: `YellowBarrel`, 0.5/2.5. Idle rad **0.5/5**
+  (yellow **5/75**). Explode toxic 1/3 else 18.0F, waste 35, rad 35/1500.
+  No TE (CE none).
+
+Honest E2E: compileJava 0 + runServer **Done (5.633s)** / 4052 / *:25566.
+RCON place + BE Size 9 / timer 18000 / no TE on vitrified.
+`/item replace` not vanilla Container. No r=150/250 detonation. No GUI.
+No Exception/ERROR.
+
+## Prior wave (seal_* / pile_brick)
+
+- **`seal_controller`**: `BlockSeal` (`BlockSeal.java`). FACING + ACTIVATED.
+  Hardness **10 / 100** (`ModBlocks.java:885`). No own TE. Click / rising
+  RS / `IBomb.explode` toggle frame size **1–6**. Interior = `seal_hatch`.
+- **`seal_hatch`**: `BlockHatch` + `TileEntityHatch` (`tileentity_seal_lid`).
+  Hardness/resistance ∞, creative tab null. Tick: missing controller or
+  `getFrameSize==0` → air.
+- **`seal_frame`**: BlockBase, hardness **10 / 100** (`ModBlocks.java:884`).
+- **`pile_brick`**: `BlockPileBrick` IToolable HAND_DRILL, MIN/MAX **5/15**,
+  flammable 30/5, hardness **5 / 10**. Size scan + CE error strings.
+  TODO(CE: BlockPileBrick.java:94-108) conversion to `pile_block` +
+  `TileEntityPileCore` / `TileEntityPileBaseMK2` — do not stub.
+
+Honest E2E: compileJava 0 + runServer **Done (5.827s)** / 4052 recipes /
+*:25566. RCON size-1 SOUTH: close → hatch + BE controller long; falling
+RS keeps hatch; second pulse → air; break frame → hatch air. `pile_brick`
+places, no TE. No client — click/`IBomb`/HAND_DRILL not physically used.
+No Exception/ERROR.
+
+## Prior wave (reactor_research / reactor_zirnox)
+
+- **`reactor_research`**: Dummyable `{2,0,0,0,0,0}` offset 0
+  (`ReactorResearch.java:87-93`). META≥12 core TE. 12 plate slots,
+  maxHeat **50000**, rod speed **0.04**, water cool `heat*0.07*water/12`,
+  explode **18.0F** + deco_steel/corium/deco_steel, rad
+  `heat/max*50` / 25000 (unshielded). Fuel map 7 plates → `_hot` waste
+  (CE meta 1). GUI `gui_research_reactor.png` 176×222 + bind. Caps item.
+  Breeding `getInteractions` reads `totalFlux`. Sensor marks core pos.
+  TODO(CE: ReactorResearch.java:36) ProxyCombo;
+  TODO(CE: RenderSmallReactor.java:16) TESR;
+  TODO(CE: TileEntityReactorResearch.java:420-478) OC;
+  TODO(CE: GUIReactorResearch.java:29) NumberDisplay 7-seg;
+  TODO(CE: TileEntityReactorResearch.java:232) block_lead/desh.
+- **`reactor_zirnox`**: Dummyable `{1,0,2,2,2,2}` offset 2 + XR
+  `{4,-2,1,1,1,1}` / `{4,-2,0,0,2,-2}` / `{4,-2,0,0,-2,2}` + 5 extras
+  (`ReactorZirnox.java:58-89`). 28 slots, tanks SHS **8000** / CO2
+  **16000** / water **32000**, maxHeat/Pressure **100000**. Steam gen
+  `(heat-10256)/maxHeat * min(CO2/14000,1) * 25 * 7.5`. Vent −1000 CO2.
+  Redstone forces on / falling edge off. GUI `gui_zirnox.png` 203×256.
+  Caps item+fluid. Meltdown: explode 12F + rad 50/15000.
+  TODO(CE: ReactorZirnox.java:33) ProxyCombo;
+  TODO(CE: StaticTesrBakedModels.java:315) OBJ TESR;
+  TODO(CE: TileEntityReactorZirnox.java:229) tilt / IConnectionAnchors;
+  TODO(CE: TileEntityReactorZirnox.java:354-431) debris / zirnox_destroyed / waste / ach;
+  TODO(CE: TileEntityReactorZirnox.java:508-656) OC + ROR;
+  TODO(CE: GUIReactorZirnox.java:99-104) GUIElements gauges.
+- Fusion / watz skipped (huge MB). Transformers stay BlockBase.
+
+Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
++ runServer **Done (1.692s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
+No physical place. No Exception/ERROR.
+
+## Prior wave (fluidtank / bigasstank / compact / satlinker)
+
+- **`machine_fluidtank`**: Dummyable `{2,0,1,1,2,2}` offset 1 + extras
+  `placed-dir ±1,±1` (`MachineFluidTank.java:79-143`). META≥12 core TE.
+  6 slots, tank **256000**, mode 0=in / 1=both / 2=out / 3=off.
+  `loadTank(2,3)` / `setType(0,1)` / `unloadTank(4,5)`. Antimatter →
+  explode 5F + `hasExploded`; highly corrosive → `hasExploded`.
+  GUI `gui_tank.png` 176×166 + mode blit 151,34 + bind. Caps item+fluid.
+  Comparator. Sneak+identifier sets type.
+  TODO(CE: TileEntityMachineFluidTank.java:198-235) UniNodespace pipe node;
+  TODO(CE: TileEntityMachineFluidTank.java:70) OC / IControllable / IClimbable / IRepairable;
+  TODO(CE: TileEntityMachineFluidTank.java:253-256) ExplosionVNT.makeAmat;
+  TODO(CE: TileEntityMachineFluidTank.java:263-370) leak/fire/pollute;
+  TODO(CE: MachineFluidTank.java:173-197) onBlockExploded + BombletZeta;
+  TODO(CE: RenderFluidTank.java:1) TESR.
+- **`machine_bigasstank`**: Dummyable `{5,0,4,4,4,4}` offset 6 + 6 XR fills
+  (`MachineBigAssTank.java:48-76`). ≠ `machine_bat9000`. Extends barrel:
+  6 slots, **16_000_000**, mode, `getReceiverSpeed`/`getProviderSpeed`
+  `max(50000,(max-fill)/100)` / `max(50000,fill/100)`. Antimatter destroy
+  + explode 10. ConPos `±dir*7`. Barrel GUI `gui_barrel.png` 176×166
+  (`guiID_barrel`). Caps item+fluid. Comparator. Sneak+identifier.
+  TODO(CE: TileEntityBarrel.java:247-286) UniNodespace buffer;
+  TODO(CE: TileEntityBarrel.java) tilt / floor pollute;
+  TODO(CE: MachineBigAssTank.java:44) ProxyCombo;
+  TODO(CE: RenderBigAssTank.java:1) TESR.
+- **`machine_compressor_compact`**: Dummyable `{2,0,1,1,3,3}` offset 1 + 6
+  extras y+1 (`MachineCompressorCompact.java:30-52`). Subclass of compressor
+  BE; only `getConPos` (6 ports) + client `fanSpin`. Reuses
+  `CompressorMenu`/`CompressorScreen` (CE same GUI). Caps item+fluid+energy.
+  Hardness 10 / 20 (`ModBlocks.java:1087`).
+  TODO(CE: TileEntityMachineCompressorCompact.java:18-29) TESR fan;
+  TODO(CE: MachineCompressorCompact.java:26) ProxyCombo.
+- **`machine_satlinker`**: 1×1 MODEL (`MachineSatLinker.java:19`). ≠
+  `machine_satlink`. 3 slots: copy freq 0→1 if both `ISatChip`; slot 2
+  `rand(100000)` if `!SatelliteSavedData.isFreqTaken`. GUI
+  `gui_sat_linker.png` 176×186 + bind. Missile tab. Caps item.
+
+Honest E2E: Dummyable `setPlacedBy` needs a Player — no client. compileJava 0
++ runServer **Done (5.751s)** / 4052 recipes / *:25566 + registry/caps/GUI bind.
+No physical place. No Exception/ERROR.
 
 ## Prior wave (leftover Dummyable + CE TE)
 
@@ -138,8 +329,8 @@ physically placed. compileJava 0 + runServer Done + registry/caps/GUI bind.
   Gates `ENABLE_DUNGEON_SPAWN` + `ENABLE_RAD_HOTSPOT_SPAWN`.
   Oil-sand now dungeon-gated (CE `enableDungeons`).
 - Cited: phased chunk-wait TODO(CE: Sellafield.java:20-45); TE never in CE
-  TODO(CE: Sellafield.java:149-155); leftover dungeons
-  TODO(CE: HbmWorldGen.java:347-395); NITAN TODO(CE: HbmWorldGen.java:652).
+  TODO(CE: Sellafield.java:149-155). Landmine/NITAN/dud/barrel/spaceship/
+  satellite dish landed; hive/atom still TODO(CE: HbmWorldGen.java:347-368).
   Basalt ores stay volcanic-fluid (CE has no chunk vein).
 
 ## Prior wave (OreEnum drops + assembler fluids + pile_rod_mk2)
@@ -403,7 +594,7 @@ TODO(CE: AnvilRecipes.java:75-130) / TODO(CE: AnvilRecipes.java:626-635). Do not
 
 Next other family by unique CE vs port (not regex 145-style): Press **41/38**,
 Combination ~done, Exposure done, Liquefaction leftovers landed, Solidification live.
-Assembler skip 3. Leftover CE dungeons (hive/satellite/spaceship/…).
+Assembler skip 3. Leftover CE dungeons (hive/desert-atom).
 Reachability **63.4%** still the owner pain (census misses worldgen). `v0.0.1-rc2` stays.
 Anvil E2E: smithing consume/produce **yes** (menu slots). Construction **yes**
 (`AnvilCraftPacket` + player inv). GUI blit CE `gui_anvil.png`, not gray-box.

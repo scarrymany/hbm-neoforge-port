@@ -67,6 +67,13 @@ import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineForceFieldBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineMiningLaserBlockEntity;
 import com.hbm.blockentity.machine.dummyable.MachineStrandCasterBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineFluidTankBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineBigAssTankBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineSatLinkerBlockEntity;
+import com.hbm.blockentity.machine.dummyable.ReactorResearchBlockEntity;
+import com.hbm.blockentity.machine.dummyable.ReactorZirnoxBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineAssemblyFactoryBlockEntity;
+import com.hbm.blockentity.machine.dummyable.MachineChemicalFactoryBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -143,6 +150,13 @@ public final class DummyableProcessMenus {
     public static DeferredHolder<MenuType<?>, MenuType<MiningLaserMenu>> MACHINE_MINING_LASER;
     public static DeferredHolder<MenuType<?>, MenuType<StrandCasterMenu>> MACHINE_STRAND_CASTER;
     public static DeferredHolder<MenuType<?>, MenuType<ForceFieldMenu>> MACHINE_FORCEFIELD;
+    public static DeferredHolder<MenuType<?>, MenuType<MachineFluidTankMenu>> MACHINE_FLUIDTANK;
+    public static DeferredHolder<MenuType<?>, MenuType<BigAssTankMenu>> MACHINE_BIGASSTANK;
+    public static DeferredHolder<MenuType<?>, MenuType<SatLinkerMenu>> MACHINE_SATLINKER;
+    public static DeferredHolder<MenuType<?>, MenuType<ReactorResearchMenu>> REACTOR_RESEARCH;
+    public static DeferredHolder<MenuType<?>, MenuType<ReactorZirnoxMenu>> REACTOR_ZIRNOX;
+    public static DeferredHolder<MenuType<?>, MenuType<MachineAssemblyFactoryMenu>> MACHINE_ASSEMBLY_FACTORY;
+    public static DeferredHolder<MenuType<?>, MenuType<MachineChemicalFactoryMenu>> MACHINE_CHEMICAL_FACTORY;
 
     private DummyableProcessMenus() {
     }
@@ -282,6 +296,20 @@ public final class DummyableProcessMenus {
                 new StrandCasterMenu(id, inv, (MachineStrandCasterBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         MACHINE_FORCEFIELD = reg("machine_forcefield", (id, inv, buf) ->
                 new ForceFieldMenu(id, inv, (MachineForceFieldBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_FLUIDTANK = reg("machine_fluidtank", (id, inv, buf) ->
+                new MachineFluidTankMenu(id, inv, (MachineFluidTankBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_BIGASSTANK = reg("machine_bigasstank", (id, inv, buf) ->
+                new BigAssTankMenu(id, inv, (MachineBigAssTankBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_SATLINKER = reg("machine_satlinker", (id, inv, buf) ->
+                new SatLinkerMenu(id, inv, (MachineSatLinkerBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        REACTOR_RESEARCH = reg("reactor_research", (id, inv, buf) ->
+                new ReactorResearchMenu(id, inv, (ReactorResearchBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        REACTOR_ZIRNOX = reg("reactor_zirnox", (id, inv, buf) ->
+                new ReactorZirnoxMenu(id, inv, (ReactorZirnoxBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_ASSEMBLY_FACTORY = reg("machine_assembly_factory", (id, inv, buf) ->
+                new MachineAssemblyFactoryMenu(id, inv, (MachineAssemblyFactoryBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        MACHINE_CHEMICAL_FACTORY = reg("machine_chemical_factory", (id, inv, buf) ->
+                new MachineChemicalFactoryMenu(id, inv, (MachineChemicalFactoryBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> reg(String name, IContainerFactory<T> factory) {

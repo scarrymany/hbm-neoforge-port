@@ -3,6 +3,7 @@ package com.hbm.items.tool;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -26,9 +27,9 @@ import java.util.List;
  *     this port yet (Phase 4 scope) for a "real" shared deposit location to matter yet.</li>
  *     <li>CE's animated compass needle ({@code IItemPropertyGetter} client-side rotation/wobble) is
  *     not reproduced - it is a pure client rendering nicety layered on top of the server-authoritative
- *     target coordinates below, which is what actually drives gameplay. The tooltip readout below is
- *     the functional replacement.</li>
+ *     target coordinates below, which is what actually drives gameplay.</li>
  * </ul>
+ * Held-distance overlay Exact CE {@code ItemColtanCompass.java:126-133} ({@code meters + "m"}, 2D).
  */
 public class ItemColtanCompass extends Item {
 
@@ -38,7 +39,18 @@ public class ItemColtanCompass extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        if (level.isClientSide() || stack.has(ToolDataComponents.COLTAN_X.get())) {
+        if (level.isClientSide()) {
+            // CE ItemColtanCompass.java:126-133
+            Integer x = stack.get(ToolDataComponents.COLTAN_X.get());
+            Integer z = stack.get(ToolDataComponents.COLTAN_Z.get());
+            if (x != null && z != null && entity instanceof Player player) {
+                double dx = entity.getX() - x;
+                double dz = entity.getZ() - z;
+                player.displayClientMessage(Component.literal(((int) Math.sqrt(dx * dx + dz * dz)) + "m"), true);
+            }
+            return;
+        }
+        if (stack.has(ToolDataComponents.COLTAN_X.get())) {
             return;
         }
 

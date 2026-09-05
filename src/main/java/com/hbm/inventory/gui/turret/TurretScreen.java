@@ -10,6 +10,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -64,9 +65,7 @@ import java.util.List;
  * whoever builds that helper once ammo lists exist to feed it - see the report's decision 5).
  * <b>Not ported</b>: the {@code stattrak} kill-tally bar and per-category lit/unlit icon overlays
  * (survey Headline 1) - both are texture-dependent cosmetic details with no functional gap, left for
- * the asset-copy pass. <b>Not ported</b>: {@code GUITurretArty}/{@code GUITurretHIMARS}'s firing-mode
- * toggle - blocked on those two turret types not existing server-side yet (survey's Blocked/deferred
- * section; not a screen-side gap).
+ * the asset-copy pass. Arty/HIMARS mode toggle lives on {@link TurretArtilleryScreen}.
  */
 public class TurretScreen extends GuiInfoContainer<TurretMenu> {
 
@@ -155,10 +154,9 @@ public class TurretScreen extends GuiInfoContainer<TurretMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/weapon/gui_turret_base.png"), 
+                x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        // Fritz's diesel tank - GUITurretFritz.java: renderTank(guiLeft+134, guiTop+115, z, 7, 52).
         if (this.getMenu().be instanceof TurretFritzBlockEntity fritz) {
             fritz.tank.renderTank(x + 134, y + 115, 0, 7, 52);
         }

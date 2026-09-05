@@ -5,13 +5,13 @@ import com.hbm.inventory.container.MenuBase;
 import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
 
-/** CE {@code ContainerMachineWoodBurner}: fuel 26,18 / ash 26,54 / ID 98,54 / fluid 98,18+36 / bat 143,54. */
+/**
+ * Exact CE {@code ContainerMachineWoodBurner.java:34-53}: fuel 26,18 / ash 26,54 / ID 98,54 /
+ * fluid 98,18+36 / bat 143,54; playerInv 8,104 / 162.
+ * Invented clickMenuButton handlers removed — GUI uses {@code NBTControlPacket}.
+ */
 public class WoodBurnerMenu extends MenuBase<MachineWoodBurnerBlockEntity> {
-
-    public static final int BUTTON_ON = 0;
-    public static final int BUTTON_LIQUID = 1;
 
     public WoodBurnerMenu(int id, Inventory playerInv, MachineWoodBurnerBlockEntity be) {
         super(DummyableProcessMenus.MACHINE_WOOD_BURNER.get(), id, be);
@@ -22,18 +22,5 @@ public class WoodBurnerMenu extends MenuBase<MachineWoodBurnerBlockEntity> {
         this.addSlot(new SlotTakeOnly(tile, 4, 98, 36));
         this.addSlot(new SlotNonRetarded(tile, 5, 143, 54));
         playerInv(playerInv, 8, 104, 162);
-    }
-
-    @Override
-    public boolean clickMenuButton(Player player, int id) {
-        if (id == BUTTON_ON) {
-            be.toggleOn();
-            return true;
-        }
-        if (id == BUTTON_LIQUID) {
-            be.toggleLiquid();
-            return true;
-        }
-        return super.clickMenuButton(player, id);
     }
 }

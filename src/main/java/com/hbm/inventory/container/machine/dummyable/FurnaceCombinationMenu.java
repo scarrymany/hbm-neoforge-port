@@ -6,7 +6,8 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code ContainerFurnaceCombo}: in 26,36 / out 89,36 / canister 136,18 / 136,54. */
+/** CE {@code ContainerFurnaceCombo}: in 26,36 / out 89,36 / canister 136,18 / 136,54.
+ * Slot 2/3 {@code unloadTank} Exact CE {@code TileEntityFurnaceCombination.java:93}. */
 public class FurnaceCombinationMenu extends MenuBase<FurnaceCombinationBlockEntity> {
 
     public FurnaceCombinationMenu(int id, Inventory playerInv, FurnaceCombinationBlockEntity be) {

@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import java.util.function.Supplier;
 
 /**
- * {@link BlockEntityType} registration for this turret package's 11 in-scope block entities
- * (Arty/HIMARS excluded, see {@code docs/phase3/turret_system.md}), sibling to {@link TurretBlocks}
+ * {@link BlockEntityType} registration for this turret package's 13 CE block entities,
+ * sibling to {@link TurretBlocks}
  * (that class registers the {@code Block}s this one's {@code BlockEntityType.Builder.of} calls
  * reference) - matching the {@code PowerGenBlocks}/{@code PowerGenBlockEntities} split precedent.
  * Called from {@link TurretBlocks#registerAll()}, not registered independently.
@@ -26,6 +26,8 @@ public final class TurretBlockEntities {
     public static Supplier<BlockEntityType<TurretFritzBlockEntity>> FRITZ;
     public static Supplier<BlockEntityType<TurretMaxwellBlockEntity>> MAXWELL;
     public static Supplier<BlockEntityType<TurretTauonBlockEntity>> TAUON;
+    public static Supplier<BlockEntityType<TurretArtyBlockEntity>> ARTY;
+    public static Supplier<BlockEntityType<TurretHIMARSBlockEntity>> HIMARS;
 
     private TurretBlockEntities() {
     }
@@ -84,6 +86,16 @@ public final class TurretBlockEntities {
         TAUON = ModBlocks.BLOCK_ENTITY_TYPES.register("turret_tauon", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new TurretTauonBlockEntity(TAUON.get(), pos, state),
                 TurretBlocks.TURRET_TAUON.get()
+        ).build(null));
+
+        ARTY = ModBlocks.BLOCK_ENTITY_TYPES.register("turret_arty", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new TurretArtyBlockEntity(ARTY.get(), pos, state),
+                TurretBlocks.TURRET_ARTY.get()
+        ).build(null));
+
+        HIMARS = ModBlocks.BLOCK_ENTITY_TYPES.register("turret_himars", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new TurretHIMARSBlockEntity(HIMARS.get(), pos, state),
+                TurretBlocks.TURRET_HIMARS.get()
         ).build(null));
     }
 }

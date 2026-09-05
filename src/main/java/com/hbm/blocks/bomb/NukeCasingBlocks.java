@@ -45,6 +45,8 @@ public final class NukeCasingBlocks {
     public static DeferredBlock<NukePrototypeBlock> NUKE_PROTOTYPE;
     public static DeferredBlock<NukeFleijaBlock> NUKE_FLEIJA;
     public static DeferredBlock<NukeBalefireBlock> NUKE_BALEFIRE;
+    public static DeferredBlock<NukeBalefireBlock> NUKE_FSTBMB;
+    public static DeferredBlock<NukeSoliniumBlock> NUKE_SOLINIUM;
     public static DeferredBlock<NukeCustomBlock> NUKE_CUSTOM;
 
     public static DeferredBlock<CrashedBombBlock> CRASHED_BOMB_BALEFIRE;
@@ -65,6 +67,9 @@ public final class NukeCasingBlocks {
         NUKE_PROTOTYPE = registerBlock("nuke_prototype", () -> new NukePrototypeBlock(CASING_PROPS));
         NUKE_FLEIJA = registerBlock("nuke_fleija", () -> new NukeFleijaBlock(CASING_PROPS));
         NUKE_BALEFIRE = registerBlock("nuke_balefire", () -> new NukeBalefireBlock(CASING_PROPS));
+        // CE ModBlocks.java:711 — same NukeBalefire class, CE id is nuke_fstbmb.
+        NUKE_FSTBMB = registerBlock("nuke_fstbmb", () -> new NukeBalefireBlock(CASING_PROPS));
+        NUKE_SOLINIUM = registerBlock("nuke_solinium", () -> new NukeSoliniumBlock(CASING_PROPS));
         NUKE_CUSTOM = registerBlock("nuke_custom", () -> new NukeCustomBlock(CASING_PROPS));
 
         CRASHED_BOMB_BALEFIRE = registerBlock("crashed_bomb_balefire", () -> new CrashedBombBlock(CRASHED_PROPS, EnumDudType.BALEFIRE));

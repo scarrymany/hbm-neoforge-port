@@ -2,36 +2,49 @@ package com.hbm.inventory.gui.machine.reprocess;
 
 import com.hbm.inventory.container.machine.reprocess.LiquefactorMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code GUILiquefactor} numbers: power + progress + output tank. */
+/** Exact CE {@code GUILiquefactor}: power + progress + output tank. */
 public class LiquefactorScreen extends GuiInfoContainer<LiquefactorMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_liquefactor.png");
 
     public LiquefactorScreen(LiquefactorMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 186;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.imageHeight = 204;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
-        this.getMenu().be.tank.renderTank(x + 152, y + 16, 0, 16, 70);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
+
+        var be = this.getMenu().be;
+        // CE GUILiquefactor.java:48-57
+        int i = (int) (be.getPower() * 52 / Math.max(1L, be.getMaxPower()));
+        if (i > 0) {
+            guiGraphics.blit(TEXTURE, x + 134, y + 70 - i, 176, 52 - i, 16, i);
+            guiGraphics.blit(TEXTURE, x + 138, y + 4, 176, 52, 9, 12);
+        }
+        int j = be.getProgressScaled(42);
+        if (j > 0) {
+            guiGraphics.blit(TEXTURE, x + 42, y + 17, 192, 0, j, 35);
+        }
+        be.tank.renderTank(x + 71, y + 88, 0, 16, 52);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        // CE :37 — inventory label only
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
         var be = this.getMenu().be;
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 8, 6, 140, 12, be.getPower(), be.getMaxPower());
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 20, 140, 10,
-                Component.literal(be.isProcessing ? "Liquefying" : "Idle"),
-                Component.literal("Progress: " + be.getProgressScaled(100) + "%"));
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 134, topPos + 18, 16, 52, be.getPower(), be.getMaxPower());
+        be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 71, topPos + 36, 16, 52);
     }
 }

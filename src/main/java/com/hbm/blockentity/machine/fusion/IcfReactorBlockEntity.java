@@ -11,8 +11,10 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingStep;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingType;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemICFPellet;
 import com.hbm.lib.DirPos;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -57,18 +59,23 @@ import java.util.List;
  *   {@link ItemICFPellet#getMaxDepletion} and simply migrates it from the internal reacting slot to
  *   an output slot, matching CE's slot-shuffle behavior without needing the item swap.</li>
  * </ul>
+ *
+ * {@code tanks[0].setType(11)} Exact CE {@code TileEntityICF.java:82}. Slot 11 Exact CE
+ * {@code ContainerICF.java:23}. Hopper {@code io} excludes 11 — CE {@code :52}.
+ * SatelliteRayScan Exact CE {@code TileEntityICF.java:126-128}.
  */
 public class IcfReactorBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, IFluidStandardTransceiverMK2, IPersistentNBT, MenuProvider {
 
     public static final long MAX_HEAT = 1_000_000_000_000L;
 
-    /** Slots 0-4: fresh pellet input. Slot 5: internal reacting slot. Slots 6-10: spent pellet output. */
+    /** Slots 0-4: fresh pellet input. Slot 5: internal reacting slot. Slots 6-10: spent pellet output. Slot 11: coolant ID. */
     private static final int INPUT_START = 0;
     private static final int INPUT_END = 4;
     private static final int ACTIVE_SLOT = 5;
     private static final int OUTPUT_START = 6;
     private static final int OUTPUT_END = 10;
+    private static final int SLOT_ID = 11;
     private static final int[] ACCESSIBLE = new int[]{0, 1, 2, 3, 4, 6, 7, 8, 9, 10};
 
     public final FluidTankNTM[] tanks = new FluidTankNTM[3];
@@ -82,7 +89,7 @@ public class IcfReactorBlockEntity extends MachineBaseBlockEntity
     public int output;
 
     public IcfReactorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 11, true, false);
+        super(type, pos, state, 12, true, false);
         tanks[0] = new FluidTankNTM(Fluids.SODIUM, 512_000).withOwner(this);
         tanks[1] = new FluidTankNTM(Fluids.SODIUM_HOT, 512_000).withOwner(this);
         tanks[2] = new FluidTankNTM(Fluids.STELLAR_FLUX, 24_000).withOwner(this);
@@ -114,6 +121,9 @@ public class IcfReactorBlockEntity extends MachineBaseBlockEntity
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
+
+        // CE TileEntityICF.java:82
+        tanks[0].setType(SLOT_ID, inventory);
 
         for (DirPos dp : getConPos()) {
             trySubscribe(tanks[0].getTankType(), level, dp);
@@ -158,8 +168,16 @@ public class IcfReactorBlockEntity extends MachineBaseBlockEntity
             inventory.setStackInSlot(ACTIVE_SLOT, copy);
             this.heat += heatup;
 
+            // Exact CE TileEntityICF.java:126-128 — react-path ping; Hadron VFX skipped
+            if (level.getGameTime() % 20 == 15) {
+                SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                        SatelliteRayScan.RayEvent.INFO_PARTICLE, 200);
+            }
+
             // stellar-flux byproduct only accrues on an actual reaction tick, matching CE
             tanks[2].setFill(tanks[2].getFill() + (int) Math.ceil(this.heat * 10.0D / MAX_HEAT));
+            // CE TileEntityICF.java:130-131
+            if (tanks[2].getFill() > tanks[2].getMaxFill()) tanks[2].setFill(tanks[2].getMaxFill());
         }
 
         if (heatup == 0) {
@@ -207,6 +225,10 @@ public class IcfReactorBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        // CE :210-211 is pellet-only (slot < 5). MenuBase.tile is getCheckedInventory(),
+        // so ID GUI insert dies without this — same as IcfPress / SILEX.
+        if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
         return slot >= INPUT_START && slot <= INPUT_END && stack.getItem() instanceof ItemICFPellet;
     }
 

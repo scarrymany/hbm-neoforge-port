@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "hbm:tcalloy_plate_triple",
+    "hbm:cdalloy_plate_triple"
+  ]
+}

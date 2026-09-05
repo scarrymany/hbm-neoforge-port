@@ -8,13 +8,13 @@ import com.hbm.entity.item.EntityMovingItem;
 import com.hbm.inventory.container.machine.dummyable.ConveyorPressMenu;
 import com.hbm.inventory.recipes.PressRecipes;
 import com.hbm.items.machine.ItemStamp;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -30,6 +30,8 @@ import java.util.List;
 /**
  * CE {@code TileEntityConveyorPress}: 50k HE, 100 HE/t, stamp slot 0,
  * {@code PressRecipes.getOutput} on {@code EntityMovingItem} in the AABB above the core.
+ * Stamp sound Exact CE {@code TileEntityConveyorPress.java:166}: {@code pressOperate} {@code getVolume(1.5F)}/1.0F.
+ * This BE has no CE muffled flag — unmuffled volume is 1.5F.
  */
 public class MachineConveyorPressBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
@@ -170,7 +172,7 @@ public class MachineConveyorPressBlockEntity extends MachineBaseBlockEntity
             }
         }
 
-        level.playSound(null, worldPosition, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 1.5F, 1.0F);
+        level.playSound(null, worldPosition, HBMSoundHandler.pressOperate.get(), SoundSource.BLOCKS, 1.5F, 1.0F);
 
         ItemStack stamp = inventory.getStackInSlot(0);
         if (stamp.isDamageableItem()) {

@@ -56,5 +56,10 @@ public class CrateBlockItem extends BlockItem {
         float percent = totalSlots > 0 ? Math.round(slotCount * 1000F / totalSlots) / 10F : 0F;
         ChatFormatting color = percent >= 75 ? ChatFormatting.RED : percent < 25 ? ChatFormatting.GREEN : ChatFormatting.YELLOW;
         tooltip.add(Component.literal(slotCount + "/" + totalSlots + " slots used (" + percent + "%)").withStyle(color));
+
+        // CE BlockStorageCrate.java:239-240
+        if (crateData != null && crateData.contains("lock")) {
+            tooltip.add(Component.literal("This container is locked.").withStyle(ChatFormatting.RED));
+        }
     }
 }

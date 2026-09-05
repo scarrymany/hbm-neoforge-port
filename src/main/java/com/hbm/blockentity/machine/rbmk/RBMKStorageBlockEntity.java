@@ -2,19 +2,25 @@ package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.rbmk.IRBMKLoadable;
 import com.hbm.handler.neutron.RBMKNeutronHandler;
+import com.hbm.inventory.container.machine.rbmk.RBMKStorageMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Spent/spare fuel rod storage column - a 9-slot buffer an autoloader or crane can pull from/push
- * into. Ported from CE's {@code TileEntityRBMKStorage} (111 lines).
+ * Storage column. Exact CE {@code TileEntityRBMKStorage.java:22-99}: 12 slots, compact toward 0,
+ * {@code canLoad} slot 11 empty, load into 11, unload from 0. {@code isItemValidForSlot} always
+ * true (CE {@code :65-67}).
  */
-public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IRBMKLoadable {
+public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IRBMKLoadable, MenuProvider {
 
-    public static final int SLOTS = 9;
+    public static final int SLOTS = 12;
 
     public RBMKStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, SLOTS);
@@ -25,10 +31,28 @@ public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IR
         return Component.translatable("container.rbmkStorage");
     }
 
+    @Override
+    public void updateEntity() {
+        if (level != null && !level.isClientSide) {
+            // CE :32-43 — pack occupied slots toward 0
+            int freeSlot = 0;
+            for (int i = 0; i < 12; i++) {
+                if (inventory.getStackInSlot(i).isEmpty()) {
+                    continue;
+                } else {
+                    if (inventory.getStackInSlot(freeSlot).isEmpty()) {
+                        moveItem(i, freeSlot);
+                    }
+                    freeSlot++;
+                }
+            }
+        }
+        super.updateEntity();
+    }
+
+    // CE :48-51
     public void moveItem(int fromSlot, int toSlot) {
-        ItemStack from = inventory.getStackInSlot(fromSlot);
-        if (from.isEmpty() || !inventory.getStackInSlot(toSlot).isEmpty()) return;
-        inventory.setStackInSlot(toSlot, from);
+        inventory.setStackInSlot(toSlot, inventory.getStackInSlot(fromSlot).copy());
         inventory.setStackInSlot(fromSlot, ItemStack.EMPTY);
     }
 
@@ -44,7 +68,7 @@ public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IR
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return stack.getItem() instanceof com.hbm.items.machine.ItemRBMKRod;
+        return true;
     }
 
     @Override
@@ -54,48 +78,38 @@ public class RBMKStorageBlockEntity extends RBMKSlottedBlockEntity implements IR
 
     @Override
     public boolean canLoad(ItemStack toLoad) {
-        for (int i = 0; i < inventory.getSlots(); i++) {
-            if (inventory.getStackInSlot(i).isEmpty()) return true;
-        }
-        return false;
+        return toLoad != null && inventory.getStackInSlot(11).isEmpty();
     }
 
     @Override
     public void load(ItemStack toLoad) {
-        for (int i = 0; i < inventory.getSlots(); i++) {
-            if (inventory.getStackInSlot(i).isEmpty()) {
-                inventory.setStackInSlot(i, toLoad.copy());
-                setChanged();
-                return;
-            }
-        }
+        inventory.setStackInSlot(11, toLoad.copy());
+        setChanged();
     }
 
     @Override
     public boolean canUnload() {
-        for (int i = 0; i < inventory.getSlots(); i++) {
-            if (!inventory.getStackInSlot(i).isEmpty()) return true;
-        }
-        return false;
+        return !inventory.getStackInSlot(0).isEmpty();
     }
 
     @Override
     public ItemStack provideNext() {
-        for (int i = 0; i < inventory.getSlots(); i++) {
-            ItemStack stack = inventory.getStackInSlot(i);
-            if (!stack.isEmpty()) return stack;
-        }
-        return ItemStack.EMPTY;
+        return inventory.getStackInSlot(0);
     }
 
     @Override
     public void unload() {
-        for (int i = 0; i < inventory.getSlots(); i++) {
-            if (!inventory.getStackInSlot(i).isEmpty()) {
-                inventory.setStackInSlot(i, ItemStack.EMPTY);
-                setChanged();
-                return;
-            }
-        }
+        inventory.setStackInSlot(0, ItemStack.EMPTY);
+        setChanged();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getDefaultName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new RBMKStorageMenu(containerId, playerInventory, this);
     }
 }

@@ -1,5 +1,7 @@
 package com.hbm.explosion.vanillant.standard;
 
+import com.hbm.entity.grenade.EntityGrenadeUniversal;
+import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.interfaces.ICustomDamageHandler;
 import com.hbm.explosion.vanillant.interfaces.IEntityProcessor;
@@ -70,12 +72,10 @@ public class EntityProcessorCross implements IEntityProcessor {
         return this;
     }
 
+    /** Exact CE {@code EntityProcessorCross.java:56-59}. */
     public static boolean shouldDealKnockback(Entity entity) {
-        // forward reference: com.hbm.entity.grenade.EntityGrenadeUniversal /
-        // com.hbm.entity.projectile.EntityBulletBaseMK4 - neither exists in this port yet (grenades/
-        // guns are separate Phase 3 packages). CE excludes both from receiving explosion knockback
-        // (a bullet/grenade in flight shouldn't get flung by its own or a nearby detonation); until
-        // those entity classes exist there is nothing to exclude, so every entity currently passes.
+        if (entity instanceof EntityBulletBaseMK4) return false;
+        if (entity instanceof EntityGrenadeUniversal) return false;
         return true;
     }
 

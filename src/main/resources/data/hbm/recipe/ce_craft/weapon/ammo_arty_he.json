@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TTT",
+    "TST",
+    "TTT"
+  ],
+  "key": {
+    "T": {
+      "item": "hbm:ball_tnt"
+    },
+    "S": {
+      "item": "hbm:ammo_arty_normal"
+    }
+  },
+  "result": {
+    "id": "hbm:ammo_arty_he",
+    "count": 1
+  }
+}

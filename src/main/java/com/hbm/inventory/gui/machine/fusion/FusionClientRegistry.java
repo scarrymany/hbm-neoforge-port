@@ -24,5 +24,8 @@ public final class FusionClientRegistry {
         SafeMenuScreens.bind(event, FusionMenus.ICF_PRESS, IcfPressScreen::new);
         SafeMenuScreens.bind(event, FusionMenus.WATZ_REACTOR, WatzReactorScreen::new);
         SafeMenuScreens.bind(event, FusionMenus.FUSION_PLASMA_FORGE, PlasmaForgeScreen::new);
+        SafeMenuScreens.bind(event, FusionMenus.FUSION_TORUS, FusionTorusScreen::new);
+        SafeMenuScreens.bind(event, FusionMenus.FUSION_KLYSTRON, FusionKlystronScreen::new);
+        SafeMenuScreens.bind(event, FusionMenus.FUSION_BREEDER, FusionBreederScreen::new);
     }
 }

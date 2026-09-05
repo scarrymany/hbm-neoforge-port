@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "bottom": "hbm:block/drone_crate_provider_bottom",
-    "top": "hbm:block/drone_crate_provider_top",
-    "side": "hbm:block/drone_crate_provider_side"
+    "down": "hbm:block/drone_crate_provider_bottom",
+    "up": "hbm:block/drone_crate_provider_top",
+    "north": "hbm:block/drone_crate_provider_side",
+    "south": "hbm:block/drone_crate_provider_side",
+    "west": "hbm:block/drone_crate_provider_side",
+    "east": "hbm:block/drone_crate_provider_side",
+    "particle": "hbm:block/drone_crate_provider_side"
   }
 }

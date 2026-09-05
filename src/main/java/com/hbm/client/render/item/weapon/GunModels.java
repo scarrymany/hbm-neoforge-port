@@ -12,148 +12,598 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * OBJ model / animation-map / texture resource holder for the 3 guns this task ({@code c6-weapon-
- * gun-rendering}) fully wired ({@link ItemRenderSpas12}/{@link ItemRenderUzi}/{@link ItemRenderAm180}),
- * mirroring CE's own {@code com.hbm.main.ResourceManager} per-gun static-field pattern
- * ({@code public static final IModelCustom spas_12 = new HFRWavefrontObject(...).asVBO();
- * public static final HashMap<String, BusAnimationSedna> spas_12_anim = AnimationLoader.load(...);}) -
- * scoped to this task's own small package rather than a port-wide {@code ResourceManager}, since no
- * such class exists yet in this port (confirmed absent by search) and creating the real port-wide
- * equivalent is a separate concern belonging to whichever future package first needs one for a
- * non-gun model too (see this class's own "Not a port-wide ResourceManager" note below).
- *
- * <h2>Why every field here is lazy, not an eager {@code public static final}</h2>
- * {@link com.hbm.render.loader.HbmObjModel}'s own class javadoc states it is "safe to eagerly load
- * from a static field" - true only once the backing {@code .obj}/texture resources actually exist on
- * disk. As of this task, CE's weapon {@code .obj}/texture asset migration has <b>not</b> happened yet
- * (confirmed: {@code find src/main/resources -ipath '*models/obj/weapons*'} and
- * {@code '*textures/models/weapons*'} both return zero files in this port, vs. 0 and 123 respectively
- * in {@code upstream/hbm-ce}) - a separate, substantial asset-migration task
- * {@code docs/phase5/weapon_gun_rendering_animloader.md} explicitly flags as out of this report's
- * (and this task's) scope. An eager {@code public static final HbmObjModel SPAS_12 =
- * HbmObjModel.get(...)} field would throw {@link ModelFormatException} the moment this class is
- * classloaded - i.e. client startup would crash the instant any code so much as references this
- * class, long before a player ever equips the gun. Every accessor below is therefore lazy (mirroring
- * {@code ExamplePlaceholderBEWLR}'s own established lazy-load pattern in the sibling
- * {@code com.hbm.client.render.item} package) <b>and</b> defensive: a missing model/animation
- * resource is caught once, logged once ({@link #warnOnce}, a per-{@link ResourceLocation} guard so a
- * gun rendered 20x/second while missing its asset doesn't spam the log or crash the render loop), and
- * reported back as {@code null} - every concrete gun renderer in this package treats a {@code null}
- * model as "skip drawing this frame" rather than propagating the exception. This is a deliberate,
- * temporary safety net for this port's current mid-migration state, not a permanent design choice -
- * once the real {@code .obj}/texture/animation-JSON assets are ported (this task copies the 12
- * animation JSONs verbatim, see {@code docs/phase5/} - the {@code .obj}/{@code .png} files are not
- * copied by this task), every lookup below resolves normally and the try/catch/log-once machinery
- * simply never triggers.
- *
- * <h2>Resource paths - mirrored 1:1 from CE</h2>
- * Every path below is copied verbatim from {@code upstream/hbm-ce/.../main/main/ResourceManager.java}
- * (grepped and read directly, not guessed) so that once the asset-migration task lands the exact
- * same files, every lookup here resolves with zero further code changes.
- */
+/** Lazy CE ResourceManager field → path lookup. No invented assets. */
 public final class GunModels {
-
-    private GunModels() {
+    private GunModels() {}
+    private static final Map<String, String> OBJ = new ConcurrentHashMap<>();
+    private static final Map<String, String> TEX = new ConcurrentHashMap<>();
+    private static final Map<String, String> ANIM = new ConcurrentHashMap<>();
+    private static final Map<String, HbmObjModel> OBJ_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, BusAnimationSedna>> ANIM_CACHE = new ConcurrentHashMap<>();
+    private static final Set<ResourceLocation> WARNED = ConcurrentHashMap.newKeySet();
+    static {
+        OBJ.put("aa_shell", "models/Mirv.obj");
+        OBJ.put("aberrator", "models/weapons/aberrator.obj");
+        OBJ.put("am180", "models/weapons/am180.obj");
+        OBJ.put("amat", "models/weapons/amat.obj");
+        OBJ.put("ammo_press", "models/machines/ammo_press.obj");
+        OBJ.put("annihilator", "models/machines/annihilator.obj");
+        OBJ.put("anvil", "models/blocks/anvil.obj");
+        OBJ.put("arc_furnace", "models/machines/arc_furnace.obj");
+        OBJ.put("arc_welder", "models/machines/arc_welder.obj");
+        OBJ.put("armor_ajr", "models/armor/AJR.obj");
+        OBJ.put("armor_bismuth", "models/armor/bismuth.obj");
+        OBJ.put("armor_bj", "models/armor/BJ.obj");
+        OBJ.put("armor_dieselsuit", "models/armor/bnuuy.obj");
+        OBJ.put("armor_dnt", "models/armor/dnt.obj");
+        OBJ.put("armor_envsuit", "models/armor/envsuit.obj");
+        OBJ.put("armor_fau", "models/armor/fau.obj");
+        OBJ.put("armor_goggles", "models/armor/goggles.obj");
+        OBJ.put("armor_hat", "models/armor/hat.obj");
+        OBJ.put("armor_hev", "models/armor/hev.obj");
+        OBJ.put("armor_mod_tesla", "models/armor/mod_tesla.obj");
+        OBJ.put("armor_ncr", "models/armor/ncrpa.obj");
+        OBJ.put("armor_no9", "models/armor/no9.obj");
+        OBJ.put("armor_remnant", "models/armor/remnant.obj");
+        OBJ.put("armor_steamsuit", "models/armor/steamsuit.obj");
+        OBJ.put("armor_t51", "models/armor/t51.obj");
+        OBJ.put("armor_taurun", "models/armor/taurun.obj");
+        OBJ.put("armor_trenchmaster", "models/armor/trenchmaster.obj");
+        OBJ.put("armor_wings", "models/armor/murk.obj");
+        OBJ.put("arrow", "models/blocks/arrow.obj");
+        OBJ.put("assembly_factory", "models/machines/assembly_factory.obj");
+        OBJ.put("assembly_machine", "models/machines/assembly_machine.obj");
+        OBJ.put("autosaw", "models/machines/autosaw.obj");
+        OBJ.put("b29", "models/b29.obj");
+        OBJ.put("bat9000", "models/machines/bat9000.obj");
+        OBJ.put("battery_redd", "models/machines/fensu2.obj");
+        OBJ.put("battery_socket", "models/machines/battery.obj");
+        OBJ.put("benelli", "models/weapons/benelli_new.obj");
+        OBJ.put("bigasstank", "models/machines/bigasstank.obj");
+        OBJ.put("bio_revolver", "models/weapons/bio_revolver.obj");
+        OBJ.put("blast_door_base", "models/blast_door_base.obj");
+        OBJ.put("blast_door_block", "models/blast_door_block.obj");
+        OBJ.put("blast_door_slider", "models/blast_door_slider.obj");
+        OBJ.put("blast_door_tooth", "models/blast_door_tooth.obj");
+        OBJ.put("blast_furnace", "models/machines/blast_furnace.obj");
+        OBJ.put("blockspider", "models/mobs/blockspider.obj");
+        OBJ.put("bm_box_lever", "models/bm_box_lever.obj");
+        OBJ.put("bobble", "models/trinkets/bobble.obj");
+        OBJ.put("bobble_leafia", "models/trinkets/leafia.obj");
+        OBJ.put("boiler", "models/machines/boiler.obj");
+        OBJ.put("boiler_burst", "models/machines/boiler_burst.obj");
+        OBJ.put("bolter", "models/weapons/bolter.obj");
+        OBJ.put("boltgun", "models/weapons/boltgun.obj");
+        OBJ.put("bomblet_selena", "models/bombletSelena.obj");
+        OBJ.put("bot_prime_head", "models/mobs/bot_prime_head.obj");
+        OBJ.put("boxcar", "models/boxcar.obj");
+        OBJ.put("breeder", "models/reactors/breeder.obj");
+        OBJ.put("building", "models/weapons/building.obj");
+        OBJ.put("c130", "models/weapons/c130.obj");
+        OBJ.put("cable_neo_obj", "models/blocks/cable_neo.obj");
+        OBJ.put("carbine", "models/weapons/carbine.obj");
+        OBJ.put("cargo_elevator", "models/machines/elevator.obj");
+        OBJ.put("cart", "models/vehicles/cart.obj");
+        OBJ.put("cart_destroyer", "models/vehicles/cart_destroyer.obj");
+        OBJ.put("cart_powder", "models/vehicles/cart_powder.obj");
+        OBJ.put("casings", "models/effect/casings.obj");
+        OBJ.put("cat", "models/weapons/cat.obj");
+        OBJ.put("catalytic_reformer", "models/machines/catalytic_reformer.obj");
+        OBJ.put("centrifuge_gas", "models/centrifuge_gas.obj");
+        OBJ.put("chainsaw", "models/weapons/chainsaw.obj");
+        OBJ.put("charge_c4", "models/blocks/charge_c4.obj");
+        OBJ.put("charge_dynamite", "models/blocks/charge_dynamite.obj");
+        OBJ.put("charge_thrower", "models/weapons/charge_thrower.obj");
+        OBJ.put("charger", "models/blocks/charger.obj");
+        OBJ.put("chemical_factory", "models/machines/chemical_factory.obj");
+        OBJ.put("chemical_plant", "models/machines/chemical_plant.obj");
+        OBJ.put("chemthrower", "models/weapons/chemthrower.obj");
+        OBJ.put("chungus", "models/machines/chungus.obj");
+        OBJ.put("coilgun", "models/weapons/coilgun.obj");
+        OBJ.put("coin", "models/trinkets/chip.obj");
+        OBJ.put("combination_oven", "models/machines/combination_oven.obj");
+        OBJ.put("combustion_engine", "models/machines/combustion_engine.obj");
+        OBJ.put("compact_launcher", "models/compact_launcher.obj");
+        OBJ.put("compressor", "models/machines/compressor.obj");
+        OBJ.put("condenser", "models/machines/condenser.obj");
+        OBJ.put("congolake", "models/weapons/congolake.obj");
+        OBJ.put("connector", "models/network/connector.obj");
+        OBJ.put("connector_super", "models/network/connector_super.obj");
+        OBJ.put("conservecrate", "models/blocks/conservecrate.obj");
+        OBJ.put("control_panel_custom", "models/control_panel/control_panel_custom.obj");
+        OBJ.put("control_panel_front", "models/control_panel/control_panel_front.obj");
+        OBJ.put("conveyor_press", "models/machines/conveyor_press.obj");
+        OBJ.put("crane_buffer", "models/blocks/crane_buffer.obj");
+        OBJ.put("crucible", "models/weapons/crucible.obj");
+        OBJ.put("crucible_heat", "models/machines/crucible.obj");
+        OBJ.put("crystallizer", "models/machines/crystallizer.obj");
+        OBJ.put("ctrl_button_emergency_push", "models/control_panel/button_emergency_push.obj");
+        OBJ.put("ctrl_button_encased_push", "models/control_panel/button_encased_push.obj");
+        OBJ.put("ctrl_button_push", "models/control_panel/button_push.obj");
+        OBJ.put("ctrl_dial_large", "models/control_panel/dial_large.obj");
+        OBJ.put("ctrl_dial_square", "models/control_panel/dial_square.obj");
+        OBJ.put("ctrl_display_seven_seg", "models/control_panel/display_seven_seg.obj");
+        OBJ.put("ctrl_indicator_lamp", "models/control_panel/indicator_lamp.obj");
+        OBJ.put("ctrl_knob_control", "models/control_panel/knob_control.obj");
+        OBJ.put("ctrl_slider_vertical", "models/control_panel/slider_vertical.obj");
+        OBJ.put("ctrl_switch_rotary_toggle", "models/control_panel/switch_rotary_toggle.obj");
+        OBJ.put("ctrl_switch_toggle", "models/control_panel/switch_toggle.obj");
+        OBJ.put("cyclotron", "models/machines/cyclotron.obj");
+        OBJ.put("deb_blank", "models/projectiles/deb_blank.obj");
+        OBJ.put("deb_element", "models/projectiles/deb_element.obj");
+        OBJ.put("deb_fuel", "models/projectiles/deb_fuel.obj");
+        OBJ.put("deb_graphite", "models/projectiles/deb_graphite.obj");
+        OBJ.put("deb_lid", "models/projectiles/deb_lid.obj");
+        OBJ.put("deb_rod", "models/projectiles/deb_rod.obj");
+        OBJ.put("deb_zirnox_blank", "models/zirnox/deb_blank.obj");
+        OBJ.put("deb_zirnox_concrete", "models/zirnox/deb_concrete.obj");
+        OBJ.put("deb_zirnox_element", "models/zirnox/deb_element.obj");
+        OBJ.put("deb_zirnox_exchanger", "models/zirnox/deb_exchanger.obj");
+        OBJ.put("deb_zirnox_shrapnel", "models/zirnox/deb_shrapnel.obj");
+        OBJ.put("delivery_drone", "models/machines/drone.obj");
+        OBJ.put("detonator_laser", "models/weapons/detonator_laser.obj");
+        OBJ.put("dfc_emitter", "models/core_emitter.obj");
+        OBJ.put("dfc_injector", "models/core_injector.obj");
+        OBJ.put("dfc_receiver", "models/core_receiver.obj");
+        OBJ.put("dieselgen", "models/machines/dieselgen.obj");
+        OBJ.put("dornier", "models/dornier.obj");
+        OBJ.put("double_barrel", "models/weapons/sacred_dragon.obj");
+        OBJ.put("drill", "models/weapons/drill.obj");
+        OBJ.put("drone", "models/mobs/quadcopter.obj");
+        OBJ.put("duchessgambit", "models/duchessgambit.obj");
+        OBJ.put("dud_balefire", "models/bombs/dud_balefire.obj");
+        OBJ.put("dud_conventional", "models/bombs/dud_conventional.obj");
+        OBJ.put("dud_nuke", "models/bombs/dud_nuke.obj");
+        OBJ.put("dud_salted", "models/bombs/dud_salted.obj");
+        OBJ.put("epress_body", "models/epress_body.obj");
+        OBJ.put("epress_head", "models/epress_head.obj");
+        OBJ.put("error", "models/error.obj");
+        OBJ.put("excavator", "models/machines/excavator.obj");
+        OBJ.put("exposure_chamber", "models/machines/exposure_chamber.obj");
+        OBJ.put("fan", "models/machines/fan.obj");
+        OBJ.put("fatman", "models/weapons/fatman.obj");
+        OBJ.put("fel", "models/machines/fel.obj");
+        OBJ.put("fensu", "models/machines/fensu.obj");
+        OBJ.put("file_cabinet", "models/file_cabinet.obj");
+        OBJ.put("fire_door", "models/doors/fire_door.obj");
+        OBJ.put("fireext", "models/weapons/fireext.obj");
+        OBJ.put("flamethrower", "models/weapons/flamethrower.obj");
+        OBJ.put("flaregun", "models/weapons/flaregun.obj");
+        OBJ.put("fluidtank", "models/fluidtank.obj");
+        OBJ.put("fluidtank_exploded", "models/fluidtank_exploded.obj");
+        OBJ.put("folly", "models/weapons/folly.obj");
+        OBJ.put("forcefield_top", "models/machines/forcefield_top.obj");
+        OBJ.put("fstbmb", "models/bombs/fstbmb.obj");
+        OBJ.put("furnace_iron", "models/machines/furnace_iron.obj");
+        OBJ.put("furnace_steel", "models/machines/furnace_steel.obj");
+        OBJ.put("fusion_klystron", "models/fusion/klystron.obj");
+        OBJ.put("fusion_mhdt", "models/fusion/mhdt.obj");
+        OBJ.put("fusion_plasma_forge", "models/fusion/plasma_forge.obj");
+        OBJ.put("fusion_torus", "models/fusion/torus.obj");
+        OBJ.put("g3", "models/weapons/g3.obj");
+        OBJ.put("gavel", "models/weapons/gavel.obj");
+        OBJ.put("glass_cannon", "models/weapons/glass_cannon.obj");
+        OBJ.put("glyphid", "models/mobs/glyphid.obj");
+        OBJ.put("greasegun", "models/weapons/greasegun.obj");
+        OBJ.put("grenades", "models/weapons/grenades.obj");
+        OBJ.put("hangman", "models/weapons/hangman.obj");
+        OBJ.put("heater_firebox", "models/machines/firebox.obj");
+        OBJ.put("heater_oilburner", "models/machines/oilburner.obj");
+        OBJ.put("heater_oven", "models/machines/heating_oven.obj");
+        OBJ.put("hemisphere_uv", "models/sphere_half.obj");
+        OBJ.put("henry", "models/weapons/henry.obj");
+        OBJ.put("hephaestus", "models/machines/hephaestus.obj");
+        OBJ.put("hev_battery", "models/blocks/battery.obj");
+        OBJ.put("horse", "models/mobs/horse.obj");
+        OBJ.put("igen", "models/machines/igen.obj");
+        OBJ.put("industrial_turbine", "models/machines/industrial_turbine.obj");
+        OBJ.put("intake", "models/machines/intake.obj");
+        OBJ.put("lance", "models/weapons/lance.obj");
+        OBJ.put("lantern", "models/trinkets/lantern.obj");
+        OBJ.put("large_vehicle_door", "models/doors/large_vehicle_door.obj");
+        OBJ.put("laser_pistol", "models/weapons/laser_pistol.obj");
+        OBJ.put("lasrifle", "models/weapons/lasrifle.obj");
+        OBJ.put("lasrifle_mods", "models/weapons/lasrifle_mods.obj");
+        OBJ.put("launch_table_base", "models/launch_table/launch_table_base.obj");
+        OBJ.put("launch_table_large_pad", "models/launch_table/launch_table_large_pad.obj");
+        OBJ.put("launch_table_large_scaffold_base", "models/launch_table/launch_table_large_scaffold_base.obj");
+        OBJ.put("launch_table_large_scaffold_connector", "models/launch_table/launch_table_large_scaffold_connector.obj");
+        OBJ.put("launch_table_large_scaffold_empty", "models/launch_table/launch_table_large_scaffold_empty.obj");
+        OBJ.put("launch_table_small_pad", "models/launch_table/launch_table_small_pad.obj");
+        OBJ.put("launch_table_small_scaffold_base", "models/launch_table/launch_table_small_scaffold_base.obj");
+        OBJ.put("launch_table_small_scaffold_connector", "models/launch_table/launch_table_small_scaffold_connector.obj");
+        OBJ.put("launch_table_small_scaffold_empty", "models/launch_table/launch_table_small_scaffold_empty.obj");
+        OBJ.put("launchpad_soyuz", "models/machines/launchpad_soyuz.obj");
+        OBJ.put("liberator", "models/weapons/liberator.obj");
+        OBJ.put("lilmac", "models/weapons/lilmac.obj");
+        OBJ.put("liquefactor", "models/machines/liquefactor.obj");
+        OBJ.put("lpw2", "models/machines/lpw2.obj");
+        OBJ.put("m2", "models/weapons/m2_browning.obj");
+        OBJ.put("maresleg", "models/weapons/maresleg.obj");
+        OBJ.put("mas36", "models/weapons/mas36.obj");
+        OBJ.put("maskman", "models/mobs/maskman.obj");
+        OBJ.put("meteor", "models/weapons/meteor.obj");
+        OBJ.put("microwave", "models/machines/microwave.obj");
+        OBJ.put("mike_hawk", "models/weapons/mike_hawk.obj");
+        OBJ.put("mine_ap", "models/bombs/ap_mine.obj");
+        OBJ.put("mine_fat", "models/bombs/mine_fat.obj");
+        OBJ.put("mine_he", "models/mine_he.obj");
+        OBJ.put("mine_marelet", "models/bombs/marelet.obj");
+        OBJ.put("mine_naval", "models/bombs/naval_mine.obj");
+        OBJ.put("minerRocket", "models/minerRocket.obj");
+        OBJ.put("minigun", "models/weapons/minigun.obj");
+        OBJ.put("mining_laser", "models/machines/mining_laser.obj");
+        OBJ.put("missileABM", "models/missile_abm.obj");
+        OBJ.put("missileBooster", "models/missileBooster.obj");
+        OBJ.put("missileCarrier", "models/missileCarrier.obj");
+        OBJ.put("missileHuge", "models/missile_huge.obj");
+        OBJ.put("missileMicro", "models/missile_micro.obj");
+        OBJ.put("missileN2", "models/missileneon.obj");
+        OBJ.put("missileNuclear", "models/missile_atlas.obj");
+        OBJ.put("missileShuttle", "models/missile_shuttle.obj");
+        OBJ.put("missileStealth", "models/missile_stealth.obj");
+        OBJ.put("missileStrong", "models/missile_strong.obj");
+        OBJ.put("missileTaint", "models/missileTaint.obj");
+        OBJ.put("missileThermo", "models/missileThermo.obj");
+        OBJ.put("missileV2", "models/missile_v2.obj");
+        OBJ.put("missile_assembly", "models/missile_assembly.obj");
+        OBJ.put("missile_erector", "models/weapons/launch_pad_erector.obj");
+        OBJ.put("missile_launcher", "models/weapons/missile_launcher.obj");
+        OBJ.put("missile_pad", "models/weapons/launch_pad_silo.obj");
+        OBJ.put("mixer", "models/machines/mixer.obj");
+        OBJ.put("mk108", "models/weapons/mk108.obj");
+        OBJ.put("mp_f_10_15_kerosene", "models/missile_parts/mp_f_10_15_kerosene.obj");
+        OBJ.put("mp_f_10_kerosene", "models/missile_parts/mp_f_10_kerosene.obj");
+        OBJ.put("mp_f_10_long_kerosene", "models/missile_parts/mp_f_10_long_kerosene.obj");
+        OBJ.put("mp_f_15_20_kerosene", "models/missile_parts/mp_f_15_20_kerosene.obj");
+        OBJ.put("mp_f_15_hydrogen", "models/missile_parts/mp_f_15_hydrogen.obj");
+        OBJ.put("mp_f_15_kerosene", "models/missile_parts/mp_f_15_kerosene.obj");
+        OBJ.put("mp_s_10_cruise", "models/missile_parts/mp_s_10_cruise.obj");
+        OBJ.put("mp_s_10_flat", "models/missile_parts/mp_s_10_flat.obj");
+        OBJ.put("mp_s_10_space", "models/missile_parts/mp_s_10_space.obj");
+        OBJ.put("mp_s_15_flat", "models/missile_parts/mp_s_15_flat.obj");
+        OBJ.put("mp_s_15_soyuz", "models/missile_parts/mp_s_15_soyuz.obj");
+        OBJ.put("mp_s_15_thin", "models/missile_parts/mp_s_15_thin.obj");
+        OBJ.put("mp_s_20", "models/missile_parts/mp_s_20.obj");
+        OBJ.put("mp_t_10_kerosene", "models/missile_parts/mp_t_10_kerosene.obj");
+        OBJ.put("mp_t_10_solid", "models/missile_parts/mp_t_10_solid.obj");
+        OBJ.put("mp_t_10_xenon", "models/missile_parts/mp_t_10_xenon.obj");
+        OBJ.put("mp_t_15_balefire", "models/missile_parts/mp_t_15_balefire.obj");
+        OBJ.put("mp_t_15_balefire_large", "models/missile_parts/mp_t_15_balefire_large.obj");
+        OBJ.put("mp_t_15_balefire_short", "models/missile_parts/mp_t_15_balefire_short.obj");
+        OBJ.put("mp_t_15_kerosene", "models/missile_parts/mp_t_15_kerosene.obj");
+        OBJ.put("mp_t_15_kerosene_dual", "models/missile_parts/mp_t_15_kerosene_dual.obj");
+        OBJ.put("mp_t_15_kerosene_triple", "models/missile_parts/mp_t_15_kerosene_triple.obj");
+        OBJ.put("mp_t_15_solid", "models/missile_parts/mp_t_15_solid.obj");
+        OBJ.put("mp_t_15_solid_hexdecuple", "models/missile_parts/mp_t_15_solid_hexdecuple.obj");
+        OBJ.put("mp_t_20_kerosene", "models/missile_parts/mp_t_20_kerosene.obj");
+        OBJ.put("mp_t_20_kerosene_dual", "models/missile_parts/mp_t_20_kerosene_dual.obj");
+        OBJ.put("mp_t_20_kerosene_triple", "models/missile_parts/mp_t_20_kerosene_triple.obj");
+        OBJ.put("mp_t_20_solid", "models/missile_parts/mp_t_20_solid.obj");
+        OBJ.put("mp_t_20_solid_multi", "models/missile_parts/mp_t_20_solid_multi.obj");
+        OBJ.put("mp_w_10_buster", "models/missile_parts/mp_w_10_buster.obj");
+        OBJ.put("mp_w_10_he", "models/missile_parts/mp_w_10_he.obj");
+        OBJ.put("mp_w_10_incendiary", "models/missile_parts/mp_w_10_incendiary.obj");
+        OBJ.put("mp_w_10_nuclear", "models/missile_parts/mp_w_10_nuclear.obj");
+        OBJ.put("mp_w_10_nuclear_large", "models/missile_parts/mp_w_10_nuclear_large.obj");
+        OBJ.put("mp_w_10_taint", "models/missile_parts/mp_w_10_taint.obj");
+        OBJ.put("mp_w_15_balefire", "models/missile_parts/mp_w_15_balefire.obj");
+        OBJ.put("mp_w_15_boxcar", "models/missile_parts/mp_w_15_boxcar.obj");
+        OBJ.put("mp_w_15_he", "models/missile_parts/mp_w_15_he.obj");
+        OBJ.put("mp_w_15_incendiary", "models/missile_parts/mp_w_15_incendiary.obj");
+        OBJ.put("mp_w_15_mirv", "models/missile_parts/mp_w_15_mirv.obj");
+        OBJ.put("mp_w_15_n2", "models/missile_parts/mp_w_15_n2.obj");
+        OBJ.put("mp_w_15_nuclear", "models/missile_parts/mp_w_15_nuclear.obj");
+        OBJ.put("mp_w_15_turbine", "models/missile_parts/mp_w_15_turbine.obj");
+        OBJ.put("n45_chain", "models/bombs/n45_chain.obj");
+        OBJ.put("n_i_4_n_i", "models/weapons/n_i_4_n_i.obj");
+        OBJ.put("orbus", "models/machines/orbus.obj");
+        OBJ.put("ore_slopper", "models/machines/ore_slopper.obj");
+        OBJ.put("panzerschreck", "models/weapons/panzerschreck.obj");
+        OBJ.put("pepperbox", "models/weapons/pepperbox.obj");
+        OBJ.put("pile_control", "models/pile/pile_control.obj");
+        OBJ.put("pile_loader", "models/pile/pile_loader.obj");
+        OBJ.put("pile_vent", "models/pile/pile_vent.obj");
+        OBJ.put("pipe_anchor", "models/network/pipe_anchor.obj");
+        OBJ.put("pipe_neo", "models/blocks/pipe_neo.obj");
+        OBJ.put("piston_inserter", "models/machines/piston_inserter.obj");
+        OBJ.put("plasticbag", "models/mobs/plasticbag.obj");
+        OBJ.put("player_manly_af", "models/armor/player_fem.obj");
+        OBJ.put("plushie_derg", "models/trinkets/derg.obj");
+        OBJ.put("plushie_hundun", "models/trinkets/hundun.obj");
+        OBJ.put("plushie_yomi", "models/trinkets/yomi.obj");
+        OBJ.put("press_body", "models/press_body.obj");
+        OBJ.put("press_head", "models/press_head.obj");
+        OBJ.put("projectiles", "models/projectiles/projectiles.obj");
+        OBJ.put("pump", "models/machines/pump.obj");
+        OBJ.put("pumpjack", "models/machines/pumpjack.obj");
+        OBJ.put("purex", "models/machines/purex.obj");
+        OBJ.put("pylon", "models/network/pylon.obj");
+        OBJ.put("pylon_large", "models/network/pylon_large.obj");
+        OBJ.put("pylon_medium", "models/network/pylon_medium.obj");
+        OBJ.put("pyrooven", "models/machines/pyrooven.obj");
+        OBJ.put("qe_containment_door", "models/doors/qe_containment.obj");
+        OBJ.put("qe_sliding_door", "models/doors/qe_sliding_door.obj");
+        OBJ.put("quadro", "models/weapons/quadro.obj");
+        OBJ.put("radar", "models/machines/radar.obj");
+        OBJ.put("radar_body", "models/radar_base.obj");
+        OBJ.put("radar_large", "models/machines/radar_large.obj");
+        OBJ.put("radar_screen", "models/machines/radar_screen.obj");
+        OBJ.put("radgen_body", "models/radgen.obj");
+        OBJ.put("rail_standard_switch", "models/blocks/rail_standard_switch.obj");
+        OBJ.put("rail_standard_switch_flipped", "models/blocks/rail_standard_switch_flipped.obj");
+        OBJ.put("railgun_base", "models/railgun_base.obj");
+        OBJ.put("railgun_main", "models/railgun_main.obj");
+        OBJ.put("railgun_rotor", "models/railgun_rotor.obj");
+        OBJ.put("rbmk_autoloader", "models/rbmk/autoloader.obj");
+        OBJ.put("rbmk_button", "models/rbmk/button.obj");
+        OBJ.put("rbmk_console", "models/rbmk/rbmk_console.obj");
+        OBJ.put("rbmk_crane", "models/rbmk/crane.obj");
+        OBJ.put("rbmk_crane_console", "models/rbmk/crane_console.obj");
+        OBJ.put("rbmk_element", "models/rbmk/rbmk_element.obj");
+        OBJ.put("rbmk_element_rods", "models/rbmk/rbmk_element_rods.obj");
+        OBJ.put("rbmk_gauge", "models/rbmk/gauge.obj");
+        OBJ.put("rbmk_indicator", "models/rbmk/indicator.obj");
+        OBJ.put("rbmk_lever", "models/rbmk/lever.obj");
+        OBJ.put("rbmk_numitron", "models/rbmk/numitron.obj");
+        OBJ.put("rbmk_reflector", "models/rbmk/rbmk_reflector.obj");
+        OBJ.put("rbmk_rods", "models/rbmk/rbmk_rods.obj");
+        OBJ.put("rbmk_rods_vbo", "models/rbmk/rbmk_rods.obj");
+        OBJ.put("rbmk_terminal", "models/rbmk/terminal.obj");
+        OBJ.put("reactor_small_base", "models/reactors/reactor_small_base.obj");
+        OBJ.put("reactor_small_rods", "models/reactors/reactor_small_rods.obj");
+        OBJ.put("refueler", "models/blocks/refueler.obj");
+        OBJ.put("rock_mill", "models/machines/rockmill.obj");
+        OBJ.put("rotary_furnace", "models/machines/rotary_furnace.obj");
+        OBJ.put("round_airlock_door", "models/doors/round_airlock_door.obj");
+        OBJ.put("rpc", "models/rpc.obj");
+        OBJ.put("rtg", "models/machines/rtg.obj");
+        OBJ.put("rtg_connector", "models/machines/rtg_connector.obj");
+        OBJ.put("sat_foeq_burning", "models/sat_foeq_burning.obj");
+        OBJ.put("sat_foeq_fire", "models/sat_foeq_fire.obj");
+        OBJ.put("satlink", "models/machines/satlink.obj");
+        OBJ.put("sawmill", "models/machines/sawmill.obj");
+        OBJ.put("scaffold", "models/blocks/scaffold.obj");
+        OBJ.put("secure_access_door", "models/doors/secure_access_door.obj");
+        OBJ.put("sexy", "models/weapons/sexy.obj");
+        OBJ.put("shimmer_axe", "models/shimmer_axe.obj");
+        OBJ.put("shimmer_sledge", "models/shimmer_sledge.obj");
+        OBJ.put("shotty", "models/weapons/supershotty.obj");
+        OBJ.put("shredder", "models/weapons/shredder.obj");
+        OBJ.put("silex", "models/machines/silex.obj");
+        OBJ.put("silo_hatch", "models/doors/silo_hatch.obj");
+        OBJ.put("silo_hatch_large", "models/doors/silo_hatch_large.obj");
+        OBJ.put("skeleton", "models/effect/skeleton.obj");
+        OBJ.put("sliding_seal_door", "models/doors/sliding_seal_door.obj");
+        OBJ.put("small_hatch", "models/doors/hatch.obj");
+        OBJ.put("snowglobe", "models/trinkets/snowglobe.obj");
+        OBJ.put("solar_mirror", "models/machines/solar_mirror.obj");
+        OBJ.put("soldering_station", "models/soldering_station.obj");
+        OBJ.put("solidifier", "models/machines/solidifier.obj");
+        OBJ.put("soyuz_lander", "models/soyuz_lander.obj");
+        OBJ.put("soyuz_module", "models/soyuz_module.obj");
+        OBJ.put("spas_12", "models/weapons/spas-12.obj");
+        OBJ.put("sphere_new", "models/sphere_new.obj");
+        OBJ.put("sphere_ruv", "models/sphere_ruv.obj");
+        OBJ.put("sphere_uv_anim", "models/sphere_uv.hmf");
+        OBJ.put("spinny_light", "models/spinny_light.obj");
+        OBJ.put("star_f", "models/weapons/star_f.obj");
+        OBJ.put("steam_engine", "models/machines/steam_engine.obj");
+        OBJ.put("stg77", "models/weapons/stg77.obj");
+        OBJ.put("stinger", "models/weapons/stinger.obj");
+        OBJ.put("stirling", "models/machines/stirling.obj");
+        OBJ.put("stopsign", "models/weapons/stopsign.obj");
+        OBJ.put("strand_caster", "models/machines/strand_caster.obj");
+        OBJ.put("strut", "models/strut.obj");
+        OBJ.put("substation", "models/network/substation.obj");
+        OBJ.put("supercomputer", "models/machines/supercomputer.obj");
+        OBJ.put("taintcrab", "models/mobs/taintcrab.obj");
+        OBJ.put("tape_drive", "models/machines/tape_drive.obj");
+        OBJ.put("tau", "models/weapons/tau.obj");
+        OBJ.put("tesla", "models/tesla.obj");
+        OBJ.put("tesla_cannon", "models/weapons/tesla_cannon.obj");
+        OBJ.put("teslacrab", "models/mobs/teslacrab.obj");
+        OBJ.put("thresher", "models/machines/thresher.obj");
+        OBJ.put("tom_flame", "models/weapons/tom_flame.hmf");
+        OBJ.put("tom_main", "models/weapons/tom_main.obj");
+        OBJ.put("torpedo", "models/weapons/torpedo.obj");
+        OBJ.put("train_cargo_tram", "models/vehicles/tram.obj");
+        OBJ.put("train_cargo_tram_trailer", "models/vehicles/tram_trailer.obj");
+        OBJ.put("turbine", "models/machines/turbine.obj");
+        OBJ.put("turbofan", "models/machines/turbofan.obj");
+        OBJ.put("turret_arty", "models/turrets/turret_arty.obj");
+        OBJ.put("turret_chekhov", "models/turrets/turret_chekhov.obj");
+        OBJ.put("turret_fritz", "models/turrets/turret_fritz.obj");
+        OBJ.put("turret_himars", "models/turrets/turret_himars.obj");
+        OBJ.put("turret_howard", "models/turrets/turret_howard.obj");
+        OBJ.put("turret_howard_damaged", "models/turrets/turret_howard_damaged.obj");
+        OBJ.put("turret_jeremy", "models/turrets/turret_jeremy.obj");
+        OBJ.put("turret_maxwell", "models/turrets/turret_microwave.obj");
+        OBJ.put("turret_richard", "models/turrets/turret_richard.obj");
+        OBJ.put("turret_sentry", "models/turrets/turret_sentry.obj");
+        OBJ.put("turret_tauon", "models/turrets/turret_tauon.obj");
+        OBJ.put("ufo", "models/mobs/ufo.obj");
+        OBJ.put("uzi", "models/weapons/uzi.obj");
+        OBJ.put("vending_machine", "models/machines/vending_machine.obj");
+        OBJ.put("vortex", "models/weapons/vortex.obj");
+        OBJ.put("water_door", "models/doors/water_door.obj");
+        OBJ.put("whiskey", "models/weapons/whiskey.obj");
+        TEX.put("aberrator_tex", "textures/models/weapons/aberrator.png");
+        TEX.put("am180_tex", "textures/models/weapons/am180.png");
+        TEX.put("amat_penance_tex", "textures/models/weapons/amat_penance.png");
+        TEX.put("amat_subtlety_tex", "textures/models/weapons/amat_subtlety.png");
+        TEX.put("amat_tex", "textures/models/weapons/amat.png");
+        TEX.put("bio_revolver_atlas_tex", "textures/models/weapons/bio_revolver_atlas.png");
+        TEX.put("bio_revolver_tex", "textures/models/weapons/bio_revolver.png");
+        TEX.put("bolter_tex", "textures/models/weapons/bolter.png");
+        TEX.put("boltgun_tex", "textures/models/weapons/boltgun.png");
+        TEX.put("building_tex", "textures/models/weapons/building.png");
+        TEX.put("c130_0_tex", "textures/models/weapons/c130_0.png");
+        TEX.put("carbine_bayonet_tex", "textures/models/weapons/carbine_bayonet.png");
+        TEX.put("carbine_tex", "textures/models/weapons/huntsman.png");
+        TEX.put("chainsaw_tex", "textures/models/weapons/chainsaw.png");
+        TEX.put("charge_thrower_hook_tex", "textures/models/weapons/charge_thrower_hook.png");
+        TEX.put("charge_thrower_mortar_tex", "textures/models/weapons/charge_thrower_mortar.png");
+        TEX.put("charge_thrower_tex", "textures/models/weapons/charge_thrower.png");
+        TEX.put("chemthrower_tex", "textures/models/weapons/chemthrower.png");
+        TEX.put("chernobylsign_tex", "textures/models/weapons/chernobylsign.png");
+        TEX.put("coilgun_tex", "textures/models/weapons/coilgun.png");
+        TEX.put("congolake_tex", "textures/models/weapons/congolake.png");
+        TEX.put("crucible_blade", "textures/models/weapons/crucible_blade.png");
+        TEX.put("crucible_blade_bloom", "textures/models/weapons/crucible_blade_bloom.png");
+        TEX.put("crucible_guard", "textures/models/weapons/crucible_guard.png");
+        TEX.put("crucible_hilt", "textures/models/weapons/crucible_hilt.png");
+        TEX.put("dani_celestial_tex", "textures/models/weapons/dani_celestial.png");
+        TEX.put("dani_lunar_tex", "textures/models/weapons/dani_lunar.png");
+        TEX.put("debug_gun_tex", "textures/models/weapons/debug_gun.png");
+        TEX.put("detonator_laser_tex", "textures/models/weapons/detonator_laser.png");
+        TEX.put("double_barrel_sacred_dragon_tex", "textures/models/weapons/double_barrel_sacred_dragon.png");
+        TEX.put("double_barrel_tex", "textures/models/weapons/double_barrel.png");
+        TEX.put("drill_tex", "textures/models/weapons/drill.png");
+        TEX.put("egon_backpack_tex", "textures/models/weapons/egon.png");
+        TEX.put("egon_display_tex", "textures/models/weapons/egon_display.png");
+        TEX.put("egon_hose_tex", "textures/models/weapons/egon_hose.png");
+        TEX.put("eott_tex", "textures/models/weapons/eott.png");
+        TEX.put("fatman_balefire_tex", "textures/models/weapons/fatman_balefire.png");
+        TEX.put("fatman_mininuke_tex", "textures/models/weapons/fatman_mininuke.png");
+        TEX.put("fatman_tex", "textures/models/weapons/fatman.png");
+        TEX.put("fireext_foam_tex", "textures/models/weapons/fireext_foam.png");
+        TEX.put("fireext_sand_tex", "textures/models/weapons/fireext_sand.png");
+        TEX.put("fireext_tex", "textures/models/weapons/fireext_normal.png");
+        TEX.put("flamethrower_daybreaker_tex", "textures/models/weapons/flamethrower_daybreaker.png");
+        TEX.put("flamethrower_tex", "textures/models/weapons/flamethrower.png");
+        TEX.put("flamethrower_topaz_tex", "textures/models/weapons/flamethrower_topaz.png");
+        TEX.put("flaregun_tex", "textures/models/weapons/flaregun.png");
+        TEX.put("folly_tex", "textures/models/weapons/moonlight.png");
+        TEX.put("g3_attachments", "textures/models/weapons/g3_attachments.png");
+        TEX.put("g3_black_tex", "textures/models/weapons/g3_polymer_black.png");
+        TEX.put("g3_green_tex", "textures/models/weapons/g3_polymer_green.png");
+        TEX.put("g3_tex", "textures/models/weapons/g3.png");
+        TEX.put("g3_zebra_tex", "textures/models/weapons/g3_zebra.png");
+        TEX.put("gavel_diamond", "textures/models/weapons/gavel_diamond.png");
+        TEX.put("gavel_lead", "textures/models/weapons/gavel_lead.png");
+        TEX.put("gavel_mese", "textures/models/weapons/gavel_mese.png");
+        TEX.put("gavel_wood", "textures/models/weapons/gavel_wood.png");
+        TEX.put("greasegun_clean_tex", "textures/models/weapons/greasegun_clean.png");
+        TEX.put("greasegun_tex", "textures/models/weapons/greasegun.png");
+        TEX.put("hangman_tex", "textures/models/weapons/hangman.png");
+        TEX.put("heavy_revolver_protege_tex", "textures/models/weapons/protege.png");
+        TEX.put("heavy_revolver_tex", "textures/models/weapons/heavy_revolver.png");
+        TEX.put("henry_lincoln_tex", "textures/models/weapons/henry_lincoln.png");
+        TEX.put("henry_tex", "textures/models/weapons/henry.png");
+        TEX.put("heretic_tex", "textures/models/weapons/sexy_heretic.png");
+        TEX.put("ks23_tex", "textures/models/weapons/ks23.png");
+        TEX.put("lance_tex", "textures/models/weapons/lance.png");
+        TEX.put("laser_pistol_morning_glory_tex", "textures/models/weapons/laser_pistol_morning_glory.png");
+        TEX.put("laser_pistol_pew_pew_tex", "textures/models/weapons/laser_pistol_pew_pew.png");
+        TEX.put("laser_pistol_tex", "textures/models/weapons/laser_pistol.png");
+        TEX.put("lasrifle_mods_tex", "textures/models/weapons/lasrifle_mods.png");
+        TEX.put("lasrifle_tex", "textures/models/weapons/lasrifle.png");
+        TEX.put("liberator_tex", "textures/models/weapons/liberator.png");
+        TEX.put("lilmac_scope_tex", "textures/models/weapons/lilmac_scope.png");
+        TEX.put("lilmac_tex", "textures/models/weapons/lilmac.png");
+        TEX.put("m2_tex", "textures/models/weapons/m2_browning.png");
+        TEX.put("maresleg_broken_tex", "textures/models/weapons/maresleg_broken.png");
+        TEX.put("maresleg_tex", "textures/models/weapons/maresleg.png");
+        TEX.put("mas36_tex", "textures/models/weapons/mas36.png");
+        TEX.put("mike_hawk_tex", "textures/models/weapons/lag.png");
+        TEX.put("minigun_dual_tex", "textures/models/weapons/minigun_dual.png");
+        TEX.put("minigun_lacunae_tex", "textures/models/weapons/minigun_lacunae.png");
+        TEX.put("minigun_tex", "textures/models/weapons/minigun.png");
+        TEX.put("missile_launcher_tex", "textures/models/weapons/missile_launcher.png");
+        TEX.put("mk108_tex", "textures/models/weapons/mk108.png");
+        TEX.put("n_i_4_n_i_greyscale_tex", "textures/models/weapons/n_i_4_n_i_greyscale.png");
+        TEX.put("n_i_4_n_i_tex", "textures/models/weapons/n_i_4_n_i.png");
+        TEX.put("panzerschreck_tex", "textures/models/weapons/panzerschreck.png");
+        TEX.put("pepperbox_tex", "textures/models/weapons/pepperbox.png");
+        TEX.put("quadro_rocket_tex", "textures/models/weapons/quadro_rocket.png");
+        TEX.put("quadro_tex", "textures/models/weapons/quadro.png");
+        TEX.put("rpc_tex", "textures/models/weapons/rpc.png");
+        TEX.put("sexy_tex", "textures/models/weapons/sexy_real_no_fake.png");
+        TEX.put("shredder_orig_tex", "textures/models/weapons/shredder_orig.png");
+        TEX.put("shredder_tex", "textures/models/weapons/shredder.png");
+        TEX.put("sopsign_tex", "textures/models/weapons/sopsign.png");
+        TEX.put("spas_12_tex", "textures/models/weapons/spas-12.png");
+        TEX.put("star_f_elite_tex", "textures/models/weapons/star_f_elite.png");
+        TEX.put("star_f_tex", "textures/models/weapons/star_f.png");
+        TEX.put("stg77_tex", "textures/models/weapons/stg77.png");
+        TEX.put("stinger_tex", "textures/models/weapons/stinger.png");
+        TEX.put("stopsign_tex", "textures/models/weapons/stopsign.png");
+        TEX.put("tau_tex", "textures/models/weapons/tau.png");
+        TEX.put("tesla_cannon_tex", "textures/models/weapons/tesla_cannon.png");
+        TEX.put("torpedo_tex", "textures/models/weapons/torpedo.png");
+        TEX.put("uzi_saturnite_tex", "textures/models/weapons/uzi_saturnite.png");
+        TEX.put("uzi_tex", "textures/models/weapons/uzi.png");
+        TEX.put("vortex_tex", "textures/models/weapons/vortex.png");
+        TEX.put("whiskey_tex", "textures/models/weapons/whiskey.png");
+        TEX.put("ncrpa_arm", "textures/armor/ncrpa_arm.png");
+        ANIM.put("am180_anim", "models/weapons/animations/am180.json");
+        ANIM.put("benelli_anim", "models/weapons/animations/benelli.json");
+        ANIM.put("congolake_anim", "models/weapons/animations/congolake.json");
+        ANIM.put("cursed_anim", "models/weapons/animations/cursed.json");
+        ANIM.put("flamethrower_anim", "models/weapons/animations/flamethrower.json");
+        ANIM.put("ks23_anim", "models/weapons/animations/ks23.json");
+        ANIM.put("lag_anim", "models/weapons/animations/lag.json");
+        ANIM.put("novac_anim", "models/weapons/animations/novac.json");
+        ANIM.put("python_anim", "models/weapons/animations/python.json");
+        ANIM.put("spas_12_anim", "models/weapons/animations/spas12.json");
+        ANIM.put("stg77_anim", "models/weapons/animations/stg77.json");
+        ANIM.put("supershotty_anim", "models/weapons/animations/supershotty.json");
     }
-
-    // ------------------------------------------------------------------------------------
-    // SPAS-12 - CE: ResourceManager.spas_12 / spas_12_tex / spas_12_anim
-    // ------------------------------------------------------------------------------------
 
     public static final ResourceLocation SPAS12_OBJ = rl("models/weapons/spas-12.obj");
     public static final ResourceLocation SPAS12_TEX = rl("textures/models/weapons/spas-12.png");
     public static final ResourceLocation SPAS12_ANIM = rl("models/weapons/animations/spas12.json");
     public static final ResourceLocation CASINGS_TEX = rl("textures/particle/casings.png");
-
-    private static volatile HbmObjModel spas12Model;
-    private static volatile Map<String, BusAnimationSedna> spas12Anim;
-
-    @Nullable
-    public static HbmObjModel spas12() {
-        if (spas12Model == null) spas12Model = tryLoadModel(SPAS12_OBJ);
-        return spas12Model;
-    }
-
-    public static Map<String, BusAnimationSedna> spas12Anim() {
-        if (spas12Anim == null) spas12Anim = tryLoadAnim(SPAS12_ANIM);
-        return spas12Anim;
-    }
-
-    // ------------------------------------------------------------------------------------
-    // Uzi - CE: ResourceManager.uzi / uzi_tex / uzi_saturnite_tex (no dedicated animation JSON -
-    // CE's own LAMBDA_UZI_ANIMS in XFactory9mm.java builds every BusAnimationSedna programmatically,
-    // see GunAnimationRegistration.UZI_ANIM in this package, ported verbatim from that lambda).
-    // ------------------------------------------------------------------------------------
-
     public static final ResourceLocation UZI_OBJ = rl("models/weapons/uzi.obj");
     public static final ResourceLocation UZI_TEX = rl("textures/models/weapons/uzi.png");
     public static final ResourceLocation UZI_SATURNITE_TEX = rl("textures/models/weapons/uzi_saturnite.png");
-
-    private static volatile HbmObjModel uziModel;
-
-    @Nullable
-    public static HbmObjModel uzi() {
-        if (uziModel == null) uziModel = tryLoadModel(UZI_OBJ);
-        return uziModel;
-    }
-
-    // ------------------------------------------------------------------------------------
-    // AM-180 - CE: ResourceManager.am180 / am180_tex / am180_anim
-    // ------------------------------------------------------------------------------------
-
     public static final ResourceLocation AM180_OBJ = rl("models/weapons/am180.obj");
     public static final ResourceLocation AM180_TEX = rl("textures/models/weapons/am180.png");
     public static final ResourceLocation AM180_ANIM = rl("models/weapons/animations/am180.json");
 
-    private static volatile HbmObjModel am180Model;
-    private static volatile Map<String, BusAnimationSedna> am180Anim;
+    @Nullable public static HbmObjModel spas12() { return obj("spas_12"); }
+    public static Map<String, BusAnimationSedna> spas12Anim() { return json("spas_12_anim"); }
+    @Nullable public static HbmObjModel uzi() { return obj("uzi"); }
+    @Nullable public static HbmObjModel am180() { return obj("am180"); }
+    public static Map<String, BusAnimationSedna> am180Anim() { return json("am180_anim"); }
 
     @Nullable
-    public static HbmObjModel am180() {
-        if (am180Model == null) am180Model = tryLoadModel(AM180_OBJ);
-        return am180Model;
+    public static HbmObjModel obj(String field) {
+        String path = OBJ.get(field);
+        if (path == null) return null;
+        return OBJ_CACHE.computeIfAbsent(field, f -> tryLoadModel(rl(path)));
     }
 
-    public static Map<String, BusAnimationSedna> am180Anim() {
-        if (am180Anim == null) am180Anim = tryLoadAnim(AM180_ANIM);
-        return am180Anim;
+    public static ResourceLocation tex(String field) {
+        String path = TEX.get(field);
+        return path != null ? rl(path) : rl("textures/models/weapons/debug_gun.png");
     }
 
-    // ------------------------------------------------------------------------------------
-    // Shared lazy-load / defensive-fallback machinery - see class javadoc.
-    // ------------------------------------------------------------------------------------
-
-    private static final Set<ResourceLocation> WARNED = ConcurrentHashMap.newKeySet();
+    public static Map<String, BusAnimationSedna> json(String field) {
+        String path = ANIM.get(field);
+        if (path == null) return Map.of();
+        return ANIM_CACHE.computeIfAbsent(field, f -> tryLoadAnim(rl(path)));
+    }
 
     @Nullable
     private static HbmObjModel tryLoadModel(ResourceLocation resource) {
-        try {
-            return HbmObjModel.get(resource);
-        } catch (ModelFormatException e) {
-            warnOnce(resource, "OBJ model", e);
-            return null;
-        }
+        try { return HbmObjModel.get(resource); }
+        catch (ModelFormatException e) { warnOnce(resource, "OBJ model", e); return null; }
     }
 
-    /** Never {@code null} - falls back to an empty, immutable map (every bus lookup then naturally returns the identity/no-op transform, matching CE's own {@code null}-tolerant call sites). */
     private static Map<String, BusAnimationSedna> tryLoadAnim(ResourceLocation resource) {
         try {
             Map<String, BusAnimationSedna> loaded = AnimationLoader.load(resource);
             if (loaded != null) return loaded;
             warnOnce(resource, "animation JSON (resource not found)", null);
-        } catch (Exception e) {
-            warnOnce(resource, "animation JSON", e);
-        }
+        } catch (Exception e) { warnOnce(resource, "animation JSON", e); }
         return Map.of();
     }
 
     private static void warnOnce(ResourceLocation resource, String kind, @Nullable Exception e) {
         if (WARNED.add(resource)) {
-            MainRegistry.logger.warn(
-                    "GunModels: failed to load {} '{}' - this gun will render without it until the " +
-                            "weapon asset-migration task ports the missing file. (Logged once per resource.)",
-                    kind, resource, e);
+            MainRegistry.logger.warn("GunModels: failed to load {} '{}' (logged once).", kind, resource, e);
         }
     }
 

@@ -5,13 +5,18 @@ import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.machine.dummyable.WoodBurnerMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Flammable;
+import com.hbm.items.BilletPowderItems;
+import com.hbm.items.ItemEnums.EnumAshType;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.Library;
+import com.hbm.modules.ModuleBurnTime;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -23,7 +28,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -31,13 +35,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * CE {@code TileEntityMachineWoodBurner.java}:72-136 — vanilla burn-time + optional
- * {@code FT_Flammable} tank. Ash ({@code powder_ash}) skipped (unregistered).
+ * CE {@code TileEntityMachineWoodBurner.java}:72-136 — {@code burnModule} + optional
+ * {@code FT_Flammable} tank.
+ * Exact CE ash {@code :96-103}/{@code :210-226} via {@code getAshFromFuel}, slot 1 hopper-out.
+ * {@code setType(2)} / {@code loadTank(3,4)} Exact CE {@code :79-80}.
+ * Solid {@code incrementPollution(SOOT, SOOT_PER_SECOND)} every 20t Exact CE {@code :117}.
+ * Liquid {@code SOOT_PER_SECOND * toBurn / 2F} every 20t Exact CE {@code :132}.
+ * Smoke particles stay skipped (VFX).
  */
 public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider,
+        IControlReceiver {
 
     public static final long MAX_POWER = 100_000;
+    private static final int ASH_THRESHOLD = 2000;
+
+    /** Exact CE {@code TileEntityMachineWoodBurner.java}:56 — log×4 / wood×2. */
+    public static ModuleBurnTime burnModule = new ModuleBurnTime().setLogTimeMod(4).setWoodTimeMod(2);
 
     public final FluidTankNTM tank;
     public long power;
@@ -46,6 +60,9 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
     public boolean liquidBurn;
     public boolean isOn;
     public int powerGen;
+    public int ashLevelWood;
+    public int ashLevelCoal;
+    public int ashLevelMisc;
 
     public MachineWoodBurnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 6, true, true);
@@ -59,7 +76,7 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        if (slot == 0) return getBurnTime(stack) > 0;
+        if (slot == 0) return burnModule.getBurnTime(stack) > 0;
         if (slot == 2) return stack.getItem() instanceof IItemFluidIdentifier;
         if (slot == 5) return Library.isBattery(stack);
         return slot == 3;
@@ -81,10 +98,9 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
 
         powerGen = 0;
 
-        ItemStack id = inventory.getStackInSlot(2);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            tank.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineWoodBurner.java:79-80
+        this.tank.setType(2, inventory);
+        this.tank.loadTank(3, 4, inventory);
 
         power = Library.chargeItemsFromTE(inventory, 5, power, MAX_POWER);
 
@@ -96,8 +112,16 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
         if (!liquidBurn) {
             if (burnTime <= 0) {
                 ItemStack fuel = inventory.getStackInSlot(0);
-                int burn = getBurnTime(fuel);
+                int burn = burnModule.getBurnTime(fuel);
                 if (burn > 0) {
+                    // Exact CE :96-103 — classify before consume, while processAsh threshold 2000
+                    EnumAshType type = HeaterFireboxBlockEntity.getAshFromFuel(fuel);
+                    if (type == EnumAshType.WOOD) ashLevelWood += burn;
+                    if (type == EnumAshType.COAL) ashLevelCoal += burn;
+                    if (type == EnumAshType.MISC) ashLevelMisc += burn;
+                    while (processAsh(ashLevelWood, EnumAshType.WOOD, ASH_THRESHOLD)) ashLevelWood -= ASH_THRESHOLD;
+                    while (processAsh(ashLevelCoal, EnumAshType.COAL, ASH_THRESHOLD)) ashLevelCoal -= ASH_THRESHOLD;
+                    while (processAsh(ashLevelMisc, EnumAshType.MISC, ASH_THRESHOLD)) ashLevelMisc -= ASH_THRESHOLD;
                     maxBurnTime = burnTime = burn;
                     inventory.extractItem(0, 1, false);
                     setChanged();
@@ -105,6 +129,11 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
             } else if (power < MAX_POWER && isOn) {
                 burnTime--;
                 powerGen += 100;
+                // CE TileEntityMachineWoodBurner.java:117
+                if (level.getGameTime() % 20 == 0) {
+                    PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                            PollutionHandler.SOOT_PER_SECOND);
+                }
             }
         } else if (power < MAX_POWER && tank.getFill() > 0 && isOn) {
             FT_Flammable trait = tank.getTankType().getTrait(FT_Flammable.class);
@@ -113,6 +142,11 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
                 if (toBurn > 0) {
                     powerGen += (int) (trait.getHeatEnergy() * toBurn / 2_000L);
                     tank.setFill(tank.getFill() - toBurn);
+                    // CE TileEntityMachineWoodBurner.java:132
+                    if (level.getGameTime() % 20 == 0) {
+                        PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                                PollutionHandler.SOOT_PER_SECOND * toBurn / 2F);
+                    }
                 }
             }
         }
@@ -122,9 +156,26 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
         networkPackMK2(25);
     }
 
-    public static int getBurnTime(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return 0;
-        return stack.getBurnTime(RecipeType.SMELTING);
+    /**
+     * Exact CE {@code TileEntityMachineWoodBurner.java}:210-226 — scan slots 0-4.
+     * CE {@code :216} also does {@code ashLevelWood -= threshold} on empty-slot place; that
+     * double-counts against the {@code while} caller and is not copied (brick/ashpit contract).
+     */
+    protected boolean processAsh(int level, EnumAshType type, int threshold) {
+        if (level < threshold) return false;
+        ItemStack ash = new ItemStack(BilletPowderItems.powderAsh(type).get());
+        for (int i = 0; i < 5; i++) {
+            ItemStack slot = inventory.getStackInSlot(i);
+            if (slot.isEmpty()) {
+                inventory.setStackInSlot(i, ash);
+                return true;
+            }
+            if (slot.is(ash.getItem()) && slot.getCount() < slot.getMaxStackSize()) {
+                slot.grow(1);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void toggleOn() {
@@ -135,6 +186,26 @@ public class MachineWoodBurnerBlockEntity extends MachineBaseBlockEntity
     public void toggleLiquid() {
         liquidBurn = !liquidBurn;
         setChanged();
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineWoodBurner.receiveControl} :229-237. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("toggle")) {
+            this.isOn = !this.isOn;
+            setChanged();
+            dataChanged();
+        }
+        if (data.contains("switch")) {
+            this.liquidBurn = !this.liquidBurn;
+            setChanged();
+            dataChanged();
+        }
     }
 
     public DirPos[] getConPos() {

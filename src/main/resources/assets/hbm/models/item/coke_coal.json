@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "hbm:item/coke"
+    "layer0": "hbm:item/coke.coal"
   }
 }

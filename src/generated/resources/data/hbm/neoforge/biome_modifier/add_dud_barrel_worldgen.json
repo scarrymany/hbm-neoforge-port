@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "hbm:dud",
+    "hbm:barrel"
+  ],
+  "step": "top_layer_modification"
+}

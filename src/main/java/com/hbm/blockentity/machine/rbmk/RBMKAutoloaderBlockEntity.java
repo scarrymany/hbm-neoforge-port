@@ -2,8 +2,10 @@ package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.machine.rbmk.RBMKBaseBlock;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.interfaces.ICopiable;
+import com.hbm.inventory.container.machine.rbmk.RBMKAutoloaderMenu;
 import com.hbm.items.machine.ItemRBMKRod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,33 +13,35 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Mechanical fuel-rod feeder that sits directly above a fuel-rod channel and periodically swaps a
- * fresh rod in from its own hopper-fed inventory, pulling the spent one back out - not itself an
- * RBMK grid column (CE's {@code TileEntityRBMKAutoloader} {@code extends TileEntityMachineBase}).
- * Ported (simplified piston-animation timing; core swap logic preserved) from CE's
- * {@code TileEntityRBMKAutoloader} (313 lines, signature-level survey).
+ * Autoloader. Exact CE {@code TileEntityRBMKAutoloader.java:60-133/:195-287}: 18-slot hopper
+ * (0-8 in / 9-17 out), enrichment {@code cycle} threshold, piston delay 40, {@code findCore}
+ * into the rod column, minus/plus ±5 clamp 5-95. Lift audio / Tower VFX / TESR lerp stay skipped.
  */
-public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements ITickableBE, IControlReceiver, ICopiable {
+public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements ITickableBE, IControlReceiver, ICopiable, MenuProvider {
 
     public static final double SPEED = 0.005D;
+    private static final int[] ALL_SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+    private static final int[] NO_SLOTS = new int[0];
 
     public double piston;
     public double lastPiston;
     public int cycle = 50;
     private int delay = 0;
-    private boolean retracting = true;
+    private boolean isRetracting = true;
 
     public RBMKAutoloaderBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 2, false, false);
+        super(type, pos, state, 18, false, false);
     }
 
     @Override
@@ -45,15 +49,21 @@ public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements
         return Component.translatable("container.rbmkAutoloader");
     }
 
+    // CE :195-204
     public boolean hasFuel() {
-        for (int i = 0; i < inventory.getSlots(); i++) {
-            if (inventory.getStackInSlot(i).getItem() instanceof ItemRBMKRod) return true;
+        for (int i = 0; i < 9; i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemRBMKRod
+                    && ItemRBMKRod.getEnrichment(stack) * 100 >= cycle) {
+                return true;
+            }
         }
         return false;
     }
 
+    // CE :206-209
     public boolean hasSpace() {
-        for (int i = 0; i < inventory.getSlots(); i++) {
+        for (int i = 9; i < 18; i++) {
             if (inventory.getStackInSlot(i).isEmpty()) return true;
         }
         return false;
@@ -63,71 +73,115 @@ public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        lastPiston = piston;
+        if (delay > 0) delay--;
 
-        BlockEntity below = level.getBlockEntity(worldPosition.below());
-        if (!(below instanceof RBMKRodBlockEntity rod)) return;
-
-        if (retracting) {
-            piston = Math.max(0, piston - SPEED);
-            if (piston <= 0 && delay-- <= 0) retracting = false;
-        } else {
-            piston = Math.min(1, piston + SPEED);
-            if (piston >= 1) {
-                trySwap(rod);
-                retracting = true;
-                delay = cycle;
+        if (delay <= 0 && this.isRetracting && this.piston > 0D) {
+            this.piston -= SPEED;
+            if (this.piston <= 0) {
+                this.piston = 0;
+                this.delay = 40;
             }
         }
 
-        setChanged();
-        dataChanged();
-        networkPackMK2(25);
+        // CE :76-89 — every 20t, start extending if fuel + space + cold rod below enrichment
+        if (isRetracting && level.getGameTime() % 20 == 0 && this.hasFuel() && this.hasSpace()) {
+            RBMKRodBlockEntity rod = findRodBelow();
+            if (rod != null && rod.coldEnoughForAutoloader()) {
+                ItemStack loaded = rod.inventory.getStackInSlot(0);
+                if (loaded.isEmpty() || (loaded.getItem() instanceof ItemRBMKRod
+                        && ItemRBMKRod.getEnrichment(loaded) * 100 < cycle)) {
+                    this.isRetracting = false;
+                }
+            }
+        }
+
+        if (delay <= 0 && !this.isRetracting && this.piston < 1D) {
+            this.piston += SPEED;
+            if (this.piston >= 1) {
+                this.piston = 1;
+                this.delay = 40;
+            }
+        }
+
+        // CE :100-133 — swap at full extension
+        if (!isRetracting && this.piston >= 1D) {
+            this.piston = 1D;
+            RBMKRodBlockEntity rod = findRodBelow();
+            if (rod != null) {
+                if (!rod.inventory.getStackInSlot(0).isEmpty() && this.hasSpace()) {
+                    for (int i = 9; i < 18; i++) {
+                        if (inventory.getStackInSlot(i).isEmpty()) {
+                            inventory.setStackInSlot(i, rod.inventory.getStackInSlot(0).copy());
+                            rod.inventory.setStackInSlot(0, ItemStack.EMPTY);
+                            rod.setChanged();
+                            break;
+                        }
+                    }
+                }
+                if (rod.inventory.getStackInSlot(0).isEmpty()) {
+                    for (int i = 0; i < 9; i++) {
+                        ItemStack stack = inventory.getStackInSlot(i);
+                        if (!stack.isEmpty() && stack.getItem() instanceof ItemRBMKRod
+                                && ItemRBMKRod.getEnrichment(stack) * 100 >= cycle) {
+                            rod.inventory.setStackInSlot(0, stack.copy());
+                            inventory.setStackInSlot(i, ItemStack.EMPTY);
+                            rod.setChanged();
+                            break;
+                        }
+                    }
+                }
+
+                this.isRetracting = true;
+                this.delay = 40;
+                setChanged();
+            }
+        }
+
+        networkPackMK2(100);
     }
 
-    private void trySwap(RBMKRodBlockEntity rod) {
-        if (rod.coldEnoughForAutoloader() && rod.canUnload() && hasSpace()) {
-            ItemStack spent = rod.provideNext().copy();
-            for (int i = 0; i < inventory.getSlots(); i++) {
-                if (inventory.getStackInSlot(i).isEmpty()) {
-                    inventory.setStackInSlot(i, spent);
-                    break;
-                }
-            }
-            rod.unload();
-        }
-
-        if (rod.canLoad(ItemStack.EMPTY)) {
-            for (int i = 0; i < inventory.getSlots(); i++) {
-                ItemStack stack = inventory.getStackInSlot(i);
-                if (stack.getItem() instanceof ItemRBMKRod) {
-                    rod.load(stack.copy());
-                    inventory.setStackInSlot(i, ItemStack.EMPTY);
-                    break;
-                }
+    /** CE {@code :77-81}/{:104-106} — {@code RBMKBase.findCore} under this block. */
+    private RBMKRodBlockEntity findRodBelow() {
+        if (level == null) return null;
+        BlockPos down = worldPosition.below();
+        if (level.getBlockState(down).getBlock() instanceof RBMKBaseBlock rbmkBase) {
+            BlockPos corePos = rbmkBase.findCore(level, down);
+            if (corePos != null && level.getBlockEntity(corePos) instanceof RBMKRodBlockEntity rod) {
+                return rod;
             }
         }
+        return null;
     }
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return stack.getItem() instanceof ItemRBMKRod;
+        // CE :228-230
+        return stack.getItem() instanceof ItemRBMKRod && ItemRBMKRod.getEnrichment(stack) * 100 >= cycle && i < 9;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        // CE :233-235 — hopper locked while piston is out
+        return this.piston <= 0 ? ALL_SLOTS : NO_SLOTS;
+    }
+
+    @Override
+    public boolean canExtractItem(int i, ItemStack itemStack, int amount) {
+        return i >= 9;
     }
 
     @Override
     public boolean hasPermission(Player player) {
-        return true;
+        return this.isUseableByPlayer(player);
     }
 
     @Override
     public void receiveControl(CompoundTag data) {
-        if (data.contains("cycle")) this.cycle = data.getInt("cycle");
+        // CE :282-286
+        if (data.contains("minus") && this.cycle > 5) this.cycle -= 5;
+        if (data.contains("plus") && this.cycle < 95) this.cycle += 5;
+        this.cycle = Mth.clamp(cycle, 5, 95);
         setChanged();
-    }
-
-    @Override
-    public void receiveControl(ServerPlayer player, CompoundTag data) {
-        receiveControl(data);
     }
 
     @Override
@@ -139,36 +193,51 @@ public class RBMKAutoloaderBlockEntity extends MachineBaseBlockEntity implements
 
     @Override
     public void pasteSettings(CompoundTag nbt, int index, Level world, Player player, BlockPos pos) {
-        if (nbt.contains("cycle")) cycle = nbt.getInt("cycle");
+        if (nbt.contains("cycle")) {
+            this.cycle = Mth.clamp(nbt.getInt("cycle"), 5, 95);
+        }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
         tag.putDouble("piston", piston);
-        tag.putInt("cycle", cycle);
-        tag.putBoolean("retracting", retracting);
+        tag.putBoolean("ret", isRetracting);
         tag.putInt("delay", delay);
+        tag.putInt("cycle", cycle);
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         piston = tag.getDouble("piston");
-        if (tag.contains("cycle")) cycle = tag.getInt("cycle");
-        retracting = tag.getBoolean("retracting");
+        isRetracting = tag.contains("ret") ? tag.getBoolean("ret") : tag.getBoolean("retracting");
         delay = tag.getInt("delay");
+        if (tag.contains("cycle")) cycle = tag.getInt("cycle");
     }
 
     @Override
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
-        buf.writeDouble(piston);
+        buf.writeDouble(this.piston);
+        buf.writeInt(this.cycle);
     }
 
     @Override
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
-        piston = buf.readDouble();
+        this.lastPiston = this.piston;
+        this.piston = buf.readDouble();
+        this.cycle = buf.readInt();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getDefaultName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
+        return new RBMKAutoloaderMenu(containerId, playerInventory, this);
     }
 }

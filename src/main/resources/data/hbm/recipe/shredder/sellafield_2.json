@@ -1,0 +1,17 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "type": "neoforge:components",
+    "items": "hbm:sellafield",
+    "components": {
+      "minecraft:block_state": {
+        "level": "2"
+      }
+    }
+  },
+  "output": {
+    "id": "hbm:scrap_nuclear",
+    "count": 3
+  },
+  "duration": 60
+}

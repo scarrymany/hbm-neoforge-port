@@ -2,11 +2,15 @@ package com.hbm.items.tool;
 
 import com.hbm.api.block.ILockable;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blockentity.machine.foundry.FoundryCastingBaseBlockEntity;
+import com.hbm.blockentity.machine.rbmk.RBMKSlottedBlockEntity;
 import com.hbm.blockentity.network.PipeBaseBlockEntity;
 import com.hbm.blockentity.network.energy.PylonBaseBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -20,15 +24,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  * (read in full). Reports the block's registry name, the block entity's class name, and - if
  * present - a few well-known interfaces' state: {@link IEnergyReceiverMK2} power,
  * {@link PipeBaseBlockEntity} duct fluid type, {@link PylonBaseBlockEntity} connection list, and
- * {@link ILockable} lock state (CE: {@code TileEntityPylonBase}/{@code TileEntityPipeBaseNT}/
- * {@code TileEntityLockableBase} branches, all confirmed real targets in this port - see this
- * class's sibling {@link ItemAnalysisTool} for the {@code BlockDummyable}/{@code IAnalyzable}-based
- * per-machine debug info this item does not attempt to duplicate).
+ * {@link ILockable} lock state, and slot count (CE {@code IInventory.getSizeInventory()}
+ * {@code :74-78}). 1.21 has no {@code IInventory} on BEs — slot count is
+ * {@code MachineBaseBlockEntity}/{@code RBMKSlottedBlockEntity}/{@code FoundryCastingBaseBlockEntity}
+ * {@code inventory.getSlots()} or vanilla {@link Container#getContainerSize()}.
  * <p>
- * <b>Not ported</b>: CE's {@code TileEntityDummy} branch (a bespoke lightweight dummy-block marker
- * distinct from this port's {@code BlockDummyable}, which resolves dummy positions at the
- * {@code Block} level via {@code findCore} instead of a dedicated dummy {@code BlockEntity} class) -
- * not applicable to this port's multiblock design, so nothing is lost by omitting it.
+ * <b>Not ported</b>: CE's {@code TileEntityDummy} branch (port uses {@code BlockDummyable.findCore},
+ * no dummy BE) and 1.12 {@code Meta:} dump.
  */
 public class ItemAnalyzer extends Item {
 
@@ -59,6 +61,12 @@ public class ItemAnalyzer extends Item {
         } else {
             player.displayClientMessage(Component.literal("Tile Entity: " + te.getClass().getSimpleName()), false);
 
+            // CE ItemAnalyzer.java:74-78
+            int slots = analyzerSlotCount(te);
+            if (slots >= 0) {
+                player.displayClientMessage(Component.literal("Slots: " + slots), false);
+            }
+
             if (te instanceof IEnergyReceiverMK2 receiver) {
                 player.displayClientMessage(Component.literal("Electricity: " + receiver.getPower() + " HE"), false);
             }
@@ -84,5 +92,22 @@ public class ItemAnalyzer extends Item {
 
         player.displayClientMessage(Component.literal("----------------------------"), false);
         return InteractionResult.SUCCESS;
+    }
+
+    /** 1.21 stand-in for CE {@code IInventory.getSizeInventory()}. */
+    private static int analyzerSlotCount(BlockEntity te) {
+        if (te instanceof MachineBaseBlockEntity machine && machine.inventory != null) {
+            return machine.inventory.getSlots();
+        }
+        if (te instanceof RBMKSlottedBlockEntity rbmk) {
+            return rbmk.inventory.getSlots();
+        }
+        if (te instanceof FoundryCastingBaseBlockEntity foundry && foundry.inventory != null) {
+            return foundry.inventory.getSlots();
+        }
+        if (te instanceof Container container) {
+            return container.getContainerSize();
+        }
+        return -1;
     }
 }

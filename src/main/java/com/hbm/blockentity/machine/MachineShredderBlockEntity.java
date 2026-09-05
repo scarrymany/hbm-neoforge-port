@@ -3,22 +3,32 @@ package com.hbm.blockentity.machine;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.generic.BlockSellafield;
+import com.hbm.blocks.generic.WastelandVirusBlocks;
 import com.hbm.inventory.container.machine.MachineShredderMenu;
 import com.hbm.inventory.recipes.HbmSimpleRecipe;
 import com.hbm.inventory.recipes.ProcessingRecipes;
 import com.hbm.items.machine.ItemBlades;
 import com.hbm.lib.Library;
+import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -38,16 +48,18 @@ import java.util.Optional;
  * <b>Recipe lookup</b>: {@link ProcessingRecipes#SHREDDER_TYPE} ({@link HbmSimpleRecipe}, JSON-backed -
  * see that class's own javadoc), replacing CE's hardcoded {@code ShredderRecipes} HashMap.
  * {@code ModItems.scrap} is registered; the explicit {@code scrap → dust} row is JSON
- * ({@code ShredderRecipes.java:208}). Miss-fallback still rejects rather than silently emitting
- * scrap — TODO(CE: ShredderRecipes.java:103-115).
+ * ({@code ShredderRecipes.java:208}). Miss-fallback emits scrap Exact CE
+ * {@code ShredderRecipes.java:103-115}.
  * OreDict {@code registerPost} auto-dust is 1.12-integration, not ported —
  * TODO(CE: ShredderRecipes.java:119-201).
- * {@code dustLapis} members other than {@code powder_lapis} —
+ *         {@code dustLapis} members other than {@code powder_lapis} —
  * TODO(CE: ShredderRecipes.java:246).
  * Old {@code ItemBedrockOre} wildcard (not {@code bedrock_ore_new_*}) —
  * TODO(CE: ShredderRecipes.java:348).
- * Sellafield LEVEL 1-5 yields (inventory flatten is one BlockItem = CE meta 0) —
- * TODO(CE: ShredderRecipes.java:353-357).
+ * Process loop sound Exact CE {@code TileEntityMachineShredder.java:156-161}:
+ * {@code MINECART_RIDING} 1.0F/0.75F every 50t while powered+processing.
+ * Sellafield LEVEL 0–5 yields Exact CE {@code ShredderRecipes.java:352-357}
+ * ({@code 1/2/3/5/7/15} {@code scrap_nuclear}).
  * Bobbleheads (block not registered) — TODO(CE: ShredderRecipes.java:400-402).
  * GC/AR moon-turf (commented out in CE) — TODO(CE: ShredderRecipes.java:412-423).
  */
@@ -73,6 +85,7 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
 
     private long power;
     private int progress;
+    public int soundCycle;
 
     public MachineShredderBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 30, false, true);
@@ -95,10 +108,36 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
                 .map(RecipeHolder::value);
     }
 
+    /** CE {@code ShredderRecipes.java:352-357} meta 0–5. */
+    private static final int[] SELLAFIELD_SCRAP = {1, 2, 3, 5, 7, 15};
+
+    /** CE {@code ShredderRecipes.getShredderResult} — miss / empty → {@code scrap}. */
+    private ItemStack shredderResult(ItemStack stack) {
+        if (stack.isEmpty()) return scrapStack();
+        if (stack.is(WastelandVirusBlocks.SELLAFIELD.get().asItem())) {
+            int meta = BlockSellafield.itemLevel(stack);
+            int count = SELLAFIELD_SCRAP[Mth.clamp(meta, 0, SELLAFIELD_SCRAP.length - 1)];
+            Item scrapNuc = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "scrap_nuclear"));
+            return scrapNuc == Items.AIR ? scrapStack() : new ItemStack(scrapNuc, count);
+        }
+        Optional<HbmSimpleRecipe> recipe = recipeFor(stack);
+        if (recipe.isPresent()) {
+            ItemStack out = recipe.get().getResultItem(level.registryAccess());
+            if (!out.isEmpty()) return out.copy();
+        }
+        return scrapStack();
+    }
+
+    private static ItemStack scrapStack() {
+        Item scrap = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "scrap"));
+        return scrap == Items.AIR ? ItemStack.EMPTY : new ItemStack(scrap);
+    }
+
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (slot >= INPUT_START && slot <= INPUT_END) {
-            return !(stack.getItem() instanceof ItemBlades) && recipeFor(stack).isPresent();
+            // CE TileEntityMachineShredder.java:78 — getShredderResult is never null
+            return !(stack.getItem() instanceof ItemBlades);
         }
         if (slot == BATTERY_SLOT) return Library.isBattery(stack);
         return (slot == BLADE_LEFT || slot == BLADE_RIGHT) && stack.getItem() instanceof ItemBlades;
@@ -172,9 +211,7 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
     }
 
     public boolean hasSpace(ItemStack stack) {
-        Optional<HbmSimpleRecipe> recipe = recipeFor(stack);
-        if (recipe.isEmpty()) return false;
-        ItemStack result = recipe.get().getResultItem(level.registryAccess());
+        ItemStack result = shredderResult(stack);
         if (result.isEmpty()) return false;
 
         int spaceLeft = 0;
@@ -194,7 +231,7 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
             ItemStack inp = inventory.getStackInSlot(inSlot);
             if (inp.isEmpty() || !hasSpace(inp)) continue;
 
-            ItemStack outp = recipeFor(inp).orElseThrow().getResultItem(level.registryAccess()).copy();
+            ItemStack outp = shredderResult(inp);
             int itemsLeft = outp.getCount();
 
             for (int outSlot = OUTPUT_START; outSlot <= OUTPUT_END && itemsLeft > 0; outSlot++) {
@@ -239,6 +276,12 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
                 progress = 0;
                 processItem();
             }
+            // Exact CE TileEntityMachineShredder.java:156-161
+            if (soundCycle == 0) {
+                level.playSound(null, worldPosition, SoundEvents.MINECART_RIDING, SoundSource.BLOCKS, 1.0F, 0.75F);
+            }
+            soundCycle++;
+            if (soundCycle >= 50) soundCycle = 0;
         } else {
             progress = 0;
         }
@@ -275,6 +318,34 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
         super.deserialize(buf);
         power = buf.readLong();
         progress = buf.readInt();
+    }
+
+    public long getPowerScaled(int scale) {
+        return MAX_POWER > 0 ? (power * scale) / MAX_POWER : 0;
+    }
+
+    public int getDiFurnaceProgressScaled(int scale) {
+        return PROCESSING_SPEED > 0 ? (progress * scale) / PROCESSING_SPEED : 0;
+    }
+
+    public int getGearLeft() {
+        ItemStack blade = inventory.getStackInSlot(BLADE_LEFT);
+        if (blade.isEmpty() || !(blade.getItem() instanceof ItemBlades)) return 0;
+        if (blade.getMaxDamage() == 0) return 1;
+        int damage = blade.getDamageValue();
+        if (damage < blade.getMaxDamage() / 2) return 1;
+        if (damage != blade.getMaxDamage()) return 2;
+        return 3;
+    }
+
+    public int getGearRight() {
+        ItemStack blade = inventory.getStackInSlot(BLADE_RIGHT);
+        if (blade.isEmpty() || !(blade.getItem() instanceof ItemBlades)) return 0;
+        if (blade.getMaxDamage() == 0) return 1;
+        int damage = blade.getDamageValue();
+        if (damage < blade.getMaxDamage() / 2) return 1;
+        if (damage != blade.getMaxDamage()) return 2;
+        return 3;
     }
 
     @Nullable

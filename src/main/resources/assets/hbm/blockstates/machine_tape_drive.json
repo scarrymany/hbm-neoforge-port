@@ -1,19 +1,19 @@
 {
   "variants": {
     "facing=north": {
-      "model": "hbm:block/machine_tape_drive"
+      "model": "hbm:block/machine_tape_drive",
+      "y": 180
     },
     "facing=south": {
       "model": "hbm:block/machine_tape_drive"
     },
     "facing=west": {
-      "model": "hbm:block/machine_tape_drive"
+      "model": "hbm:block/machine_tape_drive",
+      "y": 90
     },
     "facing=east": {
-      "model": "hbm:block/machine_tape_drive"
-    },
-    "": {
-      "model": "hbm:block/machine_tape_drive"
+      "model": "hbm:block/machine_tape_drive",
+      "y": 270
     }
   }
 }

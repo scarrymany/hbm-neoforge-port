@@ -1,5 +1,6 @@
 package com.hbm.blocks;
 
+import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -16,16 +17,17 @@ import java.util.List;
  * carried over. As in CE, this interface is intentionally not called through directly - keep a
  * static type of {@link Block} (or a subclass) so tooltip dispatch stays a normal virtual override.
  * <p>
- * CE resolved the "hold shift" detail text via a bespoke {@code I18nUtil.resolveKeyArray}, splitting
- * one description into several lang-file lines. That utility does not exist yet in this port, so the
- * expanded branch here uses a single {@link Component#translatable} call instead; a later phase can
- * reintroduce multi-line resolution once the util package lands.
+ * Exact CE {@code ITooltipProvider.java:44-54}: LSHIFT expands {@code getDescriptionId() + ".desc"}
+ * via {@link I18nUtil#resolveKeyArray} ({@code $} line breaks).
  */
 public interface ITooltipProvider {
 
     default void addStandardInfo(List<Component> tooltip) {
+        // Exact CE ITooltipProvider.java:44-54
         if (com.hbm.client.ClientScreens.hasShiftDown()) {
-            tooltip.add(Component.translatable(((Block) this).getDescriptionId() + ".desc").withStyle(ChatFormatting.YELLOW));
+            for (String s : I18nUtil.resolveKeyArray(((Block) this).getDescriptionId() + ".desc")) {
+                tooltip.add(Component.literal(s).withStyle(ChatFormatting.YELLOW));
+            }
         } else {
             tooltip.add(Component.literal("Hold <")
                     .withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC)

@@ -1,5 +1,6 @@
 package com.hbm.blocks.generic;
 
+import com.hbm.explosion.ExplosionThermo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -20,8 +21,7 @@ import java.util.List;
  * CE {@code blocks/generic/RedBarrel.java}. Kind is constructor-baked because 1.21 has one class
  * instance per registry id (CE compared {@code this == ModBlocks.red_barrel}).
  * <p>
- * {@code ExplosionThermo.freezer} (lox) and {@code BlockTaint} scatter (taint) are not ported —
- * those branches still fire the CE blast (1F, no fire, no terrain) and skip the follow-up.
+ * {@code BlockTaint} scatter (taint) stays skipped — taint block is not registered.
  */
 public class RedBarrel extends BaseBarrel {
 
@@ -84,8 +84,9 @@ public class RedBarrel extends BaseBarrel {
             level.explode(null, cx, cy, cz, 2.5F, true, Level.ExplosionInteraction.TNT);
         }
         if (kind == Kind.LOX) {
-            // CE: 1F, flaming=false, smoking=false; then ExplosionThermo.freezer(..., 7)
+            // Exact CE RedBarrel.java:86-90
             level.explode(null, cx, cy, cz, 1.0F, false, Level.ExplosionInteraction.NONE);
+            ExplosionThermo.freezer(level, x, y, z, 7);
         }
         if (kind == Kind.TAINT) {
             // CE: 1F, no fire/terrain, then 100-block BlockTaint scatter — taint block not ported

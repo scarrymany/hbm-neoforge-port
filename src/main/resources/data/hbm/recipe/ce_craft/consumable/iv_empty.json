@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S",
+    "I",
+    "S"
+  ],
+  "key": {
+    "S": {
+      "tag": "hbm:any_rubber"
+    },
+    "I": {
+      "item": "hbm:plate_iron"
+    }
+  },
+  "result": {
+    "id": "hbm:iv_empty",
+    "count": 4
+  }
+}

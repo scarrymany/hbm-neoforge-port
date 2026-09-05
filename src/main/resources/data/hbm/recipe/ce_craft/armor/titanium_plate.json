@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "X X",
+    "XXX",
+    "XXX"
+  ],
+  "key": {
+    "X": { "item": "hbm:ingot_titanium" }
+  },
+  "result": { "id": "hbm:titanium_plate", "count": 1 }
+}

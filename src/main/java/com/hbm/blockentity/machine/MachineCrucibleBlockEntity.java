@@ -1,9 +1,12 @@
 package com.hbm.blockentity.machine;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.block.ICrucibleAcceptor;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.config.ServerConfig;
 import com.hbm.handler.pollution.PollutionHandler;
@@ -38,6 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +61,7 @@ import java.util.List;
  * capability wrapper (CE's crucible has neither).
  * <p>
  * <b>Heat</b>: pulled from an {@link IHeatSource} directly below the core each tick, scaled by
- * {@link #DIFFUSION}; passively decays otherwise. This port's {@code IHeatSource} interface already
+ * {@link #diffusion}; passively decays otherwise. This port's {@code IHeatSource} interface already
  * exists verbatim, but <b>zero implementers exist anywhere in this port yet</b> (no heater/firebox
  * block has been ported) - so a placed Crucible compiles and is structurally complete/correct, but
  * sits permanently at {@code heat == 0} (fully inert) until a future phase ports at least one heat
@@ -79,14 +83,14 @@ import java.util.List;
 public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, MenuProvider, ICrucibleAcceptor, IControlReceiver {
 
-    /** CE: {@code TileEntityCrucible.recipeZCapacity}/{@code wasteZCapacity}. */
-    public static final int RECIPE_Z_CAPACITY = MaterialShapes.BLOCK.q(16);
-    public static final int WASTE_Z_CAPACITY = MaterialShapes.BLOCK.q(16);
+    /** CE: {@code TileEntityCrucible.recipeZCapacity}/{@code wasteZCapacity}. Mutable for MachineDynConfig. */
+    public static int recipeZCapacity = MaterialShapes.BLOCK.q(16);
+    public static int wasteZCapacity = MaterialShapes.BLOCK.q(16);
     /** CE: {@code processTime} - total accumulated heat-scaled "progress" needed to smelt one item. */
-    public static final int PROCESS_TIME = 20_000;
+    public static int processTime = 20_000;
     /** CE: {@code diffusion} - fraction of the {@link IHeatSource}'s available heat delta pulled per tick. */
-    public static final double DIFFUSION = 0.25D;
-    public static final int MAX_HEAT = 100_000;
+    public static double diffusion = 0.25D;
+    public static int maxHeat = 100_000;
     /** CE: {@code MaterialShapes.NUGGET.q(3)} - per-tick pour rate cap. */
     private static final int POUR_RATE = MaterialShapes.NUGGET.q(3);
 
@@ -177,18 +181,18 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
 
     /** CE: {@code tryPullHeat()}. */
     private void tryPullHeat() {
-        if (heat >= MAX_HEAT) return;
+        if (heat >= maxHeat) return;
 
         if (level.getBlockEntity(worldPosition.below()) instanceof IHeatSource source) {
             int diff = source.getHeatStored() - heat;
 
             if (diff != 0) {
-                diff = Math.min(diff, MAX_HEAT - heat);
+                diff = Math.min(diff, maxHeat - heat);
 
                 if (diff > 0) {
-                    diff = (int) Math.ceil(diff * DIFFUSION);
+                    diff = (int) Math.ceil(diff * diffusion);
                     source.useUpHeat(diff);
-                    heat = Math.min(heat + diff, MAX_HEAT);
+                    heat = Math.min(heat + diff, maxHeat);
                     return;
                 }
             }
@@ -227,7 +231,7 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
 
     /** CE: {@code update()}'s lava-column overflow-hazard block. */
     private void applyOverflowDamage() {
-        int totalCap = RECIPE_Z_CAPACITY + WASTE_Z_CAPACITY;
+        int totalCap = recipeZCapacity + wasteZCapacity;
         int totalMass = 0;
         for (Mats.MaterialStack stack : recipeStack) totalMass += stack.amount;
         for (Mats.MaterialStack stack : wasteStack) totalMass += stack.amount;
@@ -247,18 +251,18 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
 
     /** CE: {@code trySmelt()}. */
     private boolean trySmelt() {
-        if (heat < MAX_HEAT / 2) return false;
+        if (heat < maxHeat / 2) return false;
 
         int slot = getFirstSmeltableSlot();
         if (slot == -1) return false;
 
-        int delta = heat - (MAX_HEAT / 2);
+        int delta = heat - (maxHeat / 2);
         delta = (int) (delta * 0.05);
 
         progress += delta;
         heat -= delta;
 
-        if (progress >= PROCESS_TIME) {
+        if (progress >= processTime) {
             progress = 0;
 
             List<Mats.MaterialStack> materials = Mats.getSmeltingMaterialsFromItem(inventory.getStackInSlot(slot));
@@ -343,7 +347,7 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
                     wasteAmount += mat.amount;
                 }
             } else {
-                int matMaximum = recipeContent == 0 ? 0 : recipeInputRequired * RECIPE_Z_CAPACITY / recipeContent;
+                int matMaximum = recipeContent == 0 ? 0 : recipeInputRequired * recipeZCapacity / recipeContent;
                 int amountStored = getQuantaFromType(recipeStack, mat.material);
 
                 matchesRecipe = true;
@@ -353,7 +357,7 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
             }
         }
 
-        return recipeAmount <= RECIPE_Z_CAPACITY && wasteAmount <= WASTE_Z_CAPACITY && matchesRecipe;
+        return recipeAmount <= recipeZCapacity && wasteAmount <= wasteZCapacity && matchesRecipe;
     }
 
     private void addToStack(List<Mats.MaterialStack> stack, Mats.MaterialStack matStack) {
@@ -498,15 +502,15 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
     public boolean canAcceptPartialPour(Level level, BlockPos pos, double dX, double dY, double dZ, Direction side, Mats.MaterialStack stack) {
         CrucibleRecipe loaded = getLoadedRecipe();
         if (loaded == null) {
-            return getQuantaFromType(wasteStack, null) < WASTE_Z_CAPACITY;
+            return getQuantaFromType(wasteStack, null) < wasteZCapacity;
         }
 
         int recipeContent = loaded.getInputAmount();
         int recipeInputRequired = getQuantaFromType(loaded.input(), stack.material);
-        int matMaximum = recipeContent == 0 ? 0 : recipeInputRequired * RECIPE_Z_CAPACITY / recipeContent;
+        int matMaximum = recipeContent == 0 ? 0 : recipeInputRequired * recipeZCapacity / recipeContent;
         int amountStored = getQuantaFromType(recipeStack, stack.material);
 
-        return amountStored < matMaximum && getQuantaFromType(recipeStack, null) < RECIPE_Z_CAPACITY;
+        return amountStored < matMaximum && getQuantaFromType(recipeStack, null) < recipeZCapacity;
     }
 
     /**
@@ -522,18 +526,18 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
 
         if (loaded == null) {
             int amount = getQuantaFromType(wasteStack, null);
-            if (amount + stack.amount <= WASTE_Z_CAPACITY) {
+            if (amount + stack.amount <= wasteZCapacity) {
                 addToStack(wasteStack, stack.copy());
                 return null;
             }
-            int toAdd = WASTE_Z_CAPACITY - amount;
+            int toAdd = wasteZCapacity - amount;
             addToStack(wasteStack, new Mats.MaterialStack(stack.material, toAdd));
             return new Mats.MaterialStack(stack.material, stack.amount - toAdd);
         }
 
         int recipeContent = loaded.getInputAmount();
         int recipeInputRequired = getQuantaFromType(loaded.input(), stack.material);
-        int matMaximum = recipeContent == 0 ? 0 : recipeInputRequired * RECIPE_Z_CAPACITY / recipeContent;
+        int matMaximum = recipeContent == 0 ? 0 : recipeInputRequired * recipeZCapacity / recipeContent;
 
         if (recipeInputRequired + stack.amount <= matMaximum) {
             addToStack(recipeStack, stack.copy());
@@ -541,7 +545,7 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
         }
 
         int toAdd = matMaximum - stack.amount;
-        toAdd = Math.min(toAdd, RECIPE_Z_CAPACITY - getQuantaFromType(recipeStack, null));
+        toAdd = Math.min(toAdd, recipeZCapacity - getQuantaFromType(recipeStack, null));
         addToStack(recipeStack, new Mats.MaterialStack(stack.material, toAdd));
         return new Mats.MaterialStack(stack.material, stack.amount - toAdd);
     }
@@ -666,5 +670,40 @@ public class MachineCrucibleBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new MachineCrucibleMenu(containerId, playerInventory, this);
+    }
+
+    static void readCrucible(JsonObject obj) {
+        // CE TileEntityCrucible.java:83-87
+        recipeZCapacity = IConfigurableMachine.grab(obj, "I:recipeCapacity", recipeZCapacity);
+        wasteZCapacity = IConfigurableMachine.grab(obj, "I:wasteCapacity", wasteZCapacity);
+        processTime = IConfigurableMachine.grab(obj, "I:processHeat", processTime);
+        diffusion = IConfigurableMachine.grab(obj, "D:diffusion", diffusion);
+        maxHeat = IConfigurableMachine.grab(obj, "I:heatCap", maxHeat);
+    }
+
+    static void writeCrucible(JsonWriter writer) throws IOException {
+        // CE TileEntityCrucible.java:92-96
+        writer.name("I:recipeCapacity").value(recipeZCapacity);
+        writer.name("I:wasteCapacity").value(wasteZCapacity);
+        writer.name("I:processHeat").value(processTime);
+        writer.name("D:diffusion").value(diffusion);
+        writer.name("I:heatCap").value(maxHeat);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "crucible";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readCrucible(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeCrucible(writer);
+        }
     }
 }

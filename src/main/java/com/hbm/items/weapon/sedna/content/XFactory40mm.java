@@ -2,6 +2,7 @@ package com.hbm.items.weapon.sedna.content;
 
 import com.hbm.capability.HbmLivingAttachment;
 import com.hbm.capability.ModAttachments;
+import com.hbm.entity.effect.EntityFireLingering;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.standard.BlockAllocatorStandard;
@@ -20,11 +21,16 @@ import com.hbm.lib.HBMSoundHandler;
 import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import com.hbm.util.EntityDamageUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -54,14 +60,10 @@ import java.util.function.BiConsumer;
  * configs below instead of introducing an extra, never-fired {@code "g40_base"} registry entry.
  * Observably identical; only the code shape differs.
  * <p>
- * <b>{@code EntityFireLingering} - still a genuinely missing dependency; {@code EntityC130} is now
- * real and wired up.</b> {@code g40_inc}/{@code g40_phosphorus}'s lingering-fire area spawn still needs
- * {@code com.hbm.entity.effect.EntityFireLingering}, which does not exist anywhere in this port yet
- * (a different Phase 3/4 sub-area's scope, documented forward-reference TODO inline - the shell's
- * {@code standardExplode} splash damage still fires correctly regardless). {@code g26_flare_supply}/
- * {@code _weapon}'s C130 airdrop-crate spawn, previously the other half of this same TODO, is now
- * wired to the real {@code com.hbm.entity.logic.EntityC130} (Phase 4, {@code
- * entities_vehicles_aircraft}/{@code entities_orbital_and_beam_payloads}) via {@link #spawnPlane}.
+ * {@code g40_inc}/{@code g40_phosphorus} linger is Exact CE {@code XFactory40mm.java:91-116}
+ * via registered {@link EntityFireLingering} (5×2, 200t DIESEL / 400t PHOSPHORUS) plus the
+ * 3×3×3 adjacent-flammable ignite loop. {@code g26_flare_supply}/{@code _weapon} C130 airdrop
+ * is already wired via {@link #spawnPlane}.
  */
 public final class XFactory40mm {
 
@@ -158,19 +160,33 @@ public final class XFactory40mm {
         bullet.discard();
     };
 
-    /** Shared body for {@code g40_inc}/{@code g40_phosphorus} onImpact - see class javadoc for the EntityFireLingering TODO. */
+    /** Exact CE {@code XFactory40mm.java:91-116}. */
     private static void spawnFire(EntityBulletBaseMK4 bullet, HitResult hr, boolean phosphorus, int duration) {
         if (hr instanceof EntityHitResult selfCheck && bullet.tickCount < 3 && selfCheck.getEntity() == bullet.getThrower()) return;
 
         standardExplode(bullet, hr, 3F);
-
-        // TODO(phase3/4-entities): CE also spawns an EntityFireLingering(world).setArea(5, 2)
-        // .setDuration(duration).setType(phosphorus ? TYPE_PHOSPHORUS : TYPE_DIESEL) at the hit point,
-        // plus a 3x3x3-around-hit block-ignite loop (sets an adjacent air block to Blocks.FIRE when it
-        // touches a flammable neighbor) - see class javadoc, neither exists in this port yet.
-        // `phosphorus`/`duration` are threaded through ready for that TODO to consume.
-
+        Vec3 hit = hr.getLocation();
+        Level world = bullet.level();
+        EntityFireLingering.spawn(world, hit.x, hit.y, hit.z, 5F, 2F,
+                phosphorus ? EntityFireLingering.TYPE_PHOSPHORUS : EntityFireLingering.TYPE_DIESEL, duration);
         bullet.discard();
+
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    BlockPos pos = new BlockPos((int) Math.floor(hit.x) + dx, (int) Math.floor(hit.y) + dy, (int) Math.floor(hit.z) + dz);
+                    if (!world.getBlockState(pos).isAir()) continue;
+                    for (Direction dir : Direction.values()) {
+                        BlockPos adj = pos.relative(dir);
+                        BlockState neighbor = world.getBlockState(adj);
+                        if (neighbor.isFlammable(world, adj, dir.getOpposite())) {
+                            world.setBlock(pos, Blocks.FIRE.defaultBlockState(), 3);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static final BiConsumer<EntityBulletBaseMK4, HitResult> LAMBDA_STANDARD_EXPLODE_INC = (bullet, hr) -> spawnFire(bullet, hr, false, 200);

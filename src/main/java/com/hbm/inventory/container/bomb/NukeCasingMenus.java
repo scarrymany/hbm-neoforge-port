@@ -9,6 +9,7 @@ import com.hbm.blockentity.bomb.NukeManBlockEntity;
 import com.hbm.blockentity.bomb.NukeMikeBlockEntity;
 import com.hbm.blockentity.bomb.NukeN2BlockEntity;
 import com.hbm.blockentity.bomb.NukePrototypeBlockEntity;
+import com.hbm.blockentity.bomb.NukeSoliniumBlockEntity;
 import com.hbm.blockentity.bomb.NukeTsarBlockEntity;
 import com.hbm.inventory.container.ModMenuTypes;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -35,6 +36,7 @@ public final class NukeCasingMenus {
     public static DeferredHolder<MenuType<?>, MenuType<NukePrototypeMenu>> NUKE_PROTOTYPE;
     public static DeferredHolder<MenuType<?>, MenuType<NukeFleijaMenu>> NUKE_FLEIJA;
     public static DeferredHolder<MenuType<?>, MenuType<NukeBalefireMenu>> NUKE_BALEFIRE;
+    public static DeferredHolder<MenuType<?>, MenuType<NukeSoliniumMenu>> NUKE_SOLINIUM;
     public static DeferredHolder<MenuType<?>, MenuType<NukeCustomMenu>> NUKE_CUSTOM;
 
     private NukeCasingMenus() {
@@ -59,6 +61,8 @@ public final class NukeCasingMenus {
                 new NukeFleijaMenu(id, inv, (NukeFleijaBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         NUKE_BALEFIRE = reg("nuke_balefire", (id, inv, buf) ->
                 new NukeBalefireMenu(id, inv, (NukeBalefireBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
+        NUKE_SOLINIUM = reg("nuke_solinium", (id, inv, buf) ->
+                new NukeSoliniumMenu(id, inv, (NukeSoliniumBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
         NUKE_CUSTOM = reg("nuke_custom", (id, inv, buf) ->
                 new NukeCustomMenu(id, inv, (NukeCustomBlockEntity) inv.player.level().getBlockEntity(buf.readBlockPos())));
     }

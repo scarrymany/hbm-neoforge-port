@@ -2,15 +2,21 @@ package com.hbm.world.gen;
 
 import com.hbm.main.MainRegistry;
 import com.hbm.world.feature.AntennaFeature;
+import com.hbm.world.feature.BarrelFeature;
 import com.hbm.world.feature.BedrockOilDepositFeature;
 import com.hbm.world.feature.BunkerFeature;
+import com.hbm.world.feature.DesertAtomFeature;
+import com.hbm.world.feature.DudFeature;
+import com.hbm.world.feature.GlyphidHiveFeature;
 import com.hbm.world.feature.LandmineFeature;
 import com.hbm.world.feature.MeteoriteFeature;
 import com.hbm.world.feature.NitanChestFeature;
 import com.hbm.world.feature.OilBubbleFeature;
 import com.hbm.world.feature.OilSandBubbleFeature;
 import com.hbm.world.feature.RadioFeature;
+import com.hbm.world.feature.SatelliteFeature;
 import com.hbm.world.feature.SellafieldFeature;
+import com.hbm.world.feature.SpaceshipFeature;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
@@ -29,13 +35,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * Registered from {@code MainRegistry}'s constructor via {@link #register(IEventBus)} - see this
  * package's own wiringSnippets (protected file, not edited directly).
  * <p>
- * Leftover CE {@code enableDungeons} structures (no generator in this port):
- * TODO(CE: HbmWorldGen.java:347-358) hive — {@code GlyphidHive.generate}, {@code hiveSpawn} 256;
- * TODO(CE: HbmWorldGen.java:367-368) desert-atom — {@code DesertAtom001}, {@code atomStructure} 0:500, {@code !canRain && temp>=2};
- * TODO(CE: HbmWorldGen.java:370-371) barrel — {@code Barrel}, {@code barrelStructure} 0:5000, {@code temp>1.8};
- * TODO(CE: HbmWorldGen.java:373-374) satellite dish — {@code Satellite}, {@code satelliteStructure} 0:500, {@code temp<1 || temp>1.8};
- * TODO(CE: HbmWorldGen.java:377) spaceship — {@code Spaceship}, {@code spaceshipStructure} 0:1000;
- * TODO(CE: HbmWorldGen.java:379) dud — {@code Dud}, {@code dudStructure} 0:500.
+ * GlyphidHive ({@code hiveSpawn} 256) and DesertAtom ({@code atomStructure} 0:500) are registered
+ * below. FEATURES write-radius 0 clips overflow cells — same skip as Spaceship/Satellite.
  */
 public final class OilMeteorWorldGenFeatures {
 
@@ -62,6 +63,18 @@ public final class OilMeteorWorldGenFeatures {
             FEATURES.register("landmine", () -> new LandmineFeature(NoneFeatureConfiguration.CODEC));
     public static final DeferredHolder<Feature<?>, NitanChestFeature> NITAN_CHEST =
             FEATURES.register("nitan_chest", () -> new NitanChestFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, DudFeature> DUD =
+            FEATURES.register("dud", () -> new DudFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, BarrelFeature> BARREL =
+            FEATURES.register("barrel", () -> new BarrelFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, SpaceshipFeature> SPACESHIP =
+            FEATURES.register("spaceship", () -> new SpaceshipFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, SatelliteFeature> SATELLITE =
+            FEATURES.register("satellite", () -> new SatelliteFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, GlyphidHiveFeature> GLYPHID_HIVE =
+            FEATURES.register("glyphid_hive", () -> new GlyphidHiveFeature(NoneFeatureConfiguration.CODEC));
+    public static final DeferredHolder<Feature<?>, DesertAtomFeature> DESERT_ATOM =
+            FEATURES.register("desert_atom", () -> new DesertAtomFeature(NoneFeatureConfiguration.CODEC));
 
     private OilMeteorWorldGenFeatures() {
     }

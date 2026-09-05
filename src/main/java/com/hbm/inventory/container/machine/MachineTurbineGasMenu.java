@@ -7,10 +7,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * Ported (slot layout trimmed, see {@link MachineTurbineGasBlockEntity}'s javadoc) from CE's
- * {@code ContainerMachineTurbineGas}: only the battery-charging slot survives (CE's slot 0), kept at
- * CE's own pixel position; the fluid-identifier item slot (CE's slot 1) is dropped along with the
- * fluid-retyping mechanic. Buttons: 0 = start/stop, 1 = auto-mode toggle, 2/3 = throttle down/up.
+ * Exact CE {@code ContainerMachineTurbineGas}: battery slot 0 @ 8,109; fluid-ID slot 1 @ 36,17
+ * ({@code :26-28}). Identifier applies GAS-grade fuel via
+ * {@link MachineTurbineGasBlockEntity#updateEntity} Exact CE {@code :109-114}.
+ * Buttons: 0 = start/stop, 1 = auto-mode toggle, 2/3 = throttle down/up.
  */
 public class MachineTurbineGasMenu extends MenuBase<MachineTurbineGasBlockEntity> {
 
@@ -22,7 +22,8 @@ public class MachineTurbineGasMenu extends MenuBase<MachineTurbineGasBlockEntity
     public MachineTurbineGasMenu(int id, Inventory playerInv, MachineTurbineGasBlockEntity be) {
         super(PowerGenMenus.MACHINE_TURBINE_GAS.get(), id, be);
 
-        this.addSlot(new SlotNonRetarded(tile, 0, 8, 109));
+        this.addSlot(new SlotNonRetarded(tile, MachineTurbineGasBlockEntity.BATTERY_SLOT, 8, 109));
+        this.addSlot(new SlotNonRetarded(tile, MachineTurbineGasBlockEntity.SLOT_ID, 36, 17));
 
         playerInv(playerInv, 8, 141, 199);
     }

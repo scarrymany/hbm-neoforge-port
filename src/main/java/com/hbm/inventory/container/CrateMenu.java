@@ -5,6 +5,7 @@ import com.hbm.blockentity.machine.CrateBlockEntity.CrateType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * Mass storage crate menu, ported from CE's {@code com.hbm.inventory.container.ContainerCrateBase}
@@ -30,6 +31,19 @@ public class CrateMenu extends MenuBase<CrateBlockEntity> {
         CrateType type = be.getCrateType();
         addSlots(be.inventory, 0, type.crateX, type.crateY, type.rows, type.columns);
         playerInv(playerInventory, type.playerInventoryX, type.playerInventoryY, type.hotbarY);
+        // Exact CE TileEntityCrateBase.java:199-201 — server open (CE client IInventory hook).
+        if (!playerInventory.player.level().isClientSide()) {
+            be.openInventory(playerInventory.player);
+        }
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        // Exact CE TileEntityCrateBase.java:207-209 / FileCabinet onContainerClosed.
+        if (!player.level().isClientSide()) {
+            be.closeInventory(player);
+        }
     }
 
     public static CrateMenu fromNetwork(int id, Inventory playerInventory, RegistryFriendlyByteBuf buf) {

@@ -16,6 +16,7 @@ import com.hbm.explosion.vanillant.standard.EntityProcessorCrossSmooth;
 import com.hbm.explosion.vanillant.standard.ExplosionEffectWeapon;
 import com.hbm.explosion.vanillant.standard.PlayerProcessorStandard;
 import com.hbm.interfaces.IBomb;
+import com.hbm.saveddata.satellites.SatelliteDetector;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -61,10 +62,8 @@ import com.mojang.serialization.MapCodec;
  * ({@link BombBlocks#MINE_AP} through {@link BombBlocks#MINE_NAVAL}) this instance is, by identity,
  * matching CE's own registry-name-string switch one-to-one in behavior.
  * <p>
- * {@code SatelliteDetector.reportEvent} (a world-scale radar/nuke-detection system, confirmed absent
- * from this port - not part of this package's scope) is a documented forward-reference TODO for
- * the {@code mine_fat} branch only; every other branch, including the nuclear explosion itself via
- * the already-committed {@link EntityNukeExplosionMK5}, is fully wired. CE's {@code MainRegistry.
+ * {@code SatelliteDetector.reportEvent} on {@code mine_fat} is Exact CE {@code Landmine.java:241}.
+ * CE's {@code MainRegistry.
  * polaroidID} easter egg (a 1-in-100-chance balefire-cloud swap, gated on an unrelated hidden
  * config id) is dropped - the underlying 1/100 random roll for the balefire-vs-normal mushroom
  * cloud is kept.
@@ -251,8 +250,8 @@ public class Landmine extends BaseEntityBlock implements IBomb {
             ExplosionLarge.spawnShrapnelShower(level, x + 0.5, y + 0.5, z + 0.5, 0, 1D, 0, 45, .2D);
             ExplosionLarge.spawnShrapnels(level, x + 0.5, y + 0.5, z + 0.5, 5);
         } else if (this == BombBlocks.MINE_FAT.get()) {
-            // TODO(SatelliteDetector, Phase 4): CE reports a LOW-intensity/LOW-duration burst event
-            // here - com.hbm.util.SatelliteDetector is confirmed absent from this port.
+            SatelliteDetector.reportEvent(level, SatelliteDetector.DURATION_LOW,
+                    SatelliteDetector.BurstIntensity.LOW, x + 0.5, z + 0.5);
             level.addFreshEntity(EntityNukeExplosionMK5.statFac(level, BombConfig.FATMAN_RADIUS.get(), x + 0.5, y + 0.5, z + 0.5).setDetonator(detonator));
             if (level.getRandom().nextInt(100) == 0) {
                 EntityNukeTorex.statFacBale(level, x + 0.5, y + 0.5, z + 0.5, BombConfig.FATMAN_RADIUS.get());

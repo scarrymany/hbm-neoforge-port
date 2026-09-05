@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "DDD",
+    "SSC",
+    "  R"
+  ],
+  "key": {
+    "D": {
+      "item": "hbm:plate_dineutronium"
+    },
+    "S": {
+      "tag": "c:ingots/schraranium"
+    },
+    "C": {
+      "item": "hbm:circuit_bismoid"
+    },
+    "R": {
+      "item": "hbm:gun_lasrifle"
+    }
+  },
+  "result": {
+    "id": "hbm:gun_b92",
+    "count": 1
+  }
+}

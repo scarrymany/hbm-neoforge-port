@@ -1,9 +1,24 @@
 package com.hbm.inventory.recipes.loader;
 
+import com.hbm.inventory.RecipesCommon;
+import com.hbm.inventory.fluid.FluidStack;
+import com.hbm.inventory.recipes.loader.GenericRecipes.IOutput;
+import com.hbm.items.machine.ItemFluidIcon;
+import com.hbm.main.MainRegistry;
+import com.hbm.util.BobMathUtil;
+import com.hbm.util.i18n.I18nUtil;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Minimal compile-time stand-in for CE's {@code com.hbm.inventory.recipes.loader.GenericRecipe}.
@@ -37,6 +52,13 @@ public class GenericRecipe {
     protected boolean customLocalization;
     protected ItemStack icon = ItemStack.EMPTY;
     private String[] pools;
+    public RecipesCommon.AStack[] inputItem;
+    public FluidStack[] inputFluid;
+    public IOutput[] outputItem;
+    public FluidStack[] outputFluid;
+    public int duration;
+    public long power;
+    public String autoSwitchGroup;
 
     public GenericRecipe(String name) {
         this.name = name;
@@ -84,10 +106,113 @@ public class GenericRecipe {
     }
 
     /** Registers this recipe under one or more blueprint pools — see {@link GenericRecipes#addToPool}. */
+    public GenericRecipe setDuration(int duration) {
+        this.duration = duration;
+        return this;
+    }
+
+    public GenericRecipe setPower(long power) {
+        this.power = power;
+        return this;
+    }
+
+    public GenericRecipe inputFluids(FluidStack... input) {
+        this.inputFluid = input;
+        return this;
+    }
+
+    public GenericRecipe outputFluids(FluidStack... output) {
+        this.outputFluid = output;
+        return this;
+    }
+
+    public GenericRecipe outputItems(ItemStack... output) {
+        this.outputItem = new IOutput[output.length];
+        for (int i = 0; i < output.length; i++) {
+            this.outputItem[i] = new GenericRecipes.ChanceOutput(output[i]);
+        }
+        return this;
+    }
+
     public GenericRecipe setPools(String... pools) {
         this.pools = pools;
         for (String pool : pools) GenericRecipes.addToPool(pool, this);
         return this;
+    }
+
+    /** CE {@code GenericRecipe.getIcon}: first output item, else fluid icon, else {@code nothing}. */
+    public ItemStack getIcon() {
+        if (icon == null || icon.isEmpty()) {
+            if (outputItem != null && outputItem.length > 0) {
+                ItemStack single = outputItem[0].getSingle();
+                if (single != null && !single.isEmpty()) icon = single.copy();
+            }
+            if ((icon == null || icon.isEmpty()) && outputFluid != null && outputFluid.length > 0) {
+                Item fluidIcon = BuiltInRegistries.ITEM.get(
+                        ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "fluid_icon"));
+                icon = ItemFluidIcon.make(fluidIcon, outputFluid[0]);
+            }
+            if (icon == null || icon.isEmpty()) {
+                icon = new ItemStack(BuiltInRegistries.ITEM.get(
+                        ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "nothing")));
+            }
+        }
+        return icon;
+    }
+
+    public List<Component> print() {
+        List<Component> list = new ArrayList<>();
+        list.add(getLocalizedName().copy().withStyle(ChatFormatting.YELLOW));
+        if (Screen.hasShiftDown()) {
+            list.add(Component.literal("Internal: " + getInternalName()).withStyle(ChatFormatting.DARK_GRAY));
+        }
+        if (duration > 0) {
+            list.add(Component.literal(I18nUtil.resolveKey("gui.recipe.duration") + ": " + (duration / 20D) + "s")
+                    .withStyle(ChatFormatting.RED));
+        }
+        if (power > 0) {
+            list.add(Component.literal(I18nUtil.resolveKey("gui.recipe.consumption") + ": "
+                    + BobMathUtil.getShortNumber(power) + "HE/t").withStyle(ChatFormatting.RED));
+        }
+        list.add(Component.literal(I18nUtil.resolveKey("gui.recipe.input") + ":").withStyle(ChatFormatting.BOLD));
+        if (inputItem != null) {
+            for (RecipesCommon.AStack stack : inputItem) {
+                ItemStack display = stack.extractForCyclingDisplay(20);
+                list.add(Component.literal("  " + display.getCount() + "x " + display.getHoverName().getString())
+                        .withStyle(ChatFormatting.GRAY));
+            }
+        }
+        if (inputFluid != null) {
+            for (FluidStack fluid : inputFluid) {
+                String pressure = fluid.pressure == 0 ? ""
+                        : " " + I18nUtil.resolveKey("gui.recipe.atPressure") + " " + fluid.pressure + " PU";
+                list.add(Component.literal("  " + fluid.fill + "mB " + fluid.type.getLocalizedName().getString() + pressure)
+                        .withStyle(ChatFormatting.BLUE));
+            }
+        }
+        list.add(Component.literal(I18nUtil.resolveKey("gui.recipe.output") + ":").withStyle(ChatFormatting.BOLD));
+        if (outputItem != null) {
+            for (IOutput output : outputItem) {
+                ItemStack single = output.getSingle();
+                if (single == null || single.isEmpty()) continue;
+                list.add(Component.literal("  " + single.getCount() + "x " + single.getHoverName().getString()));
+            }
+        }
+        if (outputFluid != null) {
+            for (FluidStack fluid : outputFluid) {
+                String pressure = fluid.pressure == 0 ? ""
+                        : " " + I18nUtil.resolveKey("gui.recipe.atPressure") + " " + fluid.pressure + " PU";
+                list.add(Component.literal("  " + fluid.fill + "mB " + fluid.type.getLocalizedName().getString() + pressure)
+                        .withStyle(ChatFormatting.BLUE));
+            }
+        }
+        return list;
+    }
+
+    /** CE {@code GenericRecipe.matchesSearch} — localized-name substring. */
+    public boolean matchesSearch(String substring) {
+        return getLocalizedName().getString().toLowerCase(Locale.US)
+                .contains(substring.toLowerCase(Locale.US));
     }
 
     /**
@@ -99,7 +224,7 @@ public class GenericRecipe {
     public Component getLocalizedName() {
         Component base = customLocalization
                 ? Component.translatable(name)
-                : (icon.isEmpty() ? Component.literal(name) : icon.getHoverName());
+                : (getIcon().isEmpty() ? Component.literal(name) : getIcon().getHoverName());
         return nameWrapper != null ? Component.translatable(nameWrapper, base) : base;
     }
 }

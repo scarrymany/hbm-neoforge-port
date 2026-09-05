@@ -2,8 +2,11 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.MachineAssemblyMachineMenu;
 import com.hbm.inventory.fluid.FluidStack;
@@ -11,10 +14,12 @@ import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.AssemblerRecipe;
+import com.hbm.inventory.recipes.AssemblyMachineRecipes;
 import com.hbm.inventory.recipes.ProcessingRecipes;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.items.machine.MachineItems;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,6 +27,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +36,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -66,9 +73,13 @@ import java.util.Map;
  * parity (CE's assembler is {@code IFluidStandardTransceiverMK2}) even though no recipe in this pass's
  * ported data set consumes/produces fluid yet - a future fluid-bearing {@code AssemblerRecipe} variant
  * can wire them in without touching this class's slot layout.
+ * <p>
+ * ROR + named recipe: CE {@code TileEntityMachineAssemblyMachine.java:334-343, :388-414}.
+ * {@code recipe=="null"} keeps first-match so existing worlds still run; GUI/ROR lock a name.
  */
 public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IControlReceiver, IRORValueProvider, IRORInteractive {
 
     public static final long BASE_MAX_POWER = 100_000L;
     public static final int TANK_CAPACITY = 4_000;
@@ -97,9 +108,39 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
     private long maxPower = BASE_MAX_POWER;
     private int progress;
     private int maxProgress;
+    public String recipe = "null";
+    public boolean didProcess;
+    public boolean restrictedMode;
 
     public MachineAssemblyMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 17, true, true);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineAssemblyMachine.java:90-91
+                if (!stack.isEmpty() && slot >= UPGRADE_START && slot <= UPGRADE_END
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
@@ -126,16 +167,22 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
         return List.of(items);
     }
 
-    /** First-match auto-detection over every registered {@link AssemblerRecipe} - see class javadoc. */
     @Nullable
     private AssemblerRecipe findMatchingRecipe() {
         if (level == null) return null;
         AssemblerRecipe.Input input = AssemblerRecipe.Input.of(inputSnapshot());
+        AssemblerRecipe named = AssemblyMachineRecipes.byName(level, recipe);
+        if (named != null) {
+            if (!named.matches(input, level)) return null;
+            if (!matchesFluids(named)) return null;
+            return named;
+        }
+        if (recipe != null && !recipe.isEmpty() && !"null".equals(recipe)) return null;
         for (RecipeHolder<AssemblerRecipe> holder : level.getRecipeManager().getAllRecipesFor(ProcessingRecipes.ASSEMBLER_TYPE.get())) {
-            AssemblerRecipe recipe = holder.value();
-            if (!recipe.matches(input, level)) continue;
-            if (!matchesFluids(recipe)) continue;
-            return recipe;
+            AssemblerRecipe found = holder.value();
+            if (!found.matches(input, level)) continue;
+            if (!matchesFluids(found)) continue;
+            return found;
         }
         return null;
     }
@@ -239,27 +286,37 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
         AssemblerRecipe itemMatch = findItemOnlyRecipe();
         if (itemMatch != null) retargetInputTank(itemMatch);
 
-        AssemblerRecipe recipe = findMatchingRecipe();
-        if (recipe == null) {
+        didProcess = false;
+        AssemblerRecipe matched = findMatchingRecipe();
+        if (matched == null) {
             progress = 0;
             maxPower = BASE_MAX_POWER;
         } else {
-            maxPower = Math.max(BASE_MAX_POWER, recipe.getPower() * 100);
-            maxProgress = effectiveDuration(recipe.getDuration());
-            long req = effectivePower(recipe.getPower());
+            maxPower = Math.max(BASE_MAX_POWER, matched.getPower() * 100);
+            maxProgress = effectiveDuration(matched.getDuration());
+            if (restrictedMode) maxProgress = Math.max(1, maxProgress * 4); // CE ModuleMachineBase :136 speed*=0.25
+            long req = effectivePower(matched.getPower());
 
-            if (power >= req && canFitOutput(recipe.getResultItem(level.registryAccess()))) {
+            if (power >= req && canFitOutput(matched.getResultItem(level.registryAccess()))) {
                 power -= req;
                 progress++;
+                didProcess = true;
                 if (progress >= maxProgress) {
                     progress = 0;
-                    ItemStack output = recipe.getResultItem(level.registryAccess()).copy();
-                    consumeInputs(recipe);
+                    ItemStack output = matched.getResultItem(level.registryAccess()).copy();
+                    consumeInputs(matched);
                     ItemStack current = inventory.getStackInSlot(OUTPUT_SLOT);
                     if (current.isEmpty()) {
                         inventory.setStackInSlot(OUTPUT_SLOT, output);
                     } else {
                         current.grow(output.getCount());
+                    }
+
+                    // CE TileEntityMachineAssemblyMachine.java:273-275: battery-slot sword upgrade
+                    // (alloyed → machined) when any recipe completes successfully.
+                    ItemStack battery = inventory.getStackInSlot(BATTERY_SLOT);
+                    if (!battery.isEmpty() && battery.getItem() == com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_ALLOYED.get()) {
+                        inventory.setStackInSlot(BATTERY_SLOT, new ItemStack(com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_MACHINED.get()));
                     }
                 }
             }
@@ -347,6 +404,8 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
         tag.putLong("maxPower", maxPower);
         tag.putInt("progress", progress);
         tag.putInt("maxProgress", maxProgress);
+        tag.putString("recipe0", recipe);
+        tag.putBoolean("restrictedMode0", restrictedMode);
         inputTank.writeToNBT(tag, "tankIn");
         outputTank.writeToNBT(tag, "tankOut");
     }
@@ -358,6 +417,8 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
         maxPower = tag.contains("maxPower") ? tag.getLong("maxPower") : BASE_MAX_POWER;
         progress = tag.getInt("progress");
         maxProgress = tag.getInt("maxProgress");
+        recipe = tag.contains("recipe0") ? tag.getString("recipe0") : "null";
+        restrictedMode = tag.getBoolean("restrictedMode0");
         inputTank.readFromNBT(tag, "tankIn");
         outputTank.readFromNBT(tag, "tankOut");
     }
@@ -369,6 +430,9 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(maxPower);
         buf.writeInt(progress);
         buf.writeInt(maxProgress);
+        buf.writeBoolean(didProcess);
+        buf.writeBoolean(restrictedMode);
+        buf.writeUtf(recipe);
         inputTank.serialize(buf);
         outputTank.serialize(buf);
     }
@@ -380,8 +444,64 @@ public class MachineAssemblyMachineBlockEntity extends MachineBaseBlockEntity
         maxPower = buf.readLong();
         progress = buf.readInt();
         maxProgress = buf.readInt();
+        didProcess = buf.readBoolean();
+        restrictedMode = buf.readBoolean();
+        recipe = buf.readUtf();
         inputTank.deserialize(buf);
         outputTank.deserialize(buf);
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    @Override
+    public void receiveControl(CompoundTag data) {
+        // CE :334-342
+        if (data.contains("index") && data.contains("selection")) {
+            int index = data.getInt("index");
+            String selection = data.getString("selection");
+            if (index == 0) {
+                this.recipe = selection;
+                this.restrictedMode = false;
+                setChanged();
+            }
+        }
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :389-395
+        return new String[]{
+                PREFIX_VALUE + "progress",
+                PREFIX_VALUE + "recipe",
+                PREFIX_VALUE + "active",
+                PREFIX_FUNCTION + "setrecipe" + NAME_SEPARATOR + "name"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :399-403
+        if ((PREFIX_VALUE + "progress").equals(name)) {
+            return "" + (maxProgress <= 0 ? 0 : (int) Math.round(this.progress * 100.0 / maxProgress));
+        }
+        if ((PREFIX_VALUE + "recipe").equals(name)) return this.recipe;
+        if ((PREFIX_VALUE + "active").equals(name)) return "" + (this.didProcess ? 1 : 0);
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :407-413
+        if ((PREFIX_FUNCTION + "setrecipe").equals(name) && params.length == 1) {
+            this.recipe = params[0];
+            this.restrictedMode = true;
+            setChanged();
+            return null;
+        }
+        return null;
     }
 
     @Nullable

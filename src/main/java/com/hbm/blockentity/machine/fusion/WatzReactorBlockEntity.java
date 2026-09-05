@@ -1,10 +1,15 @@
 package com.hbm.blockentity.machine.fusion;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.entity.projectile.EntityShrapnel;
+import com.hbm.handler.radiation.ChunkRadiationManager;
+import com.hbm.main.AdvancementManager;
+import com.hbm.main.MainRegistry;
 import com.hbm.inventory.container.machine.fusion.WatzReactorMenu;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
@@ -20,16 +25,22 @@ import com.hbm.util.Compat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -62,20 +73,15 @@ import java.util.List;
  *   at the position one block above the top segment's own top slice - same "redstone turns the
  *   reactor on" mechanic, without the intermediate pump block. Restoring the pump block is a
  *   follow-up for whoever owns that decorative-block family.</li>
- *   <li><b>Meltdown aftermath</b>: CE's meltdown spawns {@code EntityShrapnel} (with a Watz flag),
- *   grants an advancement, and replaces the multiblock's footprint with specific
- *   {@code mud_block}/{@code watz_element}/{@code watz_cooler}/{@code watz_casing} rubble columns.
- *   None of {@code EntityShrapnel}, an advancement-grant helper, or those specific block types exist
- *   in this port yet (confirmed by search - flagged as a real gap in the survey doc, not
- *   rediscovered here). This reactor keeps the real trigger condition and consequence (mud overflow
- *   -&gt; violent meltdown, radiation-adjacent, the stack is destroyed and stops functioning) but
- *   the aftermath is a plain explosion sound plus clearing the segment's own footprint back to air,
- *   not the full rubble/shrapnel/advancement spectacle. Restoring that is flagged as a follow-up for
- *   whoever owns entities/advancements (see the survey doc's own note making the same request).</li>
+ *   <li><b>Meltdown aftermath</b>: Exact CE {@code TileEntityWatz.java:185-199}/{@code :527-585}
+ *   — roof air-clear, {@code EntityShrapnel.setWatz}, {@code watz_element}/{@code watz_cooler}/
+ *   {@code watz_casing} rubble, {@code achWatzBoom}, {@code incrementRad 1000}. {@code mud_block}
+ *   (unregistered) and RBMKMush AuxParticle stay skipped.</li>
  * </ul>
  */
 public class WatzReactorBlockEntity extends MachineBaseBlockEntity
-        implements ITickableBE, IFluidStandardTransceiverMK2, IPersistentNBT, MenuProvider {
+        implements ITickableBE, IFluidStandardTransceiverMK2, IPersistentNBT, MenuProvider,
+        IRORValueProvider {
 
     public static final int SEGMENT_HEIGHT = 3;
     private static final int PELLET_SLOTS = 24;
@@ -172,7 +178,7 @@ public class WatzReactorBlockEntity extends MachineBaseBlockEntity
         segments.get(segments.size() - 1).sendOutBottom();
 
         if (sharedTanks[2].getFill() > 0 || mudOverflow > 0) {
-            meltdown(segments);
+            meltdown();
         }
     }
 
@@ -317,29 +323,109 @@ public class WatzReactorBlockEntity extends MachineBaseBlockEntity
         };
     }
 
-    /** Simplified meltdown aftermath - see class javadoc for what CE does that this does not (yet) replicate. */
-    private void meltdown(List<WatzReactorBlockEntity> segments) {
-        for (WatzReactorBlockEntity segment : segments) {
-            BlockState state = level.getBlockState(segment.worldPosition);
-            if (state.getBlock() instanceof BlockDummyable dummy) {
-                BlockDummyable.safeRem = true;
-                try {
-                    int[] dims = dummy.getDimensions();
-                    for (int x = -dims[4]; x <= dims[5]; x++) {
-                        for (int y = -dims[1]; y <= dims[0]; y++) {
-                            for (int z = -dims[2]; z <= dims[3]; z++) {
-                                level.removeBlock(segment.worldPosition.offset(x, y, z), false);
-                            }
-                        }
-                    }
-                } finally {
-                    BlockDummyable.safeRem = false;
+    /**
+     * Exact CE {@code TileEntityWatz.java:185-199} + {@code disassemble :527-585}.
+     * {@code mud_block} writes become air (unregistered). RBMKMush stays skipped.
+     */
+    private void meltdown() {
+        if (level == null) return;
+        BlockPos origin = worldPosition;
+        for (int x = -3; x <= 3; x++) {
+            for (int y = 3; y < 6; y++) {
+                for (int z = -3; z <= 3; z++) {
+                    level.setBlock(origin.offset(x, y, z), Blocks.AIR.defaultBlockState(), 3);
                 }
             }
         }
-
-        level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 2, worldPosition.getZ() + 0.5,
+        disassemble();
+        ChunkRadiationManager.proxy.incrementRad(level, origin.above(), 1_000F);
+        level.playSound(null, origin.getX() + 0.5, origin.getY() + 2, origin.getZ() + 0.5,
                 HBMSoundHandler.rbmk_explosion.get(), SoundSource.BLOCKS, 50.0F, 1.0F);
+    }
+
+    private void disassemble() {
+        if (level == null) return;
+        BlockPos origin = worldPosition;
+        int count = 20;
+        var rand = level.random;
+        for (int i = 0; i < count * 5; i++) {
+            EntityShrapnel shrapnel = new EntityShrapnel(level, origin.getX() + 0.5, origin.getY() + 3, origin.getZ() + 0.5);
+            double motionY = ((rand.nextFloat() * 0.5) + 0.5) * (1 + (count / (15.0F + rand.nextInt(21)))) + (rand.nextFloat() / 50 * count);
+            double motionX = rand.nextGaussian() * 1 * (1 + (count / 100.0F));
+            double motionZ = rand.nextGaussian() * 1 * (1 + (count / 100.0F));
+            shrapnel.setDeltaMovement(motionX, motionY, motionZ);
+            shrapnel.setWatz(true);
+            level.addFreshEntity(shrapnel);
+        }
+
+        // CE :543-545 mud_block on core column — unregistered, air.
+        level.setBlock(origin, Blocks.AIR.defaultBlockState(), 3);
+        level.setBlock(origin.above(), Blocks.AIR.defaultBlockState(), 3);
+        level.setBlock(origin.above(2), Blocks.AIR.defaultBlockState(), 3);
+
+        Block element = watzBlock("watz_element");
+        Block cooler = watzBlock("watz_cooler");
+        Block casing = watzBlock("watz_casing");
+        setBrokenColumn(0, element, 1, 0);
+        setBrokenColumn(0, element, 2, 0);
+        setBrokenColumn(0, element, 0, 1);
+        setBrokenColumn(0, element, 0, 2);
+        setBrokenColumn(0, element, -1, 0);
+        setBrokenColumn(0, element, -2, 0);
+        setBrokenColumn(0, element, 0, -1);
+        setBrokenColumn(0, element, 0, -2);
+        setBrokenColumn(0, element, 1, 1);
+        setBrokenColumn(0, element, 1, -1);
+        setBrokenColumn(0, element, -1, 1);
+        setBrokenColumn(0, element, -1, -1);
+        setBrokenColumn(0, cooler, 2, 1);
+        setBrokenColumn(0, cooler, 2, -1);
+        setBrokenColumn(0, cooler, 1, 2);
+        setBrokenColumn(0, cooler, -1, 2);
+        setBrokenColumn(0, cooler, -2, 1);
+        setBrokenColumn(0, cooler, -2, -1);
+        setBrokenColumn(0, cooler, 1, -2);
+        setBrokenColumn(0, cooler, -1, -2);
+
+        for (int j = -1; j < 2; j++) {
+            setBrokenColumn(1, casing, 3, j);
+            setBrokenColumn(1, casing, j, 3);
+            setBrokenColumn(1, casing, -3, j);
+            setBrokenColumn(1, casing, j, -3);
+        }
+        setBrokenColumn(1, casing, 2, 2);
+        setBrokenColumn(1, casing, 2, -2);
+        setBrokenColumn(1, casing, -2, 2);
+        setBrokenColumn(1, casing, -2, -2);
+
+        double cx = origin.getX() + 0.5;
+        double cy = origin.getY() + 0.5;
+        double cz = origin.getZ() + 0.5;
+        AABB box = new AABB(cx, cy, cz, cx, cy, cz).inflate(50, 50, 50);
+        for (Player player : level.getEntitiesOfClass(Player.class, box)) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                AdvancementManager.grantAchievement(serverPlayer, AdvancementManager.achWatzBoom);
+            }
+        }
+    }
+
+    private void setBrokenColumn(int minHeight, Block block, int x, int z) {
+        if (level == null || block == Blocks.AIR) return;
+        int height = minHeight + level.random.nextInt(3 - minHeight);
+        BlockPos origin = worldPosition;
+        for (int i = 0; i < 3; i++) {
+            BlockPos p = origin.offset(x, i, z);
+            if (i <= height) {
+                level.setBlock(p, block.defaultBlockState(), 3);
+            } else {
+                // CE :596 mud_block — unregistered, air.
+                level.setBlock(p, Blocks.AIR.defaultBlockState(), 3);
+            }
+        }
+    }
+
+    private static Block watzBlock(String name) {
+        return BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, name));
     }
 
     @Override
@@ -429,5 +515,28 @@ public class WatzReactorBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new WatzReactorMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityWatz.java:703-713
+        return new String[]{
+                PREFIX_VALUE + "heat",
+                PREFIX_VALUE + "flux",
+                PREFIX_VALUE + "mud",
+                PREFIX_VALUE + "coolant_hot",
+                PREFIX_VALUE + "coolant_cold",
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :717-723
+        if ((PREFIX_VALUE + "heat").equals(name)) return "" + this.heat;
+        if ((PREFIX_VALUE + "flux").equals(name)) return "" + (int) (this.fluxLastBase + this.fluxLastReaction);
+        if ((PREFIX_VALUE + "mud").equals(name)) return "" + this.tanks[2].getFill();
+        if ((PREFIX_VALUE + "coolant_hot").equals(name)) return "" + this.tanks[1].getFill();
+        if ((PREFIX_VALUE + "coolant_cold").equals(name)) return "" + this.tanks[0].getFill();
+        return null;
     }
 }

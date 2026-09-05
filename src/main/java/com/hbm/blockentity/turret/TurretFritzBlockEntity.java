@@ -9,6 +9,8 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Flammable;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple;
 import com.hbm.items.weapon.sedna.BulletConfig;
+import com.hbm.items.weapon.sedna.content.GunHeavyItems;
+import com.hbm.items.weapon.sedna.content.XFactoryFlamer;
 import com.hbm.lib.CapabilityContextProvider;
 import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
@@ -18,6 +20,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -37,17 +40,14 @@ import java.util.Map;
  * inventory - {@link #getAmmoList()} always returns an empty list here, matching CE's own
  * {@code getAmmoList() { return null; }}.
  * <p>
- * <b>Scope trim vs. CE, documented</b>: CE's flame projectile uses
- * {@code XFactoryFlamer.flame_nograv} ({@code flame_diesel.clone().setGrav(0)}), which itself pulls
- * in {@code EntityFireLingering}, {@code GunFactory.EnumAmmo.FLAME_DIESEL}, and
- * {@code HbmLivingCapability} fire-effect lambdas from the gun-content/flamethrower package (Package
- * D, out of this turret package's scope - see {@code docs/phase3/turret_system.md}). Until that
- * lands, {@link #getFlameConfig()} returns {@code null} and firing is a documented no-op, matching
- * every other bullet-firing turret's ammo-gated inert state. CE's item-canister
- * {@code tank.setType(9, 9, inventory)}/ammo-slot-fill loop is also dropped, matching this port's
- * already-established precedent ({@code MachineDieselBlockEntity}'s own documented scope trim - the
- * item-canister loading subsystem isn't ported anywhere in this port yet): fuel arrives purely over
- * the fluid network.
+ * Fire uses Exact CE {@code XFactoryFlamer.flame_nograv} ({@code flame_diesel.clone().setGrav(0)},
+ * CE {@code :123}). Ricochet linger is Exact CE {@code LAMBDA_LINGER_DIESEL} {@code :77} via
+ * registered {@link com.hbm.entity.effect.EntityFireLingering}. Flame-burst particles skipped.
+ * {@code tank.setType(9, 9, inventory)} Exact CE {@code TileEntityTurretFritz.java:178}.
+ * Slot 9 is the last ammo-grid cell (CE {@code ContainerTurretBase} 3×3). Hopper excludes 9
+ * Exact CE {@code :242-244}. FLAME_DIESEL fill loop Exact CE {@code :181-189} — flattened
+ * {@link GunHeavyItems#FLAME_DIESEL} is the registered stand-in for CE {@code ammo_standard}
+ * + {@code EnumAmmo.FLAME_DIESEL}.
  */
 public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFluidStandardReceiverMK2 {
 
@@ -69,13 +69,10 @@ public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFl
         return Collections.emptyList();
     }
 
-    /**
-     * TODO(phase3-gun-content): CE uses {@code XFactoryFlamer.flame_nograv} - not ported yet, see
-     * this class's own javadoc.
-     */
+    /** Exact CE {@code TileEntityTurretFritz.java:139} {@code XFactoryFlamer.flame_nograv}. */
     @Nullable
     protected BulletConfig getFlameConfig() {
-        return null;
+        return XFactoryFlamer.flame_nograv;
     }
 
     @Override
@@ -139,6 +136,25 @@ public class TurretFritzBlockEntity extends TurretBaseBlockEntity implements IFl
                 HBMSoundHandler.flamethrowerShoot.get(), SoundSource.BLOCKS, 2F, 1F + level.random.nextFloat() * 0.5F);
 
         // TODO(phase3-gun-vfx): CE spawns a flame-burst particle effect here - deferred.
+    }
+
+    @Override
+    public void updateEntity() {
+        super.updateEntity();
+        if (level == null || level.isClientSide) return;
+        // CE TileEntityTurretFritz.java:178
+        tank.setType(9, 9, inventory);
+
+        // CE TileEntityTurretFritz.java:181-189 — slots 1-9, +1000 diesel per flame_diesel.
+        for (int i = 1; i < 10; i++) {
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() == GunHeavyItems.FLAME_DIESEL.get()) {
+                if (this.tank.getTankType() == Fluids.DIESEL && this.tank.getFill() + 1000 <= this.tank.getMaxFill()) {
+                    this.tank.setFill(this.tank.getFill() + 1000);
+                    stack.shrink(1);
+                }
+            }
+        }
     }
 
     @Override

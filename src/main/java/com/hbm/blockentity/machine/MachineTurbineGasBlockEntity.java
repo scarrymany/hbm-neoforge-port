@@ -2,14 +2,18 @@ package com.hbm.blockentity.machine;
 
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.container.machine.MachineTurbineGasMenu;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
@@ -41,18 +45,22 @@ import java.util.Map;
  * {@code tanks[2]} (water) into {@code tanks[3]} (hot steam) while separately producing HE directly
  * off the fuel via an RPM/temperature/throttle state machine ({@link #startup}/{@link #run}/
  * {@link #shutdown}, CE's own numeric tuning constants reproduced unchanged).
+ * Slot 1 fluid-ID is Exact CE {@code TileEntityMachineTurbineGas.java:109-114}: manual
+ * {@link IItemFluidIdentifier#getType} then {@code tanks[0].setTankType} only when the fluid is
+ * {@link FT_Combustible} {@code FuelGrade.GAS}. Not {@code setType} — CE does not call it here.
+ * Slot 1 @ 36,17 Exact CE {@code ContainerMachineTurbineGas.java:28}.
  * <p>
- * <b>Scope trims vs. CE</b>: no fluid-identifier item slot (fuel type is fixed by whatever's piped
- * into {@code tanks[0]}, matching every other turbine in this pass); no pollution call (CE calls
- * {@code PollutionHandler.incrementPollution} directly here, not via
- * {@code TileEntityMachinePolluting} - Phase 4 scope per the research report, stubbed as a no-op);
- * no OpenComputers/Redstone-over-Radio. The battery-charging slot (CE's slot 0) is kept.
+ * {@code incrementPollution(SOOT, SOOT_PER_SECOND*3)} Exact CE {@code :352}
+ * (skip OXYHYDROGEN). No OpenComputers. ROR: CE {@code TileEntityMachineTurbineGas.java:716-783}.
+ * {@code gui_turbinegas.png} is not in this tree — do not invent it.
  */
 public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final long MAX_POWER = 1_000_000L;
-    private static final int BATTERY_SLOT = 0;
+    public static final int BATTERY_SLOT = 0;
+    public static final int SLOT_ID = 1;
     private static final int RPM_IDLE = 10;
     private static final int TEMP_IDLE = 300;
 
@@ -82,7 +90,7 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
     private double fuelToConsume;
 
     public MachineTurbineGasBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1, true, true);
+        super(type, pos, state, 2, true, true);
         tanks = new FluidTankNTM[]{
                 new FluidTankNTM(Fluids.GAS, 100_000).withOwner(this),
                 new FluidTankNTM(Fluids.LUBRICANT, 16_000).withOwner(this),
@@ -98,7 +106,9 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return i == BATTERY_SLOT && Library.isBattery(stack);
+        if (i == BATTERY_SLOT) return Library.isBattery(stack);
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        return false;
     }
 
     private Direction coreDirection() {
@@ -190,6 +200,11 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
         }
 
         double consMax = FUEL_MAX_CONS.getOrDefault(tanks[0].getTankType(), 5D);
+        // CE TileEntityMachineTurbineGas.java:352
+        if (level.getGameTime() % 20 == 0 && tanks[0].getTankType() != Fluids.OXYHYDROGEN) {
+            PollutionHandler.incrementPollution(level, worldPosition, PollutionHandler.PollutionType.SOOT,
+                    PollutionHandler.SOOT_PER_SECOND * 3);
+        }
         makePower(consMax);
     }
 
@@ -258,6 +273,16 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         throttle = powerSliderPos * 100 / 60;
+
+        // CE TileEntityMachineTurbineGas.java:109-114 — GAS-grade identifier only, not setType.
+        ItemStack idStack = inventory.getStackInSlot(SLOT_ID);
+        if (!idStack.isEmpty() && idStack.getItem() instanceof IItemFluidIdentifier identifier) {
+            FluidType fluid = identifier.getType(level, worldPosition, idStack);
+            if (fluid.hasTrait(FT_Combustible.class)
+                    && fluid.getTrait(FT_Combustible.class).getGrade() == FT_Combustible.FuelGrade.GAS) {
+                tanks[0].setTankType(fluid);
+            }
+        }
 
         if (autoMode) {
             int target = 60 - (int) (60 * power / MAX_POWER);
@@ -442,5 +467,81 @@ public class MachineTurbineGasBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new MachineTurbineGasMenu(containerId, playerInventory, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :716-732
+        return new String[]{
+                PREFIX_VALUE + "turbinepercent",
+                PREFIX_VALUE + "turbinespeed",
+                PREFIX_VALUE + "output",
+                PREFIX_VALUE + "state",
+                PREFIX_VALUE + "automode",
+                PREFIX_VALUE + "temp",
+                PREFIX_VALUE + "power",
+                PREFIX_VALUE + "fuel",
+                PREFIX_VALUE + "lubricant",
+                PREFIX_VALUE + "water",
+                PREFIX_VALUE + "steam",
+                PREFIX_FUNCTION + "setauto" + NAME_SEPARATOR + "auto",
+                PREFIX_FUNCTION + "setthrottle" + NAME_SEPARATOR + "percent",
+                PREFIX_FUNCTION + "setstate" + NAME_SEPARATOR + "state"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :736-748
+        if ((PREFIX_VALUE + "turbinepercent").equals(name)) return "" + (int) (this.powerSliderPos * 100D / 60D);
+        if ((PREFIX_VALUE + "turbinespeed").equals(name)) return "" + this.rpm;
+        if ((PREFIX_VALUE + "output").equals(name)) return "" + (this.instantPowerOutput * 20);
+        if ((PREFIX_VALUE + "state").equals(name)) return "" + this.state;
+        if ((PREFIX_VALUE + "automode").equals(name)) return "" + (this.autoMode ? 1 : 0);
+        if ((PREFIX_VALUE + "temp").equals(name)) return "" + this.temp;
+        if ((PREFIX_VALUE + "power").equals(name)) return "" + this.power;
+        if ((PREFIX_VALUE + "fuel").equals(name)) return "" + tanks[0].getFill();
+        if ((PREFIX_VALUE + "lubricant").equals(name)) return "" + tanks[1].getFill();
+        if ((PREFIX_VALUE + "water").equals(name)) return "" + tanks[2].getFill();
+        if ((PREFIX_VALUE + "steam").equals(name)) return "" + tanks[3].getFill();
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :752-783
+        if ((PREFIX_FUNCTION + "setauto").equals(name) && params.length > 0) {
+            try {
+                this.autoMode = Integer.parseInt(params[0]) == 1;
+                setChanged();
+            } catch (NumberFormatException ignored) {
+            }
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "setthrottle").equals(name) && params.length > 0) {
+            try {
+                int percent = Integer.parseInt(params[0]);
+                if (percent < 0) percent = 0;
+                if (percent > 100) percent = 100;
+                this.powerSliderPos = percent * 60 / 100;
+                setChanged();
+            } catch (NumberFormatException ignored) {
+            }
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "setstate").equals(name) && params.length > 0) {
+            try {
+                int newState = Integer.parseInt(params[0]);
+                if (newState == 1) {
+                    if (this.state == 0) this.state = -1;
+                } else if (newState == 0) {
+                    if (this.state == 1) this.state = 0;
+                }
+                setChanged();
+            } catch (NumberFormatException ignored) {
+            }
+            return null;
+        }
+        return null;
     }
 }

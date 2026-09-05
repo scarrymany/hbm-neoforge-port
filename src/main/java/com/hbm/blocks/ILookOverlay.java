@@ -28,12 +28,9 @@ import java.util.List;
  * {@code com.hbm.blocks.ILookOverlay#printGeneric} (same class/method name, package, and body -
  * confirmed API shape, not merely inferred).
  * <p>
- * <b>Not wired up yet</b>: nothing in this port currently raytraces the player's look target and
- * calls {@link #printHook} on it when the targeted block implements this interface - CE and Neo
- * Edition both do this from a central client tick/render hook, which is a Phase 5 client/UX concern
- * (per {@code docs/phase2/blocks_network_conveyor_crane.md}, this whole family's rendering side is
- * explicitly out of scope for the block-logic pass). The interface and this helper are implemented
- * and ready for that dispatcher to call once it lands.
+ * Wired by {@code com.hbm.render.hud.LookOverlayDispatcher} — CE
+ * {@code ModEventHandlerClient.java:839-865} (CROSSHAIRS + {@code DODD_RBMK_DIAGNOSTIC}),
+ * including {@code TileEntityRBMKBase.diagnosticPrintHook}.
  */
 public interface ILookOverlay {
 

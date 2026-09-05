@@ -4,6 +4,7 @@ import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.MicrowaveMenu;
+import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -27,7 +28,9 @@ import java.util.Optional;
 
 /**
  * CE {@code TileEntityMicrowave} — 50 HE/t, 300 ticks, speed 0–5. Speed 5 explodes.
- * Battery charge-from-item skipped.
+ * Slot 2 battery {@code chargeTEFromItems} Exact CE {@code TileEntityMicrowave.java:65}.
+ * Hopper sides Exact CE {@code :146-148}. GUI Exact CE {@code ContainerMicrowave}/{@code GUIMicrowave}
+ * on existing {@code gui_microwave.png} — not invent.
  */
 public class MachineMicrowaveBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
@@ -36,6 +39,9 @@ public class MachineMicrowaveBlockEntity extends MachineBaseBlockEntity
     public static final int CONSUMPTION = 50;
     public static final int MAX_TIME = 300;
     public static final int MAX_SPEED = 5;
+    public static final int SLOT_IN = 0;
+    public static final int SLOT_OUT = 1;
+    public static final int BATTERY_SLOT = 2;
 
     public long power;
     public int time;
@@ -52,21 +58,40 @@ public class MachineMicrowaveBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return slot == 0 && smelt(stack).isPresent();
+        if (slot == BATTERY_SLOT) return Library.isBattery(stack);
+        return slot == SLOT_IN && smelt(stack).isPresent();
     }
 
     @Override
     public boolean canExtractItem(int slot, ItemStack stack, int amount) {
-        return slot == 1;
+        return slot == SLOT_OUT;
+    }
+
+    /** Exact CE {@code TileEntityMicrowave.java:146-148}. */
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        return side == Direction.DOWN ? new int[]{SLOT_OUT} : new int[]{SLOT_IN};
+    }
+
+    public long getPowerScaled(int i) {
+        return (power * i) / MAX_POWER;
+    }
+
+    public int getProgressScaled(int i) {
+        return (time * i) / MAX_TIME;
+    }
+
+    public int getSpeedScaled(int i) {
+        return (speed * i) / MAX_SPEED;
     }
 
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        if (level.getGameTime() % 20 == 0) {
-            for (Direction d : Direction.values()) trySubscribe(level, worldPosition.relative(d), d);
-        }
+        // CE TileEntityMicrowave.java:63-65 — every tick, all faces + battery slot 2
+        for (Direction d : Direction.values()) trySubscribe(level, worldPosition.relative(d), d);
+        this.power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
 
         if (canProcess()) {
             if (speed >= MAX_SPEED) {
@@ -97,9 +122,9 @@ public class MachineMicrowaveBlockEntity extends MachineBaseBlockEntity
 
     private boolean canProcess() {
         if (speed <= 0 || power < CONSUMPTION) return false;
-        Optional<ItemStack> out = smelt(inventory.getStackInSlot(0));
+        Optional<ItemStack> out = smelt(inventory.getStackInSlot(SLOT_IN));
         if (out.isEmpty()) return false;
-        ItemStack dest = inventory.getStackInSlot(1);
+        ItemStack dest = inventory.getStackInSlot(SLOT_OUT);
         if (dest.isEmpty()) return true;
         ItemStack result = out.get();
         return ItemStack.isSameItemSameComponents(dest, result)
@@ -107,13 +132,13 @@ public class MachineMicrowaveBlockEntity extends MachineBaseBlockEntity
     }
 
     private void process() {
-        Optional<ItemStack> out = smelt(inventory.getStackInSlot(0));
+        Optional<ItemStack> out = smelt(inventory.getStackInSlot(SLOT_IN));
         if (out.isEmpty()) return;
         ItemStack result = out.get();
-        ItemStack dest = inventory.getStackInSlot(1);
-        if (dest.isEmpty()) inventory.setStackInSlot(1, result.copy());
+        ItemStack dest = inventory.getStackInSlot(SLOT_OUT);
+        if (dest.isEmpty()) inventory.setStackInSlot(SLOT_OUT, result.copy());
         else dest.grow(result.getCount());
-        inventory.extractItem(0, 1, false);
+        inventory.extractItem(SLOT_IN, 1, false);
     }
 
     private Optional<ItemStack> smelt(ItemStack input) {

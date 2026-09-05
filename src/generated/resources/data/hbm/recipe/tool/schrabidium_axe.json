@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "hbm:blades_desh"
+    },
+    "P": {
+      "tag": "hbm:any_plastic"
+    },
+    "S": {
+      "item": "hbm:schrabidium_block"
+    },
+    "W": {
+      "item": "hbm:desh_axe"
+    }
+  },
+  "pattern": [
+    "BS",
+    "BW",
+    " P"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:schrabidium_axe"
+  }
+}

@@ -288,8 +288,10 @@ public final class OreBlocks {
     }
 
     /**
-     * CE {@code ModBlocks.java}:353 / 489 — {@code ore_volcano} TE/fluid sender skipped
-     * (Phase 2); unbreakable glowing casing only. {@code ore_tektite_osmiridium} is a plain cube.
+     * CE {@code ModBlocks.java}:353 is {@code BlockFissure}. Casing only.
+     * TODO(CE: BlockFissure.java:1-105): {@code TileEntityFissure} sends LAVA UP.
+     * Blocked by {@code volcanic_lava_block}/{@code rad_lava_block} + CE {@code IFluidStandardSender}
+     * ≠ port MK2. Do not invent lava ids. {@code ore_tektite_osmiridium} is a plain cube.
      */
     private static void registerImpactOres() {
         registerBlock("ore_volcano",

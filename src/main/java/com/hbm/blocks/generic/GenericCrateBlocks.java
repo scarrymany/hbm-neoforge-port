@@ -26,8 +26,8 @@ import java.util.function.Supplier;
  * table-driven-{@code registerAll()} shape.
  * <p>
  * <b>{@code BaseBarrel} / {@link RedBarrel} / {@link YellowBarrel}.</b> CE never registers a plain
- * {@code BaseBarrel} — only Red/Pink/LOX/Taint ({@code RedBarrel}) and {@code yellow_barrel}.
- * Phase 8 registers those CE ids (nuke tab, 0.5F/2.5F) plus the Phase-1 placeholder {@code barrel}.
+ * {@code BaseBarrel} — only Red/Pink/LOX/Taint ({@code RedBarrel}) and
+ * {@code yellow_barrel}/{@code vitrified_barrel} ({@code YellowBarrel}).
  * <p>
  * <b>{@link BlockCrate}/{@link BlockAmmoCrate}/{@link BlockCanCrate}/{@link BlockJungleCrate}'s empty
  * loot pools.</b> Each of those classes' own javadoc already documents why their drop pools are wired
@@ -48,6 +48,7 @@ public final class GenericCrateBlocks {
     private static final float SMALL_CRATE_RESISTANCE = 2.5F;
 
     public static Supplier<BlockEntityType<BlockLoot.LootBlockEntity>> LOOT_ENTITY_TYPE;
+    public static Supplier<BlockEntityType<BlockPedestal.PedestalBlockEntity>> PEDESTAL_ENTITY_TYPE;
     public static Supplier<BlockEntityType<BlockSupplyCrate.SupplyCrateBlockEntity>> SUPPLY_CRATE_ENTITY_TYPE;
     public static Supplier<BlockEntityType<BlockSkeletonHolder.SkeletonHolderBlockEntity>> SKELETON_HOLDER_ENTITY_TYPE;
 
@@ -91,11 +92,20 @@ public final class GenericCrateBlocks {
         return CRATE_RED;
     }
 
+    public static DeferredBlock<BlockPedestal> pedestal() {
+        return PEDESTAL;
+    }
+
+    public static DeferredBlock<BlockLoot> decoLoot() {
+        return DECO_LOOT;
+    }
+
     public static DeferredBlock<RedBarrel> RED_BARREL;
     public static DeferredBlock<RedBarrel> PINK_BARREL;
     public static DeferredBlock<RedBarrel> LOX_BARREL;
     public static DeferredBlock<RedBarrel> TAINT_BARREL;
     public static DeferredBlock<YellowBarrel> YELLOW_BARREL;
+    public static DeferredBlock<YellowBarrel> VITRIFIED_BARREL;
 
     private static DeferredBlock<BlockSupplyCrate> CRATE_SUPPLY;
     private static DeferredBlock<BlockCrate> CRATE_STANDARD;
@@ -103,6 +113,8 @@ public final class GenericCrateBlocks {
     private static DeferredBlock<BlockCrate> CRATE_METAL;
     private static DeferredBlock<BlockCrate> CRATE_LEAD;
     private static DeferredBlock<BlockCrate> CRATE_RED;
+    private static DeferredBlock<BlockPedestal> PEDESTAL;
+    private static DeferredBlock<BlockLoot> DECO_LOOT;
 
     private GenericCrateBlocks() {
     }
@@ -122,6 +134,8 @@ public final class GenericCrateBlocks {
         LOX_BARREL = registerBlock("lox_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.LOX), ModCreativeTabs.NUKE);
         TAINT_BARREL = registerBlock("taint_barrel", () -> new RedBarrel(barrelProps(), RedBarrel.Kind.TAINT), ModCreativeTabs.NUKE);
         YELLOW_BARREL = registerBlock("yellow_barrel", () -> new YellowBarrel(barrelProps()), ModCreativeTabs.NUKE);
+        // CE ModBlocks.java:752 — same YellowBarrel class, idle rad 0.5/5 (see YellowBarrel.tick).
+        VITRIFIED_BARREL = registerBlock("vitrified_barrel", () -> new YellowBarrel(barrelProps()), ModCreativeTabs.NUKE);
     }
 
     private static void registerCrates() {
@@ -144,8 +158,16 @@ public final class GenericCrateBlocks {
         // CE: setCreativeTab(null).setHardness(0.0F).setResistance(0.0F)
         DeferredBlock<BlockLoot> lootBlock = registerBlock("deco_loot",
                 () -> new BlockLoot(BlockBehaviour.Properties.of().strength(0.0F, 0.0F).noOcclusion()), null);
+        DECO_LOOT = lootBlock;
         LOOT_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("deco_loot",
                 () -> BlockEntityType.Builder.of(BlockLoot.LootBlockEntity::new, lootBlock.get()).build(null));
+
+        // CE: pedestal for red-room loot display, tab=null (world-gen only)
+        DeferredBlock<BlockPedestal> pedestalBlock = registerBlock("pedestal",
+                () -> new BlockPedestal(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).noOcclusion()), null);
+        PEDESTAL = pedestalBlock;
+        PEDESTAL_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("pedestal",
+                () -> BlockEntityType.Builder.of(BlockPedestal.PedestalBlockEntity::new, pedestalBlock.get()).build(null));
 
         // CE: setCreativeTab(MainRegistry.missileTab).setHardness(1.0F).setResistance(2.5F)
         DeferredBlock<BlockSupplyCrate> supplyCrateBlock = registerBlock("crate_supply",

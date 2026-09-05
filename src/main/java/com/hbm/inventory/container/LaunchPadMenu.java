@@ -6,16 +6,9 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * Ported from CE's {@code com.hbm.inventory.container.ContainerLaunchPadLarge} (109 lines,
- * signature + slot-layout level per {@code docs/phase3/missile_launch_infra.md}) - shared by both
- * {@link com.hbm.blockentity.bomb.LaunchPadBlockEntity} (small pad) and
- * {@link com.hbm.blockentity.bomb.LaunchPadLargeBlockEntity} (large pad), exactly matching CE's own
- * {@code TileEntityLaunchPadBase.provideContainer} always returning {@code ContainerLaunchPadLarge}
- * regardless of which concrete pad opened it. Pixel positions copied verbatim from CE's own
- * constructor. Slot 2 ("Battery") uses {@link com.hbm.inventory.slot.SlotNonRetarded} rather than
- * CE's dedicated {@code SlotBattery} - this port has no equivalent battery-only filtered slot class
- * yet, so any item can sit there client-side; server-side charging still only accepts
- * {@link com.hbm.api.energymk2.IBatteryItem}s via {@link com.hbm.lib.Library#chargeTEFromItems}.
+ * Exact CE {@code ContainerLaunchPadLarge.java:25-38}: missile 26,36 / designator 26,72 /
+ * battery 107,90 / fuel 125,90 + 125,108 takeOnly / oxidizer 143,90 + 143,108 takeOnly.
+ * {@code loadTank(3,4)} / {@code loadTank(5,6)} Exact CE {@code TileEntityLaunchPadBase.java:173-174}.
  */
 public class LaunchPadMenu extends MenuBase<LaunchPadBaseBlockEntity> {
 

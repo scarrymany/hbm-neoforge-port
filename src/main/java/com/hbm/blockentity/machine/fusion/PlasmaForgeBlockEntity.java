@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.fusion;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
@@ -34,9 +35,12 @@ import java.util.List;
 /**
  * CE {@code TileEntityFusionPlasmaForge}: maxPower 10_000_000. PlasmaNetwork / ModuleMachinePlasma
  * not ported — recipes run locally. {@code setInputEnergy} is an extra HE ignition cost on complete.
+ * ROR: CE {@code :590-607} progress/recipe/active. {@code booster}/{@code plasma} skipped —
+ * PlasmaNetwork + booster slot not ported.
  */
 public class PlasmaForgeBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT,
+        MenuProvider, IRORValueProvider {
 
     public static final int SLOT_OUT = 6;
     public static final int SLOT_BATTERY = 7;
@@ -49,6 +53,7 @@ public class PlasmaForgeBlockEntity extends MachineBaseBlockEntity
     public int processTime = 1;
     public long consumption;
     public boolean isProcessing;
+    private String activeRecipeName;
 
     public PlasmaForgeBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 8, true, true);
@@ -98,8 +103,10 @@ public class PlasmaForgeBlockEntity extends MachineBaseBlockEntity
             progress = 0;
             isProcessing = false;
             consumption = 0;
+            activeRecipeName = null;
             return;
         }
+        activeRecipeName = recipe.name;
         processTime = recipe.duration;
         consumption = recipe.power;
         if (power < consumption) {
@@ -244,5 +251,24 @@ public class PlasmaForgeBlockEntity extends MachineBaseBlockEntity
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new PlasmaForgeMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :590-597 — booster/plasma omitted (PlasmaNetwork + booster slot not ported)
+        return new String[]{
+                PREFIX_VALUE + "progress",
+                PREFIX_VALUE + "recipe",
+                PREFIX_VALUE + "active"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :601-604 — module.progress 0-1 → getProgressScaled(100); didProcess → isProcessing
+        if ((PREFIX_VALUE + "progress").equals(name)) return "" + getProgressScaled(100);
+        if ((PREFIX_VALUE + "recipe").equals(name)) return this.activeRecipeName != null ? this.activeRecipeName : "null";
+        if ((PREFIX_VALUE + "active").equals(name)) return "" + (this.isProcessing ? 1 : 0);
+        return null;
     }
 }

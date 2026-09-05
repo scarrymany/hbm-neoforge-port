@@ -157,6 +157,7 @@ public final class ClientPackets {
             if (anims == null) return;
 
             BusAnimationSedna animation = anims.apply(stack, type);
+            // CE: GunAnimationPacketSedna.java:108-113 — RELOAD_EMPTY/CYCLE_EMPTY omitted from this port's enum.
             if (animation == null && type == GunAnimationType.ALT_CYCLE) {
                 animation = anims.apply(stack, GunAnimationType.CYCLE);
             }

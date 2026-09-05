@@ -22,7 +22,10 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * CE {@code TileEntityDiFurnaceRTG} — pellet heat + NT alloy. Decay / block-swap skipped.
+ * CE {@code TileEntityDiFurnaceRTG} — pellet heat + NT alloy.
+ * {@code RTGUtil.updateRTGs} slots 3-8 Exact CE {@code :65} via already-ported
+ * {@link ItemRTGPellet#getScaledPower}/{@link ItemRTGPellet#handleDecay}, clamp {@code maxRTGPower}.
+ * Block-swap stay skipped.
  */
 public class MachineDiFurnaceRtgBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -64,12 +67,15 @@ public class MachineDiFurnaceRtgBlockEntity extends MachineBaseBlockEntity imple
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        heat = 0;
+        // CE TileEntityDiFurnaceRTG.java:65 — min(RTGUtil.updateRTGs({3..8}), maxRTGPower)
+        int newHeat = 0;
         for (int i = 3; i <= 8; i++) {
             ItemStack s = inventory.getStackInSlot(i);
-            if (s.getItem() instanceof ItemRTGPellet pellet) heat += pellet.getHeat();
+            if (!(s.getItem() instanceof ItemRTGPellet)) continue;
+            newHeat += ItemRTGPellet.getScaledPower(s);
+            inventory.setStackInSlot(i, ItemRTGPellet.handleDecay(s));
         }
-        if (heat > MAX_HEAT) heat = MAX_HEAT;
+        heat = Math.min(MAX_HEAT, newHeat);
 
         if (heat > 0 && canProcess()) {
             progress += heat;
@@ -119,6 +125,16 @@ public class MachineDiFurnaceRtgBlockEntity extends MachineBaseBlockEntity imple
         ItemStack dest = inventory.getStackInSlot(2);
         if (dest.isEmpty()) inventory.setStackInSlot(2, out);
         else dest.grow(out.getCount());
+    }
+
+    /** Exact CE {@code TileEntityDiFurnaceRTG.hasPower} :204-206. */
+    public boolean hasPower() {
+        return heat > 0;
+    }
+
+    /** Exact CE {@code TileEntityDiFurnaceRTG.getDiFurnaceProgressScaled} :134-136. */
+    public int getDiFurnaceProgressScaled(int i) {
+        return (progress * i) / PROCESS;
     }
 
     @Override

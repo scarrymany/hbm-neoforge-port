@@ -1,8 +1,10 @@
 package com.hbm.inventory.gui;
 
+import com.hbm.inventory.recipes.loader.GenericRecipe;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.i18n.I18nUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -11,6 +13,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -144,5 +148,37 @@ public abstract class GuiInfoContainer<T extends AbstractContainerMenu> extends 
     /** Plays the standard UI click sound, for machine GUI buttons that don't need a full {@code AbstractWidget}. */
     protected void click() {
         this.minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
+    }
+
+    /**
+     * CE {@code GUIMachineChemicalFactory.java:113-130} / {@code GuiInfoContainerProcessor.java:127-147}:
+     * cycling ghost on empty input slots, then 50% slot-bg blit at z=300.
+     */
+    protected void renderGhostInputs(GuiGraphics graphics, ResourceLocation texture, GenericRecipe recipe, int[] inputSlots) {
+        if (recipe == null || recipe.inputItem == null) return;
+        int limit = Math.min(recipe.inputItem.length, inputSlots.length);
+        for (int i = 0; i < limit; i++) {
+            Slot slot = this.menu.getSlot(inputSlots[i]);
+            if (slot.hasItem()) continue;
+            ItemStack display = recipe.inputItem[i].extractForCyclingDisplay(20);
+            if (display.isEmpty()) continue;
+            graphics.pose().pushPose();
+            graphics.pose().translate(0, 0, 10);
+            graphics.renderItem(display, this.leftPos + slot.x, this.topPos + slot.y);
+            graphics.pose().popPose();
+        }
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        graphics.setColor(1F, 1F, 1F, 0.5F);
+        graphics.pose().pushPose();
+        graphics.pose().translate(0, 0, 300);
+        for (int i = 0; i < limit; i++) {
+            Slot slot = this.menu.getSlot(inputSlots[i]);
+            if (slot.hasItem()) continue;
+            graphics.blit(texture, this.leftPos + slot.x, this.topPos + slot.y, slot.x, slot.y, 16, 16);
+        }
+        graphics.pose().popPose();
+        graphics.setColor(1F, 1F, 1F, 1F);
+        RenderSystem.disableBlend();
     }
 }

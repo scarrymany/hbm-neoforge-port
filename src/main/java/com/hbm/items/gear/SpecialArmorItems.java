@@ -1,5 +1,7 @@
 package com.hbm.items.gear;
 
+import com.hbm.creativetabs.CreativeTabContents;
+import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ModItems;
 import com.hbm.main.MainRegistry;
 import com.hbm.main.MaterialRegistry;
@@ -173,6 +175,49 @@ public final class SpecialArmorItems {
     // builder calls at all. No fire immunity, no potion effects, no hazard-class registration of
     // their own beyond what ArmorUtil.register() wires for the helmet. No creative tab.
 
+    // CE ModItems.java:719 ArmorModel IRON HEAD. Overlay/custom model stay Phase 5.
+    public static final DeferredItem<Item> GOGGLES = ModItems.ITEMS.register("goggles",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    // CE ModItems.java:720 ArmorAshGlasses. Port has no ArmorAshGlasses — ArmorModel stand-in, no invented ash overlay.
+    public static final DeferredItem<Item> ASHGLASSES = ModItems.ITEMS.register("ashglasses",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    // CE ModItems.java:722-723 ArmorModel IRON HEAD. Unblocks ItemRag mask_rag water/throw transitions.
+    public static final DeferredItem<Item> MASK_DAMP = ModItems.ITEMS.register("mask_damp",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    public static final DeferredItem<Item> MASK_PISS = ModItems.ITEMS.register("mask_piss",
+            () -> new ArmorModel(ArmorMaterials.IRON, ArmorItem.Type.HELMET, props(ArmorMaterials.IRON, ArmorItem.Type.HELMET)));
+    static {
+        COMBAT_TAB.add(GOGGLES);
+        COMBAT_TAB.add(ASHGLASSES);
+        COMBAT_TAB.add(MASK_DAMP);
+        COMBAT_TAB.add(MASK_PISS);
+    }
+
+    // CE ModItems.java:738-740 ArmorModel CHEST, consumableTab. Overlay stays Phase 5.
+    public static final DeferredItem<Item> CAPE_RADIATION = ModItems.ITEMS.register("cape_radiation",
+            () -> new ArmorModel(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE, props(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE)));
+    public static final DeferredItem<Item> CAPE_GASMASK = ModItems.ITEMS.register("cape_gasmask",
+            () -> new ArmorModel(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE, props(ArmorMaterials.CHAIN, ArmorItem.Type.CHESTPLATE)));
+    public static final DeferredItem<Item> CAPE_SCHRABIDIUM = ModItems.ITEMS.register("cape_schrabidium",
+            () -> new ArmorModel(MaterialRegistry.aMatSchrab, ArmorItem.Type.CHESTPLATE, props(MaterialRegistry.aMatSchrab, ArmorItem.Type.CHESTPLATE)));
+    static {
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CAPE_RADIATION);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CAPE_GASMASK);
+        CreativeTabContents.add(ModCreativeTabs.CONSUMABLE, CAPE_SCHRABIDIUM);
+    }
+
+    // CE ModItems.java:471-473 ArmorFSB aMatPaa + Haste. getReflector() = neutron_reflector.
+    public static final DeferredItem<Item> PAA_PLATE = ModItems.ITEMS.register("paa_plate",
+            () -> paaEffects(new ArmorFSB(MaterialRegistry.aMatPaa, ArmorItem.Type.CHESTPLATE, props(MaterialRegistry.aMatPaa, ArmorItem.Type.CHESTPLATE))));
+    public static final DeferredItem<Item> PAA_LEGS = ModItems.ITEMS.register("paa_legs",
+            () -> paaEffects(new ArmorFSB(MaterialRegistry.aMatPaa, ArmorItem.Type.LEGGINGS, props(MaterialRegistry.aMatPaa, ArmorItem.Type.LEGGINGS))));
+    public static final DeferredItem<Item> PAA_BOOTS = ModItems.ITEMS.register("paa_boots",
+            () -> paaEffects(new ArmorFSB(MaterialRegistry.aMatPaa, ArmorItem.Type.BOOTS, props(MaterialRegistry.aMatPaa, ArmorItem.Type.BOOTS))));
+
+    private static ArmorFSB paaEffects(ArmorFSB armor) {
+        return armor.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 30, 0, false, true));
+    }
+
     public static final DeferredItem<Item> ASBESTOS_HELMET = ModItems.ITEMS.register("asbestos_helmet",
             () -> new ArmorFSB(MaterialRegistry.aMatAsbestos, ArmorItem.Type.HELMET, props(MaterialRegistry.aMatAsbestos, ArmorItem.Type.HELMET)));
     public static final DeferredItem<Item> ASBESTOS_PLATE = ModItems.ITEMS.register("asbestos_plate",
@@ -184,8 +229,8 @@ public final class SpecialArmorItems {
 
     // ==================== Schrabidium (4) - real live CE behavior is ArmorFSB + 4 full-suit effects ====================
     // CE ModItems.java:534-541: helmet gets 4 .addEffect(...) calls (Haste II, Strength II, Jump
-    // Boost I, Speed II, each a 20-tick refresh via ArmorFSB.handleTick - not yet wired to any tick
-    // event by the ArmorFSB package itself, see that class's own javadoc); plate/legs/boots
+    // Boost I, Speed II, each a 20-tick refresh via ArmorFSB.handleTick);
+    // plate/legs/boots
     // .cloneStats(helmet) in CE. Reproduced here as identical per-piece .addEffect calls (via
     // schrabidiumEffects) rather than a live .cloneStats(...) call against the helmet's
     // DeferredItem, to avoid relying on cross-item DeferredItem#get() succeeding before the

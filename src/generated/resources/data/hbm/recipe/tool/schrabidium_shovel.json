@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "B": {
+      "item": "hbm:schrabidium_block"
+    },
+    "P": {
+      "tag": "hbm:any_plastic"
+    },
+    "W": {
+      "item": "hbm:desh_shovel"
+    }
+  },
+  "pattern": [
+    "B",
+    "W",
+    "P"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:schrabidium_shovel"
+  }
+}

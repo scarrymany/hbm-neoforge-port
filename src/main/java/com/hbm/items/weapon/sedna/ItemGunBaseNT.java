@@ -3,6 +3,7 @@ package com.hbm.items.weapon.sedna;
 import com.hbm.handler.HbmKeybinds;
 import com.hbm.interfaces.IItemHUD;
 import com.hbm.inventory.RecipesCommon;
+import com.hbm.items.ICustomItemModelRegister;
 import com.hbm.items.IEquipReceiver;
 import com.hbm.items.IKeybindReceiver;
 import com.hbm.items.weapon.sedna.hud.HUDComponents;
@@ -35,6 +36,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
 
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
@@ -79,7 +81,7 @@ import java.util.function.Function;
  * {@code BusAnimationSedna}-typed config slots (both classes are unported Phase 5 rendering
  * infrastructure, see {@code GunConfig}'s own javadoc).
  */
-public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipReceiver, IItemHUD {
+public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipReceiver, IItemHUD, ICustomItemModelRegister {
 
     public static final List<ItemGunBaseNT> INSTANCES = new ArrayList<>();
     public static final List<Item> secrets = new ArrayList<>();
@@ -519,6 +521,21 @@ public class ItemGunBaseNT extends Item implements IKeybindReceiver, IEquipRecei
      * per-gun layouts (dual-mag mirroring, no-counter flamethrowers, ...) - a real, narrow, documented
      * scope cut, not a silent behavior change for guns that already have {@code .hud(...)} wired.
      */
+    /**
+     * CE Sedna guns render via {@code ItemRenderWeaponBase} (TEISR / builtin entity),
+     * not vanilla {@code item/generated}. Leftovers without a Sedna {@code ItemRender*}
+     * keep their 2D icon: {@code gun_fireext} TODO(CE:ItemRenderFireExt.java:20),
+     * {@code gun_pa_ranged} TODO(CE:XFactoryPA.java:36).
+     */
+    @Override
+    public void registerItemModel(ItemModelProvider provider, ResourceLocation modelLocation) {
+        String path = modelLocation.getPath();
+        if ("gun_fireext".equals(path) || "gun_pa_ranged".equals(path)) {
+            return;
+        }
+        provider.withExistingParent(path, provider.mcLoc("builtin/entity"));
+    }
+
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderHUD(RenderGuiLayerEvent.Pre event, ResourceLocation layer, Player player, ItemStack stack, InteractionHand hand) {

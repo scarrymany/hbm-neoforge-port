@@ -1,15 +1,17 @@
 package com.hbm.api.entity;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
- * Plain data holder for a single radar blip. The CE original carried a manual ByteBuf codec
- * (fromBytes/toBytes via Forge's ByteBufUtils); that wire format is a packet concern and is
- * intentionally left out here, to be defined as a StreamCodec&lt;RegistryFriendlyByteBuf, RadarEntry&gt;
- * alongside whichever packet the networking area builds around this DTO.
+ * Plain data holder for a single radar blip.
+ * {@link #toBytes}/{@link #fromBytes} Exact CE {@code RadarEntry.java:47-65}; dim is
+ * {@link ResourceKey} (this port) instead of CE's raw int.
  */
 public class RadarEntry {
 
@@ -48,5 +50,28 @@ public class RadarEntry {
 
     public RadarEntry(Player player) {
         this(player.getDisplayName().getString(), IRadarDetectableNT.PLAYER, (int) Math.floor(player.getX()), (int) Math.floor(player.getY()), (int) Math.floor(player.getZ()), player.level().dimension(), player.getId(), true);
+    }
+
+    /** CE {@code RadarEntry.java:47-55}; dim as registry id string. */
+    public void fromBytes(RegistryFriendlyByteBuf buf) {
+        this.unlocalizedName = buf.readUtf();
+        this.blipLevel = buf.readShort();
+        this.posX = buf.readInt();
+        this.posY = buf.readInt();
+        this.posZ = buf.readInt();
+        String dimId = buf.readUtf();
+        this.dim = dimId.isEmpty() ? null : ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(dimId));
+        this.entityID = buf.readInt();
+    }
+
+    /** CE {@code RadarEntry.java:57-65}; dim as registry id string. */
+    public void toBytes(RegistryFriendlyByteBuf buf) {
+        buf.writeUtf(unlocalizedName == null ? "" : unlocalizedName);
+        buf.writeShort(blipLevel);
+        buf.writeInt(posX);
+        buf.writeInt(posY);
+        buf.writeInt(posZ);
+        buf.writeUtf(dim == null ? "" : dim.location().toString());
+        buf.writeInt(entityID);
     }
 }

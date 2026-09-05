@@ -37,7 +37,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * CE {@code TileEntityMachineCatalyticReformer}: 20k HE / 100 mB + catalyst. Canister load/unload skipped.
+ * CE {@code TileEntityMachineCatalyticReformer}: 20k HE / 100 mB + catalyst.
+ * {@code setType(9)} / {@code loadTank(1,2)} / three {@code unloadTank} Exact CE {@code :66-73}.
  */
 public class MachineCatalyticReformerBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -92,11 +93,13 @@ public class MachineCatalyticReformerBlockEntity extends MachineBaseBlockEntity
             }
         }
         power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
-        ItemStack id = inventory.getStackInSlot(9);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            input.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineCatalyticReformer.java:66-73
+        input.setType(9, inventory);
+        input.loadTank(1, 2, inventory);
         reform();
+        out1.unloadTank(3, 4, inventory);
+        out2.unloadTank(5, 6, inventory);
+        out3.unloadTank(7, 8, inventory);
         for (DirPos pos : getConPos()) {
             if (out1.getFill() > 0) tryProvide(out1, level, pos);
             if (out2.getFill() > 0) tryProvide(out2, level, pos);

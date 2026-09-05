@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "T  ",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:steel_plate_triple"
+    },
+    "T": {
+      "item": "hbm:tank_steel"
+    }
+  },
+  "result": {
+    "id": "hbm:machine_drain",
+    "count": 1
+  }
+}

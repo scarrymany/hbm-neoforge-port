@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rod_u235"
+    }
+  ],
+  "result": {
+    "id": "hbm:billet_u235",
+    "count": 1
+  }
+}

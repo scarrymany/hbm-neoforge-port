@@ -36,20 +36,9 @@ import java.util.function.BiConsumer;
  * See {@link XFactory556mm}'s class javadoc for why every field here is a plain eager
  * {@code static final} (not deferred into a supplier) and why {@code .setCasing(...)} is omitted.
  * <p>
- * <b>CAPACITOR/CAPACITOR_OVERCHARGE/CAPACITOR_IR ammo items - a genuinely missing CROSS-PACKAGE
- * dependency, not invented here.</b> CE's {@code energy_lacunae}/{@code _overcharge}/{@code _ir}
- * bind to the same {@code GunFactory.EnumAmmo.CAPACITOR}/{@code CAPACITOR_OVERCHARGE}/
- * {@code CAPACITOR_IR} constants that CE's {@code XFactoryEnergy} guns ({@code gun_tesla_cannon}/
- * {@code gun_laser_pistol}/{@code gun_lasrifle}, not in this batch's roster) also consume - a shared
- * ammo family owned by whichever Phase 3 package ports {@code XFactoryEnergy}, not this one. Minting
- * 3 new "Capacitor" items here would risk a duplicate-{@code DeferredItem} registration race against
- * that concurrent/future package. {@code .setItem(...)} is therefore left uncalled on the 3
- * {@code energy_lacunae*} configs below (verified safe: every magazine/reload code path already
- * null-checks {@code BulletConfig.getAmmo()} before using it, so an ammo-less config simply can never
- * be inventory-reloaded yet, rather than crashing) - confirmed real dependency,
- * {@code com.hbm.items.IngotNuggetItems.INGOT_POLYMER}, is the eventual Ammo Press crafting input
- * per CE's own {@code setCasing(new ItemStack(ModItems.ingot_polymer, 2), 160)} call, for whoever
- * wires the shared Capacitor item + Ammo Press recipe later.
+ * {@code energy_lacunae*} bind Exact CE {@code XFactory762mm.java:57-61} to the shared
+ * {@code XFactoryEnergy} capacitor items (already registered). {@code energy_lacunae_ir} uses
+ * {@link XFactoryEnergy#irHit} — Exact CE {@code LAMBDA_IR_HIT}.
  */
 public final class XFactory762mm {
 
@@ -117,23 +106,16 @@ public final class XFactory762mm {
     public static final BulletConfig r762_he = new BulletConfig("r762_he").setItem(() -> ITEM_R762_HE)
             .setWear(3F).setDamage(2F).setOnImpact(LAMBDA_TINY_EXPLODE);
 
-    // energy_lacunae/_overcharge/_ir - beam ammo, no setItem(...) yet, see class javadoc.
-    public static final BulletConfig energy_lacunae = new BulletConfig("energy_lacunae")
+    /** Exact CE {@code XFactory762mm.java:57-61} — shared capacitor items + IR linger. */
+    public static final BulletConfig energy_lacunae = new BulletConfig("energy_lacunae").setItem(() -> XFactoryEnergy.ITEM_CAPACITOR)
             .setupDamageClass(DamageClass.LASER).setBeam().setReloadCount(40).setSpread(0.0F).setLife(5)
             .setRenderRotations(false).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
-    public static final BulletConfig energy_lacunae_overcharge = new BulletConfig("energy_lacunae_overcharge")
+    public static final BulletConfig energy_lacunae_overcharge = new BulletConfig("energy_lacunae_overcharge").setItem(() -> XFactoryEnergy.ITEM_CAPACITOR_OVERCHARGE)
             .setupDamageClass(DamageClass.LASER).setBeam().setReloadCount(40).setSpread(0.0F).setLife(5)
             .setRenderRotations(false).setDoesPenetrate(true).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
-    /**
-     * CE's {@code onImpactBeam} here is {@code XFactoryEnergy.LAMBDA_IR_HIT} (an incendiary-ignite
-     * beam-hit variant), not the plain standard beam hit - {@code XFactoryEnergy} is a different,
-     * out-of-scope Phase 3 package (see class javadoc), so this falls back to the standard beam-hit
-     * lambda (still deals full damage, just without the ignite-on-hit VFX/effect) until that package
-     * lands and this can reference the real lambda.
-     */
-    public static final BulletConfig energy_lacunae_ir = new BulletConfig("energy_lacunae_ir")
+    public static final BulletConfig energy_lacunae_ir = new BulletConfig("energy_lacunae_ir").setItem(() -> XFactoryEnergy.ITEM_CAPACITOR_IR)
             .setupDamageClass(DamageClass.FIRE).setBeam().setReloadCount(40).setSpread(0.0F).setLife(5)
-            .setRenderRotations(false).setOnBeamImpact(BulletConfig.LAMBDA_STANDARD_BEAM_HIT);
+            .setRenderRotations(false).setOnBeamImpact(XFactoryEnergy::irHit);
 
     // ==================== recoil (see XFactory556mm's javadoc - not currently wired anywhere, kept for 1:1 parity) ====================
 

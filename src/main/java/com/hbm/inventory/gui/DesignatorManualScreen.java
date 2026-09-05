@@ -3,6 +3,7 @@ package com.hbm.inventory.gui;
 import com.hbm.items.tool.ItemDesignatorManual;
 import com.hbm.items.tool.ToolDataComponents;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -13,6 +14,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -21,38 +23,23 @@ import com.hbm.packet.toserver.ItemControlPacket;
 
 /**
  * Client-only, containerless GUI for {@link ItemDesignatorManual}, ported from CE's
- * {@code GUIScreenDesignator} (213 lines, read in full for this review pass - see
- * {@code docs/phase5/gui_screens_survey_weapons_storage_special.md}'s Satellite/designator section).
+ * {@code GUIScreenDesignator} (213 lines, read in full for this review pass).
  * CE's custom {@code GuiTextField} pair plus hand-drawn flip-X/flip-Z/"here"/"save" button sprites
- * are re-expressed against plain vanilla {@link EditBox}/{@link Button} widgets (this port has no
- * equivalent hand-rolled texture-button framework, same simplification this port's
- * {@code TurretMobFilterScreen} already established for a bare-Screen GUI) - the underlying behavior
- * (type X/Z, optionally flip sign, optionally snap to the player's current position, Save writes
- * back onto the held stack) is preserved exactly.
+ * are re-expressed against plain vanilla {@link EditBox}/{@link Button} widgets.
  * <p>
  * "Save" sends a {@link ItemControlPacket} carrying {@code designatorX}/{@code designatorZ} ints,
- * dispatched server-side to {@link ItemDesignatorManual#receiveControl} - see that class's javadoc
- * for why this reuses the existing generic control-packet mechanism rather than a new payload.
+ * dispatched server-side to {@link ItemDesignatorManual#receiveControl}.
  * <p>
- * <b>Review-pass fixes</b>, all against CE's real {@code GUIScreenDesignator}:
- * <ul>
- *   <li>{@code HEIGHT} corrected from 100 to CE's real {@code ySize} of 126, with the extra room
- *   given to the (previously cramped) button row and distance readout.</li>
- *   <li>Flip X/Flip Z/Here now play {@link HBMSoundHandler#buttonYes} on click (CE:
- *   {@code mc.getSoundHandler().playSound(..., HBMSoundHandler.buttonYes, ...)}); Save now plays
- *   {@link HBMSoundHandler#techBleep} instead of the generic UI click this port previously used for
- *   every button uniformly.</li>
- *   <li>Save no longer closes the screen. CE's {@code GUIScreenDesignator} deliberately does
- *   <b>not</b> close on save (it flashes the button and stays open for repeat adjustments, tracked by
- *   a 20-tick {@code saveButtonCoolDown} this port does not reproduce since it has no matching
- *   flash-texture asset yet) - this port's previous {@code this.onClose()} call diverged from CE in
- *   the opposite direction from {@link SatCoordScreen}'s own bug (which failed to close when CE
- *   does). Both are now CE-accurate.</li>
- *   <li>Added hover tooltips on all 4 buttons and the distance readout, matching CE's 5
- *   {@code drawHoveringText} call sites exactly (Flip X/Flip Z/Here/Save/distance-field).</li>
- * </ul>
+ * Review-pass fixes (all against CE's real {@code GUIScreenDesignator}): HEIGHT corrected from
+ * 100 to CE's real {@code ySize} of 126, Flip X/Flip Z/Here now play {@link HBMSoundHandler#buttonYes}
+ * on click, Save now plays {@link HBMSoundHandler#techBleep}, Save no longer closes the screen (CE
+ * deliberately stays open for repeat adjustments), added hover tooltips on all 4 buttons and the
+ * distance readout, matching CE's 5 {@code drawHoveringText} call sites exactly.
  */
 public class DesignatorManualScreen extends Screen {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/gui_designator.png");
 
     private static final int WIDTH = 176;
     private static final int HEIGHT = 126;
@@ -146,7 +133,7 @@ public class DesignatorManualScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.fill(guiLeft, guiTop, guiLeft + WIDTH, guiTop + HEIGHT, 0xC0101010);
+        guiGraphics.blit(TEXTURE, guiLeft, guiTop, 0, 0, WIDTH, HEIGHT);
         guiGraphics.drawCenteredString(this.font, this.title, guiLeft + WIDTH / 2, guiTop + 8, 0xFFFFFF);
 
         Player player = Minecraft.getInstance().player;
@@ -154,8 +141,6 @@ public class DesignatorManualScreen extends Screen {
             long dx = parse(xField) - (long) player.getX();
             long dz = parse(zField) - (long) player.getZ();
             long distance = (long) Math.sqrt(dx * dx + dz * dz);
-            // Drawn in the gap between the Z field (ends at guiTop+64) and the Here/Save row
-            // (starts at guiTop+90) so a long distance string never overlaps either button.
             int distanceY = guiTop + 72;
             guiGraphics.drawString(this.font, "Distance: " + distance + " m", guiLeft + 8, distanceY, 0x0091FF, false);
 

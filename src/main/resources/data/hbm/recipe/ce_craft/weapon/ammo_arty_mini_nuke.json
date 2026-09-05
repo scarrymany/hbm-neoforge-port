@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "NSN",
+    " P "
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:nugget_pu239"
+    },
+    "N": {
+      "item": "hbm:neutron_reflector"
+    },
+    "S": {
+      "item": "hbm:ammo_arty_normal"
+    }
+  },
+  "result": {
+    "id": "hbm:ammo_arty_mini_nuke",
+    "count": 1
+  }
+}

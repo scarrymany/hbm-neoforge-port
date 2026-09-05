@@ -3,40 +3,67 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachineDiFurnaceRtgBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.DiFurnaceRtgMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
+import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Exact CE {@code GUIDiFurnaceRTG} on existing {@code gui_rtg_difurnace.png} 176×166.
+ * Heat pip 58,36 from 176,31; progress 101,35 from 176,14; info -15,36 type 3.
+ * Invented vertical {@code fill()} bars removed.
+ */
 public class DiFurnaceRtgScreen extends GuiInfoContainer<DiFurnaceRtgMenu> {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_rtg_difurnace.png");
 
     public DiFurnaceRtgScreen(DiFurnaceRtgMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 168;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.imageHeight = 166;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineDiFurnaceRtgBlockEntity be = this.getMenu().be;
-        int hh = be.heat * 52 / MachineDiFurnaceRtgBlockEntity.MAX_HEAT;
-        guiGraphics.fill(x + 62, y + 70 - hh, x + 70, y + 70, 0xFF88FF44);
-        int ph = be.progress * 24 / MachineDiFurnaceRtgBlockEntity.PROCESS;
-        guiGraphics.fill(x + 101, y + 35, x + 101 + ph, y + 49, 0xFFFFFF55);
+        // CE GUIDiFurnaceRTG.java:57-62
+        if (be.hasPower()) {
+            guiGraphics.blit(TEXTURE, x + 58, y + 36, 176, 31, 18, 16);
+        }
+        int p = be.getDiFurnaceProgressScaled(24);
+        guiGraphics.blit(TEXTURE, x + 101, y + 35, 176, 14, p + 1, 17);
+        drawInfoPanel(guiGraphics, x - 15, y + 36, 3);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        int nameX = this.imageWidth / 2 - this.font.width(this.title) / 2;
+        guiGraphics.drawString(this.font, this.title, nameX, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+
         MachineDiFurnaceRtgBlockEntity be = this.getMenu().be;
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 62, topPos + 18, 8, 52,
-                Component.literal("Heat: " + be.heat + " / " + MachineDiFurnaceRtgBlockEntity.MAX_HEAT));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 101, topPos + 35, 24, 14,
-                Component.literal(be.progress + " / " + MachineDiFurnaceRtgBlockEntity.PROCESS));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos - 15, topPos + 36, 16, 16, leftPos - 8, topPos + 36 + 16,
+                toComponents(I18nUtil.resolveKeyArray("desc.gui.rtgBFurnace.desc", MachineDiFurnaceRtgBlockEntity.MAX_HEAT)));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 58, topPos + 36, 18, 16, mouseX, mouseY,
+                toComponents(I18nUtil.resolveKeyArray("desc.gui.rtg.heat", be.heat)));
+    }
+
+    private static List<Component> toComponents(String[] lines) {
+        List<Component> out = new ArrayList<>(lines.length);
+        for (String line : lines) {
+            out.add(Component.literal(line));
+        }
+        return out;
     }
 }

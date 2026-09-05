@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " GL",
+    "IBP",
+    " GL"
+  ],
+  "key": {
+    "G": { "item": "hbm:ingot_gunmetal" },
+    "L": { "tag": "hbm:any_rubber" },
+    "I": { "item": "hbm:ingot_titanium" },
+    "B": { "item": "hbm:steel_block" },
+    "P": { "item": "hbm:piston_selenium" }
+  },
+  "result": { "id": "hbm:gun_drill", "count": 1 }
+}

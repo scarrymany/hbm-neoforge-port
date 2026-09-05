@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rod_zirnox_depleted_plutonium_fuel"
+    }
+  ],
+  "result": {
+    "id": "hbm:waste_plutonium_hot",
+    "count": 2
+  }
+}

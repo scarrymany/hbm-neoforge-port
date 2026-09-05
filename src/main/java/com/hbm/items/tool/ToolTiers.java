@@ -61,6 +61,7 @@ public final class ToolTiers {
     public static final Tier VOLCANIC = BISMUTH;
     public static final Tier STARMETAL = new SimpleTier(BlockTags.INCORRECT_FOR_DIAMOND_TOOL, 1000, 20.0F, 0.0F, 30, () -> repairTag(Mats.MAT_STAR));
     public static final Tier SCHRABIDIUM = new SimpleTier(BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 10000, 50.0F, 0.0F, 200, () -> repairTag(Mats.MAT_SCHRABIDIUM));
+    public static final Tier METEORITE = new SimpleTier(BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 0, 50.0F, 0.0F, 200, () -> Ingredient.EMPTY);
     /** No matching {@link Mats} constant yet for chlorophyte/mese - see class javadoc. */
     public static final Tier CHLOROPHYTE = new SimpleTier(BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 0, 50.0F, 0.0F, 200, () -> Ingredient.EMPTY);
     public static final Tier MESE = new SimpleTier(BlockTags.INCORRECT_FOR_NETHERITE_TOOL, 0, 50.0F, 0.0F, 200, () -> Ingredient.EMPTY);

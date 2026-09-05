@@ -36,7 +36,7 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineOreSlopper}: 100k HE, water→slop, bedrock_ore_base → BASE grades.
- * Animation / entity shred skipped.
+ * {@code tanks[0].setType(1)} Exact CE {@code :121}. Animation / entity shred skipped.
  */
 public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -48,6 +48,7 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
     public final FluidTankNTM water;
     public final FluidTankNTM slop;
     public long power;
+    public long consumption = CONSUMPTION;
     public float progress;
     public boolean processing;
     private final double[] ores = new double[BedrockOreType.VALUES.length];
@@ -87,21 +88,20 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
-        ItemStack id = inventory.getStackInSlot(1);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            water.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineOreSlopper.java:121
+        this.water.setType(1, inventory);
 
         int speed = upgrade(UpgradeType.SPEED);
         int effect = upgrade(UpgradeType.EFFECT);
-        long use = CONSUMPTION + (CONSUMPTION * speed) / 2 + CONSUMPTION * effect;
+        // CE TileEntityMachineOreSlopper.java:138
+        this.consumption = CONSUMPTION + (CONSUMPTION * speed) / 2 + CONSUMPTION * effect;
 
         processing = false;
-        if (canSlop(use)) {
-            power -= use;
+        if (canSlop(consumption)) {
+            power -= consumption;
             progress += 1F / (600 - speed * 150);
             processing = true;
-            while (progress >= 1F && canSlop(use)) {
+            while (progress >= 1F && canSlop(consumption)) {
                 progress -= 1F;
                 ItemStack in = inventory.getStackInSlot(2);
                 for (BedrockOreType type : BedrockOreType.VALUES) {
@@ -245,6 +245,7 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeLong(power);
+        buf.writeLong(consumption);
         buf.writeFloat(progress);
         buf.writeBoolean(processing);
         water.serialize(buf);
@@ -255,6 +256,7 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         power = buf.readLong();
+        consumption = buf.readLong();
         progress = buf.readFloat();
         processing = buf.readBoolean();
         water.deserialize(buf);

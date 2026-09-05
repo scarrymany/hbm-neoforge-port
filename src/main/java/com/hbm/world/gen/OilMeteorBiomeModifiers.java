@@ -35,6 +35,12 @@ public final class OilMeteorBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_OIL_METEOR_WORLDGEN = key("add_oil_meteor_worldgen");
     /** Landmine after vegetal so grass/trees do not overwrite the 1-block mine (CE {@code IWorldGenerator} is post-decorate). */
     public static final ResourceKey<BiomeModifier> ADD_LANDMINE_WORLDGEN = key("add_landmine_worldgen");
+    /** Dud + waste barrel after vegetal — 1-block dud / surface tower, same CE post-decorate step. */
+    public static final ResourceKey<BiomeModifier> ADD_DUD_BARREL_WORLDGEN = key("add_dud_barrel_worldgen");
+    /** Spaceship wreck + satellite dish after vegetal — CE {@code IWorldGenerator} post-decorate. */
+    public static final ResourceKey<BiomeModifier> ADD_SPACESHIP_SATELLITE_WORLDGEN = key("add_spaceship_satellite_worldgen");
+    /** Glyphid hive + desert atom after vegetal — CE {@code IWorldGenerator} post-decorate. */
+    public static final ResourceKey<BiomeModifier> ADD_HIVE_ATOM_WORLDGEN = key("add_hive_atom_worldgen");
 
     private OilMeteorBiomeModifiers() {
     }
@@ -59,6 +65,24 @@ public final class OilMeteorBiomeModifiers {
         context.register(ADD_LANDMINE_WORLDGEN, new AddFeaturesBiomeModifier(
                 biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
                 HolderSet.direct(List.of(placedFeatures.getOrThrow(OilMeteorPlacedFeatures.LANDMINE))),
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
+        context.register(ADD_DUD_BARREL_WORLDGEN, new AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(List.of(
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.DUD),
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.BARREL))),
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
+        context.register(ADD_SPACESHIP_SATELLITE_WORLDGEN, new AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(List.of(
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.SPACESHIP),
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.SATELLITE))),
+                GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
+        context.register(ADD_HIVE_ATOM_WORLDGEN, new AddFeaturesBiomeModifier(
+                biomes.getOrThrow(BiomeTags.IS_OVERWORLD),
+                HolderSet.direct(List.of(
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.GLYPHID_HIVE),
+                        placedFeatures.getOrThrow(OilMeteorPlacedFeatures.DESERT_ATOM))),
                 GenerationStep.Decoration.TOP_LAYER_MODIFICATION));
     }
 

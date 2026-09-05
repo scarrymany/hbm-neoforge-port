@@ -3,6 +3,8 @@ package com.hbm.blocks.generic;
 import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.BlockFallingBase;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blockentity.machine.CyberCrabBlockEntity;
+import com.hbm.blocks.machine.BlockCybercrab;
 import com.hbm.blocks.machine.NTMAnvil;
 import com.hbm.inventory.container.AnvilMenus;
 import com.hbm.blocks.machine.RailBooster;
@@ -37,10 +39,14 @@ import java.util.function.Supplier;
 public final class Phase8Blocks {
 
     public static Supplier<BlockEntityType<BlockWandLoot.WandLootBlockEntity>> WAND_LOOT_ENTITY_TYPE;
+    public static Supplier<BlockEntityType<CyberCrabBlockEntity>> METEOR_SPAWNER_ENTITY_TYPE;
+    public static DeferredBlock<BlockCybercrab> METEOR_SPAWNER;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_GREEN_OFF;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_GREEN_ON;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_BLUE_OFF;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_BLUE_ON;
+    /** CE {@code ModBlocks.press_preheater} — adjacent to {@code machine_press} for +4 speed. */
+    public static DeferredBlock<Block> PRESS_PREHEATER;
 
     private Phase8Blocks() {
     }
@@ -84,7 +90,7 @@ public final class Phase8Blocks {
         registerBlock("brick_concrete_broken", () -> new BlockBase(stone(15.0F, 45.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("brick_light", () -> new BlockBase(stone(15.0F, 20.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("brick_asbestos", () -> new BlockBase(stone(15.0F, 40.0F)), ModCreativeTabs.BLOCKS);
-        registerBlock("brick_obsidian", () -> new BlockBase(stone(15.0F, 120.0F)), ModCreativeTabs.BLOCKS);
+        ModBlocks.BRICK_OBSIDIAN = registerBlock("brick_obsidian", () -> new BlockBase(stone(15.0F, 120.0F)), ModCreativeTabs.BLOCKS);
         registerBlock("cmb_brick", () -> new BlockBase(BlockBehaviour.Properties.of().strength(25.0F, 5000.0F).sound(SoundType.METAL)), ModCreativeTabs.BLOCKS);
         registerBlock("concrete", () -> new BlockBase(stone(15.0F, 140.0F), true), ModCreativeTabs.BLOCKS);
         registerBlock("concrete_smooth", () -> new BlockBase(stone(15.0F, 140.0F), true), ModCreativeTabs.BLOCKS);
@@ -102,7 +108,7 @@ public final class Phase8Blocks {
                 BlockBehaviour.Properties.of().strength(0.5F, 0.5F).sound(SoundType.WOOD)), null);
         registerBlock("frozen_dirt", () -> new BlockHazard(stone(0.5F, 0.5F)), ModCreativeTabs.BLOCKS);
         registerBlock("frozen_planks", () -> new BlockHazard(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOD)), ModCreativeTabs.BLOCKS);
-        registerBlock("press_preheater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        PRESS_PREHEATER = registerBlock("press_preheater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("sand_boron", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
         registerBlock("sand_gold", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
         registerBlock("sand_lead", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
@@ -114,7 +120,13 @@ public final class Phase8Blocks {
         registerBlock("struct_scaffold", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MISSILE);
         registerBlock("fusion_heater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("fusion_hatch", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        // CE ModBlocks.java:1316 field fusion_core, registry "fusion_core_block". Do not collide
+        // the fusion_core battery item (MachineItems.java).
         registerBlock("fusion_core_block", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        // CE ModBlocks.java:1351 BlockHadronCoil factor 10. Casing + CE assets; hadron TE later.
+        registerBlock("hadron_coil_alloy", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        // CE ModBlocks.java:1009 / MachineGenerator.java — Block, no TE. Drop: circuit ADVANCED.
+        registerBlock("machine_generator", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), null);
         // CE ModBlocks.java:811-812 — leftover cubes (BlockBakeBase → BlockBase, no TE).
         registerBlock("cm_flux", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("cm_heat", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
@@ -122,8 +134,7 @@ public final class Phase8Blocks {
         registerBlock("structure_anchor", () -> new BlockBase(BlockBehaviour.Properties.of().strength(2.5F, 10.0F).sound(SoundType.METAL)), null);
     }
 
-    /** CE ModBlocks.java:398-405 — meteor dungeon brick family. {@code meteor_spawner} is a cube here
-     *  (CE {@code BlockCybercrab} entity spawn is Phase 9). */
+    /** CE ModBlocks.java:398-405 — meteor dungeon brick family. {@code meteor_spawner} is {@link BlockCybercrab}. */
     private static void registerMeteorBricks() {
         BlockBehaviour.Properties meteor = stone(15.0F, 360.0F);
         registerBlock("meteor_polished", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
@@ -131,7 +142,13 @@ public final class Phase8Blocks {
         registerBlock("meteor_brick_mossy", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
         registerBlock("meteor_brick_cracked", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
         registerBlock("meteor_brick_chiseled", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
-        registerBlock("meteor_spawner", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
+        // Dedicated Properties — do not mutate the shared meteor instance (brick loot).
+        METEOR_SPAWNER = registerBlock("meteor_spawner",
+                () -> new BlockCybercrab(stone(15.0F, 360.0F).noLootTable()), ModCreativeTabs.BLOCKS);
+        METEOR_SPAWNER_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_cyber_crab",
+                () -> BlockEntityType.Builder.of(
+                        (pos, state) -> new CyberCrabBlockEntity(METEOR_SPAWNER_ENTITY_TYPE.get(), pos, state),
+                        METEOR_SPAWNER.get()).build(null));
         registerBlock("meteor_battery", () -> new BlockBase(meteor), ModCreativeTabs.BLOCKS);
     }
 

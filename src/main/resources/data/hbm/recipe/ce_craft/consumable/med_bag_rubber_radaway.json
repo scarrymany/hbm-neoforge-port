@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LL",
+    "SI",
+    "LL"
+  ],
+  "key": {
+    "L": {
+      "tag": "hbm:any_rubber"
+    },
+    "S": {
+      "item": "hbm:syringe_metal_super"
+    },
+    "I": {
+      "item": "hbm:radaway"
+    }
+  },
+  "result": {
+    "id": "hbm:med_bag",
+    "count": 1
+  }
+}

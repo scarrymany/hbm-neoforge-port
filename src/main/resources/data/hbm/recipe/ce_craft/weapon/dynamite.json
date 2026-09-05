@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DDD",
+    "DSD",
+    "DDD"
+  ],
+  "key": {
+    "D": {
+      "item": "hbm:stick_dynamite"
+    },
+    "S": {
+      "item": "hbm:safety_fuse"
+    }
+  },
+  "result": {
+    "id": "hbm:dynamite",
+    "count": 1
+  }
+}

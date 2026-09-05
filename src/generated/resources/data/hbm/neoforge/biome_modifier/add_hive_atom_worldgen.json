@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "hbm:glyphid_hive",
+    "hbm:desert_atom"
+  ],
+  "step": "top_layer_modification"
+}

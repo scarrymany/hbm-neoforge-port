@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "DSD",
+    "DTD"
+  ],
+  "key": {
+    "W": {
+      "item": "hbm:magnetizedtungsten_dense_wire"
+    },
+    "D": {
+      "item": "hbm:saturnite_plate_triple"
+    },
+    "S": {
+      "item": "hbm:powder_power"
+    },
+    "T": {
+      "item": "hbm:crystal_trixite"
+    }
+  },
+  "result": {
+    "id": "hbm:battery_trixite",
+    "count": 1
+  }
+}

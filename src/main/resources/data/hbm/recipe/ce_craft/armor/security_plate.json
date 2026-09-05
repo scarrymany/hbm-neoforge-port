@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "KWK",
+    "IKI",
+    "WKW"
+  ],
+  "key": {
+    "K": {
+      "item": "hbm:plate_kevlar"
+    },
+    "I": {
+      "tag": "hbm:any_plastic"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    }
+  },
+  "result": {
+    "id": "hbm:security_plate",
+    "count": 1
+  }
+}

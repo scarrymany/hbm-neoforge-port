@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "CCC",
+    "PIP"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:circuit_capacitor_tantalium"
+    },
+    "P": [
+      {
+        "tag": "c:ingots/polycarbonate"
+      },
+      {
+        "tag": "c:ingots/pvc"
+      }
+    ],
+    "I": {
+      "item": "hbm:circuit_chip_bismoid"
+    }
+  },
+  "result": {
+    "id": "hbm:weapon_mod_special_las_capacitor",
+    "count": 1
+  }
+}

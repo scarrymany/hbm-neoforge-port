@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "CDN"
+  ],
+  "key": {
+    "C": { "item": "hbm:circuit_analog" },
+    "D": { "item": "hbm:ducttape" },
+    "N": { "item": "hbm:nuke_demo" }
+  },
+  "result": { "id": "hbm:mine_fat", "count": 1 }
+}

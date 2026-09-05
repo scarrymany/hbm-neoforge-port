@@ -101,6 +101,16 @@ public class ItemFluidTank extends ItemBase implements IFillableItem {
     }
 
     @Override
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
+        return getFill(stack) > 0;
+    }
+
+    @Override
+    public ItemStack getCraftingRemainingItem(ItemStack stack) {
+        return empty(stack);
+    }
+
+    @Override
     public Component getName(ItemStack stack) {
         FluidType type = getFluidType(stack);
         return type != null ? type.getLocalizedName() : super.getName(stack);

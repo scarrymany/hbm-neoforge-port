@@ -1,17 +1,20 @@
 package com.hbm.blockentity.machine;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.handler.ClimbableRegistry;
 import com.hbm.interfaces.IClimbable;
+import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.MachineCrystallizerMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.CrystallizerRecipes;
 import com.hbm.inventory.recipes.CrystallizerRecipes.CrystallizerRecipe;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.HBMSoundHandler;
@@ -32,6 +35,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,14 +49,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * read in full) - see {@code docs/phase2/machines_shredder_assembler_crystallizer_mixer.md}'s
  * per-machine detail for the full slot/power/recipe breakdown.
  * <p>
- * <b>Slot trim vs. CE</b> (documented, not silent - the same shape {@code MachineDieselBlockEntity}'s
- * own javadoc already established for this exact gap): CE's slots 3-4 (item-based tank
- * fill/drain via {@code tankNew.loadTank}) and slot 7 (an {@code IItemFluidIdentifier} fluid-type
- * selector, {@code tankNew.setType}) both depend on the item-canister-loading subsystem
- * {@link FluidTankNTM}'s own javadoc confirms does not exist in this port yet. This class's inventory
- * is therefore renumbered to 4 slots: 0 item input, 1 battery, 2 item output, 3-4 upgrade slots (CE:
- * 8 slots, 0 input/1 battery/2 output/3-4 fluid-load/5-6 upgrade/7 fluid-id). The acid tank itself is
- * unaffected - it still fills purely over the fluid pipe network via {@link IFluidStandardReceiverMK2}.
+ * {@code tank.setType(7)} / {@code tank.loadTank(3, 4)} Exact CE
+ * {@code TileEntityMachineCrystallizer.java:133-134}. Inventory is 8 slots Exact CE {@code :72}.
  * <p>
  * <b>{@code IClimbable}</b>: CE's tower model doubles as an in-world ladder via a small AABB offset
  * to one side of the machine, rotated to match the block's placed {@code BlockDirectional} facing
@@ -87,14 +85,18 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
     public static final int ITEM_INPUT = 0;
     public static final int BATTERY_SLOT = 1;
     public static final int ITEM_OUTPUT = 2;
-    public static final int UPGRADE_START = 3;
-    public static final int UPGRADE_END = 4;
+    public static final int SLOT_CANISTER = 3;
+    public static final int SLOT_EMPTY = 4;
+    public static final int UPGRADE_START = 5;
+    public static final int UPGRADE_END = 6;
+    public static final int SLOT_ID = 7;
 
     private static final Map<UpgradeType, Integer> VALID_UPGRADES = new EnumMap<>(UpgradeType.class);
 
     static {
         VALID_UPGRADES.put(UpgradeType.SPEED, 3);
         VALID_UPGRADES.put(UpgradeType.EFFECT, 3);
+        VALID_UPGRADES.put(UpgradeType.OVERDRIVE, 3);
     }
 
     private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(VALID_UPGRADES);
@@ -108,7 +110,34 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
     private AABB ladderAABB;
 
     public MachineCrystallizerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 5, true, true);
+        super(type, pos, state, 8, true, true);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineCrystallizer.java:82-83
+                if (!stack.isEmpty() && slot >= UPGRADE_START && slot <= UPGRADE_END
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
@@ -118,15 +147,36 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        if (stack.isEmpty()) return false;
         if (slot == ITEM_INPUT) return CrystallizerRecipes.getOutput(stack, tank.getTankType()) != null;
         if (slot == BATTERY_SLOT) return Library.isBattery(stack);
+        // CE canInsertItem is slot 0 only; MenuBase.tile is getCheckedInventory(),
+        // so canister/ID GUI insert dies without this.
+        if (slot == SLOT_CANISTER) {
+            if (FluidContainerRegistry.getFluidContent(stack, tank.getTankType()) > 0) return true;
+            return stack.getItem() instanceof IFillableItem fill && fill.providesFluid(tank.getTankType(), stack);
+        }
+        if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
         if (slot >= UPGRADE_START && slot <= UPGRADE_END) return stack.getItem() instanceof ItemMachineUpgrade;
         return false;
     }
 
     @Override
+    public boolean canInsertItem(int slot, ItemStack itemStack) {
+        // CE TileEntityMachineCrystallizer.java:306-307
+        return slot == ITEM_INPUT && CrystallizerRecipes.getOutput(itemStack, tank.getTankType()) != null;
+    }
+
+    @Override
     public boolean canExtractItem(int slot, ItemStack itemStack, int amount) {
-        return slot == ITEM_OUTPUT;
+        // CE :311-312
+        return slot == ITEM_OUTPUT || slot == SLOT_EMPTY;
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        // CE :316-317
+        return new int[]{ITEM_INPUT, ITEM_OUTPUT, SLOT_EMPTY};
     }
 
     private int speedLevel() {
@@ -155,11 +205,9 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
      * research report's own explicit flag on this interaction.
      */
     private int getCycleCount() {
-        // No OVERDRIVE upgrade type is wired to this machine's VALID_UPGRADES (CE's crystallizer
-        // itself only exposes SPEED/EFFECT upgrade slots, per its own 2-upgrade-slot layout - see
-        // class javadoc's slot trim) - kept as a named method (always 1) so a future OVERDRIVE slot
-        // addition is a one-line change, not a redesign.
-        return 1;
+        // CE TileEntityMachineCrystallizer.java:300-302
+        int overdrive = upgradeManager.getLevel(UpgradeType.OVERDRIVE);
+        return Math.min(1 + overdrive * 2, 7);
     }
 
     @Override
@@ -173,6 +221,9 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
 
         upgradeManager.checkSlots(inventory, UPGRADE_START, UPGRADE_END);
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, MAX_POWER);
+        // CE TileEntityMachineCrystallizer.java:133-134
+        tank.setType(SLOT_ID, inventory);
+        tank.loadTank(SLOT_CANISTER, SLOT_EMPTY, inventory);
 
         for (int cycle = 0; cycle < getCycleCount(); cycle++) {
             tick();
@@ -245,6 +296,10 @@ public class MachineCrystallizerBlockEntity extends MachineBaseBlockEntity
     @Override
     public long getMaxPower() {
         return MAX_POWER;
+    }
+
+    public long getPowerScaled(int scale) {
+        return getMaxPower() > 0 ? (power * scale) / getMaxPower() : 0;
     }
 
     @Override

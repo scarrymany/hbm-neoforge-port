@@ -53,11 +53,11 @@ public final class Phase9TailEntityTypes {
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> EXPLOSIVE_BEAM;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> AA_SHELL;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> ZETA;
-    public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> ARTILLERY_ROCKET;
+    public static DeferredHolder<EntityType<?>, EntityType<EntityArtilleryRocket>> ARTILLERY_ROCKET;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> BULLET_MK2;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> BOXCAR;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> BURNING_FOEQ;
-    public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> ARTILLERY_SHELL;
+    public static DeferredHolder<EntityType<?>, EntityType<EntityArtilleryShell>> ARTILLERY_SHELL;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> COMBINE_BALL;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> COG;
     public static DeferredHolder<EntityType<?>, EntityType<EntityThrownTail>> VORTEX_BEAM;
@@ -127,11 +127,11 @@ public final class Phase9TailEntityTypes {
         EXPLOSIVE_BEAM = thrown("entity_explosive_beam");
         AA_SHELL = thrown("entity_aa_shell");
         ZETA = thrown("entity_zeta");
-        ARTILLERY_ROCKET = thrown("entity_artillery_rocket");
+        ARTILLERY_ROCKET = thrownNamed("entity_artillery_rocket", EntityArtilleryRocket::new, 0.5F, 0.5F, 1000);
         BULLET_MK2 = thrown("entity_bullet_mk2");
         BOXCAR = thrown("entity_boxcar");
         BURNING_FOEQ = thrown("entity_burning_foeq");
-        ARTILLERY_SHELL = thrown("entity_artillery_shell");
+        ARTILLERY_SHELL = thrownNamed("entity_artillery_shell", EntityArtilleryShell::new, 0.5F, 0.5F, 1000);
         COMBINE_BALL = thrown("entity_combine_ball");
         COG = thrown("entity_cog");
         VORTEX_BEAM = thrown("entity_vortex_beam");

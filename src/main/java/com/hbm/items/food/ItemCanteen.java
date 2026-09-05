@@ -1,5 +1,6 @@
 package com.hbm.items.food;
 
+import com.hbm.config.VersatileConfig;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
@@ -28,11 +29,8 @@ import java.util.List;
  * (a custom int component) instead of {@code DataComponents.DAMAGE}, since 1.21's damage bar is a
  * genuine "this item is worn out" concept and a canteen's cooldown is not that.
  * <p>
- * <b>Not ported (see docs/phase1/items_food_gear.md finding #2):</b> CE gates {@code onItemRightClick}
- * on {@code VersatileConfig.hasPotionSickness(player)} and calls
- * {@code VersatileConfig.applyPotionSickness(entityLiving, 5)} at the end of {@code onItemUseFinish} -
- * neither exists in this port yet (see {@link FoodDataComponents}'s sibling classes' javadoc for the
- * same gap), so both calls are TODO'd below rather than silently dropped.
+ * {@code VersatileConfig.hasPotionSickness} gates {@link #use}; {@code applyPotionSickness(..., 5)}
+ * runs at the end of {@link #finishUsingItem}. Polaroid-ID tooltip forks stay skipped.
  */
 public class ItemCanteen extends Item {
 
@@ -89,8 +87,7 @@ public class ItemCanteen extends Item {
             }
         }
 
-        // TODO(VersatileConfig follow-up, docs/phase1/items_food_gear.md finding #2): CE calls
-        // VersatileConfig.applyPotionSickness(entityLiving, 5) here - not ported, see class javadoc.
+        VersatileConfig.applyPotionSickness(entityLiving, 5);
 
         return stack;
     }
@@ -108,10 +105,7 @@ public class ItemCanteen extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        // TODO(VersatileConfig follow-up, docs/phase1/items_food_gear.md finding #2): CE also gates this
-        // on !VersatileConfig.hasPotionSickness(player) - not ported, see class javadoc. Only the
-        // cooldown gate below is enforced for now.
-        if (getCooldown(stack) > 0) {
+        if (VersatileConfig.hasPotionSickness(player) || getCooldown(stack) > 0) {
             return InteractionResultHolder.fail(stack);
         }
         player.startUsingItem(hand);

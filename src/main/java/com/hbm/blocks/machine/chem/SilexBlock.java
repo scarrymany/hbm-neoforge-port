@@ -5,6 +5,7 @@ import com.hbm.blockentity.machine.chem.ChemIsotopeBlockEntities;
 import com.hbm.blockentity.machine.chem.SilexBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -15,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-/** Ported from CE's {@code MachineSILEX} (regname {@code machine_silex}) - laser isotope/element separation. */
+/** Ported from CE's {@code MachineSILEX} (regname {@code machine_silex}) - laser isotope/element separation. fillSpace extras Exact CE {@code :62-74}. */
 public class SilexBlock extends BlockDummyable {
 
     public SilexBlock(Properties properties) {
@@ -30,6 +31,25 @@ public class SilexBlock extends BlockDummyable {
     @Override
     public int getOffset() {
         return 1;
+    }
+
+    /**
+     * Exact CE {@code MachineSILEX.fillSpace} extras ({@code MachineSILEX.java:62-74}).
+     * After {@code super.fillSpace}: extras at {@code core.y+1} perpendicular to facing —
+     * NS → {@code ±X}, EW → {@code ±Z}. No ProxyCombo TE — extras are {@code makeExtra} flags only.
+     */
+    @Override
+    protected void fillSpace(Level level, BlockPos placedPos, Direction dir, int placementOffset) {
+        super.fillSpace(level, placedPos, dir, placementOffset);
+        BlockPos core = placedPos.relative(dir, placementOffset);
+        if (dir == Direction.NORTH || dir == Direction.SOUTH) {
+            makeExtra(level, core.offset(1, 1, 0));
+            makeExtra(level, core.offset(-1, 1, 0));
+        }
+        if (dir == Direction.EAST || dir == Direction.WEST) {
+            makeExtra(level, core.offset(0, 1, 1));
+            makeExtra(level, core.offset(0, 1, -1));
+        }
     }
 
     @Nullable

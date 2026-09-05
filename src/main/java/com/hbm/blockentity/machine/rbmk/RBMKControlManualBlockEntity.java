@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.rbmk.RBMKControlMath;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.blocks.machine.rbmk.RBMKControlBlock;
 import com.hbm.interfaces.IControlReceiver;
@@ -24,7 +25,8 @@ import net.minecraft.world.phys.Vec3;
  * withdrawal - per the research report, "one of the highest-value functions to unit-test given the
  * project's own framing" (the Chernobyl-reference positive-void-coefficient effect).
  */
-public class RBMKControlManualBlockEntity extends RBMKControlBlockEntity implements IControlReceiver, ICopiable {
+public class RBMKControlManualBlockEntity extends RBMKControlBlockEntity
+        implements IControlReceiver, ICopiable, IRORInteractive {
 
     public RBMKColor color;
     public double startingLevel;
@@ -143,6 +145,34 @@ public class RBMKControlManualBlockEntity extends RBMKControlBlockEntity impleme
             int c = nbt.getInt("color");
             this.color = c >= 0 && c < RBMKColor.VALUES.length ? RBMKColor.VALUES[c] : null;
         }
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityRBMKControlManual.java:226-231
+        return new String[]{
+                PREFIX_VALUE + "extraction",
+                PREFIX_FUNCTION + "setrods" + NAME_SEPARATOR + "percent",
+                PREFIX_FUNCTION + "extendrods" + NAME_SEPARATOR + "percent"
+        };
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :235-251
+        if ((PREFIX_FUNCTION + "setrods").equals(name) && params.length > 0) {
+            int percent = IRORInteractive.parseInt(params[0], 0, 100);
+            this.setTarget(percent / 100D);
+            setChanged();
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "extendrods").equals(name) && params.length > 0) {
+            int percent = IRORInteractive.parseInt(params[0], -100, 100);
+            this.setTarget(Math.max(0D, Math.min(1D, this.targetLevel + percent / 100D)));
+            setChanged();
+            return null;
+        }
+        return null;
     }
 
     /** CE nests this on {@code TileEntityRBMKControlManual} - kept nested here for naming stability, per the research report. */

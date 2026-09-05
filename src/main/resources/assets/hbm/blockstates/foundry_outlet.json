@@ -1,35 +1,19 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures": {},
-    "custom": {
-      "flip-v": true
-    },
-    "model": "hbm:block/foundry_outlet.obj"
-  },
   "variants": {
-    "facing=north": [
-      {
-        "y": 90
-      }
-    ],
-    "facing=south": [
-      {
-        "y": 270
-      }
-    ],
-    "facing=west": [
-      {}
-    ],
-    "facing=east": [
-      {
-        "y": 180
-      }
-    ],
-    "": [
-      {
-        "y": 90
-      }
-    ]
+    "facing=north": {
+      "model": "hbm:block/foundry_outlet"
+    },
+    "facing=south": {
+      "model": "hbm:block/foundry_outlet",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "hbm:block/foundry_outlet",
+      "y": 270
+    },
+    "facing=east": {
+      "model": "hbm:block/foundry_outlet",
+      "y": 90
+    }
   }
 }

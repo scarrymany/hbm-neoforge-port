@@ -34,6 +34,9 @@ public final class DynamicCraftingRecipes {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<GrenadeCraftingRecipe>> GRENADE_SERIALIZER =
             HbmRecipes.RECIPE_SERIALIZERS.register("grenade_crafting", () -> GrenadeCraftingRecipe.Serializer.INSTANCE);
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<CargoShellCraftingRecipe>> CARGO_SHELL_SERIALIZER =
+            HbmRecipes.RECIPE_SERIALIZERS.register("cargo_shell_crafting", () -> CargoShellCraftingRecipe.Serializer.INSTANCE);
+
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<RBMKFuelRecycleRecipe>> RBMK_FUEL_RECYCLE_SERIALIZER =
             HbmRecipes.RECIPE_SERIALIZERS.register("rbmk_fuel_recycle", () -> RBMKFuelRecycleRecipe.Serializer.INSTANCE);
 
@@ -51,6 +54,18 @@ public final class DynamicCraftingRecipes {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<ContainerUpgradeRecipe>> CONTAINER_UPGRADE_SAFE_SERIALIZER =
             HbmRecipes.RECIPE_SERIALIZERS.register("container_upgrade_safe",
                     () -> new ContainerUpgradeRecipe.Serializer(ContainerUpgradeRecipe.SAFE));
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<FluidContainerCraftingRecipe>> FLUID_CONTAINER_CRAFTING_SERIALIZER =
+            HbmRecipes.RECIPE_SERIALIZERS.register("fluid_container_crafting",
+                    () -> FluidContainerCraftingRecipe.Serializer.INSTANCE);
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BreedingRodTritiumCellRecipe>> BREEDING_ROD_TRITIUM_CELL_SERIALIZER =
+            HbmRecipes.RECIPE_SERIALIZERS.register("breeding_rod_tritium_cell",
+                    () -> BreedingRodTritiumCellRecipe.Serializer.INSTANCE);
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<EmptyCellCraftingRecipe>> EMPTY_CELL_CRAFTING_SERIALIZER =
+            HbmRecipes.RECIPE_SERIALIZERS.register("empty_cell_crafting",
+                    () -> EmptyCellCraftingRecipe.Serializer.INSTANCE);
 
     /** No-op - see class javadoc. Forces this class's static fields (and therefore the registrations above) to run. */
     public static void bootstrap() {

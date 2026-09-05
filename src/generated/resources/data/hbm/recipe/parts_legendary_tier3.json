@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:ingot_chainsteel"
+    },
+    {
+      "item": "hbm:ingot_smore"
+    },
+    {
+      "item": "hbm:gem_alexandrite"
+    },
+    {
+      "item": "hbm:gem_alexandrite"
+    },
+    {
+      "item": "hbm:gem_alexandrite"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:parts_legendary_tier3"
+  }
+}

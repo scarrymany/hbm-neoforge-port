@@ -36,7 +36,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * CE {@code TileEntityMachineHydrotreater}: 20k HE / 100 mB + H₂@P1 + catalyst. Canister load skipped.
+ * CE {@code TileEntityMachineHydrotreater}: 20k HE / 100 mB + H₂@P1 + catalyst.
+ * {@code setType(7)} / {@code loadTank(1,2)} / {@code unloadTank(3,4)}/{@code (5,6)} Exact CE {@code :65-72}.
  */
 public class MachineHydrotreaterBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -92,11 +93,12 @@ public class MachineHydrotreaterBlockEntity extends MachineBaseBlockEntity
             }
         }
         power = Library.chargeTEFromItems(inventory, 0, power, MAX_POWER);
-        ItemStack id = inventory.getStackInSlot(7);
-        if (!id.isEmpty() && id.getItem() instanceof IItemFluidIdentifier ident) {
-            oil.setTankType(ident.getType(level, worldPosition, id));
-        }
+        // CE TileEntityMachineHydrotreater.java:65-72
+        oil.setType(7, inventory);
+        oil.loadTank(1, 2, inventory);
         if (level.getGameTime() % 2 == 0) reform();
+        out1.unloadTank(3, 4, inventory);
+        out2.unloadTank(5, 6, inventory);
         for (DirPos pos : getConPos()) {
             if (out1.getFill() > 0) tryProvide(out1, level, pos);
             if (out2.getFill() > 0) tryProvide(out2, level, pos);

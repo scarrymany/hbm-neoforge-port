@@ -1,7 +1,13 @@
 {
   "type": "hbm:shredder",
   "input": {
-    "item": "hbm:sellafield"
+    "type": "neoforge:components",
+    "items": "hbm:sellafield",
+    "components": {
+      "minecraft:block_state": {
+        "level": "0"
+      }
+    }
   },
   "output": {
     "id": "hbm:scrap_nuclear",

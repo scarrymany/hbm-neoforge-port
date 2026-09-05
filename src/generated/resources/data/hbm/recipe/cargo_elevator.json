@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "hbm:steel_grate"
+    },
+    "P": {
+      "item": "hbm:part_generic_piston_hydraulic"
+    },
+    "S": {
+      "tag": "c:ingots/steel"
+    }
+  },
+  "pattern": [
+    "GGG",
+    "SPS"
+  ],
+  "result": {
+    "count": 3,
+    "id": "hbm:cargo_elevator"
+  }
+}

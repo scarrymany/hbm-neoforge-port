@@ -13,9 +13,9 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * CE {@code blocks/generic/YellowBarrel.java}.
  * <p>
- * {@code toxic_block} (1-in-3 explode replacement) is a fluid block not registered in this port —
- * that branch falls through to the 18.0F blast so the barrel never silently vanishes.
- * {@code ChunkRadiationManager} tick + detonation rad match CE (5/75 idle, 35/1500 on explode).
+ * {@code toxic_block} 1-in-3 explode replacement is live ({@link WastelandVirusBlocks#TOXIC_BLOCK}).
+ * {@code ChunkRadiationManager} tick + detonation rad match CE (yellow 5/75 idle, vitrified 0.5/5,
+ * explode 35/1500).
  */
 public class YellowBarrel extends BaseBarrel {
 
@@ -30,8 +30,10 @@ public class YellowBarrel extends BaseBarrel {
     }
 
     public void explode(Level level, int x, int y, int z) {
-        // CE: 1-in-3 places toxic_block; else createExplosion(..., 18.0F, smoking=true)
-        if (level.getRandom().nextInt(3) != 0) {
+        // CE YellowBarrel.java: 1-in-3 places toxic_block; else createExplosion(..., 18.0F)
+        if (level.getRandom().nextInt(3) == 0) {
+            level.setBlock(new BlockPos(x, y, z), WastelandVirusBlocks.TOXIC_BLOCK.get().defaultBlockState(), 3);
+        } else {
             level.explode(null, x, y, z, 18.0F, false, Level.ExplosionInteraction.TNT);
         }
         ExplosionNukeGeneric.waste(level, x, y, z, 35);
@@ -48,8 +50,12 @@ public class YellowBarrel extends BaseBarrel {
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        // CE yellow_barrel: incrementRad(world, pos, 5F, 75F) every tickRate=20
-        ChunkRadiationManager.proxy.incrementRad(level, pos, 5F, 75F);
+        // CE YellowBarrel.java:62-66 — yellow 5/75, vitrified 0.5/5
+        if (this == GenericCrateBlocks.YELLOW_BARREL.get()) {
+            ChunkRadiationManager.proxy.incrementRad(level, pos, 5F, 75F);
+        } else {
+            ChunkRadiationManager.proxy.incrementRad(level, pos, 0.5F, 5F);
+        }
         level.scheduleTick(pos, this, 20);
     }
 

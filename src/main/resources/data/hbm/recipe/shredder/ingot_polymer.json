@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ingot_polymer"
+  },
+  "output": {
+    "id": "hbm:powder_polymer",
+    "count": 1
+  },
+  "duration": 60
+}

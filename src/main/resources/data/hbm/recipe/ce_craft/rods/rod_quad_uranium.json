@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rod_quad_empty"
+    },
+    {
+      "item": "hbm:billet_uranium"
+    },
+    {
+      "item": "hbm:billet_uranium"
+    },
+    {
+      "item": "hbm:billet_uranium"
+    },
+    {
+      "item": "hbm:billet_uranium"
+    }
+  ],
+  "result": {
+    "id": "hbm:rod_quad_uranium",
+    "count": 1
+  }
+}

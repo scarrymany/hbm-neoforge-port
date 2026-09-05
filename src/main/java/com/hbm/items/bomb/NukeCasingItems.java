@@ -48,7 +48,7 @@ public final class NukeCasingItems {
     public static DeferredItem<Item> BOY_IGNITER;
 
     // ==================== Fat Man / Ivy Mike / Tsar Bomba (staged) ====================
-    public static DeferredItem<Item> MAN_CORE;
+    // man_core: registered in SpecialItems as ItemManMike (CE :2385)
     public static DeferredItem<Item> MAN_IGNITER;
     public static DeferredItem<Item> EXPLOSIVE_LENSES; // CE: explosive_lenses (man_explosive8) - shared Mike/Tsar (NOT Man, which uses EARLY_EXPLOSIVE_LENSES)
     public static DeferredItem<Item> MIKE_CORE;
@@ -100,7 +100,7 @@ public final class NukeCasingItems {
         BOY_PROPELLANT = reg1("boy_propellant");
         BOY_IGNITER = reg1("boy_igniter");
 
-        MAN_CORE = reg1("man_core");
+        // man_core: registered in SpecialItems as ItemManMike (CE :2385)
         MAN_IGNITER = reg1("man_igniter");
         EXPLOSIVE_LENSES = reg1("explosive_lenses");
         MIKE_CORE = reg1("mike_core");

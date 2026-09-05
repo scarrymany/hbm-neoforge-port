@@ -4,15 +4,17 @@ import com.hbm.inventory.container.machine.chem.CyclotronMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/** Ported (visually, from CE's {@code GUIMachineCyclotron}) as a plain panel. */
 public class CyclotronScreen extends GuiInfoContainer<CyclotronMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/machine/gui_cyclotron.png");
 
     public CyclotronScreen(CyclotronMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.imageWidth = 220;
-        this.imageHeight = 200;
+        this.imageWidth = 190;
+        this.imageHeight = 215;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -20,21 +22,43 @@ public class CyclotronScreen extends GuiInfoContainer<CyclotronMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         var be = this.getMenu().be;
-        be.tanks[0].renderTank(x + 8, y + 140, 0, 16, 54);
-        be.tanks[1].renderTank(x + 28, y + 140, 0, 16, 54);
-        be.tanks[2].renderTank(x + 48, y + 140, 0, 16, 54);
+        int k = (int) (be.getPower() * 63 / Math.max(1, be.getMaxPower()));
+        guiGraphics.blit(TEXTURE, x + 168, y + 80 - k, 190, 62 - k, 16, k);
+
+        int l = be.getProgressScaled(34);
+        guiGraphics.blit(TEXTURE, x + 48, y + 27, 206, 0, l, 34);
+
+        if (l > 0) {
+            guiGraphics.blit(TEXTURE, x + 172, y + 4, 190, 63, 9, 12);
+        }
+
+        be.tanks[0].renderTank(x + 11, y + 88, 0, 34, 7);
+        be.tanks[1].renderTank(x + 11, y + 97, 0, 34, 7);
+        be.tanks[2].renderTank(x + 107, y + 97, 0, 34, 16);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, name, 79 - this.font.width(name) / 2, 6, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, 15, this.imageHeight - 96 + 2, 0x404040, false);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        
         var be = this.getMenu().be;
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 70, 100, 140, 12, be.getPower(), be.getMaxPower());
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 70, 114, 140, 10,
-                Component.literal("Progress: " + be.getProgressScaled(100) + "%"));
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 168, topPos + 18, 16, 63, be.getPower(), be.getMaxPower());
+        
+        be.tanks[0].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 11, topPos + 81, 34, 7);
+        be.tanks[1].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 11, topPos + 90, 34, 7);
+        be.tanks[2].renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 107, topPos + 81, 34, 16);
+        
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }

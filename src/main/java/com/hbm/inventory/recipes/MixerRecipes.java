@@ -337,17 +337,9 @@ public final class MixerRecipes {
     }
 
     /**
-     * Auto-detection scan over every registered recipe, keyed by the two input tanks' current
-     * contents plus the optional solid input - used by {@code MachineMixerBlockEntity} in place of
-     * CE's manual "select target output fluid via GUI toggle, then the two input tanks re-derive
-     * their expected type from it" flow ({@code TileEntityMachineMixer.canProcess}'s own
-     * {@code tanks[0].setTankType(recipe.input1.type)} call). This port has no
-     * {@code IItemFluidIdentifier} output-fluid-selector item yet (same gap
-     * {@code com.hbm.inventory.fluid.tank.FluidTankNTM}'s own javadoc documents) to drive that manual selection with, so the
-     * block entity instead asks "does anything already in my tanks/input slot match a real recipe" -
-     * a documented simplification, not a silent behavior change: every recipe below still requires
-     * the exact same two fluids (or one fluid + solid, or solid alone) in the exact same amounts CE's
-     * data specifies.
+     * Auto-detection scan over every registered recipe. The mixer BE now uses
+     * {@link #getOutput(FluidType)} + {@code recipeIndex} Exact CE; this helper remains for callers
+     * that still want a contents-first match.
      *
      * @param tank1Type  {@code tanks[0]}'s current fluid type ({@link Fluids#NONE} if empty)
      * @param tank1Fill  {@code tanks[0]}'s current fill, mB

@@ -1,5 +1,7 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonWriter;
 import com.hbm.api.energymk2.IEnergyProviderMK2;
 import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
@@ -7,6 +9,8 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
 import com.hbm.inventory.container.machine.dummyable.StirlingMenu;
 import com.hbm.items.machine.ItemGear;
+import com.hbm.lib.HBMSoundHandler;
+import com.hbm.tileentity.IConfigurableMachine;
 import com.hbm.lib.DirPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,6 +18,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -24,23 +29,30 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.io.IOException;
+
 /**
  * CE {@code TileEntityStirling.java}:59-181 — heat pull diffusion 0.1, efficiency 0.5,
  * maxHeat 300/1500, overspeed 300. EntityCog spawn skipped.
+ * Overspeed warning Exact CE {@code :65-75}: {@code warnOverspeed} 2.0F/1.0F after
+ * {@code overspeed > 60}, cooldown 100t. {@link IConfigurableMachine} Exact CE
+ * {@code TileEntityStirling.java:233-253} ({@code stirling}).
  */
 public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, ITickableBE, MenuProvider, IConfigurableMachine {
 
-    public static final double DIFFUSION = 0.1D;
-    public static final double EFFICIENCY = 0.5D;
-    public static final int MAX_HEAT_NORMAL = 300;
-    public static final int MAX_HEAT_STEEL = 1500;
-    public static final int OVERSPEED_LIMIT = 300;
+    public static double diffusion = 0.1D;
+    public static double efficiency = 0.5D;
+    public static int maxHeatNormal = 300;
+    public static int maxHeatSteel = 1500;
+    public static int overspeedLimit = 300;
 
     public long powerBuffer;
     public int heat;
     public boolean hasCog = true;
     public int overspeed;
+    private int warnCooldown;
+    private int syncHeat;
 
     public MachineStirlingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 0, false, true);
@@ -60,7 +72,7 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
     }
 
     public int maxHeat() {
-        return getBlockState().is(DummyableProcessBlocks.MACHINE_STIRLING.get()) ? MAX_HEAT_NORMAL : MAX_HEAT_STEEL;
+        return getBlockState().is(DummyableProcessBlocks.MACHINE_STIRLING.get()) ? maxHeatNormal : maxHeatSteel;
     }
 
     public ItemGear.GearType requiredGear() {
@@ -74,21 +86,29 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
         if (hasCog) {
             powerBuffer = 0;
             tryPullHeat();
-            powerBuffer = (long) (heat * (isCreative() ? 1D : EFFICIENCY));
-            if (!isCreative()) {
-                if (heat > maxHeat()) {
-                    overspeed++;
-                    if (overspeed > OVERSPEED_LIMIT) {
-                        hasCog = false;
-                        powerBuffer = 0;
-                        level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
-                                5.0F, false, Level.ExplosionInteraction.NONE);
-                    }
-                } else {
-                    overspeed = 0;
+            powerBuffer = (long) (heat * (isCreative() ? 1D : efficiency));
+            // CE TileEntityStirling.java:65-75
+            if (warnCooldown > 0) warnCooldown--;
+            if (heat > maxHeat() && !isCreative()) {
+                overspeed++;
+                if (overspeed > 60 && warnCooldown == 0) {
+                    warnCooldown = 100;
+                    level.playSound(null, worldPosition, HBMSoundHandler.warnOverspeed.get(),
+                            SoundSource.BLOCKS, 2.0F, 1.0F);
                 }
+                if (overspeed > overspeedLimit) {
+                    hasCog = false;
+                    powerBuffer = 0;
+                    level.explode(null, worldPosition.getX() + 0.5, worldPosition.getY() + 1.5, worldPosition.getZ() + 0.5,
+                            5.0F, false, Level.ExplosionInteraction.NONE);
+                }
+            } else {
+                overspeed = 0;
             }
         } else {
+            // CE TileEntityStirling.java:97-99
+            overspeed = 0;
+            warnCooldown = 0;
             powerBuffer = 0;
             heat = Math.max(heat - Math.max(heat / 1000, 1), 0);
         }
@@ -96,17 +116,18 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
         if (powerBuffer > 0) {
             for (DirPos pos : getConPos()) tryProvide(level, pos.getPos(), pos.getDir());
         }
-        heat = 0;
-
+        // CE TileEntityStirling.java:101-114 — snapshot then pack then zero
+        syncHeat = heat;
         dataChanged();
         networkPackMK2(25);
+        heat = 0;
     }
 
     private void tryPullHeat() {
         if (level == null) return;
         BlockEntity below = level.getBlockEntity(worldPosition.below());
         if (below instanceof IHeatSource source && below != this) {
-            int heatSrc = (int) (source.getHeatStored() * DIFFUSION);
+            int heatSrc = (int) (source.getHeatStored() * diffusion);
             if (heatSrc > 0) {
                 source.useUpHeat(heatSrc);
                 heat += heatSrc;
@@ -147,7 +168,57 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public long getMaxPower() {
-        return Math.max(1L, (long) (maxHeat() * (isCreative() ? 1D : EFFICIENCY)));
+        return Math.max(1L, (long) (maxHeat() * (isCreative() ? 1D : efficiency)));
+    }
+
+    @Override
+    public String getConfigName() {
+        return "stirling";
+    }
+
+    @Override
+    public void readIfPresent(JsonObject obj) {
+        readConfig(obj);
+    }
+
+    @Override
+    public void writeConfig(JsonWriter writer) throws IOException {
+        writeConfigStatic(writer);
+    }
+
+    static void readConfig(JsonObject obj) {
+        // CE TileEntityStirling.java:239-243
+        diffusion = IConfigurableMachine.grab(obj, "D:diffusion", diffusion);
+        efficiency = IConfigurableMachine.grab(obj, "D:efficiency", efficiency);
+        maxHeatNormal = IConfigurableMachine.grab(obj, "I:maxHeatNormal", maxHeatNormal);
+        maxHeatSteel = IConfigurableMachine.grab(obj, "I:maxHeatSteel", maxHeatSteel);
+        overspeedLimit = IConfigurableMachine.grab(obj, "I:overspeedLimit", overspeedLimit);
+    }
+
+    static void writeConfigStatic(JsonWriter writer) throws IOException {
+        // CE TileEntityStirling.java:248-252
+        writer.name("D:diffusion").value(diffusion);
+        writer.name("D:efficiency").value(efficiency);
+        writer.name("I:maxHeatNormal").value(maxHeatNormal);
+        writer.name("I:maxHeatSteel").value(maxHeatSteel);
+        writer.name("I:overspeedLimit").value(overspeedLimit);
+    }
+
+    public static final class ConfigDummy implements IConfigurableMachine {
+        @Override
+        public String getConfigName() {
+            return "stirling";
+        }
+
+        @Override
+        public void readIfPresent(JsonObject obj) {
+            readConfig(obj);
+        }
+
+        @Override
+        public void writeConfig(JsonWriter writer) throws IOException {
+            writeConfigStatic(writer);
+        }
     }
 
     @Override
@@ -172,7 +243,7 @@ public class MachineStirlingBlockEntity extends MachineBaseBlockEntity
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeLong(powerBuffer);
-        buf.writeInt(heat);
+        buf.writeInt(syncHeat);
         buf.writeBoolean(hasCog);
         buf.writeInt(overspeed);
     }

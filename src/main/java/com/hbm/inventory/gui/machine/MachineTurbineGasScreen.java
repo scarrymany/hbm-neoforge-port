@@ -8,10 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * Ported (visually, from CE's {@code GUIMachineTurbineGas}) as a plain panel - see
- * {@link MachineRTGScreen}'s javadoc for the no-texture-yet rationale. Four tanks (gas, lubricant,
- * water, hot steam) render side by side; four buttons drive {@link MachineTurbineGasMenu}'s
- * start/stop, auto-mode, and throttle button ids via vanilla's inventory-button click path.
+ * Plain panel — {@code gui_turbinegas.png} is not in this tree (do not invent). Slot 1 fluid-ID
+ * sits at Exact CE 36,17 so Start/Stop is at 8,38 to keep that slot clickable.
+ * Four tanks (gas, lubricant, water, hot steam); four buttons drive {@link MachineTurbineGasMenu}.
  */
 public class MachineTurbineGasScreen extends GuiInfoContainer<MachineTurbineGasMenu> {
 
@@ -28,7 +27,7 @@ public class MachineTurbineGasScreen extends GuiInfoContainer<MachineTurbineGasM
         int containerId = this.getMenu().containerId;
         this.addRenderableWidget(Button.builder(Component.literal("Start/Stop"), b ->
                 this.minecraft.gameMode.handleInventoryButtonClick(containerId, MachineTurbineGasMenu.BUTTON_TOGGLE_RUN)
-        ).bounds(leftPos + 8, topPos + 17, 70, 20).build());
+        ).bounds(leftPos + 8, topPos + 38, 70, 20).build());
         this.addRenderableWidget(Button.builder(Component.literal("Auto"), b ->
                 this.minecraft.gameMode.handleInventoryButtonClick(containerId, MachineTurbineGasMenu.BUTTON_TOGGLE_AUTO)
         ).bounds(leftPos + 80, topPos + 17, 40, 20).build());

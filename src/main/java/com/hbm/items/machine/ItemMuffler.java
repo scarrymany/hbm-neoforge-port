@@ -2,8 +2,8 @@ package com.hbm.items.machine;
 
 import com.hbm.blockentity.LoadedBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  * "has no other package dependency beyond the base class itself" - {@code muffled} is real, already
  * base-class content per {@code docs/phase2/blockentity_base.md}, confirmed at
  * {@code LoadedBaseBlockEntity} lines 66/133 ({@code public boolean muffled}/{@code setMuffled}).
+ * Apply sound Exact CE {@code ItemMuffler.java:29} ({@code upgradePlug} 1.0F/1.0F).
  */
 public class ItemMuffler extends Item {
 
@@ -46,8 +47,9 @@ public class ItemMuffler extends Item {
 
         if (!level.isClientSide) {
             loaded.setMuffled(true);
+            // CE ItemMuffler.java:29
             level.playSound(player, player == null ? pos.getX() : player.getX(), player == null ? pos.getY() : player.getY(),
-                    player == null ? pos.getZ() : player.getZ(), SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    player == null ? pos.getZ() : player.getZ(), HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
             loaded.setChanged();
             if (player != null) {
                 context.getItemInHand().shrink(1);

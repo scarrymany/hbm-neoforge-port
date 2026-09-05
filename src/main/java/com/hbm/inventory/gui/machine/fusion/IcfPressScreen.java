@@ -4,10 +4,12 @@ import com.hbm.inventory.container.machine.fusion.IcfPressMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/** Ported (visually, from CE's {@code GUIICFPress}) as a plain panel. */
 public class IcfPressScreen extends GuiInfoContainer<IcfPressMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/reactors/gui_icf.png");
 
     public IcfPressScreen(IcfPressMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -20,12 +22,12 @@ public class IcfPressScreen extends GuiInfoContainer<IcfPressMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         var be = this.getMenu().be;
-        be.tanks[0].renderTank(x + 62, y + 18, 0, 16, 34);
-        be.tanks[1].renderTank(x + 134, y + 18, 0, 16, 34);
+        // CE GUIICFPress.java:57-58 — tanks sit beside ID slots 6/7 at 62,18 / 134,18.
+        be.tanks[0].renderTank(x + 44, y + 70, 0, 16, 52);
+        be.tanks[1].renderTank(x + 152, y + 70, 0, 16, 52);
     }
 
     @Override

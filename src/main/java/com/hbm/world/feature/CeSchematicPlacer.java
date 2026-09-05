@@ -5,15 +5,20 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hbm.blockentity.machine.CrateBlockEntity;
+import com.hbm.blocks.generic.BlockScaffold;
+import com.hbm.blocks.generic.BlockSellafield;
 import com.hbm.itempool.ItemPool;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
@@ -35,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -88,36 +94,64 @@ public final class CeSchematicPlacer {
     private static void placeBlock(WorldGenLevel level, BlockPos pos, Block block, Cell cell) {
         if (block == null) return;
         BlockState state = apply(block.defaultBlockState(), cell);
-        level.setBlock(pos, state, 3);
+        setBlockSafe(level, pos, state);
     }
 
     private static void placeChest(WorldGenLevel level, BlockPos pos, RandomSource random, Cell cell) {
         Direction facing = direction(cell.special.facing, Direction.EAST);
-        level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), 3);
+        setBlockSafe(level, pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing));
         fillContainer(level, pos, random, cell.special);
     }
 
     private static void placeCrate(WorldGenLevel level, BlockPos pos, RandomSource random, Cell cell) {
         Block crate = block(cell.blockId);
         if (crate == null) return;
-        level.setBlock(pos, crate.defaultBlockState(), 3);
+        setBlockSafe(level, pos, crate.defaultBlockState());
         fillContainer(level, pos, random, cell.special);
+    }
+
+    /**
+     * Public write used by hive/atom (and {@link #place}). FEATURES write-radius is 0 —
+     * skip cells outside the generating chunk. Do not {@code ServerLevel.setBlock}.
+     */
+    public static boolean setBlockInRegion(WorldGenLevel level, BlockPos pos, BlockState state) {
+        return setBlockSafe(level, pos, state);
+    }
+
+    /**
+     * CE {@code IWorldGenerator} wrote the full wreck. 1.21 {@code WorldGenRegion} rejects
+     * {@code setBlock} outside the generating write-radius (spaceship 12×46 / satellite 25×31)
+     * and logs {@code Detected setBlock in a far chunk}. Skip those cells — do not
+     * {@code ServerLevel.setBlock} (creates/cascades chunks at forced 1/1).
+     */
+    private static boolean setBlockSafe(WorldGenLevel level, BlockPos pos, BlockState state) {
+        // FEATURES write-radius is 0. ensureCanWrite logs the far-chunk ERROR
+        // when it returns false — skip silently instead.
+        if (level instanceof WorldGenRegion region) {
+            var center = region.getCenter();
+            if ((pos.getX() >> 4) != center.x || (pos.getZ() >> 4) != center.z) return false;
+        }
+        level.setBlock(pos, state, 3);
+        return true;
     }
 
     private static void fillContainer(WorldGenLevel level, BlockPos pos, RandomSource random, Special special) {
         ItemPool pool = ItemPool.getPool(special.pool);
         int rolls = special.rolls;
         if (special.rand > 0) rolls = special.base + random.nextInt(special.rand);
-        if (level.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity chest) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be == null) be = level.getLevel().getBlockEntity(pos);
+        if (be instanceof RandomizableContainerBlockEntity chest) {
             int slots = chest.getContainerSize();
             if (slots <= 0) return;
             for (int i = 0; i < rolls; i++) {
                 ItemStack stack = ItemPool.getStack(pool, random);
                 if (!stack.isEmpty()) chest.setItem(random.nextInt(slots), stack);
             }
+            extraItem(random, special).ifPresent(stack -> chest.setItem(random.nextInt(slots), stack));
             return;
         }
-        if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
+        if (be instanceof CrateBlockEntity crate) {
             var inv = crate.getCheckedInventory();
             int slots = inv.getSlots();
             if (slots <= 0) return;
@@ -125,7 +159,17 @@ public final class CeSchematicPlacer {
                 ItemStack stack = ItemPool.getStack(pool, random);
                 if (!stack.isEmpty()) inv.setStackInSlot(random.nextInt(slots), stack);
             }
+            extraItem(random, special).ifPresent(stack -> inv.setStackInSlot(random.nextInt(slots), stack));
         }
+    }
+
+    private static Optional<ItemStack> extraItem(RandomSource random, Special special) {
+        if (special.item == null || special.chance <= 0 || random.nextInt(special.chance) != 0) {
+            return Optional.empty();
+        }
+        Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(special.item)).orElse(null);
+        if (item == null) return Optional.empty();
+        return Optional.of(new ItemStack(item));
     }
 
     /** CE {@code Library.placeDoorWithoutCheck} at Library.java:1119-1127. */
@@ -141,8 +185,8 @@ public final class CeSchematicPlacer {
                 .setValue(DoorBlock.HINGE, hinge)
                 .setValue(DoorBlock.OPEN, false)
                 .setValue(DoorBlock.POWERED, false);
-        level.setBlock(pos, base.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER), 3);
-        level.setBlock(pos.above(), base.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER), 3);
+        setBlockSafe(level, pos, base.setValue(DoorBlock.HALF, DoubleBlockHalf.LOWER));
+        setBlockSafe(level, pos.above(), base.setValue(DoorBlock.HALF, DoubleBlockHalf.UPPER));
     }
 
     private static void placeGeiger(WorldGenLevel level, BlockPos pos, Cell cell) {
@@ -151,7 +195,7 @@ public final class CeSchematicPlacer {
         BlockState state = geiger.defaultBlockState();
         Direction facing = direction(cell.special.facing, Direction.SOUTH);
         state = applyFacing(state, facing);
-        level.setBlock(pos, state, 3);
+        setBlockSafe(level, pos, state);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -169,6 +213,18 @@ public final class CeSchematicPlacer {
         }
         if (cell.open != null && state.hasProperty(TrapDoorBlock.OPEN)) {
             state = state.setValue(TrapDoorBlock.OPEN, cell.open);
+        }
+        if (cell.level != null && state.hasProperty(BlockSellafield.LEVEL)) {
+            int lv = Math.max(0, Math.min(5, cell.level));
+            state = state.setValue(BlockSellafield.LEVEL, lv);
+        }
+        if (cell.orient != null && state.hasProperty(BlockScaffold.ORIENT)) {
+            for (BlockScaffold.Orient value : BlockScaffold.Orient.values()) {
+                if (value.getSerializedName().equals(cell.orient)) {
+                    state = state.setValue(BlockScaffold.ORIENT, value);
+                    break;
+                }
+            }
         }
         return state;
     }
@@ -222,12 +278,16 @@ public final class CeSchematicPlacer {
                 String facing = null;
                 String half = null;
                 Boolean open = null;
+                Integer level = null;
+                String orient = null;
                 Special special = null;
                 if (rec.size() > 4) {
                     JsonObject extra = rec.get(4).getAsJsonObject();
                     if (extra.has("f")) facing = extra.get("f").getAsString();
                     if (extra.has("h")) half = extra.get("h").getAsString();
                     if (extra.has("o")) open = extra.get("o").getAsBoolean();
+                    if (extra.has("l")) level = extra.get("l").getAsInt();
+                    if (extra.has("or")) orient = extra.get("or").getAsString();
                     if (extra.has("s")) {
                         JsonObject s = extra.getAsJsonObject("s");
                         special = new Special(
@@ -237,10 +297,12 @@ public final class CeSchematicPlacer {
                                 s.has("rand") ? s.get("rand").getAsInt() : 0,
                                 s.has("base") ? s.get("base").getAsInt() : 0,
                                 s.has("facing") ? s.get("facing").getAsString() : facing,
-                                s.has("hinge") ? s.get("hinge").getAsString() : "left");
+                                s.has("hinge") ? s.get("hinge").getAsString() : "left",
+                                s.has("item") ? s.get("item").getAsString() : null,
+                                s.has("chance") ? s.get("chance").getAsInt() : 0);
                     }
                 }
-                cells.add(new Cell(x, y, z, id, facing, half, open, special));
+                cells.add(new Cell(x, y, z, id, facing, half, open, level, orient, special));
             }
             MainRegistry.logger.info("Loaded CE schematic {} ({} cells)", name, cells.size());
             return new Schematic(cells);
@@ -252,9 +314,9 @@ public final class CeSchematicPlacer {
     private record Schematic(List<Cell> cells) {
     }
 
-    private record Cell(int x, int y, int z, String blockId, String facing, String half, Boolean open, Special special) {
+    private record Cell(int x, int y, int z, String blockId, String facing, String half, Boolean open, Integer level, String orient, Special special) {
     }
 
-    private record Special(String type, String pool, int rolls, int rand, int base, String facing, String hinge) {
+    private record Special(String type, String pool, int rolls, int rand, int base, String facing, String hinge, String item, int chance) {
     }
 }

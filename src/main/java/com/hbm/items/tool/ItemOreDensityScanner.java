@@ -1,9 +1,12 @@
 package com.hbm.items.tool;
 
+import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.items.special.BedrockOreType;
 import com.hbm.items.special.ItemBedrockOreBase;
+import com.hbm.world.feature.BedrockOreFeature;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -14,22 +17,13 @@ import net.minecraft.world.level.Level;
  * Reports the local noise-based ore density for every {@link BedrockOreType} bucket. Ported from
  * CE's {@code com.hbm.items.tool.ItemOreDensityScanner}.
  *
- * <p>CE's version blended two related-but-distinct systems: {@code ItemBedrockOreBase.getOreLevel}
- * (a per-position noise scan, the "how good would a scan tool find this spot" system) and
- * {@code com.hbm.world.feature.BedrockOre.getTier}/{@code getBoreFluid} (translating a combined
- * level into what a *placed* bedrock-ore world-gen feature at that quality would actually yield).
- * This port's {@code com.hbm.items.special} package already carries the first system in full (per
- * this area's task brief: "their world-gen soft-dependency is already satisfied by the existing
- * {@code BlockBedrockOre}/{@code BedrockOre*} cluster"), so the per-type density readout below is
- * real, unabridged logic - not a stub. The second system ({@code com.hbm.world.feature.BedrockOre})
- * does not exist anywhere in this port yet (it is a distinct, larger world-gen feature, not part of
- * the special-items ore cluster), so the closing "Tier N - X mB of fluid" summary line is left an
- * explicit TODO rather than faked.
+ * <p>Per-type density via {@link ItemBedrockOreBase#getOreLevel}. Summary
+ * {@code Tier N - X mB <fluid>} Exact CE {@code ItemOreDensityScanner.java:55-63} using
+ * {@link BedrockOreFeature#getTier}/{@link BedrockOreFeature#getBoreFluid}
+ * ({@code BedrockOre.java:90-101}).
  *
- * <p>CE dispatched its per-type readout through a custom {@code PlayerInformPacketLegacy} (an
- * action-bar-style toast). No such packet exists in this port; {@code Player#sendSystemMessage} (the
- * pattern already used by sibling items in this package, e.g. {@link ItemDosimeter}) is used
- * instead - same information, delivered to chat rather than the action bar.
+ * <p>CE dispatched readout through {@code PlayerInformPacketLegacy}. No such packet exists in this
+ * port; {@code Player#sendSystemMessage} is used instead — same text, chat not action bar.
  */
 public class ItemOreDensityScanner extends Item {
 
@@ -59,9 +53,15 @@ public class ItemOreDensityScanner extends Item {
 
         totalLevel /= BedrockOreType.VALUES.length;
 
-        // TODO(cross-area follow-up): once com.hbm.world.feature.BedrockOre (tier/fluid-per-level
-        // lookup) is ported, close out CE's "Tier N - X mB of <fluid>" summary line here using
-        // totalLevel, as CE's BedrockOre.getTier(totalLevel)/getBoreFluid(totalLevel) do.
+        // CE ItemOreDensityScanner.java:55-63
+        int tier = BedrockOreFeature.getTier(totalLevel);
+        FluidStack boreFluid = BedrockOreFeature.getBoreFluid(totalLevel);
+        MutableComponent summary = Component.literal("Tier " + tier);
+        if (boreFluid != null) {
+            summary.append(Component.literal(" - " + boreFluid.fill + "mB "))
+                    .append(Component.translatable(boreFluid.type.getTranslationKey()));
+        }
+        player.sendSystemMessage(summary.withStyle(ChatFormatting.YELLOW));
     }
 
     public static String formatDensity(double density) {

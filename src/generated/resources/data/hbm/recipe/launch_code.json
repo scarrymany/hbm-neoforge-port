@@ -1,0 +1,37 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:launch_code_piece"
+    },
+    {
+      "item": "hbm:circuit_advanced"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:launch_code"
+  }
+}

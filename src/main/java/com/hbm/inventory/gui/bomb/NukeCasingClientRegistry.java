@@ -35,6 +35,7 @@ public final class NukeCasingClientRegistry {
         SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_PROTOTYPE, NukePrototypeScreen::new);
         SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_FLEIJA, NukeFleijaScreen::new);
         SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_BALEFIRE, NukeBalefireScreen::new);
+        SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_SOLINIUM, NukeSoliniumScreen::new);
         SafeMenuScreens.bind(event, NukeCasingMenus.NUKE_CUSTOM, NukeCustomScreen::new);
     }
 }

@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "hbm:block/launch_pad"
-  }
+  "parent": "hbm:block/launch_pad"
 }

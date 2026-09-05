@@ -1,14 +1,18 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.lib.DirPos;
+import com.hbm.util.Compat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -16,16 +20,18 @@ import java.util.List;
 
 /**
  * Active coolant column - no player-facing GUI in CE either (no {@code IGUIProvider} on
- * {@code TileEntityRBMKCooler}, confirmed by signature survey), no inventory. Consumes cold coolant,
- * removes column heat, outputs warmed coolant. Ported (simplified consumption-rate approximation,
- * tank sizes/fluid types CE-confirmed) from CE's {@code TileEntityRBMKCooler} (237 lines).
+ * {@code TileEntityRBMKCooler}). Exact CE {@code TileEntityRBMKCooler.java:51-129}: 50 mB/t
+ * {@code PERFLUOROMETHYL_COLD}→{@code PERFLUOROMETHYL}, −200°C on every RBMK column in a 5×5
+ * footprint (floor 20°C), subscribe below, hot out at column-top. {@code rbmk_loader} outlet
+ * branches stay skipped (block unregistered).
  */
 public class RBMKCoolerBlockEntity extends RBMKBaseBlockEntity implements IFluidStandardTransceiverMK2 {
 
-    private static final int COOL_PER_MB = 1;
-
+    protected int timer;
     public final FluidTankNTM[] tanks;
     public int lastCooled;
+    /** CE {@code TileEntityRBMKCooler.neighborCache} — 5×5, not the base 4-dir heat cache. */
+    private final RBMKBaseBlockEntity[] coolNeighborCache = new RBMKBaseBlockEntity[25];
 
     public RBMKCoolerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -42,21 +48,61 @@ public class RBMKCoolerBlockEntity extends RBMKBaseBlockEntity implements IFluid
     @Override
     public void updateEntity() {
         if (level != null && !level.isClientSide) {
-            int cool = Math.min(tanks[0].getFill(), tanks[1].getMaxFill() - tanks[1].getFill());
-            cool = (int) Math.min(cool, Math.max(0, (heat - 20D) / COOL_PER_MB));
-
-            if (cool > 0) {
-                tanks[0].setFill(tanks[0].getFill() - cool);
-                tanks[1].setFill(tanks[1].getFill() + cool);
-                heat -= cool * COOL_PER_MB;
+            if (timer <= 0) {
+                timer = 60;
+                for (int i = 0; i < 25; i++) {
+                    int x = worldPosition.getX() - 2 + i / 5;
+                    int z = worldPosition.getZ() - 2 + i % 5;
+                    if (Compat.getBlockEntityStandard(level, new BlockPos(x, worldPosition.getY(), z)) instanceof RBMKBaseBlockEntity tile) {
+                        coolNeighborCache[i] = tile;
+                    } else {
+                        coolNeighborCache[i] = null;
+                    }
+                }
+            } else {
+                timer--;
             }
-            lastCooled = cool;
 
-            trySubscribe(tanks[0].getTankType(), level, worldPosition.below(), Direction.UP);
-            tryProvide(tanks[1], level, worldPosition.above(), Direction.DOWN);
+            if (tanks[0].getFill() >= 50 && tanks[1].getMaxFill() - tanks[1].getFill() >= 50) {
+                tanks[0].setFill(tanks[0].getFill() - 50);
+                tanks[1].setFill(tanks[1].getFill() + 50);
+
+                int cooled = 0;
+                for (RBMKBaseBlockEntity neighbor : coolNeighborCache) {
+                    if (neighbor != null && !neighbor.isRemoved()) {
+                        double before = neighbor.heat;
+                        neighbor.heat -= 200;
+                        if (neighbor.heat < 20) neighbor.heat = 20;
+                        int delta = (int) (before - neighbor.heat);
+                        if (delta > 0) {
+                            cooled += delta;
+                            neighbor.setChanged();
+                        }
+                    }
+                }
+                lastCooled = cooled;
+            } else {
+                lastCooled = 0;
+            }
+
+            trySubscribe(tanks[0].getTankType(), level, worldPosition.below(), Direction.DOWN);
+
+            if (tanks[1].getFill() > 0) {
+                for (DirPos out : getOutputPos()) {
+                    tryProvide(tanks[1], level, out);
+                }
+            }
         }
 
         super.updateEntity();
+    }
+
+    /** CE {@code :104-129} default (no {@code rbmk_loader}). */
+    protected DirPos[] getOutputPos() {
+        int height = level instanceof ServerLevel serverLevel ? RBMKDials.getColumnHeight(serverLevel) : 0;
+        return new DirPos[]{
+                new DirPos(worldPosition.getX(), worldPosition.getY() + height + 1, worldPosition.getZ(), Direction.UP)
+        };
     }
 
     @Override

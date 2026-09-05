@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hbm:block/plutonium240_block"
+    }
+  }
+}

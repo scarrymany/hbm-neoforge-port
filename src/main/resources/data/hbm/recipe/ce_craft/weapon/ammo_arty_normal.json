@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CIC",
+    "CSC",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:cordite"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    },
+    "S": {
+      "item": "hbm:copper_shell"
+    }
+  },
+  "result": {
+    "id": "hbm:ammo_arty_normal",
+    "count": 1
+  }
+}

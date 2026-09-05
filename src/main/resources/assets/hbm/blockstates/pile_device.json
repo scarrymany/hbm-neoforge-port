@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "meta=0": { "model": "hbm:block/pile_device_loader", "y": 90 },
+    "meta=1": { "model": "hbm:block/pile_device_loader", "y": 270 },
+    "meta=2": { "model": "hbm:block/pile_device_loader", "y": 180 },
+    "meta=3": { "model": "hbm:block/pile_device_loader", "y": 0 },
+    "meta=4": { "model": "hbm:block/pile_device_vent", "y": 90 },
+    "meta=5": { "model": "hbm:block/pile_device_vent", "y": 270 },
+    "meta=6": { "model": "hbm:block/pile_device_vent", "y": 180 },
+    "meta=7": { "model": "hbm:block/pile_device_vent", "y": 0 },
+    "meta=8": { "model": "hbm:block/pile_device_control", "y": 90 },
+    "meta=9": { "model": "hbm:block/pile_device_control", "y": 270 },
+    "meta=10": { "model": "hbm:block/pile_device_control", "y": 180 },
+    "meta=11": { "model": "hbm:block/pile_device_control", "y": 0 }
+  }
+}

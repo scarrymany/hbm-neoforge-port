@@ -2,12 +2,15 @@ package com.hbm.inventory.gui.machine.reprocess;
 
 import com.hbm.inventory.container.machine.reprocess.PurexMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 /** Auto-recognition GUI (no CE recipe dropdown). Tanks + power + progress. */
 public class PurexScreen extends GuiInfoContainer<PurexMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_purex.png");
 
     public PurexScreen(PurexMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -20,8 +23,7 @@ public class PurexScreen extends GuiInfoContainer<PurexMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         var be = this.getMenu().be;
         for (int i = 0; i < 3; i++) {

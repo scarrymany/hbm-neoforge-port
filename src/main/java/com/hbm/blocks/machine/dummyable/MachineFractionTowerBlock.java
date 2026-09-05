@@ -4,20 +4,34 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.MachineFractionTowerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.ILookOverlay;
+import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.items.machine.IItemFluidIdentifier;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineFractionTower} — Dummyable {2,0,1,1,1,1} offset 1 + 4 extras. */
-public class MachineFractionTowerBlock extends BlockDummyable {
+import java.util.ArrayList;
+import java.util.List;
+
+/** CE {@code MachineFractionTower} — Dummyable {2,0,1,1,1,1} offset 1 + 4 extras. Held fluid-ID Exact CE {@code :56-86}. printHook Exact CE {@code :109-128}. */
+public class MachineFractionTowerBlock extends BlockDummyable implements ILookOverlay {
 
     public MachineFractionTowerBlock(Properties properties) {
         super(properties);
@@ -48,6 +62,29 @@ public class MachineFractionTowerBlock extends BlockDummyable {
     }
 
     @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        // Exact CE MachineFractionTower.java:56-86 — !sneak + ID; only bottom; tanks[0]
+        if (!player.isShiftKeyDown() && !stack.isEmpty() && stack.getItem() instanceof IItemFluidIdentifier ident) {
+            if (!level.isClientSide) {
+                BlockPos core = findCore(level, pos);
+                if (core != null && level.getBlockEntity(core) instanceof MachineFractionTowerBlockEntity frac) {
+                    if (level.getBlockEntity(core.below(3)) instanceof MachineFractionTowerBlockEntity) {
+                        player.displayClientMessage(Component.translatable("chat.fractioning.onlybottom"), false);
+                    } else {
+                        var type = ident.getType(level, core, stack);
+                        frac.input.setTankType(type);
+                        frac.setChanged();
+                        player.displayClientMessage(Component.translatable("chat.fractioning.changedto", type.getLocalizedName()), false);
+                    }
+                }
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         return standardOpenBehavior(level, pos, player);
     }
@@ -60,5 +97,26 @@ public class MachineFractionTowerBlock extends BlockDummyable {
         makeExtra(level, core.west());
         makeExtra(level, core.south());
         makeExtra(level, core.north());
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE MachineFractionTower.java:109-128
+        BlockPos core = findCore(world, pos);
+        if (core == null) return;
+        if (!(world.getBlockEntity(core) instanceof MachineFractionTowerBlockEntity frac)) return;
+
+        List<Component> text = new ArrayList<>();
+        FluidTankNTM[] tanks = {frac.input, frac.left, frac.right};
+        for (int i = 0; i < tanks.length; i++) {
+            FluidTankNTM tank = tanks[i];
+            text.add(Component.literal(i < 1 ? "-> " : "<- ")
+                    .withStyle(i < 1 ? ChatFormatting.GREEN : ChatFormatting.RED)
+                    .append(Component.empty().withStyle(ChatFormatting.RESET)
+                            .append(tank.getTankType().getLocalizedName())
+                            .append(Component.literal(": " + tank.getFill() + "/" + tank.getMaxFill() + "mB"))));
+        }
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
     }
 }

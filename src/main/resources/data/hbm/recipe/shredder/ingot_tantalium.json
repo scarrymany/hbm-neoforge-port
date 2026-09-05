@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ingot_tantalium"
+  },
+  "output": {
+    "id": "hbm:powder_tantalium",
+    "count": 1
+  },
+  "duration": 60
+}

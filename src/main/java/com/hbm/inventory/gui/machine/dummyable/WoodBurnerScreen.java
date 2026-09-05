@@ -3,61 +3,117 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachineWoodBurnerBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.WoodBurnerMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
+import com.hbm.packet.toserver.NBTControlPacket;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-/** CE {@code GUIMachineWoodBurner} — tank + power + burn + on/liquid buttons. */
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Exact CE {@code GUIMachineWoodBurner} on existing {@code gui_wood_burner_alt.png} 176×186.
+ * Liquid overlay 16,17+79,17; on 53,17; power 143,{@code 52-p}; burn 17,{@code 70-b}; tank 80,70.
+ * Invented Button widgets and power {@code fill()} removed.
+ */
 public class WoodBurnerScreen extends GuiInfoContainer<WoodBurnerMenu> {
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/generators/gui_wood_burner_alt.png");
 
     public WoodBurnerScreen(WoodBurnerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 186;
-        this.inventoryLabelY = this.imageHeight - 94;
-    }
-
-    @Override
-    protected void init() {
-        super.init();
-        this.addRenderableWidget(Button.builder(Component.literal("On"), b ->
-                this.minecraft.gameMode.handleInventoryButtonClick(this.getMenu().containerId, WoodBurnerMenu.BUTTON_ON)
-        ).bounds(leftPos + 52, topPos + 17, 28, 16).build());
-        this.addRenderableWidget(Button.builder(Component.literal("Oil"), b ->
-                this.minecraft.gameMode.handleInventoryButtonClick(this.getMenu().containerId, WoodBurnerMenu.BUTTON_LIQUID)
-        ).bounds(leftPos + 52, topPos + 37, 28, 16).build());
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineWoodBurnerBlockEntity be = this.getMenu().be;
-        int ph = (int) (be.getPower() * 52 / Math.max(1, be.getMaxPower()));
-        guiGraphics.fill(x + 143, y + 52 - ph, x + 159, y + 52, 0xFFFFCC00);
-        be.tank.renderTank(x + 80, y + 52, 0, 16, 52);
-        int bh = be.maxBurnTime <= 0 ? 0 : be.burnTime * 14 / be.maxBurnTime;
-        guiGraphics.fill(x + 26, y + 38 + (14 - bh), x + 40, y + 52, 0xFFFF6622);
-        if (be.isOn) guiGraphics.fill(x + 52, y + 17, x + 80, y + 21, 0xFF44CC44);
-        if (be.liquidBurn) guiGraphics.fill(x + 52, y + 37, x + 80, y + 41, 0xFF4488FF);
+        // CE GUIMachineWoodBurner.java:98-115
+        if (be.liquidBurn) {
+            guiGraphics.blit(TEXTURE, x + 16, y + 17, 176, 52, 60, 54);
+            guiGraphics.blit(TEXTURE, x + 79, y + 17, 176, 106, 36, 54);
+        }
+        if (be.isOn) {
+            guiGraphics.blit(TEXTURE, x + 53, y + 17, 196, 0, 16, 15);
+        }
+        int p = (int) (be.getPower() * 34 / Math.max(1L, be.getMaxPower()));
+        if (p > 0) {
+            guiGraphics.blit(TEXTURE, x + 143, y + 52 - p, 176, 52 - p, 16, p);
+        }
+        if (be.maxBurnTime > 0 && !be.liquidBurn) {
+            int b = be.burnTime * 52 / be.maxBurnTime;
+            if (b > 0) {
+                guiGraphics.blit(TEXTURE, x + 17, y + 70 - b, 192, 52 - b, 4, b);
+            }
+        }
+        if (be.liquidBurn) {
+            be.tank.renderTank(x + 80, y + 70, 0, 16, 52);
+        }
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        // CE :87 — title centered on x=70, white
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, this.title, 70 - this.font.width(name) / 2, 6, 0xffffff, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+
         MachineWoodBurnerBlockEntity be = this.getMenu().be;
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, 143, 0, 16, 52, be.getPower(), be.getMaxPower());
-        be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 80, topPos, 16, 52);
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 26, topPos + 38, 14, 14,
-                Component.literal("Burn: " + be.burnTime + " / " + be.maxBurnTime),
-                Component.literal(be.powerGen + " HE/t"));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 52, topPos + 17, 28, 16,
-                Component.literal(be.isOn ? "ON" : "OFF"));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 52, topPos + 37, 28, 16,
-                Component.literal(be.liquidBurn ? "FLUID" : "SOLID"));
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 143, topPos + 18, 16, 34, be.getPower(), be.getMaxPower());
+
+        if (this.menu.getCarried().isEmpty()) {
+            Slot slot = this.menu.getSlot(0);
+            if (!slot.hasItem() && isHovered(mouseX, mouseY, slot.x, slot.y, 16, 16)) {
+                List<String> bonuses = MachineWoodBurnerBlockEntity.burnModule.getDesc();
+                if (!bonuses.isEmpty()) {
+                    List<Component> lines = new ArrayList<>(bonuses.size());
+                    for (String line : bonuses) {
+                        lines.add(Component.literal(line));
+                    }
+                    guiGraphics.renderComponentTooltip(this.font, lines, mouseX, mouseY);
+                }
+            }
+        }
+        if (be.liquidBurn) {
+            be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 80, topPos + 18, 16, 52);
+        }
+        if (!be.liquidBurn) {
+            drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 16, topPos + 17, 8, 54,
+                    Component.literal((be.burnTime / 20) + "s"));
+        }
+        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 53, topPos + 17, 16, 15,
+                Component.literal((be.isOn ? ChatFormatting.GREEN + "ON" : ChatFormatting.RED + "OFF")));
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // CE GUIMachineWoodBurner.java:68-80
+        if (isHovered(mouseX, mouseY, 53, 17, 16, 15)) {
+            click();
+            CompoundTag data = new CompoundTag();
+            data.putBoolean("toggle", false);
+            PacketDistributor.sendToServer(new NBTControlPacket(this.getMenu().be.getBlockPos(), data));
+            return true;
+        }
+        if (isHovered(mouseX, mouseY, 46, 37, 30, 14)) {
+            click();
+            CompoundTag data = new CompoundTag();
+            data.putBoolean("switch", false);
+            PacketDistributor.sendToServer(new NBTControlPacket(this.getMenu().be.getBlockPos(), data));
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

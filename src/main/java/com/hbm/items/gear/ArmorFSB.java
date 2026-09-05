@@ -2,6 +2,7 @@ package com.hbm.items.gear;
 
 import com.hbm.config.PotionConfig;
 import com.hbm.handler.ArmorUtil;
+import com.hbm.handler.HazmatRegistry;
 import com.hbm.items.armor.IArmorDisableModel;
 import com.hbm.items.tool.ToolItems;
 import com.hbm.lib.HBMSoundHandler;
@@ -62,23 +63,17 @@ import java.util.Set;
  *     {@link LivingIncomingDamageEvent}/{@link LivingDamageEvent.Pre} respectively (the confirmed
  *     real 1.21.1 replacements for CE's {@code LivingAttackEvent}/{@code LivingHurtEvent} - see
  *     {@code docs/phase3/armor_equippable_framework.md} Key design decision #2).</li>
- *     <li>{@link #handleTick}/{@link #handleJump}/{@link #handleFall} - static dispatch hooks for
- *     the full-suit potion effects, jump sound, and hard-landing knockback+fall sound. <b>Not</b>
- *     wired to any NeoForge event by this package - {@code com.hbm.handler.ArmorDamageHandler}'s
- *     confirmed event-dispatch scope (per this package's task brief) covers only damage/attack, not
- *     per-tick/jump/fall player events; wiring these three belongs to whichever later package first
- *     needs a general player-tick/fall listener. The methods exist now so that wiring is a one-line
- *     call, matching CE's own shape exactly.</li>
+ *     <li>{@link #handleTick}/{@link #handleJump}/{@link #handleFall} - full-suit potion effects,
+ *     jump sound, hard-landing knockback+fall sound. Dispatched from
+ *     {@code CommonTickEvents} Exact CE {@code ModEventHandler} {@code :871-873}/{@code :1255-1257}/
+ *     {@code :809-816}.</li>
  *     <li>{@link #disablesPart} ({@link IArmorDisableModel}) - body-part hiding for custom-modeled
  *     pieces, consumed by the (Phase 5) player render layer.</li>
  *     <li>{@link #setHazardClass} - self-registration into the already-ported
  *     {@link ArmorRegistry}.</li>
- *     <li>{@link #setRadResist} - stubbed with a documented forward-reference TODO: CE's real body
- *     registers into {@code com.hbm.handler.HazmatRegistry}, which does not exist anywhere in this
- *     port yet (a separate, not-yet-ported per-item radiation-resistance table - see this package's
- *     task brief item 2 and {@code docs/phase3/armor_equippable_framework.md} finding #4). The
- *     {@link #radResist} field itself is still stored so a future port of {@code HazmatRegistry} has
- *     the value to register.</li>
+ *     <li>{@link #setRadResist} - Exact CE {@code ArmorFSB.java:394-402}: stores {@link #radResist}
+ *     and, when {@code fullSet > 0}, queues {@code fullSet * HazmatRegistry.<slot>} into
+ *     {@code HazmatRegistry.external} for the {@code FMLCommonSetupEvent} flush.</li>
  * </ul>
  *
  * <p>{@link #onArmorTick}'s geiger-tick sound cue (Phase 4) is now wired against
@@ -238,7 +233,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
      * CE: {@code ArmorFSB#handleTick(TickEvent.PlayerTickEvent)} - applies the full-suit potion
      * effect list every tick a matching set is worn. See the class javadoc's "Simplified relative
      * to CE" note for what is intentionally left out of this port (the footstep-sound cadence).
-     * Not wired to any event by this package - see the class javadoc.
+     * Wired from {@code CommonTickEvents#onPlayerTick} (CE {@code ModEventHandler:871-873}).
      */
     public static void handleTick(Player player) {
         if (!hasFSBArmor(player)) return;
@@ -253,7 +248,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
         }
     }
 
-    /** CE: {@code ArmorFSB#handleJump(EntityPlayer)}. Not wired to any event by this package - see the class javadoc. */
+    /** CE: {@code ArmorFSB#handleJump(EntityPlayer)}. Wired from {@code CommonTickEvents#onEntityJump}. */
     public static void handleJump(Player player) {
         if (hasFSBArmor(player)) {
             ArmorFSB chestplate = (ArmorFSB) player.getItemBySlot(EquipmentSlot.CHEST).getItem();
@@ -264,7 +259,7 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
         }
     }
 
-    /** CE: {@code ArmorFSB#handleFall(EntityPlayer)}. Not wired to any event by this package - see the class javadoc. */
+    /** CE: {@code ArmorFSB#handleFall(EntityPlayer)}. Wired from {@code CommonTickEvents} fall events. */
     public static void handleFall(Player player) {
         if (hasFSBArmor(player)) {
             ArmorFSB chestplate = (ArmorFSB) player.getItemBySlot(EquipmentSlot.CHEST).getItem();
@@ -454,14 +449,19 @@ public class ArmorFSB extends ArmorItem implements IArmorDisableModel {
     }
 
     /**
-     * CE: {@code ArmorFSB#setRadResist(double)}. TODO(HazmatRegistry): CE's real body also
-     * registers {@code fullSet * HazmatRegistry.<slot>} into {@code HazmatRegistry.external}; that
-     * class does not exist anywhere in this port yet (a separate, not-yet-ported per-item
-     * radiation-resistance table - see class javadoc). {@link #radResist} is still stored so a
-     * future port of that registry has the value.
+     * CE: {@code ArmorFSB#setRadResist(double)} ({@code ArmorFSB.java:394-402}). Slot multiplier
+     * uses {@link Type} (1.21 stand-in for CE {@code EntityEquipmentSlot}); else-boots matches CE.
      */
     public ArmorFSB setRadResist(double fullSet) {
         this.radResist = fullSet;
+        if (fullSet > 0) {
+            Type type = this.getType();
+            double mult = type == Type.HELMET ? HazmatRegistry.helmet
+                    : type == Type.CHESTPLATE ? HazmatRegistry.chest
+                    : type == Type.LEGGINGS ? HazmatRegistry.legs
+                    : HazmatRegistry.boots;
+            HazmatRegistry.external.add(new Tuple.Pair<>(this, fullSet * mult));
+        }
         return this;
     }
 

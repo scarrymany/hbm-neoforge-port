@@ -6,6 +6,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -53,6 +54,12 @@ public class BlockLayering extends Block {
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return getShape(state, level, pos, context);
+    }
+
+    /** Exact CE {@code BlockLayering.java:119-123} {@code isReplaceable}: meta &lt; 7. */
+    @Override
+    protected boolean canBeReplaced(BlockState state, BlockPlaceContext context) {
+        return state.getValue(LAYERS) < 7;
     }
 
     @Override

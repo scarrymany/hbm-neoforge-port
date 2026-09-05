@@ -166,6 +166,9 @@ public final class BilletPowderItems {
     public static final DeferredItem<Item> POWDER_LITHIUM = registerPowder("powder_lithium");
     public static final DeferredItem<Item> POWDER_LITHIUM_TINY = registerPowder("powder_lithium_tiny");
     public static final DeferredItem<Item> POWDER_QUARTZ = registerPowder("powder_quartz");
+    // Note: powder_fluorite/powder_sulfur do NOT exist as discrete items in CE — CE uses MaterialShapes
+    // autogen F.dust()/S.dust() (MAT_FLUORITE/MAT_SULFUR .setAutogen(DUST)). This port now generates
+    // fluorite_dust/sulfur_dust via MaterialShapes DUST autogen (MaterialItemGenerator).
     public static final DeferredItem<Item> POWDER_BORAX = registerPowder("powder_borax");
     public static final DeferredItem<Item> POWDER_DURA_STEEL = registerPowder("powder_dura_steel");
     public static final DeferredItem<Item> POWDER_POLYMER = registerPowder("powder_polymer");

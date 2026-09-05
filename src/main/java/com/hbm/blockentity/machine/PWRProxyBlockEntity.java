@@ -1,6 +1,8 @@
 package com.hbm.blockentity.machine;
 
 import com.hbm.api.fluidmk2.IFluidReceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
 import com.hbm.blocks.machine.PWRProxyBlock;
@@ -43,11 +45,11 @@ import java.util.List;
  * {@link CapabilityContextProvider#pushPos}/{@link CapabilityContextProvider#popPos} (see that
  * class's own javadoc: "a future proxy block entity pushes its own position before delegating").
  *
- * <p>Not ported: CE's {@code IRORValueProvider}/{@code IRORInteractive} forwarding (redstone-over-
- * radio; same cross-cutting undecided gap as {@link PWRControllerBlockEntity}'s own javadoc notes)
- * and {@code ILookOverlay}/{@code printHook} (a debug F3-style overlay with no player-facing purpose).
+ * <p>ROR forward: CE {@code BlockPWR.TileEntityBlockPWR}:321-341 (IO_ENABLED gate + core delegate).
+ * Not ported: {@code ILookOverlay}/{@code printHook}.
  */
-public class PWRProxyBlockEntity extends LoadedBaseBlockEntity implements ITickableBE, IFluidReceiverMK2 {
+public class PWRProxyBlockEntity extends LoadedBaseBlockEntity
+        implements ITickableBE, IFluidReceiverMK2, IRORValueProvider, IRORInteractive {
 
     @Nullable
     private BlockState originalBlockState;
@@ -182,5 +184,32 @@ public class PWRProxyBlockEntity extends LoadedBaseBlockEntity implements ITicka
             this.corePos = new BlockPos(tag.getInt("coreX"), tag.getInt("coreY"), tag.getInt("coreZ"));
         }
         this.cachedCore = null;
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE BlockPWR.java:321-325
+        if (!isIoEnabled()) return new String[0];
+        PWRControllerBlockEntity controller = getCore();
+        if (controller != null) return controller.getFunctionInfo();
+        return new String[0];
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :329-333
+        if (!isIoEnabled()) return "";
+        PWRControllerBlockEntity controller = getCore();
+        if (controller != null) return controller.provideRORValue(name);
+        return "";
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :337-341
+        if (!isIoEnabled()) return "";
+        PWRControllerBlockEntity controller = getCore();
+        if (controller != null) return controller.runRORFunction(name, params);
+        return "";
     }
 }

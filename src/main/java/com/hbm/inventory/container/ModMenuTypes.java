@@ -78,6 +78,33 @@ public final class ModMenuTypes {
     public static final DeferredHolder<MenuType<?>, MenuType<LemegetonMenu>> LEMEGETON =
             reg("lemegeton", LemegetonMenu::fromNetwork);
 
+    public static final DeferredHolder<MenuType<?>, MenuType<TapeDriveMenu>> TAPE_DRIVE =
+            reg("tape_drive", TapeDriveMenu::fromNetwork);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneInserterMenu>> CRANE_INSERTER =
+            reg("crane_inserter", com.hbm.menu.CraneInserterMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneExtractorMenu>> CRANE_EXTRACTOR =
+            reg("crane_extractor", com.hbm.menu.CraneExtractorMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneGrabberMenu>> CRANE_GRABBER =
+            reg("crane_grabber", com.hbm.menu.CraneGrabberMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneBoxerMenu>> CRANE_BOXER =
+            reg("crane_boxer", com.hbm.menu.CraneBoxerMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneUnboxerMenu>> CRANE_UNBOXER =
+            reg("crane_unboxer", com.hbm.menu.CraneUnboxerMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.menu.CraneRouterMenu>> CRANE_ROUTER =
+            reg("crane_router", com.hbm.menu.CraneRouterMenu::new);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.inventory.gui.DroneCrateProviderMenu>> DRONE_CRATE_PROVIDER =
+            reg("drone_crate_provider", com.hbm.inventory.gui.DroneCrateProviderMenu::fromNetwork);
+
+    public static final DeferredHolder<MenuType<?>, MenuType<com.hbm.inventory.gui.DroneCrateRequesterMenu>> DRONE_CRATE_REQUESTER =
+            reg("drone_crate_requester", com.hbm.inventory.gui.DroneCrateRequesterMenu::fromNetwork);
+
     private ModMenuTypes() {
     }
 

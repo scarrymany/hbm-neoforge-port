@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:radaway_strong"
+    },
+    {
+      "item": "hbm:powder_iodine"
+    }
+  ],
+  "result": {
+    "id": "hbm:radaway_flush",
+    "count": 1
+  }
+}

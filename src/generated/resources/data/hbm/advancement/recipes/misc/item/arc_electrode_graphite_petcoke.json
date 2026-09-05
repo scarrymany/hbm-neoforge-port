@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_petcoke": {
+      "conditions": {
+        "items": [
+          {
+            "items": "hbm:coke_petroleum"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "hbm:item/arc_electrode_graphite_petcoke"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_petcoke"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "hbm:item/arc_electrode_graphite_petcoke"
+    ]
+  }
+}

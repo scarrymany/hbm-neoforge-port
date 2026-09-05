@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B",
+    "D"
+  ],
+  "key": {
+    "B": { "item": "hbm:ingot_boron" },
+    "D": { "item": "hbm:concrete_asbestos" }
+  },
+  "result": { "id": "hbm:rbmk_display_blank", "count": 8 }
+}

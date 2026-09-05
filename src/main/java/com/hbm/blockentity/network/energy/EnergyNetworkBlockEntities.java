@@ -18,11 +18,14 @@ public final class EnergyNetworkBlockEntities {
     public static Supplier<BlockEntityType<CableBaseBlockEntity>> CABLE;
     public static Supplier<BlockEntityType<CableSwitchBlockEntity>> CABLE_SWITCH;
     public static Supplier<BlockEntityType<CableDiodeBlockEntity>> CABLE_DIODE;
+    public static Supplier<BlockEntityType<CableGaugeBlockEntity>> CABLE_GAUGE;
     public static Supplier<BlockEntityType<PylonBlockEntity>> PYLON;
     public static Supplier<BlockEntityType<PylonLargeBlockEntity>> PYLON_LARGE;
     public static Supplier<BlockEntityType<PylonMediumBlockEntity>> PYLON_MEDIUM;
     public static Supplier<BlockEntityType<SubstationBlockEntity>> SUBSTATION;
     public static Supplier<BlockEntityType<ProxyConductorBlockEntity>> PROXY_CONDUCTOR;
+    public static Supplier<BlockEntityType<ConnectorBlockEntity>> CONNECTOR;
+    public static Supplier<BlockEntityType<ConnectorSuperBlockEntity>> CONNECTOR_SUPER;
 
     private EnergyNetworkBlockEntities() {
     }
@@ -42,6 +45,11 @@ public final class EnergyNetworkBlockEntities {
         CABLE_DIODE = ModBlocks.BLOCK_ENTITY_TYPES.register("cable_diode", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new CableDiodeBlockEntity(CABLE_DIODE.get(), pos, state),
                 EnergyNetworkBlocks.CABLE_DIODE.get()
+        ).build(null));
+
+        CABLE_GAUGE = ModBlocks.BLOCK_ENTITY_TYPES.register("red_cable_gauge", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new CableGaugeBlockEntity(CABLE_GAUGE.get(), pos, state),
+                EnergyNetworkBlocks.RED_CABLE_GAUGE.get()
         ).build(null));
 
         PYLON = ModBlocks.BLOCK_ENTITY_TYPES.register("red_pylon", () -> BlockEntityType.Builder.of(
@@ -68,6 +76,16 @@ public final class EnergyNetworkBlockEntities {
         PROXY_CONDUCTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("substation_proxy_conductor", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new ProxyConductorBlockEntity(PROXY_CONDUCTOR.get(), pos, state),
                 EnergyNetworkBlocks.SUBSTATION.get()
+        ).build(null));
+
+        CONNECTOR = ModBlocks.BLOCK_ENTITY_TYPES.register("red_connector", () -> BlockEntityType.Builder.of(
+                ConnectorBlockEntity::new,
+                EnergyNetworkBlocks.RED_CONNECTOR.get()
+        ).build(null));
+
+        CONNECTOR_SUPER = ModBlocks.BLOCK_ENTITY_TYPES.register("red_connector_super", () -> BlockEntityType.Builder.of(
+                ConnectorSuperBlockEntity::new,
+                EnergyNetworkBlocks.RED_CONNECTOR_SUPER.get()
         ).build(null));
     }
 }

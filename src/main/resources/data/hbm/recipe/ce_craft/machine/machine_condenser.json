@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SIS",
+    "ICI",
+    "SIS"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:ingot_steel"
+    },
+    "I": {
+      "item": "hbm:plate_iron"
+    },
+    "C": {
+      "item": "hbm:copper_plate_triple"
+    }
+  },
+  "result": {
+    "id": "hbm:machine_condenser",
+    "count": 1
+  }
+}

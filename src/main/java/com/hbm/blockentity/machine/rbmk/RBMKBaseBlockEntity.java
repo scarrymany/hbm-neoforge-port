@@ -7,15 +7,22 @@ import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.api.rbmk.RBMKMeltdownTrigger;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity;
+import com.hbm.blocks.machine.rbmk.RBMKBaseBlock;
 import com.hbm.handler.neutron.NeutronNodeWorld;
 import com.hbm.handler.neutron.RBMKNeutronHandler;
+import com.hbm.lib.HBMSoundHandler;
+import com.hbm.main.AdvancementManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -31,13 +38,11 @@ import net.minecraft.world.level.block.state.BlockState;
  * arithmetic those two lean on ({@link RBMKColumnHeatMath}, {@link RBMKMeltdownTrigger}) comes from
  * the sibling package.
  * <p>
- * <b>Not ported here</b> (Phase 3/"Package C" scope, {@code com.hbm.entity} does not exist in this
- * port at all): real debris/corium block conversion in {@link #standardMelt}, {@code EntityRBMKDebris}
- * spawning in {@link #spawnDebris}, the overpressure fluid-pipe-destruction pass, and every particle/
- * sound/advancement side effect CE's real {@code meltdown()} fires. What IS ported: the trigger
- * condition dispatch ({@link #checkMeltdown}), the BFS flood-fill topology, and the per-column
- * debris-reduce-factor math (distance-from-meltdown-footprint-edge) - the full *decision logic*, with
- * every actual world-mutating side effect left as a documented forward reference/no-op.
+ * Melt Exact CE {@code TileEntityRBMKBase.java:463-597} playable: {@code dropLids} gate,
+ * {@code rbmk_explosion} vol 50, {@code achRBMKBoom} ±50 AABB. pribris/EntityRBMKDebris /
+ * overpressure pipes / RBMKMush / EntitySpear stay skipped.
+ * ReaSim boilers Exact CE {@code :74-77}/{@code :159-176}/{@code :190-280}: {@code reasimWater}/{@code reasimSteam}
+ * tanks, {@code boilWater()}, neighbor fluid equalize. {@code rbmk_loader} stays skipped.
  */
 public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implements IRBMKColumn, ITickableBE {
 
@@ -47,6 +52,14 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
     private static final IRBMKMeltdownHandler MELTDOWN_HANDLER = RBMKBaseBlockEntity::runMeltdown;
 
     public double heat = 20.0D;
+    /** CE {@code TileEntityRBMKBase.reasimWater}/{@code maxWater}. */
+    public int reasimWater;
+    public static final int maxWater = 16_000;
+    /** CE {@code TileEntityRBMKBase.reasimSteam}/{@code maxSteam}. */
+    public int reasimSteam;
+    public static final int maxSteam = 16_000;
+    /** CE {@code TileEntityRBMKBase.diag} — skip super NBT when flushing DODD. */
+    public boolean diag;
 
     protected RBMKBaseBlockEntity[] neighborCache = new RBMKBaseBlockEntity[4];
 
@@ -95,9 +108,10 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
      */
     @Override
     public void updateEntity() {
-        if (level == null || level.isClientSide || !(level instanceof ServerLevel serverLevel)) return;
+        if (level == null || level.isClientSide || !(level instanceof ServerLevel)) return;
 
         moveHeat();
+        boilWater();
         networkPackNT(trackingRange());
     }
 
@@ -144,9 +158,61 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
                     neighbor.setChanged();
                 }
             }
+
+            // CE :222-277 reasim water/steam integer equalize (heat math stays in RBMKColumnHeatMath).
+            if (RBMKDials.getReasimBoilers((ServerLevel) level)) {
+                int waterTot = this.reasimWater;
+                int steamTot = this.reasimSteam;
+                for (RBMKBaseBlockEntity neighbor : neighborCache) {
+                    if (neighbor != null) {
+                        waterTot += neighbor.reasimWater;
+                        steamTot += neighbor.reasimSteam;
+                    }
+                }
+                int tWater = waterTot / members;
+                int rWater = waterTot % members;
+                int tSteam = steamTot / members;
+                int rSteam = steamTot % members;
+                for (RBMKBaseBlockEntity neighbor : neighborCache) {
+                    if (neighbor != null) {
+                        neighbor.reasimWater = tWater;
+                        neighbor.reasimSteam = tSteam;
+                        if (rWater > 0) { neighbor.reasimWater++; rWater--; }
+                        if (rSteam > 0) { neighbor.reasimSteam++; rSteam--; }
+                    }
+                }
+                this.reasimWater = tWater;
+                this.reasimSteam = tSteam;
+                if (rWater > 0) this.reasimWater += rWater;
+                if (rSteam > 0) this.reasimSteam += rSteam;
+            }
         }
 
         coolPassively(members - 1);
+    }
+
+    /**
+     * CE {@code TileEntityRBMKBase.boilWater()} {@code :159-176}. Every column boils when
+     * {@link RBMKDials#getReasimBoilers} is on.
+     */
+    protected void boilWater() {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!RBMKDials.getReasimBoilers(serverLevel)) return;
+        if (heat < 100D) return;
+
+        double heatConsumption = RBMKDials.getBoilerHeatConsumption(serverLevel);
+        double availableHeat = (this.heat - 100) / heatConsumption;
+        double availableWater = this.reasimWater;
+        double availableSpace = maxSteam - this.reasimSteam;
+
+        double speed = Math.max(0D, Math.min(1D, RBMKDials.getReaSimBoilerSpeed(serverLevel)));
+        int processedWater = (int) Math.floor(Math.min(availableHeat, Math.min(availableWater, availableSpace)) * speed);
+
+        if (processedWater <= 0) return;
+
+        this.reasimWater -= processedWater;
+        this.reasimSteam += processedWater;
+        this.heat -= processedWater * heatConsumption;
     }
 
     protected void coolPassively(int neighbors) {
@@ -170,6 +236,7 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
      * documented no-op fallback (see {@link #standardMelt}/{@link #spawnDebris}).
      */
     private static void runMeltdown(ServerLevel level, BlockPos originPos, IRBMKColumn origin) {
+        RBMKBaseBlock.dropLids = false;
         java.util.Set<RBMKBaseBlockEntity> columns = new java.util.HashSet<>();
         java.util.Deque<BlockPos> queue = new java.util.ArrayDeque<>();
         queue.add(originPos);
@@ -187,7 +254,10 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
             }
         }
 
-        if (columns.isEmpty()) return;
+        if (columns.isEmpty()) {
+            RBMKBaseBlock.dropLids = true;
+            return;
+        }
 
         int minX = originPos.getX(), maxX = originPos.getX(), minZ = originPos.getZ(), maxZ = originPos.getZ();
         for (RBMKBaseBlockEntity rbmk : columns) {
@@ -205,6 +275,25 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
             int minDist = Math.min(Math.min(distFromMinX, distFromMaxX), Math.min(distFromMinZ, distFromMaxZ));
             rbmk.onMelt(minDist + 1);
         }
+
+        // CE :501-564 pribris/overpressure — pribris + IOverpressurable unregistered, skip invent.
+        // CE :570-573 RBMKMush — VFX skip.
+        int avgX = minX + (maxX - minX) / 2;
+        int avgZ = minZ + (maxZ - minZ) / 2;
+        level.playSound(null, avgX + 0.5, originPos.getY() + 1, avgZ + 0.5,
+                HBMSoundHandler.rbmk_explosion.get(), SoundSource.BLOCKS, 50.0F, 1.0F);
+
+        AABB box = new AABB(
+                originPos.getX() - 50 + 0.5, originPos.getY() - 50 + 0.5, originPos.getZ() - 50 + 0.5,
+                originPos.getX() + 50 + 0.5, originPos.getY() + 50 + 0.5, originPos.getZ() + 50 + 0.5);
+        for (Player player : level.getEntitiesOfClass(Player.class, box)) {
+            if (player instanceof ServerPlayer serverPlayer) {
+                AdvancementManager.grantAchievement(serverPlayer, AdvancementManager.achRBMKBoom);
+            }
+        }
+        // CE :583-589 EntitySpear on digamma — EntityLogicTail stub, skip invent.
+        RBMKBaseBlock.dropLids = true;
+        RBMKBaseBlock.digamma = false;
     }
 
     /**
@@ -258,6 +347,8 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
         col.heat = this.heat;
         col.maxHeat = this.maxHeat();
         col.moderated = this.isModerated();
+        col.reasimWater = this.reasimWater;
+        col.reasimSteam = this.reasimSteam;
         return col;
     }
 
@@ -267,24 +358,41 @@ public abstract class RBMKBaseBlockEntity extends LoadedBaseBlockEntity implemen
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         this.heat = tag.getDouble("heat");
+        this.reasimWater = tag.getInt("realSimWater");
+        this.reasimSteam = tag.getInt("realSimSteam");
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+        if (!diag) {
+            super.saveAdditional(tag, registries);
+        }
         tag.putDouble("heat", this.heat);
+        tag.putInt("realSimWater", this.reasimWater);
+        tag.putInt("realSimSteam", this.reasimSteam);
+    }
+
+    /** CE {@code TileEntityRBMKBase.getDiagData}. */
+    public void getDiagData(CompoundTag nbt, HolderLookup.Provider registries) {
+        diag = true;
+        saveAdditional(nbt, registries);
+        diag = false;
     }
 
     @Override
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeDouble(this.heat);
+        buf.writeInt(this.reasimWater);
+        buf.writeInt(this.reasimSteam);
     }
 
     @Override
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         this.heat = buf.readDouble();
+        this.reasimWater = buf.readInt();
+        this.reasimSteam = buf.readInt();
     }
 
     /** CE: {@code TileEntityRBMKBase.getRBMKType()}, default {@code OTHER} - see {@link IRBMKColumn#getRBMKType()}. */

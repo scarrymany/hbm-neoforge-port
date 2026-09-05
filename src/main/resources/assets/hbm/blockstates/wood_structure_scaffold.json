@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "hbm:block/wood_structure_scaffold"
+    }
+  }
+}

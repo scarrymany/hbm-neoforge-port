@@ -8,9 +8,12 @@ import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.container.machine.dummyable.BlastFurnaceMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.recipes.BlastFurnaceRecipesNT;
 import com.hbm.inventory.recipes.BlastFurnaceRecipesNT.BlastFurnaceRecipe;
 import com.hbm.lib.DirPos;
+import com.hbm.modules.ModuleBurnTime;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -23,7 +26,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +34,8 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineBlastFurnace}: coal-fuel + airblast speed, 2-in 2-out.
+ * {@code FT_Polluting.pollute(SPILL, spill)} on flue overflow Exact CE {@code :113}.
+ * Audio / particles stay skipped.
  */
 public class MachineBlastFurnaceBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -47,6 +51,8 @@ public class MachineBlastFurnaceBlockEntity extends MachineBaseBlockEntity
     public float progress;
     public float speed;
     public int fuel;
+    /** Exact CE {@code TileEntityMachineBlastFurnace.java:60-61}. */
+    public final ModuleBurnTime burnModule = new ModuleBurnTime().setWoodHeatMod(0D);
 
     public MachineBlastFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, true, false);
@@ -105,7 +111,14 @@ public class MachineBlastFurnaceBlockEntity extends MachineBaseBlockEntity
                 progress = 0F;
                 fuel -= FUEL_RATE;
                 flue.setFill((int) (flue.getFill() + FLUE_GAS * (recipe.duration / Math.max(0.5F, speed))));
-                if (flue.getFill() > flue.getMaxFill()) flue.setFill(flue.getMaxFill());
+                if (flue.getFill() > flue.getMaxFill()) {
+                    int spill = flue.getFill() - flue.getMaxFill();
+                    // CE TileEntityMachineBlastFurnace.java:112-114
+                    flue.getTankType().onFluidRelease(level, worldPosition.above(7), flue, spill);
+                    FT_Polluting.pollute(level, worldPosition, flue.getTankType(),
+                            FluidTrait.FluidReleaseType.SPILL, spill);
+                    flue.setFill(flue.getMaxFill());
+                }
             }
         } else {
             isProgressing = false;
@@ -119,7 +132,8 @@ public class MachineBlastFurnaceBlockEntity extends MachineBaseBlockEntity
 
     public int getBurnTime(ItemStack stack) {
         if (stack.isEmpty()) return 0;
-        return stack.getBurnTime(RecipeType.SMELTING);
+        // CE TileEntityMachineBlastFurnace.java:215-217
+        return burnModule.getBurnHeat(burnModule.getBurnTime(stack, 0D), stack, 0D);
     }
 
     public boolean hasQuantities(BlastFurnaceRecipe recipe) {

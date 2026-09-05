@@ -9,6 +9,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.container.machine.MachineTurbineMenu;
 import com.hbm.inventory.fluid.trait.FT_Coolable;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,15 +33,9 @@ import java.util.List;
  * {@code machine_turbine}, read in full): small standalone single-block turbine, 85% of
  * {@link FT_Coolable}'s TURBINE efficiency, with a 6000-heat-equivalent per-tick operation cap
  * ({@code cap = 6000 / trait.amountReq}) that CE's larger turbines don't have.
- * <p>
- * <b>Scope trim vs. CE</b>: CE's 7-slot inventory has slot 0 retype the input tank from a held
- * fluid-identifier item, slots 2/3 fill the input tank from a container item, and slots 5/6 drain
- * the output tank into a container item - all three depend on either {@code IItemFluidIdentifier}
- * (a plain marker interface, trivially portable, but with zero implementing items registered
- * anywhere in this port yet) or the not-yet-portable {@code FluidContainerRegistry} (see
- * {@link MachineDieselBlockEntity}'s javadoc). Only the battery-charging slot (CE's slot 4) is kept;
- * the tank stays fixed to steam/spent-steam and fills only over the fluid network, exactly like
- * {@link MachineLargeTurbineBlockEntity}/{@link MachineIndustrialTurbineBlockEntity} already do.
+ * {@code setType(0,1)} / {@code loadTank(2,3)} / {@code unloadTank(5,6)} Exact CE
+ * {@code TileEntityMachineTurbine.java:129-155}. 7-slot layout Exact CE
+ * {@code ContainerMachineTurbine.java:36-45}.
  */
 public class MachineTurbineBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -48,13 +43,19 @@ public class MachineTurbineBlockEntity extends MachineBaseBlockEntity
     public static final long MAX_POWER = 1_000_000L;
     private static final double EFFICIENCY = 0.85D;
     private static final int OPS_HEAT_CAP = 6_000;
-    private static final int BATTERY_SLOT = 0;
+    private static final int SLOT_ID = 0;
+    private static final int SLOT_ID_OUT = 1;
+    private static final int SLOT_LOAD = 2;
+    private static final int SLOT_LOAD_OUT = 3;
+    private static final int SLOT_BATTERY = 4;
+    private static final int SLOT_UNLOAD = 5;
+    private static final int SLOT_UNLOAD_OUT = 6;
 
     public final FluidTankNTM[] tanks;
     private long power;
 
     public MachineTurbineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 1, true, true);
+        super(type, pos, state, 7, true, true);
         tanks = new FluidTankNTM[]{
                 new FluidTankNTM(Fluids.STEAM, 64_000).withOwner(this),
                 new FluidTankNTM(Fluids.SPENTSTEAM, 128_000).withOwner(this)
@@ -68,7 +69,10 @@ public class MachineTurbineBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return i == BATTERY_SLOT && Library.isBattery(stack);
+        // CE TileEntityMachineTurbine.java:80-88
+        if (i == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        if (i == SLOT_BATTERY) return Library.isBattery(stack);
+        return true;
     }
 
     @Override
@@ -80,7 +84,10 @@ public class MachineTurbineBlockEntity extends MachineBaseBlockEntity
             this.tryProvide(level, target.getX(), target.getY(), target.getZ(), dir);
         }
 
-        power = Library.chargeItemsFromTE(inventory, BATTERY_SLOT, power, MAX_POWER);
+        // CE TileEntityMachineTurbine.java:129-131
+        tanks[0].setType(SLOT_ID, SLOT_ID_OUT, inventory);
+        tanks[0].loadTank(SLOT_LOAD, SLOT_LOAD_OUT, inventory);
+        power = Library.chargeItemsFromTE(inventory, SLOT_BATTERY, power, MAX_POWER);
 
         FluidType in = tanks[0].getTankType();
         boolean valid = false;
@@ -108,8 +115,16 @@ public class MachineTurbineBlockEntity extends MachineBaseBlockEntity
             this.trySubscribe(tanks[0].getTankType(), level, target.getX(), target.getY(), target.getZ(), dir);
         }
 
+        // CE TileEntityMachineTurbine.java:155
+        tanks[1].unloadTank(SLOT_UNLOAD, SLOT_UNLOAD_OUT, inventory);
+
         dataChanged();
         networkPackMK2(50);
+    }
+
+    /** Exact CE {@code TileEntityMachineTurbine.getPowerScaled} :260-261. */
+    public long getPowerScaled(int i) {
+        return (power * i) / MAX_POWER;
     }
 
     @Override

@@ -1,20 +1,30 @@
 package com.hbm.blockentity.machine;
 
+import com.hbm.api.block.ILockable;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.generic.BlockStorageCrate;
 import com.hbm.blocks.machine.CrateBlock;
 import com.hbm.hazard.HazardSystem;
+import com.hbm.items.tool.ItemKey;
+import com.hbm.items.tool.ItemKeyPin;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.util.ContaminationUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Mass storage crate block entity, ported from CE's {@code com.hbm.tileentity.machine.TileEntityCrate}
@@ -25,16 +35,13 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * class parameterized by {@link CrateType}, matching this port's own {@code BlockCrate.Type}
  * precedent (see {@code com.hbm.blocks.generic.BlockCrate}) rather than five near-duplicate files.
  *
+ * {@code ILockable} Exact CE {@code TileEntityCrate.java:184-203}/{@code :311-312}/{@code :165-168}
+ * (same stack as MassStorage). Hopper capability gated by {@code checkLock}: {@code facing == null
+ * || !isLocked()}. {@code tryPick} omitted — lockpick {@code pin} item is not in this port.
+ * Open/close sounds Exact CE {@code TileEntityCrateBase.java:199-208}: {@code crateOpen}/{@code crateClose} 1.0F/1.0F.
+ *
  * <h2>Deliberately narrowed scope vs. CE - both documented in {@code machines_storage.md}</h2>
  * <ul>
- *   <li><b>No lock/pin mechanism.</b> CE's {@code TileEntityLockableBase} (lock state machine) is
- *   trivial on its own, but every path that actually unlocks a locked crate reads
- *   {@code ItemKeyPin}/{@code ModItems.key_red}/a screwdriver-based pick-attempt - none of which
- *   exist in this port yet (confirmed absent from {@code com.hbm.items} at the time of this pass).
- *   Porting inert lock fields with no way to ever lock or unlock a crate would be dead weight, not a
- *   feature; the research report recommends porting the lock/pin item family in the same pass, but
- *   that is an items/tools package, not a storage-machines one, so it is left as documented follow-up
- *   work rather than guessed at here. Every crate this class produces is therefore always accessible.</li>
  *   <li><b>No loot-table auto-fill.</b> CE's {@code TileEntityCrateBase.ensureFilled}/{@code fillWithLoot}
  *   lazily rolls a vanilla {@code LootTable} into the crate's inventory the first time it's touched,
  *   driven by a {@code ResourceLocation} + seed CE's block placement/world-gen code assigns. No
@@ -49,7 +56,7 @@ import net.neoforged.neoforge.items.ItemStackHandler;
  * (slot contents, via {@link IPersistentNBT}), and the custom-name/GUI-metadata fields - is a direct
  * port of CE's {@code TileEntityCrate} behavior.
  */
-public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersistentNBT {
+public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersistentNBT, ILockable {
 
     /**
      * Per-grade layout/metadata table, replacing CE's five hard-coded subclass constructors (see
@@ -102,6 +109,13 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
     }
 
     private final CrateType type;
+    private int[] allSlots;
+
+    /** CE {@code TileEntityLockableBase}: lock / isLocked / lockMod / cheesable. */
+    private int lock;
+    private boolean isLocked;
+    private double lockMod = 0.1D;
+    private boolean cheesable = true;
 
     public CrateBlockEntity(BlockEntityType<?> beType, BlockPos pos, BlockState state, CrateType type) {
         super(beType, pos, state, type.slots, false, false);
@@ -120,6 +134,128 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
     @Override
     public boolean isItemValidForSlot(int i, ItemStack stack) {
         return !(stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof CrateBlock);
+    }
+
+    @Override
+    public int[] getAccessibleSlotsFromSide(Direction side) {
+        // CE TileEntityCrateBase.java:253-256
+        if (allSlots == null || allSlots.length != inventory.getSlots()) {
+            allSlots = new int[inventory.getSlots()];
+            for (int i = 0; i < allSlots.length; i++) allSlots[i] = i;
+        }
+        return allSlots;
+    }
+
+    @Nullable
+    @Override
+    public IItemHandlerModifiable getItemHandlerCapability(@Nullable Direction side) {
+        // CE TileEntityCrate.java:311-312 checkLock
+        if (side != null && isLocked()) return null;
+        return super.getItemHandlerCapability(side);
+    }
+
+    @Override
+    public boolean hasItemHandlerCapability(@Nullable Direction side) {
+        if (side != null && isLocked()) return false;
+        return super.hasItemHandlerCapability(side);
+    }
+
+    /** CE {@code TileEntityCrate.java:184-203} (tryPick skipped — no pin item). */
+    public boolean canAccess(Player player) {
+        if (!isLocked() || player == null) return true;
+        ItemStack held = player.getMainHandItem();
+        int heldPins = held.getItem() instanceof ItemKeyPin ? ItemKeyPin.getPins(held) : 0;
+        boolean ok = canAccess(heldPins, held.getItem() instanceof ItemKey);
+        if (ok && level != null) {
+            level.playSound(null, player.blockPosition(), HBMSoundHandler.lockOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return ok;
+    }
+
+    /** Exact CE {@code TileEntityCrateBase.java:199-201}. */
+    public void openInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.crateOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
+    /** Exact CE {@code TileEntityCrateBase.java:207-209}. */
+    public void closeInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.crateClose.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
+    @Override
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    @Override
+    public void lock() {
+        if (!isLocked) {
+            isLocked = true;
+            dataChanged();
+            setChanged();
+        }
+    }
+
+    @Override
+    public void unlock() {
+        isLocked = false;
+        setChanged();
+    }
+
+    @Override
+    public void setPins(int pins) {
+        if (lock != pins) {
+            lock = pins;
+            dataChanged();
+            setChanged();
+        }
+    }
+
+    @Override
+    public int getPins() {
+        return lock;
+    }
+
+    @Override
+    public void setMod(double mod) {
+        if (lockMod != mod) {
+            lockMod = mod;
+            dataChanged();
+            setChanged();
+        }
+    }
+
+    @Override
+    public double getMod() {
+        return lockMod;
+    }
+
+    @Override
+    public boolean isCheesable() {
+        return cheesable;
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        // CE TileEntityLockableBase.java:83-88
+        tag.putInt("lock", lock);
+        tag.putBoolean("cheesable", cheesable);
+        tag.putBoolean("isLocked", isLocked);
+        tag.putDouble("lockMod", lockMod);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        lock = tag.getInt("lock");
+        cheesable = !tag.contains("cheesable") || tag.getBoolean("cheesable");
+        isLocked = tag.getBoolean("isLocked");
+        lockMod = tag.contains("lockMod") ? tag.getDouble("lockMod") : 0.1D;
     }
 
     @Override
@@ -151,12 +287,23 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
             if (stack.isEmpty()) continue;
             data.put("slot" + i, stack.save(this.level.registryAccess(), new CompoundTag()));
         }
+        // CE TileEntityCrate.java:165-168
+        if (this.isLocked()) {
+            data.putInt("lock", this.getPins());
+            data.putDouble("lockMod", this.getMod());
+        }
         if (!data.isEmpty()) nbt.put(NBT_PERSISTENT_KEY, data);
     }
 
     @Override
     public void readNBT(CompoundTag nbt) {
         CompoundTag data = nbt.contains(NBT_PERSISTENT_KEY) ? nbt.getCompound(NBT_PERSISTENT_KEY) : nbt;
+        // CE TileEntityCrate.java:280-284
+        if (data.contains("lock")) {
+            this.setPins(data.getInt("lock"));
+            this.setMod(data.contains("lockMod") ? data.getDouble("lockMod") : 0.1D);
+            this.lock();
+        }
         for (int i = 0; i < inventory.getSlots(); i++) {
             String key = "slot" + i;
             if (data.contains(key)) {

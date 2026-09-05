@@ -1,6 +1,9 @@
 package com.hbm.hazard;
 
 import com.hbm.blocks.MaterialBlockGenerator;
+import com.hbm.blocks.bomb.NukeCasingBlocks;
+import com.hbm.blocks.generic.GenericCrateBlocks;
+import com.hbm.blocks.generic.WastelandVirusBlocks;
 import com.hbm.config.GeneralConfig;
 import com.hbm.hazard.transformer.HazardTransformerForgeFluid;
 import com.hbm.hazard.transformer.HazardTransformerPostCustom;
@@ -10,6 +13,7 @@ import com.hbm.hazard.transformer.HazardTransformerRadiationNBT;
 import com.hbm.hazard.modifier.HazardModifierFuelRadiation;
 import com.hbm.hazard.modifier.HazardModifierRBMKRadiation;
 import com.hbm.hazard.modifier.HazardModifierRTGRadiation;
+import com.hbm.hazard.modifier.HazardModifierSellafield;
 import com.hbm.hazard.type.HazardTypeAsbestos;
 import com.hbm.hazard.type.HazardTypeBlinding;
 import com.hbm.hazard.type.HazardTypeCoal;
@@ -24,25 +28,37 @@ import com.hbm.hazard.type.HazardTypeRadiation;
 import com.hbm.hazard.type.HazardTypeToxic;
 import com.hbm.hazard.type.HazardTypeUnstable;
 import com.hbm.hazard.type.IHazardType;
+import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.items.bomb.NukeCasingItems;
+import com.hbm.items.machine.Phase11ProcessItems;
 import com.hbm.items.machine.ItemBreedingRod;
 import com.hbm.items.machine.ItemPWRFuel;
 import com.hbm.items.machine.ItemPileRodMK2;
+import com.hbm.items.machine.PWRDepletedFuelItems;
+import com.hbm.items.machine.PWRHotFuelItems;
 import com.hbm.items.machine.ItemWatzPellet;
 import com.hbm.items.machine.ItemZirnoxRod;
 import com.hbm.items.machine.ItemZirnoxRodDepleted;
 import com.hbm.items.machine.MachineItems;
 import com.hbm.items.special.ItemWasteLong;
 import com.hbm.items.special.ItemWasteShort;
+import com.hbm.items.special.CellFluidHazardModifier;
+import com.hbm.items.special.ScatteredMilitaryItems;
 import com.hbm.items.special.SpecialItems;
+import com.hbm.items.tool.CouplingToolItems;
+import com.hbm.items.weapon.grenade.GrenadeItems;
 import com.hbm.main.MainRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * Physics-derived level constants and the {@link IHazardType} singletons every {@code HazardData} entry is built
@@ -193,6 +209,49 @@ public class HazardRegistry {
      * {@link IHazardType} singletons above.
      */
     public static void registerItems() {
+        // CE HazardRegistry.java:171-187 EXPLOSIVE + COAL. Skip dustTinyLignite
+        // (powder_lignite_tiny not registered — do not invent).
+        HazardSystem.register(Items.GUNPOWDER, new HazardData().addEntry(EXPLOSIVE, 1F));
+        HazardSystem.register(Blocks.TNT, new HazardData().addEntry(EXPLOSIVE, 4F));
+        HazardSystem.register(Items.PUMPKIN_PIE, new HazardData().addEntry(EXPLOSIVE, 1F));
+
+        HazardSystem.register(Phase11ProcessItems.BALL_DYNAMITE.get(), new HazardData().addEntry(EXPLOSIVE, 2F));
+        HazardSystem.register(GrenadeItems.STICK_DYNAMITE.get(), new HazardData().addEntry(EXPLOSIVE, 1F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "stick_tnt"),
+                new HazardData().addEntry(EXPLOSIVE, 1.5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "stick_semtex"),
+                new HazardData().addEntry(EXPLOSIVE, 2.5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "stick_c4"),
+                new HazardData().addEntry(EXPLOSIVE, 2.5F));
+
+        HazardSystem.register(Phase11ProcessItems.CORDITE.get(), new HazardData().addEntry(EXPLOSIVE, 2F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ballistite"),
+                new HazardData().addEntry(EXPLOSIVE, 1F));
+
+        HazardSystem.register(BilletPowderItems.POWDER_COAL.get(), new HazardData().addEntry(COAL, powder));
+        HazardSystem.register(BilletPowderItems.POWDER_COAL_TINY.get(), new HazardData().addEntry(COAL, powder_tiny));
+        HazardSystem.register(BilletPowderItems.POWDER_LIGNITE.get(), new HazardData().addEntry(COAL, powder));
+
+        // CE :189 insert_polonium / :198 lamp_demon / :208-209 solid_fuel_presto_bf* —
+        // unregistered, skip invent. demon_core already bound below.
+        // CE :200-207 cell TRITIUM/SAS3 + cell_balefire + eggs + solid_fuel_bf.
+        // cell is one item; per-fluid via CellFluidHazardModifier (CE ItemStack meta).
+        HazardSystem.register(SpecialItems.CELL.get(), new HazardData()
+                .addEntry(new HazardEntry(RADIATION, 0.001F)
+                        .addMod(new CellFluidHazardModifier(Fluids.TRITIUM.getID(), 0.001F)))
+                .addEntry(new HazardEntry(RADIATION, sas3)
+                        .addMod(new CellFluidHazardModifier(Fluids.SAS3.getID(), sas3)))
+                .addEntry(new HazardEntry(BLINDING, 60F)
+                        .addMod(new CellFluidHazardModifier(Fluids.SAS3.getID(), 60F))));
+        HazardSystem.register(ScatteredMilitaryItems.CELL_BALEFIRE.get(),
+                new HazardData().addEntry(RADIATION, 50F));
+        HazardSystem.register(NukeCasingItems.EGG_BALEFIRE_SHARD.get(),
+                new HazardData().addEntry(RADIATION, bf * nugget));
+        HazardSystem.register(NukeCasingItems.EGG_BALEFIRE.get(),
+                new HazardData().addEntry(RADIATION, bf * ingot));
+        HazardSystem.register(Phase11ProcessItems.SOLID_FUEL_BF.get(),
+                new HazardData().addEntry(RADIATION, 1000F));
+
         // items_plate_crystal_waste area (docs/phase1/moditems_generative.md section 3,
         // docs/phase1/hazard_bindings_plan.md Pattern A/D): waste_/crystal_/gem_ hazard bindings.
         // Formulas ported verbatim from CE's HazardRegistry.registerOtherWasteContaminating/
@@ -292,6 +351,55 @@ public class HazardRegistry {
         HazardSystem.register(PlateCrystalWasteItems.GEM_RAD.get(),
                 new HazardData().addEntry(RADIATION, 25F));
 
+        // CE HazardRegistry.java:220 scrap_nuclear; :236-241 sellafield meta 0–5.
+        // :243 ore_sellafield_radgem (registered). LEVEL via HazardModifierSellafield.
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "scrap_nuclear"),
+                new HazardData().addEntry(RADIATION, 1F));
+        HazardSystem.register(WastelandVirusBlocks.SELLAFIELD.get(),
+                new HazardData().addEntry(new HazardEntry(RADIATION, 0.5F).addMod(new HazardModifierSellafield())));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ore_sellafield_radgem"),
+                new HazardData().addEntry(RADIATION, 25F));
+
+        // CE HazardRegistry.java:221-234 remaining waste / barrel / corium.
+        // Skip trinitite item (not registered). Skip nuclear_waste_vitrified_tiny (not registered).
+        // vitrified_barrel has no CE HazardRegistry row — do not invent.
+        HazardSystem.register(WastelandVirusBlocks.BLOCK_TRINITITE.get(),
+                new HazardData().addEntry(RADIATION, trn * block));
+        HazardSystem.register(NukeCasingItems.NUCLEAR_WASTE.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot).addEntry(CONTAMINATING, wst * powder));
+        HazardSystem.register(GenericCrateBlocks.YELLOW_BARREL.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 10));
+        HazardSystem.register(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get(),
+                new HazardData().addEntry(RADIATION, wst * nugget).addEntry(CONTAMINATING, wst * powder_tiny));
+        HazardSystem.register(Phase11ProcessItems.NUCLEAR_WASTE_VITRIFIED.get(),
+                new HazardData().addEntry(RADIATION, wstv * ingot).addEntry(CONTAMINATING, wstv * powder));
+        HazardSystem.register(WastelandVirusBlocks.BLOCK_WASTE.get(),
+                new HazardData().addEntry(RADIATION, wst * block));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_waste_painted"),
+                new HazardData().addEntry(RADIATION, wst * block));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_waste_vitrified"),
+                new HazardData().addEntry(RADIATION, wstv * block));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ancient_scrap"),
+                new HazardData().addEntry(RADIATION, 150F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_corium"),
+                new HazardData().addEntry(RADIATION, 150F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_corium_cobble"),
+                new HazardData().addEntry(RADIATION, 150F));
+
+        // CE HazardRegistry.java:298-304 debris_*. Skip debris_fuel (not registered).
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_graphite"),
+                new HazardData().addEntry(RADIATION, 70F).addEntry(HOT, 5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_metal"),
+                new HazardData().addEntry(RADIATION, 5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_concrete"),
+                new HazardData().addEntry(RADIATION, 30F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_exchanger"),
+                new HazardData().addEntry(RADIATION, 25F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_shrapnel"),
+                new HazardData().addEntry(RADIATION, 2.5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "debris_element"),
+                new HazardData().addEntry(RADIATION, 100F));
+
         // items_billet_powder area (docs/phase1/moditems_generative.md section 3,
         // hazard_bindings_plan.md Pattern A/B): only the billet_/powder_ fields CE's own
         // HazardRegistry.registerItems() actually binds (upstream hbm-ce HazardRegistry.java
@@ -330,9 +438,49 @@ public class HazardRegistry {
                 new HazardData().addEntry(RADIATION, 500F).addEntry(CONTAMINATING, bf * powder));
         HazardSystem.register(BilletPowderItems.POWDER_YELLOWCAKE.get(),
                 new HazardData().addEntry(RADIATION, yc * powder).addEntry(CONTAMINATING, yc * powder));
+        // CE HazardRegistry.java:491 / :494. Skip :492/:493 fallout item vs ModBlocks.fallout
+        // (same BlockItem in this port — do not invent a merged number).
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_yellowcake"),
+                new HazardData().addEntry(RADIATION, yc * block * powder_mult));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_fallout"),
+                new HazardData().addEntry(RADIATION, yc * block * powder_mult));
         HazardSystem.register(BilletPowderItems.POWDER_CAESIUM.get(),
                 new HazardData().addEntry(HYDROACTIVE, 1F).addEntry(HOT, 3F));
         HazardSystem.register(BilletPowderItems.POWDER_COLTAN_ORE.get(), new HazardData().addEntry(ASBESTOS, 3F));
+        // CE HazardRegistry.java:497-498
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "brick_asbestos"),
+                new HazardData().addEntry(ASBESTOS, 1F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "tile_lab_broken"),
+                new HazardData().addEntry(ASBESTOS, 1F));
+
+        // CE HazardRegistry.java:506-513 nuke parts.
+        HazardSystem.register(NukeCasingItems.BOY_PROPELLANT.get(),
+                new HazardData().addEntry(EXPLOSIVE, 2F));
+        HazardSystem.register(NukeCasingItems.GADGET_CORE.get(),
+                new HazardData().addEntry(RADIATION, pu239 * nugget * 10));
+        HazardSystem.register(NukeCasingItems.BOY_TARGET.get(),
+                new HazardData().addEntry(RADIATION, u235 * ingot * 2));
+        HazardSystem.register(NukeCasingItems.BOY_BULLET.get(),
+                new HazardData().addEntry(RADIATION, u235 * ingot));
+        HazardSystem.register(SpecialItems.MAN_CORE.get(),
+                new HazardData().addEntry(RADIATION, pu239 * nugget * 10));
+        HazardSystem.register(NukeCasingItems.MIKE_CORE.get(),
+                new HazardData().addEntry(RADIATION, u238 * nugget * 10));
+        HazardSystem.register(NukeCasingItems.TSAR_CORE.get(),
+                new HazardData().addEntry(RADIATION, pu239 * nugget * 15));
+
+        // CE HazardRegistry.java:515-521 FLEIJA / solinium / nuke_fstbmb.
+        // Skip :522-523 holotape DIGAMMA (meta split — do not invent merge).
+        HazardSystem.register(NukeCasingItems.FLEIJA_PROPELLANT.get(),
+                new HazardData().addEntry(RADIATION, 15F).addEntry(EXPLOSIVE, 8F).addEntry(BLINDING, 50F));
+        HazardSystem.register(NukeCasingItems.FLEIJA_CORE.get(),
+                new HazardData().addEntry(RADIATION, 10F));
+        HazardSystem.register(Phase11ProcessItems.SOLINIUM_PROPELLANT.get(),
+                new HazardData().addEntry(EXPLOSIVE, 10F));
+        HazardSystem.register(NukeCasingItems.SOLINIUM_CORE.get(),
+                new HazardData().addEntry(RADIATION, sa327 * nugget * 8).addEntry(BLINDING, 45F));
+        HazardSystem.register(NukeCasingBlocks.NUKE_FSTBMB.get(),
+                new HazardData().addEntry(DIGAMMA, 0.01F));
 
         // items_ingot_nugget area (docs/phase1/moditems_generative.md section 3,
         // hazard_bindings_plan.md Pattern A/B): only the ingot_/nugget_ fields CE's own
@@ -343,18 +491,30 @@ public class HazardRegistry {
         // invent radiation for them.
         HazardSystem.register(IngotNuggetItems.NUGGET_URANIUM_FUEL.get(), new HazardData().addEntry(RADIATION, uf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_URANIUM_FUEL.get(), new HazardData().addEntry(RADIATION, uf * ingot));
+        // CE HazardRegistry.java:309
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_uranium_fuel"),
+                new HazardData().addEntry(RADIATION, uf * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_PLUTONIUM_FUEL.get(), new HazardData().addEntry(RADIATION, puf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_PLUTONIUM_FUEL.get(), new HazardData().addEntry(RADIATION, puf * ingot));
+        // CE :315
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_plutonium_fuel"),
+                new HazardData().addEntry(RADIATION, puf * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_THORIUM_FUEL.get(), new HazardData().addEntry(RADIATION, thf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_THORIUM_FUEL.get(), new HazardData().addEntry(RADIATION, thf * ingot));
+        // CE :320
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_thorium_fuel"),
+                new HazardData().addEntry(RADIATION, thf * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_NEPTUNIUM_FUEL.get(), new HazardData().addEntry(RADIATION, npf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_NEPTUNIUM_FUEL.get(), new HazardData().addEntry(RADIATION, npf * ingot));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_MOX_FUEL.get(), new HazardData().addEntry(RADIATION, mox * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_MOX_FUEL.get(), new HazardData().addEntry(RADIATION, mox * ingot));
+        // CE :329
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_mox_fuel"),
+                new HazardData().addEntry(RADIATION, mox * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_AMERICIUM_FUEL.get(), new HazardData().addEntry(RADIATION, amf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_AMERICIUM_FUEL.get(), new HazardData().addEntry(RADIATION, amf * ingot));
@@ -363,6 +523,9 @@ public class HazardRegistry {
                 new HazardData().addEntry(RADIATION, saf * nugget).addEntry(BLINDING, 5F * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_SCHRABIDIUM_FUEL.get(),
                 new HazardData().addEntry(RADIATION, saf * ingot).addEntry(BLINDING, 5F * ingot));
+        // CE :338
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_schrabidium_fuel"),
+                new HazardData().addEntry(RADIATION, saf * block).addEntry(BLINDING, 5F * block));
 
         HazardSystem.register(IngotNuggetItems.NUGGET_HES.get(), new HazardData().addEntry(RADIATION, saf * nugget));
         HazardSystem.register(IngotNuggetItems.INGOT_HES.get(), new HazardData().addEntry(RADIATION, saf * ingot));
@@ -431,34 +594,41 @@ public class HazardRegistry {
         // (docs/phase1/hazard_bindings_plan.md Pattern F for the demon core; CE HazardRegistry.java
         // demon_core_open/demon_core_closed + nuclear_waste_long/nuclear_waste_short bindings).
         //
-        // demon_core_open: RADIATION 5F plus a HazardTypeDangerousDrop that swaps the dropped item
-        // back to the closed core on ground contact, mirroring CE's EntityItem/onGround transition
-        // with the confirmed 1.21 renames (EntityItem -> ItemEntity, .world -> .level(),
-        // .isRemote -> .isClientSide(), world.spawnEntity(...) -> level().addFreshEntity(...); see
-        // docs/phase1/DIGEST_REMAINDER.md's hazard_bindings_plan.md section). CE also re-spawns a
-        // dropped screwdriver alongside the closed core on this transition; this port has not
-        // registered ItemTooling/screwdriver yet (no such item exists anywhere in this codebase), so
-        // that half of the drop behavior is intentionally left out here rather than referencing a
-        // nonexistent item - flagged as a follow-up once the tooling items land.
+        // Exact CE HazardRegistry.java:191-196 — open core snaps shut on ground and drops screwdriver.
         HazardSystem.register(SpecialItems.DEMON_CORE_OPEN.get(), new HazardData()
                 .addEntry(RADIATION, 5F)
                 .addEntry(new HazardEntry(new HazardTypeDangerousDrop((entityItem, level) -> {
                     if (!entityItem.level().isClientSide() && entityItem.onGround()) {
                         entityItem.setItem(new ItemStack(SpecialItems.DEMON_CORE_CLOSED.get()));
+                        entityItem.level().addFreshEntity(new ItemEntity(
+                                entityItem.level(),
+                                entityItem.getX(), entityItem.getY(), entityItem.getZ(),
+                                new ItemStack(CouplingToolItems.SCREWDRIVER.get())));
                     }
                 }))));
         HazardSystem.register(SpecialItems.DEMON_CORE_CLOSED.get(), new HazardData().addEntry(RADIATION, 100_000F));
 
-        // nuclear_waste_long_* (5 WasteClass variants) / nuclear_waste_short_* (8 WasteClass
-        // variants): CE binds nuclear_waste_long flat to RADIATION 5F and nuclear_waste_short flat to
-        // RADIATION 30F + HOT 5F with no per-material variation; applied identically across every
-        // WasteClass this port flattened CE's single metadata-multi field into.
+        // nuclear_waste_long_* (5 WasteClass) / nuclear_waste_short_* (8 WasteClass).
+        // Exact CE :211-218 — flat per form, no per-material variation.
         for (final ItemWasteLong.WasteClass wasteClass : ItemWasteLong.WasteClass.VALUES) {
-            HazardSystem.register(SpecialItems.nuclearWasteLong(wasteClass).get(), new HazardData().addEntry(RADIATION, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLong(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLongTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLongDepleted(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLongDepletedTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.05F));
         }
         for (final ItemWasteShort.WasteClass wasteClass : ItemWasteShort.WasteClass.VALUES) {
             HazardSystem.register(SpecialItems.nuclearWasteShort(wasteClass).get(),
                     new HazardData().addEntry(RADIATION, 30F).addEntry(HOT, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteShortTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 3F).addEntry(HOT, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteShortDepleted(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 3F));
+            HazardSystem.register(SpecialItems.nuclearWasteShortDepletedTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.3F));
         }
 
         // hazard_wiring_complete: items_machine fuel/rod/pellet family
@@ -520,27 +690,37 @@ public class HazardRegistry {
         HazardSystem.register(MachineItems.ZIRNOX_RODS_DEPLETED.get(ItemZirnoxRodDepleted.EnumZirnoxTypeDepleted.ZFB_MOX_FUEL).get(),
                 new HazardData().addEntry(RADIATION, wst * rod_dual * 5F));
 
-        // ItemPWRFuel: all 15 EnumPWRFuel values (CE's registerPWRFuel calls). Only the fresh
-        // pwr_fuel_* item exists in this port so far - MachineItems.registerPwrFuel()'s own comment
-        // notes pwr_fuel_hot/pwr_fuel_depleted are separate CE byproduct-marker items sharing this
-        // same enum, out of that class's scope and not yet registered here - so only the fresh item's
-        // base RADIATION level (CE's un-multiplied "baseRad" argument) is bound; the *10 hot/depleted
-        // tiers are a follow-up once those items exist.
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEU).get(), new HazardData().addEntry(RADIATION, uf * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEU233).get(), new HazardData().addEntry(RADIATION, u233 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEU235).get(), new HazardData().addEntry(RADIATION, u235 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEN).get(), new HazardData().addEntry(RADIATION, npf * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEN237).get(), new HazardData().addEntry(RADIATION, np237 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MOX).get(), new HazardData().addEntry(RADIATION, mox * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEP).get(), new HazardData().addEntry(RADIATION, purg * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEP239).get(), new HazardData().addEntry(RADIATION, pu239 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEP241).get(), new HazardData().addEntry(RADIATION, pu241 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEA).get(), new HazardData().addEntry(RADIATION, amrg * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEA242).get(), new HazardData().addEntry(RADIATION, am242 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HES326).get(), new HazardData().addEntry(RADIATION, sa326 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HES327).get(), new HazardData().addEntry(RADIATION, sa327 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.BFB_AM_MIX).get(), new HazardData().addEntry(RADIATION, amrg * billet));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.BFB_PU241).get(), new HazardData().addEntry(RADIATION, pu241 * billet));
+        // Exact CE HazardRegistry.java:270 — ZIRNOX lithium byproduct rod.
+        HazardSystem.register(MachineItems.ROD_ZIRNOX_TRITIUM.get(),
+                new HazardData().addEntry(RADIATION, 0.001F * rod_dual));
+
+        // Exact CE HazardRegistry.java:282-288 — research-reactor plate fuels.
+        registerOtherFuel(MachineItems.PLATE_FUEL_U233.get(), u233 * ingot, wst * ingot * 13F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_U235.get(), u235 * ingot, wst * ingot * 10F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_MOX.get(), mox * ingot, wst * ingot * 16F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_PU239.get(), pu239 * ingot, wst * ingot * 13.5F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_SA326.get(), sa326 * ingot, wst * ingot * 10F, true);
+        registerOtherFuel(MachineItems.PLATE_FUEL_RA226BE.get(), rabe * billet, pobe * nugget * 3, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_PU238BE.get(), pube * billet, pube * nugget * 1, false);
+
+        // Exact CE HazardRegistry.java:474-488 / registerPWRFuel :547-551.
+        // Fresh already bound; leftover hot (*10 + HOT 5) + depleted (*10) now that
+        // PWRHotFuelItems / PWRDepletedFuelItems exist. No invent art.
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEU, uf * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEU233, u233 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEU235, u235 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEN, npf * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEN237, np237 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MOX, mox * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEP, purg * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEP239, pu239 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEP241, pu241 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEA, amrg * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEA242, am242 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HES326, sa326 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HES327, sa327 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.BFB_AM_MIX, amrg * billet);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.BFB_PU241, pu241 * billet);
 
         // ItemPileRodMK2: 8 of EnumPileRod's 9 values - CE binds exactly these 8 (to its own
         // ModItems.pile_rod field, a CE naming quirk for what is actually the MK2 rod); ZR is never
@@ -554,10 +734,23 @@ public class HazardRegistry {
         HazardSystem.register(MachineItems.PILE_RODS_MK2.get(ItemPileRodMK2.EnumPileRod.THORIUM).get(), new HazardData().addEntry(RADIATION, th232 * billet * 3));
         HazardSystem.register(MachineItems.PILE_RODS_MK2.get(ItemPileRodMK2.EnumPileRod.THORIUM_FUEL).get(), new HazardData().addEntry(RADIATION, thf * billet * 3));
 
-        // ItemRTGPellet: 10 variants (CE's registerRTGPellet calls). pellet_rtg_depleted's Neptunium
-        // byproduct variant (a different, plain Item class - RTG_DEPLETED in MachineItems, private and
-        // not part of this table) and the port-only PELLET_RTG_BALEFIRE addition (no CE hazard entry
-        // exists for it) are both outside CE's own registerRTGPellet table and are skipped.
+        // Exact CE HazardRegistry.java:375-378 — leftover ItemPileRod (not MK2).
+        // boron/lithium/detector have no CE hazard bind. Skip invent.
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_uranium"),
+                new HazardData().addEntry(RADIATION, u * billet * 3));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_pu239"),
+                new HazardData().addEntry(RADIATION, !GeneralConfig.enable528()
+                        ? purg * billet + pu239 * billet + u * billet
+                        : purg * billet + pu239 * billet + wst * billet));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_plutonium"),
+                new HazardData().addEntry(RADIATION, !GeneralConfig.enable528()
+                        ? purg * billet * 2 + u * billet
+                        : purg * billet * 2 + wst * billet));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_source"),
+                new HazardData().addEntry(RADIATION, rabe * billet * 3));
+
+        // ItemRTGPellet: 10 variants (CE's registerRTGPellet calls). Port-only PELLET_RTG_BALEFIRE
+        // has no CE hazard entry — skip invent.
         registerRTGPellet(MachineItems.PELLET_RTG.get(), pu238 * rtg, 0F, 3F);
         registerRTGPellet(MachineItems.PELLET_RTG_RADIUM.get(), ra226 * rtg, 0F);
         registerRTGPellet(MachineItems.PELLET_RTG_WEAK.get(), (pu238 + (u238 * 2)) * billet, 0F);
@@ -568,6 +761,9 @@ public class HazardRegistry {
         registerRTGPellet(MachineItems.PELLET_RTG_LEAD.get(), pb209 * rtg, 0F, 7F, 50F);
         registerRTGPellet(MachineItems.PELLET_RTG_GOLD.get(), au198 * rtg, 0F, 5F);
         registerRTGPellet(MachineItems.PELLET_RTG_AMERICIUM.get(), am241 * rtg, 0F);
+        // Exact CE HazardRegistry.java:364 — only NEPTUNIUM depleted byproduct is bound.
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pellet_rtg_depleted_neptunium"),
+                new HazardData().addEntry(RADIATION, np237 * rtg));
 
         // ItemWatzPellet: 10 of EnumWatzType's 12 values (CE binds exactly these 10 fresh pellets to
         // RADIATION; LEAD and BORON are never bound anywhere in CE's registerItems()).
@@ -647,6 +843,15 @@ public class HazardRegistry {
     // ==================== items_machine hazard-wiring helpers (CE Pattern E, ported near-verbatim; Item
     // parameters take the already-resolved concrete item via the items area's own DeferredItem<Item>.get()
     // accessors instead of CE's meta-variant overloads) ====================
+
+    /** Exact CE {@code HazardRegistry.java:547-551}. */
+    private static void registerPWRFuel(final ItemPWRFuel.EnumPWRFuel fuel, final float baseRad) {
+        HazardSystem.register(MachineItems.PWR_FUEL.get(fuel).get(), new HazardData().addEntry(RADIATION, baseRad));
+        HazardSystem.register(PWRHotFuelItems.HOT_FUEL.get(fuel).get(),
+                new HazardData().addEntry(RADIATION, baseRad * 10F).addEntry(HOT, 5F));
+        HazardSystem.register(PWRDepletedFuelItems.DEPLETED.get(fuel).get(),
+                new HazardData().addEntry(RADIATION, baseRad * 10F));
+    }
 
     private static void registerBreedingRodRadiation(final ItemBreedingRod.BreedingRodType type, final float base) {
         HazardSystem.register(MachineItems.BREEDING_ROD_SINGLE.get(type).get(), new HazardData().addEntry(RADIATION, base));

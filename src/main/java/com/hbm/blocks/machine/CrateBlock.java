@@ -5,13 +5,19 @@ import com.hbm.blockentity.machine.CrateBlockEntity;
 import com.hbm.blockentity.machine.CrateBlockEntity.CrateType;
 import com.hbm.blockentity.machine.StorageBlockEntities;
 import com.hbm.blocks.generic.BlockStorageCrate;
+import com.hbm.config.ServerConfig;
 import com.hbm.handler.radiation.RadiationSystemNT;
 import com.hbm.interfaces.IRadResistantBlock;
 import com.hbm.inventory.container.CrateMenu;
+import com.hbm.items.tool.ItemCounterfeitKeys;
+import com.hbm.items.tool.ItemLock;
+import com.hbm.lib.InventoryHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -128,6 +134,14 @@ public class CrateBlock extends BaseEntityBlock implements IRadResistantBlock, B
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!level.isClientSide && !state.is(newState.getBlock())) {
+            // CE BlockStorageCrate.java:98-105
+            if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate
+                    && !ServerConfig.CRATE_KEEP_CONTENTS.get() && !crate.isLocked()) {
+                InventoryHelper.dropInventoryItems(level, pos, crate.inventory);
+                for (int i = 0; i < crate.inventory.getSlots(); i++) {
+                    crate.inventory.setStackInSlot(i, ItemStack.EMPTY);
+                }
+            }
             IPersistentNBT.breakBlock(level, pos, state);
             RadiationSystemNT.markSectionForRebuild(level, pos);
         }
@@ -146,13 +160,34 @@ public class CrateBlock extends BaseEntityBlock implements IRadResistantBlock, B
      * against Neo Edition's own real, compiling {@code CrateBlock#useWithoutItem}.
      */
     @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        // CE BlockStorageCrate.java:126 — ItemLock / key_kit handle themselves
+        if (stack.getItem() instanceof ItemLock || stack.getItem() instanceof ItemCounterfeitKeys) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (player.isShiftKeyDown()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate && crate.canAccess(player)) {
+            player.openMenu(new SimpleMenuProvider((id, inv, ply) -> new CrateMenu(id, inv, crate), crate.getDisplayName()), pos);
+            return ItemInteractionResult.SUCCESS;
+        }
+        return ItemInteractionResult.FAIL;
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate) {
+        ItemStack held = player.getMainHandItem();
+        if (held.getItem() instanceof ItemLock || held.getItem() instanceof ItemCounterfeitKeys) {
+            return InteractionResult.PASS;
+        }
+        if (player.isShiftKeyDown()) return InteractionResult.PASS;
+        if (level.getBlockEntity(pos) instanceof CrateBlockEntity crate && crate.canAccess(player)) {
             player.openMenu(new SimpleMenuProvider((id, inv, ply) -> new CrateMenu(id, inv, crate), crate.getDisplayName()), pos);
             return InteractionResult.CONSUME;
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResult.FAIL;
     }
 
     /**

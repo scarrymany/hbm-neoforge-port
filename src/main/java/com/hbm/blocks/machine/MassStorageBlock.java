@@ -6,11 +6,15 @@ import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.MassStorageBlockEntity;
 import com.hbm.blocks.ILookOverlay;
 import com.hbm.blocks.ITooltipProvider;
+import com.hbm.items.tool.ItemCounterfeitKeys;
+import com.hbm.items.tool.ItemLock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item.TooltipContext;
@@ -39,8 +43,9 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * CE {@code BlockMassStorage} — 1×1 stockpile (in / filter / out). Lock/OC/ROR skipped
- * (same as crates). Capacities from CE {@code getCapacity()}.
+ * CE {@code BlockMassStorage} — 1×1 stockpile (in / filter / out). Lock via
+ * {@link com.hbm.api.block.ILockable} Exact CE {@code TileEntityMassStorage.java:112}/
+ * {@code :258}/{@code :263}. OC skipped. Capacities from CE {@code getCapacity()}.
  */
 public class MassStorageBlock extends BaseEntityBlock implements ILookOverlay, ITooltipProvider {
 
@@ -113,12 +118,34 @@ public class MassStorageBlock extends BaseEntityBlock implements ILookOverlay, I
     }
 
     @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        // CE BlockMassStorage.java:103 — ItemLock / key_kit handle themselves
+        if (stack.getItem() instanceof ItemLock || stack.getItem() instanceof ItemCounterfeitKeys) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (player.isShiftKeyDown()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        if (level.getBlockEntity(pos) instanceof MassStorageBlockEntity be && be.canAccess(player)) {
+            player.openMenu(be, pos);
+            return ItemInteractionResult.SUCCESS;
+        }
+        return ItemInteractionResult.FAIL;
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(pos) instanceof MassStorageBlockEntity be) {
-            player.openMenu(be, pos);
+        ItemStack held = player.getMainHandItem();
+        if (held.getItem() instanceof ItemLock || held.getItem() instanceof ItemCounterfeitKeys) {
+            return InteractionResult.PASS;
         }
-        return InteractionResult.CONSUME;
+        if (player.isShiftKeyDown()) return InteractionResult.PASS;
+        if (level.getBlockEntity(pos) instanceof MassStorageBlockEntity be && be.canAccess(player)) {
+            player.openMenu(be, pos);
+            return InteractionResult.CONSUME;
+        }
+        return InteractionResult.FAIL;
     }
 
     @Override

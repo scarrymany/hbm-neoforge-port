@@ -1,32 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures": {},
-    "model": "hbm:block/anvil_desh.obj"
-  },
   "variants": {
-    "facing=north": [
-      {
-        "y": 90
-      }
-    ],
-    "facing=south": [
-      {
-        "y": 270
-      }
-    ],
-    "facing=west": [
-      {}
-    ],
-    "facing=east": [
-      {
-        "y": 180
-      }
-    ],
-    "": [
-      {
-        "y": 90
-      }
-    ]
+    "": {
+      "model": "hbm:block/anvil_desh"
+    }
   }
 }

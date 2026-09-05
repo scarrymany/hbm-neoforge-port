@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rune_blank"
+    },
+    {
+      "item": "hbm:powder_spark_mix"
+    },
+    {
+      "item": "hbm:singularity_spark"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:rune_jera"
+  }
+}

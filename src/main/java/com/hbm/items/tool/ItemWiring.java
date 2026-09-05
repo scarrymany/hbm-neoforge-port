@@ -8,6 +8,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
@@ -39,6 +41,8 @@ import java.util.List;
  * other ported {@code useOn} override in this port uses, rather than reproducing CE's
  * {@code if (world.isRemote)} branch verbatim - {@code displayClientMessage} already routes to the
  * right side by itself.
+ * Held-distance overlay Exact CE {@code ItemWiring.java:167-180}
+ * ({@code displayName + ": " + meters + "m"}).
  */
 public class ItemWiring extends Item {
 
@@ -140,6 +144,20 @@ public class ItemWiring extends Item {
 
     private static boolean isLengthValid(BlockPos a, BlockPos b, double length) {
         return Math.sqrt(a.distSqr(b)) <= length;
+    }
+
+    /** Exact CE {@code ItemWiring.java:167-180}. */
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        if (!level.isClientSide() || !(entity instanceof Player player)) return;
+        if (!TagsUtil.hasCustomData(stack)) return;
+        CompoundTag tag = TagsUtil.getCustomData(stack);
+        if (!tag.contains("x")) return;
+        Vec3 vec = new Vec3(
+                entity.getX() - tag.getInt("x"),
+                entity.getY() - tag.getInt("y"),
+                entity.getZ() - tag.getInt("z"));
+        player.displayClientMessage(Component.literal(stack.getHoverName().getString() + ": " + ((int) vec.length()) + "m"), true);
     }
 
     @Override

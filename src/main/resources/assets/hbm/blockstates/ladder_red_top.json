@@ -1,32 +1,7 @@
 {
-  "forge_marker": 1,
-  "defaults": {
-    "textures": {},
-    "model": "hbm:block/red_ladder_top.obj"
-  },
   "variants": {
-    "facing=north": [
-      {
-        "y": 270
-      }
-    ],
-    "facing=south": [
-      {
-        "y": 90
-      }
-    ],
-    "facing=west": [
-      {
-        "y": 180
-      }
-    ],
-    "facing=east": [
-      {}
-    ],
-    "": [
-      {
-        "y": 270
-      }
-    ]
+    "": {
+      "model": "hbm:block/ladder_red_top"
+    }
   }
 }

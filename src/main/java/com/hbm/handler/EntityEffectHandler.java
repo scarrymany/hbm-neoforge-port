@@ -1,10 +1,19 @@
 package com.hbm.handler;
 
+import com.hbm.capability.ContaminationEffect;
+import com.hbm.capability.HbmLivingAttachment;
 import com.hbm.capability.HbmLivingProps;
+import com.hbm.capability.HbmPlayerAttachment;
+import com.hbm.capability.ModAttachments;
 import com.hbm.config.GeneralConfig;
 import com.hbm.config.RadiationConfig;
+import com.hbm.config.ServerConfig;
 import com.hbm.config.WorldConfig;
 import com.hbm.damage.ModDamageTypes;
+import com.hbm.handler.HbmKeybinds.EnumKeybind;
+import com.hbm.interfaces.IArmorModDash;
+import com.hbm.items.gear.ArmorFSB;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.entity.mob.CreeperVariantEntityTypes;
 import com.hbm.entity.mob.EntityCreeperNuclear;
 import com.hbm.entity.mob.EntityDuck;
@@ -14,6 +23,7 @@ import com.hbm.entity.mob.Phase4BossEntityTypes2;
 import com.hbm.entity.mob.RadBeastEntityTypes;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.handler.pollution.PollutionHandler.PollutionType;
+import com.hbm.main.AdvancementManager;
 import com.hbm.main.MainRegistry;
 import com.hbm.potion.HbmPotionEffects;
 import com.hbm.util.ArmorRegistry;
@@ -22,13 +32,22 @@ import com.hbm.util.ContaminationUtil;
 import com.hbm.util.ContaminationUtil.ContaminationType;
 import com.hbm.util.ContaminationUtil.HazardType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.animal.MushroomCow;
 import net.minecraft.world.entity.monster.Blaze;
@@ -36,11 +55,19 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.ZombieVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+
+import java.util.Iterator;
+import java.util.Random;
 
 /**
  * Real, self-subscribing port of a narrow slice of CE's 759-line {@code com.hbm.handler.EntityEffectHandler}
@@ -56,10 +83,12 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
  *     <li>the lead-poisoning-on-ore-break hook, from CE's real {@code ModEventHandler.blockBreak}
  *     (lines 1294-1307, read in full).</li>
  * </ol>
- * Every other branch of the real file (contamination-effect ticking, digamma, lung disease, oil,
- * temperature, dashing, plinking, the full 200-2,500,000 rad sickness-effect ladder beyond the mutation
- * thresholds) is out of this package's scope per this task's own brief - not reproduced here, and not
- * claimed as done.
+ * {@link #handleDashing} / {@link #handlePlinking} are Exact CE {@code :655-754}, dispatched from
+ * {@code CommonTickEvents#onPlayerTick} (both sides). Dash-bar HUD stays skipped.
+ * {@link #handleContamination}/{@link #handleLungDisease}/{@link #handleOil}/{@link #handleTemperature}
+ * / {@link #handleContagion} / {@link #handleRadiationSickness} / {@link #handleRadBufSnapshot}
+ * / {@link #handleNetherBurn} / {@link #handleShieldRegen} are Exact CE server ticks.
+ * Vomit/sweat/FlameCreator/Confetti / {@code HbmPlayerSyncPacket} stay skipped.
  * <p>
  * <b>Review pass finding (not fixed here)</b>: CE's real {@code handleRadiationEffect} table actually has
  * a <em>6th</em> branch this file's own scope list above omits - {@code eRad >= 800 && entity instanceof
@@ -110,9 +139,59 @@ public final class EntityEffectHandler {
         if (!(event.getEntity() instanceof LivingEntity entity)) return;
         if (!(entity.level() instanceof ServerLevel level)) return;
 
+        handleRadBufSnapshot(entity);
+        handleNetherBurn(entity, level);
         handleCraterRadiation(entity, level);
+        handleShieldRegen(entity);
         handleMutationCascade(entity, level);
         handlePollution(entity, level);
+        handleContamination(entity);
+        handleContagion(entity);
+        handleLungDisease(entity);
+        handleOil(entity);
+        handleTemperature(entity);
+    }
+
+    // ==================== CE onUpdate server block (lines 74-109) ====================================
+
+    /**
+     * Exact CE {@code onUpdate} {@code :76-79}. Copies this second's accumulated {@code radEnv}
+     * (written by {@link ContaminationUtil#contaminate}) into {@code radBuf} and zeroes env.
+     * Geiger/dosimeter read {@code radBuf} — without this snapshot they stay at 0.
+     */
+    private static void handleRadBufSnapshot(LivingEntity entity) {
+        if (entity.tickCount % 20 != 0) return;
+        HbmLivingProps.setRadBuf(entity, HbmLivingProps.getRadEnv(entity));
+        HbmLivingProps.setRadEnv(entity, 0);
+    }
+
+    /**
+     * Exact CE {@code onUpdate} {@code :84-86}. CE post-load forces {@code enable528NetherBurn=false}
+     * when {@code !enable528} ({@code GeneralConfig.java:291-294}); port gates both flags instead of
+     * mutating config. {@code HbmPlayerSyncPacket} stays skipped (unported).
+     */
+    private static void handleNetherBurn(LivingEntity entity, ServerLevel level) {
+        if (!GeneralConfig.enable528() || !GeneralConfig.X528_ENABLE_NETHER_BURN.get()) return;
+        if (!(entity instanceof Player)) return;
+        if (entity.fireImmune()) return;
+        if (level.dimension() != Level.NETHER) return;
+        entity.igniteForSeconds(5);
+    }
+
+    /**
+     * Exact CE {@code onUpdate} {@code :96-105}. Shield regen 60 ticks after last hit, 0.005F * tsd
+     * per tick, clamp to {@link HbmPlayerAttachment#getEffectiveMaxShield}. Sync packet skipped.
+     */
+    private static void handleShieldRegen(LivingEntity entity) {
+        if (!(entity instanceof ServerPlayer player)) return;
+        HbmPlayerAttachment cap = HbmPlayerAttachment.getData(player);
+        float max = cap.getEffectiveMaxShield(player);
+        float shield = cap.getShield();
+        if (shield < max && entity.tickCount > cap.getLastDamage() + 60) {
+            int tsd = entity.tickCount - (cap.getLastDamage() + 60);
+            cap.setShield(shield + Math.min(max - shield, 0.005F * tsd));
+        }
+        if (cap.getShield() > max) cap.setShield(max);
     }
 
     // ==================== crater-biome ambient radiation (CE onUpdate, lines 81-94) ====================
@@ -147,52 +226,113 @@ public final class EntityEffectHandler {
     // ==================== radiation-mutation cascade (CE handleRadiationEffect, lines 233-285) =======
 
     private static void handleMutationCascade(LivingEntity entity, ServerLevel level) {
-        // CE: handleRadiationEffect's own top-level gate - `if (!GeneralConfig.enableRads ...) return;`
-        // ([CE: 1.16_enableRadiation], this port's GeneralConfig.ENABLE_RADIATION) - was missing here,
-        // meaning the whole mutation cascade would still fire even with radiation disabled server-wide.
+        // CE handleRadiationEffect :236-237 — enableRads / invulnerable(RADIATION) / spectator.
+        // CE does NOT skip creative (ladder + mutations both run). Mutations keep the existing
+        // creative skip below; the potion/death ladder still fires for creative (Exact CE).
         if (!GeneralConfig.ENABLE_RADIATION.get()) return;
         if (!entity.isAlive()) return;
-        if (entity instanceof Player player && (player.isCreative() || player.isSpectator())) return;
+        if (entity instanceof Player player && player.isSpectator()) return;
+        if (entity.isInvulnerableTo(entity.damageSources().source(ModDamageTypes.RADIATION))) return;
 
         double eRad = HbmLivingProps.getRadiation(entity);
         if (eRad < 50D) return;
+        // CE :241 — one 21000-draw shared by creeper mutate and the sickness ladder.
+        int rng = level.random.nextInt(21000);
 
-        // See class javadoc: CE's real condition is `instanceof EntityCreeper` (broader than "vanilla
-        // Creeper"), guarded here against remutating an already-Nuclear creeper (a harmless no-op in
-        // real CE too, since Nuclear Creepers are radiation-immune and never reach this threshold).
-        if (entity instanceof Creeper creeper && !(creeper instanceof EntityCreeperNuclear) && eRad >= 200D) {
-            if (level.random.nextInt(3) == 0) {
-                EntityCreeperNuclear mutated = new EntityCreeperNuclear(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), level);
-                mutate(creeper, mutated, level);
-            } else {
-                entity.hurt(entity.damageSources().source(ModDamageTypes.RADIATION), 100F);
+        boolean creative = entity instanceof Player player && player.isCreative();
+        if (!creative) {
+            // See class javadoc: CE's real condition is `instanceof EntityCreeper` (broader than "vanilla
+            // Creeper"), guarded here against remutating an already-Nuclear creeper (a harmless no-op in
+            // real CE too, since Nuclear Creepers are radiation-immune and never reach this threshold).
+            if (entity instanceof Creeper creeper && !(creeper instanceof EntityCreeperNuclear) && eRad >= 200D) {
+                if (rng % 3 == 0) {
+                    EntityCreeperNuclear mutated = new EntityCreeperNuclear(CreeperVariantEntityTypes.CREEPER_NUCLEAR.get(), level);
+                    mutate(creeper, mutated, level);
+                } else {
+                    entity.hurt(entity.damageSources().source(ModDamageTypes.RADIATION), 100F);
+                }
+                return;
             }
-            return;
+
+            if (entity instanceof Cow cow && !(cow instanceof MushroomCow) && eRad >= 50D) {
+                MushroomCow mooshroom = new MushroomCow(EntityType.MOOSHROOM, level);
+                mutate(cow, mooshroom, level);
+                return;
+            }
+
+            if (entity instanceof Villager villager && eRad >= 500D) {
+                ZombieVillager zombie = new ZombieVillager(EntityType.ZOMBIE_VILLAGER, level);
+                zombie.setVillagerData(villager.getVillagerData());
+                zombie.setBaby(villager.isBaby());
+                mutate(villager, zombie, level);
+                return;
+            }
+
+            if (entity instanceof Blaze && eRad >= 700D) {
+                EntityRADBeast beast = new EntityRADBeast(RadBeastEntityTypes.RAD_BEAST.get(), level);
+                mutate(entity, beast, level);
+                return;
+            }
+
+            if (entity instanceof EntityDuck duck && !(duck instanceof EntityQuackos) && eRad >= 200D) {
+                EntityQuackos quacc = new EntityQuackos(Phase4BossEntityTypes2.QUACKOS.get(), level);
+                mutate(duck, quacc, level);
+                return;
+            }
         }
 
-        if (entity instanceof Cow cow && !(cow instanceof MushroomCow) && eRad >= 50D) {
-            MushroomCow mooshroom = new MushroomCow(EntityType.MOOSHROOM, level);
-            mutate(cow, mooshroom, level);
-            return;
-        }
+        handleRadiationSickness(entity, eRad, rng);
+    }
 
-        if (entity instanceof Villager villager && eRad >= 500D) {
-            ZombieVillager zombie = new ZombieVillager(EntityType.ZOMBIE_VILLAGER, level);
-            zombie.setVillagerData(villager.getVillagerData());
-            zombie.setBaby(villager.isBaby());
-            mutate(villager, zombie, level);
-            return;
-        }
+    /**
+     * Exact CE {@code handleRadiationEffect} {@code :287-329} potion/death ladder after mutations.
+     * Horse zombify ({@code :269-279}) stays skipped — no verified 1.21 {@code temper}/{@code makeMad}.
+     * CE {@code eRad > 2500000} cap is a no-op here: {@link com.hbm.capability.HbmLivingAttachment}
+     * already clamps writes to {@code MAX_RADS=2500}.
+     */
+    private static void handleRadiationSickness(LivingEntity entity, double eRad, int rng) {
+        if (eRad < 200D) return;
+        if (eRad > 2_500_000D) HbmLivingProps.setRadiation(entity, 2_500_000D);
 
-        if (entity instanceof Blaze && eRad >= 700D) {
-            EntityRADBeast beast = new EntityRADBeast(RadBeastEntityTypes.RAD_BEAST.get(), level);
-            mutate(entity, beast, level);
-            return;
-        }
-
-        if (entity instanceof EntityDuck duck && !(duck instanceof EntityQuackos) && eRad >= 200D) {
-            EntityQuackos quacc = new EntityQuackos(Phase4BossEntityTypes2.QUACKOS.get(), level);
-            mutate(duck, quacc, level);
+        if (eRad >= 1000D) {
+            entity.hurt(entity.damageSources().source(ModDamageTypes.RADIATION), 1000F);
+            HbmLivingProps.setRadiation(entity, 0);
+            if (entity.getHealth() > 0) {
+                entity.setHealth(0);
+                entity.die(entity.damageSources().source(ModDamageTypes.RADIATION));
+            }
+            if (entity instanceof ServerPlayer player) {
+                AdvancementManager.grantAchievement(player, AdvancementManager.achRadDeath);
+            }
+        } else if (eRad >= 800D) {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 30, 0));
+            if (rng % 300 == 50) entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10 * 20, 2));
+            if (rng % 300 == 100) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 10 * 20, 2));
+            if (rng % 500 == 0) entity.addEffect(new MobEffectInstance(MobEffects.POISON, 3 * 20, 2));
+            if (rng % 700 == 0) entity.addEffect(new MobEffectInstance(MobEffects.WITHER, 3 * 20, 1));
+            if (rng % 300 == 150) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 5 * 20, 3));
+            if (rng % 300 == 200) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 5 * 20, 3));
+        } else if (eRad >= 600D) {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 30, 0));
+            if (rng % 300 == 50) entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 10 * 20, 2));
+            if (rng % 300 == 100) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 10 * 20, 2));
+            if (rng % 500 == 0) entity.addEffect(new MobEffectInstance(MobEffects.POISON, 3 * 20, 1));
+            if (rng % 300 == 150) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 3 * 20, 3));
+            if (rng % 400 == 0) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 6 * 20, 2));
+        } else if (eRad >= 400D) {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 30, 0));
+            if (rng % 500 == 50) entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 5 * 20, 0));
+            if (rng % 300 == 100) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 5 * 20, 1));
+            if (rng % 500 == 150) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 3 * 20, 2));
+            if (rng % 600 == 0) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 4 * 20, 1));
+        } else {
+            if (rng % 300 == 0) entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 5 * 20, 0));
+            if (rng % 500 == 0) entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 5 * 20, 0));
+            if (rng % 700 == 0) entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, 3 * 20, 2));
+            if (rng % 800 == 0) entity.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 4 * 20, 0));
+            if (entity instanceof ServerPlayer player) {
+                AdvancementManager.grantAchievement(player, AdvancementManager.achRadPoison);
+            }
         }
     }
 
@@ -259,5 +399,399 @@ public final class EntityEffectHandler {
         else amplifier = 2;
 
         player.addEffect(new MobEffectInstance(HbmPotionEffects.LEAD, 100, amplifier));
+    }
+
+    // ==================== contamination / lungs / oil / temperature (CE :136-151, :464-650) ========
+
+    /** Exact CE {@code handleContamination} {@code :136-151}. AuxParticle stay skipped. */
+    private static void handleContamination(LivingEntity entity) {
+        Iterator<ContaminationEffect> iterator = HbmLivingProps.getCont(entity).iterator();
+        boolean dirty = false;
+        while (iterator.hasNext()) {
+            ContaminationEffect con = iterator.next();
+            ContaminationUtil.contaminate(entity, HazardType.RADIATION,
+                    con.ignoreArmor ? ContaminationType.RAD_BYPASS : ContaminationType.CREATIVE, con.getRad());
+            con.time--;
+            dirty = true;
+            if (con.time <= 0) {
+                iterator.remove();
+            }
+        }
+        if (dirty) {
+            persistLiving(entity);
+        }
+    }
+
+    /**
+     * Exact CE {@code handleContagion} {@code :354-461}. Item flag is CE {@code ntmContagion} NBT
+     * via {@link DataComponents#CUSTOM_DATA} (same key). Vomit AuxParticle stays skipped;
+     * vomit sound still plays.
+     */
+    private static void handleContagion(LivingEntity entity) {
+        if (!ServerConfig.ENABLE_MKU.get()) {
+            return;
+        }
+
+        RandomSource rand = entity.getRandom();
+        int minute = 60 * 20;
+        int hour = 60 * minute;
+        int contagion = HbmLivingProps.getContagion(entity);
+
+        if (entity instanceof Player player) {
+            var inv = player.getInventory();
+            ItemStack stack = inv.items.get(rand.nextInt(inv.items.size()));
+            if (rand.nextInt(100) == 0) {
+                stack = inv.armor.get(rand.nextInt(4));
+            }
+
+            if (!stack.isEmpty()
+                    && !ArmorUtil.checkForHazmatOnly(player)
+                    && !ArmorRegistry.hasProtection(player, EquipmentSlot.HEAD, HazardClass.BACTERIA)) {
+                if (contagion > 0) {
+                    if (!hasNtmContagion(stack)) {
+                        setNtmContagion(stack, true);
+                    }
+                } else if (hasNtmContagion(stack)) {
+                    HbmLivingProps.setContagion(player, 3 * hour);
+                }
+            }
+        }
+
+        if (contagion > 0) {
+            HbmLivingProps.setContagion(entity, contagion - 1);
+
+            if (contagion < (2 * hour + 55 * minute) && contagion % 20 == 0) {
+                double range = entity.isInWaterOrRain() ? 16D : 2D;
+                for (Entity ent : entity.level().getEntities(entity, entity.getBoundingBox().inflate(range))) {
+                    if (ent instanceof LivingEntity living) {
+                        if (HbmLivingProps.getContagion(living) <= 0
+                                && !ArmorUtil.checkForHazmatOnly(living)
+                                && !ArmorRegistry.hasProtection(living, EquipmentSlot.HEAD, HazardClass.BACTERIA)) {
+                            HbmLivingProps.setContagion(living, 3 * hour);
+                        }
+                    }
+                    if (ent instanceof ItemEntity itemEntity) {
+                        setNtmContagion(itemEntity.getItem(), true);
+                    }
+                }
+            }
+
+            if (contagion < 2 * hour && rand.nextInt(1000) == 0) {
+                entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+            }
+
+            if (contagion < hour && rand.nextInt(100) == 0) {
+                entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+                entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 300, 4));
+            }
+
+            if (contagion < 30 * minute && rand.nextInt(400) == 0) {
+                entity.hurt(entity.damageSources().source(ModDamageTypes.MKU), 1F);
+            }
+
+            if (contagion < 30 * minute && (contagion + entity.getId()) % 200 < 20 && canVomit(entity)) {
+                if ((contagion + entity.getId()) % 200 == 19) {
+                    entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(),
+                            HBMSoundHandler.vomit.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                }
+            }
+
+            if (contagion < 5 * minute && rand.nextInt(100) == 0) {
+                entity.hurt(entity.damageSources().source(ModDamageTypes.MKU), 2F);
+            }
+
+            if (contagion == 1) {
+                entity.hurt(entity.damageSources().source(ModDamageTypes.MKU), 100000F);
+            }
+        }
+    }
+
+    /** CE {@code ntmContagion} boolean on the stack compound. */
+    public static boolean hasNtmContagion(ItemStack stack) {
+        if (stack.isEmpty() || !stack.has(DataComponents.CUSTOM_DATA)) {
+            return false;
+        }
+        return stack.get(DataComponents.CUSTOM_DATA).copyTag().getBoolean("ntmContagion");
+    }
+
+    public static void setNtmContagion(ItemStack stack, boolean infected) {
+        if (stack.isEmpty()) {
+            return;
+        }
+        CompoundTag tag = stack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
+        if (infected) {
+            tag.putBoolean("ntmContagion", true);
+            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        } else {
+            tag.remove("ntmContagion");
+            if (tag.isEmpty()) {
+                stack.remove(DataComponents.CUSTOM_DATA);
+            } else {
+                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+            }
+        }
+    }
+
+    /** Exact CE {@code canVomit} {@code :756-758}. */
+    private static boolean canVomit(Entity e) {
+        return e.getType().getCategory() != MobCategory.WATER_CREATURE;
+    }
+
+    /**
+     * Exact CE {@code handleLungDisease} {@code :464-544}. Cough/potion/decay only;
+     * vomit AuxParticle packets stay skipped. Caps use CE {@code EntityHbmProps.maxBlacklung}
+     * ({@code 60*60*20}), not {@link HbmLivingAttachment#MAX_BLACKLUNG} (2x).
+     */
+    private static void handleLungDisease(LivingEntity entity) {
+        if (entity instanceof Player player && player.isCreative()) {
+            HbmLivingProps.setBlackLung(entity, 0);
+            HbmLivingProps.setAsbestos(entity, 0);
+            return;
+        }
+
+        // CE EntityHbmProps.maxBlacklung (HbmLivingCapability.java:140), not HbmLivingProps.maxBlacklung.
+        final int maxBlacklung = 60 * 60 * 20;
+        final int maxAsbestos = HbmLivingAttachment.MAX_ASBESTOS;
+
+        int bl = HbmLivingProps.getBlackLung(entity);
+        if (bl > 0 && bl < maxBlacklung * 0.25) {
+            HbmLivingProps.setBlackLung(entity, HbmLivingProps.getBlackLung(entity) - 1);
+        }
+
+        double blacklung = Math.min(HbmLivingProps.getBlackLung(entity), maxBlacklung);
+        double asbestos = Math.min(HbmLivingProps.getAsbestos(entity), maxAsbestos);
+
+        boolean coughs = blacklung / maxBlacklung > 0.25D || asbestos / maxAsbestos > 0.25D;
+        if (!coughs) {
+            return;
+        }
+
+        double blacklungDelta = 1D - (blacklung / (double) maxBlacklung);
+        double asbestosDelta = 1D - (asbestos / (double) maxAsbestos);
+        double total = 1 - (blacklungDelta * asbestosDelta);
+        int freq = Math.max((int) (1000 - 950 * total), 20);
+
+        Random rand = new Random(entity.getId());
+
+        if (total > 0.8D) {
+            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 6));
+            entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 3));
+            if (rand.nextInt(250) == 0) {
+                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 2));
+            }
+        } else if (total > 0.65D) {
+            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 2));
+            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 2));
+            if (rand.nextInt(500) == 0) {
+                entity.addEffect(new MobEffectInstance(MobEffects.POISON, 100, 0));
+            }
+        } else if (total > 0.45D) {
+            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 100, 1));
+            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 1));
+        } else if (total > 0.25D) {
+            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100, 0));
+        }
+
+        if (entity.level().getGameTime() % freq == entity.getId() % freq) {
+            entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(),
+                    HBMSoundHandler.cough.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        }
+    }
+
+    /** Exact CE {@code handleOil} {@code :546-569}. Sweat AuxParticle stays skipped. */
+    private static void handleOil(LivingEntity entity) {
+        int oil = HbmLivingProps.getOil(entity);
+        if (oil <= 0) {
+            return;
+        }
+
+        if (entity.isOnFire()) {
+            HbmLivingProps.setOil(entity, 0);
+            entity.level().explode(null, entity.getX(), entity.getY() + entity.getBbHeight() / 2,
+                    entity.getZ(), 3F, false, Level.ExplosionInteraction.TNT);
+        } else {
+            HbmLivingProps.setOil(entity, oil - 1);
+        }
+    }
+
+    /**
+     * Exact CE {@code handleTemperature} {@code :609-653}. FlameCreator / Confetti stay skipped.
+     * Fire/phosphorus/balefire timers are already written by registered flamers / 12ga / lingering fire.
+     */
+    private static void handleTemperature(LivingEntity living) {
+        if (!living.isAlive()) {
+            return;
+        }
+
+        HbmLivingAttachment props = HbmLivingAttachment.getData(living);
+        RandomSource rand = living.getRandom();
+        boolean dirty = false;
+
+        if (living.fireImmune()) {
+            if (props.getFire() > 0 || props.getPhosphorus() > 0) {
+                props.setFire(0);
+                props.setPhosphorus(0);
+                dirty = true;
+            }
+        }
+
+        if (living.isInWaterOrRain() && props.getFire() > 0) {
+            props.setFire(0);
+            dirty = true;
+        }
+
+        if (props.getFire() > 0) {
+            props.setFire(props.getFire() - 1);
+            dirty = true;
+            if ((living.tickCount + living.getId()) % 15 == 0) {
+                living.level().playSound(null, living.getX(), living.getY() + living.getBbHeight() / 2, living.getZ(),
+                        SoundEvents.FIRE_EXTINGUISH, SoundSource.HOSTILE, 1F, 1.5F + rand.nextFloat() * 0.5F);
+            }
+            if ((living.tickCount + living.getId()) % 40 == 0) {
+                living.hurt(living.damageSources().onFire(), 2F);
+            }
+        }
+
+        if (props.getPhosphorus() > 0) {
+            props.setPhosphorus(props.getPhosphorus() - 1);
+            dirty = true;
+            if ((living.tickCount + living.getId()) % 15 == 0) {
+                living.level().playSound(null, living.getX(), living.getY() + living.getBbHeight() / 2, living.getZ(),
+                        SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 1F, 1.5F + rand.nextFloat() * 0.5F);
+            }
+            if ((living.tickCount + living.getId()) % 40 == 0) {
+                living.hurt(living.damageSources().onFire(), 5F);
+            }
+        }
+
+        if (props.getBalefire() > 0) {
+            props.setBalefire(props.getBalefire() - 1);
+            dirty = true;
+            if ((living.tickCount + living.getId()) % 15 == 0) {
+                living.level().playSound(null, living.getX(), living.getY() + living.getBbHeight() / 2, living.getZ(),
+                        SoundEvents.FIRE_EXTINGUISH, SoundSource.NEUTRAL, 1F, 1.5F + rand.nextFloat() * 0.5F);
+            }
+            ContaminationUtil.contaminate(living, HazardType.RADIATION, ContaminationType.CREATIVE, 5F);
+            if ((living.tickCount + living.getId()) % 20 == 0) {
+                living.hurt(living.damageSources().onFire(), 5F);
+            }
+        }
+
+        if (dirty) {
+            living.setData(ModAttachments.LIVING_ATTACHMENT, props);
+        }
+    }
+
+    private static void persistLiving(LivingEntity entity) {
+        entity.setData(ModAttachments.LIVING_ATTACHMENT, HbmLivingAttachment.getData(entity));
+    }
+
+    // ==================== dash / plink (CE EntityEffectHandler :655-754) ====================
+
+    private static final EquipmentSlot[] DASH_ARMOR_SLOTS = {
+            EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD
+    };
+
+    /**
+     * Exact CE {@code handleDashing} {@code :655-743}. LSHIFT via {@code EnumKeybind.DASH} /
+     * {@code KeybindPacket}; stamina 30/dash; cooldown {@link HbmPlayerAttachment#DASH_COOLDOWN_LENGTH}.
+     * Dash-bar overlay stays skipped.
+     */
+    public static void handleDashing(LivingEntity entity) {
+        if (!(entity instanceof Player player)) return;
+
+        HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
+        props.setDashCount(0);
+
+        ArmorFSB chestplate = null;
+        int armorDashCount = 0;
+        int armorModDashCount = 0;
+
+        if (ArmorFSB.hasFSBArmor(player)) {
+            ItemStack plate = player.getItemBySlot(EquipmentSlot.CHEST);
+            chestplate = (ArmorFSB) plate.getItem();
+        }
+
+        if (chestplate != null) {
+            armorDashCount = chestplate.dashCount;
+        }
+
+        for (EquipmentSlot armorSlot : DASH_ARMOR_SLOTS) {
+            ItemStack armorStack = player.getItemBySlot(armorSlot);
+            if (!armorStack.isEmpty() && armorStack.getItem() instanceof ArmorItem) {
+                ItemStack[] mods = ArmorModHandler.pryMods(armorStack);
+                // CE loops modSlot < 8 — battery slot 8 is excluded.
+                int limit = Math.min(8, mods.length);
+                for (int modSlot = 0; modSlot < limit; modSlot++) {
+                    ItemStack mod = mods[modSlot];
+                    if (!mod.isEmpty() && mod.getItem() instanceof IArmorModDash dashMod) {
+                        armorModDashCount += dashMod.getDashes();
+                    }
+                }
+            }
+        }
+
+        int dashCount = armorDashCount + armorModDashCount;
+        boolean dashActivated = props.getKeyPressed(EnumKeybind.DASH);
+
+        if (dashCount * 30 < props.getStamina()) {
+            props.setStamina(dashCount * 30);
+        }
+
+        if (dashCount > 0) {
+            int perDash = 30;
+            int stamina = props.getStamina();
+
+            props.setDashCount(dashCount);
+
+            if (props.getDashCooldown() <= 0) {
+                if (dashActivated && stamina >= perDash) {
+                    Vec3 lookingIn = player.getLookAngle();
+                    Vec3 strafeVec = lookingIn.yRot((float) Math.PI * 0.5F);
+
+                    int forward = (int) Math.signum(player.zza);
+                    int strafe = (int) Math.signum(player.xxa);
+                    if (forward == 0 && strafe == 0) {
+                        forward = 1;
+                    }
+
+                    player.push(
+                            lookingIn.x * forward + strafeVec.x * strafe,
+                            0,
+                            lookingIn.z * forward + strafeVec.z * strafe);
+                    var mot = player.getDeltaMovement();
+                    player.setDeltaMovement(mot.x, 0, mot.z);
+                    player.fallDistance = 0F;
+                    player.playSound(HBMSoundHandler.rocketFlame.get(), 1.0F, 1.0F);
+
+                    props.setDashCooldown(HbmPlayerAttachment.DASH_COOLDOWN_LENGTH);
+                    stamina -= perDash;
+                }
+            } else {
+                props.setDashCooldown(props.getDashCooldown() - 1);
+                props.setKeyPressed(EnumKeybind.DASH, false);
+            }
+
+            if (stamina < props.getDashCount() * perDash) {
+                stamina++;
+                if (stamina % perDash == perDash - 1) {
+                    player.playSound(HBMSoundHandler.techBoop.get(), 1.0F,
+                            1.0F + ((1F / 12F) * (stamina / perDash)));
+                    stamina++;
+                }
+            }
+
+            props.setStamina(stamina);
+        }
+    }
+
+    /** Exact CE {@code handlePlinking} {@code :745-754}. */
+    public static void handlePlinking(LivingEntity entity) {
+        if (!(entity instanceof Player player)) return;
+        HbmPlayerAttachment props = HbmPlayerAttachment.getData(player);
+        if (props.getPlinkCooldown() > 0) {
+            props.setPlinkCooldown(props.getPlinkCooldown() - 1);
+        }
     }
 }

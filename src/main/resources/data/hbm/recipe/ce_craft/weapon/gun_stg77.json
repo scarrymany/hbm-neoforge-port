@@ -1,0 +1,43 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " D ",
+    "BRS",
+    "GM "
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "B": {
+      "tag": "c:light_barrels/saturnite"
+    },
+    "R": {
+      "tag": "c:light_receivers/saturnite"
+    },
+    "S": [
+      {
+        "tag": "c:stocks/polycarbonate"
+      },
+      {
+        "tag": "c:stocks/pvc"
+      }
+    ],
+    "G": [
+      {
+        "tag": "c:grips/polycarbonate"
+      },
+      {
+        "tag": "c:grips/pvc"
+      }
+    ],
+    "M": {
+      "tag": "c:gun_mechanisms/saturnite"
+    }
+  },
+  "result": {
+    "id": "hbm:gun_stg77",
+    "count": 1
+  }
+}

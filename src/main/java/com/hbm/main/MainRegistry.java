@@ -75,6 +75,8 @@ public class MainRegistry {
         if(!configHbmDir.exists()) configHbmDir.mkdirs();
 
         HbmConfig.register(modContainer);
+        // CE AutoRegistry.loadAuxiliaryData — MachineDynConfig hbmMachines.json
+        AutoRegistry.loadAuxiliaryData();
 
         HBMSoundHandler.register(modEventBus);
         ModParticleTypes.register(modEventBus);
@@ -96,6 +98,9 @@ public class MainRegistry {
         ModItems.register(modEventBus);
         HbmDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);
+        com.hbm.blocks.machine.foundry.FoundryBlocks.BLOCKS.register(modEventBus);
+        com.hbm.blocks.machine.foundry.FoundryBlocks.ITEMS.register(modEventBus);
+        com.hbm.blockentity.machine.foundry.FoundryBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         ConveyorEntityTypes.register(modEventBus);
         NukeEntityTypes.register(modEventBus);
         EffectEntityTypes.register(modEventBus);
@@ -127,6 +132,7 @@ public class MainRegistry {
         HbmRecipes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.register(modEventBus);
+        com.hbm.inventory.container.bomb.ModBombMenus.register(modEventBus);
 
         Fluids.init();
         // Populates the data-driven Solinium block-swap table (defaults to empty/no-op otherwise).

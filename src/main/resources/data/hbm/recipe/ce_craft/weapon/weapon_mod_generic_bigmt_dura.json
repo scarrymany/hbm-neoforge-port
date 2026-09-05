@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "hbm:plate_saturnite"
+    },
+    {
+      "tag": "c:plates_triple/saturnite"
+    },
+    {
+      "item": "hbm:ducttape"
+    }
+  ],
+  "result": {
+    "id": "hbm:weapon_mod_generic_bigmt_dura",
+    "count": 1
+  }
+}

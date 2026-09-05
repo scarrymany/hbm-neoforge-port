@@ -1,6 +1,7 @@
 package com.hbm.items.weapon.sedna.content;
 
 import com.hbm.entity.projectile.EntityBulletBeamBase;
+import com.hbm.entity.projectile.EntityCoin;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.items.weapon.sedna.GunConfig;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT;
@@ -8,6 +9,7 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.Receiver;
 import com.hbm.items.weapon.sedna.factory.GunStateDecider;
 import com.hbm.items.weapon.sedna.factory.Lego;
+import com.hbm.items.weapon.sedna.impl.ItemGunNI4NI;
 import com.hbm.items.weapon.sedna.mags.MagazineBelt;
 import com.hbm.items.weapon.sedna.mags.MagazineInfinite;
 import com.hbm.items.weapon.sedna.mags.MagazineSingleReload;
@@ -16,15 +18,16 @@ import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import com.hbm.weapon.anim.GunAnimationType;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * Port of CE's {@code com.hbm.items.weapon.sedna.factory.XFactoryAccelerator} - the 3 particle-
@@ -39,14 +42,9 @@ import java.util.function.Consumer;
  * the reload scan to match against - see {@code XFactory556mm}'s class javadoc for why every ammo
  * item below is a plain eager {@code static final} field (no sound/registry timing hazard).
  * <p>
- * <b>{@code gun_n_i_4_n_i}'s coin-throwing secondary fire is a documented forward reference, not
- * ported</b>: CE's {@code LAMBDA_NI4NI_SECONDARY_PRESS} spawns a {@code com.hbm.entity.item.EntityCoin}
- * from a per-stack coin counter ({@code ItemGunNI4NI}) - neither the entity nor the bespoke item
- * subclass exist anywhere in this port (confirmed: no {@code EntityCoin} under
- * {@code com.hbm.entity}). The gun's real weapon behavior (an infinite-ammo melee-range arc beam) is
- * fully ported below as a plain {@link ItemGunBaseNT}; the secondary press is a documented no-op
- * until {@code EntityCoin}/{@code ItemGunNI4NI} land (unrelated gambling/currency-item feature, not
- * ammo/ballistics content).
+ * <b>{@code gun_n_i_4_n_i} coin throw is Exact CE {@code XFactoryAccelerator.java:183-201}</b>
+ * via {@link ItemGunNI4NI} regen ({@code :31-54}) + {@link EntityCoin#throwFrom}. Color
+ * {@code ICustomizable} skipped (unused command cosmetics).
  * <p>
  * <b>{@code gun_tau}'s charged alt-fire is ported</b>: CE's secondary-press/-release pair spins up
  * over a hold, then on release spawns one bigger {@link EntityBulletBeamBase} scaled by hold
@@ -142,7 +140,7 @@ public final class XFactoryAccelerator {
     }
 
     public static ItemGunBaseNT gun_n_i_4_n_i() {
-        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.SPECIAL,
+        return new ItemGunNI4NI(new Item.Properties(), WeaponQuality.SPECIAL,
                 new GunConfig()
                         .dura(0).draw(5).inspect(39).crosshair(Crosshair.CIRCLE)
                         .rec(new Receiver(0)
@@ -151,10 +149,7 @@ public final class XFactoryAccelerator {
                                 .offset(0.75, -0.0625, -0.1875D)
                                 .setupStandardFire().fire(Lego.LAMBDA_NOWEAR_FIRE))
                         .setupStandardConfiguration()
-                        // TODO(entity-item-coin): CE's secondary press throws an EntityCoin from a
-                        // per-stack counter (ItemGunNI4NI) - see this class's javadoc. No-op until
-                        // com.hbm.entity.item.EntityCoin exists.
-                        .ps((stack, ctx) -> { }));
+                        .ps(LAMBDA_NI4NI_SECONDARY_PRESS));
     }
 
     // ==================== lambdas ====================
@@ -193,6 +188,17 @@ public final class XFactoryAccelerator {
         } else {
             ItemGunBaseNT.playAnimation(ctx.getPlayer(), stack, GunAnimationType.CYCLE_DRY, ctx.configIndex);
         }
+    };
+
+    /** Exact CE {@code XFactoryAccelerator.java:183-201} {@code LAMBDA_NI4NI_SECONDARY_PRESS}. */
+    private static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_NI4NI_SECONDARY_PRESS = (stack, ctx) -> {
+        if (ctx.getPlayer() == null) return;
+        Player player = ctx.getPlayer();
+        if (ItemGunNI4NI.getCoinCount(stack) <= 0) return;
+        EntityCoin.throwFrom(player);
+        player.level().playSound(null, player.blockPosition(), SoundEvents.EXPERIENCE_ORB_PICKUP,
+                SoundSource.PLAYERS, 1.0F, 1F + player.getRandom().nextFloat() * 0.25F);
+        ItemGunNI4NI.setCoinCount(stack, ItemGunNI4NI.getCoinCount(stack) - 1);
     };
 
     private static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_RECOIL_COILGUN =

@@ -7,6 +7,8 @@ import com.hbm.blocks.BlockDummyable;
 import com.hbm.inventory.container.machine.dummyable.DrainMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.inventory.fluid.trait.FT_Polluting;
+import com.hbm.inventory.fluid.trait.FluidTrait;
 import com.hbm.inventory.fluid.trait.FluidTraitSimple;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.lib.DirPos;
@@ -30,7 +32,9 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineDrain} — subscribe + spill {@code max(fill/2, 1)}.
- * Amat explodes. {@code FT_Polluting}/{@code oil_spill} skipped (not wired).
+ * Amat explodes.
+ * {@code FT_Polluting.pollute(SPILL, toSpill)} Exact CE {@code TileEntityMachineDrain.java:69}.
+ * {@code oil_spill} raycast / particles stay skipped.
  */
 public class MachineDrainBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
@@ -73,6 +77,9 @@ public class MachineDrainBlockEntity extends MachineBaseBlockEntity
             }
             int toSpill = Math.max(tank.getFill() / 2, 1);
             tank.setFill(tank.getFill() - toSpill);
+            // CE TileEntityMachineDrain.java:69
+            FT_Polluting.pollute(level, worldPosition, tank.getTankType(),
+                    FluidTrait.FluidReleaseType.SPILL, toSpill);
         }
 
         dataChanged();

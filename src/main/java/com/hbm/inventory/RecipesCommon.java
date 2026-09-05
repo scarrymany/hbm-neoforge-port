@@ -528,4 +528,93 @@ public final class RecipesCommon {
     public static MetaBlock metaOf(Block block) {
         return new MetaBlock(block);
     }
+
+    /**
+     * Port-specific: {@code FluidBarrelStack} - an ingredient matching a fluid identifier item
+     * (e.g., {@link com.hbm.items.machine.ItemFluidIDMulti}) holding a specific {@link FluidType}.
+     * <p>
+     * CE used {@code Fluids.*.getDict(quantity)} to reference fluid barrels in anvil recipes via
+     * ore-dictionary. NeoForge 1.21 no longer has ore-dictionary; this class provides the equivalent
+     * matching logic: accepts any {@link com.hbm.items.machine.IItemFluidIdentifier} item-stack whose
+     * primary type matches the target {@link FluidType}.
+     * <p>
+     * <b>Example</b>: CE's {@code new OreDictStack(Fluids.SOURGAS.getDict(1_000), 8)} becomes
+     * {@code new FluidBarrelStack(Fluids.SOURGAS, 1_000, 8)} in this port.
+     */
+    public static class FluidBarrelStack extends AStack {
+        private final FluidType fluidType;
+        private final int fluidAmount; // mB per barrel (e.g., 1_000, 16_000)
+
+        public FluidBarrelStack(FluidType fluidType, int fluidAmount, int count) {
+            this.fluidType = fluidType;
+            this.fluidAmount = fluidAmount;
+            this.stacksize = count;
+        }
+
+        @Override
+        public boolean matchesRecipe(ItemStack stack, boolean useDamage) {
+            if (stack.getCount() < this.stacksize) return false;
+            if (!(stack.getItem() instanceof com.hbm.items.machine.IItemFluidIdentifier identifier)) return false;
+            FluidType stackType = identifier.getType(null, null, stack);
+            return stackType == this.fluidType;
+        }
+
+        @Override
+        public List<ItemStack> getStackList() {
+            ItemStack stack = new ItemStack(com.hbm.items.machine.MachineItems.FLUID_IDENTIFIER.get(), this.stacksize);
+            com.hbm.items.machine.ItemFluidIDMulti.setType(stack, this.fluidType, true);
+            return Collections.singletonList(stack);
+        }
+
+        @Override
+        public List<ItemStack> extractForJEI() {
+            return getStackList();
+        }
+
+        @Override
+        public ItemStack extractForCyclingDisplay(int count) {
+            // Return a fluid_identifier ItemStack with the target fluid type set
+            ItemStack stack = new ItemStack(com.hbm.items.machine.MachineItems.FLUID_IDENTIFIER.get(), count);
+            com.hbm.items.machine.ItemFluidIDMulti.setType(stack, this.fluidType, true);
+            return stack;
+        }
+
+        @Override
+        public ItemStack getStack() {
+            ItemStack stack = new ItemStack(com.hbm.items.machine.MachineItems.FLUID_IDENTIFIER.get(), this.stacksize);
+            com.hbm.items.machine.ItemFluidIDMulti.setType(stack, this.fluidType, true);
+            return stack;
+        }
+
+        @Override
+        public AStack copy() {
+            return new FluidBarrelStack(this.fluidType, this.fluidAmount, this.stacksize);
+        }
+
+        @Override
+        public AStack copy(int stacksize) {
+            return new FluidBarrelStack(this.fluidType, this.fluidAmount, stacksize);
+        }
+
+        @Override
+        public int compareTo(AStack o) {
+            if (!(o instanceof FluidBarrelStack other)) return -1;
+            int cmp = Integer.compare(this.fluidType.getID(), other.fluidType.getID());
+            if (cmp != 0) return cmp;
+            cmp = Integer.compare(this.fluidAmount, other.fluidAmount);
+            if (cmp != 0) return cmp;
+            return Integer.compare(this.stacksize, other.stacksize);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof FluidBarrelStack other)) return false;
+            return this.fluidType == other.fluidType && this.fluidAmount == other.fluidAmount && this.stacksize == other.stacksize;
+        }
+
+        @Override
+        public int hashCode() {
+            return 31 * (31 * fluidType.getID() + fluidAmount) + stacksize;
+        }
+    }
 }

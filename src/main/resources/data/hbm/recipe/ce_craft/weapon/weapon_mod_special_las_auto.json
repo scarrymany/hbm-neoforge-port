@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " C ",
+    "RFR",
+    " C "
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:circuit_chip_bismoid"
+    },
+    "R": {
+      "item": "hbm:crystal_redstone"
+    },
+    "F": [
+      {
+        "tag": "c:heavy_receivers/bismoid_bronze"
+      },
+      {
+        "tag": "c:heavy_receivers/bismoid_brass"
+      }
+    ]
+  },
+  "result": {
+    "id": "hbm:weapon_mod_special_las_auto",
+    "count": 1
+  }
+}

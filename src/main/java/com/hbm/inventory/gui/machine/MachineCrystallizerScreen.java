@@ -11,7 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 /**
  * CE {@code GUICrystallizer}. Texture is the unmodified CE png
  * ({@code textures/gui/processing/gui_crystallizer_alt.png}, 176×204).
- * Fluid-load / fluid-id slots stay trimmed — {@code TODO(CE: ContainerCrystallizer.java:38-42)}.
+ * Slots Exact CE {@code ContainerCrystallizer.java:35-42} (canister 17,18/54, ID 35,72).
  */
 public class MachineCrystallizerScreen extends GuiInfoContainer<MachineCrystallizerMenu> {
 

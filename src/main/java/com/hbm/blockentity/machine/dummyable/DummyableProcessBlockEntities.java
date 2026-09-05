@@ -95,6 +95,14 @@ public final class DummyableProcessBlockEntities {
     public static Supplier<BlockEntityType<MachineChungusBlockEntity>> MACHINE_CHUNGUS;
     public static Supplier<BlockEntityType<MachineSatLinkBlockEntity>> MACHINE_SATLINK;
     public static Supplier<BlockEntityType<MachineTeleporterBlockEntity>> MACHINE_TELEPORTER;
+    public static Supplier<BlockEntityType<MachineFluidTankBlockEntity>> MACHINE_FLUIDTANK;
+    public static Supplier<BlockEntityType<MachineBigAssTankBlockEntity>> MACHINE_BIGASSTANK;
+    public static Supplier<BlockEntityType<MachineCompressorCompactBlockEntity>> MACHINE_COMPRESSOR_COMPACT;
+    public static Supplier<BlockEntityType<MachineSatLinkerBlockEntity>> MACHINE_SATLINKER;
+    public static Supplier<BlockEntityType<ReactorResearchBlockEntity>> REACTOR_RESEARCH;
+    public static Supplier<BlockEntityType<ReactorZirnoxBlockEntity>> REACTOR_ZIRNOX;
+    public static Supplier<BlockEntityType<MachineAssemblyFactoryBlockEntity>> MACHINE_ASSEMBLY_FACTORY;
+    public static Supplier<BlockEntityType<MachineChemicalFactoryBlockEntity>> MACHINE_CHEMICAL_FACTORY;
 
     private DummyableProcessBlockEntities() {
     }
@@ -464,6 +472,38 @@ public final class DummyableProcessBlockEntities {
         MACHINE_TELEPORTER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_teleporter", () -> BlockEntityType.Builder.of(
                 (pos, state) -> new MachineTeleporterBlockEntity(MACHINE_TELEPORTER.get(), pos, state),
                 DummyableProcessBlocks.MACHINE_TELEPORTER.get()
+        ).build(null));
+        MACHINE_FLUIDTANK = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_fluidtank", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineFluidTankBlockEntity(MACHINE_FLUIDTANK.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_FLUIDTANK.get()
+        ).build(null));
+        MACHINE_BIGASSTANK = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_bigasstank", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineBigAssTankBlockEntity(MACHINE_BIGASSTANK.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_BIGASSTANK.get()
+        ).build(null));
+        MACHINE_COMPRESSOR_COMPACT = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_compressor_compact", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineCompressorCompactBlockEntity(MACHINE_COMPRESSOR_COMPACT.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_COMPRESSOR_COMPACT.get()
+        ).build(null));
+        MACHINE_SATLINKER = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_satlinker", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineSatLinkerBlockEntity(MACHINE_SATLINKER.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_SATLINKER.get()
+        ).build(null));
+        REACTOR_RESEARCH = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_small_reactor", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new ReactorResearchBlockEntity(REACTOR_RESEARCH.get(), pos, state),
+                DummyableProcessBlocks.REACTOR_RESEARCH.get()
+        ).build(null));
+        REACTOR_ZIRNOX = ModBlocks.BLOCK_ENTITY_TYPES.register("tileentity_zirnox", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new ReactorZirnoxBlockEntity(REACTOR_ZIRNOX.get(), pos, state),
+                DummyableProcessBlocks.REACTOR_ZIRNOX.get()
+        ).build(null));
+        MACHINE_ASSEMBLY_FACTORY = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_assembly_factory", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineAssemblyFactoryBlockEntity(MACHINE_ASSEMBLY_FACTORY.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_ASSEMBLY_FACTORY.get()
+        ).build(null));
+        MACHINE_CHEMICAL_FACTORY = ModBlocks.BLOCK_ENTITY_TYPES.register("machine_chemical_factory", () -> BlockEntityType.Builder.of(
+                (pos, state) -> new MachineChemicalFactoryBlockEntity(MACHINE_CHEMICAL_FACTORY.get(), pos, state),
+                DummyableProcessBlocks.MACHINE_CHEMICAL_FACTORY.get()
         ).build(null));
     }
 }

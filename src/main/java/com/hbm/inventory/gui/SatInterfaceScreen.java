@@ -1,6 +1,7 @@
 package com.hbm.inventory.gui;
 
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.main.MainRegistry;
 import com.hbm.packet.toclient.SatPanelPayload;
 import com.hbm.packet.toserver.SatPanelActionPayload;
 import com.hbm.saveddata.satellites.Satellite;
@@ -11,6 +12,7 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
@@ -22,57 +24,42 @@ import net.neoforged.neoforge.network.PacketDistributor;
 /**
  * Client-only, containerless GUI for {@link com.hbm.items.tool.ItemSatInterface} (non-coord
  * variant, {@code sat_interface}), ported from CE's {@code GUIScreenSatInterface} (288 lines, now
- * read in full for this review pass - see
- * {@code docs/phase5/gui_screens_survey_weapons_storage_special.md} Headline finding 3, which
- * confirmed this port's earlier version - written before {@code GUIScreenSatInterface} had been
- * read - was a much smaller placeholder than CE's real screen, a "live radar/map minigame", not a
- * static status readout).
+ * read in full for this review pass).
  * <p>
- * <b>Rebuilt against CE's exact mechanics</b>:
- * <ul>
- *   <li>Real dimensions: 216x216 (this port's earlier placeholder was 200x150).</li>
- *   <li>A 200x200 map area at local (8,8)-(208,208), rendered directly from the <b>client's own
- *   already-loaded {@link Level}</b> ({@link Minecraft#level}/{@link Level#getBlockState}/
- *   {@link Level#getHeight}) - no server payload carries the pixel data itself, exactly like CE.</li>
- *   <li>{@link Satellite.InterfaceActions#HAS_MAP}: a top-down terrain-color scan. One full
- *   {@code z}-row of 200 columns is (re-)sampled roughly every 15ms via {@link #scanPos}, sweeping
- *   through all 200 rows over ~3 seconds - matching CE's {@code drawMap}/{@code progresScan} timing
- *   exactly. Color comes from {@code BlockState#getMapColor} (this version's closest equivalent to
- *   CE's {@code Material.getMaterialMapColor().colorValue}).</li>
- *   <li>{@link Satellite.InterfaceActions#HAS_RADAR}: entities within a &plusmn;100-block AABB
- *   around the tracked view center, every frame, drawn as 8x8 blips (grey = other, red = hostile
- *   {@link Enemy}, blue = {@link Player}) at CE's exact screen-space formula (an
- *   {@code EntityMissileBaseAdvanced} branch is commented out/{@code TODO} in CE itself, so this
- *   port does not reproduce it either).</li>
- *   <li><b>WASD pans the tracked view center by 50 blocks</b> and resets the scan buffer - CE's own
- *   real navigation mechanic, entirely unbuilt before this pass.</li>
- *   <li>Clicking inside the map (when {@link Satellite.InterfaceActions#CAN_CLICK}) sends the
- *   clicked world coordinate as {@code satClickX}/{@code satClickZ} via
- *   {@link SatPanelActionPayload}, dispatched server-side to {@code Satellite#onClick} - this
- *   port's wiring was already correct (per the survey's own finding); only the click <i>surface</i>
- *   (this real scanned map, replacing a placeholder centered box) and its {@link
- *   HBMSoundHandler#techBleep} feedback were missing.</li>
- *   <li>{@link Satellite.InterfaceActions#SHOW_COORDS}: a raw world X/Z tooltip under the cursor
- *   while hovering the map.</li>
- * </ul>
+ * Rebuilt against CE's exact mechanics: real dimensions 216x216, a 200x200 map area at local
+ * (8,8)-(208,208), rendered directly from the client's own already-loaded {@link Level}
+ * ({@link Level#getBlockState}/{@link Level#getHeight}) - no server payload carries the pixel
+ * data itself, exactly like CE.
  * <p>
- * <b>Deliberate removal vs. this port's earlier placeholder</b>: the frequency/satellite-type/color/
- * info-lines/{@code tx}-scratch text readout the previous version drew is dropped - having now read
- * {@code GUIScreenSatInterface} in full, CE's real screen draws <i>no</i> such text anywhere (only
- * the not-connected/no-service banners, the map/radar pixels, and the coords tooltip). Per this
- * report's ground rule that CE is the sole source of truth for visuals, this screen now matches that
- * exactly rather than keeping an invented readout. {@link SatPanelPayload#infoLines()}/{@link
- * SatPanelPayload#tx()} remain defined on the payload (harmless - a different, not-yet-built
- * satellite console screen may legitimately want them); flagged here as an open question for
- * whoever owns that, not resolved by this pass.
+ * {@link Satellite.InterfaceActions#HAS_MAP}: a top-down terrain-color scan. One full {@code z}-row
+ * of 200 columns is (re-)sampled roughly every 15ms via {@link #scanPos}, sweeping through all 200
+ * rows over ~3 seconds - matching CE's {@code drawMap}/{@code progresScan} timing exactly. Color
+ * comes from {@code BlockState#getMapColor} (this version's closest equivalent to CE's
+ * {@code Material.getMaterialMapColor().colorValue}).
  * <p>
- * <b>Not ported (named blocker)</b>: {@link Satellite.InterfaceActions#HAS_ORES} (the ore-scan mode)
- * - blocked on a {@code BedrockOreRegistry}-equivalent ore-scan-color table, confirmed not ported
- * anywhere in this port (survey's Blocked/deferred section). If a satellite declares {@code HAS_ORES}
- * without {@code HAS_MAP}, the map area stays blank - a real, named, non-Phase-5 gap, not a bug in
- * this screen.
+ * {@link Satellite.InterfaceActions#HAS_RADAR}: entities within a &plusmn;100-block AABB around
+ * the tracked view center, every frame, drawn as 8x8 blips (grey = other, red = hostile {@link
+ * Enemy}, blue = {@link Player}) at CE's exact screen-space formula.
+ * <p>
+ * WASD pans the tracked view center by 50 blocks and resets the scan buffer - CE's own real
+ * navigation mechanic.
+ * <p>
+ * Clicking inside the map (when {@link Satellite.InterfaceActions#CAN_CLICK}) sends the clicked
+ * world coordinate as {@code satClickX}/{@code satClickZ} via {@link SatPanelActionPayload},
+ * dispatched server-side to {@code Satellite#onClick}.
+ * <p>
+ * {@link Satellite.InterfaceActions#SHOW_COORDS}: a raw world X/Z tooltip under the cursor while
+ * hovering the map.
+ * <p>
+ * Not ported (named blocker): {@link Satellite.InterfaceActions#HAS_ORES} (the ore-scan mode) -
+ * blocked on a {@code BedrockOreRegistry}-equivalent ore-scan-color table, confirmed not ported
+ * anywhere in this port. If a satellite declares {@code HAS_ORES} without {@code HAS_MAP}, the
+ * map area stays blank.
  */
 public class SatInterfaceScreen extends Screen {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/satellites/gui_sat_interface.png");
 
     private static final int WIDTH = 216;
     private static final int HEIGHT = 216;
@@ -141,7 +128,7 @@ public class SatInterfaceScreen extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.fill(guiLeft, guiTop, guiLeft + WIDTH, guiTop + HEIGHT, 0xC0101010);
+        guiGraphics.blit(TEXTURE, guiLeft, guiTop, 0, 0, WIDTH, HEIGHT);
 
         SatPanelPayload latest = SatPanelClientState.LATEST;
         if (latest == null || latest.freq() != freq) {

@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MPM",
+    "IBI",
+    "P P"
+  ],
+  "key": {
+    "P": {
+      "item": "hbm:plate_armor_hev"
+    },
+    "B": {
+      "item": "hbm:titanium_legs"
+    },
+    "I": {
+      "tag": "hbm:any_plastic"
+    },
+    "M": {
+      "item": "hbm:motor_desh"
+    }
+  },
+  "result": {
+    "id": "hbm:hev_legs",
+    "count": 1
+  }
+}

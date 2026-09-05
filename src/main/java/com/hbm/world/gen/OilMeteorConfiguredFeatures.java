@@ -27,6 +27,12 @@ public final class OilMeteorConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> SELLAFIELD = key("sellafield");
     public static final ResourceKey<ConfiguredFeature<?, ?>> LANDMINE = key("landmine");
     public static final ResourceKey<ConfiguredFeature<?, ?>> NITAN_CHEST = key("nitan_chest");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> DUD = key("dud");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> BARREL = key("barrel");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> SPACESHIP = key("spaceship");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> SATELLITE = key("satellite");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> GLYPHID_HIVE = key("glyphid_hive");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> DESERT_ATOM = key("desert_atom");
 
     private OilMeteorConfiguredFeatures() {
     }
@@ -42,6 +48,12 @@ public final class OilMeteorConfiguredFeatures {
         context.register(SELLAFIELD, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.SELLAFIELD.get(), NoneFeatureConfiguration.INSTANCE));
         context.register(LANDMINE, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.LANDMINE.get(), NoneFeatureConfiguration.INSTANCE));
         context.register(NITAN_CHEST, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.NITAN_CHEST.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(DUD, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.DUD.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(BARREL, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.BARREL.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(SPACESHIP, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.SPACESHIP.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(SATELLITE, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.SATELLITE.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(GLYPHID_HIVE, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.GLYPHID_HIVE.get(), NoneFeatureConfiguration.INSTANCE));
+        context.register(DESERT_ATOM, new ConfiguredFeature<>(OilMeteorWorldGenFeatures.DESERT_ATOM.get(), NoneFeatureConfiguration.INSTANCE));
     }
 
     private static ResourceKey<ConfiguredFeature<?, ?>> key(String path) {

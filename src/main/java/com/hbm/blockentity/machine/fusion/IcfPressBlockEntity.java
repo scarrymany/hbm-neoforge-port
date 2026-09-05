@@ -10,6 +10,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.inventory.material.Mats;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.IcfPressItems;
 import com.hbm.items.machine.ItemICFPellet;
 import com.hbm.items.machine.ItemICFPellet.EnumICFFuel;
@@ -39,14 +40,9 @@ import java.util.List;
  * {@link ItemICFPellet} stacks from two independent fuel inputs (each either a fluid or a
  * single-ingot material) plus an optional muon-catalyst item consumed 1:1 for the muon-catalyzed
  * bonus ({@link ItemICFPellet#getFusingDifficulty}).
- * <p>
- * <b>Simplification versus CE</b>: CE's tank slots (6/7) double as item-canister-fill slots via
- * {@code FluidTankNTM.setType(slot, inventory)}, a subsystem this port's {@code FluidTankNTM}
- * explicitly does not carry over yet (see that class's own javadoc, "item-canister loading
- * subsystem ... left out"). This press's tanks fill only through the {@code fluidmk2} network
- * ({@link IFluidStandardReceiverMK2}) instead - a real, working fluid path, just without the
- * "insert a filled canister directly" convenience. Restoring that convenience is a follow-up once
- * the item-canister subsystem lands.
+ * {@code tanks[0].setType(6)} / {@code tanks[1].setType(7)} Exact CE {@code TileEntityICFPress.java:57-58}.
+ * Slots 6/7 Exact CE {@code ContainerICFPress.java:47-48}.
+ * Muon {@code getContainerItem} → slot 3 Exact CE {@code TileEntityICFPress.java:67-85}.
  */
 public class IcfPressBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, IFluidStandardReceiverMK2, IPersistentNBT, MenuProvider {
@@ -58,6 +54,8 @@ public class IcfPressBlockEntity extends MachineBaseBlockEntity
     private static final int SLOT_MUON_CONTAINER_OUT = 3;
     private static final int SLOT_FUEL1 = 4;
     private static final int SLOT_FUEL2 = 5;
+    private static final int SLOT_ID0 = 6;
+    private static final int SLOT_ID1 = 7;
     private static final int[] SLOTS_TOP_BOTTOM = new int[]{0, 1, 2, 3, 4};
     private static final int[] SLOTS_SIDES = new int[]{0, 1, 2, 3, 5};
 
@@ -66,7 +64,7 @@ public class IcfPressBlockEntity extends MachineBaseBlockEntity
     private final boolean[] usedFluid = new boolean[2];
 
     public IcfPressBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 6, true, false);
+        super(type, pos, state, 8, true, false);
         tanks[0] = new FluidTankNTM(Fluids.DEUTERIUM, 16_000).withOwner(this);
         tanks[1] = new FluidTankNTM(Fluids.TRITIUM, 16_000).withOwner(this);
     }
@@ -80,6 +78,10 @@ public class IcfPressBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // CE TileEntityICFPress.java:57-58
+        this.tanks[0].setType(SLOT_ID0, inventory);
+        this.tanks[1].setType(SLOT_ID1, inventory);
+
         if (level.getGameTime() % 20 == 0) {
             for (Direction dir : Direction.values()) {
                 trySubscribe(tanks[0].getTankType(), level, worldPosition.relative(dir), dir);
@@ -89,9 +91,27 @@ public class IcfPressBlockEntity extends MachineBaseBlockEntity
 
         ItemStack muonStack = inventory.getStackInSlot(SLOT_MUON);
         if (muon <= 0 && !muonStack.isEmpty() && muonStack.getItem() == IcfPressItems.PARTICLE_MUON.get()) {
-            muonStack.shrink(1);
-            this.muon = MAX_MUON;
-            setChanged();
+            // CE TileEntityICFPress.java:67-85 — getContainerItem → slot 3
+            ItemStack container = muonStack.getCraftingRemainingItem();
+            ItemStack outputContainerStack = inventory.getStackInSlot(SLOT_MUON_CONTAINER_OUT);
+            boolean canStore = false;
+
+            if (container.isEmpty()) {
+                canStore = true;
+            } else if (outputContainerStack.isEmpty()) {
+                inventory.setStackInSlot(SLOT_MUON_CONTAINER_OUT, container.copy());
+                canStore = true;
+            } else if (ItemStack.isSameItem(outputContainerStack, container)
+                    && outputContainerStack.getCount() < outputContainerStack.getMaxStackSize()) {
+                outputContainerStack.grow(1);
+                canStore = true;
+            }
+
+            if (canStore) {
+                this.muon = MAX_MUON;
+                muonStack.shrink(1);
+                setChanged();
+            }
         }
 
         press();
@@ -153,6 +173,8 @@ public class IcfPressBlockEntity extends MachineBaseBlockEntity
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (stack.getItem() == IcfPressItems.ICF_PELLET_EMPTY.get()) return slot == SLOT_EMPTY_PELLET;
         if (stack.getItem() == IcfPressItems.PARTICLE_MUON.get()) return slot == SLOT_MUON;
+        // CE :199-202 returns false for 6/7; without this the ID never lands and setType is dead.
+        if (slot == SLOT_ID0 || slot == SLOT_ID1) return stack.getItem() instanceof IItemFluidIdentifier;
         return slot == SLOT_FUEL1 || slot == SLOT_FUEL2;
     }
 

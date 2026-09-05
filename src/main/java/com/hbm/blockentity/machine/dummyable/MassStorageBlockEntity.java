@@ -1,16 +1,23 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.hbm.api.block.ILockable;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.MassStorageMenu;
+import com.hbm.items.tool.ItemKey;
+import com.hbm.items.tool.ItemKeyPin;
 import com.hbm.items.tool.ToolItems;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -21,10 +28,13 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * CE {@code TileEntityMassStorage}: 3 slots (in / filter / out), stockpile, output toggle.
- * Lock / OC / ROR skipped (same as crates).
+ * {@code isLocked()} gates {@code canInsert} / hopper Exact CE {@code :112}/{@code :258}/{@code :263}
+ * via already-real {@link ILockable} (CE inherits {@code TileEntityLockableBase}). OC skipped.
+ * ROR: CE {@code :293-317}.
+ * Open/close sounds Exact CE {@code TileEntityMassStorage.java:186-192}: {@code storageOpen}/{@code storageClose} 1.0F/1.0F.
  */
 public class MassStorageBlockEntity extends MachineBaseBlockEntity
-        implements ITickableBE, MenuProvider, IPersistentNBT {
+        implements ITickableBE, MenuProvider, IPersistentNBT, IRORValueProvider, IRORInteractive, ILockable {
 
     public static final int SLOT_IN = 0;
     public static final int SLOT_FILTER = 1;
@@ -34,6 +44,12 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
     public boolean output;
     private int capacity;
     public int redstone;
+
+    /** CE {@code TileEntityLockableBase}: lock / isLocked / lockMod / cheesable. */
+    private int lock;
+    private boolean isLocked;
+    private double lockMod = 0.1D;
+    private boolean cheesable = true;
 
     public MassStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         this(type, pos, state, 10_000);
@@ -57,8 +73,15 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public boolean canInsertItem(int slot, ItemStack itemStack) {
+        // CE TileEntityMassStorage.java:257-258
+        return !isLocked() && isItemValidForSlot(slot, itemStack);
+    }
+
+    @Override
     public boolean canExtractItem(int slot, ItemStack stack, int amount) {
-        return slot == SLOT_OUT;
+        // CE :262-263
+        return !isLocked() && slot == SLOT_OUT;
     }
 
     @Override
@@ -122,7 +145,8 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
     }
 
     public boolean canInsert(ItemStack stack) {
-        if (stack.isEmpty()) return false;
+        // CE :111-112
+        if (stack.isEmpty() || this.isLocked()) return false;
         ItemStack type = getFilterType();
         if (type.isEmpty()) return false;
         return ItemStack.isSameItemSameComponents(stack, type);
@@ -194,6 +218,87 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
         this.stack = stack;
     }
 
+    /** CE {@code TileEntityLockableBase#canAccess(EntityPlayer)}. */
+    public boolean canAccess(Player player) {
+        if (!isLocked()) return true;
+        if (player == null) return false;
+        ItemStack held = player.getMainHandItem();
+        int heldPins = held.getItem() instanceof ItemKeyPin ? ItemKeyPin.getPins(held) : 0;
+        boolean ok = canAccess(heldPins, held.getItem() instanceof ItemKey);
+        if (ok && level != null) {
+            level.playSound(null, player.blockPosition(), HBMSoundHandler.lockOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return ok;
+    }
+
+    /** Exact CE {@code TileEntityMassStorage.java:186-188}. */
+    public void openInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.storageOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
+    /** Exact CE {@code TileEntityMassStorage.java:190-192}. */
+    public void closeInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.storageClose.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
+    @Override
+    public boolean isLocked() {
+        return isLocked;
+    }
+
+    @Override
+    public void lock() {
+        // CE TileEntityLockableBase.java:38-42 (pin-zero logger omitted)
+        if (!isLocked) {
+            isLocked = true;
+            dataChanged();
+            setChanged();
+        }
+    }
+
+    @Override
+    public void unlock() {
+        isLocked = false;
+        setChanged();
+    }
+
+    @Override
+    public void setPins(int pins) {
+        if (lock != pins) {
+            lock = pins;
+            dataChanged();
+            setChanged();
+        }
+    }
+
+    @Override
+    public int getPins() {
+        return lock;
+    }
+
+    @Override
+    public void setMod(double mod) {
+        if (lockMod != mod) {
+            lockMod = mod;
+            dataChanged();
+            setChanged();
+        }
+    }
+
+    @Override
+    public double getMod() {
+        return lockMod;
+    }
+
+    @Override
+    public boolean isCheesable() {
+        return cheesable;
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
@@ -201,6 +306,11 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
         tag.putBoolean("output", output);
         tag.putInt("capacity", capacity);
         tag.putByte("redstone", (byte) redstone);
+        // CE TileEntityLockableBase.java:83-88
+        tag.putInt("lock", lock);
+        tag.putBoolean("cheesable", cheesable);
+        tag.putBoolean("isLocked", isLocked);
+        tag.putDouble("lockMod", lockMod);
     }
 
     @Override
@@ -211,6 +321,11 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
         capacity = tag.getInt("capacity");
         redstone = tag.getByte("redstone");
         if (capacity <= 0) capacity = 10_000;
+        // CE TileEntityLockableBase.java:77-80
+        lock = tag.getInt("lock");
+        cheesable = !tag.contains("cheesable") || tag.getBoolean("cheesable");
+        isLocked = tag.getBoolean("isLocked");
+        lockMod = tag.contains("lockMod") ? tag.getDouble("lockMod") : 0.1D;
     }
 
     @Override
@@ -245,6 +360,11 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
         data.putInt("stack", stack);
         data.putBoolean("output", output);
         data.putInt("capacity", capacity);
+        // CE BlockMassStorage.java:140-145 — persist pins only when locked
+        if (isLocked()) {
+            data.putInt("lock", getPins());
+            data.putDouble("lockMod", getMod());
+        }
         nbt.put(NBT_PERSISTENT_KEY, data);
     }
 
@@ -262,10 +382,47 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
         if (data.contains("stack")) stack = data.getInt("stack");
         if (data.contains("output")) output = data.getBoolean("output");
         if (data.contains("capacity") && data.getInt("capacity") > 0) capacity = data.getInt("capacity");
+        // CE BlockMassStorage.java:179-185
+        if (data.contains("lock")) {
+            setPins(data.getInt("lock"));
+            setMod(data.contains("lockMod") ? data.getDouble("lockMod") : 0.1D);
+            lock();
+        }
     }
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
         return new MassStorageMenu(id, inv, this);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :293-295
+        return new String[]{
+                PREFIX_VALUE + "type", PREFIX_VALUE + "fill", PREFIX_VALUE + "fillpercent",
+                PREFIX_FUNCTION + "toggleoutput"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :298-306
+        if ((PREFIX_VALUE + "fill").equals(name)) return "" + this.stack;
+        if ((PREFIX_VALUE + "fillpercent").equals(name)) return "" + this.stack * 100 / this.capacity;
+        if ((PREFIX_VALUE + "type").equals(name)) {
+            if (inventory.getStackInSlot(SLOT_FILTER).isEmpty()) return "None";
+            return inventory.getStackInSlot(SLOT_FILTER).getHoverName().getString();
+        }
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :310-316
+        if ((PREFIX_FUNCTION + "toggleoutput").equals(name)) {
+            this.output = !this.output;
+            setChanged();
+        }
+        return null;
     }
 }

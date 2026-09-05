@@ -3,56 +3,70 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachineMicrowaveBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.MicrowaveMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
+/**
+ * Exact CE {@code GUIMicrowave} on existing {@code gui_microwave.png} 176×168.
+ * Power 8,51-i / progress 104,34 / speed 62,60-k. Buttons 43,25 / 43,43.
+ */
 public class MicrowaveScreen extends GuiInfoContainer<MicrowaveMenu> {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_microwave.png");
 
     public MicrowaveScreen(MicrowaveMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 168;
-        this.inventoryLabelY = this.imageHeight - 94;
-    }
-
-    @Override
-    protected void init() {
-        super.init();
-        this.addRenderableWidget(Button.builder(Component.literal("+"), b ->
-                this.minecraft.gameMode.handleInventoryButtonClick(this.getMenu().containerId, MicrowaveMenu.BUTTON_UP)
-        ).bounds(leftPos + 133, topPos + 17, 16, 16).build());
-        this.addRenderableWidget(Button.builder(Component.literal("-"), b ->
-                this.minecraft.gameMode.handleInventoryButtonClick(this.getMenu().containerId, MicrowaveMenu.BUTTON_DOWN)
-        ).bounds(leftPos + 133, topPos + 35, 16, 16).build());
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineMicrowaveBlockEntity be = this.getMenu().be;
-        long max = Math.max(1L, be.getMaxPower());
-        int ph = (int) (be.power * 52L / max);
-        guiGraphics.fill(x + 26, y + 70 - ph, x + 42, y + 70, 0xFF44CCFF);
-        int prog = be.time * 24 / Math.max(1, MachineMicrowaveBlockEntity.MAX_TIME);
-        guiGraphics.fill(x + 79, y + 18, x + 79 + prog, y + 32, 0xFFFFFF55);
+        // CE GUIMicrowave.java:63-70
+        int i = (int) be.getPowerScaled(34);
+        guiGraphics.blit(TEXTURE, x + 8, y + 51 - i, 176, 34 - i, 16, i);
+        int j = Math.min(be.getProgressScaled(23), 22);
+        guiGraphics.blit(TEXTURE, x + 104, y + 34, 192, 0, j, 16);
+        int k = be.getSpeedScaled(34);
+        guiGraphics.blit(TEXTURE, x + 62, y + 60 - k, 214, 34 - k, 4, k);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        // CE :52 — title centered
+        int nameX = this.imageWidth / 2 - this.font.width(this.title) / 2;
+        guiGraphics.drawString(this.font, this.title, nameX, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+
         MachineMicrowaveBlockEntity be = this.getMenu().be;
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 26, topPos + 18, 16, 52,
-                Component.literal(be.power + " / " + be.getMaxPower() + " HE"),
-                Component.literal(MachineMicrowaveBlockEntity.CONSUMPTION + " HE/t"));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 79, topPos + 18, 24, 14,
-                Component.literal(be.time + " / " + MachineMicrowaveBlockEntity.MAX_TIME));
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 133, topPos + 17, 16, 34,
-                Component.literal("speed " + be.speed));
+        // CE GUIMicrowave.java:33
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 51 - 34, 16, 34,
+                be.power, MachineMicrowaveBlockEntity.MAX_POWER);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        // CE GUIMicrowave.java:40-45
+        if (isHovered(mouseX, mouseY, 43, 25, 18, 18)) {
+            click();
+            this.minecraft.gameMode.handleInventoryButtonClick(this.getMenu().containerId, MicrowaveMenu.BUTTON_UP);
+            return true;
+        }
+        if (isHovered(mouseX, mouseY, 43, 43, 18, 18)) {
+            click();
+            this.minecraft.gameMode.handleInventoryButtonClick(this.getMenu().containerId, MicrowaveMenu.BUTTON_DOWN);
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

@@ -2,11 +2,11 @@ package com.hbm.blocks.generic;
 
 import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -25,12 +25,8 @@ import net.minecraft.world.phys.BlockHitResult;
  * entries of this one class, none wired into a creative tab (CE: {@code setCreativeTab(null)}).
  * <p>
  * The key-unlock interaction (right-click with {@code hbm:key_red}/{@code hbm:key_red_cracked} to
- * carve out a small vault room) is resolved through a {@link BuiltInRegistries#ITEM} lookup rather
- * than a hard {@code ModItems} field reference, since those key items belong to a different Phase 1
- * area and have not landed yet; the interaction silently no-ops until they do. CE's lock-open sound
- * ({@code HBMSoundHandler.lockOpen}) is not portable yet for the same reason (that sound registry
- * has not landed) - substituted with vanilla's iron-door-open sound as the closest stand-in until a
- * real sound event exists.
+ * carve out a small vault room) is resolved through a {@link BuiltInRegistries#ITEM} lookup.
+ * Unlock sound Exact CE {@code BlockForgottenLock.java:88} ({@code lockOpen} 1.0F/1.0F BLOCKS at player).
  */
 public class BlockForgottenLock extends BlockBase {
 
@@ -71,7 +67,9 @@ public class BlockForgottenLock extends BlockBase {
         }
 
         generate(level, pos, facing);
-        level.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 1.0F, 1.0F);
+        // Exact CE BlockForgottenLock.java:88
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.lockOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         return ItemInteractionResult.SUCCESS;
     }
 

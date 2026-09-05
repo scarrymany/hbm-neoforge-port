@@ -14,6 +14,7 @@ import com.hbm.client.render.ClientEntityRenderers;
 import com.hbm.client.render.blockentity.rbmk.RBMKAutoloaderPistonRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKConsoleHeatmapRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKControlRodRenderer;
+import com.hbm.client.render.blockentity.rbmk.RBMKDisplayRenderer;
 import com.hbm.client.render.blockentity.rbmk.RBMKFuelColumnRenderer;
 import com.hbm.inventory.container.ModMenuTypes;
 import com.hbm.inventory.gui.BatteryScreen;
@@ -77,6 +78,7 @@ public class ClientModRegistry {
             BlockEntityRenderers.register(RBMKBlockEntities.ROD_REASIM.get(), new RBMKFuelColumnRenderer.Provider());
             BlockEntityRenderers.register(RBMKBlockEntities.CONSOLE.get(), new RBMKConsoleHeatmapRenderer.Provider());
             BlockEntityRenderers.register(RBMKBlockEntities.AUTOLOADER.get(), new RBMKAutoloaderPistonRenderer.Provider());
+            BlockEntityRenderers.register(RBMKBlockEntities.DISPLAY.get(), new RBMKDisplayRenderer.Provider());
 
             // Phase 5 (particle_engine_and_generic_vfx): registers every HbmEffect constant's
             // client-only render handler - must run once, client-side only, before any
@@ -102,5 +104,39 @@ public class ClientModRegistry {
         SafeMenuScreens.bind(event, ModMenuTypes.BATTERY, BatteryScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.FLUID_TANK, FluidTankScreen::new);
         SafeMenuScreens.bind(event, ModMenuTypes.LEMEGETON, LemegetonScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.TAPE_DRIVE, com.hbm.client.gui.TapeDriveScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRANE_INSERTER, com.hbm.client.screen.CraneInserterScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRANE_EXTRACTOR, com.hbm.client.screen.CraneExtractorScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRANE_GRABBER, com.hbm.client.screen.CraneGrabberScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRANE_BOXER, com.hbm.client.screen.CraneBoxerScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRANE_UNBOXER, com.hbm.client.screen.CraneUnboxerScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.CRANE_ROUTER, com.hbm.client.screen.CraneRouterScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.DRONE_CRATE_PROVIDER, com.hbm.inventory.gui.DroneCrateProviderScreen::new);
+        SafeMenuScreens.bind(event, ModMenuTypes.DRONE_CRATE_REQUESTER, com.hbm.inventory.gui.DroneCrateRequesterScreen::new);
+
+        // RBMK column-block Screens
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.OUTGASSER, com.hbm.client.gui.screens.rbmk.RBMKOutgasserScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.STORAGE, com.hbm.client.gui.screens.rbmk.RBMKStorageScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.HEATER, com.hbm.client.gui.screens.rbmk.RBMKHeaterScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.BOILER, com.hbm.client.gui.screens.rbmk.RBMKBoilerScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.ROD, com.hbm.client.gui.screens.rbmk.RBMKRodScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.AUTOLOADER, com.hbm.client.gui.screens.rbmk.RBMKAutoloaderScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL, com.hbm.client.gui.screens.rbmk.RBMKControlScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONTROL_AUTO, com.hbm.client.gui.screens.rbmk.RBMKControlAutoScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.rbmk.RBMKMenuTypes.CONSOLE, com.hbm.client.gui.screens.rbmk.RBMKConsoleScreen::new);
+
+        // Processing machines (Shredder / Assembler / Crystallizer / Mixer)
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_SHREDDER, com.hbm.client.gui.screens.machine.ShredderScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_ASSEMBLER, com.hbm.inventory.gui.machine.MachineAssemblyMachineScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_CRYSTALLIZER, com.hbm.client.gui.screens.machine.CrystallizerScreen::new);
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.ProcessingMenus.MACHINE_MIXER, com.hbm.client.gui.screens.machine.MixerScreen::new);
+
+        // Crucible (separate menu registry)
+        SafeMenuScreens.bind(event, com.hbm.inventory.container.machine.CrucibleMenus.MACHINE_CRUCIBLE, com.hbm.inventory.gui.machine.MachineCrucibleScreen::new);
+
+        // Dummyable machines (all registered in DummyableProcessClientRegistry)
+        com.hbm.inventory.gui.machine.dummyable.DummyableProcessClientRegistry.registerScreens(event);
+
+        BombClientRegistry.registerScreens(event);
     }
 }

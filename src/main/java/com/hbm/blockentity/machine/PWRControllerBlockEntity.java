@@ -1,6 +1,8 @@
 package com.hbm.blockentity.machine;
 
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORInteractive;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blockentity.network.IConnectionAnchors;
@@ -14,11 +16,13 @@ import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingStep;
 import com.hbm.inventory.fluid.trait.FT_Heatable.HeatingType;
 import com.hbm.inventory.fluid.trait.FT_PWRModerator;
+import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemPWRFuel;
 import com.hbm.items.machine.ItemPWRFuel.EnumPWRFuel;
 import com.hbm.items.machine.PWRHotFuelItems;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
+import com.hbm.saveddata.satellites.SatelliteRayScan;
 import com.hbm.util.EnumUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -54,34 +58,23 @@ import java.util.Map;
  * formulas themselves (heat-capacity scaling, the connection-efficiency curve, core/hull heat
  * equalization, the 0.999 per-tick decay).
  *
- * <h2>3-slot inventory, slot 2 unused</h2>
- * Kept at CE's own {@code super(3, true, false)} shape even though slot 2 is never read or written
- * anywhere in this class either (matching CE bit for bit) - see the research report's "open question"
- * on this: it may be a vestigial slot from an earlier CE revision, or a slot {@code ContainerPWR}
- * itself uses. Not resolved here, faithfully preserved rather than silently dropped to 2 slots.
+ * <h2>3-slot inventory</h2>
+ * Slot 2 is the coolant {@link IItemFluidIdentifier} — Exact CE {@code TileEntityPWRController.java:183}
+ * {@code tanks[0].setType(2, inventory)} when {@code amountLoaded <= 0}.
  *
  * <h2>Deliberate drops from CE, each independently justified</h2>
  * <ul>
- *   <li>The item-canister coolant-loading line ({@code tanks[0].setType(2, inventory)}) is dropped -
- *   {@link FluidTankNTM}'s own javadoc already documents that CE's item-canister loading subsystem
- *   ({@code loadTank}/{@code unloadTank}/{@code setType(int, IInventory)}) was not ported (neither
- *   exists in this port yet). The coolant tank fills only through the fluid pipe network
- *   ({@link #updateEntity()}'s {@code trySubscribe} calls below), not from an inventory slot.</li>
  *   <li>The {@code isPrinting}/{@link com.hbm.items.machine.ItemPWRPrinter} sync-channel hijack is
  *   dropped - already flagged Deferred in both {@code docs/phase1/items_machine.md} and this
  *   package's own research report ("port the controller's normal serialize/deserialize path first").
  *   {@link #serialize}/{@link #deserialize} below are the plain, always-real-state path only.</li>
- *   <li>{@code SatelliteRayScan.reportEvent} (orbital-satellite visibility ping) is dropped - the
- *   research report's own framing: "safe to stub as a no-op ... should not block porting the rest of
- *   the controller" (the satellite save-data system is Phase 4+ scope per PORT_SPEC).</li>
- *   <li>OpenComputers (@Callback methods) and {@code IRORValueProvider}/{@code IRORInteractive}
- *   (redstone-over-radio) are dropped - both cross-cutting undecided gaps flagged by this package's
- *   research report and (independently) {@code docs/phase2/machines_power_generation.md}; nothing
- *   about the core PWR simulation depends on either.</li>
+ *   <li>SatelliteRayScan.INFO_NUCLEAR Exact CE {@code TileEntityPWRController.java:265-266}.</li>
+ *   <li>OpenComputers (@Callback methods) dropped. ROR: CE {@code TileEntityPWRController.java:609-640}.</li>
  * </ul>
  */
 public class PWRControllerBlockEntity extends MachineBaseBlockEntity
-        implements IFluidStandardTransceiverMK2, IConnectionAnchors, ITickableBE, MenuProvider {
+        implements IFluidStandardTransceiverMK2, IConnectionAnchors, ITickableBE, MenuProvider,
+        IRORValueProvider, IRORInteractive {
 
     public static final long CORE_HEAT_CAPACITY_BASE = 10_000_000L;
     public static final long HULL_HEAT_CAPACITY_BASE = 10_000_000L;
@@ -193,8 +186,8 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        // CE's item-canister coolant-loading line (tanks[0].setType(2, inventory)) is dropped - see
-        // class javadoc "Deliberate drops from CE".
+        // CE TileEntityPWRController.java:183
+        if (this.amountLoaded <= 0) this.tanks[0].setType(2, inventory);
         setupTanks();
 
         if (unloadDelay > 0) unloadDelay--;
@@ -278,7 +271,11 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
                         this.setChanged();
                     }
 
-                    // CE: SatelliteRayScan.reportEvent(...) every 100 ticks - dropped, see class javadoc.
+                    // CE TileEntityPWRController.java:265-266
+                    if (level.getGameTime() % 100 == 0) {
+                        SatelliteRayScan.reportEvent(level, worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(),
+                                SatelliteRayScan.RayEvent.INFO_NUCLEAR, 200);
+                    }
                 }
 
                 if (this.amountLoaded <= 0) this.typeLoaded = -1;
@@ -416,7 +413,10 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
-        return slot == 0 && stack.getItem() instanceof ItemPWRFuel;
+        if (slot == 0) return stack.getItem() instanceof ItemPWRFuel;
+        // CE :483-486 returns false for slot 2; without this the ID never lands and setType is dead.
+        if (slot == 2) return stack.getItem() instanceof IItemFluidIdentifier;
+        return false;
     }
 
     @Override
@@ -572,5 +572,48 @@ public class PWRControllerBlockEntity extends MachineBaseBlockEntity
         this.coreHeatCapacity = buf.readLong();
         tanks[0].deserialize(buf);
         tanks[1].deserialize(buf);
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE :609-611
+        return new String[]{
+                PREFIX_VALUE + "rods",
+                PREFIX_VALUE + "coreheat",
+                PREFIX_VALUE + "hullheat",
+                PREFIX_VALUE + "flux",
+                PREFIX_VALUE + "depletion",
+                PREFIX_FUNCTION + "setrods" + NAME_SEPARATOR + "percent",
+                PREFIX_FUNCTION + "jettison"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :614-620
+        if ((PREFIX_VALUE + "rods").equals(name)) return "" + (int) this.rodLevel;
+        if ((PREFIX_VALUE + "coreheat").equals(name)) return "" + this.coreHeat;
+        if ((PREFIX_VALUE + "hullheat").equals(name)) return "" + this.hullHeat;
+        if ((PREFIX_VALUE + "flux").equals(name)) return "" + (int) this.flux;
+        if ((PREFIX_VALUE + "depletion").equals(name)) return "" + (int) (this.progress * 100 / this.processTime);
+        return null;
+    }
+
+    @Override
+    public String runRORFunction(String name, String[] params) {
+        // CE :624-640
+        if ((PREFIX_FUNCTION + "setrods").equals(name) && params.length > 0) {
+            this.rodTarget = IRORInteractive.parseInt(params[0], 0, 100);
+            setChanged();
+            return null;
+        }
+        if ((PREFIX_FUNCTION + "jettison").equals(name)) {
+            this.typeLoaded = -1;
+            this.amountLoaded = 0;
+            this.progress = 0;
+            setChanged();
+            return null;
+        }
+        return null;
     }
 }

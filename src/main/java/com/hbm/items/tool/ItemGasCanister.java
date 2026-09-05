@@ -1,5 +1,6 @@
 package com.hbm.items.tool;
 
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.items.ItemBase;
@@ -22,7 +23,7 @@ import java.util.List;
  * instead). Unlike {@link ItemCanister}, CE hardcoded this container's capacity to 1000mB rather
  * than taking it as a constructor argument, so this class does the same.
  */
-public class ItemGasCanister extends ItemBase {
+public class ItemGasCanister extends ItemBase implements IFillableItem {
 
     public static final int CAPACITY = 1000;
 
@@ -37,11 +38,19 @@ public class ItemGasCanister extends ItemBase {
         return id == null ? null : Fluids.fromID(id);
     }
 
-    public static int getFill(ItemStack stack) {
+    public static int fillOf(ItemStack stack) {
         return stack.getOrDefault(MachineDataComponents.FLUID_AMOUNT.get(), 0);
     }
 
+    @Override
+    public boolean acceptsFluid(FluidType type, ItemStack stack) {
+        if (type == null || type == Fluids.NONE || type.isAntimatter()) return false;
+        FluidType current = getFluidType(stack);
+        return current == null || current == Fluids.NONE || current == type;
+    }
+
     /** @return the leftover amount that could not be accepted. */
+    @Override
     public int tryFill(FluidType type, int amount, ItemStack stack) {
         if (amount <= 0 || type == null || type == Fluids.NONE || type.isAntimatter()) {
             return amount;
@@ -52,7 +61,7 @@ public class ItemGasCanister extends ItemBase {
             return amount;
         }
 
-        int fill = getFill(stack);
+        int fill = fillOf(stack);
         int toFill = Math.min(amount, CAPACITY - fill);
         if (toFill <= 0) {
             return amount;
@@ -63,9 +72,33 @@ public class ItemGasCanister extends ItemBase {
         return amount - toFill;
     }
 
+    @Override
+    public boolean providesFluid(FluidType type, ItemStack stack) {
+        return type != null && type == getFluidType(stack) && fillOf(stack) > 0;
+    }
+
+    @Override
+    public int tryEmpty(FluidType type, int amount, ItemStack stack) {
+        if (!providesFluid(type, stack) || amount <= 0) return 0;
+        int fill = fillOf(stack);
+        int moved = Math.min(fill, amount);
+        int leftover = tryEmpty(moved, stack);
+        return moved - leftover;
+    }
+
+    @Override
+    public FluidType getFirstFluidType(ItemStack stack) {
+        return getFluidType(stack);
+    }
+
+    @Override
+    public int getFill(ItemStack stack) {
+        return fillOf(stack);
+    }
+
     /** @return the leftover amount that could not be drained. */
     public int tryEmpty(int amount, ItemStack stack) {
-        int fill = getFill(stack);
+        int fill = fillOf(stack);
         int toDrain = Math.min(amount, fill);
         if (toDrain <= 0) {
             return amount;
@@ -93,7 +126,7 @@ public class ItemGasCanister extends ItemBase {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         FluidType type = getFluidType(stack);
-        int fill = getFill(stack);
+        int fill = fillOf(stack);
         tooltip.add(Component.literal(fill + "/" + CAPACITY + " mB"));
         if (type != null && type != Fluids.NONE) {
             tooltip.add(type.getLocalizedName());

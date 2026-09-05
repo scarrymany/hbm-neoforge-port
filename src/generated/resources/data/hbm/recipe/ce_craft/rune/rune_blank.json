@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "item": "hbm:powder_magic"
+    },
+    "S": {
+      "item": "hbm:ingot_starmetal"
+    },
+    "D": {
+      "item": "hbm:circuit_bismoid"
+    }
+  },
+  "pattern": [
+    "PSP",
+    "SDS",
+    "PSP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:rune_blank"
+  }
+}

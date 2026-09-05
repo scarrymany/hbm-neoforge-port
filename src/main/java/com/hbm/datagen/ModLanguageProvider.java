@@ -366,8 +366,10 @@ public class ModLanguageProvider extends LanguageProvider {
         m.put("corium_block", "Corium");
         m.put("launchpad_soyuz", "Soyuz Launch Pad");
         m.put("machine_assembly_machine", "Assembly Machine");
+        m.put("machine_assembly_factory", "Assembly Factory");
         m.put("machine_centrifuge", "Centrifuge");
         m.put("machine_chemical_plant", "Chemical Plant");
+        m.put("machine_chemical_factory", "Chemical Factory");
         m.put("machine_combustion_engine", "Industrial Combustion Engine");
         m.put("machine_crystallizer", "Ore Acidizer");
         m.put("machine_cyclotron", "Cyclotron");
@@ -381,11 +383,14 @@ public class ModLanguageProvider extends LanguageProvider {
         m.put("machine_mixer", "Industrial Mixer");
         m.put("machine_powerrtg", "PT Isotope Cell");
         m.put("machine_reactor_breeding", "Breeding Reactor");
+        m.put("reactor_research", "Research Reactor"); // CE tile.machine_reactor_small_new.name
+        m.put("reactor_zirnox", "ZIRNOX Nuclear Reactor"); // CE tile.machine_zirnox.name
         m.put("machine_rtg_grey", "RT Generator");
         m.put("machine_shredder", "Shredder");
         m.put("machine_silex", "Laser Isotope Separation Chamber (SILEX)");
         m.put("machine_solar_boiler", "Solar Tower Boiler");
         m.put("machine_steam_engine", "Steam Engine");
+        m.put("machine_tape_drive", "Drive Enclosure");
         m.put("machine_turbine", "Steam Turbine");
         m.put("machine_turbine_gas", "Combined Cycle Gas Turbine");
         m.put("pwr_block", "PWR");
@@ -626,7 +631,10 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.launchPad", "Launch Pad");
         this.add("container.launchPadRusted", "Launch Pad");
         this.add("container.launchpadSoyuz", "Soyuz Launch Pad");
+        this.add("container.machineTapeDrive", "Drive Enclosure");
         this.add("container.machineChemicalPlant", "Chemical Plant");
+        this.add("container.machineAssemblyFactory", "Assembly Factory");
+        this.add("container.machineChemicalFactory", "Chemical Factory");
         this.add("container.machineDiesel", "Diesel Generator");
         this.add("container.machineElectrolyser", "Electrolysis Machine");
         this.add("container.machineICF", "ICF");
@@ -658,6 +666,8 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.rbmkRod", "RBMK Fuel Rod");
         this.add("container.rbmkStorage", "RBMK Storage Column");
         this.add("container.reactorBreeding", "Breeding Reactor");
+        this.add("container.reactorResearch", "Research Reactor");
+        this.add("container.zirnox", "ZIRNOX Nuclear Reactor");
         this.add("container.rtg", "RT Generator");
         this.add("container.trainTram", "Electric Flat Bed Tram");
         this.add("container.turbinegas", "Combined Cycle Gas Turbine");
@@ -670,6 +680,8 @@ public class ModLanguageProvider extends LanguageProvider {
         this.add("container.turretRichard", "Richard");
         this.add("container.turretSentry", "Brown");
         this.add("container.turretTauon", "Tauon");
+        this.add("container.turretArty", "Greg");
+        this.add("container.turretHIMARS", "Henry");
 
         // ---- key-drift: resolved via a per-machine CE grep, not a verbatim container.* match ----
         this.add("container.assemblyMachine", "Assembly Machine (Legacy)"); // CE GUIMachineAssemblyMachine draws tile.machine_assembler.name directly, not a container.* key

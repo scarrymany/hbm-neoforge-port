@@ -5,15 +5,12 @@ import com.hbm.inventory.gui.GuiInfoContainer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * Flat-panel GUI for {@link NukeBalefireMenu} - arm button plus the +/-60s timer-step buttons (see
- * that Menu's own javadoc for why CE's free-drag slider becomes stepped buttons here), same
- * {@code Button}-&gt;{@code handleInventoryButtonClick}-&gt;{@code clickMenuButton} plumbing as
- * {@code PWRControllerScreen}.
- */
 public class NukeBalefireScreen extends GuiInfoContainer<NukeBalefireMenu> {
+
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath("hbm", "textures/gui/bomb_generic.png");
 
     public NukeBalefireScreen(NukeBalefireMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -39,10 +36,7 @@ public class NukeBalefireScreen extends GuiInfoContainer<NukeBalefireMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        int x = this.leftPos;
-        int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
     }
 
     @Override

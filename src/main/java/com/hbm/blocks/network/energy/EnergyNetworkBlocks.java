@@ -25,8 +25,7 @@ import java.util.function.Supplier;
  * wiring notes) - no other shared file needs a direct edit.
  * <p>
  * <b>Not ported</b> (see the research report's own "Phase-2-safe scope"/"Deferred scope" tables):
- * {@code WireCoatedRadResistant} (radiation-package marker), {@code BlockCableGauge} (OpenComputers integration explicitly recommended
- * for dropping, no NeoForge OpenComputers release exists to compile against anyway),
+ * {@code WireCoatedRadResistant} (radiation-package marker),
  * {@code BlockCablePaintable} (paint/facade mechanic explicitly flagged as needing a cross-team call
  * with whichever area owns {@code com.hbm.items.util} paint tools), {@code PowerDetector} (a
  * redstone-lamp-shaped energy receiver, orthogonal to the conductor/pylon network graph this pass
@@ -56,6 +55,9 @@ public final class EnergyNetworkBlocks {
     public static DeferredBlock<PylonMediumBlock> RED_PYLON_MEDIUM_TRANSFORMER;
     public static DeferredBlock<PylonMediumBlock> RED_PYLON_STEEL_TRANSFORMER;
     public static DeferredBlock<SubstationBlock> SUBSTATION;
+    public static DeferredBlock<ConnectorRedWireBlock> RED_CONNECTOR;
+    public static DeferredBlock<ConnectorRedWireSuperBlock> RED_CONNECTOR_SUPER;
+    public static DeferredBlock<BlockCableGauge> RED_CABLE_GAUGE;
 
     private EnergyNetworkBlocks() {
     }
@@ -70,6 +72,9 @@ public final class EnergyNetworkBlocks {
         CABLE_SWITCH = registerBlock("cable_switch", () -> new CableSwitchBlock(CABLE_PROPS));
         CABLE_DETECTOR = registerBlock("cable_detector", () -> new CableDetectorBlock(CABLE_PROPS));
         CABLE_DIODE = registerBlock("cable_diode", () -> new CableDiodeBlock(CABLE_PROPS));
+        // CE ModBlocks.java:769 — BlockCableGauge, 5.0F/10.0F, machineTab. Full cube (not thin cable).
+        RED_CABLE_GAUGE = registerBlock("red_cable_gauge",
+                () -> new BlockCableGauge(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)));
         RED_PYLON = registerBlock("red_pylon", () -> new PylonRedWireBlock(PYLON_PROPS));
         RED_PYLON_STEEL_SMALL = registerBlock("red_pylon_steel_small", () -> new PylonRedWireBlock(PYLON_PROPS));
         RED_PYLON_LARGE = registerBlock("red_pylon_large", () -> new PylonLargeBlock(PYLON_PROPS));
@@ -79,6 +84,8 @@ public final class EnergyNetworkBlocks {
         RED_PYLON_MEDIUM_TRANSFORMER = registerBlock("red_pylon_medium_transformer", () -> new PylonMediumBlock(PYLON_PROPS));
         RED_PYLON_STEEL_TRANSFORMER = registerBlock("red_pylon_steel_transformer", () -> new PylonMediumBlock(PYLON_PROPS));
         SUBSTATION = registerBlock("substation", () -> new SubstationBlock(CABLE_PROPS));
+        RED_CONNECTOR = registerBlock("red_connector", () -> new ConnectorRedWireBlock(PYLON_PROPS));
+        RED_CONNECTOR_SUPER = registerBlock("red_connector_super", () -> new ConnectorRedWireSuperBlock(PYLON_PROPS));
 
         com.hbm.blockentity.network.energy.EnergyNetworkBlockEntities.registerAll();
     }

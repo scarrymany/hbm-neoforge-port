@@ -2,6 +2,7 @@ package com.hbm.blocks.generic;
 
 import com.hbm.blocks.BlockBase;
 import com.hbm.blocks.ModBlocks;
+import com.hbm.blocks.fluid.ToxicBlock;
 import com.hbm.creativetabs.CreativeTabContents;
 import com.hbm.creativetabs.ModCreativeTabs;
 import com.hbm.items.ModItems;
@@ -38,10 +39,8 @@ import java.util.function.Supplier;
  * this list does not include, {@code ModBlocks.crystal_pulsar}/{@code cheater_virus} - out of this
  * narrow package's scope, flagged in the implementing session's own knownGaps rather than guessed at);
  * {@code BlockNuclearWaste}'s periodic {@code gas_radon_dense} spread (that gas block does not exist
- * in this port's gas-block family yet); {@code HazardRegistry} data entries binding
- * {@code block_trinitite}/{@code block_waste} to a real radiation level (registering the block with
- * {@link BlockHazard} makes {@link com.hbm.hazard.HazardSystem#applyHazards} a safe no-op until that
- * data-table entry exists, exactly like every other un-tagged {@code BlockHazard} instance).
+ * in this port's gas-block family yet). {@code HazardRegistry} now binds {@code block_trinitite}
+ * ({@code trn * block}) and {@code block_waste} ({@code wst * block}) — CE {@code HazardRegistry.java:222/:229}.
  */
 public final class WastelandVirusBlocks {
 
@@ -54,6 +53,7 @@ public final class WastelandVirusBlocks {
     public static DeferredBlock<BlockNuclearWaste> BLOCK_WASTE;
     public static DeferredBlock<BlockSellafield> SELLAFIELD;
     public static DeferredBlock<BlockBase> SELLAFIELD_SLAKED;
+    public static DeferredBlock<ToxicBlock> TOXIC_BLOCK;
 
     private WastelandVirusBlocks() {
     }
@@ -62,6 +62,7 @@ public final class WastelandVirusBlocks {
         registerVirus();
         registerHazardDecoration();
         registerSellafield();
+        registerToxicBlock();
     }
 
     /**
@@ -112,6 +113,21 @@ public final class WastelandVirusBlocks {
         BlockBehaviour.Properties props = BlockBehaviour.Properties.of().strength(5.0F, 6.0F).sound(SoundType.STONE);
         SELLAFIELD = registerBlock("sellafield", () -> new BlockSellafield(props), ModCreativeTabs.RESOURCE);
         SELLAFIELD_SLAKED = registerBlock("sellafield_slaked", () -> new BlockBase(props), ModCreativeTabs.RESOURCE);
+    }
+
+    /**
+     * CE {@code new ToxicBlock(toxic_fluid, Material.WATER, "toxic_block")}. Creative tab null.
+     * Existing CE blockstate/model/lang. Fluid flow cited on the class.
+     */
+    private static void registerToxicBlock() {
+        BlockBehaviour.Properties props = BlockBehaviour.Properties.of()
+                .noCollission()
+                .noOcclusion()
+                .noLootTable()
+                .replaceable()
+                .strength(100.0F)
+                .sound(SoundType.SLIME_BLOCK);
+        TOXIC_BLOCK = registerBlock("toxic_block", () -> new ToxicBlock(props), null);
     }
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> factory, @Nullable ResourceKey<CreativeModeTab> tab) {

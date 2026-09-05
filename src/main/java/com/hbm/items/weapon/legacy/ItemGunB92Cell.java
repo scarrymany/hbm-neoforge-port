@@ -1,21 +1,19 @@
 package com.hbm.items.weapon.legacy;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 /**
- * Port of CE's {@code com.hbm.items.weapon.WeaponizedCell}/{@code GunB92Cell} - {@code gun_b92_ammo},
- * a passive charge-storage item (0-25) meant to be topped up by siphoning from a held
- * {@link ItemGunB92} at 1 charge/tick.
- * <p>
- * <b>Simplified relative to CE, documented rather than silently dropped:</b> the live per-tick
- * inventory-scanning siphon ({@code WeaponizedCell#onUpdate} walking the holder's inventory for a
- * {@code gun_b92} stack and draining 1 charge/tick into this item) is not wired - it is a minor,
- * self-contained flavor mechanic with no bearing on {@code gun_b92}'s own core charge/fire/self-detonate
- * loop (which is fully ported on {@link ItemGunB92} independent of any cell). This item is registered
- * as a real, holdable charge-counter (same {@link LegacyWeaponDataComponents#ENERGY} component
- * {@code gun_b92} itself uses) with a working {@link #getFullCell()} pre-charged factory matching
- * CE's own static helper; only the tick-driven transfer loop is a documented forward reference.
+ * Exact CE {@code GunB92Cell} ({@code gun_b92_ammo}). Siphon 1 charge/tick from {@code gun_b92}
+ * while {@code energy < 25} — {@code GunB92Cell.java:24-40}. {@code weaponized_starblaster_cell}
+ * drop-bomb is a different CE item, not registered — skip invent.
  */
 public class ItemGunB92Cell extends Item {
 
@@ -26,7 +24,7 @@ public class ItemGunB92Cell extends Item {
     /** Port of CE's {@code GunB92Cell.getFullCell()} - a cell pre-charged to the 25-point cap. */
     public static ItemStack getFullCell(ItemGunB92Cell item) {
         ItemStack stack = new ItemStack(item);
-        stack.set(LegacyWeaponDataComponents.ENERGY.get(), 25);
+        setEnergy(stack, 25);
         return stack;
     }
 
@@ -34,8 +32,36 @@ public class ItemGunB92Cell extends Item {
         return stack.getOrDefault(LegacyWeaponDataComponents.ENERGY.get(), 0);
     }
 
-    // TODO(legacy-weapon-siphon): CE's WeaponizedCell#onUpdate scans the holder's inventory for a
-    // gun_b92 stack and transfers 1 charge/tick (capped at 25 here, 10 there before b92 self-
-    // detonates) - see class javadoc. Not wired; the cell still holds/persists its own charge count
-    // correctly via LegacyWeaponDataComponents.ENERGY.
+    public static void setEnergy(ItemStack stack, int value) {
+        stack.set(LegacyWeaponDataComponents.ENERGY.get(), value);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        // Exact CE GunB92Cell.java:24-40
+        if (!(entity instanceof Player player) || getEnergy(stack) >= 25) return;
+        for (ItemStack inv : player.getInventory().items) {
+            if (inv.getItem() instanceof ItemGunB92) {
+                int p = ItemGunB92.getEnergy(inv);
+                if (p > 1) {
+                    ItemGunB92.setEnergy(inv, p - 1);
+                    setEnergy(stack, getEnergy(stack) + 1);
+                    return;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE GunB92Cell.java:44-51
+        tooltip.add(Component.literal("Draws energy from the B92, allowing you to"));
+        tooltip.add(Component.literal("reload it an additional 25 times."));
+        tooltip.add(Component.literal("The cell will permanently hold it's charge,"));
+        tooltip.add(Component.literal("it is not meant to be used as a battery enhancement"));
+        tooltip.add(Component.literal("for the B92, but rather as a bomb."));
+        tooltip.add(Component.literal(""));
+        tooltip.add(Component.literal("Charges: " + getEnergy(stack) + " / 25"));
+    }
 }

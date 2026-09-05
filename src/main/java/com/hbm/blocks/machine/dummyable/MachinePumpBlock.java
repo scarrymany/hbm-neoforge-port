@@ -102,7 +102,7 @@ public class MachinePumpBlock extends BlockDummyable implements ITooltipProvider
         text.add(Component.literal("<- ").withStyle(ChatFormatting.RED)
                 .append(pump.water.getTankType().getLocalizedName())
                 .append(Component.literal(String.format(": %,d / %,d mB", pump.water.getFill(), pump.water.getMaxFill()))));
-        if (core.getY() > MachinePumpBlockEntity.GROUND_HEIGHT) {
+        if (core.getY() > MachinePumpBlockEntity.groundHeight) {
             text.add(Component.literal("! ! ! ALTITUDE ! ! !").withStyle(ChatFormatting.RED));
         }
         if (!pump.onGround) {

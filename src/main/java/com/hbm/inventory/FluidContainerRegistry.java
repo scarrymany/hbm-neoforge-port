@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -74,13 +75,10 @@ import java.util.Set;
  * is a follow-up of a different shape than this registry (a component-reading wrapper, not this
  * item-swapping one) - registering them here would be actively wrong, not just incomplete, so they are
  * intentionally left out rather than mis-registered. CE's remaining static entries
- * ({@code bottle_mercury}/{@code ingot_mercury}, the red/pink/lox-barrel-to-{@code tank_steel} set,
- * {@code rod_zirnox_tritium}, {@code particle_hydrogen}/{@code particle_amat}/{@code particle_aschrab},
- * {@code iv_blood}/{@code iv_xp}) reference items that do not exist anywhere in this port yet in any
- * form (confirmed by search) - CE's exact calls are preserved below as commented-out reference code so
- * a future item-family port can reactivate them verbatim once those items land, matching the
- * "commented-out, not deleted" precedent CE's own {@code register()} already sets for its vanilla
- * bucket/bottle block (superseded by the capability wrapper, per CE's own {@code mlbv} comment).
+ * ({@code bottle_mercury}/{@code nugget_mercury} live; red/pink/lox barrels + {@code tank_steel},
+ * {@code rod_zirnox_tritium}/{@code rod_zirnox_empty}, {@code iv_blood}/{@code iv_xp} are live
+ * one-item-one-fluid like CE). {@code particle_hydrogen}/{@code particle_amat}/{@code particle_aschrab}
+ * + {@code particle_empty} likewise.
  * <p>
  * Four of CE's entries <em>are</em> faithfully portable today, because their underlying items are
  * real, already-registered, and keep the classic "one plain item = one fixed fluid" shape CE assumed:
@@ -135,29 +133,25 @@ public class FluidContainerRegistry {
         // registerContainer(new FluidContainer(new ItemStack(Items.POTIONITEM), new ItemStack(Items.GLASS_BOTTLE), Fluids.WATER, 250));
         // registerContainer(new FluidContainer(new ItemStack(Items.LAVA_BUCKET), new ItemStack(Items.BUCKET), Fluids.LAVA, 1000));
 
-        // Barrels -> tanks: needs ModBlocks.red_barrel/pink_barrel/lox_barrel and ModItems.tank_steel,
-        // none of which exist in this port yet.
-        // registerContainer(new FluidContainer(new ItemStack(ModBlocks.red_barrel), new ItemStack(ModItems.tank_steel), Fluids.DIESEL, 10000));
-        // registerContainer(new FluidContainer(new ItemStack(ModBlocks.pink_barrel), new ItemStack(ModItems.tank_steel), Fluids.KEROSENE, 10000));
-        // registerContainer(new FluidContainer(new ItemStack(ModBlocks.lox_barrel), new ItemStack(ModItems.tank_steel), Fluids.OXYGEN, 10000));
+        // CE :49-51 — barrel blocks + tank_steel (both registered).
+        registerBlockPair("red_barrel", "tank_steel", Fluids.DIESEL, 10000);
+        registerBlockPair("pink_barrel", "tank_steel", Fluids.KEROSENE, 10000);
+        registerBlockPair("lox_barrel", "tank_steel", Fluids.OXYGEN, 10000);
 
         registerContainer(new FluidContainer(new ItemStack(resolveItem("bottle_mercury")), new ItemStack(Items.GLASS_BOTTLE), Fluids.MERCURY, 1000));
         registerContainer(new FluidContainer(new ItemStack(resolveItem("nugget_mercury")), null, Fluids.MERCURY, 125));
 
-        // Zirnox tritium fuel rod: needs ModItems.rod_zirnox_tritium/rod_zirnox_empty. This port's
-        // MachineItems only has rod_zirnox_<type>/rod_zirnox_depleted_<type> (a different family, no
-        // fillable-tritium-load variant).
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.rod_zirnox_tritium), new ItemStack(ModItems.rod_zirnox_empty), Fluids.TRITIUM, 2000));
+        // CE :58 — tritium rod ↔ empty housing.
+        registerPair("rod_zirnox_tritium", "rod_zirnox_empty", Fluids.TRITIUM, 2000);
 
-        // Particles: needs ModItems.particle_hydrogen/particle_amat/particle_aschrab/particle_empty,
-        // none of which exist in this port yet (particle_muon/particle_digamma are unrelated items).
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.particle_hydrogen), new ItemStack(ModItems.particle_empty), Fluids.HYDROGEN, 1000));
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.particle_amat), new ItemStack(ModItems.particle_empty), Fluids.AMAT, 1000));
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.particle_aschrab), new ItemStack(ModItems.particle_empty), Fluids.ASCHRAB, 1000));
+        // CE :61-63 — one-item-one-fluid particles (items exist in Phase11ProcessItems).
+        registerParticle("particle_hydrogen", Fluids.HYDROGEN);
+        registerParticle("particle_amat", Fluids.AMAT);
+        registerParticle("particle_aschrab", Fluids.ASCHRAB);
 
-        // IVs: needs ModItems.iv_blood/iv_empty/iv_xp/iv_xp_empty, none of which exist in this port yet.
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.iv_blood), new ItemStack(ModItems.iv_empty), Fluids.BLOOD, 100));
-        // registerContainer(new FluidContainer(new ItemStack(ModItems.iv_xp), new ItemStack(ModItems.iv_xp_empty), Fluids.XPJUICE, 100));
+        // CE :66-67
+        registerPair("iv_blood", "iv_empty", Fluids.BLOOD, 100);
+        registerPair("iv_xp", "iv_xp_empty", Fluids.XPJUICE, 100);
 
         // Dynamic per-fluid containers (canister/gas tank/disperser/glyphid gland/lead+plain fluid
         // tank/fluid barrel) and the SpecialContainerFillLists.EnumCell-driven cell loop: architecturally
@@ -289,6 +283,24 @@ public class FluidContainerRegistry {
     /** Lazily resolves a {@code hbm:}-namespaced item by registry path (same idiom as {@code OilDrillBaseBlockEntity#resolve}). */
     private static Item resolveItem(String path) {
         return BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, path));
+    }
+
+    private static void registerParticle(String full, FluidType type) {
+        registerPair(full, "particle_empty", type, 1000);
+    }
+
+    private static void registerPair(String full, String empty, FluidType type, int amount) {
+        Item fullItem = resolveItem(full);
+        Item emptyItem = resolveItem(empty);
+        if (fullItem == Items.AIR || emptyItem == Items.AIR) return;
+        registerContainer(new FluidContainer(new ItemStack(fullItem), new ItemStack(emptyItem), type, amount));
+    }
+
+    private static void registerBlockPair(String fullBlock, String emptyItem, FluidType type, int amount) {
+        Block full = resolveBlock(fullBlock);
+        Item empty = resolveItem(emptyItem);
+        if (full == Blocks.AIR || empty == Items.AIR) return;
+        registerContainer(new FluidContainer(new ItemStack(full), new ItemStack(empty), type, amount));
     }
 
     /** Lazily resolves a {@code hbm:}-namespaced block by registry path (same idiom as {@code OilDrillBaseBlockEntity#resolve}). */

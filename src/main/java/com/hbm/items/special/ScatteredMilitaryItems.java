@@ -60,15 +60,25 @@ public final class ScatteredMilitaryItems {
     // --- CE's ItemDrop singularity/xen/antimatter half - see class javadoc ------------------------
 
     public static final DeferredItem<ItemDrop> SINGULARITY =
-            reg("singularity", () -> new ItemDrop(new Item.Properties().stacksTo(1), ItemDrop.DropEffect.SINGULARITY));
+            reg("singularity", () -> new ItemDrop(new Item.Properties().stacksTo(1)
+                    .craftRemainder(com.hbm.items.bomb.NukeCasingItems.NUCLEAR_WASTE.get()),
+                    ItemDrop.DropEffect.SINGULARITY));
     public static final DeferredItem<ItemDrop> SINGULARITY_COUNTER_RESONANT =
-            reg("singularity_counter_resonant", () -> new ItemDrop(new Item.Properties().stacksTo(1), ItemDrop.DropEffect.SINGULARITY_COUNTER_RESONANT));
+            reg("singularity_counter_resonant", () -> new ItemDrop(new Item.Properties().stacksTo(1)
+                    .craftRemainder(com.hbm.items.bomb.NukeCasingItems.NUCLEAR_WASTE.get()),
+                    ItemDrop.DropEffect.SINGULARITY_COUNTER_RESONANT));
     public static final DeferredItem<ItemDrop> SINGULARITY_SUPER_HEATED =
-            reg("singularity_super_heated", () -> new ItemDrop(new Item.Properties().stacksTo(1), ItemDrop.DropEffect.SINGULARITY_SUPER_HEATED));
+            reg("singularity_super_heated", () -> new ItemDrop(new Item.Properties().stacksTo(1)
+                    .craftRemainder(com.hbm.items.bomb.NukeCasingItems.NUCLEAR_WASTE.get()),
+                    ItemDrop.DropEffect.SINGULARITY_SUPER_HEATED));
     public static final DeferredItem<ItemDrop> SINGULARITY_SPARK =
-            reg("singularity_spark", () -> new ItemDrop(new Item.Properties().stacksTo(1), ItemDrop.DropEffect.SINGULARITY_SPARK));
+            reg("singularity_spark", () -> new ItemDrop(new Item.Properties().stacksTo(1)
+                    .craftRemainder(com.hbm.items.bomb.NukeCasingItems.NUCLEAR_WASTE.get()),
+                    ItemDrop.DropEffect.SINGULARITY_SPARK));
     public static final DeferredItem<ItemDrop> BLACK_HOLE =
-            reg("black_hole", () -> new ItemDrop(new Item.Properties().stacksTo(1), ItemDrop.DropEffect.BLACK_HOLE));
+            reg("black_hole", () -> new ItemDrop(new Item.Properties().stacksTo(1)
+                    .craftRemainder(com.hbm.items.bomb.NukeCasingItems.NUCLEAR_WASTE.get()),
+                    ItemDrop.DropEffect.BLACK_HOLE));
     public static final DeferredItem<ItemDrop> CAPSULE_XEN =
             reg("capsule_xen", () -> new ItemDrop(new Item.Properties(), ItemDrop.DropEffect.CAPSULE_XEN));
     public static final DeferredItem<ItemDrop> CRYSTAL_XEN =

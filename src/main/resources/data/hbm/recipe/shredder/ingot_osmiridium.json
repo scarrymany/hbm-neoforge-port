@@ -1,0 +1,11 @@
+{
+  "type": "hbm:shredder",
+  "input": {
+    "item": "hbm:ingot_osmiridium"
+  },
+  "output": {
+    "id": "hbm:powder_osmiridium",
+    "count": 1
+  },
+  "duration": 60
+}

@@ -7,15 +7,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * RBMK console menu - no slots. Unlike every column TE, {@link RBMKConsoleBlockEntity} extends the
- * shared {@code MachineBaseBlockEntity} (it is not itself an RBMK grid column, see that class's
- * javadoc), so this reuses the shared {@link MenuBase} rather than {@link RBMKSlottedMenuBase}.
+ * Console menu. Exact CE {@code provideContainer} returns null — no slots.
  */
 public class RBMKConsoleMenu extends MenuBase<RBMKConsoleBlockEntity> {
 
     public RBMKConsoleMenu(int id, Inventory playerInventory, RBMKConsoleBlockEntity be) {
         super(RBMKMenuTypes.CONSOLE.get(), id, be);
-        playerInv(playerInventory, 8, 84);
     }
 
     public static RBMKConsoleMenu fromNetwork(int id, Inventory playerInventory, RegistryFriendlyByteBuf buf) {

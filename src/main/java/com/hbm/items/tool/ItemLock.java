@@ -2,8 +2,8 @@ package com.hbm.items.tool;
 
 import com.hbm.api.block.ILockable;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  * Installs a lock on an {@link ILockable} target, ported from CE's
  * {@code com.hbm.items.tool.ItemLock} (read in full). See {@link ItemKeyPin}'s javadoc for the
  * family-wide note on {@link ILockable} being real, generic, not-yet-consumed infrastructure.
+ * Install sound Exact CE {@code ItemLock.java:56} ({@code lockHang} 1.0F/1.0F PLAYERS at player).
  */
 public class ItemLock extends ItemKeyPin {
 
@@ -54,7 +55,11 @@ public class ItemLock extends ItemKeyPin {
         lockable.setPins(getPins(stack));
         lockable.lock();
         lockable.setMod(this.lockMod);
-        level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, SoundEvents.CHAIN_PLACE, SoundSource.PLAYERS, 1.0F, 1.0F);
+        // Exact CE ItemLock.java:56 — lockHang at player, not block / CHAIN_PLACE.
+        if (player != null) {
+            level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                    HBMSoundHandler.lockHang.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+        }
         stack.shrink(1);
         return InteractionResult.SUCCESS;
     }

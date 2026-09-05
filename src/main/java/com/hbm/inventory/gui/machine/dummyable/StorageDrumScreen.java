@@ -3,12 +3,15 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.StorageDrumBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.StorageDrumMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 /** CE {@code GUIStorageDrum} 176×237 — liquid/gas gauges. */
 public class StorageDrumScreen extends GuiInfoContainer<StorageDrumMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/storage/gui_drum.png");
 
     public StorageDrumScreen(StorageDrumMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -21,8 +24,7 @@ public class StorageDrumScreen extends GuiInfoContainer<StorageDrumMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         StorageDrumBlockEntity be = this.getMenu().be;
         be.liquid.renderTank(x + 16, y + 131, 0, 9, 108);

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": {
+      "item": "hbm:coil_copper"
+    },
+    "I": {
+      "item": "hbm:plate_polymer"
+    },
+    "S": {
+      "tag": "hbm:any_resistantalloy"
+    }
+  },
+  "pattern": [
+    "CCC",
+    "III",
+    " S "
+  ],
+  "result": {
+    "count": 2,
+    "id": "hbm:red_connector_super"
+  }
+}

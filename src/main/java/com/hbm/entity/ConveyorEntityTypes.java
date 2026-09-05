@@ -1,6 +1,7 @@
 package com.hbm.entity;
 
 import com.hbm.entity.item.EntityMovingItem;
+import com.hbm.entity.item.EntityMovingPackage;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -23,9 +24,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
  * <p>
  * {@code EntityMovingConveyorObject} itself is abstract and never spawned directly, so it has no
  * {@link EntityType} of its own - matching CE, which only {@code @AutoRegister}s the concrete
- * {@code EntityMovingItem}/{@code EntityMovingPackage} subclasses. {@code EntityMovingPackage} is not
- * ported in this pass (only crane blocks - out of this task's scope - ever spawn it; see the research
- * report's "Deferred scope" section), so only {@link EntityMovingItem} is registered here.
+ * {@code EntityMovingItem}/{@code EntityMovingPackage} subclasses. Both are registered here.
  * <p>
  * Sizing/tracking values are ported directly from CE's
  * {@code @AutoRegister(name = "entity_c_item", trackingRange = 1000)} annotation and the
@@ -40,6 +39,7 @@ public final class ConveyorEntityTypes {
             DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, MainRegistry.MODID);
 
     public static DeferredHolder<EntityType<?>, EntityType<EntityMovingItem>> MOVING_ITEM;
+    public static DeferredHolder<EntityType<?>, EntityType<EntityMovingPackage>> MOVING_PACKAGE;
 
     private ConveyorEntityTypes() {
     }
@@ -51,6 +51,14 @@ public final class ConveyorEntityTypes {
                         .sized(0.375F, 0.375F)
                         .setTrackingRange(1000)
                         .build("entity_c_item"));
+
+        // CE @AutoRegister(name = "entity_c_package", trackingRange = 1000), setSize(0.5F, 0.5F)
+        MOVING_PACKAGE = ENTITY_TYPES.register("entity_c_package", () ->
+                EntityType.Builder.<EntityMovingPackage>of(EntityMovingPackage::new, MobCategory.MISC)
+                        .noSummon()
+                        .sized(0.5F, 0.5F)
+                        .setTrackingRange(1000)
+                        .build("entity_c_package"));
 
         ENTITY_TYPES.register(modEventBus);
     }

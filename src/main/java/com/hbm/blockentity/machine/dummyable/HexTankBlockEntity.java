@@ -18,6 +18,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
@@ -26,13 +27,16 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineUF6Tank} / {@code TileEntityMachinePuF6Tank} — 64k fixed-type tank.
- * Canister {@code loadTank}/{@code unloadTank} skipped (FluidTankNTM item path not ported).
+ * Canister {@code loadTank(0,1)}/{@code unloadTank(2,3)} Exact CE {@code :68-78}.
+ * Comparator {@code lastRedstone} Exact CE {@code :71-78}.
  */
 public class HexTankBlockEntity extends MachineBaseBlockEntity
         implements IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
 
     public static final int CAPACITY = 64_000;
     public final FluidTankNTM tank;
+    /** CE {@code TileEntityMachineUF6Tank.java:27}. */
+    public byte lastRedstone = 0;
 
     public static HexTankBlockEntity uf6(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         return new HexTankBlockEntity(type, pos, state, Fluids.UF6, "container.uf6_tank");
@@ -45,7 +49,7 @@ public class HexTankBlockEntity extends MachineBaseBlockEntity
     private final String nameKey;
 
     public HexTankBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, FluidType fluid, String nameKey) {
-        super(type, pos, state, 0, true, false);
+        super(type, pos, state, 4, true, false);
         this.tank = new FluidTankNTM(fluid, CAPACITY).withOwner(this);
         this.nameKey = nameKey;
     }
@@ -56,8 +60,31 @@ public class HexTankBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    public boolean canInsertItem(int slot, ItemStack itemStack) {
+        return slot != 1 && slot != 3 && isItemValidForSlot(slot, itemStack);
+    }
+
+    @Override
+    public boolean canExtractItem(int slot, ItemStack itemStack, int amount) {
+        return slot == 1 || slot == 3;
+    }
+
+    @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
+        // CE TileEntityMachineUF6Tank.java:68-69
+        tank.loadTank(0, 1, inventory);
+        tank.unloadTank(2, 3, inventory);
+
+        // CE TileEntityMachineUF6Tank.java:71-78
+        byte comp = tank.getRedstoneComparatorPower();
+        if (comp != this.lastRedstone) {
+            setChanged();
+            level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+        }
+        this.lastRedstone = comp;
+
         if (level.getGameTime() % 20 == 0) {
             for (Direction d : Direction.values()) {
                 DirPos p = new DirPos(worldPosition.relative(d), d);

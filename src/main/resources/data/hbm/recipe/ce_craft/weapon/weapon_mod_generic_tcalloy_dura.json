@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "tag": "c:plates/weaponsteel"
+    },
+    [
+      {
+        "tag": "c:plates_triple/tcalloy"
+      },
+      {
+        "tag": "c:plates_triple/cdalloy"
+      }
+    ],
+    {
+      "item": "hbm:ducttape"
+    }
+  ],
+  "result": {
+    "id": "hbm:weapon_mod_generic_tcalloy_dura",
+    "count": 1
+  }
+}

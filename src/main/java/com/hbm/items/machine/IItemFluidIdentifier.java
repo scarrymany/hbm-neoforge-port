@@ -6,12 +6,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
- * Ported unchanged from CE's {@code com.hbm.items.machine.IItemFluidIdentifier} - a trivial
- * interface (one method) whose only implementor, {@link ItemFluidIDMulti}, lives in this same file
- * per {@code docs/phase2/items_tool_machine_coupling_and_recipe_system.md}'s recommendation ("port
- * alongside {@code ItemFluidIDMulti} - no reason to split").
+ * Port of CE {@code IItemFluidIdentifier} - marker interface for items that identify a {@link FluidType}
+ * contextually (e.g., {@link ItemFluidIDMulti} returns the player-selected primary type stored in NBT).
+ * <p>
+ * CE: upstream/hbm-ce/src/main/java/com/hbm/items/machine/IItemFluidIdentifier.java (10 lines)
  */
 public interface IItemFluidIdentifier {
-
+    /**
+     * Returns the {@link FluidType} this item-stack identifies at the given world position.
+     * CE signature: {@code getType(World world, int x, int y, int z, ItemStack stack)}.
+     */
     FluidType getType(Level level, BlockPos pos, ItemStack stack);
 }

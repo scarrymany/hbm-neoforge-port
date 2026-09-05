@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "D",
+    "S",
+    "D"
+  ],
+  "key": {
+    "D": {
+      "item": "hbm:ingot_phosphorus"
+    },
+    "S": {
+      "item": "hbm:ammo_arty_normal"
+    }
+  },
+  "result": {
+    "id": "hbm:ammo_arty_phosphorus",
+    "count": 1
+  }
+}

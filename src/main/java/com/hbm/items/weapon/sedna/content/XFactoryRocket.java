@@ -1,5 +1,6 @@
 package com.hbm.items.weapon.sedna.content;
 
+import com.hbm.entity.effect.EntityFireLingering;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
 import com.hbm.explosion.vanillant.ExplosionVNT;
 import com.hbm.explosion.vanillant.standard.BlockAllocatorStandard;
@@ -13,17 +14,21 @@ import com.hbm.items.weapon.sedna.ItemGunBaseNT;
 import com.hbm.items.weapon.sedna.ItemGunBaseNT.WeaponQuality;
 import com.hbm.items.weapon.sedna.Receiver;
 import com.hbm.items.weapon.sedna.factory.Lego;
+import com.hbm.items.weapon.sedna.impl.ItemGunStinger;
 import com.hbm.items.weapon.sedna.mags.MagazineFullReload;
 import com.hbm.items.weapon.sedna.mags.MagazineSingleReload;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.render.misc.RenderScreenOverlay.Crosshair;
 import com.hbm.util.EntityDamageUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -44,20 +49,13 @@ import java.util.function.Consumer;
  * CE source), built purely on this port's already-landed {@code ExplosionVNT} stack - matching the
  * precedent {@code GrenadeFillingActions} already set for the same situation.
  * <p>
- * <b>Forward references (documented, not silently dropped):</b>
- * <ul>
- *     <li>{@code EntityFireLingering} (the INC/PHOSPHORUS rounds' lingering ground fire) - confirmed
- *     not ported anywhere in this tree, same gap {@code XFactoryEnergy}/{@code GrenadeFillingActions}
- *     already documented; the explosion half of each incendiary round's impact is still real.</li>
- *     <li>{@code gun_stinger}/{@code gun_missile_launcher}'s target lock-on acquisition - CE drives
- *     this through {@code com.hbm.items.weapon.sedna.impl.ItemGunStinger}, a bespoke subclass with its
- *     own tick-based locking-progress state machine that does not exist in this port. Both guns are
- *     registered as plain {@link ItemGunBaseNT}s with a real, self-contained lock-on scan
- *     ({@link #findLockonTarget}, a nearest-entity-in-cone search) substituted for
- *     {@code ItemGunStinger.getLockonTarget} - same observable behavior (aim near a target, it locks,
- *     the fired round homes in via {@link EntityBulletBaseMK4}'s already-ported {@code lockonTarget}
- *     field), without the missing subclass's own multi-tick "locking..." progress readout.</li>
- * </ul>
+ * INC/PHOS linger is Exact CE {@code XFactoryRocket.java:114-138} via registered
+ * {@link EntityFireLingering} (6×2, 300t DIESEL / 600t PHOSPHORUS) plus the 5×5×5
+ * adjacent-flammable ignite loop.
+ * <p>
+ * Stinger lock-on is Exact CE {@code ItemGunStinger.java:36-76} (60-tick progress, ADS + secondary)
+ * plus {@code getLockonTarget :87-124}. Missile-launcher ADS primary uses the same scan at
+ * {@code 150D}/{@code 20D} ({@code XFactoryRocket.java:220-230}). HUD lock-on bar skipped.
  */
 public final class XFactoryRocket {
 
@@ -87,10 +85,10 @@ public final class XFactoryRocket {
             .setDamage(0.75F).setOnImpact(XFactoryRocket::explodeDemo);
     public static final BulletConfig rocket_inc = new BulletConfig("rocket_inc").setItem(() -> ITEM_ROCKET_INC)
             .setLife(300).setSelfDamageDelay(10).setVel(0F).setGrav(0).setOnEntityHit(null).setOnRicochet(null).setOnUpdate(LAMBDA_ACCELERATE)
-            .setDamage(0.75F).setOnImpact((bullet, hit) -> explodeIncendiary(bullet, hit, 3F));
+            .setDamage(0.75F).setOnImpact((bullet, hit) -> spawnFire(bullet, hit, false, 300));
     public static final BulletConfig rocket_phosphorus = new BulletConfig("rocket_phosphorus").setItem(() -> ITEM_ROCKET_PHOSPHORUS)
             .setLife(300).setSelfDamageDelay(10).setVel(0F).setGrav(0).setOnEntityHit(null).setOnRicochet(null).setOnUpdate(LAMBDA_ACCELERATE)
-            .setDamage(0.75F).setOnImpact((bullet, hit) -> explodeIncendiary(bullet, hit, 3F));
+            .setDamage(0.75F).setOnImpact((bullet, hit) -> spawnFire(bullet, hit, true, 600));
 
     // ==================== guns ====================
 
@@ -108,7 +106,7 @@ public final class XFactoryRocket {
     }
 
     public static ItemGunBaseNT gun_stinger() {
-        return new ItemGunBaseNT(new Item.Properties(), WeaponQuality.A_SIDE,
+        return new ItemGunStinger(new Item.Properties(), WeaponQuality.A_SIDE,
                 new GunConfig()
                         .dura(300).draw(7).inspect(40).crosshair(Crosshair.L_BOX_OUTLINE)
                         .rec(new Receiver(0)
@@ -117,7 +115,7 @@ public final class XFactoryRocket {
                                 .offset(1, -0.09375, -0.1875D)
                                 .setupLockonFire())
                         .setupStandardConfiguration()
-                        .ps(LAMBDA_STINGER_LOCKON).rs((stack, ctx) -> ItemGunBaseNT.setIsLockedOn(stack, false)));
+                        .ps(LAMBDA_STINGER_SECONDARY_PRESS).rs(LAMBDA_STINGER_SECONDARY_RELEASE));
         // default ammo (not yet wired): ROCKET_HEAT x3
     }
 
@@ -149,18 +147,16 @@ public final class XFactoryRocket {
 
     // ==================== lock-on ====================
 
-    private static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_STINGER_LOCKON = (stack, ctx) -> {
-        if (!(ctx.getPlayer() instanceof Player player)) return;
-        int target = findLockonTarget(player, 150D, 20D);
-        if (target != -1) {
-            ItemGunBaseNT.setLockonTarget(stack, target);
-            ItemGunBaseNT.setIsLockedOn(stack, true);
-        }
-    };
+    /** Exact CE {@code XFactoryRocket.java:217-218}. */
+    public static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_STINGER_SECONDARY_PRESS =
+            (stack, ctx) -> ItemGunStinger.setIsLockingOn(stack, true);
+    public static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_STINGER_SECONDARY_RELEASE =
+            (stack, ctx) -> ItemGunStinger.setIsLockingOn(stack, false);
 
-    private static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_MISSILE_LAUNCHER_PRIMARY_PRESS = (stack, ctx) -> {
-        if (ItemGunBaseNT.getIsAiming(stack) && ctx.getPlayer() instanceof Player player) {
-            int target = findLockonTarget(player, 150D, 20D);
+    /** Exact CE {@code XFactoryRocket.java:220-230}. */
+    public static final BiConsumer<ItemStack, ItemGunBaseNT.LambdaContext> LAMBDA_MISSILE_LAUNCHER_PRIMARY_PRESS = (stack, ctx) -> {
+        if (ItemGunBaseNT.getIsAiming(stack)) {
+            int target = ItemGunStinger.getLockonTarget(ctx.getPlayer(), 150D, 20D);
             if (target != -1) {
                 ItemGunBaseNT.setLockonTarget(stack, target);
                 ItemGunBaseNT.setIsLockedOn(stack, true);
@@ -169,34 +165,6 @@ public final class XFactoryRocket {
         Lego.LAMBDA_STANDARD_CLICK_PRIMARY.accept(stack, ctx);
         ItemGunBaseNT.setIsLockedOn(stack, false);
     };
-
-    /**
-     * Self-contained replacement for {@code ItemGunStinger.getLockonTarget} (see class javadoc) -
-     * nearest {@link LivingEntity} within {@code range} blocks whose direction from the player's eye
-     * falls within {@code coneDegrees} of the look vector. Returns the target's entity id, or -1.
-     */
-    private static int findLockonTarget(Player player, double range, double coneDegrees) {
-        Vec3 eye = player.getEyePosition();
-        Vec3 look = player.getLookAngle();
-        double cosThreshold = Math.cos(Math.toRadians(coneDegrees));
-
-        Entity best = null;
-        double bestDist = Double.MAX_VALUE;
-
-        for (LivingEntity candidate : player.level().getEntitiesOfClass(LivingEntity.class, new AABB(eye.x, eye.y, eye.z, eye.x, eye.y, eye.z).inflate(range))) {
-            if (candidate == player || !candidate.isAlive()) continue;
-            Vec3 toTarget = candidate.getEyePosition().subtract(eye);
-            double dist = toTarget.length();
-            if (dist < 0.5 || dist > range) continue;
-            if (toTarget.normalize().dot(look) < cosThreshold) continue;
-            if (dist < bestDist) {
-                bestDist = dist;
-                best = candidate;
-            }
-        }
-
-        return best != null ? best.getId() : -1;
-    }
 
     // ==================== impact lambdas ====================
 
@@ -238,13 +206,31 @@ public final class XFactoryRocket {
         bullet.discard();
     }
 
-    /** INC/PHOSPHORUS rounds: standard blast; the lingering ground-fire payload is a documented forward reference (see class javadoc). */
-    private static void explodeIncendiary(EntityBulletBaseMK4 bullet, HitResult hit, float range) {
-        if (skipSelfHit(bullet, hit)) return;
-        standardExplode(bullet, hit, range, 1F);
+    /** Exact CE {@code XFactoryRocket.java:114-138}. */
+    public static void spawnFire(EntityBulletBaseMK4 bullet, HitResult mop, boolean phosphorus, int duration) {
+        if (mop instanceof EntityHitResult && bullet.tickCount < 3) return;
+        Vec3 hit = mop.getLocation();
+        Level world = bullet.level();
+        standardExplode(bullet, mop, 3F, 1F);
+        EntityFireLingering.spawn(world, hit.x, hit.y, hit.z, 6F, 2F,
+                phosphorus ? EntityFireLingering.TYPE_PHOSPHORUS : EntityFireLingering.TYPE_DIESEL, duration);
         bullet.discard();
-        // TODO(entity-effect-fire-lingering): CE spawns an EntityFireLingering area-fire puddle plus a
-        // 5x5x5 block-ignite scan here - see class javadoc's forward reference.
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dy = -2; dy <= 2; dy++) {
+                for (int dz = -2; dz <= 2; dz++) {
+                    BlockPos pos = new BlockPos((int) Math.floor(hit.x) + dx, (int) Math.floor(hit.y) + dy, (int) Math.floor(hit.z) + dz);
+                    if (!world.getBlockState(pos).isAir()) continue;
+                    for (Direction dir : Direction.values()) {
+                        BlockPos adj = pos.relative(dir);
+                        BlockState neighbor = world.getBlockState(adj);
+                        if (neighbor.isFlammable(world, adj, dir.getOpposite())) {
+                            world.setBlock(pos, Blocks.FIRE.defaultBlockState(), 3);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**

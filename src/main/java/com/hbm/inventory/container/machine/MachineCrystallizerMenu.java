@@ -7,11 +7,9 @@ import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * Ported from CE's {@code ContainerCrystallizer} - coordinates kept for the slots that survive this
- * pass's item-input/battery/output/upgrade layout (see {@link MachineCrystallizerBlockEntity}'s own
- * javadoc for the fluid-load/fluid-id slot trim): item input at (62,45), battery at (152,72), item
- * output (take-only) at (113,45), 2 upgrade slots at (80,18)/(98,18), player inventory 3 rows from
- * y=122 + hotbar at y=180.
+ * Exact CE {@code ContainerCrystallizer.java:35-42}: input 62,45 / battery 152,72 / output 113,45 /
+ * canister 17,18 + 17,54 takeOnly / upgrades 80,18 + 98,18 / ID 35,72.
+ * {@code setType(7)} / {@code loadTank(3,4)} Exact CE {@code TileEntityMachineCrystallizer.java:133-134}.
  */
 public class MachineCrystallizerMenu extends MenuBase<MachineCrystallizerBlockEntity> {
 
@@ -21,7 +19,11 @@ public class MachineCrystallizerMenu extends MenuBase<MachineCrystallizerBlockEn
         this.addSlot(new SlotNonRetarded(tile, MachineCrystallizerBlockEntity.ITEM_INPUT, 62, 45));
         this.addSlot(new SlotNonRetarded(tile, MachineCrystallizerBlockEntity.BATTERY_SLOT, 152, 72));
         this.addSlot(new SlotTakeOnly(tile, MachineCrystallizerBlockEntity.ITEM_OUTPUT, 113, 45));
-        addSlots(tile, MachineCrystallizerBlockEntity.UPGRADE_START, 80, 18, 1, 2);
+        this.addSlot(new SlotNonRetarded(tile, MachineCrystallizerBlockEntity.SLOT_CANISTER, 17, 18));
+        this.addSlot(new SlotTakeOnly(tile, MachineCrystallizerBlockEntity.SLOT_EMPTY, 17, 54));
+        this.addSlot(new SlotNonRetarded(tile, MachineCrystallizerBlockEntity.UPGRADE_START, 80, 18));
+        this.addSlot(new SlotNonRetarded(tile, MachineCrystallizerBlockEntity.UPGRADE_END, 98, 18));
+        this.addSlot(new SlotNonRetarded(tile, MachineCrystallizerBlockEntity.SLOT_ID, 35, 72));
 
         playerInv(playerInv, 8, 122, 180);
     }

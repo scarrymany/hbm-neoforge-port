@@ -10,6 +10,7 @@ import com.hbm.items.food.ItemLemon;
 import com.hbm.items.special.ItemConsumable;
 import com.hbm.items.special.ItemFuel;
 import com.hbm.items.special.ItemHot;
+import com.hbm.items.weapon.ItemArtyShell;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -24,7 +25,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
  * {@code :1151-1154} scrap family, {@code :1310} {@code pipes_steel},
  * {@code :1994-2000} debris_* (ShredderRecipes.java:208/:347/:405-410),
  * {@code sawblade}/{@code mold_base}/{@code deuterium_filter}/{@code egg_glyphid}/
- * {@code flame_pony}/{@code blade_titanium}/{@code blade_tungsten}/{@code blade_meteorite}
+ * {@code flame_pony}/{@code blade_titanium}/{@code blade_tungsten} (ported, part-tab). blade_meteorite
+ * moved to {@code IngotNuggetItems} for meteorite sword chain proximity.
  * (Anvil leftover I/O). {@code lignite} CE {@code ItemFuel} 1200 ({@code ModItems.java:1339}).
  * {@code wings_*} live in {@code JetpackItems} as {@code WingsMurk}.
  */
@@ -45,6 +47,7 @@ public final class Phase11ProcessItems {
     public static DeferredItem<Item> BALL_TNT;
     public static DeferredItem<Item> BALL_DYNAMITE;
     public static DeferredItem<Item> BALL_TATB;
+    public static DeferredItem<Item> BALL_FIRECLAY;
     public static DeferredItem<Item> ROCKET_FUEL;
     public static DeferredItem<Item> CANISTER_NAPALM;
     public static DeferredItem<Item> PART_LITHIUM;
@@ -52,6 +55,10 @@ public final class Phase11ProcessItems {
     public static DeferredItem<Item> PART_CARBON;
     public static DeferredItem<Item> PART_COPPER;
     public static DeferredItem<Item> PART_PLUTONIUM;
+    public static DeferredItem<Item> SOLINIUM_IGNITER;
+    public static DeferredItem<Item> SOLINIUM_PROPELLANT;
+    public static DeferredItem<Item> PELLET_CLUSTER;
+    public static DeferredItem<Item> PARTICLE_EMPTY;
 
     private Phase11ProcessItems() {
     }
@@ -88,6 +95,7 @@ public final class Phase11ProcessItems {
         BALL_TNT = parts("ball_tnt");
         BALL_DYNAMITE = parts("ball_dynamite");
         BALL_TATB = parts("ball_tatb");
+        BALL_FIRECLAY = parts("ball_fireclay"); // CE ModItems.java:1239
         ROCKET_FUEL = fuel("rocket_fuel", 6400);
         CANISTER_NAPALM = parts("canister_napalm");
         PART_LITHIUM = parts("part_lithium");
@@ -114,13 +122,19 @@ public final class Phase11ProcessItems {
         for (ItemEnums.EnumTarType type : ItemEnums.EnumTarType.VALUES) {
             parts("oil_tar_" + type.name().toLowerCase());
         }
+        // CE ModItems.java:1240 ItemEnumMulti plant_item / EnumPlantType
+        for (ItemEnums.EnumPlantType type : ItemEnums.EnumPlantType.VALUES) {
+            parts("plant_item_" + type.name().toLowerCase());
+        }
         // CE ModItems.java:1273 ItemEnumMulti chunk_ore / EnumChunkType
         for (ItemEnums.EnumChunkType type : ItemEnums.EnumChunkType.VALUES) {
             parts("chunk_ore_" + type.name().toLowerCase());
         }
 
+        // CE ModItems.java:2314 — particle_muon.setContainerItem(particle_empty)
+        PARTICLE_EMPTY = control("particle_empty");
         String[] particles = {
-                "particle_empty", "particle_hydrogen", "particle_copper", "particle_lead",
+                "particle_hydrogen", "particle_copper", "particle_lead",
                 "particle_amat", "particle_aschrab", "particle_dark", "particle_higgs",
                 "particle_tachyon", "particle_strange", "particle_sparkticle"
         };
@@ -178,7 +192,7 @@ public final class Phase11ProcessItems {
         parts("tank_steel");
         // CE ModItems.java:1281 / :1289 — cluster/buckshot leftover assembler
         parts("pellet_buckshot");
-        parts("pellet_cluster");
+        PELLET_CLUSTER = parts("pellet_cluster");
         // CE ModItems.java:2530-2532 — mp_* assembler inputs
         parts("seg_10");
         parts("seg_15");
@@ -191,10 +205,28 @@ public final class Phase11ProcessItems {
         parts("sawblade");
         parts("mold_base");
         parts("deuterium_filter");
+        // CE ModItems.java:1297 ItemBase partsTab — deuterium_filter + gas_mask_filter_* crafts
+        parts("catalyst_clay");
+        // CE ModItems.java:1304 ItemBakedBase partsTab + CraftingManager.java:831
+        parts("safety_fuse");
+        // CE ModItems.java:239 ItemModSensor — I/O + assets; no invented sensor HUD
+        consume("gas_tester");
+        // CE ModItems.java:284 ItemCustomLore max16 controlTab — energy_core shapeless
+        control16("fuse");
+        // CE ModItems.java:290 ItemBase controlTab
+        control("piston_selenium");
+        // CE ModItems.java:1765 ItemFluidIDMulti max1 templateTab — already registered in CouplingMachineItems as FLUID_ID_MULTI
+        // CE ModItems.java:1843 ItemEnumMulti parts_legendary / EnumLegendaryType — default stack 64
+        // (no setMaxStackSize). CraftingManager.java:1004/1006 downgrade outputs ×3.
+        parts("parts_legendary_tier1");
+        parts("parts_legendary_tier2");
+        parts("parts_legendary_tier3");
+        // CE ModItems.java:399 ItemBase controlTab — t51/ajr/liquidator plate crafts
+        control("gas_empty");
         // CE ModItems.java:1305 / :1307 ItemBase; :887 ItemHot(200). Mold/hot recipes stay cited.
+        // blade_meteorite (ItemHot) now registered in IngotNuggetItems — meteorite sword chain item.
         parts("blade_titanium");
         parts("blade_tungsten");
-        partsHot("blade_meteorite", 200);
         consume("egg_glyphid");
         parts("flame_pony");
         // CE ModItems.java:1173 — syringe_metal_empty input
@@ -238,8 +270,8 @@ public final class Phase11ProcessItems {
         // CE ModItems.java:2521 / ass.gadget
         parts("pedestal_steel");
         // CE ModItems.java:2397-2398 / ass.solinium*
-        nuke1("solinium_igniter");
-        nuke1("solinium_propellant");
+        SOLINIUM_IGNITER = nuke1("solinium_igniter");
+        SOLINIUM_PROPELLANT = nuke1("solinium_propellant");
         // CE ModItems.java:417 / ass.emptypackage
         control("fluid_pack_empty");
         // CE ModItems.java:2490 / ass.lander
@@ -253,21 +285,49 @@ public final class Phase11ProcessItems {
         weapon1("ammo_himars_small_lava");
         weapon1("ammo_himars_large");
         weapon1("ammo_himars_large_tb");
-        // CE ItemAmmoArty meta 9/10/11 / ass.shell*
-        weapon1("ammo_arty_normal");
-        weapon1("ammo_arty_chlorine");
-        weapon1("ammo_arty_phosgene");
-        weapon1("ammo_arty_mustard");
+        // CE ItemAmmoArty metas 0–11 / WeaponRecipes.java:240-248
+        weaponArty("ammo_arty_normal");
+        weaponArty("ammo_arty_classic");
+        weaponArty("ammo_arty_he");
+        weaponArty("ammo_arty_mini_nuke");
+        weaponArty("ammo_arty_nuke");
+        weaponArty("ammo_arty_phosphorus");
+        weaponArty("ammo_arty_mini_nuke_multi");
+        weaponArty("ammo_arty_phosphorus_multi");
+        weaponArty("ammo_arty_cargo");
+        weaponArty("ammo_arty_chlorine");
+        weaponArty("ammo_arty_phosgene");
+        weaponArty("ammo_arty_mustard");
         // CE ModItems.java:1360 / ass.capfritz
         consume("cap_fritz");
         // CE ItemEnums.EnumSecretType / ass.50bmgbypass — CE tab=null
         hidden("item_secret_selenium_steel");
+        hidden("item_secret_folly");
+        hidden("item_secret_controller");
+        hidden("item_secret_aberrator");
+
+        // CE ModItems.java:1241-1245 consumable items for legendary gun crafts (PedestalRecipes.java)
+        // CE cite: PedestalRecipes.java:71 (BONE.grip), :109 (morning_glory), :119 (wild_p/card_aos/card_qos)
+        // Note: bone_grip already registered in previous wave (commit 17494466)
+        consume("morning_glory");
+        consume("wild_p");
+        consume("card_aos");
+        consume("card_qos");
+        // CE ModItems.java:1172 ItemBase partsTab — CE PedestalRecipes.java:57/:117 (barbed_wire recipe)
+        // bolt_spike×16 (CE has bolt_spike commented out in ItemBoltgun.java:58 with //FIXME)
+        // Register as parts item with TODO cite
+        // TODO(CE: PedestalRecipes.java:57/117): bolt_spike not fully implemented in CE itself (commented FIXME)
+        parts("bolt_spike");
 
         // CE ModItems.java:1323 coke flatten + :1211 catalytic_converter (reformer/hydrotreater slot).
         fuel("coke_coal", 3200);
         fuel("coke_lignite", 3200);
         fuel("coke_petroleum", 3200);
         parts1("catalytic_converter");
+        // CE ModItems.java:775-777 ItemBakedBase weaponTab (default stack 64).
+        weapon("stick_tnt");
+        weapon("stick_semtex");
+        weapon("stick_c4");
     }
 
     private static DeferredItem<Item> parts(String name) {
@@ -290,6 +350,12 @@ public final class Phase11ProcessItems {
 
     private static DeferredItem<Item> control(String name) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.CONTROL, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> control16(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(16)));
         CreativeTabContents.add(ModCreativeTabs.CONTROL, item);
         return item;
     }
@@ -337,8 +403,20 @@ public final class Phase11ProcessItems {
         return item;
     }
 
+    private static DeferredItem<Item> weapon(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties()));
+        CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
+        return item;
+    }
+
     private static DeferredItem<Item> weapon1(String name) {
         DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemBase(new Item.Properties().stacksTo(1)));
+        CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
+        return item;
+    }
+
+    private static DeferredItem<Item> weaponArty(String name) {
+        DeferredItem<Item> item = ModItems.ITEMS.register(name, () -> new ItemArtyShell(new Item.Properties().stacksTo(1)));
         CreativeTabContents.add(ModCreativeTabs.WEAPON, item);
         return item;
     }

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S",
+    "F"
+  ],
+  "key": {
+    "S": {
+      "item": "hbm:steel_bolt"
+    },
+    "F": {
+      "item": "hbm:safety_fuse"
+    }
+  },
+  "result": {
+    "id": "hbm:grenade_fuze_s3",
+    "count": 4
+  }
+}

@@ -1,11 +1,16 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
+import com.hbm.items.tool.ItemCounterfeitKeys;
+import com.hbm.items.tool.ItemLock;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -15,6 +20,8 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -26,7 +33,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * CE {@code BlockDecoContainer} {@code filing_cabinet} — one registry id (no extra variant ids),
- * 8-slot container. TESR drawer animation skipped.
+ * 8-slot container. Lock via {@link com.hbm.api.block.ILockable} Exact CE
+ * {@code BlockDecoContainer.java:120-127}. TESR drawer animation skipped.
  */
 public class FilingCabinetBlock extends BaseEntityBlock {
 
@@ -80,13 +88,41 @@ public class FilingCabinetBlock extends BaseEntityBlock {
         return new FilingCabinetBlockEntity(DummyableProcessBlockEntities.FILING_CABINET.get(), pos, state);
     }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return type == DummyableProcessBlockEntities.FILING_CABINET.get() ? ITickableBE.ticker() : null;
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        // CE BlockDecoContainer.java:122 — ItemLock / key_kit handle themselves
+        if (stack.getItem() instanceof ItemLock || stack.getItem() instanceof ItemCounterfeitKeys) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (player.isShiftKeyDown()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
+        if (level.getBlockEntity(pos) instanceof FilingCabinetBlockEntity be && be.canAccess(player)) {
+            player.openMenu(be, pos);
+            return ItemInteractionResult.SUCCESS;
+        }
+        return ItemInteractionResult.FAIL;
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        if (level.getBlockEntity(pos) instanceof FilingCabinetBlockEntity be) {
-            player.openMenu(be, pos);
+        ItemStack held = player.getMainHandItem();
+        if (held.getItem() instanceof ItemLock || held.getItem() instanceof ItemCounterfeitKeys) {
+            return InteractionResult.PASS;
         }
-        return InteractionResult.CONSUME;
+        if (player.isShiftKeyDown()) return InteractionResult.PASS;
+        if (level.getBlockEntity(pos) instanceof FilingCabinetBlockEntity be && be.canAccess(player)) {
+            player.openMenu(be, pos);
+            return InteractionResult.CONSUME;
+        }
+        return InteractionResult.FAIL;
     }
 
     @Override

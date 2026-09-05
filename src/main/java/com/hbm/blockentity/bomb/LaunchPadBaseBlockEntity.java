@@ -75,12 +75,7 @@ import java.util.Set;
  *   {@link MissileEntityTypes}'s own declarative {@code .setTrackingRange(1000)} on every missile
  *   {@code EntityType.Builder} (already shipped), matching the research report's own predicted
  *   simplification.</li>
- *   <li>{@code toRender}/canister-slot fuel loading ({@code tanks[].loadTank(slot, slot, inventory)})
- *   - CE's item-canister tank-fill mechanic has no port equivalent yet ({@link FluidTankNTM}'s own
- *   javadoc documents this exact gap: "The item-canister loading subsystem ... is left out - neither
- *   exists in this port yet"). Tanks still fill correctly through the fluid pipe network
- *   ({@link IFluidStandardReceiverMK2}); only the "insert a canister directly into the GUI slot"
- *   convenience is missing, a real but narrow gameplay gap, not a compile blocker.</li>
+ *   <li>{@code toRender} TESR missile preview — client-only, not this wave.</li>
  * </ul>
  */
 public abstract class LaunchPadBaseBlockEntity extends MachineBaseBlockEntity
@@ -218,6 +213,9 @@ public abstract class LaunchPadBaseBlockEntity extends MachineBaseBlockEntity
         this.prevRedstonePower = this.redstonePower;
 
         this.power = Library.chargeTEFromItems(inventory, 2, power, MAX_POWER);
+        // CE TileEntityLaunchPadBase.java:173-174
+        tanks[0].loadTank(3, 4, inventory);
+        tanks[1].loadTank(5, 6, inventory);
 
         if (this.isMissileValid() && inventory.getStackInSlot(0).getItem() instanceof ItemMissileStandard missile) {
             setFuel(missile);

@@ -1,7 +1,10 @@
 package com.hbm.inventory.recipes.loader;
 
+import net.minecraft.world.item.ItemStack;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -29,7 +32,11 @@ import java.util.Map;
  */
 public final class GenericRecipes {
 
-    private GenericRecipes() {
+    public final Map<String, GenericRecipe> recipeNameMap = new LinkedHashMap<>();
+    public final List<GenericRecipe> recipeOrderedList = new ArrayList<>();
+    public final Map<String, List<GenericRecipe>> autoSwitchGroups = new HashMap<>();
+
+    public GenericRecipes() {
     }
 
     /** Alternate recipes, i.e. obtainable otherwise. */
@@ -55,5 +62,34 @@ public final class GenericRecipes {
     public static void clearPools() {
         blueprintPools.clear();
         pooledBlueprints.clear();
+    }
+
+    public interface IOutput {
+        ItemStack collapse();
+        ItemStack getSingle();
+        boolean possibleMultiOutput();
+    }
+
+    public static final class ChanceOutput implements IOutput {
+        public final ItemStack stack;
+
+        public ChanceOutput(ItemStack stack) {
+            this.stack = stack;
+        }
+
+        @Override
+        public ItemStack collapse() {
+            return stack.copy();
+        }
+
+        @Override
+        public ItemStack getSingle() {
+            return stack;
+        }
+
+        @Override
+        public boolean possibleMultiOutput() {
+            return false;
+        }
     }
 }

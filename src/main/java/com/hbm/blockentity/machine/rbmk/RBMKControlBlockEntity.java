@@ -1,6 +1,7 @@
 package com.hbm.blockentity.machine.rbmk;
 
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
+import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.api.rbmk.IRBMKControlColumn;
 import com.hbm.api.rbmk.RBMKDials;
 import com.hbm.blocks.machine.rbmk.RBMKControlBlock;
@@ -25,7 +26,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * level} field (the world) in NeoForge 1.21.1, which CE's 1.12 {@code TileEntity} base (field
  * {@code world}) never had. Every other CE name is kept unchanged.
  */
-public abstract class RBMKControlBlockEntity extends RBMKSlottedBlockEntity implements IEnergyReceiverMK2, IRBMKControlColumn {
+public abstract class RBMKControlBlockEntity extends RBMKSlottedBlockEntity
+        implements IEnergyReceiverMK2, IRBMKControlColumn, IRORValueProvider {
 
     /** CE field name {@code level} - see class javadoc for the rename. */
     public double extraction;
@@ -195,5 +197,20 @@ public abstract class RBMKControlBlockEntity extends RBMKSlottedBlockEntity impl
         this.targetLevel = buf.readDouble();
         this.power = buf.readLong();
         this.hasPower = buf.readBoolean();
+    }
+
+    @Override
+    public String[] getFunctionInfo() {
+        // CE TileEntityRBMKControl.java:245-248
+        return new String[]{
+                PREFIX_VALUE + "extraction"
+        };
+    }
+
+    @Override
+    public String provideRORValue(String name) {
+        // CE :252-254 — field {@code level} → {@link #extraction}
+        if ((PREFIX_VALUE + "extraction").equals(name)) return "" + (int) (this.extraction * 100);
+        return null;
     }
 }

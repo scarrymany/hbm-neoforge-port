@@ -1,9 +1,13 @@
 package com.hbm.blockentity.machine.dummyable;
 
+import com.hbm.api.fluidmk2.IFluidStandardSenderMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.container.machine.dummyable.DiFurnaceMenu;
+import com.hbm.inventory.fluid.Fluids;
+import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.BlastFurnaceRecipesNT;
 import com.hbm.inventory.recipes.BlastFurnaceRecipesNT.BlastFurnaceRecipe;
 import com.hbm.main.MainRegistry;
@@ -25,21 +29,35 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * CE {@code TileEntityDiFurnace} — fuel + 2-in alloy via {@link BlastFurnaceRecipesNT}.
- * Smoke / pollution / extension / side-config / block-swap skipped.
+ * {@code pollute(SOOT, SOOT_PER_SECOND)} every 20t while processing Exact CE {@code :123-124}
+ * ({@code machine_difurnace_ext} unregistered — extension {@code *3} stay skipped).
+ * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:39-48}.
+ * Side-config / block-swap stay skipped.
  */
-public class MachineDiFurnaceBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
+public class MachineDiFurnaceBlockEntity extends MachineBaseBlockEntity
+        implements IFluidStandardSenderMK2, ITickableBE, MenuProvider {
 
     public static final int MAX_FUEL = 12_800;
     public static final int PROCESS_TICKS = 400;
 
     public int fuel;
     public int progress;
+    /** CE {@code TileEntityMachinePolluting} buffer 50 from {@code super(4, 50)}. */
+    public final FluidTankNTM smoke;
+    public final FluidTankNTM smokeLeaded;
+    public final FluidTankNTM smokePoison;
 
     public MachineDiFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state, 4, false, false);
+        super(type, pos, state, 4, true, false);
+        this.smoke = new FluidTankNTM(Fluids.SMOKE, 50).withOwner(this);
+        this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 50).withOwner(this);
+        this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 50).withOwner(this);
     }
 
     @Override
@@ -70,6 +88,11 @@ public class MachineDiFurnaceBlockEntity extends MachineBaseBlockEntity implemen
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // CE TileEntityDiFurnace.java:85-87 — sendSmoke all faces (ext Y+2 stay skipped)
+        for (Direction dir : Direction.values()) {
+            sendSmoke(worldPosition.relative(dir), dir);
+        }
+
         int power = getItemPower(inventory.getStackInSlot(2));
         if (power > 0 && fuel <= MAX_FUEL - power) {
             fuel += power;
@@ -84,12 +107,48 @@ public class MachineDiFurnaceBlockEntity extends MachineBaseBlockEntity implemen
                 process();
             }
             if (fuel < 0) fuel = 0;
+            // CE TileEntityDiFurnace.java:123-124 — ext unregistered, multiplier 1
+            if (level.getGameTime() % 20 == 0) {
+                pollute(PollutionHandler.PollutionType.SOOT, PollutionHandler.SOOT_PER_SECOND);
+            }
         } else {
             progress = 0;
         }
 
         dataChanged();
         networkPackMK2(15);
+    }
+
+    /** CE {@code TileEntityMachinePolluting#sendSmoke}. */
+    private void sendSmoke(BlockPos pos, Direction dir) {
+        if (smoke.getFill() > 0) tryProvide(smoke, level, pos, dir);
+        if (smokeLeaded.getFill() > 0) tryProvide(smokeLeaded, level, pos, dir);
+        if (smokePoison.getFill() > 0) tryProvide(smokePoison, level, pos, dir);
+    }
+
+    /** Exact CE {@code TileEntityMachinePolluting#pollute(PollutionType, float)} {@code :39-48}. */
+    public void pollute(PollutionHandler.PollutionType type, float amount) {
+        FluidTankNTM tank = type == PollutionHandler.PollutionType.SOOT ? smoke
+                : type == PollutionHandler.PollutionType.HEAVYMETAL ? smokeLeaded : smokePoison;
+        int fluidAmount = (int) Math.ceil(amount * 100);
+        tank.setFill(tank.getFill() + fluidAmount);
+        if (tank.getFill() > tank.getMaxFill()) {
+            int overflow = tank.getFill() - tank.getMaxFill();
+            tank.setFill(tank.getMaxFill());
+            PollutionHandler.incrementPollution(level, worldPosition, type, overflow / 100F);
+        }
+    }
+
+    @Override
+    public @NotNull List<FluidTankNTM> getSendingTanks() {
+        // CE TileEntityDiFurnace.java:319-320 getSmokeTanks
+        return List.of(smoke, smokeLeaded, smokePoison);
+    }
+
+    @Override
+    public @NotNull List<FluidTankNTM> getAllTanks() {
+        // CE TileEntityDiFurnace.java:314-315
+        return List.of();
     }
 
     private boolean canProcess() {
@@ -177,6 +236,9 @@ public class MachineDiFurnaceBlockEntity extends MachineBaseBlockEntity implemen
         super.saveAdditional(tag, registries);
         tag.putInt("powerTime", fuel);
         tag.putInt("cookTime", progress);
+        smoke.writeToNBT(tag, "smoke0");
+        smokeLeaded.writeToNBT(tag, "smoke1");
+        smokePoison.writeToNBT(tag, "smoke2");
     }
 
     @Override
@@ -184,6 +246,9 @@ public class MachineDiFurnaceBlockEntity extends MachineBaseBlockEntity implemen
         super.loadAdditional(tag, registries);
         fuel = tag.getInt("powerTime");
         progress = tag.getInt("cookTime");
+        smoke.readFromNBT(tag, "smoke0");
+        smokeLeaded.readFromNBT(tag, "smoke1");
+        smokePoison.readFromNBT(tag, "smoke2");
     }
 
     @Override

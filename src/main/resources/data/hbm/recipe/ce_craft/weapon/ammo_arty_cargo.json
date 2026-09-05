@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " I ",
+    " S ",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "hbm:cordite"
+    },
+    "I": {
+      "item": "hbm:sphere_steel"
+    },
+    "S": {
+      "item": "hbm:copper_shell"
+    }
+  },
+  "result": {
+    "id": "hbm:ammo_arty_cargo",
+    "count": 1
+  }
+}

@@ -3,9 +3,12 @@ package com.hbm.items.special;
 import com.hbm.config.WeaponConfig;
 import com.hbm.entity.effect.EntityQuasar;
 import com.hbm.items.ItemBase;
+import com.hbm.util.ContaminationUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -19,19 +22,10 @@ import java.util.List;
  * life", the inverse of how the superclass' generic digamma-hazard interpretation reads a flat
  * value).
  * <p>
- * The dropped-item {@link EntityQuasar} spawn is now wired, per
- * docs/phase4/entities_vortex_gravity_wells.md's Headline finding 2 (this exact call site was the
- * report's own live, already-committed "this package's other real consumer" find) - CE's real gate is
- * {@code entityItem.onGround} only (unlike {@link ItemDrop}'s sibling gate, which also fires on a
- * burning item), and the spawned quasar's fixed size is CE's real {@code 5F}.
- * <p>
- * Still not ported: {@code ContaminationUtil.applyDigammaData} (CE's per-tick player contamination
- * accumulator, which would otherwise run from an {@code inventoryTick} override) -
- * {@code com.hbm.util.ContaminationUtil} has not been ported by any Phase 1 area yet. CE's own hazard
- * table binds no static entry for this item at all (verified against
- * {@code upstream/hbm-ce/.../hazard/HazardRegistry.java}: no {@code particle_digamma} call exists
- * there) - its radiation entirely comes from the deferred {@code ContaminationUtil} call, not
- * {@code HazardSystem.register(...)}, so no hazard binding is added for it here either.
+ * Exact CE {@code :29-34}: held {@code onUpdate} applies
+ * {@link ContaminationUtil#applyDigammaData}{@code (player, 1.0 / digamma)} — CE hazard table has
+ * no {@code particle_digamma} row; tick is the only holder dose. Dropped-item {@link EntityQuasar}
+ * spawn is CE {@code :45-64} ({@code onGround} + {@code !isRemote}, size {@code 5F}).
  */
 public class ItemDigamma extends ItemBase {
 
@@ -40,6 +34,15 @@ public class ItemDigamma extends ItemBase {
     public ItemDigamma(Properties properties, int digamma) {
         super(properties);
         this.digamma = digamma;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+        // CE ItemDigamma.java:29-34 — no isRemote gate
+        if (entity instanceof Player player) {
+            ContaminationUtil.applyDigammaData(player, 1.0 / digamma);
+        }
     }
 
     @Override

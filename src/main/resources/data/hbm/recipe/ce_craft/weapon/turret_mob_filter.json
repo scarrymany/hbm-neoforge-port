@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "TBT",
+    "IRI"
+  ],
+  "key": {
+    "S": { "item": "hbm:plate_steel" },
+    "C": { "item": "minecraft:comparator" },
+    "T": { "item": "minecraft:redstone_block" },
+    "B": { "item": "hbm:turret_chip" },
+    "R": { "item": "hbm:circuit_chip" },
+    "I": { "item": "hbm:plate_iron" }
+  },
+  "result": { "id": "hbm:turret_mob_filter", "count": 1 }
+}

@@ -17,8 +17,10 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import javax.annotation.Nullable;
 import java.util.EnumMap;
@@ -81,6 +83,8 @@ public final class PlantBlocks {
     private static final Map<EnumTallPlantType, DeferredBlock<BlockTallPlant>> TALL_PLANTS = new EnumMap<>(EnumTallPlantType.class);
     private static final Map<BlockGlyphid.Type, DeferredBlock<BlockGlyphid>> GLYPHID = new EnumMap<>(BlockGlyphid.Type.class);
     private static final Map<BlockGlyph.Type, DeferredBlock<BlockGlyph>> GLYPH = new EnumMap<>(BlockGlyph.Type.class);
+    public static DeferredBlock<BlockGlyphidSpawner> GLYPHID_SPAWNER;
+    public static DeferredHolder<BlockEntityType<?>, BlockEntityType<GlyphidSpawnerBlockEntity>> GLYPHID_SPAWNER_ENTITY_TYPE;
 
     private PlantBlocks() {
     }
@@ -148,6 +152,10 @@ public final class PlantBlocks {
 
     public static Block tallPlant(EnumTallPlantType type) {
         return TALL_PLANTS.get(type).get();
+    }
+
+    public static DeferredBlock<BlockGlyphid> glyphid(BlockGlyphid.Type type) {
+        return GLYPHID.get(type);
     }
 
     // ==================== registration ====================
@@ -235,6 +243,12 @@ public final class PlantBlocks {
             BlockBehaviour.Properties props = BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOL).noLootTable();
             GLYPHID.put(type, registerBlock(name, () -> new BlockGlyphid(props, type), ModCreativeTabs.BLOCKS));
         }
+        // CE ModBlocks.java:564 BlockGlyphidSpawner Material.CORAL, SoundType.CLOTH, hardness 0.5F
+        GLYPHID_SPAWNER = registerBlock("glyphid_spawner",
+                () -> new BlockGlyphidSpawner(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOL)),
+                ModCreativeTabs.BLOCKS);
+        GLYPHID_SPAWNER_ENTITY_TYPE = ModBlocks.BLOCK_ENTITY_TYPES.register("glyphid_spawner",
+                () -> BlockEntityType.Builder.of(GlyphidSpawnerBlockEntity::new, GLYPHID_SPAWNER.get()).build(null));
     }
 
     private static void registerGuide() {

@@ -3,11 +3,14 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachineElectricFurnaceBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.ElectricFurnaceMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class ElectricFurnaceScreen extends GuiInfoContainer<ElectricFurnaceMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_electric_furnace.png");
 
     public ElectricFurnaceScreen(ElectricFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -20,15 +23,14 @@ public class ElectricFurnaceScreen extends GuiInfoContainer<ElectricFurnaceMenu>
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineElectricFurnaceBlockEntity be = this.getMenu().be;
         long max = Math.max(1L, be.getMaxPower());
         int ph = (int) (be.power * 52L / max);
-        guiGraphics.fill(x + 26, y + 70 - ph, x + 42, y + 70, 0xFF44CCFF);
+        if (ph > 0) guiGraphics.blit(TEXTURE, x + 26, y + 70 - ph, 176, 52 - ph, 16, ph);
         int prog = be.progress * 24 / Math.max(1, MachineElectricFurnaceBlockEntity.MAX_PROGRESS);
-        guiGraphics.fill(x + 79, y + 35, x + 79 + prog, y + 49, 0xFFFFFF55);
+        if (prog > 0) guiGraphics.blit(TEXTURE, x + 79, y + 35, 192, 0, prog, 14);
     }
 
     @Override

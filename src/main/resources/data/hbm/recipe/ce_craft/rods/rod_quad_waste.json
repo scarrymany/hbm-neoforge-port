@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "hbm:rod_quad_empty"
+    },
+    {
+      "item": "hbm:billet_nuclear_waste"
+    },
+    {
+      "item": "hbm:billet_nuclear_waste"
+    },
+    {
+      "item": "hbm:billet_nuclear_waste"
+    },
+    {
+      "item": "hbm:billet_nuclear_waste"
+    }
+  ],
+  "result": {
+    "id": "hbm:rod_quad_waste",
+    "count": 1
+  }
+}

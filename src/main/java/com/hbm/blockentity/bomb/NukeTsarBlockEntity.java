@@ -29,7 +29,7 @@ public class NukeTsarBlockEntity extends NukeCasingBlockEntity {
                 && inventory.getStackInSlot(1).getItem() == NukeCasingItems.EXPLOSIVE_LENSES.get()
                 && inventory.getStackInSlot(2).getItem() == NukeCasingItems.EXPLOSIVE_LENSES.get()
                 && inventory.getStackInSlot(3).getItem() == NukeCasingItems.EXPLOSIVE_LENSES.get()
-                && inventory.getStackInSlot(4).getItem() == NukeCasingItems.MAN_CORE.get();
+                && inventory.getStackInSlot(4).getItem() == com.hbm.items.special.SpecialItems.MAN_CORE.get();
     }
 
     public boolean isFilled() {

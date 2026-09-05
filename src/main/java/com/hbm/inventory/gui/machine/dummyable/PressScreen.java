@@ -3,12 +3,15 @@ package com.hbm.inventory.gui.machine.dummyable;
 import com.hbm.blockentity.machine.dummyable.MachinePressBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.PressMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 /** CE {@code GUIMachinePress} stamp/progress layout, painted panel. */
 public class PressScreen extends GuiInfoContainer<PressMenu> {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_press.png");
 
     public PressScreen(PressMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -21,14 +24,13 @@ public class PressScreen extends GuiInfoContainer<PressMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachinePressBlockEntity be = this.getMenu().be;
         int p = be.progress * 16 / MachinePressBlockEntity.MAX_PROGRESS;
-        guiGraphics.fill(x + 80, y + 35, x + 96, y + 35 + p, 0xFF555555);
+        if (p > 0) guiGraphics.blit(TEXTURE, x + 80, y + 35, 176, 0, 16, p);
         int s = be.speed * 14 / MachinePressBlockEntity.MAX_SPEED;
-        guiGraphics.fill(x + 25, y + 16 + (14 - s), x + 39, y + 30, 0xFFFF4400);
+        if (s > 0) guiGraphics.blit(TEXTURE, x + 25, y + 16, 192, 0, 14, s);
     }
 
     @Override

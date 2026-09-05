@@ -1,36 +1,79 @@
 package com.hbm.items.armor;
 
-import net.minecraft.world.entity.player.Player;
+import com.hbm.items.weapon.sedna.ItemGunBaseNT;
+import com.hbm.items.weapon.sedna.ItemGunBaseNT.LambdaContext;
+import com.hbm.items.weapon.sedna.content.XFactoryPA;
+import com.hbm.lib.HBMSoundHandler;
+import com.hbm.util.EntityDamageUtil;
+import com.hbm.weapon.anim.GunAnimationType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 
 /**
- * Stub port of CE's {@code com.hbm.items.armor.ArmorNCRPAMelee} - the NCR power-armor set's
- * built-in "swing the whole arm" melee weapon component, returned by {@link ArmorNCRPA}'s
- * {@link IPAWeaponsProvider#getMeleeComponent}.
- *
- * <p><b>Deliberately not ported</b> per this package's task brief item 3 ("stub the actual
- * melee/ranged component implementations with a documented TODO if they need the not-yet-ported
- * gun_state_machine package"): CE's real body ({@code clickPrimary}/{@code clickSecondary}/
- * {@code orchestra}) drives a raycast-and-damage swing sequence timed off
- * {@code ItemGunBaseNT.getLastAnim}/{@code getAnimTimer} (the gun state machine's per-tick timer
- * bookkeeping) and calls into {@code com.hbm.items.weapon.sedna.factory.XFactoryPA}/
- * {@code ConfettiUtil} - a swing-choreography helper library not confirmed to exist anywhere in
- * this port (distinct from the confirmed-landed ballistics core named in this package's task
- * brief: {@code BulletConfig}/{@code EntityBulletBaseMK4}/{@code EntityThrowableNT}). Wiring this
- * for real needs that gun-state-machine timer plumbing to land first; until then both hooks are
- * documented no-ops rather than a guessed reimplementation.
+ * Exact CE {@code ArmorNCRPAMelee} click + orchestra ({@code ArmorNCRPAMelee.java:25-66}).
+ * {@code ConfettiUtil.gib} / first-person arm buses stay skipped.
  */
 public class ArmorNCRPAMelee implements IPAMelee {
 
     @Override
-    public void clickPrimary(ItemStack stack, Player player) {
-        // TODO(gun_state_machine): CE's XFactoryPA.doSwing(stack, ctx, GunAnimation.CYCLE, 25) +
-        // orchestra()'s timed raycast-and-damage swing. See class javadoc.
+    public void clickPrimary(ItemStack stack, LambdaContext ctx) {
+        XFactoryPA.doSwing(stack, ctx, GunAnimationType.CYCLE, 25);
     }
 
     @Override
-    public void clickSecondary(ItemStack stack, Player player) {
-        // TODO(gun_state_machine): CE's XFactoryPA.doSwing(stack, ctx, GunAnimation.ALT_CYCLE, 30)
-        // heavy-sweep variant. See class javadoc.
+    public void clickSecondary(ItemStack stack, LambdaContext ctx) {
+        XFactoryPA.doSwing(stack, ctx, GunAnimationType.ALT_CYCLE, 30);
+    }
+
+    @Override
+    public void orchestra(ItemStack stack, LambdaContext ctx) {
+        LivingEntity entity = ctx.entity;
+        if (entity.level().isClientSide()) return;
+        int type = ItemGunBaseNT.getLastAnim(stack, ctx.configIndex);
+        int timer = ItemGunBaseNT.getAnimTimer(stack, ctx.configIndex);
+
+        boolean swings = type == GunAnimationType.CYCLE.ordinal() && (timer == 5 || timer == 15);
+        boolean sweep = type == GunAnimationType.ALT_CYCLE.ordinal() && timer == 5;
+
+        if ((swings || sweep) && ctx.getPlayer() != null) {
+            HitResult mop = EntityDamageUtil.getMouseOver(ctx.getPlayer(), 3.0D, 0.5D);
+
+            if (mop != null && mop.getType() != HitResult.Type.MISS) {
+                if (mop.getType() == HitResult.Type.ENTITY && mop instanceof EntityHitResult ehr && ehr.getEntity().isAlive()) {
+                    float damage = swings ? 15F : 35F;
+                    float knockback = swings ? 0F : 1.5F;
+                    float dt = swings ? 5F : 15F;
+                    float pierce = swings ? 0.1F : 0.25F;
+                    Entity hit = ehr.getEntity();
+                    DamageSource source = ctx.getPlayer().damageSources().playerAttack(ctx.getPlayer());
+
+                    if (hit instanceof LivingEntity living) {
+                        if (living.getMaxHealth() >= 100) damage *= 2.5F;
+                        EntityDamageUtil.attackEntityFromNT(living, source, damage, true, false, knockback, dt, pierce);
+                        // TODO(CE:ArmorNCRPAMelee.java:51): ConfettiUtil.gib — VFX not ported.
+                    } else {
+                        hit.hurt(source, damage);
+                    }
+
+                    entity.level().playSound(null, hit.blockPosition(), HBMSoundHandler.fireStab.get(),
+                            SoundSource.PLAYERS, 1F, 0.9F + entity.getRandom().nextFloat() * 0.2F);
+                }
+                if (mop.getType() == HitResult.Type.BLOCK && mop instanceof BlockHitResult bhr) {
+                    BlockPos pos = bhr.getBlockPos();
+                    BlockState state = entity.level().getBlockState(pos);
+                    entity.level().playSound(null, mop.getLocation().x, mop.getLocation().y, mop.getLocation().z,
+                            state.getSoundType(entity.level(), pos, entity).getStepSound(),
+                            SoundSource.BLOCKS, 2F, 0.9F + entity.getRandom().nextFloat() * 0.2F);
+                }
+            }
+        }
     }
 }

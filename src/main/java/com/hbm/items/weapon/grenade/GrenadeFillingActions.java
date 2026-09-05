@@ -1,6 +1,7 @@
 package com.hbm.items.weapon.grenade;
 
 import com.hbm.entity.effect.EntityCloudFleija;
+import com.hbm.entity.effect.EntityFireLingering;
 import com.hbm.entity.grenade.EntityGrenadeUniversal;
 import com.hbm.entity.logic.EntityNukeExplosionMK3;
 import com.hbm.entity.projectile.EntityBulletBaseMK4;
@@ -17,13 +18,17 @@ import com.hbm.handler.radiation.ChunkRadiationManager;
 import com.hbm.items.weapon.sedna.BulletConfig;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.particle.HbmEffect;
+import com.hbm.saveddata.satellites.SatelliteDetector;
 import com.hbm.util.DamageResistanceHandler.DamageClass;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -40,30 +45,17 @@ import java.util.List;
  * one of these via a plain method handle rather than a shared {@code public static final} lambda
  * field.
  * <p>
+ * INC/WP linger is Exact CE {@code ItemGrenadeFilling.java:139-154} via registered
+ * {@link EntityFireLingering} (6×2, 200t DIESEL / 600t PHOSPHORUS) plus
+ * {@code igniteAround} {@code :233-247}.
+ * <p>
  * <b>Forward references (documented, not silently dropped) - each one is called out again at its
  * exact call site below:</b>
  * <ul>
- *     <li>{@code com.hbm.entity.effect.EntityFireLingering} (INC/WP's lingering-fire payload) is
- *     confirmed not ported anywhere in this tree. The WP/energy-filling {@code AuxParticlePacketNT}
- *     VFX broadcasts ({@link #explodeWp}'s {@link com.hbm.particle.HbmEffect#HAZE} x3,
- *     {@link #explodeStandardEnergy}'s {@link com.hbm.particle.HbmEffect#PLASMA_BLAST} x3,
- *     {@link #spawnMush}'s {@link com.hbm.particle.HbmEffect#MUKE}) are now wired - see
- *     {@code docs/phase5/particle_engine_and_generic_vfx.md}.</li>
- *     <li>{@code igniteAround}'s "ignite a flammable-adjacent air block" branch - CE's
- *     {@code Block#isFlammable(IBlockAccess,BlockPos,EnumFacing)} has no single confirmed 1.21.1
- *     replacement; dropped rather than guessed at, matching
- *     {@code com.hbm.explosion.ExplosionNukeGeneric#vaporDest}'s identical documented gap for the
- *     same CE API.</li>
- *     <li>{@code EntityProcessorCrossSmooth#setDamageClass(DamageClass)} does not exist on this
- *     port's {@code EntityProcessorCrossSmooth} yet (the {@code DamageClass}-to-{@code DamageType}
- *     mapping {@code docs/phase3/gun_framework.md} already flagged as missing a
- *     {@code SEDNA_PLASMA}-family entry) - EMP/PLASMA fall back to the processor's own plain
- *     explosion-damage source until that lands.</li>
- *     <li>{@code com.hbm.saveddata.satellites.SatelliteDetector} ({@code spawnMush}'s satellite ping) -
- *     confirmed not ported anywhere in this tree (missile-infra scope, per
- *     {@code docs/phase3/explosion_engine.md}'s identical finding for {@code EntityFalloutRain}).
- *     {@code com.hbm.handler.radiation.ChunkRadiationManager} (NUCLEAR/NUCLEAR_DEMO's
- *     {@code incrementRad}) is now real (Phase 4) and wired below.</li>
+ *     <li>{@code explodeStandardEnergy} {@code setDamageClass} is Exact CE
+ *     {@code ItemGrenadeFilling.java:272-274} (EMP ELECTRIC / PLASMA PLASMA).</li>
+ *     <li>{@code SatelliteDetector.reportEvent} on nuclear grenade {@code spawnMush} is Exact CE
+ *     {@code ItemGrenadeFilling.java:262}.</li>
  * </ul>
  * Every other call below (the {@code ExplosionVNT} blasts themselves, the CLUSTER/CLUSTER_HEAVY/LASER/
  * FRAG_SLEEVE submunitions, SCHRAB's Fleija spawn) is a real, fully-wired port - none of Phase 3's own
@@ -115,22 +107,27 @@ public final class GrenadeFillingActions {
         vnt.explode();
     }
 
+    /** Exact CE {@code ItemGrenadeFilling.java:139-146}. */
     static void explodeInc(EntityGrenadeUniversal grenade) {
+        Level world = grenade.level();
         standardExplode(grenade, 3F, 10F);
-        // forward reference: EntityFireLingering(6x2 area, 200t, TYPE_DIESEL) - see class javadoc.
-        // forward reference: igniteAround(...,2) - see class javadoc.
+        EntityFireLingering.spawn(world, grenade.getX(), grenade.getY(), grenade.getZ(), 6F, 2F,
+                EntityFireLingering.TYPE_DIESEL, 200);
+        igniteAround(world, grenade.getX(), grenade.getY(), grenade.getZ(), 2);
     }
 
+    /** Exact CE {@code ItemGrenadeFilling.java:148-163}. */
     static void explodeWp(EntityGrenadeUniversal grenade) {
+        Level world = grenade.level();
         standardExplode(grenade, 3F, 10F);
-        // forward reference: EntityFireLingering(6x2 area, 600t, TYPE_PHOSPHORUS) - see class javadoc.
-        // forward reference: igniteAround(...,3) - see class javadoc.
+        EntityFireLingering.spawn(world, grenade.getX(), grenade.getY(), grenade.getZ(), 6F, 2F,
+                EntityFireLingering.TYPE_PHOSPHORUS, 600);
+        igniteAround(world, grenade.getX(), grenade.getY(), grenade.getZ(), 3);
 
-        Level level = grenade.level();
         for (int i = 0; i < 3; i++) {
-            double hx = grenade.getX() + level.getRandom().nextGaussian() * 4;
-            double hz = grenade.getZ() + level.getRandom().nextGaussian() * 4;
-            HbmEffect.sendPacket(level, HbmEffect.HAZE, hx, grenade.getY(), hz, 150, null);
+            double hx = grenade.getX() + world.getRandom().nextGaussian() * 4;
+            double hz = grenade.getZ() + world.getRandom().nextGaussian() * 4;
+            HbmEffect.sendPacket(world, HbmEffect.HAZE, hx, grenade.getY(), hz, 150, null);
         }
     }
 
@@ -159,24 +156,20 @@ public final class GrenadeFillingActions {
     }
 
     static void explodeEmp(EntityGrenadeUniversal grenade) {
-        // CE: explodeStandardEnergy(grenade, 30F, 3F, DamageClass.ELECTRIC, 0.5F, 0.5F, 1F, 3F) - a
-        // pale blue burst.
-        explodeStandardEnergy(grenade, 30F, 3F, 0.5F, 0.5F, 1F, 3F);
+        explodeStandardEnergy(grenade, 30F, 3F, DamageClass.ELECTRIC, 0.5F, 0.5F, 1F, 3F);
     }
 
     static void explodePlasma(EntityGrenadeUniversal grenade) {
         // CE's own code comment: "TODO: unique effect because this sucks" - CE itself flags this
         // filling's VFX as a placeholder; not worth over-polishing beyond parity here either.
-        // CE: explodeStandardEnergy(grenade, 50F, 5F, DamageClass.PLASMA, 0.5F, 1F, 0.5F, 4F) - a
-        // pale green burst.
-        explodeStandardEnergy(grenade, 50F, 5F, 0.5F, 1F, 0.5F, 4F);
+        explodeStandardEnergy(grenade, 50F, 5F, DamageClass.PLASMA, 0.5F, 1F, 0.5F, 4F);
     }
 
-    private static void explodeStandardEnergy(EntityGrenadeUniversal grenade, float damage, float range, float r, float g, float b, float scale) {
+    /** Exact CE {@code ItemGrenadeFilling.java:272-274}. */
+    private static void explodeStandardEnergy(EntityGrenadeUniversal grenade, float damage, float range, DamageClass damageClass, float r, float g, float b, float scale) {
         Level level = grenade.level();
         ExplosionVNT vnt = new ExplosionVNT(level, grenade.getX(), grenade.getY(), grenade.getZ(), range, grenade.getThrower());
-        // forward reference: EntityProcessorCrossSmooth#setDamageClass(...) - see class javadoc.
-        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, damage));
+        vnt.setEntityProcessor(new EntityProcessorCrossSmooth(1, damage).setDamageClass(damageClass));
         vnt.setPlayerProcessor(new PlayerProcessorStandard());
         vnt.explode();
         level.playSound(null, grenade.getX(), grenade.getY(), grenade.getZ(),
@@ -268,7 +261,8 @@ public final class GrenadeFillingActions {
 
     private static void spawnMush(EntityGrenadeUniversal grenade) {
         Level level = grenade.level();
-        // forward reference: SatelliteDetector.reportEvent(...) - see class javadoc. The sound below is real.
+        SatelliteDetector.reportEvent(level, SatelliteDetector.DURATION_LOW,
+                SatelliteDetector.BurstIntensity.LOW, grenade.getX(), grenade.getZ());
         level.playSound(null, grenade.getX(), grenade.getY(), grenade.getZ(),
                 HBMSoundHandler.mukeExplosion, SoundSource.HOSTILE, 15.0F, 1.0F);
 
@@ -330,6 +324,26 @@ public final class GrenadeFillingActions {
     }
 
     // ==================== shared ExplosionVNT presets ====================
+
+    /** Exact CE {@code ItemGrenadeFilling.java:233-247}. */
+    private static void igniteAround(Level world, double px, double py, double pz, int radius) {
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dy = -radius; dy <= radius; dy++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    BlockPos bp = new BlockPos((int) Math.floor(px) + dx, (int) Math.floor(py) + dy, (int) Math.floor(pz) + dz);
+                    if (!world.getBlockState(bp).isAir()) continue;
+                    for (Direction dir : Direction.values()) {
+                        BlockPos np = bp.relative(dir);
+                        BlockState neighbor = world.getBlockState(np);
+                        if (neighbor.isFlammable(world, np, dir.getOpposite())) {
+                            world.setBlock(bp, Blocks.FIRE.defaultBlockState(), 3);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     static void standardExplode(EntityGrenadeUniversal grenade, float range, float damage) {
         standardExplode(grenade, range, damage, 0F, 0F);

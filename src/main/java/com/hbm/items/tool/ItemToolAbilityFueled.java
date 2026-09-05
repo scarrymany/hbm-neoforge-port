@@ -1,5 +1,6 @@
 package com.hbm.items.tool;
 
+import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.inventory.fluid.FluidType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -12,18 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Adds a fluid-fuel tank on top of {@link ItemToolAbility} (used by {@link ItemChainsaw}). Ported
- * from CE's {@code com.hbm.items.tool.ItemToolAbilityFueled}.
- *
- * <p>Fuel is stored as a plain {@code Integer} data component ({@link ToolDataComponents#TOOL_FUEL})
- * rather than the {@code com.hbm.api.fluidmk2.IFillableItem} CE implements: that interface does not
- * exist anywhere in this port yet (a genuinely not-yet-ported Phase 2 fluid-item-network system),
- * so this class cannot be filled from pipes/tanks/canisters today. The fuel-consumption gameplay
- * (tool refuses to operate below {@link #consumption}, drains on every harvest) is fully
- * self-contained and works; only network refilling is deferred. {@link #tryFill} is kept as the
- * seam a future {@code IFillableItem} port should call into.
+ * Exact CE {@code ItemToolAbilityFueled} — {@link IFillableItem} tank on {@link ItemToolAbility}.
+ * Fuel in {@link ToolDataComponents#TOOL_FUEL}. Machines fill via {@code FluidLoaderFillableItem}.
  */
-public class ItemToolAbilityFueled extends ItemToolAbility {
+public class ItemToolAbilityFueled extends ItemToolAbility implements IFillableItem {
 
     protected final int maxFuel;
     protected final int consumption;
@@ -50,17 +43,44 @@ public class ItemToolAbilityFueled extends ItemToolAbility {
         return acceptedFuels.contains(type);
     }
 
-    /** @return the leftover amount that could not be accepted (mirrors CE's {@code IFillableItem.tryFill}). */
+    /** Exact CE {@code ItemToolAbilityFueled.java}:92-94. */
+    @Override
+    public boolean acceptsFluid(FluidType type, ItemStack stack) {
+        return acceptsFluid(type);
+    }
+
+    /** Exact CE {@code :97-107} — remainder; fill capped at {@code fillRate} then tank space. */
+    @Override
     public int tryFill(FluidType type, int amount, ItemStack stack) {
-        if (!acceptsFluid(type)) {
-            return amount;
-        }
-
-        int toFill = Math.min(amount, fillRate);
-        toFill = Math.min(toFill, maxFuel - getFuel(stack));
-        setFuel(stack, getFuel(stack) + toFill);
-
+        if (!acceptsFluid(type, stack)) return amount;
+        int toFill = Math.min(amount, this.fillRate);
+        toFill = Math.min(toFill, this.maxFuel - getFill(stack));
+        setFuel(stack, getFill(stack) + toFill);
         return amount - toFill;
+    }
+
+    /** Exact CE {@code :110-112}. */
+    @Override
+    public boolean providesFluid(FluidType type, ItemStack stack) {
+        return false;
+    }
+
+    /** Exact CE {@code :115-117} — leftover unchanged. */
+    @Override
+    public int tryEmpty(FluidType type, int amount, ItemStack stack) {
+        return amount;
+    }
+
+    /** Exact CE {@code :127-129}. */
+    @Override
+    public FluidType getFirstFluidType(ItemStack stack) {
+        return null;
+    }
+
+    /** Exact CE {@code :73-81} — {@code TOOL_FUEL}, default full. */
+    @Override
+    public int getFill(ItemStack stack) {
+        return getFuel(stack);
     }
 
     @Override

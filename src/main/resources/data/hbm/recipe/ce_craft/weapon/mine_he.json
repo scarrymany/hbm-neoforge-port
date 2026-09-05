@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " C ",
+    "PTP"
+  ],
+  "key": {
+    "C": { "item": "hbm:circuit_basic" },
+    "P": { "item": "hbm:plate_steel" },
+    "T": { "tag": "hbm:any_highexplosive" }
+  },
+  "result": { "id": "hbm:mine_he", "count": 1 }
+}

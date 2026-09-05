@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "hbm:block/foundry_channel_center"
+      "model": "hbm:block/foundry_channel"
     }
   }
 }

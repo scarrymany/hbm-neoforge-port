@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "block/cube",
   "textures": {
-    "all": "hbm:block/foundry_basin_side"
+    "down": "hbm:block/foundry_basin_bottom",
+    "up": "hbm:block/foundry_basin_top",
+    "north": "hbm:block/foundry_basin_side",
+    "south": "hbm:block/foundry_basin_side",
+    "east": "hbm:block/foundry_basin_side",
+    "west": "hbm:block/foundry_basin_side",
+    "particle": "hbm:block/foundry_basin_side"
   }
 }
