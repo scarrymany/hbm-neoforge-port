@@ -5,12 +5,12 @@ import com.hbm.blockentity.machine.dummyable.VendingMachineBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.itempool.ItemPool;
 import com.hbm.itempool.ItemPoolsVendingMachine;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * CE {@code BlockVendingMachine} — Dummyable {1,0,0,0,0,0}. No container. Token → pool drop.
+ * Dispense sound Exact CE {@code BlockVendingMachine.java:80} ({@code boltOpen} 1.0F/0.75F BLOCKS).
  */
 public class VendingMachineBlock extends BlockDummyable {
 
@@ -82,7 +83,9 @@ public class VendingMachineBlock extends BlockDummyable {
                         drop);
                 level.addFreshEntity(item);
             }
-            level.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 1.0F, 0.75F);
+            // Exact CE BlockVendingMachine.java:80
+            level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                    HBMSoundHandler.boltOpen.get(), SoundSource.BLOCKS, 1.0F, 0.75F);
         }
         return ItemInteractionResult.CONSUME;
     }
