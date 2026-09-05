@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
  * nor holds an {@code ItemStackHandler}), see {@link MachineIndustrialTurbineBlockEntity}'s javadoc.
  * Compressor lever Exact CE {@code MachineIndustrialTurbine.java:53-78}
  * ({@code chungus_lever} 1.5F/1.0F BLOCKS when {@code !operational}).
+ * fillSpace extras Exact CE {@code :85-99}.
  */
 public class MachineIndustrialTurbineBlock extends BlockDummyable {
 
@@ -42,6 +43,27 @@ public class MachineIndustrialTurbineBlock extends BlockDummyable {
     @Override
     public int getOffset() {
         return 3;
+    }
+
+    /**
+     * Exact CE {@code MachineIndustrialTurbine.fillSpace} extras ({@code MachineIndustrialTurbine.java:85-99}).
+     * After {@code super.fillSpace}: add {@code dir * o} (core), {@code rot = dir} clockwise around Y.
+     * Front pair at {@code dir*3 ± rot} (y), rear pair at {@code -dir ± rot} (y), tops at
+     * {@code dir*3 y+2} / {@code -dir y+2}, plus {@code -dir*3 y+1}. No ProxyCombo TE — extras are
+     * {@code makeExtra} flags only.
+     */
+    @Override
+    protected void fillSpace(Level level, BlockPos placedPos, Direction dir, int placementOffset) {
+        super.fillSpace(level, placedPos, dir, placementOffset);
+        BlockPos core = placedPos.relative(dir, placementOffset);
+        Direction rot = dir.getClockWise();
+        makeExtra(level, core.relative(dir, 3).relative(rot));
+        makeExtra(level, core.relative(dir, 3).relative(rot.getOpposite()));
+        makeExtra(level, core.relative(dir.getOpposite()).relative(rot));
+        makeExtra(level, core.relative(dir.getOpposite()).relative(rot.getOpposite()));
+        makeExtra(level, core.relative(dir, 3).above(2));
+        makeExtra(level, core.relative(dir.getOpposite()).above(2));
+        makeExtra(level, core.relative(dir.getOpposite(), 3).above());
     }
 
     @Nullable
