@@ -58,6 +58,12 @@ public class ItemMachineUpgrade extends ItemBase {
         return this.speed;
     }
 
+    /** Exact CE {@code ItemMachineUpgrade.getSpeed(ItemStack)} :60-71. */
+    public static int getSpeed(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return 0;
+        return stack.getItem() instanceof ItemMachineUpgrade upgrade ? upgrade.getSpeed() : 0;
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
         Arrays.stream(this.descKeys)

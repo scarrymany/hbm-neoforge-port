@@ -5,7 +5,7 @@ import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.FurnaceIronMenu;
 import com.hbm.items.machine.ItemMachineUpgrade;
-import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
+import com.hbm.modules.ModuleBurnTime;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -29,6 +29,8 @@ import java.util.Optional;
 /**
  * CE {@code TileEntityFurnaceIron.java}:61-116 — coal-fuel vanilla smelt, baseTime 160,
  * SPEED upgrade slot scan.
+ * {@code ModuleBurnTime} Exact CE {@code :46-52}/{@code :75}/{@code :185-186}.
+ * Container-item leftover Exact CE {@code :80-83}.
  * {@code incrementPollution(SOOT, SOOT_PER_SECOND)} every 20t while smelting Exact CE {@code :116}.
  * Smoke particles stay skipped (VFX).
  */
@@ -41,6 +43,14 @@ public class FurnaceIronBlockEntity extends MachineBaseBlockEntity implements IT
     public int progress;
     public int processingTime = BASE_TIME;
     public boolean wasOn;
+    /** Exact CE {@code TileEntityFurnaceIron.java}:46-52. */
+    public final ModuleBurnTime burnModule = new ModuleBurnTime()
+            .setLigniteTimeMod(1.25)
+            .setCoalTimeMod(1.25)
+            .setCokeTimeMod(1.5)
+            .setSolidTimeMod(2)
+            .setRocketTimeMod(2)
+            .setBalefireTimeMod(2);
 
     public FurnaceIronBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, false, false);
@@ -53,9 +63,9 @@ public class FurnaceIronBlockEntity extends MachineBaseBlockEntity implements IT
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        // Exact CE TileEntityFurnaceIron.java:180-188 — hopper: in / fuel only
         if (slot == 0) return smeltResult(stack).isPresent();
-        if (slot == 1 || slot == 2) return getBurnTime(stack) > 0;
-        if (slot == 4) return stack.getItem() instanceof ItemMachineUpgrade u && u.getType() == UpgradeType.SPEED;
+        if (slot < 3) return burnModule.getBurnTime(stack) > 0;
         return false;
     }
 
@@ -73,16 +83,26 @@ public class FurnaceIronBlockEntity extends MachineBaseBlockEntity implements IT
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
-        processingTime = Math.max(20, BASE_TIME - 15 * speedTier());
+        // Exact CE TileEntityFurnaceIron.java:65 / ItemMachineUpgrade.getSpeed :60-71
+        processingTime = BASE_TIME - 15 * ItemMachineUpgrade.getSpeed(inventory.getStackInSlot(4));
         wasOn = false;
 
         if (burnTime <= 0) {
             for (int i = 1; i < 3; i++) {
                 ItemStack fuel = inventory.getStackInSlot(i);
-                int fuelTime = getBurnTime(fuel);
+                if (fuel.isEmpty()) continue;
+                int fuelTime = burnModule.getBurnTime(fuel);
                 if (fuelTime > 0) {
                     maxBurnTime = burnTime = fuelTime;
-                    inventory.extractItem(i, 1, false);
+                    // Exact CE :80-83 — shrink then leftover container item
+                    ItemStack copy = fuel.copy();
+                    ItemStack remainder = fuel.copy();
+                    remainder.shrink(1);
+                    if (remainder.isEmpty() && copy.hasCraftingRemainingItem()) {
+                        inventory.setStackInSlot(i, copy.getCraftingRemainingItem());
+                    } else {
+                        inventory.setStackInSlot(i, remainder);
+                    }
                     setChanged();
                     break;
                 }
@@ -134,19 +154,6 @@ public class FurnaceIronBlockEntity extends MachineBaseBlockEntity implements IT
         Optional<RecipeHolder<SmeltingRecipe>> rec = level.getRecipeManager()
                 .getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(input), level);
         return rec.map(h -> h.value().assemble(new SingleRecipeInput(input), level.registryAccess()));
-    }
-
-    private int speedTier() {
-        ItemStack up = inventory.getStackInSlot(4);
-        if (up.getItem() instanceof ItemMachineUpgrade u && u.getType() == UpgradeType.SPEED) {
-            return u.getTier();
-        }
-        return 0;
-    }
-
-    public static int getBurnTime(ItemStack stack) {
-        if (stack == null || stack.isEmpty()) return 0;
-        return stack.getBurnTime(RecipeType.SMELTING);
     }
 
     @Override
