@@ -5,8 +5,10 @@ import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.items.machine.ItemGear;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -20,7 +22,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineStirling} — Dummyable {1,0,1,1,1,1} offset 1 + 4 extras. Shared by ×3 ids. */
+/**
+ * CE {@code MachineStirling} — Dummyable {1,0,1,1,1,1} offset 1 + 4 extras. Shared by ×3 ids.
+ * Cog install {@code upgradePlug} Exact CE {@code MachineStirling.java:97} (1.5F/0.75F PLAYERS).
+ */
 public class MachineStirlingBlock extends BlockDummyable {
 
     public MachineStirlingBlock(Properties properties) {
@@ -64,6 +69,9 @@ public class MachineStirlingBlock extends BlockDummyable {
                 if (core != null && level.getBlockEntity(core) instanceof MachineStirlingBlockEntity stirling) {
                     if (stirling.tryInstallCog(stack)) {
                         if (!player.getAbilities().instabuild) stack.shrink(1);
+                        // CE MachineStirling.java:97
+                        level.playSound(null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                                HBMSoundHandler.upgradePlug.get(), SoundSource.PLAYERS, 1.5F, 0.75F);
                         return ItemInteractionResult.SUCCESS;
                     }
                 }
