@@ -1,6 +1,8 @@
 package com.hbm.blocks.machine.foundry;
 
 import com.hbm.api.block.ICrucibleAcceptor;
+import com.hbm.api.block.IToolable;
+import com.hbm.api.block.IToolable.ToolType;
 import com.hbm.blockentity.machine.foundry.FoundryCastingBaseBlockEntity;
 import com.hbm.inventory.material.Mats;
 import com.hbm.items.machine.ItemMold;
@@ -37,8 +39,9 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Handles mold insertion (CE :113-135), output extraction (CE :99-109), shovel scrap (CE :138-151).
  * Mold insert {@code upgradePlug} Exact CE {@code :130} (1.5F/1.0F).
+ * Screwdriver mold extract Exact CE {@code :185-205} when slot 0 nonempty and {@code amount == 0}.
  */
-public abstract class BlockFoundryCastingBase extends Block implements EntityBlock, ICrucibleAcceptor {
+public abstract class BlockFoundryCastingBase extends Block implements EntityBlock, ICrucibleAcceptor, IToolable {
 
     protected BlockFoundryCastingBase(Properties properties) {
         super(properties);
@@ -119,6 +122,29 @@ public abstract class BlockFoundryCastingBase extends Block implements EntityBlo
         }
 
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+
+    @Override
+    public boolean onScrew(Level world, Player player, int x, int y, int z, Direction side, float fX, float fY, float fZ,
+                           InteractionHand hand, ToolType tool) {
+        if (tool != ToolType.SCREWDRIVER) return false;
+
+        BlockPos pos = new BlockPos(x, y, z);
+        if (!(world.getBlockEntity(pos) instanceof FoundryCastingBaseBlockEntity cast)) return false;
+
+        if (cast.inventory.getStackInSlot(0).isEmpty()) return false;
+        if (cast.amount > 0) return false;
+
+        // Exact CE FoundryCastingBase.java:194-203
+        if (!player.getInventory().add(cast.inventory.getStackInSlot(0).copy())) {
+            world.addFreshEntity(new ItemEntity(world, x + 0.5, y + 0.5, z + 0.5, cast.inventory.getStackInSlot(0).copy()));
+        }
+
+        cast.inventory.setStackInSlot(0, ItemStack.EMPTY);
+        cast.setChanged();
+        BlockState currentState = world.getBlockState(pos);
+        world.sendBlockUpdated(pos, currentState, currentState, 3);
+        return true;
     }
 
     @Override
