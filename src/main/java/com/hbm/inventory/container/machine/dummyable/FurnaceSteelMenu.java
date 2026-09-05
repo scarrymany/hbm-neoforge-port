@@ -6,17 +6,20 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
-/** CE {@code ContainerFurnaceSteel}: 3 in 35/53/71,17 / 3 out 35/53/71,63. */
+/**
+ * Exact CE {@code ContainerFurnaceSteel}: 3 in 35,17/35/53 / 3 out 125,17/35/53.
+ * Invented horizontal 35/53/71 layout removed.
+ */
 public class FurnaceSteelMenu extends MenuBase<FurnaceSteelBlockEntity> {
 
     public FurnaceSteelMenu(int id, Inventory playerInv, FurnaceSteelBlockEntity be) {
         super(DummyableProcessMenus.FURNACE_STEEL.get(), id, be);
         this.addSlot(new SlotNonRetarded(tile, 0, 35, 17));
-        this.addSlot(new SlotNonRetarded(tile, 1, 53, 17));
-        this.addSlot(new SlotNonRetarded(tile, 2, 71, 17));
-        this.addSlot(new SlotTakeOnly(tile, 3, 35, 63));
-        this.addSlot(new SlotTakeOnly(tile, 4, 53, 63));
-        this.addSlot(new SlotTakeOnly(tile, 5, 71, 63));
-        playerInv(playerInv, 8, 104);
+        this.addSlot(new SlotNonRetarded(tile, 1, 35, 35));
+        this.addSlot(new SlotNonRetarded(tile, 2, 35, 53));
+        this.addSlot(new SlotTakeOnly(tile, 3, 125, 17));
+        this.addSlot(new SlotTakeOnly(tile, 4, 125, 35));
+        this.addSlot(new SlotTakeOnly(tile, 5, 125, 53));
+        playerInv(playerInv, 8, 84);
     }
 }
