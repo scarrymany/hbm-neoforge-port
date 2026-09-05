@@ -1,6 +1,7 @@
 package com.hbm.hazard;
 
 import com.hbm.blocks.MaterialBlockGenerator;
+import com.hbm.blocks.bomb.NukeCasingBlocks;
 import com.hbm.blocks.generic.GenericCrateBlocks;
 import com.hbm.blocks.generic.WastelandVirusBlocks;
 import com.hbm.config.GeneralConfig;
@@ -414,6 +415,19 @@ public class HazardRegistry {
                 new HazardData().addEntry(RADIATION, u238 * nugget * 10));
         HazardSystem.register(NukeCasingItems.TSAR_CORE.get(),
                 new HazardData().addEntry(RADIATION, pu239 * nugget * 15));
+
+        // CE HazardRegistry.java:515-521 FLEIJA / solinium / nuke_fstbmb.
+        // Skip :522-523 holotape DIGAMMA (meta split — do not invent merge).
+        HazardSystem.register(NukeCasingItems.FLEIJA_PROPELLANT.get(),
+                new HazardData().addEntry(RADIATION, 15F).addEntry(EXPLOSIVE, 8F).addEntry(BLINDING, 50F));
+        HazardSystem.register(NukeCasingItems.FLEIJA_CORE.get(),
+                new HazardData().addEntry(RADIATION, 10F));
+        HazardSystem.register(Phase11ProcessItems.SOLINIUM_PROPELLANT.get(),
+                new HazardData().addEntry(EXPLOSIVE, 10F));
+        HazardSystem.register(NukeCasingItems.SOLINIUM_CORE.get(),
+                new HazardData().addEntry(RADIATION, sa327 * nugget * 8).addEntry(BLINDING, 45F));
+        HazardSystem.register(NukeCasingBlocks.NUKE_FSTBMB.get(),
+                new HazardData().addEntry(DIGAMMA, 0.01F));
 
         // items_ingot_nugget area (docs/phase1/moditems_generative.md section 3,
         // hazard_bindings_plan.md Pattern A/B): only the ingot_/nugget_ fields CE's own
