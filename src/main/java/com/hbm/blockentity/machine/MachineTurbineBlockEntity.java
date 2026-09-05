@@ -122,6 +122,11 @@ public class MachineTurbineBlockEntity extends MachineBaseBlockEntity
         networkPackMK2(50);
     }
 
+    /** Exact CE {@code TileEntityMachineTurbine.getPowerScaled} :260-261. */
+    public long getPowerScaled(int i) {
+        return (power * i) / MAX_POWER;
+    }
+
     @Override
     public long getPower() {
         return power;
