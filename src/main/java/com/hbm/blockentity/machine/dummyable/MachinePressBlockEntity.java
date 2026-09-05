@@ -6,13 +6,13 @@ import com.hbm.blocks.generic.Phase8Blocks;
 import com.hbm.inventory.container.machine.dummyable.PressMenu;
 import com.hbm.inventory.recipes.PressRecipes;
 import com.hbm.items.machine.ItemStamp;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 /**
  * CE {@code TileEntityMachinePress}: burner stamp press, 13 slots.
  * Adjacent {@code press_preheater} {@code speed += 4} Exact CE {@code :60-71}.
+ * Stamp sound Exact CE {@code TileEntityMachinePress.java:97}: {@code pressOperate} 1.5F/1.0F.
  */
 public class MachinePressBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -120,7 +121,7 @@ public class MachinePressBlockEntity extends MachineBaseBlockEntity implements I
                             }
                         }
                         if (burnTime >= 200) burnTime -= 200;
-                        level.playSound(null, worldPosition, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 0.4F, 1.2F);
+                        level.playSound(null, worldPosition, HBMSoundHandler.pressOperate.get(), SoundSource.BLOCKS, 1.5F, 1.0F);
                     }
                     retracting = true;
                     delay = 5;

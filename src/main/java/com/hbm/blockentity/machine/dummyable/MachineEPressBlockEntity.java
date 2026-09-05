@@ -8,6 +8,7 @@ import com.hbm.inventory.recipes.PressRecipes;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.items.machine.ItemStamp;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,7 +16,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * CE {@code TileEntityMachineEPress}: 100 HE/t, 200 progress, SPEED upgrade via slot scan.
+ * Stamp sound Exact CE {@code TileEntityMachineEPress.java:137}: {@code pressOperate} 1.5F/1.0F.
  */
 public class MachineEPressBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
@@ -101,7 +102,7 @@ public class MachineEPressBlockEntity extends MachineBaseBlockEntity
                         progress = MAX_PROGRESS;
                         craftItem();
                         if (level != null) {
-                            level.playSound(null, worldPosition, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, 1.0F, 1.0F);
+                            level.playSound(null, worldPosition, HBMSoundHandler.pressOperate.get(), SoundSource.BLOCKS, 1.5F, 1.0F);
                         }
                         retracting = true;
                         delay = 5 - speed + 1;

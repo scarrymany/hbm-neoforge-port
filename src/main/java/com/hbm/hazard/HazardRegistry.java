@@ -690,6 +690,19 @@ public class HazardRegistry {
         HazardSystem.register(MachineItems.ZIRNOX_RODS_DEPLETED.get(ItemZirnoxRodDepleted.EnumZirnoxTypeDepleted.ZFB_MOX_FUEL).get(),
                 new HazardData().addEntry(RADIATION, wst * rod_dual * 5F));
 
+        // Exact CE HazardRegistry.java:270 — ZIRNOX lithium byproduct rod.
+        HazardSystem.register(MachineItems.ROD_ZIRNOX_TRITIUM.get(),
+                new HazardData().addEntry(RADIATION, 0.001F * rod_dual));
+
+        // Exact CE HazardRegistry.java:282-288 — research-reactor plate fuels.
+        registerOtherFuel(MachineItems.PLATE_FUEL_U233.get(), u233 * ingot, wst * ingot * 13F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_U235.get(), u235 * ingot, wst * ingot * 10F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_MOX.get(), mox * ingot, wst * ingot * 16F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_PU239.get(), pu239 * ingot, wst * ingot * 13.5F, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_SA326.get(), sa326 * ingot, wst * ingot * 10F, true);
+        registerOtherFuel(MachineItems.PLATE_FUEL_RA226BE.get(), rabe * billet, pobe * nugget * 3, false);
+        registerOtherFuel(MachineItems.PLATE_FUEL_PU238BE.get(), pube * billet, pube * nugget * 1, false);
+
         // ItemPWRFuel: all 15 EnumPWRFuel values (CE's registerPWRFuel calls). Only the fresh
         // pwr_fuel_* item exists in this port so far - MachineItems.registerPwrFuel()'s own comment
         // notes pwr_fuel_hot/pwr_fuel_depleted are separate CE byproduct-marker items sharing this
