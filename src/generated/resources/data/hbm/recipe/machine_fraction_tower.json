@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "G": {
+      "item": "hbm:steel_grate"
+    },
+    "H": {
+      "tag": "c:plates_sextuple/steel"
+    }
+  },
+  "pattern": [
+    "H",
+    "G",
+    "H"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hbm:machine_fraction_tower"
+  }
+}

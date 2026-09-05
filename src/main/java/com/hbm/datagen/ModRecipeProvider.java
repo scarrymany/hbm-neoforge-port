@@ -4344,7 +4344,8 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_lead", has(leadIngotTag))
                 .save(output, id("block/anvil_lead"));
 
-        // CE :340 = machine_fraction_tower = "H","G","H", H=STEEL.plateWelded() (plate_sextuple), G=steel_grate
+        // leftover obtain: machine_fraction_tower. TODO(CE:CraftingManager.java:297)
+        // "H","G","H": H=STEEL.plateWelded() (c:plates_sextuple/steel), G=steel_grate
         TagKey<Item> steelWeldedPlateTag = MaterialShapes.WELDEDPLATE.commonTag(Mats.MAT_STEEL);
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, block("machine_fraction_tower"))
                 .pattern("H")
