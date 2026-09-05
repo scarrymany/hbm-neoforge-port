@@ -16,6 +16,7 @@ import com.hbm.items.machine.ItemArcElectrode;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import com.hbm.main.MainRegistry;
 import com.hbm.util.CrucibleUtil;
@@ -28,6 +29,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -37,6 +39,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,7 @@ import java.util.Locale;
  * CE {@code TileEntityMachineArcFurnaceLarge}: 2.5M HE, 20-slot grid + 5 queue, liquid mode,
  * SPEED upgrade.
  * {@code incrementPollution(SOOT, 10F)} on process complete Exact CE {@code :178}.
+ * Upgrade insert {@code upgradePlug} Exact CE {@code :118-122} (1.0F/1.0F, slot 4).
  * Lid animation / particles stay skipped.
  */
 public class MachineArcFurnaceBlockEntity extends MachineBaseBlockEntity
@@ -64,6 +68,33 @@ public class MachineArcFurnaceBlockEntity extends MachineBaseBlockEntity
 
     public MachineArcFurnaceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 30, false, true);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineArcFurnaceLarge.java:118-122
+                if (!stack.isEmpty() && stack.getItem() instanceof ItemMachineUpgrade && slot == 4
+                        && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
