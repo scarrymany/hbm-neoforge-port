@@ -384,6 +384,12 @@ public class HazardRegistry {
                 new HazardData().addEntry(RADIATION, 500F).addEntry(CONTAMINATING, bf * powder));
         HazardSystem.register(BilletPowderItems.POWDER_YELLOWCAKE.get(),
                 new HazardData().addEntry(RADIATION, yc * powder).addEntry(CONTAMINATING, yc * powder));
+        // CE HazardRegistry.java:491 / :494. Skip :492/:493 fallout item vs ModBlocks.fallout
+        // (same BlockItem in this port — do not invent a merged number).
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_yellowcake"),
+                new HazardData().addEntry(RADIATION, yc * block * powder_mult));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_fallout"),
+                new HazardData().addEntry(RADIATION, yc * block * powder_mult));
         HazardSystem.register(BilletPowderItems.POWDER_CAESIUM.get(),
                 new HazardData().addEntry(HYDROACTIVE, 1F).addEntry(HOT, 3F));
         HazardSystem.register(BilletPowderItems.POWDER_COLTAN_ORE.get(), new HazardData().addEntry(ASBESTOS, 3F));
