@@ -112,7 +112,7 @@ public final class ProgressionChainGameTests {
      * Scenario 1 step 3: chem plant runs {@code chem.ethanol} (10x {@code minecraft:sugar} -> 1000mB
      * ethanol, {@code duration: 100} ticks - {@code inventory/recipes/chem/ChemPlantRecipes.java:66
      * -70}, the only fluid-input-free recipe in this port's chem plant table). Battery slot
-     * confirmed {@code ChemPlantBlockEntity.java:55} ({@code BATTERY_SLOT = 6}).
+     * Exact CE {@code TileEntityMachineChemicalPlant} 0 / item in 4-6.
      */
     // TODO(gametest, fc7-gametest-emptytemplate): removed `@EmptyTemplate(value = {5, 5, 5})` -
     // same non-existent-annotation issue as assemblerCraftsSteelPlate above; see that method's
@@ -127,10 +127,8 @@ public final class ProgressionChainGameTests {
             return;
         }
 
-        be.inventory.setStackInSlot(6, creativeBattery());
-        // Item-input slots start at 0 in this block entity's own layout; 10x sugar satisfies
-        // chem.ethanol's AStack input (ComparableStack(Items.SUGAR, 10)).
-        be.inventory.setStackInSlot(0, new ItemStack(Items.SUGAR, 10));
+        be.inventory.setStackInSlot(ChemPlantBlockEntity.BATTERY_SLOT, creativeBattery());
+        be.inventory.setStackInSlot(ChemPlantBlockEntity.ITEM_IN_START, new ItemStack(Items.SUGAR, 10));
 
         helper.succeedWhen(() -> helper.assertTrue(
                 be.outputTanks[0].getFill() > 0,

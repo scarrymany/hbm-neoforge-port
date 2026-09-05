@@ -9,6 +9,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.RecipesCommon.AStack;
+import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.chem.ChemPlantMenu;
 import com.hbm.inventory.fluid.FluidStack;
 import com.hbm.inventory.fluid.FluidType;
@@ -17,6 +18,9 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.ChemicalPlantRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes;
 import com.hbm.inventory.recipes.chem.ChemPlantRecipes.ChemPlantRecipe;
+import com.hbm.items.machine.ItemBlueprints;
+import com.hbm.items.machine.ItemMachineUpgrade;
+import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
@@ -34,40 +38,50 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Ported from CE's {@code TileEntityMachineChemicalPlant} (single-module chemical plant, distinct
- * from the 4-module {@code TileEntityMachineChemicalFactory} - not ported this pass, see
- * {@code docs/phase2/machines_chemical_isotope.md}'s Chemical Plant section and this task's own
- * per-machine list, which names "chemical plant" only). Delegates all recipe data to
- * {@link ChemPlantRecipes}; see that class's header for the documented auto-recognition model
- * (this port matches by current input contents, not CE's player-selected-by-name GUI dropdown) and
- * scope trim (representative recipe subset).
- * <p>
- * 3 item in / 3 item out stay on port indices 0-5 / battery 6 (recipe matching unchanged).
- * Canister slots 10-21 Exact CE {@code TileEntityMachineChemicalPlant.java:123-131} /
- * {@code ContainerMachineChemicalPlant.java:47-52}. Factory leftover {@code loadTank(10,13)} is
- * not copied — CE factory container has no canister slots and those indices collide with item-out.
- * <p>
- * ROR + named recipe: CE {@code TileEntityMachineChemicalPlant.java:303-311, :358-383}.
+ * Ported from CE's {@code TileEntityMachineChemicalPlant} (single-module, distinct from the
+ * 4-lane factory). Delegates recipe data to {@link ChemPlantRecipes}.
  * {@code recipe=="null"} keeps first-match; GUI/ROR lock a name.
+ * <p>
+ * Exact CE {@code TileEntityMachineChemicalPlant} 22-slot layout: battery 0 / blueprint 1 /
+ * upgrades 2-3 / item in 4-6 / item out 7-9 / canisters 10-21
+ * ({@code ContainerMachineChemicalPlant.java:36-52}). Slots 2-3 SPEED/POWER/OVERDRIVE cap 3
+ * Exact CE {@code :121}/{@code :142-147}/{@code :349-354}. {@code upgradePlug} on insert
+ * {@code :83-84}. {@code ModuleMachineBase.process} speed/pow + {@code restrictedMode*0.25}
+ * {@code :135-148}. IUpgradeInfoProvider / looped audio stay skipped.
+ * Factory leftover {@code loadTank(10,13)} is not copied.
  */
 public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, IPersistentNBT,
         MenuProvider, IControlReceiver, IRORValueProvider, IRORInteractive {
 
-    private static final int ITEM_IN_START = 0;
-    private static final int ITEM_OUT_START = 3;
-    private static final int BATTERY_SLOT = 6;
+    public static final int BATTERY_SLOT = 0;
+    public static final int BLUEPRINT_SLOT = 1;
+    public static final int SLOT_UPGRADE_A = 2;
+    public static final int SLOT_UPGRADE_B = 3;
+    public static final int ITEM_IN_START = 4;
+    public static final int ITEM_OUT_START = 7;
     /** Exact CE fluid-in load / empty-out. */
     private static final int SLOT_FLUID_IN = 10;
     private static final int SLOT_FLUID_IN_EMPTY = 13;
     /** Exact CE fluid-out empty / filled. */
     private static final int SLOT_FLUID_OUT = 16;
     private static final int SLOT_FLUID_OUT_FULL = 19;
+
+    private static final Map<UpgradeType, Integer> VALID_UPGRADES = new EnumMap<>(UpgradeType.class);
+
+    static {
+        VALID_UPGRADES.put(UpgradeType.SPEED, 3);
+        VALID_UPGRADES.put(UpgradeType.POWER, 3);
+        VALID_UPGRADES.put(UpgradeType.OVERDRIVE, 3);
+    }
 
     public static final long MIN_MAX_POWER = 100_000L;
     public static final int TANK_CAPACITY = 24_000;
@@ -77,12 +91,13 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
 
     public long power;
     public long maxPower = MIN_MAX_POWER;
-    public int progress;
+    public double progress;
     public boolean isProcessing;
     public boolean didProcess;
     public boolean restrictedMode;
     public String recipe = "null";
     private String activeRecipeName;
+    private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(VALID_UPGRADES);
 
     public ChemPlantBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 22, true, true);
@@ -93,6 +108,33 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     }
 
     @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineChemicalPlant.java:83-84
+                if (!stack.isEmpty() && slot >= SLOT_UPGRADE_A && slot <= SLOT_UPGRADE_B
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
+    }
+
+    @Override
     protected Component getDefaultName() {
         return Component.translatable("container.machineChemicalPlant");
     }
@@ -100,8 +142,10 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         if (stack.isEmpty()) return false;
-        if (slot == BATTERY_SLOT) return Library.isBattery(stack);
-        // CE :270-276 — canister columns accept any stack; hopper is solids-only (:285-286).
+        // CE TileEntityMachineChemicalPlant.java:270-276
+        if (slot == BATTERY_SLOT) return true;
+        if (slot == BLUEPRINT_SLOT) return stack.getItem() instanceof ItemBlueprints;
+        if (slot >= SLOT_UPGRADE_A && slot <= SLOT_UPGRADE_B) return stack.getItem() instanceof ItemMachineUpgrade;
         if (slot >= SLOT_FLUID_IN && slot <= SLOT_FLUID_IN + 2) return true;
         if (slot >= SLOT_FLUID_OUT && slot <= SLOT_FLUID_OUT + 2) return true;
         return slot >= ITEM_IN_START && slot < ITEM_IN_START + 3;
@@ -115,14 +159,11 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
 
     @Override
     public int[] getAccessibleSlotsFromSide(Direction side) {
-        return new int[]{0, 1, 2, 3, 4, 5};
+        return new int[]{4, 5, 6, 7, 8, 9};
     }
 
     public int getProgressScaled(int i) {
-        ChemPlantRecipe matched = findRecipe();
-        int duration = matched == null ? 1 : matched.duration;
-        if (restrictedMode) duration = Math.max(1, duration * 4);
-        return (progress * i) / Math.max(1, duration);
+        return (int) Math.round(progress * i);
     }
 
     private ChemPlantRecipe findRecipe() {
@@ -225,12 +266,6 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
             }
         }
 
-        // CE TileEntityMachineChemicalPlant.java:262-264: battery-slot sword upgrade
-        // (machined → treated) when any recipe completes successfully.
-        ItemStack battery = inventory.getStackInSlot(BATTERY_SLOT);
-        if (!battery.isEmpty() && battery.getItem() == com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_MACHINED.get()) {
-            inventory.setStackInSlot(BATTERY_SLOT, new ItemStack(com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_TREATED.get()));
-        }
     }
 
     private void retargetEmptyTanks(ChemPlantRecipe recipe) {
@@ -260,12 +295,19 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         if (level == null || level.isClientSide) return;
 
         power = Library.chargeTEFromItems(inventory, BATTERY_SLOT, power, maxPower);
+        upgradeManager.checkSlots(inventory, SLOT_UPGRADE_A, SLOT_UPGRADE_B);
 
         ChemPlantRecipe itemOnly = findItemOnlyRecipe();
         if (itemOnly != null) retargetEmptyTanks(itemOnly);
 
-        // CE TileEntityMachineChemicalPlant.java:123-131
-        ChemPlantRecipe selected = ChemicalPlantRecipes.byName(recipe);
+        // CE TileEntityMachineChemicalPlant.java:114-131
+        ChemPlantRecipe named = ChemicalPlantRecipes.byName(recipe);
+        if (named != null) {
+            maxPower = named.power * 100L;
+        }
+        maxPower = Math.max(Math.max(power, maxPower), MIN_MAX_POWER);
+
+        ChemPlantRecipe selected = named;
         if (selected == null && (recipe == null || recipe.isEmpty() || "null".equals(recipe))) {
             selected = itemOnly;
         }
@@ -284,30 +326,49 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
             for (FluidTankNTM tank : outputTanks) if (tank.getFill() > 0) tryProvide(tank, level, dp);
         }
 
+        // CE TileEntityMachineChemicalPlant.java:139-147 + ModuleMachineBase.java:135-148
+        double speed = 1D;
+        double pow = 1D;
+        speed += Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 3) / 3D;
+        speed += Math.min(upgradeManager.getLevel(UpgradeType.OVERDRIVE), 3);
+        pow -= Math.min(upgradeManager.getLevel(UpgradeType.POWER), 3) * 0.25D;
+        pow += Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 3);
+        pow += Math.min(upgradeManager.getLevel(UpgradeType.OVERDRIVE), 3) * 10D / 3D;
+
         didProcess = false;
         ChemPlantRecipe matched = findRecipe();
         if (matched == null) {
             progress = 0;
             isProcessing = false;
             activeRecipeName = null;
-            maxPower = Math.max(power, MIN_MAX_POWER);
         } else {
             activeRecipeName = matched.name;
-            maxPower = Math.max(Math.max(power, matched.power * 100), MIN_MAX_POWER);
-            int duration = restrictedMode ? Math.max(1, matched.duration * 4) : matched.duration;
-
-            if (power >= matched.power && hasOutputSpace(matched)) {
+            long cost = pow == 1 ? matched.power : (long) (matched.power * pow);
+            if (power >= cost && hasOutputSpace(matched)) {
+                double stepSpeed = restrictedMode ? speed * 0.25D : speed;
                 isProcessing = true;
                 didProcess = true;
-                progress++;
-                power -= matched.power;
-
-                if (progress >= duration) {
+                power -= cost;
+                progress += Math.min(stepSpeed / Math.max(1, matched.duration), 1D);
+                if (progress >= 1D) {
                     process(matched);
-                    progress = 0;
+                    if (findRecipe() != null && power >= cost && hasOutputSpace(matched)) {
+                        progress -= 1D;
+                    } else {
+                        progress = 0;
+                    }
                 }
             } else {
+                progress = 0;
                 isProcessing = false;
+            }
+        }
+
+        // CE :153-155 — every processing tick, not only recipe complete
+        if (didProcess) {
+            ItemStack battery = inventory.getStackInSlot(BATTERY_SLOT);
+            if (!battery.isEmpty() && battery.getItem() == com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_MACHINED.get()) {
+                inventory.setStackInSlot(BATTERY_SLOT, new ItemStack(com.hbm.items.weapon.WeaponMeleeItems.METEORITE_SWORD_TREATED.get()));
             }
         }
 
@@ -394,7 +455,7 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
         tag.putLong("maxPower", maxPower);
-        tag.putInt("progress", progress);
+        tag.putDouble("chemProg", progress);
         tag.putString("recipe0", recipe);
         tag.putBoolean("restrictedMode0", restrictedMode);
         for (int i = 0; i < 3; i++) {
@@ -408,7 +469,7 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
         maxPower = Math.max(tag.getLong("maxPower"), MIN_MAX_POWER);
-        progress = tag.getInt("progress");
+        progress = tag.contains("chemProg") ? tag.getDouble("chemProg") : 0D;
         recipe = tag.contains("recipe0") ? tag.getString("recipe0") : "null";
         restrictedMode = tag.getBoolean("restrictedMode0");
         for (int i = 0; i < 3; i++) {
@@ -427,7 +488,7 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         buf.writeBoolean(isProcessing);
         buf.writeBoolean(didProcess);
         buf.writeBoolean(restrictedMode);
-        buf.writeInt(progress);
+        buf.writeDouble(progress);
         buf.writeUtf(recipe);
     }
 
@@ -441,7 +502,7 @@ public class ChemPlantBlockEntity extends MachineBaseBlockEntity
         isProcessing = buf.readBoolean();
         didProcess = buf.readBoolean();
         restrictedMode = buf.readBoolean();
-        progress = buf.readInt();
+        progress = buf.readDouble();
         recipe = buf.readUtf();
     }
 
