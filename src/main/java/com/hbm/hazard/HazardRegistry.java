@@ -48,9 +48,11 @@ import com.hbm.items.special.ItemWasteShort;
 import com.hbm.items.special.CellFluidHazardModifier;
 import com.hbm.items.special.ScatteredMilitaryItems;
 import com.hbm.items.special.SpecialItems;
+import com.hbm.items.tool.CouplingToolItems;
 import com.hbm.items.weapon.grenade.GrenadeItems;
 import com.hbm.main.MainRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -590,20 +592,16 @@ public class HazardRegistry {
         // (docs/phase1/hazard_bindings_plan.md Pattern F for the demon core; CE HazardRegistry.java
         // demon_core_open/demon_core_closed + nuclear_waste_long/nuclear_waste_short bindings).
         //
-        // demon_core_open: RADIATION 5F plus a HazardTypeDangerousDrop that swaps the dropped item
-        // back to the closed core on ground contact, mirroring CE's EntityItem/onGround transition
-        // with the confirmed 1.21 renames (EntityItem -> ItemEntity, .world -> .level(),
-        // .isRemote -> .isClientSide(), world.spawnEntity(...) -> level().addFreshEntity(...); see
-        // docs/phase1/DIGEST_REMAINDER.md's hazard_bindings_plan.md section). CE also re-spawns a
-        // dropped screwdriver alongside the closed core on this transition; this port has not
-        // registered ItemTooling/screwdriver yet (no such item exists anywhere in this codebase), so
-        // that half of the drop behavior is intentionally left out here rather than referencing a
-        // nonexistent item - flagged as a follow-up once the tooling items land.
+        // Exact CE HazardRegistry.java:191-196 — open core snaps shut on ground and drops screwdriver.
         HazardSystem.register(SpecialItems.DEMON_CORE_OPEN.get(), new HazardData()
                 .addEntry(RADIATION, 5F)
                 .addEntry(new HazardEntry(new HazardTypeDangerousDrop((entityItem, level) -> {
                     if (!entityItem.level().isClientSide() && entityItem.onGround()) {
                         entityItem.setItem(new ItemStack(SpecialItems.DEMON_CORE_CLOSED.get()));
+                        entityItem.level().addFreshEntity(new ItemEntity(
+                                entityItem.level(),
+                                entityItem.getX(), entityItem.getY(), entityItem.getZ(),
+                                new ItemStack(CouplingToolItems.SCREWDRIVER.get())));
                     }
                 }))));
         HazardSystem.register(SpecialItems.DEMON_CORE_CLOSED.get(), new HazardData().addEntry(RADIATION, 100_000F));
