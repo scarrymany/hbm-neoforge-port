@@ -735,10 +735,23 @@ public class HazardRegistry {
         HazardSystem.register(MachineItems.PILE_RODS_MK2.get(ItemPileRodMK2.EnumPileRod.THORIUM).get(), new HazardData().addEntry(RADIATION, th232 * billet * 3));
         HazardSystem.register(MachineItems.PILE_RODS_MK2.get(ItemPileRodMK2.EnumPileRod.THORIUM_FUEL).get(), new HazardData().addEntry(RADIATION, thf * billet * 3));
 
-        // ItemRTGPellet: 10 variants (CE's registerRTGPellet calls). pellet_rtg_depleted's Neptunium
-        // byproduct variant (a different, plain Item class - RTG_DEPLETED in MachineItems, private and
-        // not part of this table) and the port-only PELLET_RTG_BALEFIRE addition (no CE hazard entry
-        // exists for it) are both outside CE's own registerRTGPellet table and are skipped.
+        // Exact CE HazardRegistry.java:375-378 — leftover ItemPileRod (not MK2).
+        // boron/lithium/detector have no CE hazard bind. Skip invent.
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_uranium"),
+                new HazardData().addEntry(RADIATION, u * billet * 3));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_pu239"),
+                new HazardData().addEntry(RADIATION, !GeneralConfig.enable528()
+                        ? purg * billet + pu239 * billet + u * billet
+                        : purg * billet + pu239 * billet + wst * billet));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_plutonium"),
+                new HazardData().addEntry(RADIATION, !GeneralConfig.enable528()
+                        ? purg * billet * 2 + u * billet
+                        : purg * billet * 2 + wst * billet));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pile_rod_source"),
+                new HazardData().addEntry(RADIATION, rabe * billet * 3));
+
+        // ItemRTGPellet: 10 variants (CE's registerRTGPellet calls). Port-only PELLET_RTG_BALEFIRE
+        // has no CE hazard entry — skip invent.
         registerRTGPellet(MachineItems.PELLET_RTG.get(), pu238 * rtg, 0F, 3F);
         registerRTGPellet(MachineItems.PELLET_RTG_RADIUM.get(), ra226 * rtg, 0F);
         registerRTGPellet(MachineItems.PELLET_RTG_WEAK.get(), (pu238 + (u238 * 2)) * billet, 0F);
@@ -749,6 +762,9 @@ public class HazardRegistry {
         registerRTGPellet(MachineItems.PELLET_RTG_LEAD.get(), pb209 * rtg, 0F, 7F, 50F);
         registerRTGPellet(MachineItems.PELLET_RTG_GOLD.get(), au198 * rtg, 0F, 5F);
         registerRTGPellet(MachineItems.PELLET_RTG_AMERICIUM.get(), am241 * rtg, 0F);
+        // Exact CE HazardRegistry.java:364 — only NEPTUNIUM depleted byproduct is bound.
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "pellet_rtg_depleted_neptunium"),
+                new HazardData().addEntry(RADIATION, np237 * rtg));
 
         // ItemWatzPellet: 10 of EnumWatzType's 12 values (CE binds exactly these 10 fresh pellets to
         // RADIATION; LEAD and BORON are never bound anywhere in CE's registerItems()).
