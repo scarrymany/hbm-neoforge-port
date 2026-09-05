@@ -19,6 +19,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -54,6 +56,8 @@ import java.util.Optional;
  * TODO(CE: ShredderRecipes.java:246).
  * Old {@code ItemBedrockOre} wildcard (not {@code bedrock_ore_new_*}) —
  * TODO(CE: ShredderRecipes.java:348).
+ * Process loop sound Exact CE {@code TileEntityMachineShredder.java:156-161}:
+ * {@code MINECART_RIDING} 1.0F/0.75F every 50t while powered+processing.
  * Sellafield LEVEL 0–5 yields Exact CE {@code ShredderRecipes.java:352-357}
  * ({@code 1/2/3/5/7/15} {@code scrap_nuclear}).
  * Bobbleheads (block not registered) — TODO(CE: ShredderRecipes.java:400-402).
@@ -81,6 +85,7 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
 
     private long power;
     private int progress;
+    public int soundCycle;
 
     public MachineShredderBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 30, false, true);
@@ -271,6 +276,12 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
                 progress = 0;
                 processItem();
             }
+            // Exact CE TileEntityMachineShredder.java:156-161
+            if (soundCycle == 0) {
+                level.playSound(null, worldPosition, SoundEvents.MINECART_RIDING, SoundSource.BLOCKS, 1.0F, 0.75F);
+            }
+            soundCycle++;
+            if (soundCycle >= 50) soundCycle = 0;
         } else {
             progress = 0;
         }
