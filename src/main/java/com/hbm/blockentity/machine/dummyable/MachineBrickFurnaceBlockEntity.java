@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.machine.MachineBrickFurnaceBlock;
 import com.hbm.inventory.container.machine.dummyable.BrickFurnaceMenu;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.ItemEnums.EnumAshType;
@@ -32,7 +33,7 @@ import java.util.Optional;
 /**
  * CE {@code TileEntityFurnaceBrick} — fuel + vanilla smelt.
  * Exact CE ash {@code :91-98}/{@code :169-181} via {@code getAshFromFuel} hopper slot 3.
- * Block-swap stay skipped.
+ * Block-swap Exact CE {@code :120-123} / {@code MachineBrickFurnace.updateBlockState}.
  */
 public class MachineBrickFurnaceBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -80,6 +81,9 @@ public class MachineBrickFurnaceBlockEntity extends MachineBaseBlockEntity imple
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // Exact CE TileEntityFurnaceBrick.java:74 / :120-123
+        boolean wasBurning = burnTime > 0;
+
         if (burnTime > 0) burnTime--;
 
         if (burnTime == 0 && canSmelt()) {
@@ -106,6 +110,10 @@ public class MachineBrickFurnaceBlockEntity extends MachineBaseBlockEntity imple
             }
         } else {
             progress = 0;
+        }
+
+        if (wasBurning != burnTime > 0) {
+            MachineBrickFurnaceBlock.updateBlockState(burnTime > 0, level, worldPosition);
         }
 
         dataChanged();
