@@ -4,14 +4,25 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.MachineSteamEngineBlockEntity;
 import com.hbm.blockentity.machine.PowerGenBlockEntities;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.ILookOverlay;
+import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Ported from CE's {@code MachineSteamEngine} (regname {@code machine_steam_engine}): a
@@ -22,8 +33,9 @@ import org.jetbrains.annotations.Nullable;
  * have - see the research report's simplification note on this class's block-entity javadoc: the
  * core's own fixed connector-position math already reaches the right neighbor blocks directly,
  * without needing the dummy itself to forward anything). fillSpace extras Exact CE {@code :49-59}.
+ * printHook Exact CE {@code :74-108}.
  */
-public class MachineSteamEngineBlock extends BlockDummyable {
+public class MachineSteamEngineBlock extends BlockDummyable implements ILookOverlay {
 
     public MachineSteamEngineBlock(Properties properties) {
         super(properties);
@@ -65,5 +77,35 @@ public class MachineSteamEngineBlock extends BlockDummyable {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return type == PowerGenBlockEntities.STEAM_ENGINE.get() ? ITickableBE.ticker() : null;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE MachineSteamEngine.java:74-108 — green steam / red spentsteam, %,d fill / max
+        BlockPos core = findCore(world, pos);
+        if (core == null) return;
+        if (!(world.getBlockEntity(core) instanceof MachineSteamEngineBlockEntity engine)) return;
+
+        List<Component> text = new ArrayList<>();
+        FluidTankNTM in = engine.tanks[0];
+        FluidTankNTM out = engine.tanks[1];
+        text.add(Component.literal("-> ").withStyle(ChatFormatting.GREEN)
+                .append(Component.empty().withStyle(ChatFormatting.RESET)
+                        .append(in.getTankType().getLocalizedName())
+                        .append(Component.literal(": "
+                                + String.format(Locale.US, "%,d", in.getFill())
+                                + " / "
+                                + String.format(Locale.US, "%,d", in.getMaxFill())
+                                + "mB"))));
+        text.add(Component.literal("<- ").withStyle(ChatFormatting.RED)
+                .append(Component.empty().withStyle(ChatFormatting.RESET)
+                        .append(out.getTankType().getLocalizedName())
+                        .append(Component.literal(": "
+                                + String.format(Locale.US, "%,d", out.getFill())
+                                + " / "
+                                + String.format(Locale.US, "%,d", out.getMaxFill())
+                                + "mB"))));
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
     }
 }
