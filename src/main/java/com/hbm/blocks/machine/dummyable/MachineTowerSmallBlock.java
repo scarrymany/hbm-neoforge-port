@@ -5,6 +5,7 @@ import com.hbm.blockentity.machine.dummyable.CondenserBlockEntity;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blocks.BlockDummyable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -15,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineTowerSmall} — Dummyable {18,0,2,2,2,2} offset 2. Fluid condenser, not a chimney. */
+/** CE {@code MachineTowerSmall} — Dummyable {18,0,2,2,2,2} offset 2. Fluid condenser, not a chimney. fillSpace extras Exact CE {@code :48-58}. */
 public class MachineTowerSmallBlock extends BlockDummyable {
 
     public MachineTowerSmallBlock(Properties properties) {
@@ -30,6 +31,24 @@ public class MachineTowerSmallBlock extends BlockDummyable {
     @Override
     public int getOffset() {
         return 2;
+    }
+
+    /**
+     * Exact CE {@code MachineTowerSmall.fillSpace} extras ({@code MachineTowerSmall.java:48-58}).
+     * After {@code super.fillSpace}: add {@code dir * o} (core), then {@code makeExtra} at
+     * {@code core + dr2 * 2} for CE {@code ForgeDirection} ids {@code 2..6} (N/S/W/E + {@code UNKNOWN}
+     * which is {@code (0,0,0)} = the core itself). No ProxyCombo TE — extras are {@code makeExtra}
+     * flags only.
+     */
+    @Override
+    protected void fillSpace(Level level, BlockPos placedPos, Direction dir, int placementOffset) {
+        super.fillSpace(level, placedPos, dir, placementOffset);
+        BlockPos core = placedPos.relative(dir, placementOffset);
+        makeExtra(level, core.relative(Direction.NORTH, 2));
+        makeExtra(level, core.relative(Direction.SOUTH, 2));
+        makeExtra(level, core.relative(Direction.WEST, 2));
+        makeExtra(level, core.relative(Direction.EAST, 2));
+        makeExtra(level, core);
     }
 
     @Nullable
