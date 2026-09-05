@@ -48,6 +48,7 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
     public final FluidTankNTM water;
     public final FluidTankNTM slop;
     public long power;
+    public long consumption = CONSUMPTION;
     public float progress;
     public boolean processing;
     private final double[] ores = new double[BedrockOreType.VALUES.length];
@@ -92,14 +93,15 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
 
         int speed = upgrade(UpgradeType.SPEED);
         int effect = upgrade(UpgradeType.EFFECT);
-        long use = CONSUMPTION + (CONSUMPTION * speed) / 2 + CONSUMPTION * effect;
+        // CE TileEntityMachineOreSlopper.java:138
+        this.consumption = CONSUMPTION + (CONSUMPTION * speed) / 2 + CONSUMPTION * effect;
 
         processing = false;
-        if (canSlop(use)) {
-            power -= use;
+        if (canSlop(consumption)) {
+            power -= consumption;
             progress += 1F / (600 - speed * 150);
             processing = true;
-            while (progress >= 1F && canSlop(use)) {
+            while (progress >= 1F && canSlop(consumption)) {
                 progress -= 1F;
                 ItemStack in = inventory.getStackInSlot(2);
                 for (BedrockOreType type : BedrockOreType.VALUES) {
@@ -243,6 +245,7 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeLong(power);
+        buf.writeLong(consumption);
         buf.writeFloat(progress);
         buf.writeBoolean(processing);
         water.serialize(buf);
@@ -253,6 +256,7 @@ public class MachineOreSlopperBlockEntity extends MachineBaseBlockEntity
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         power = buf.readLong();
+        consumption = buf.readLong();
         progress = buf.readFloat();
         processing = buf.readBoolean();
         water.deserialize(buf);
