@@ -314,6 +314,13 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         process.serialize(buf);
         steam.serialize(buf);
         spent.serialize(buf);
+        if (this.output != null && this.output.material != null) {
+            buf.writeBoolean(true);
+            buf.writeInt(this.output.material.id);
+            buf.writeInt(this.output.amount);
+        } else {
+            buf.writeBoolean(false);
+        }
     }
 
     @Override
@@ -327,6 +334,13 @@ public class MachineRotaryFurnaceBlockEntity extends MachineBaseBlockEntity
         process.deserialize(buf);
         steam.deserialize(buf);
         spent.deserialize(buf);
+        if (buf.readBoolean()) {
+            NTMMaterial mat = Mats.matById.get(buf.readInt());
+            int amt = buf.readInt();
+            this.output = mat != null ? new Mats.MaterialStack(mat, amt) : null;
+        } else {
+            this.output = null;
+        }
     }
 
     @Override

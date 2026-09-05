@@ -22,7 +22,7 @@ public class MicrowaveScreen extends GuiInfoContainer<MicrowaveMenu> {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 168;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
@@ -43,10 +43,14 @@ public class MicrowaveScreen extends GuiInfoContainer<MicrowaveMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        // CE :52 — title centered
+        int nameX = this.imageWidth / 2 - this.font.width(this.title) / 2;
+        guiGraphics.drawString(this.font, this.title, nameX, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+
         MachineMicrowaveBlockEntity be = this.getMenu().be;
         // CE GUIMicrowave.java:33
-        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 17, 16, 34,
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 51 - 34, 16, 34,
                 be.power, MachineMicrowaveBlockEntity.MAX_POWER);
     }
 
