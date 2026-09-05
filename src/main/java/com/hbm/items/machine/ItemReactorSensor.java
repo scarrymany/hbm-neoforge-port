@@ -2,23 +2,28 @@ package com.hbm.items.machine;
 
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.machine.dummyable.DummyableProcessBlocks;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
 import java.util.List;
 
 /**
  * CE {@code ItemReactorSensor}: marks a {@code reactor_research} position (core, via findCore).
+ * Link sound Exact CE {@code ItemReactorSensor.java:61} ({@code techBoop} 1.0F/1.0F BLOCKS at player).
  */
 public class ItemReactorSensor extends Item {
 
@@ -55,14 +60,21 @@ public class ItemReactorSensor extends Item {
         tag.putInt("y", core.getY());
         tag.putInt("z", core.getZ());
         stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
-        if (!context.getLevel().isClientSide && context.getPlayer() != null) {
-            context.getPlayer().displayClientMessage(
+        Level level = context.getLevel();
+        Player player = context.getPlayer();
+        if (!level.isClientSide && player != null) {
+            player.displayClientMessage(
                     Component.literal("[").withStyle(ChatFormatting.DARK_AQUA)
                             .append(Component.translatable(stack.getDescriptionId()).withStyle(ChatFormatting.DARK_AQUA))
                             .append(Component.literal("] ").withStyle(ChatFormatting.DARK_AQUA))
                             .append(Component.literal("Position set!").withStyle(ChatFormatting.GREEN)),
                     false);
         }
-        return InteractionResult.sidedSuccess(context.getLevel().isClientSide);
+        // Exact CE ItemReactorSensor.java:61 — both sides, player except (client plays locally).
+        if (player != null) {
+            level.playSound(player, player.getX(), player.getY(), player.getZ(),
+                    HBMSoundHandler.techBoop.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 }
