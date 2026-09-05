@@ -1,11 +1,14 @@
 package com.hbm.blocks.machine.dummyable;
 
+import com.hbm.api.block.IToolable;
+import com.hbm.api.block.IToolable.ToolType;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeaterOilburnerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -16,8 +19,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code HeaterOilburner} — Dummyable {1,0,1,1,1,1} offset 1 + 5 extras. */
-public class HeaterOilburnerBlock extends BlockDummyable {
+/**
+ * CE {@code HeaterOilburner} — Dummyable {1,0,1,1,1,1} offset 1 + 5 extras.
+ * Screwdriver/hand-drill burn-rate Exact CE {@code HeaterOilburner.java:120-142}.
+ */
+public class HeaterOilburnerBlock extends BlockDummyable implements IToolable {
 
     public HeaterOilburnerBlock(Properties properties) {
         super(properties);
@@ -61,5 +67,25 @@ public class HeaterOilburnerBlock extends BlockDummyable {
         makeExtra(level, core.north());
         makeExtra(level, core.south());
         makeExtra(level, core.above());
+    }
+
+    @Override
+    public boolean onScrew(Level world, Player player, int x, int y, int z, Direction side, float fX, float fY, float fZ,
+                           InteractionHand hand, ToolType tool) {
+        if (tool != ToolType.SCREWDRIVER && tool != ToolType.HAND_DRILL)
+            return false;
+        if (world.isClientSide) return true;
+
+        BlockPos core = findCore(world, new BlockPos(x, y, z));
+        if (core == null) return false;
+        if (!(world.getBlockEntity(core) instanceof HeaterOilburnerBlockEntity tile)) return false;
+
+        // Exact CE HeaterOilburner.java:135-139
+        if (tool == ToolType.SCREWDRIVER)
+            tile.toggleSettingUp();
+        else
+            tile.toggleSettingDown();
+        tile.setChanged();
+        return true;
     }
 }

@@ -164,6 +164,22 @@ public class HeaterOilburnerBlockEntity extends MachineBaseBlockEntity
         setChanged();
     }
 
+    /** Exact CE {@code TileEntityHeaterOilburner.toggleSettingUp} :149-155. Wrap 100→1. */
+    public void toggleSettingUp() {
+        setting++;
+        if (setting > 100) {
+            setting = 1;
+        }
+    }
+
+    /** Exact CE {@code TileEntityHeaterOilburner.toggleSettingDown} :157-163. Wrap 1→100. */
+    public void toggleSettingDown() {
+        setting--;
+        if (setting < 1) {
+            setting = 100;
+        }
+    }
+
     @Override
     public boolean hasPermission(Player player) {
         // Exact CE TileEntityHeaterOilburner.java:192-194
