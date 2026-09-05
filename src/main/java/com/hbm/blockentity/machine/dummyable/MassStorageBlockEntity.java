@@ -31,6 +31,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * {@code isLocked()} gates {@code canInsert} / hopper Exact CE {@code :112}/{@code :258}/{@code :263}
  * via already-real {@link ILockable} (CE inherits {@code TileEntityLockableBase}). OC skipped.
  * ROR: CE {@code :293-317}.
+ * Open/close sounds Exact CE {@code TileEntityMassStorage.java:186-192}: {@code storageOpen}/{@code storageClose} 1.0F/1.0F.
  */
 public class MassStorageBlockEntity extends MachineBaseBlockEntity
         implements ITickableBE, MenuProvider, IPersistentNBT, IRORValueProvider, IRORInteractive, ILockable {
@@ -228,6 +229,20 @@ public class MassStorageBlockEntity extends MachineBaseBlockEntity
             level.playSound(null, player.blockPosition(), HBMSoundHandler.lockOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         }
         return ok;
+    }
+
+    /** Exact CE {@code TileEntityMassStorage.java:186-188}. */
+    public void openInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.storageOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
+    /** Exact CE {@code TileEntityMassStorage.java:190-192}. */
+    public void closeInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.storageClose.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override

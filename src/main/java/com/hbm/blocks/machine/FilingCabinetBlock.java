@@ -1,5 +1,6 @@
 package com.hbm.blocks.machine;
 
+import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.FilingCabinetBlockEntity;
 import com.hbm.items.tool.ItemCounterfeitKeys;
@@ -19,6 +20,8 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -83,6 +86,12 @@ public class FilingCabinetBlock extends BaseEntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new FilingCabinetBlockEntity(DummyableProcessBlockEntities.FILING_CABINET.get(), pos, state);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return type == DummyableProcessBlockEntities.FILING_CABINET.get() ? ITickableBE.ticker() : null;
     }
 
     @Override
