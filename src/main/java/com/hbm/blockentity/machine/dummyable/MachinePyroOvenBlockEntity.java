@@ -15,6 +15,7 @@ import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,6 +23,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +31,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -38,7 +41,8 @@ import java.util.List;
  * {@code tanks[0].setType(3)} Exact CE {@code :115}.
  * {@code pollute(SOOT, SOOT_PER_SECOND)} while processing Exact CE {@code :152}.
  * Smoke-tank overflow {@code incrementPollution(type, overflow/100F)} Exact CE {@code :332-343}.
- * Audio / particles stay skipped.
+ * Upgrade insert {@code upgradePlug} Exact CE {@code :89-93} (1.0F/1.0F, slots 4–5).
+ * Process audio / particles stay skipped.
  */
 public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
@@ -65,6 +69,33 @@ public class MachinePyroOvenBlockEntity extends MachineBaseBlockEntity
         this.smoke = new FluidTankNTM(Fluids.SMOKE, 50).withOwner(this);
         this.smokeLeaded = new FluidTankNTM(Fluids.SMOKE_LEADED, 50).withOwner(this);
         this.smokePoison = new FluidTankNTM(Fluids.SMOKE_POISON, 50).withOwner(this);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachinePyroOven.java:89-93
+                if (!stack.isEmpty() && stack.getItem() instanceof ItemMachineUpgrade && slot >= 4 && slot <= 5
+                        && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
