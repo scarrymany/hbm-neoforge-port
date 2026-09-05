@@ -10,6 +10,7 @@ import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -32,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/** CE {@code MachineHeatBoiler} — Dummyable {3,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :65-78}. printHook Exact CE {@code :135-149}. Tooltip Exact CE {@code :129-132}. */
+/** CE {@code MachineHeatBoiler} — Dummyable {3,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :65-78}. fillSpace extras Exact CE {@code :115-126}. printHook Exact CE {@code :135-149}. Tooltip Exact CE {@code :129-132}. */
 public class HeatBoilerBlock extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
     public HeatBoilerBlock(Properties properties) {
@@ -88,6 +89,17 @@ public class HeatBoilerBlock extends BlockDummyable implements ILookOverlay, ITo
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         return standardOpenBehavior(level, pos, player);
+    }
+
+    @Override
+    protected void fillSpace(Level level, BlockPos placedPos, Direction dir, int placementOffset) {
+        // Exact CE MachineHeatBoiler.java:115-126 — side ports + top extra
+        super.fillSpace(level, placedPos, dir, placementOffset);
+        BlockPos core = placedPos.relative(dir, placementOffset);
+        Direction rot = dir.getClockWise();
+        makeExtra(level, core.relative(rot));
+        makeExtra(level, core.relative(rot.getOpposite()));
+        makeExtra(level, core.above(3));
     }
 
     @Override
