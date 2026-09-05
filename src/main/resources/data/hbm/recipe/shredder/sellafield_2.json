@@ -5,13 +5,13 @@
     "items": "hbm:sellafield",
     "components": {
       "minecraft:block_state": {
-        "level": "0"
+        "level": "2"
       }
     }
   },
   "output": {
     "id": "hbm:scrap_nuclear",
-    "count": 1
+    "count": 3
   },
   "duration": 60
 }

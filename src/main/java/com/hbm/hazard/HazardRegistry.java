@@ -1,6 +1,7 @@
 package com.hbm.hazard;
 
 import com.hbm.blocks.MaterialBlockGenerator;
+import com.hbm.blocks.generic.WastelandVirusBlocks;
 import com.hbm.config.GeneralConfig;
 import com.hbm.hazard.transformer.HazardTransformerForgeFluid;
 import com.hbm.hazard.transformer.HazardTransformerPostCustom;
@@ -10,6 +11,7 @@ import com.hbm.hazard.transformer.HazardTransformerRadiationNBT;
 import com.hbm.hazard.modifier.HazardModifierFuelRadiation;
 import com.hbm.hazard.modifier.HazardModifierRBMKRadiation;
 import com.hbm.hazard.modifier.HazardModifierRTGRadiation;
+import com.hbm.hazard.modifier.HazardModifierSellafield;
 import com.hbm.hazard.type.HazardTypeAsbestos;
 import com.hbm.hazard.type.HazardTypeBlinding;
 import com.hbm.hazard.type.HazardTypeCoal;
@@ -290,6 +292,15 @@ public class HazardRegistry {
         HazardSystem.register(PlateCrystalWasteItems.CRYSTAL_TRIXITE.get(),
                 new HazardData().addEntry(RADIATION, trx * crystal));
         HazardSystem.register(PlateCrystalWasteItems.GEM_RAD.get(),
+                new HazardData().addEntry(RADIATION, 25F));
+
+        // CE HazardRegistry.java:220 scrap_nuclear; :236-241 sellafield meta 0–5.
+        // :243 ore_sellafield_radgem (registered). LEVEL via HazardModifierSellafield.
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "scrap_nuclear"),
+                new HazardData().addEntry(RADIATION, 1F));
+        HazardSystem.register(WastelandVirusBlocks.SELLAFIELD.get(),
+                new HazardData().addEntry(new HazardEntry(RADIATION, 0.5F).addMod(new HazardModifierSellafield())));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ore_sellafield_radgem"),
                 new HazardData().addEntry(RADIATION, 25F));
 
         // items_billet_powder area (docs/phase1/moditems_generative.md section 3,

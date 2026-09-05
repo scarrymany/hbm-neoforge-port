@@ -3,6 +3,8 @@ package com.hbm.blockentity.machine;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.generic.BlockSellafield;
+import com.hbm.blocks.generic.WastelandVirusBlocks;
 import com.hbm.inventory.container.machine.MachineShredderMenu;
 import com.hbm.inventory.recipes.HbmSimpleRecipe;
 import com.hbm.inventory.recipes.ProcessingRecipes;
@@ -17,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -47,12 +50,12 @@ import java.util.Optional;
  * {@code ShredderRecipes.java:103-115}.
  * OreDict {@code registerPost} auto-dust is 1.12-integration, not ported —
  * TODO(CE: ShredderRecipes.java:119-201).
- * {@code dustLapis} members other than {@code powder_lapis} —
+ *         {@code dustLapis} members other than {@code powder_lapis} —
  * TODO(CE: ShredderRecipes.java:246).
  * Old {@code ItemBedrockOre} wildcard (not {@code bedrock_ore_new_*}) —
  * TODO(CE: ShredderRecipes.java:348).
- * Sellafield LEVEL 1-5 yields (inventory flatten is one BlockItem = CE meta 0) —
- * TODO(CE: ShredderRecipes.java:353-357).
+ * Sellafield LEVEL 0–5 yields Exact CE {@code ShredderRecipes.java:352-357}
+ * ({@code 1/2/3/5/7/15} {@code scrap_nuclear}).
  * Bobbleheads (block not registered) — TODO(CE: ShredderRecipes.java:400-402).
  * GC/AR moon-turf (commented out in CE) — TODO(CE: ShredderRecipes.java:412-423).
  */
@@ -100,9 +103,18 @@ public class MachineShredderBlockEntity extends MachineBaseBlockEntity
                 .map(RecipeHolder::value);
     }
 
+    /** CE {@code ShredderRecipes.java:352-357} meta 0–5. */
+    private static final int[] SELLAFIELD_SCRAP = {1, 2, 3, 5, 7, 15};
+
     /** CE {@code ShredderRecipes.getShredderResult} — miss / empty → {@code scrap}. */
     private ItemStack shredderResult(ItemStack stack) {
         if (stack.isEmpty()) return scrapStack();
+        if (stack.is(WastelandVirusBlocks.SELLAFIELD.get().asItem())) {
+            int meta = BlockSellafield.itemLevel(stack);
+            int count = SELLAFIELD_SCRAP[Mth.clamp(meta, 0, SELLAFIELD_SCRAP.length - 1)];
+            Item scrapNuc = BuiltInRegistries.ITEM.get(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "scrap_nuclear"));
+            return scrapNuc == Items.AIR ? scrapStack() : new ItemStack(scrapNuc, count);
+        }
         Optional<HbmSimpleRecipe> recipe = recipeFor(stack);
         if (recipe.isPresent()) {
             ItemStack out = recipe.get().getResultItem(level.registryAccess());
