@@ -4,6 +4,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.ILookOverlay;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.ChatFormatting;
@@ -20,10 +21,17 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :61-88}. */
-public class HeatBoilerIndustrialBlock extends BlockDummyable {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :61-88}. printHook Exact CE {@code :119-153}. */
+public class HeatBoilerIndustrialBlock extends BlockDummyable implements ILookOverlay {
 
     public HeatBoilerIndustrialBlock(Properties properties) {
         super(properties);
@@ -81,5 +89,34 @@ public class HeatBoilerIndustrialBlock extends BlockDummyable {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         return standardOpenBehavior(level, pos, player);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE MachineHeatBoilerIndustrial.java:119-153
+        BlockPos core = findCore(world, pos);
+        if (core == null) return;
+        if (!(world.getBlockEntity(core) instanceof HeatBoilerBlockEntity boiler)) return;
+
+        List<Component> text = new ArrayList<>();
+        text.add(Component.literal(String.format(Locale.US, "%,d", boiler.heat) + "TU"));
+        text.add(Component.literal("-> ").withStyle(ChatFormatting.GREEN)
+                .append(Component.empty().withStyle(ChatFormatting.RESET)
+                        .append(boiler.water.getTankType().getLocalizedName())
+                        .append(Component.literal(": "
+                                + String.format(Locale.US, "%,d", boiler.water.getFill())
+                                + " / "
+                                + String.format(Locale.US, "%,d", boiler.water.getMaxFill())
+                                + "mB"))));
+        text.add(Component.literal("<- ").withStyle(ChatFormatting.RED)
+                .append(Component.empty().withStyle(ChatFormatting.RESET)
+                        .append(boiler.steam.getTankType().getLocalizedName())
+                        .append(Component.literal(": "
+                                + String.format(Locale.US, "%,d", boiler.steam.getFill())
+                                + " / "
+                                + String.format(Locale.US, "%,d", boiler.steam.getMaxFill())
+                                + "mB"))));
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
     }
 }
