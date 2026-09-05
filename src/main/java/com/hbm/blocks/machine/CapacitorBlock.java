@@ -6,8 +6,11 @@ import com.hbm.blockentity.machine.CapacitorBlockEntity;
 import com.hbm.blockentity.machine.StorageBlockEntities;
 import com.hbm.blocks.ILookOverlay;
 import com.hbm.blocks.IPersistentInfoProvider;
+import com.hbm.blocks.ITooltipProvider;
+import com.hbm.client.ClientScreens;
 import com.hbm.util.BobMathUtil;
 import com.hbm.util.TagsUtil;
+import com.hbm.util.i18n.I18nUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,9 +51,9 @@ import java.util.List;
  * scope notes, including one documented facing-rotation simplification.
  * printHook Exact CE {@code MachineCapacitor.java:112-128}.
  * addInformation Exact CE {@code MachineCapacitor.java:131-136} via {@link IPersistentInfoProvider}.
- * LSHIFT {@code :139-146} leftover ({@code tile.capacitor.desc} shared key, not per-id).
+ * LSHIFT Exact CE {@code MachineCapacitor.java:139-146} via shared {@code tile.capacitor.desc}.
  */
-public class CapacitorBlock extends BaseEntityBlock implements ILookOverlay, IPersistentInfoProvider {
+public class CapacitorBlock extends BaseEntityBlock implements ILookOverlay, IPersistentInfoProvider, ITooltipProvider {
 
     public static final MapCodec<CapacitorBlock> CODEC = simpleCodec(p -> new CapacitorBlock(p, 0L));
 
@@ -143,7 +146,16 @@ public class CapacitorBlock extends BaseEntityBlock implements ILookOverlay, IPe
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        // CE ItemBlockBase.java:80-84 — only when the stack carries persistent NBT
+        // Exact CE MachineCapacitor.java:139-146 — shared tile.capacitor.desc, not per-id
+        if (ClientScreens.hasShiftDown()) {
+            for (String s : I18nUtil.resolveKeyArray("tile.capacitor.desc")) {
+                tooltip.add(Component.literal(s).withStyle(ChatFormatting.YELLOW));
+            }
+        } else {
+            addStandardInfo(tooltip);
+        }
+
+        // CE ItemBlockBase.java:80-84 — persistent HE lines after LSHIFT
         if (!TagsUtil.hasCustomData(stack)) return;
         CompoundTag root = TagsUtil.getCustomData(stack);
         if (!root.contains(IPersistentNBT.NBT_PERSISTENT_KEY)) return;
