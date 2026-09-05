@@ -5,13 +5,17 @@ import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.reprocess.SolidifierMenu;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.recipes.SolidificationRecipes;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.items.machine.ItemMachineUpgrade;
+import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,6 +23,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -26,20 +31,26 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * CE {@code TileEntityMachineSolidifier.java}: maxPower 100_000, usageBase 250, processTimeBase 60,
  * tank 24_000. {@code tank.setType(4)} Exact CE {@code :89}. Slot 4 Exact CE
- * {@code ContainerSolidifier.java:41}. Upgrades 2-3 skipped — base numbers only.
+ * {@code ContainerSolidifier.java:41}. Slots 2-3 upgrades Exact CE {@code :86-96}
+ * / {@code ContainerSolidifier.java:38-39}. IUpgradeInfoProvider stay skipped.
  */
 public class SolidifierBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
 
     private static final int SLOT_OUT = 0;
     private static final int SLOT_BATTERY = 1;
+    public static final int SLOT_UPGRADE_A = 2;
+    public static final int SLOT_UPGRADE_B = 3;
     private static final int SLOT_ID = 4;
 
     public static final long MAX_POWER = 100_000L;
@@ -47,14 +58,51 @@ public class SolidifierBlockEntity extends MachineBaseBlockEntity
     public static final int PROCESS_TIME = 60;
     public static final int TANK_CAPACITY = 24_000;
 
+    private static final Map<UpgradeType, Integer> VALID_UPGRADES = new EnumMap<>(UpgradeType.class);
+
+    static {
+        VALID_UPGRADES.put(UpgradeType.SPEED, 3);
+        VALID_UPGRADES.put(UpgradeType.POWER, 3);
+    }
+
     public final FluidTankNTM tank;
     public long power;
     public int progress;
+    public int usage = USAGE;
+    public int processTime = PROCESS_TIME;
     public boolean isProcessing;
+    private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(VALID_UPGRADES);
 
     public SolidifierBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, true, true);
         tank = new FluidTankNTM(Fluids.NONE, TANK_CAPACITY).withOwner(this);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineSolidifier.java:71-73
+                if (!stack.isEmpty() && slot >= SLOT_UPGRADE_A && slot <= SLOT_UPGRADE_B
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
@@ -67,6 +115,7 @@ public class SolidifierBlockEntity extends MachineBaseBlockEntity
         if (slot == SLOT_BATTERY) return Library.isBattery(stack);
         // CE :126-128 canInsert is false for slot 4; without this the ID never lands and setType is dead.
         if (slot == SLOT_ID) return stack.getItem() instanceof IItemFluidIdentifier;
+        if (slot == SLOT_UPGRADE_A || slot == SLOT_UPGRADE_B) return stack.getItem() instanceof ItemMachineUpgrade;
         return false;
     }
 
@@ -81,7 +130,8 @@ public class SolidifierBlockEntity extends MachineBaseBlockEntity
     }
 
     public int getProgressScaled(int i) {
-        return (progress * i) / PROCESS_TIME;
+        if (processTime <= 0) return 0;
+        return (progress * i) / processTime;
     }
 
     public DirPos[] getConPos() {
@@ -109,11 +159,18 @@ public class SolidifierBlockEntity extends MachineBaseBlockEntity
             }
         }
 
+        // CE TileEntityMachineSolidifier.java:86-96
+        upgradeManager.checkSlots(inventory, SLOT_UPGRADE_A, SLOT_UPGRADE_B);
+        int speed = Math.min(upgradeManager.getLevel(UpgradeType.SPEED), 3);
+        int powerLevel = Math.min(upgradeManager.getLevel(UpgradeType.POWER), 3);
+        this.processTime = PROCESS_TIME - (PROCESS_TIME / 4) * speed;
+        this.usage = (USAGE + (USAGE * speed)) / (powerLevel + 1);
+
         if (canProcess()) {
             isProcessing = true;
-            power -= USAGE;
+            power -= usage;
             progress++;
-            if (progress >= PROCESS_TIME) {
+            if (progress >= processTime) {
                 SolidificationRecipes.Output out = SolidificationRecipes.getOutput(tank.getTankType());
                 tank.setFill(tank.getFill() - out.amount());
                 ItemStack have = inventory.getStackInSlot(SLOT_OUT);
@@ -134,7 +191,7 @@ public class SolidifierBlockEntity extends MachineBaseBlockEntity
     }
 
     private boolean canProcess() {
-        if (power < USAGE) return false;
+        if (power < usage) return false;
         SolidificationRecipes.Output out = SolidificationRecipes.getOutput(tank.getTankType());
         if (out == null) return false;
         if (out.amount() > tank.getFill()) return false;
@@ -216,6 +273,8 @@ public class SolidifierBlockEntity extends MachineBaseBlockEntity
         buf.writeLong(power);
         buf.writeBoolean(isProcessing);
         buf.writeInt(progress);
+        buf.writeInt(usage);
+        buf.writeInt(processTime);
     }
 
     @Override
@@ -225,6 +284,8 @@ public class SolidifierBlockEntity extends MachineBaseBlockEntity
         power = buf.readLong();
         isProcessing = buf.readBoolean();
         progress = buf.readInt();
+        usage = buf.readInt();
+        processTime = buf.readInt();
     }
 
     @Override

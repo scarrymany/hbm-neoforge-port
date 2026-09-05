@@ -7,10 +7,8 @@ import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 
 /**
- * Exact CE {@code ContainerSolidifier.java:34-41}: out + battery + fluid ID.
- * Upgrade slots 2-3 exist in the inventory (so {@code setType(4)} keeps CE index) but are not
- * wired — {@code isItemValid} rejects them. {@code setType(4)} Exact CE
- * {@code TileEntityMachineSolidifier.java:89}.
+ * Exact CE {@code ContainerSolidifier.java:34-41}: out + battery + upgrades 2-3 + fluid ID.
+ * {@code setType(4)} Exact CE {@code TileEntityMachineSolidifier.java:89}.
  */
 public class SolidifierMenu extends MenuBase<SolidifierBlockEntity> {
 
