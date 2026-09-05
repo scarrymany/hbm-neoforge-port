@@ -39,10 +39,8 @@ import java.util.function.Supplier;
  * this list does not include, {@code ModBlocks.crystal_pulsar}/{@code cheater_virus} - out of this
  * narrow package's scope, flagged in the implementing session's own knownGaps rather than guessed at);
  * {@code BlockNuclearWaste}'s periodic {@code gas_radon_dense} spread (that gas block does not exist
- * in this port's gas-block family yet); {@code HazardRegistry} data entries binding
- * {@code block_trinitite}/{@code block_waste} to a real radiation level (registering the block with
- * {@link BlockHazard} makes {@link com.hbm.hazard.HazardSystem#applyHazards} a safe no-op until that
- * data-table entry exists, exactly like every other un-tagged {@code BlockHazard} instance).
+ * in this port's gas-block family yet). {@code HazardRegistry} now binds {@code block_trinitite}
+ * ({@code trn * block}) and {@code block_waste} ({@code wst * block}) — CE {@code HazardRegistry.java:222/:229}.
  */
 public final class WastelandVirusBlocks {
 

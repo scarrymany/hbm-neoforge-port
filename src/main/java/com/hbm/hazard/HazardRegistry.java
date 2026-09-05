@@ -1,6 +1,7 @@
 package com.hbm.hazard;
 
 import com.hbm.blocks.MaterialBlockGenerator;
+import com.hbm.blocks.generic.GenericCrateBlocks;
 import com.hbm.blocks.generic.WastelandVirusBlocks;
 import com.hbm.config.GeneralConfig;
 import com.hbm.hazard.transformer.HazardTransformerForgeFluid;
@@ -31,6 +32,8 @@ import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.items.BilletPowderItems;
 import com.hbm.items.IngotNuggetItems;
 import com.hbm.items.PlateCrystalWasteItems;
+import com.hbm.items.bomb.NukeCasingItems;
+import com.hbm.items.machine.Phase11ProcessItems;
 import com.hbm.items.machine.ItemBreedingRod;
 import com.hbm.items.machine.ItemPWRFuel;
 import com.hbm.items.machine.ItemPileRodMK2;
@@ -302,6 +305,32 @@ public class HazardRegistry {
                 new HazardData().addEntry(new HazardEntry(RADIATION, 0.5F).addMod(new HazardModifierSellafield())));
         HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ore_sellafield_radgem"),
                 new HazardData().addEntry(RADIATION, 25F));
+
+        // CE HazardRegistry.java:221-234 remaining waste / barrel / corium.
+        // Skip trinitite item (not registered). Skip nuclear_waste_vitrified_tiny (not registered).
+        // vitrified_barrel has no CE HazardRegistry row — do not invent.
+        HazardSystem.register(WastelandVirusBlocks.BLOCK_TRINITITE.get(),
+                new HazardData().addEntry(RADIATION, trn * block));
+        HazardSystem.register(NukeCasingItems.NUCLEAR_WASTE.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot).addEntry(CONTAMINATING, wst * powder));
+        HazardSystem.register(GenericCrateBlocks.YELLOW_BARREL.get(),
+                new HazardData().addEntry(RADIATION, wst * ingot * 10));
+        HazardSystem.register(Phase11ProcessItems.NUCLEAR_WASTE_TINY.get(),
+                new HazardData().addEntry(RADIATION, wst * nugget).addEntry(CONTAMINATING, wst * powder_tiny));
+        HazardSystem.register(Phase11ProcessItems.NUCLEAR_WASTE_VITRIFIED.get(),
+                new HazardData().addEntry(RADIATION, wstv * ingot).addEntry(CONTAMINATING, wstv * powder));
+        HazardSystem.register(WastelandVirusBlocks.BLOCK_WASTE.get(),
+                new HazardData().addEntry(RADIATION, wst * block));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_waste_painted"),
+                new HazardData().addEntry(RADIATION, wst * block));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_waste_vitrified"),
+                new HazardData().addEntry(RADIATION, wstv * block));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ancient_scrap"),
+                new HazardData().addEntry(RADIATION, 150F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_corium"),
+                new HazardData().addEntry(RADIATION, 150F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "block_corium_cobble"),
+                new HazardData().addEntry(RADIATION, 150F));
 
         // items_billet_powder area (docs/phase1/moditems_generative.md section 3,
         // hazard_bindings_plan.md Pattern A/B): only the billet_/powder_ fields CE's own
