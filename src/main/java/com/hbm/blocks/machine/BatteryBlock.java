@@ -4,10 +4,14 @@ import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.BatteryBlockEntity;
 import com.hbm.blockentity.machine.StorageBlockEntities;
+import com.hbm.blocks.ILookOverlay;
 import com.hbm.inventory.container.BatteryMenu;
 import com.hbm.lib.InventoryHelper;
+import com.hbm.lib.Library;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,16 +30,23 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
 import com.mojang.serialization.MapCodec;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Single-block HE battery, ported from CE's {@code com.hbm.blocks.machine.MachineBattery} (read in
  * full). One instance per grade (potato/normal/lithium/schrabidium/dineutronium), each with its own
  * {@code maxPower} - see {@link com.hbm.blockentity.machine.BatteryBlockEntity} for the block
  * entity's full CE-vs-port scope notes.
+ * printHook Exact CE {@code MachineBattery.java:221-241}. MachineFENSU is unregistered — stay skipped.
  */
-public class BatteryBlock extends BaseEntityBlock {
+public class BatteryBlock extends BaseEntityBlock implements ILookOverlay {
 
     public static final MapCodec<BatteryBlock> CODEC = simpleCodec(p -> new BatteryBlock(p, 0L));
 
@@ -140,5 +151,32 @@ public class BatteryBlock extends BaseEntityBlock {
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         if (!(level.getBlockEntity(pos) instanceof BatteryBlockEntity battery)) return 0;
         return (int) battery.getPowerRemainingScaled(15L);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE MachineBattery.java:221-241
+        if (!(world.getBlockEntity(pos) instanceof BatteryBlockEntity battery)) return;
+
+        List<Component> text = new ArrayList<>();
+        text.add(Component.literal(Library.getShortNumber(battery.getPower()) + "/"
+                + Library.getShortNumber(getMaxPower()) + " HE"));
+        if (battery.delta == 0) {
+            text.add(Component.literal("-- ").withStyle(ChatFormatting.YELLOW)
+                    .append(Component.literal("0HE/s").withStyle(ChatFormatting.RESET)));
+        } else if (battery.delta > 0) {
+            text.add(Component.literal("-> ").withStyle(ChatFormatting.GREEN)
+                    .append(Component.literal(Library.getShortNumber(battery.delta) + "HE/s")
+                            .withStyle(ChatFormatting.RESET)));
+        } else {
+            text.add(Component.literal("<- ").withStyle(ChatFormatting.RED)
+                    .append(Component.literal(Library.getShortNumber(-battery.delta) + "HE/s")
+                            .withStyle(ChatFormatting.RESET)));
+        }
+        double frac = (double) battery.getPower() / (double) getMaxPower();
+        text.add(Component.literal("    " + Library.getPercentage(frac) + "%")
+                .withColor(Library.getColorProgress(frac)));
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
     }
 }

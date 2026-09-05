@@ -150,6 +150,11 @@ public final class Library {
         return (float) (Math.round(number * POWERS_OF_TEN[decimals]) / (float) POWERS_OF_TEN[decimals]);
     }
 
+    /** Exact CE {@code Library.java:244-246}. */
+    public static float roundFloat(double number, int decimals) {
+        return (float) (Math.round(number * POWERS_OF_TEN[decimals]) / (float) POWERS_OF_TEN[decimals]);
+    }
+
     /**
      * Formats a (potentially very large, HE-power-sized) {@code long} with an SI-ish magnitude
      * suffix instead of a wall of digits - e.g. {@code 4200000L -> "4.20M"}. Ported from CE's
@@ -178,6 +183,23 @@ public final class Library {
         }
 
         return negative ? "-" + result : result;
+    }
+
+    /**
+     * Red→green RGB for a 0..1 fill fraction. Exact CE {@code Library.java:182-186}.
+     */
+    public static int getColorProgress(double fraction) {
+        int r = (int) (255 * Math.min(1, fraction * -2 + 2));
+        int g = (int) (255 * Math.min(1, fraction * 2));
+        return 65536 * r + 256 * g;
+    }
+
+    /**
+     * {@code 0.00}-style percent of a 0..1 fraction (no {@code %} suffix). Exact CE
+     * {@code Library.java:188-190}.
+     */
+    public static String getPercentage(double fraction) {
+        return SHORT_NUMBER_FORMAT.format(roundFloat(fraction * 100D, 2));
     }
 
     /**
