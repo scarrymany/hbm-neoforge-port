@@ -4,6 +4,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeaterHeatexBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.ILookOverlay;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -20,10 +21,16 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code HeaterHeatex} — Dummyable {0,0,1,1,1,1} offset 1 + 4 corner extras. Sneak fluid-ID Exact CE {@code :65-73}. */
-public class HeaterHeatexBlock extends BlockDummyable {
+import java.util.ArrayList;
+import java.util.List;
+
+/** CE {@code HeaterHeatex} — Dummyable {0,0,1,1,1,1} offset 1 + 4 corner extras. Sneak fluid-ID Exact CE {@code :65-73}. printHook Exact CE {@code :104-111}. */
+public class HeaterHeatexBlock extends BlockDummyable implements ILookOverlay {
 
     public HeaterHeatexBlock(Properties properties) {
         super(properties);
@@ -87,5 +94,18 @@ public class HeaterHeatexBlock extends BlockDummyable {
         makeExtra(level, placedPos.offset(1, 0, -1));
         makeExtra(level, placedPos.offset(-1, 0, 1));
         makeExtra(level, placedPos.offset(-1, 0, -1));
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE HeaterHeatex.java:104-111
+        BlockPos core = findCore(world, pos);
+        if (core == null) return;
+        if (!(world.getBlockEntity(core) instanceof HeaterHeatexBlockEntity heater)) return;
+
+        List<Component> text = new ArrayList<>();
+        text.add(Component.literal(String.format("%,d", heater.heatEnergy) + " TU"));
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
     }
 }
