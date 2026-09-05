@@ -24,6 +24,7 @@ public class MachineOilWellMenu extends MenuBase<OilDrillBaseBlockEntity> {
         this.addSlot(new SlotNonRetarded(tile, 5, 156, 36));
         this.addSlot(new SlotNonRetarded(tile, 6, 156, 54));
 
-        playerInv(playerInv, 8, 121, 179);
+        // Exact CE ContainerMachineOilWell.java:47-58 (12,108 / hotbar 166)
+        playerInv(playerInv, 12, 108, 166);
     }
 }
