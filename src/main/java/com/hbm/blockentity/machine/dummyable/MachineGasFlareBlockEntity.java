@@ -5,6 +5,7 @@ import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.LoadedBaseBlockEntity.TiltType;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.machine.dummyable.GasFlareMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -45,10 +46,11 @@ import java.util.List;
  * {@code setType(3)} / {@code loadTank(1,2)} Exact CE {@code :135-136}.
  * Vent {@code onFluidRelease} + {@code FT_Polluting.pollute(SPILL, eject*5)} Exact CE {@code :156-162}.
  * Burn fire box + {@code pollute(BURN, eject*5)} Exact CE {@code :188-199}.
+ * Valve/dial {@code IControlReceiver} Exact CE {@code :324-327}.
  * Tower / {@code spawnGasFlame} / VanillaExt_Smoke stay skipped (VFX).
  */
 public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyProviderMK2, IFluidStandardReceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
 
     public static final long MAX_POWER = 1_000_000;
 
@@ -188,13 +190,16 @@ public class MachineGasFlareBlockEntity extends MachineBaseBlockEntity
         return level;
     }
 
-    public void toggleValve() {
-        isOn = !isOn;
-        setChanged();
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
     }
 
-    public void toggleBurn() {
-        doesBurn = !doesBurn;
+    /** Exact CE {@code TileEntityMachineGasFlare.receiveControl} :324-327. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("valve")) this.isOn = !this.isOn;
+        if (data.contains("dial")) this.doesBurn = !this.doesBurn;
         setChanged();
     }
 
