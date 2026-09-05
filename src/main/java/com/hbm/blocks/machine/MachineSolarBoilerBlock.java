@@ -5,12 +5,16 @@ import com.hbm.blockentity.machine.PowerGenBlockEntities;
 import com.hbm.blockentity.machine.SolarBoilerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item.TooltipContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -28,9 +32,9 @@ import java.util.Locale;
 /**
  * Ported from CE's {@code MachineSolarBoiler} (regname {@code machine_solar_boiler}). No GUI, no
  * inventory - a pure fluid producer fed externally by a {@link com.hbm.blocks.machine.SolarMirrorBlock}.
- * fillSpace extras Exact CE {@code :50-56}. printHook Exact CE {@code :66-85}.
+ * fillSpace extras Exact CE {@code :50-56}. printHook Exact CE {@code :66-85}. Tooltip Exact CE {@code :58-63}.
  */
-public class MachineSolarBoilerBlock extends BlockDummyable implements ILookOverlay {
+public class MachineSolarBoilerBlock extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
     public MachineSolarBoilerBlock(Properties properties) {
         super(properties);
@@ -98,5 +102,11 @@ public class MachineSolarBoilerBlock extends BlockDummyable implements ILookOver
                             .append(Component.literal(": " + steam.getFill() + "/" + steam.getMaxFill() + "mB"))));
         }
         ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE MachineSolarBoiler.java:58-63 — addStandardInfo via existing block.hbm.machine_solar_boiler.desc
+        addStandardInfo(tooltip);
     }
 }
