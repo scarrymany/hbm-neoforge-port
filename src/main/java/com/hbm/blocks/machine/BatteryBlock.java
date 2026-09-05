@@ -8,15 +8,19 @@ import com.hbm.blocks.ILookOverlay;
 import com.hbm.inventory.container.BatteryMenu;
 import com.hbm.lib.InventoryHelper;
 import com.hbm.lib.Library;
+import com.hbm.util.TagsUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -45,6 +49,7 @@ import java.util.List;
  * {@code maxPower} - see {@link com.hbm.blockentity.machine.BatteryBlockEntity} for the block
  * entity's full CE-vs-port scope notes.
  * printHook Exact CE {@code MachineBattery.java:221-241}. MachineFENSU is unregistered — stay skipped.
+ * addInformation Exact CE {@code MachineBattery.java:191-218} (item tooltip, not GUI).
  */
 public class BatteryBlock extends BaseEntityBlock implements ILookOverlay {
 
@@ -178,5 +183,39 @@ public class BatteryBlock extends BaseEntityBlock implements ILookOverlay {
         text.add(Component.literal("    " + Library.getPercentage(frac) + "%")
                 .withColor(Library.getColorProgress(frac)));
         ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE MachineBattery.java:191-218
+        long charge = 0L;
+        if (TagsUtil.hasCustomData(stack)) {
+            CompoundTag nbt = TagsUtil.getCustomData(stack);
+            if (nbt.contains(IPersistentNBT.NBT_PERSISTENT_KEY)) {
+                charge = nbt.getCompound(IPersistentNBT.NBT_PERSISTENT_KEY).getLong("power");
+            }
+        }
+
+        if (charge == 0L) {
+            tooltip.add(Component.literal("0").withStyle(ChatFormatting.RED)
+                    .append(Component.literal("/" + Library.getShortNumber(this.maxPower) + "HE ")
+                            .withStyle(ChatFormatting.DARK_RED))
+                    .append(Component.literal("(0.0%)").withStyle(ChatFormatting.RED)));
+        } else {
+            double percent = Math.round(charge * 1000L / this.maxPower) * 0.1D;
+            ChatFormatting color = ChatFormatting.YELLOW;
+            ChatFormatting color2 = ChatFormatting.GOLD;
+            if (percent < 25) {
+                color = ChatFormatting.RED;
+                color2 = ChatFormatting.DARK_RED;
+            } else if (percent >= 75) {
+                color = ChatFormatting.GREEN;
+                color2 = ChatFormatting.DARK_GREEN;
+            }
+            tooltip.add(Component.literal(Library.getShortNumber(charge)).withStyle(color)
+                    .append(Component.literal("/" + Library.getShortNumber(this.maxPower) + "HE ")
+                            .withStyle(color2))
+                    .append(Component.literal("(" + percent + "%)").withStyle(color)));
+        }
     }
 }
