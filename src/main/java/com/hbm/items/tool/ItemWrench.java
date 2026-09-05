@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,8 +36,9 @@ import java.util.List;
  * <b>Not the pylon-linking wrench</b>: {@code docs/phase2/energy_cable_pylon_network.md} originally
  * guessed CE's {@code ItemWrench} also touches {@code TileEntityPylonBase}, but CE's real source
  * (read directly for this pass) shows it only ever touches {@code TileEntityPipelineBase} - the
- * already-ported {@link ItemWiring} (a separate sibling-package item) is what links pylons. No
- * behavior is missing by keeping this item pipeline-only: it matches CE exactly.
+ * already-ported {@link ItemWiring} (a separate sibling-package item) is what links pylons.
+ * Held-distance overlay Exact CE {@code ItemWrench.java:147-157}
+ * ({@code displayName + ": " + meters + "m"}).
  */
 public class ItemWrench extends SwordItem {
 
@@ -110,6 +112,20 @@ public class ItemWrench extends SwordItem {
         target.setDeltaMovement(target.getDeltaMovement().add(look.x * 0.5, look.y * 0.5, look.z * 0.5));
         level.playSound(null, target.getX(), target.getY(), target.getZ(), SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 3.0F, 0.75F);
         return false;
+    }
+
+    /** Exact CE {@code ItemWrench.java:147-157}. */
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        if (!level.isClientSide() || !(entity instanceof Player player)) return;
+        if (!TagsUtil.hasCustomData(stack)) return;
+        CompoundTag tag = TagsUtil.getCustomData(stack);
+        if (!tag.contains("x")) return;
+        Vec3 vec = new Vec3(
+                entity.getX() - tag.getInt("x"),
+                entity.getY() - tag.getInt("y"),
+                entity.getZ() - tag.getInt("z"));
+        player.displayClientMessage(Component.literal(stack.getHoverName().getString() + ": " + (int) vec.length() + "m"), true);
     }
 
     @Override
