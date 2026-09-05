@@ -4,11 +4,13 @@ import com.hbm.api.redstoneoverradio.IRORInteractive;
 import com.hbm.api.redstoneoverradio.IRORValueProvider;
 import com.hbm.blocks.network.FluidCounterValveBlock;
 import com.hbm.inventory.fluid.Fluids;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.uninos.UniNodespace;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -20,6 +22,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * third-party mod-integration surfaces not otherwise established for this port. The Redstone-over-Radio
  * ({@link IRORValueProvider}/{@link IRORInteractive}) half is kept - both interfaces are already fully
  * ported in this port with no forward-reference gaps.
+ * ROR {@code setState} sound Exact CE {@code TileEntityFluidCounterValve.java:87-91}
+ * ({@code reactorStart} 1.0F/1.0F).
  */
 public class FluidCounterValveBlockEntity extends PipeBaseBlockEntity implements IRORValueProvider, IRORInteractive {
 
@@ -57,6 +61,14 @@ public class FluidCounterValveBlockEntity extends PipeBaseBlockEntity implements
             UniNodespace.destroyNode(level, node);
             this.node = null;
         }
+    }
+
+    /** Exact CE {@code TileEntityFluidCounterValve.java:87-91}. */
+    private void setState(int state) {
+        if (level == null) return;
+        level.setBlock(worldPosition, getBlockState().setValue(FluidCounterValveBlock.ACTIVE, state == 1), 2);
+        level.playSound(null, worldPosition, HBMSoundHandler.reactorStart.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        updateState();
     }
 
     public long getCounter() {
@@ -106,10 +118,8 @@ public class FluidCounterValveBlockEntity extends PipeBaseBlockEntity implements
             updateCounter();
             counter = 0;
             setChanged();
-        } else if (name.equals(PREFIX_FUNCTION + "setState") && params.length > 0 && level != null) {
-            boolean active = IRORInteractive.parseInt(params[0], 0, 1) == 1;
-            level.setBlock(worldPosition, getBlockState().setValue(FluidCounterValveBlock.ACTIVE, active), 2);
-            updateState();
+        } else if (name.equals(PREFIX_FUNCTION + "setState") && params.length > 0) {
+            setState(IRORInteractive.parseInt(params[0], 0, 1));
         }
         return null;
     }
