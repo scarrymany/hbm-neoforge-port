@@ -14,6 +14,7 @@ import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.fluid.trait.FT_Combustible;
 import com.hbm.inventory.fluid.trait.FT_Polluting;
 import com.hbm.inventory.fluid.trait.FluidTrait;
@@ -61,7 +62,7 @@ import java.util.Map;
  */
 public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
         implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
-        IRORValueProvider, IRORInteractive {
+        IControlReceiver, IRORValueProvider, IRORInteractive {
 
     public static final long MAX_POWER = 2_500_000L;
     private static final int SLOT_CANISTER = 0;
@@ -233,6 +234,20 @@ public class MachineCombustionEngineBlockEntity extends MachineBaseBlockEntity
                 PollutionHandler.incrementPollution(level, worldPosition, entry.getKey(), overflow / 100F);
             }
         }
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineCombustionEngine.receiveControl} :389-391. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("turnOn")) this.isOn = !this.isOn;
+        if (data.contains("setting")) this.setting = data.getInt("setting");
+        setChanged();
+        dataChanged();
     }
 
     public void setOn(boolean on) {
