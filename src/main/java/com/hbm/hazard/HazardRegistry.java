@@ -28,6 +28,7 @@ import com.hbm.hazard.type.HazardTypeRadiation;
 import com.hbm.hazard.type.HazardTypeToxic;
 import com.hbm.hazard.type.HazardTypeUnstable;
 import com.hbm.hazard.type.IHazardType;
+import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.MaterialShapes;
 import com.hbm.items.BilletPowderItems;
@@ -44,6 +45,8 @@ import com.hbm.items.machine.ItemZirnoxRodDepleted;
 import com.hbm.items.machine.MachineItems;
 import com.hbm.items.special.ItemWasteLong;
 import com.hbm.items.special.ItemWasteShort;
+import com.hbm.items.special.CellFluidHazardModifier;
+import com.hbm.items.special.ScatteredMilitaryItems;
 import com.hbm.items.special.SpecialItems;
 import com.hbm.items.weapon.grenade.GrenadeItems;
 import com.hbm.main.MainRegistry;
@@ -224,6 +227,26 @@ public class HazardRegistry {
         HazardSystem.register(BilletPowderItems.POWDER_COAL.get(), new HazardData().addEntry(COAL, powder));
         HazardSystem.register(BilletPowderItems.POWDER_COAL_TINY.get(), new HazardData().addEntry(COAL, powder_tiny));
         HazardSystem.register(BilletPowderItems.POWDER_LIGNITE.get(), new HazardData().addEntry(COAL, powder));
+
+        // CE :189 insert_polonium / :198 lamp_demon / :208-209 solid_fuel_presto_bf* —
+        // unregistered, skip invent. demon_core already bound below.
+        // CE :200-207 cell TRITIUM/SAS3 + cell_balefire + eggs + solid_fuel_bf.
+        // cell is one item; per-fluid via CellFluidHazardModifier (CE ItemStack meta).
+        HazardSystem.register(SpecialItems.CELL.get(), new HazardData()
+                .addEntry(new HazardEntry(RADIATION, 0.001F)
+                        .addMod(new CellFluidHazardModifier(Fluids.TRITIUM.getID(), 0.001F)))
+                .addEntry(new HazardEntry(RADIATION, sas3)
+                        .addMod(new CellFluidHazardModifier(Fluids.SAS3.getID(), sas3)))
+                .addEntry(new HazardEntry(BLINDING, 60F)
+                        .addMod(new CellFluidHazardModifier(Fluids.SAS3.getID(), 60F))));
+        HazardSystem.register(ScatteredMilitaryItems.CELL_BALEFIRE.get(),
+                new HazardData().addEntry(RADIATION, 50F));
+        HazardSystem.register(NukeCasingItems.EGG_BALEFIRE_SHARD.get(),
+                new HazardData().addEntry(RADIATION, bf * nugget));
+        HazardSystem.register(NukeCasingItems.EGG_BALEFIRE.get(),
+                new HazardData().addEntry(RADIATION, bf * ingot));
+        HazardSystem.register(Phase11ProcessItems.SOLID_FUEL_BF.get(),
+                new HazardData().addEntry(RADIATION, 1000F));
 
         // items_plate_crystal_waste area (docs/phase1/moditems_generative.md section 3,
         // docs/phase1/hazard_bindings_plan.md Pattern A/D): waste_/crystal_/gem_ hazard bindings.

@@ -37,7 +37,9 @@ public class HazardTypeBlinding implements IHazardType {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void addHazardInformation(final Player player, final List<Component> list, final double level, final ItemStack stack, final List<IHazardModifier> modifiers) {
+    public void addHazardInformation(final Player player, final List<Component> list, double level, final ItemStack stack, final List<IHazardModifier> modifiers) {
+        level = IHazardModifier.evalAllModifiers(stack, player, level, modifiers);
+        if (level == 0) return;
         list.add(Component.literal("[" + I18nUtil.resolveKey("trait.blinding") + "]").withStyle(ChatFormatting.DARK_AQUA));
     }
 }
