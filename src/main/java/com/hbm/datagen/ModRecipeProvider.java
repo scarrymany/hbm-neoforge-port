@@ -7192,7 +7192,35 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_flower", has(Blocks.DANDELION))
                 .save(output, id("ball_resin"));
 
-        // SKIP :1004-1008 = parts_legendary (CE uses ItemEnums.EnumLegendaryType + DictFrame)
+        // leftover obtain: parts_legendary. TODO(CE:CraftingManager.java:1003-1007)
+        // Flattened EnumLegendaryType TIER1/2/3. I/O registered (chainsteel/asbestos/bismuth/smore/alexandrite).
+        Item chainsteelLegendary = item("ingot_chainsteel");
+        Item alexandriteLegendary = item("gem_alexandrite");
+        Item partsLegendary1 = item("parts_legendary_tier1");
+        Item partsLegendary2 = item("parts_legendary_tier2");
+        Item partsLegendary3 = item("parts_legendary_tier3");
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, partsLegendary1)
+                .requires(chainsteelLegendary).requires(item("ingot_asbestos")).requires(alexandriteLegendary)
+                .unlockedBy("has_chainsteel", has(chainsteelLegendary))
+                .save(output, id("parts_legendary_tier1"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, partsLegendary1, 3)
+                .requires(partsLegendary2)
+                .unlockedBy("has_tier2", has(partsLegendary2))
+                .save(output, id("parts_legendary_tier1_from_tier2"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, partsLegendary2)
+                .requires(chainsteelLegendary).requires(item("ingot_bismuth"))
+                .requires(alexandriteLegendary).requires(alexandriteLegendary)
+                .unlockedBy("has_chainsteel", has(chainsteelLegendary))
+                .save(output, id("parts_legendary_tier2"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, partsLegendary2, 3)
+                .requires(partsLegendary3)
+                .unlockedBy("has_tier3", has(partsLegendary3))
+                .save(output, id("parts_legendary_tier2_from_tier3"));
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, partsLegendary3)
+                .requires(chainsteelLegendary).requires(item("ingot_smore"))
+                .requires(alexandriteLegendary).requires(alexandriteLegendary).requires(alexandriteLegendary)
+                .unlockedBy("has_chainsteel", has(chainsteelLegendary))
+                .save(output, id("parts_legendary_tier3"));
 
         // CE :1010-1012 = gear_large + sawblade
         TagKey<Item> titaniumIngotTagLocal2 = MaterialShapes.INGOT.commonTag(Mats.MAT_TITANIUM);
@@ -7476,7 +7504,13 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_blank", has(block("rbmk_blank")))
                 .save(output, id("rbmk_cooler"));
 
-        // SKIP :1090-1113 = launch_code + circuit_star_component/piece (CE uses DictFrame + stackFromEnum)
+        // leftover obtain: launch_code. TODO(CE:CraftingManager.java:1090-1095)
+        // 8× launch_code_piece + circuit_advanced. circuit_star_* stay skipped (DictFrame scrap).
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, item("launch_code"))
+                .requires(item("launch_code_piece"), 8)
+                .requires(item("circuit_advanced"))
+                .unlockedBy("has_launch_code_piece", has(item("launch_code_piece")))
+                .save(output, id("launch_code"));
 
         // ---- CraftingManager.java:1114-1162 crafts (circuit_star, sliding_blast_door, cm_* blocks, plushie). ----
         // SKIP :1115-1132 = circuit_star_component/circuit_star assembly (CE uses stackFromEnum)
