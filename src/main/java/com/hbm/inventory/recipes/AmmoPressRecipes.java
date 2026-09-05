@@ -238,5 +238,10 @@ public final class AmmoPressRecipes {
             this.output = output;
             this.slots = slots;
         }
+
+        /** CE {@code AmmoPressRecipe.input[i]} — port stores the 9-grid as {@code slots}. */
+        public AStack input(int i) {
+            return slots[i] instanceof AStack stack ? stack : null;
+        }
     }
 }
