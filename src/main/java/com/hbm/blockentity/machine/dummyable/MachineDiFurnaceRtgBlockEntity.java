@@ -127,6 +127,16 @@ public class MachineDiFurnaceRtgBlockEntity extends MachineBaseBlockEntity imple
         else dest.grow(out.getCount());
     }
 
+    /** Exact CE {@code TileEntityDiFurnaceRTG.hasPower} :204-206. */
+    public boolean hasPower() {
+        return heat > 0;
+    }
+
+    /** Exact CE {@code TileEntityDiFurnaceRTG.getDiFurnaceProgressScaled} :134-136. */
+    public int getDiFurnaceProgressScaled(int i) {
+        return (progress * i) / PROCESS;
+    }
+
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);

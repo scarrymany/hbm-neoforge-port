@@ -5,6 +5,7 @@ import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.dummyable.CompressorMenu;
 import com.hbm.inventory.fluid.Fluids;
@@ -44,7 +45,8 @@ import java.util.Map;
  * / {@code ContainerCompressor.java:36-37}. IUpgradeInfoProvider stay skipped.
  */
 public class MachineCompressorBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
+        IControlReceiver {
 
     public static final long MAX_POWER = 100_000;
     public static final int PROCESS_TIME_BASE = 100;
@@ -217,6 +219,24 @@ public class MachineCompressorBlockEntity extends MachineBaseBlockEntity
         input.withPressure(compression);
         setupTanks();
         setChanged();
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineCompressorBase.receiveControl} :245-260. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (!data.contains("compression")) return;
+        int compression = data.getInt("compression");
+        if (compression != input.getPressure()) {
+            input.withPressure(compression);
+            setupTanks();
+            setChanged();
+            dataChanged();
+        }
     }
 
     public DirPos[] getConPos() {
