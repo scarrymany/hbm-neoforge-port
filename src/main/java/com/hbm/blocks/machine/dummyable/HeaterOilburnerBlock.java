@@ -7,6 +7,7 @@ import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeaterOilburnerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.trait.FT_Flammable;
 import com.hbm.items.tool.ItemTooling;
@@ -18,7 +19,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -38,8 +41,9 @@ import java.util.Locale;
  * CE {@code HeaterOilburner} — Dummyable {1,0,1,1,1,1} offset 1 + 5 extras.
  * Screwdriver/hand-drill burn-rate Exact CE {@code HeaterOilburner.java:120-142}.
  * Tool-skip GUI Exact CE {@code :55-61}. Overlay Exact CE {@code :95-117}.
+ * Tooltip Exact CE {@code :88-92}.
  */
-public class HeaterOilburnerBlock extends BlockDummyable implements IToolable, ILookOverlay {
+public class HeaterOilburnerBlock extends BlockDummyable implements IToolable, ILookOverlay, ITooltipProvider {
 
     public HeaterOilburnerBlock(Properties properties) {
         super(properties);
@@ -135,5 +139,11 @@ public class HeaterOilburnerBlock extends BlockDummyable implements IToolable, I
                     .append(Component.literal(String.format(Locale.US, "%,d", heat) + " TU/t").withStyle(ChatFormatting.RESET)));
         }
         ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE HeaterOilburner.java:88-92
+        addStandardInfo(tooltip);
     }
 }
