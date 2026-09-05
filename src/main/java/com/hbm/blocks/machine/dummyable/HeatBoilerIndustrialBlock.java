@@ -4,9 +4,16 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.inventory.fluid.trait.FT_Heatable;
+import com.hbm.items.machine.IItemFluidIdentifier;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -15,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. */
+/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :61-88}. */
 public class HeatBoilerIndustrialBlock extends BlockDummyable {
 
     public HeatBoilerIndustrialBlock(Properties properties) {
@@ -44,6 +51,31 @@ public class HeatBoilerIndustrialBlock extends BlockDummyable {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return type == DummyableProcessBlockEntities.MACHINE_INDUSTRIAL_BOILER.get() ? ITickableBE.ticker() : null;
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
+        // Exact CE MachineHeatBoilerIndustrial.java:61-88 — !sneak + ID + FT_Heatable BOILER
+        if (!player.isShiftKeyDown() && !stack.isEmpty() && stack.getItem() instanceof IItemFluidIdentifier ident) {
+            if (!level.isClientSide) {
+                BlockPos core = findCore(level, pos);
+                if (core != null && level.getBlockEntity(core) instanceof HeatBoilerBlockEntity boiler) {
+                    var type = ident.getType(level, core, stack);
+                    if (type.hasTrait(FT_Heatable.class)
+                            && type.getTrait(FT_Heatable.class).getEfficiency(FT_Heatable.HeatingType.BOILER) > 0) {
+                        boiler.water.setTankType(type);
+                        boiler.setChanged();
+                        player.displayClientMessage(Component.literal("Changed type to ")
+                                .append(type.getLocalizedName())
+                                .append(Component.literal("!"))
+                                .withStyle(ChatFormatting.YELLOW), false);
+                    }
+                }
+            }
+            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
 
     @Override
