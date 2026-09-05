@@ -4,12 +4,16 @@ import com.hbm.api.block.ICrucibleAcceptor;
 import com.hbm.api.block.IToolable;
 import com.hbm.api.block.IToolable.ToolType;
 import com.hbm.blockentity.machine.foundry.FoundryCastingBaseBlockEntity;
+import com.hbm.blocks.ILookOverlay;
 import com.hbm.inventory.material.Mats;
 import com.hbm.items.machine.ItemMold;
 import com.hbm.items.machine.ItemScraps;
 import com.hbm.lib.HBMSoundHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -29,8 +33,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * NeoForge port of CE {@code FoundryCastingBase} - base class for foundry casting blocks.
@@ -40,8 +50,9 @@ import org.jetbrains.annotations.Nullable;
  * Handles mold insertion (CE :113-135), output extraction (CE :99-109), shovel scrap (CE :138-151).
  * Mold insert {@code upgradePlug} Exact CE {@code :130} (1.5F/1.0F).
  * Screwdriver mold extract Exact CE {@code :185-205} when slot 0 nonempty and {@code amount == 0}.
+ * Overlay Exact CE {@code :208-242}.
  */
-public abstract class BlockFoundryCastingBase extends Block implements EntityBlock, ICrucibleAcceptor, IToolable {
+public abstract class BlockFoundryCastingBase extends Block implements EntityBlock, ICrucibleAcceptor, IToolable, ILookOverlay {
 
     protected BlockFoundryCastingBase(Properties properties) {
         super(properties);
@@ -145,6 +156,30 @@ public abstract class BlockFoundryCastingBase extends Block implements EntityBlo
         BlockState currentState = world.getBlockState(pos);
         world.sendBlockUpdated(pos, currentState, currentState, 3);
         return true;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE FoundryCastingBase.java:208-242
+        if (!(world.getBlockEntity(pos) instanceof FoundryCastingBaseBlockEntity cast)) return;
+
+        List<Component> text = new ArrayList<>();
+        ItemStack moldStack = cast.inventory.getStackInSlot(0);
+
+        if (moldStack.isEmpty()) {
+            text.add(Component.translatable("foundry.noCast").withStyle(ChatFormatting.RED));
+        } else if (moldStack.getItem() instanceof ItemMold) {
+            ItemMold.MoldEntry mold = ItemMold.getMold(moldStack);
+            text.add(Component.literal(mold.getTitle()).withStyle(ChatFormatting.YELLOW));
+            if (cast.type != null && cast.amount > 0) {
+                text.add(cast.type.getName().copy()
+                        .append(Component.literal(": " + cast.amount + " / " + cast.getCapacity()))
+                        .withStyle(style -> style.withColor(TextColor.fromRgb(cast.type.moltenColor & 0xFFFFFF))));
+            }
+        }
+
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xFF4000, 0x401000, text);
     }
 
     @Override
