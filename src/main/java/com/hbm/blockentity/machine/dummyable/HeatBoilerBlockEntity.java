@@ -17,6 +17,7 @@ import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.saveddata.TomSaveData;
 import com.hbm.tileentity.IConfigurableMachine;
 import net.minecraft.core.BlockPos;
@@ -26,6 +27,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -44,7 +46,8 @@ import java.util.List;
  * CE {@code TileEntityHeatBoiler} / {@code TileEntityHeatBoilerIndustrial} —
  * pull heat from {@link IHeatSource} below, {@link FT_Heatable} BOILER convert.
  * Overpressure explode Exact CE {@code TileEntityHeatBoiler.java:273-293} (small only,
- * {@code canExplode}); Tom fire heat {@code :82-85}. Groan audio stay skipped.
+ * {@code canExplode}); Tom fire heat {@code :82-85}. Groan Exact CE {@code :265-266}
+ * / industrial {@code :231-233} ({@code boilerGroan} 0.5F/1.0F, 1/400).
  * {@link IConfigurableMachine} Exact CE {@code boiler}/{@code boilerIndustrial}
  * ({@code TileEntityHeatBoiler.java:359-375}, {@code TileEntityHeatBoilerIndustrial.java:315-328}).
  * ROR: CE {@code TileEntityHeatBoiler.java:396-412} / industrial {@code :348-360}.
@@ -160,6 +163,12 @@ public class HeatBoilerBlockEntity extends MachineBaseBlockEntity
         steam.setFill(steam.getFill() + entry.amountProduced * ops);
         steam.setTankType(entry.typeProduced);
         heat -= heatReq * ops;
+        // CE TileEntityHeatBoiler.java:265-266 / TileEntityHeatBoilerIndustrial.java:231-233
+        if (ops > 0 && level != null && level.random.nextInt(400) == 0) {
+            var groans = HBMSoundHandler.boilerGroanSounds();
+            level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 2, worldPosition.getZ() + 0.5,
+                    groans[level.random.nextInt(3)], SoundSource.BLOCKS, 0.5F, 1.0F);
+        }
         if (ops > 0) isOn = true;
         // CE TileEntityHeatBoiler.java:273-293 — industrial has no explode
         if (outputOps == 0 && canExplode && explodable) {
