@@ -5,9 +5,9 @@ import com.hbm.blockentity.machine.foundry.FoundryCastingBaseBlockEntity;
 import com.hbm.inventory.material.Mats;
 import com.hbm.items.machine.ItemMold;
 import com.hbm.items.machine.ItemScraps;
+import com.hbm.lib.HBMSoundHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
  * CE: upstream/hbm-ce/src/main/java/com/hbm/blocks/machine/FoundryCastingBase.java
  * <p>
  * Handles mold insertion (CE :113-135), output extraction (CE :99-109), shovel scrap (CE :138-151).
+ * Mold insert {@code upgradePlug} Exact CE {@code :130} (1.5F/1.0F).
  */
 public abstract class BlockFoundryCastingBase extends Block implements EntityBlock, ICrucibleAcceptor {
 
@@ -95,7 +96,8 @@ public abstract class BlockFoundryCastingBase extends Block implements EntityBlo
                 cast.inventory.setStackInSlot(0, newMold);
                 if (!player.isCreative()) stack.shrink(1);
 
-                level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 1.5F, 1.0F);
+                // CE FoundryCastingBase.java:130
+                level.playSound(null, pos, HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.5F, 1.0F);
                 cast.setChanged();
                 level.sendBlockUpdated(pos, state, state, 3);
                 return ItemInteractionResult.SUCCESS;

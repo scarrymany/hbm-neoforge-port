@@ -9,12 +9,12 @@ import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
 import com.hbm.blocks.ITooltipProvider;
 import com.hbm.items.machine.ItemStamp;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -42,6 +42,7 @@ import java.util.List;
 /**
  * CE {@code MachineConveyorPress} — Dummyable {2,0,0,0,0,0} offset 0.
  * Live I/O: {@code PressRecipes} on {@code EntityMovingItem} above the core + 1 stamp slot.
+ * Stamp insert {@code upgradePlug} Exact CE {@code MachineConveyorPress.java:83} (1.0F/1.0F).
  */
 public class MachineConveyorPressBlock extends BlockDummyable
         implements IConveyorBelt, IToolable, ILookOverlay, ITooltipProvider {
@@ -93,7 +94,8 @@ public class MachineConveyorPressBlock extends BlockDummyable
                     if (!player.getAbilities().instabuild) {
                         stack.shrink(1);
                     }
-                    level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    // CE MachineConveyorPress.java:83
+                    level.playSound(null, pos, HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
                     press.setChanged();
                     press.dataChanged();
                     return ItemInteractionResult.SUCCESS;
