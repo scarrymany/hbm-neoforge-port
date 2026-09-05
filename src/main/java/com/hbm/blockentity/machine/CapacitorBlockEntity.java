@@ -55,8 +55,8 @@ public class CapacitorBlockEntity extends LoadedBaseBlockEntity
     private long power;
     /** Cached once from the owning {@link CapacitorBlock}, matching CE's own field of the same role. */
     private long maxPower;
-    private long powerReceived;
-    private long powerSent;
+    public long powerReceived;
+    public long powerSent;
     private long lastPowerReceived;
     private long lastPowerSent;
     private boolean destroyedByCreativePlayer = false;
