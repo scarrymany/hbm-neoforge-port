@@ -5,6 +5,7 @@ import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeaterHeatexBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -14,7 +15,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -29,8 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-/** CE {@code HeaterHeatex} — Dummyable {0,0,1,1,1,1} offset 1 + 4 corner extras. Sneak fluid-ID Exact CE {@code :65-73}. printHook Exact CE {@code :104-111}. */
-public class HeaterHeatexBlock extends BlockDummyable implements ILookOverlay {
+/** CE {@code HeaterHeatex} — Dummyable {0,0,1,1,1,1} offset 1 + 4 corner extras. Sneak fluid-ID Exact CE {@code :65-73}. printHook Exact CE {@code :104-111}. Tooltip Exact CE {@code :85-88}. */
+public class HeaterHeatexBlock extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
     public HeaterHeatexBlock(Properties properties) {
         super(properties);
@@ -107,5 +110,11 @@ public class HeaterHeatexBlock extends BlockDummyable implements ILookOverlay {
         List<Component> text = new ArrayList<>();
         text.add(Component.literal(String.format("%,d", heater.heatEnergy) + " TU"));
         ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE HeaterHeatex.java:85-88
+        addStandardInfo(tooltip);
     }
 }
