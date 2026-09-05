@@ -399,6 +399,22 @@ public class HazardRegistry {
         HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "tile_lab_broken"),
                 new HazardData().addEntry(ASBESTOS, 1F));
 
+        // CE HazardRegistry.java:506-513 nuke parts.
+        HazardSystem.register(NukeCasingItems.BOY_PROPELLANT.get(),
+                new HazardData().addEntry(EXPLOSIVE, 2F));
+        HazardSystem.register(NukeCasingItems.GADGET_CORE.get(),
+                new HazardData().addEntry(RADIATION, pu239 * nugget * 10));
+        HazardSystem.register(NukeCasingItems.BOY_TARGET.get(),
+                new HazardData().addEntry(RADIATION, u235 * ingot * 2));
+        HazardSystem.register(NukeCasingItems.BOY_BULLET.get(),
+                new HazardData().addEntry(RADIATION, u235 * ingot));
+        HazardSystem.register(SpecialItems.MAN_CORE.get(),
+                new HazardData().addEntry(RADIATION, pu239 * nugget * 10));
+        HazardSystem.register(NukeCasingItems.MIKE_CORE.get(),
+                new HazardData().addEntry(RADIATION, u238 * nugget * 10));
+        HazardSystem.register(NukeCasingItems.TSAR_CORE.get(),
+                new HazardData().addEntry(RADIATION, pu239 * nugget * 15));
+
         // items_ingot_nugget area (docs/phase1/moditems_generative.md section 3,
         // hazard_bindings_plan.md Pattern A/B): only the ingot_/nugget_ fields CE's own
         // HazardRegistry.registerItems() actually binds (upstream hbm-ce HazardRegistry.java
