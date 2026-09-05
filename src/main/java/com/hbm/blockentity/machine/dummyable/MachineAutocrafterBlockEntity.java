@@ -5,6 +5,7 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.inventory.container.machine.dummyable.AutocrafterMenu;
 import com.hbm.lib.Library;
+import com.hbm.util.ItemStackUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -29,7 +30,8 @@ import java.util.List;
 
 /**
  * CE {@code TileEntityMachineAutocrafter} — 21 slots, 100 HE/craft.
- * OreDict mode names skipped (1.21: EXACT / WILDCARD only).
+ * Mode cycle is Exact CE {@code nextMode}: exact → wildcard → tag keys from
+ * {@link ItemStackUtil#getOreDictNames} (1.21 tag ids, same helper already in-tree).
  */
 public class MachineAutocrafterBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
@@ -157,8 +159,28 @@ public class MachineAutocrafterBlockEntity extends MachineBaseBlockEntity
             modes[i] = null;
             return;
         }
-        if (MODE_EXACT.equals(modes[i])) modes[i] = MODE_WILDCARD;
-        else modes[i] = MODE_EXACT;
+        // Exact CE TileEntityMachineAutocrafter.java:90-130
+        if (modes[i] == null) {
+            modes[i] = MODE_EXACT;
+        } else if (MODE_EXACT.equals(modes[i])) {
+            modes[i] = MODE_WILDCARD;
+        } else if (MODE_WILDCARD.equals(modes[i])) {
+            List<String> names = ItemStackUtil.getOreDictNames(stack);
+            modes[i] = names.isEmpty() ? MODE_EXACT : names.getFirst();
+        } else {
+            List<String> names = ItemStackUtil.getOreDictNames(stack);
+            if (names.size() < 2 || modes[i].equals(names.getLast())) {
+                modes[i] = MODE_EXACT;
+            } else {
+                for (int j = 0; j < names.size() - 1; j++) {
+                    if (modes[i].equals(names.get(j))) {
+                        modes[i] = names.get(j + 1);
+                        setChanged();
+                        return;
+                    }
+                }
+            }
+        }
         setChanged();
     }
 
@@ -194,8 +216,10 @@ public class MachineAutocrafterBlockEntity extends MachineBaseBlockEntity
     }
 
     public boolean isValidForFilter(ItemStack filter, String mode, ItemStack input) {
+        // Exact CE TileEntityMachineAutocrafter.java:427-436
+        if (MODE_EXACT.equals(mode)) return ItemStack.isSameItemSameComponents(input, filter);
         if (MODE_WILDCARD.equals(mode)) return input.getItem() == filter.getItem();
-        return ItemStack.isSameItemSameComponents(input, filter);
+        return ItemStackUtil.getOreDictNames(input).contains(mode);
     }
 
     private CraftingInput templateGrid() {
