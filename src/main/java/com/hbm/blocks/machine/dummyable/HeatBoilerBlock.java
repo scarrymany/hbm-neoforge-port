@@ -4,6 +4,8 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.HeatBoilerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.ILookOverlay;
+import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -19,10 +21,16 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineHeatBoiler} — Dummyable {3,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :65-78}. */
-public class HeatBoilerBlock extends BlockDummyable {
+import java.util.ArrayList;
+import java.util.List;
+
+/** CE {@code MachineHeatBoiler} — Dummyable {3,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :65-78}. printHook Exact CE {@code :135-149}. */
+public class HeatBoilerBlock extends BlockDummyable implements ILookOverlay {
 
     public HeatBoilerBlock(Properties properties) {
         super(properties);
@@ -77,5 +85,26 @@ public class HeatBoilerBlock extends BlockDummyable {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         return standardOpenBehavior(level, pos, player);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE MachineHeatBoiler.java:135-149
+        BlockPos core = findCore(world, pos);
+        if (core == null) return;
+        if (!(world.getBlockEntity(core) instanceof HeatBoilerBlockEntity boiler)) return;
+
+        List<Component> text = new ArrayList<>();
+        FluidTankNTM[] tanks = {boiler.water, boiler.steam};
+        for (int i = 0; i < tanks.length; i++) {
+            FluidTankNTM tank = tanks[i];
+            text.add(Component.literal(i < 1 ? "-> " : "<- ")
+                    .withStyle(i < 1 ? ChatFormatting.GREEN : ChatFormatting.RED)
+                    .append(Component.empty().withStyle(ChatFormatting.RESET)
+                            .append(tank.getTankType().getLocalizedName())
+                            .append(Component.literal(": " + tank.getFill() + "/" + tank.getMaxFill() + "mB"))));
+        }
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
     }
 }
