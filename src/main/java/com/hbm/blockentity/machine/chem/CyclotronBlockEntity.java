@@ -16,6 +16,7 @@ import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
+import com.hbm.main.MainRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -27,6 +28,9 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -64,6 +68,8 @@ public class CyclotronBlockEntity extends MachineBaseBlockEntity
 
     public long power;
     public int progress;
+    /** Exact CE {@code TileEntityMachineCyclotron} plug bitmask. TESR stay skipped. */
+    private byte plugs;
 
     public CyclotronBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 12, true, true);
@@ -210,6 +216,31 @@ public class CyclotronBlockEntity extends MachineBaseBlockEntity
         return (progress * i) / DURATION;
     }
 
+    /** Exact CE {@code TileEntityMachineCyclotron.setPlug} :337-340. */
+    public void setPlug(int index) {
+        this.plugs |= (1 << index);
+        setChanged();
+    }
+
+    /** Exact CE {@code TileEntityMachineCyclotron.getPlug} :342-344. */
+    public boolean getPlug(int index) {
+        return (this.plugs & (1 << index)) > 0;
+    }
+
+    /** Exact CE {@code TileEntityMachineCyclotron.getItemForPlug} :346-356. */
+    @Nullable
+    public static Item getItemForPlug(int i) {
+        String name = switch (i) {
+            case 0 -> "powder_balefire";
+            case 1 -> "book_of_";
+            case 2 -> "diamond_gavel";
+            case 3 -> "coin_maskman";
+            default -> null;
+        };
+        if (name == null) return null;
+        return BuiltInRegistries.ITEM.getOptional(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, name)).orElse(null);
+    }
+
     @Override
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
@@ -289,6 +320,7 @@ public class CyclotronBlockEntity extends MachineBaseBlockEntity
         super.saveAdditional(tag, registries);
         tag.putLong("power", power);
         tag.putInt("progress", progress);
+        tag.putByte("plugs", plugs);
         for (int i = 0; i < 3; i++) tanks[i].writeToNBT(tag, "tank" + i);
     }
 
@@ -297,6 +329,7 @@ public class CyclotronBlockEntity extends MachineBaseBlockEntity
         super.loadAdditional(tag, registries);
         power = tag.getLong("power");
         progress = tag.getInt("progress");
+        plugs = tag.getByte("plugs");
         for (int i = 0; i < 3; i++) tanks[i].readFromNBT(tag, "tank" + i);
     }
 
@@ -305,6 +338,7 @@ public class CyclotronBlockEntity extends MachineBaseBlockEntity
         super.serialize(buf);
         buf.writeLong(power);
         buf.writeInt(progress);
+        buf.writeByte(plugs);
         for (FluidTankNTM tank : tanks) tank.serialize(buf);
     }
 
@@ -313,6 +347,7 @@ public class CyclotronBlockEntity extends MachineBaseBlockEntity
         super.deserialize(buf);
         power = buf.readLong();
         progress = buf.readInt();
+        plugs = buf.readByte();
         for (FluidTankNTM tank : tanks) tank.deserialize(buf);
     }
 
