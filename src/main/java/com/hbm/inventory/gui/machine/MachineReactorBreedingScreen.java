@@ -2,33 +2,58 @@ package com.hbm.inventory.gui.machine;
 
 import com.hbm.inventory.container.machine.MachineReactorBreedingMenu;
 import com.hbm.inventory.gui.GuiInfoContainer;
+import com.hbm.main.MainRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/** Ported (visually, from CE's {@code GUIMachineReactorBreeding}) as a plain panel - see {@code GuiInfoContainer}'s own no-texture-yet rationale. */
+/**
+ * Exact CE {@code GUIMachineReactorBreeding} on existing {@code gui_breeder.png} 176×166.
+ * Progress 53,32 / flux 88,21 / info panel −16,16.
+ */
 public class MachineReactorBreedingScreen extends GuiInfoContainer<MachineReactorBreedingMenu> {
+
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_breeder.png");
 
     public MachineReactorBreedingScreen(MachineReactorBreedingMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 166;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
-        int progress = this.getMenu().be.getProgressScaled(24);
-        guiGraphics.fill(x + 80, y + 50 - progress, x + 96, y + 50, 0xFF55AAFF);
+        // CE GUIMachineReactorBreeding.java:64-67
+        int i = this.getMenu().be.getProgressScaled(70);
+        if (i > 0) {
+            guiGraphics.blit(TEXTURE, x + 53, y + 32, 176, 0, i, 20);
+        }
+        drawInfoPanel(guiGraphics, x - 16, y + 16, 3);
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
-        drawCustomInfo(guiGraphics, mouseX, mouseY, 8, 20, 160, 10, Component.literal("Flux: " + this.getMenu().be.flux));
+        // CE :40-44
+        int nameX = this.imageWidth / 2 - this.font.width(this.title) / 2;
+        guiGraphics.drawString(this.font, this.title, nameX, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
+
+        String flux = Integer.toString(this.getMenu().be.flux);
+        int fluxX = 88 - this.font.width(flux) / 2;
+        guiGraphics.drawString(this.font, flux, fluxX, 21, 0x08FF00, false);
+
+        // CE :30-35 (keep CE wording)
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos - 16, topPos + 16, 16, 16,
+                leftPos - 8, topPos + 32,
+                Component.literal("The reactor has to recieve"),
+                Component.literal("neutron flux from adjacent"),
+                Component.literal("research reactors to breed."));
     }
 }
