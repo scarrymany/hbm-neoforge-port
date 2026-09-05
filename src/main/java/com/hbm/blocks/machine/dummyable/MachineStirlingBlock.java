@@ -5,6 +5,7 @@ import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.MachineStirlingBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.items.machine.ItemGear;
 import com.hbm.lib.HBMSoundHandler;
 import com.hbm.util.BobMathUtil;
@@ -16,7 +17,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item.TooltipContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -35,8 +38,9 @@ import java.util.List;
  * CE {@code MachineStirling} — Dummyable {1,0,1,1,1,1} offset 1 + 4 extras. Shared by ×3 ids.
  * Cog install {@code upgradePlug} Exact CE {@code MachineStirling.java:97} (1.5F/0.75F PLAYERS).
  * printHook Exact CE {@code :149-185} (creative skips percent/overspeed/gear).
+ * Tooltip Exact CE {@code :189-191} via existing {@code block.hbm.machine_stirling*.desc}.
  */
-public class MachineStirlingBlock extends BlockDummyable implements ILookOverlay {
+public class MachineStirlingBlock extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
     public MachineStirlingBlock(Properties properties) {
         super(properties);
@@ -132,5 +136,11 @@ public class MachineStirlingBlock extends BlockDummyable implements ILookOverlay
         }
 
         ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE MachineStirling.java:189-191 — addStandardInfo via existing block.hbm.machine_stirling*.desc
+        addStandardInfo(tooltip);
     }
 }
