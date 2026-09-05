@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.blocks.generic.Phase8Blocks;
 import com.hbm.inventory.container.machine.dummyable.PressMenu;
 import com.hbm.inventory.recipes.PressRecipes;
 import com.hbm.items.machine.ItemStamp;
@@ -23,6 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 /**
  * CE {@code TileEntityMachinePress}: burner stamp press, 13 slots.
+ * Adjacent {@code press_preheater} {@code speed += 4} Exact CE {@code :60-71}.
  */
 public class MachinePressBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
 
@@ -73,9 +75,18 @@ public class MachinePressBlockEntity extends MachineBaseBlockEntity implements I
     public void updateEntity() {
         if (level == null || level.isClientSide) return;
 
+        // Exact CE TileEntityMachinePress.java:60-67 / :71
+        boolean preheated = false;
+        for (Direction dir : Direction.values()) {
+            if (level.getBlockState(worldPosition.relative(dir)).is(Phase8Blocks.PRESS_PREHEATER.get())) {
+                preheated = true;
+                break;
+            }
+        }
+
         boolean can = canProcess();
         if ((can || retracting) && burnTime >= 200) {
-            speed = Math.min(MAX_SPEED, speed + 1);
+            speed = Math.min(MAX_SPEED, speed + (preheated ? 4 : 1));
         } else {
             speed = Math.max(0, speed - 1);
         }

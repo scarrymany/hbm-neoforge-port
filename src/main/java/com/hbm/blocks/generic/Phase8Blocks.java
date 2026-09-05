@@ -45,6 +45,8 @@ public final class Phase8Blocks {
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_GREEN_ON;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_BLUE_OFF;
     public static DeferredBlock<TritiumLampBlock> LAMP_TRITIUM_BLUE_ON;
+    /** CE {@code ModBlocks.press_preheater} — adjacent to {@code machine_press} for +4 speed. */
+    public static DeferredBlock<Block> PRESS_PREHEATER;
 
     private Phase8Blocks() {
     }
@@ -106,7 +108,7 @@ public final class Phase8Blocks {
                 BlockBehaviour.Properties.of().strength(0.5F, 0.5F).sound(SoundType.WOOD)), null);
         registerBlock("frozen_dirt", () -> new BlockHazard(stone(0.5F, 0.5F)), ModCreativeTabs.BLOCKS);
         registerBlock("frozen_planks", () -> new BlockHazard(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.WOOD)), ModCreativeTabs.BLOCKS);
-        registerBlock("press_preheater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
+        PRESS_PREHEATER = registerBlock("press_preheater", () -> new BlockBase(BlockBehaviour.Properties.of().strength(5.0F, 10.0F).sound(SoundType.METAL)), ModCreativeTabs.MACHINE);
         registerBlock("sand_boron", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
         registerBlock("sand_gold", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
         registerBlock("sand_lead", () -> new BlockFallingBase(BlockBehaviour.Properties.of().strength(0.5F).sound(SoundType.SAND)), ModCreativeTabs.BLOCKS);
