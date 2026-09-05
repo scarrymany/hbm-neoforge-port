@@ -242,6 +242,11 @@ public class MachineRefineryBlockEntity extends MachineBaseBlockEntity
         this.power -= 5;
     }
 
+    /** Exact CE {@code TileEntityMachineRefinery.getPowerScaled} :332-334. */
+    public long getPowerScaled(long i) {
+        return (power * i) / MAX_POWER;
+    }
+
     @Override
     public long getPower() {
         return power;
