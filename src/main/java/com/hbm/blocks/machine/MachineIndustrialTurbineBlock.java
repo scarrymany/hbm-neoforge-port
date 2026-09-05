@@ -6,6 +6,7 @@ import com.hbm.blockentity.machine.PowerGenBlockEntities;
 import com.hbm.blockentity.machine.TurbineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.blocks.ILookOverlay;
+import com.hbm.blocks.ITooltipProvider;
 import com.hbm.inventory.fluid.FluidType;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -17,6 +18,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.Item.TooltipContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -40,9 +44,9 @@ import java.util.Locale;
  * nor holds an {@code ItemStackHandler}), see {@link MachineIndustrialTurbineBlockEntity}'s javadoc.
  * Compressor lever Exact CE {@code MachineIndustrialTurbine.java:53-78}
  * ({@code chungus_lever} 1.5F/1.0F BLOCKS when {@code !operational}).
- * fillSpace extras Exact CE {@code :85-99}. printHook Exact CE {@code :110-138}.
+ * fillSpace extras Exact CE {@code :85-99}. printHook Exact CE {@code :110-138}. Tooltip Exact CE {@code :102-105}.
  */
-public class MachineIndustrialTurbineBlock extends BlockDummyable implements ILookOverlay {
+public class MachineIndustrialTurbineBlock extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
     public MachineIndustrialTurbineBlock(Properties properties) {
         super(properties);
@@ -168,5 +172,11 @@ public class MachineIndustrialTurbineBlock extends BlockDummyable implements ILo
                         .withColor(color))
                 .append(Component.literal(")").withStyle(ChatFormatting.WHITE)));
         ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE MachineIndustrialTurbine.java:102-105 — addStandardInfo via existing block.hbm.machine_industrial_turbine.desc
+        addStandardInfo(tooltip);
     }
 }
