@@ -7,7 +7,10 @@ import com.hbm.inventory.slot.SlotTakeOnly;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 
-/** CE {@code ContainerMicrowave}: in / out + speed buttons. Battery slot unused. */
+/**
+ * Exact CE {@code ContainerMicrowave.java:31-46}: in 80,35 / out 140,35 / battery 8,53.
+ * Player inv 8,84. Existing {@code gui_microwave.png} — not invent.
+ */
 public class MicrowaveMenu extends MenuBase<MachineMicrowaveBlockEntity> {
 
     public static final int BUTTON_UP = 0;
@@ -15,9 +18,10 @@ public class MicrowaveMenu extends MenuBase<MachineMicrowaveBlockEntity> {
 
     public MicrowaveMenu(int id, Inventory playerInv, MachineMicrowaveBlockEntity be) {
         super(DummyableProcessMenus.MACHINE_MICROWAVE.get(), id, be);
-        this.addSlot(new SlotNonRetarded(tile, 0, 80, 35));
-        this.addSlot(new SlotTakeOnly(tile, 1, 80, 55));
-        playerInv(playerInv, 8, 86);
+        this.addSlot(new SlotNonRetarded(tile, MachineMicrowaveBlockEntity.SLOT_IN, 80, 35));
+        this.addSlot(new SlotTakeOnly(tile, MachineMicrowaveBlockEntity.SLOT_OUT, 140, 35));
+        this.addSlot(new SlotNonRetarded(tile, MachineMicrowaveBlockEntity.BATTERY_SLOT, 8, 53));
+        playerInv(playerInv, 8, 84);
     }
 
     @Override

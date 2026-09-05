@@ -15,6 +15,7 @@ import com.hbm.items.machine.IItemFluidIdentifier;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,6 +23,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +31,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -40,6 +43,7 @@ import java.util.Map;
  * {@code tanks[2].setType(2, inventory)} Exact CE {@code TileEntityMachineMixer.java:95}.
  * {@code recipeIndex} cycle Exact CE {@code :184-193}/{@code :351-353}.
  * Slots Exact CE {@code ContainerMixer.java:32-40} (5 slots: battery/solid/ID/upgrades 3-4).
+ * {@code upgradePlug} on insert slots 3-4 Exact CE {@code :74-75}.
  */
 public class MachineMixerBlockEntity extends MachineBaseBlockEntity
         implements IEnergyReceiverMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
@@ -78,6 +82,33 @@ public class MachineMixerBlockEntity extends MachineBaseBlockEntity
 
     public MachineMixerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state, 5, true, true);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineMixer.java:74-75
+                if (!stack.isEmpty() && slot >= UPGRADE_START && slot <= UPGRADE_END
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override

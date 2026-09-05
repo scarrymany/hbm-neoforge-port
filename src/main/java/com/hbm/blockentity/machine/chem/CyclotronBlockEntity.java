@@ -14,6 +14,7 @@ import com.hbm.inventory.recipes.chem.CyclotronRecipes;
 import com.hbm.items.machine.ItemMachineUpgrade;
 import com.hbm.items.machine.ItemMachineUpgrade.UpgradeType;
 import com.hbm.lib.DirPos;
+import com.hbm.lib.HBMSoundHandler;
 import com.hbm.lib.Library;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,6 +22,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +30,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
@@ -73,6 +76,33 @@ public class CyclotronBlockEntity extends MachineBaseBlockEntity
         maxLevels.put(UpgradeType.POWER, 3);
         maxLevels.put(UpgradeType.EFFECT, 3);
         this.upgradeManager = new UpgradeManagerNT(maxLevels);
+    }
+
+    @Override
+    protected ItemStackHandler getNewInventory(int scount, int slotlimit) {
+        return new ItemStackHandler(scount) {
+            @Override
+            protected void onContentsChanged(int slot) {
+                super.onContentsChanged(slot);
+                setChanged();
+            }
+
+            @Override
+            public void setStackInSlot(int slot, ItemStack stack) {
+                super.setStackInSlot(slot, stack);
+                // CE TileEntityMachineCyclotron.java:78-79
+                if (!stack.isEmpty() && slot >= UPGRADE_START && slot <= UPGRADE_END
+                        && stack.getItem() instanceof ItemMachineUpgrade && level != null && !level.isClientSide) {
+                    level.playSound(null, worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5,
+                            HBMSoundHandler.upgradePlug.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+            }
+
+            @Override
+            public int getSlotLimit(int slot) {
+                return slotlimit;
+            }
+        };
     }
 
     @Override
