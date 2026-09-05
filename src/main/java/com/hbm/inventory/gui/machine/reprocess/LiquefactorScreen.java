@@ -16,7 +16,7 @@ public class LiquefactorScreen extends GuiInfoContainer<LiquefactorMenu> {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 204;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
@@ -26,25 +26,25 @@ public class LiquefactorScreen extends GuiInfoContainer<LiquefactorMenu> {
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         var be = this.getMenu().be;
-        int p = (int) (be.getPower() * 52 / Math.max(be.getMaxPower(), 1));
-        if (p > 0) {
-            guiGraphics.blit(TEXTURE, x + 134, y + 70 - p, 176, 52 - p, 16, p);
+        // CE GUILiquefactor.java:48-57
+        int i = (int) (be.getPower() * 52 / Math.max(1L, be.getMaxPower()));
+        if (i > 0) {
+            guiGraphics.blit(TEXTURE, x + 134, y + 70 - i, 176, 52 - i, 16, i);
             guiGraphics.blit(TEXTURE, x + 138, y + 4, 176, 52, 9, 12);
         }
-        int prog = be.getProgressScaled(42);
-        if (prog > 0) {
-            guiGraphics.blit(TEXTURE, x + 42, y + 17, 192, 0, prog, 35);
+        int j = be.getProgressScaled(42);
+        if (j > 0) {
+            guiGraphics.blit(TEXTURE, x + 42, y + 17, 192, 0, j, 35);
         }
-        // Exact CE GUILiquefactor.java:57 — tank at 71,88 (bottom origin, 16×52).
         be.tank.renderTank(x + 71, y + 88, 0, 16, 52);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        // CE :37 — inventory label only
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
         var be = this.getMenu().be;
         drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 134, topPos + 18, 16, 52, be.getPower(), be.getMaxPower());
         be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 71, topPos + 36, 16, 52);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }

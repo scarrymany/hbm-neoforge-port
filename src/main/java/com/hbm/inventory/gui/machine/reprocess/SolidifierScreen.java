@@ -16,7 +16,7 @@ public class SolidifierScreen extends GuiInfoContainer<SolidifierMenu> {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 204;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
@@ -26,25 +26,27 @@ public class SolidifierScreen extends GuiInfoContainer<SolidifierMenu> {
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         var be = this.getMenu().be;
-        int p = (int) (be.getPower() * 52 / Math.max(be.getMaxPower(), 1));
-        if (p > 0) {
-            guiGraphics.blit(TEXTURE, x + 134, y + 70 - p, 176, 52 - p, 16, p);
+        // CE GUISolidifier.java:52-63
+        int i = (int) (be.getPower() * 52 / Math.max(1L, be.getMaxPower()));
+        if (i > 0) {
+            guiGraphics.blit(TEXTURE, x + 134, y + 70 - i, 176, 52 - i, 16, i);
             guiGraphics.blit(TEXTURE, x + 138, y + 4, 176, 52, 9, 12);
         }
-        int prog = be.getProgressScaled(42);
-        if (prog > 0) {
-            guiGraphics.blit(TEXTURE, x + 42, y + 17, 192, 0, prog, 35);
+        int j = be.getProgressScaled(42);
+        if (j > 0) {
+            guiGraphics.blit(TEXTURE, x + 42, y + 17, 192, 0, j, 35);
         }
-        // Exact CE GUISolidifier.java:63 — tank at 35,88 (bottom origin, 16×52).
         be.tank.renderTank(x + 35, y + 88, 0, 16, 52);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        // CE :40 — title at x=70, color 0xC7C1A3
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, this.title, 70 - this.font.width(name) / 2, 6, 0xC7C1A3, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
         var be = this.getMenu().be;
         drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 134, topPos + 18, 16, 52, be.getPower(), be.getMaxPower());
         be.tank.renderTankTooltip(guiGraphics, mouseX, mouseY, leftPos + 35, topPos + 36, 16, 52);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }

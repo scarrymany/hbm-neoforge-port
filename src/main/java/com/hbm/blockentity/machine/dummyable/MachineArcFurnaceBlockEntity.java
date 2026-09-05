@@ -3,6 +3,7 @@ package com.hbm.blockentity.machine.dummyable;
 import com.hbm.api.energymk2.IEnergyReceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.blocks.BlockDummyable;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.container.machine.dummyable.ArcFurnaceMenu;
@@ -48,7 +49,7 @@ import java.util.Locale;
  * Lid animation / particles stay skipped.
  */
 public class MachineArcFurnaceBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, ITickableBE, MenuProvider {
+        implements IEnergyReceiverMK2, ITickableBE, MenuProvider, IControlReceiver {
 
     public static final long MAX_POWER = 2_500_000;
     public static final int MAX_LIQUID = MaterialShapes.BLOCK.q(128);
@@ -240,6 +241,20 @@ public class MachineArcFurnaceBlockEntity extends MachineBaseBlockEntity
     public void toggleLiquid() {
         liquidMode = !liquidMode;
         setChanged();
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineArcFurnaceLarge.receiveControl} :630-634. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.getBoolean("liquid")) {
+            this.liquidMode = !this.liquidMode;
+            setChanged();
+        }
     }
 
     public void addToStack(Mats.MaterialStack matStack) {
