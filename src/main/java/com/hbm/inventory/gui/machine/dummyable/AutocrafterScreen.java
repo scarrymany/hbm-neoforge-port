@@ -17,7 +17,7 @@ public class AutocrafterScreen extends GuiInfoContainer<AutocrafterMenu> {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 240;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
@@ -27,18 +27,21 @@ public class AutocrafterScreen extends GuiInfoContainer<AutocrafterMenu> {
         guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineAutocrafterBlockEntity be = this.getMenu().be;
-        long max = Math.max(1L, be.getMaxPower());
-        int ph = (int) (be.power * 52L / max);
-        if (ph > 0) guiGraphics.blit(TEXTURE, x + 8, y + 88 - ph, 176, 52 - ph, 8, ph);
+        // Exact CE GUIAutocrafter.java:78-79
+        if (be.getMaxPower() > 0) {
+            int i = (int) (be.getPower() * 52 / be.getMaxPower());
+            if (i > 0) {
+                guiGraphics.blit(TEXTURE, x + 17, y + 97 - i, 176, 52 - i, 16, i);
+            }
+        }
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, this.title, this.imageWidth / 2 - this.font.width(name) / 2, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
         MachineAutocrafterBlockEntity be = this.getMenu().be;
-        drawCustomInfo(guiGraphics, mouseX, mouseY, leftPos + 8, topPos + 36, 8, 52,
-                Component.literal(be.power + " / " + be.getMaxPower() + " HE"),
-                Component.literal(MachineAutocrafterBlockEntity.CONSUMPTION + " HE/craft"),
-                Component.literal("Recipe " + (be.recipeCount == 0 ? 0 : be.recipeIndex + 1) + "/" + be.recipeCount));
+        drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 17, topPos + 45, 16, 52, be.getPower(), be.getMaxPower());
     }
 }

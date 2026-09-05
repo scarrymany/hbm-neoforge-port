@@ -2,6 +2,7 @@ package com.hbm.blockentity.machine.dummyable;
 
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.machine.dummyable.FunnelMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -30,8 +31,9 @@ import java.util.Optional;
 
 /**
  * CE {@code TileEntityMachineFunnel} — 9→1 / 4→1 compress via vanilla crafting.
+ * Mode toggle Exact CE {@code :193-195}.
  */
-public class MachineFunnelBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider {
+public class MachineFunnelBlockEntity extends MachineBaseBlockEntity implements ITickableBE, MenuProvider, IControlReceiver {
 
     public static final int MODE_AUTO = 0;
     public static final int MODE_3x3 = 1;
@@ -97,8 +99,16 @@ public class MachineFunnelBlockEntity extends MachineBaseBlockEntity implements 
         networkPackMK2(15);
     }
 
-    public void cycleMode() {
-        mode = (mode + 1) % 3;
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineFunnel.receiveControl} :193-195. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        this.mode++;
+        if (mode > 2) mode = 0;
         setChanged();
     }
 

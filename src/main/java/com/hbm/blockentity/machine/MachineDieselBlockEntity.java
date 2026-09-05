@@ -9,6 +9,7 @@ import com.hbm.api.fluidmk2.IFillableItem;
 import com.hbm.api.fluidmk2.IFluidStandardTransceiverMK2;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.handler.pollution.PollutionHandler;
 import com.hbm.inventory.FluidContainerRegistry;
 import com.hbm.inventory.fluid.FluidType;
@@ -54,10 +55,10 @@ import java.util.Map;
  * ({@code dieselgen}).
  * {@code pollute(BURN, 5F)} every 5t while generating Exact CE {@code :233-234}.
  * Smoke overflow {@code incrementPollution} Exact CE {@code TileEntityMachinePolluting:53-76}.
- * Audio stay skipped.
+ * On/off {@code IControlReceiver} Exact CE {@code :323-324}. Audio stay skipped.
  */
 public class MachineDieselBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IConfigurableMachine {
+        implements IEnergyProviderMK2, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider, IConfigurableMachine, IControlReceiver {
 
     public static int fuelCap = 16_000;
     public static long maxPower = 50_000L;
@@ -80,6 +81,7 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
     public final FluidTankNTM smokeLeaded;
     public final FluidTankNTM smokePoison;
     public boolean isOn;
+    public boolean wasOn;
     private long power;
 
     public MachineDieselBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -125,7 +127,10 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
 
         power = Library.chargeItemsFromTE(inventory, SLOT_BATTERY, power, maxPower);
 
+        // CE TileEntityMachineDiesel.java:119 / :222-228
+        this.wasOn = false;
         if (isOn && !level.hasNeighborSignal(worldPosition) && hasAcceptableFuel() && tank.getFill() > 0) {
+            this.wasOn = true;
             tank.setFill(Math.max(0, tank.getFill() - 1));
             // CE TileEntityMachineDiesel.java:233-234
             if (level.getGameTime() % 5 == 0) {
@@ -170,9 +175,15 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
         }
     }
 
-    public void setOn(boolean on) {
-        this.isOn = on;
-        dataChanged();
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineDiesel.receiveControl} :323-324. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("turnOn")) this.isOn = !this.isOn;
         setChanged();
     }
 
@@ -327,6 +338,7 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
     public void serialize(RegistryFriendlyByteBuf buf) {
         super.serialize(buf);
         buf.writeBoolean(isOn);
+        buf.writeBoolean(wasOn);
         buf.writeLong(power);
         tank.serialize(buf);
     }
@@ -335,6 +347,7 @@ public class MachineDieselBlockEntity extends MachineBaseBlockEntity
     public void deserialize(RegistryFriendlyByteBuf buf) {
         super.deserialize(buf);
         isOn = buf.readBoolean();
+        wasOn = buf.readBoolean();
         power = buf.readLong();
         tank.deserialize(buf);
     }
