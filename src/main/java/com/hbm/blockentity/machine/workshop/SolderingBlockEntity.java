@@ -5,6 +5,7 @@ import com.hbm.api.fluidmk2.IFluidStandardReceiverMK2;
 import com.hbm.blockentity.IPersistentNBT;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.RecipesCommon.AStack;
 import com.hbm.inventory.UpgradeManagerNT;
 import com.hbm.inventory.container.machine.workshop.SolderingMenu;
@@ -42,10 +43,11 @@ import java.util.Map;
 /**
  * CE {@code TileEntityMachineSolderingStation}: maxPower 2_000, slots 0-2 toppings / 3-4 pcb / 5 solder.
  * {@code tank.setType(8)} Exact CE {@code :123}. Slots 9-10 upgrades Exact CE {@code :156-168}
- * / {@code ContainerMachineSolderingStation.java:39-41}. Collision-prevention button / Tau VFX stay skipped.
+ * / {@code ContainerMachineSolderingStation.java:39-41}. Collision-prevention Exact CE
+ * {@code TileEntityMachineSolderingStation} {@code :69}/{@code :229}/{@code :514-516}. Tau VFX stay skipped.
  */
 public class SolderingBlockEntity extends MachineBaseBlockEntity
-        implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider {
+        implements IEnergyReceiverMK2, IFluidStandardReceiverMK2, ITickableBE, IPersistentNBT, MenuProvider, IControlReceiver {
 
     public static final int SLOT_OUT = 6;
     public static final int SLOT_BATTERY = 7;
@@ -70,6 +72,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     public int processTime = 1;
     public long consumption;
     public boolean isProcessing;
+    public boolean collisionPrevention;
     private final UpgradeManagerNT upgradeManager = new UpgradeManagerNT(VALID_UPGRADES);
 
     public SolderingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -162,7 +165,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
             consumption *= (long) Math.pow(2, blackLevel);
             intendedMaxPower = consumption * 20;
 
-            if (canOutput(recipe) && hasFluid(recipe) && power >= consumption) {
+            if (canProcess(recipe)) {
                 isProcessing = true;
                 progress += (1 + blackLevel);
                 power -= consumption;
@@ -187,6 +190,14 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     private boolean hasFluid(SolderingRecipe recipe) {
         if (recipe.fluid == null) return true;
         return tank.getTankType() == recipe.fluid.type && tank.getFill() >= recipe.fluid.fill;
+    }
+
+    /** Exact CE {@code TileEntityMachineSolderingStation.canProcess} :220-238. */
+    private boolean canProcess(SolderingRecipe recipe) {
+        if (power < consumption) return false;
+        if (!hasFluid(recipe)) return false;
+        if (collisionPrevention && recipe.fluid == null && tank.getFill() > 0) return false;
+        return canOutput(recipe);
     }
 
     private boolean canOutput(SolderingRecipe recipe) {
@@ -271,6 +282,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         tag.putLong("maxPower", maxPower);
         tag.putInt("progress", progress);
         tag.putInt("processTime", processTime);
+        tag.putBoolean("collisionPrevention", collisionPrevention);
         tank.writeToNBT(tag, "t");
     }
 
@@ -281,6 +293,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         if (tag.contains("maxPower")) maxPower = tag.getLong("maxPower");
         progress = tag.getInt("progress");
         if (tag.contains("processTime")) processTime = tag.getInt("processTime");
+        collisionPrevention = tag.getBoolean("collisionPrevention");
         tank.readFromNBT(tag, "t");
     }
 
@@ -294,6 +307,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         buf.writeInt(processTime);
         buf.writeLong(maxPower);
         buf.writeLong(consumption);
+        buf.writeBoolean(collisionPrevention);
     }
 
     @Override
@@ -306,6 +320,7 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
         processTime = buf.readInt();
         maxPower = buf.readLong();
         consumption = buf.readLong();
+        collisionPrevention = buf.readBoolean();
     }
 
     @Override
@@ -316,6 +331,18 @@ public class SolderingBlockEntity extends MachineBaseBlockEntity
     @Override
     public void readNBT(CompoundTag nbt) {
         tank.readFromNBT(nbt, "nt");
+    }
+
+    @Override
+    public boolean hasPermission(Player player) {
+        return isUseableByPlayer(player);
+    }
+
+    /** Exact CE {@code TileEntityMachineSolderingStation.receiveControl} :514-516. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        this.collisionPrevention = !this.collisionPrevention;
+        setChanged();
     }
 
     @Override

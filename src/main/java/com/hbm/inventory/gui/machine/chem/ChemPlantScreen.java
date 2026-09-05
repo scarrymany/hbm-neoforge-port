@@ -28,7 +28,7 @@ public class ChemPlantScreen extends GuiInfoContainer<ChemPlantMenu> {
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 256;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.inventoryLabelY = this.imageHeight - 96 + 2;
     }
 
     @Override
@@ -79,7 +79,10 @@ public class ChemPlantScreen extends GuiInfoContainer<ChemPlantMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        // Exact CE GUIMachineChemicalPlant.java:50 — title x=70
+        String name = this.title.getString();
+        guiGraphics.drawString(this.font, this.title, 70 - this.font.width(name) / 2, 6, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
         ChemPlantBlockEntity be = this.getMenu().be;
         drawElectricityInfo(guiGraphics, mouseX, mouseY, leftPos + 152, topPos + 18, 16, 61, be.power, be.maxPower);
         for (int i = 0; i < 3; i++) {
