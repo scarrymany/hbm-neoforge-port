@@ -38,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
  * {@code ILockable} Exact CE {@code TileEntityCrate.java:184-203}/{@code :311-312}/{@code :165-168}
  * (same stack as MassStorage). Hopper capability gated by {@code checkLock}: {@code facing == null
  * || !isLocked()}. {@code tryPick} omitted — lockpick {@code pin} item is not in this port.
+ * Open/close sounds Exact CE {@code TileEntityCrateBase.java:199-208}: {@code crateOpen}/{@code crateClose} 1.0F/1.0F.
  *
  * <h2>Deliberately narrowed scope vs. CE - both documented in {@code machines_storage.md}</h2>
  * <ul>
@@ -169,6 +170,20 @@ public class CrateBlockEntity extends MachineBaseBlockEntity implements IPersist
             level.playSound(null, player.blockPosition(), HBMSoundHandler.lockOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
         }
         return ok;
+    }
+
+    /** Exact CE {@code TileEntityCrateBase.java:199-201}. */
+    public void openInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.crateOpen.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
+    }
+
+    /** Exact CE {@code TileEntityCrateBase.java:207-209}. */
+    public void closeInventory(Player player) {
+        if (level == null || player == null) return;
+        level.playSound(null, player.getX(), player.getY(), player.getZ(),
+                HBMSoundHandler.crateClose.get(), SoundSource.BLOCKS, 1.0F, 1.0F);
     }
 
     @Override
