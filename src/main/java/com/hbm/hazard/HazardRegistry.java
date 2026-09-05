@@ -45,10 +45,13 @@ import com.hbm.items.machine.MachineItems;
 import com.hbm.items.special.ItemWasteLong;
 import com.hbm.items.special.ItemWasteShort;
 import com.hbm.items.special.SpecialItems;
+import com.hbm.items.weapon.grenade.GrenadeItems;
 import com.hbm.main.MainRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 
 /**
  * Physics-derived level constants and the {@link IHazardType} singletons every {@code HazardData} entry is built
@@ -199,6 +202,29 @@ public class HazardRegistry {
      * {@link IHazardType} singletons above.
      */
     public static void registerItems() {
+        // CE HazardRegistry.java:171-187 EXPLOSIVE + COAL. Skip dustTinyLignite
+        // (powder_lignite_tiny not registered — do not invent).
+        HazardSystem.register(Items.GUNPOWDER, new HazardData().addEntry(EXPLOSIVE, 1F));
+        HazardSystem.register(Blocks.TNT, new HazardData().addEntry(EXPLOSIVE, 4F));
+        HazardSystem.register(Items.PUMPKIN_PIE, new HazardData().addEntry(EXPLOSIVE, 1F));
+
+        HazardSystem.register(Phase11ProcessItems.BALL_DYNAMITE.get(), new HazardData().addEntry(EXPLOSIVE, 2F));
+        HazardSystem.register(GrenadeItems.STICK_DYNAMITE.get(), new HazardData().addEntry(EXPLOSIVE, 1F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "stick_tnt"),
+                new HazardData().addEntry(EXPLOSIVE, 1.5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "stick_semtex"),
+                new HazardData().addEntry(EXPLOSIVE, 2.5F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "stick_c4"),
+                new HazardData().addEntry(EXPLOSIVE, 2.5F));
+
+        HazardSystem.register(Phase11ProcessItems.CORDITE.get(), new HazardData().addEntry(EXPLOSIVE, 2F));
+        HazardSystem.register(ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "ballistite"),
+                new HazardData().addEntry(EXPLOSIVE, 1F));
+
+        HazardSystem.register(BilletPowderItems.POWDER_COAL.get(), new HazardData().addEntry(COAL, powder));
+        HazardSystem.register(BilletPowderItems.POWDER_COAL_TINY.get(), new HazardData().addEntry(COAL, powder_tiny));
+        HazardSystem.register(BilletPowderItems.POWDER_LIGNITE.get(), new HazardData().addEntry(COAL, powder));
+
         // items_plate_crystal_waste area (docs/phase1/moditems_generative.md section 3,
         // docs/phase1/hazard_bindings_plan.md Pattern A/D): waste_/crystal_/gem_ hazard bindings.
         // Formulas ported verbatim from CE's HazardRegistry.registerOtherWasteContaminating/
