@@ -6,7 +6,10 @@ import com.hbm.inventory.slot.SlotNonRetarded;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 
-/** CE {@code ContainerCompressor} slots 17,72 / 152,72 / 52,72 / 70,72. Pressure buttons 0–5. */
+/**
+ * Exact CE {@code ContainerCompressor.java:32-37}: fluid ID + battery + upgrades 2-3 at 52,72 / 70,72.
+ * Pressure buttons 0–5.
+ */
 public class CompressorMenu extends MenuBase<MachineCompressorBlockEntity> {
 
     public CompressorMenu(int id, Inventory playerInv, MachineCompressorBlockEntity be) {
