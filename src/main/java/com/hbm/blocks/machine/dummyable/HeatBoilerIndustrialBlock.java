@@ -10,6 +10,7 @@ import com.hbm.inventory.fluid.trait.FT_Heatable;
 import com.hbm.items.machine.IItemFluidIdentifier;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -33,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :61-88}. printHook Exact CE {@code :119-153}. Tooltip Exact CE {@code :157-164}. */
+/** CE {@code MachineHeatBoilerIndustrial} — Dummyable {4,0,1,1,1,1} offset 1. Held fluid-ID Exact CE {@code :61-88}. fillSpace extras Exact CE {@code :108-116}. printHook Exact CE {@code :119-153}. Tooltip Exact CE {@code :157-164}. */
 public class HeatBoilerIndustrialBlock extends BlockDummyable implements ILookOverlay, ITooltipProvider {
 
     public HeatBoilerIndustrialBlock(Properties properties) {
@@ -92,6 +93,24 @@ public class HeatBoilerIndustrialBlock extends BlockDummyable implements ILookOv
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         return standardOpenBehavior(level, pos, player);
+    }
+
+    /**
+     * Exact CE {@code MachineHeatBoilerIndustrial.fillSpace} extras ({@code MachineHeatBoilerIndustrial.java:108-116}).
+     * After {@code super.fillSpace} (AABB only): four cardinal ports around {@code placed − dir}, plus the
+     * top extra at {@code y+4}. CE uses the <em>placed</em> {@code x,y,z} and subtracts {@code dir} only —
+     * it does <em>not</em> add {@code o}. HeatBoiler uses core-relative rot/−rot + {@code y+3}; industrial
+     * uses axis-aligned ±1 + {@code y+4}.
+     */
+    @Override
+    protected void fillSpace(Level level, BlockPos placedPos, Direction dir, int placementOffset) {
+        super.fillSpace(level, placedPos, dir, placementOffset);
+        BlockPos base = placedPos.relative(dir.getOpposite());
+        makeExtra(level, base.offset(1, 0, 0));
+        makeExtra(level, base.offset(-1, 0, 0));
+        makeExtra(level, base.offset(0, 0, 1));
+        makeExtra(level, base.offset(0, 0, -1));
+        makeExtra(level, base.above(4));
     }
 
     @Override
