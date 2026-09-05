@@ -4136,23 +4136,25 @@ public class ModRecipeProvider extends RecipeProvider {
                 .requires(batteryScEmpty).requires(item("billet_am241")).requires(item("billet_am241"))
                 .unlockedBy("has_battery", has(batteryScEmpty)).save(output, id("battery/sc_am241"));
 
-        // ---- red_connector family (CraftingManager.java:290-291). ----
-        // red_connector (CE :290) = "C","I","S", C=coil_copper, I=plate_polymer, S=STEEL.ingot()
+        // ---- red_connector family (TODO(CE:CraftingManager.java:243-244)). ----
+        // leftover obtain: red_connector_super. I/O registered (coil_copper, plate_polymer,
+        // ANY_RESISTANTALLOY = tcalloy|cdalloy via hbm:any_resistantalloy).
+        Item platePolymerConnector = item("plate_polymer");
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("red_connector"), 4)
                 .pattern("C").pattern("I").pattern("S")
                 .define('C', coilCopper)
-                .define('I', ingotPolymer)
+                .define('I', platePolymerConnector)
                 .define('S', steelIngotTag)
                 .unlockedBy("has_coil", has(coilCopper))
                 .save(output, id("block/red_connector"));
 
-        // red_connector_super (CE :291) = "CCC","III"," S ", C=coil_copper, I=plate_polymer, S=ANY_RESISTANTALLOY.ingot()
-        TagKey<Item> resistantAlloyIngotTag = MaterialShapes.INGOT.commonTag(Mats.MAT_DURA);
+        TagKey<Item> anyResistantalloyConnector = ItemTags.create(
+                ResourceLocation.fromNamespaceAndPath("hbm", "any_resistantalloy"));
         ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, block("red_connector_super"), 2)
                 .pattern("CCC").pattern("III").pattern(" S ")
                 .define('C', coilCopper)
-                .define('I', ingotPolymer)
-                .define('S', resistantAlloyIngotTag)
+                .define('I', platePolymerConnector)
+                .define('S', anyResistantalloyConnector)
                 .unlockedBy("has_coil", has(coilCopper))
                 .save(output, id("block/red_connector_super"));
 
@@ -5744,13 +5746,14 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_planks", has(block("pink_planks")))
                 .save(output, id("pink_stairs"));
 
-        // CE :686 = cargo_elevator (3x, uses steel_grate + STEEL ingot + part_generic PISTON_HYDRAULIC)
+        // leftover obtain: cargo_elevator. TODO(CE:CraftingManager.java:635)
+        // "GGG","SPS": G=steel_grate, S=STEEL.ingot(), P=part_generic PISTON_HYDRAULIC → x3
         ShapedRecipeBuilder.shaped(RecipeCategory.DECORATIONS, block("cargo_elevator"), 3)
                 .pattern("GGG").pattern("SPS")
-                .define('G', block("steel_grate_wide"))
+                .define('G', block("steel_grate"))
                 .define('S', ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", "ingots/steel")))
                 .define('P', item("part_generic_piston_hydraulic"))
-                .unlockedBy("has_steel_grate", has(block("steel_grate_wide")))
+                .unlockedBy("has_steel_grate", has(block("steel_grate")))
                 .save(output, id("cargo_elevator"));
 
         // CE :689-691 = doors (door_metal, door_office, door_bunker)
