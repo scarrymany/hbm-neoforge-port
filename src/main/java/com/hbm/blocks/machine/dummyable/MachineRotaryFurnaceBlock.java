@@ -4,8 +4,11 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.MachineRotaryFurnaceBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.ILookOverlay;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -14,10 +17,19 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineRotaryFurnace} — Dummyable {4,0,1,1,2,2} offset 1 + extras. */
-public class MachineRotaryFurnaceBlock extends BlockDummyable {
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * CE {@code MachineRotaryFurnace} — Dummyable {4,0,1,1,2,2} offset 1 + extras.
+ * printHook Exact CE {@code :73-104} ({@code hitCheck} steam/fluids/fuel).
+ */
+public class MachineRotaryFurnaceBlock extends BlockDummyable implements ILookOverlay {
 
     public MachineRotaryFurnaceBlock(Properties properties) {
         super(properties);
@@ -63,5 +75,56 @@ public class MachineRotaryFurnaceBlock extends BlockDummyable {
         makeExtra(level, core.relative(dir).relative(rot, 2));
         makeExtra(level, core.relative(rot).above(4));
         makeExtra(level, core.relative(dir).relative(rot));
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE MachineRotaryFurnace.java:73-104
+        BlockPos core = findCore(world, pos);
+        if (core == null) return;
+        if (!(world.getBlockEntity(core) instanceof MachineRotaryFurnaceBlockEntity furnace)) return;
+
+        Direction dir = Direction.from3DDataValue(world.getBlockState(core).getValue(META) - offset);
+
+        List<Component> text = new ArrayList<>();
+
+        // steam
+        if (hitCheck(dir, core.getX(), core.getY(), core.getZ(), -1, -1, 0, pos.getX(), pos.getY(), pos.getZ())
+                || hitCheck(dir, core.getX(), core.getY(), core.getZ(), -1, -2, 0, pos.getX(), pos.getY(), pos.getZ())) {
+            text.add(Component.literal("-> ").withStyle(ChatFormatting.GREEN)
+                    .append(Component.empty().withStyle(ChatFormatting.RESET)
+                            .append(furnace.steam.getTankType().getLocalizedName())));
+            text.add(Component.literal("<- ").withStyle(ChatFormatting.RED)
+                    .append(Component.empty().withStyle(ChatFormatting.RESET)
+                            .append(furnace.spent.getTankType().getLocalizedName())));
+        }
+
+        // fluids
+        if (hitCheck(dir, core.getX(), core.getY(), core.getZ(), 1, 2, 0, pos.getX(), pos.getY(), pos.getZ())
+                || hitCheck(dir, core.getX(), core.getY(), core.getZ(), -1, 2, 0, pos.getX(), pos.getY(), pos.getZ())) {
+            text.add(Component.literal("-> ").withStyle(ChatFormatting.GREEN)
+                    .append(Component.empty().withStyle(ChatFormatting.RESET)
+                            .append(furnace.process.getTankType().getLocalizedName())));
+        }
+
+        if (hitCheck(dir, core.getX(), core.getY(), core.getZ(), 1, 1, 0, pos.getX(), pos.getY(), pos.getZ())) {
+            text.add(Component.literal("-> ").withStyle(ChatFormatting.YELLOW)
+                    .append(Component.literal("Fuel").withStyle(ChatFormatting.RESET)));
+        }
+
+        if (!text.isEmpty()) {
+            ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
+        }
+    }
+
+    /** Exact CE {@code MachineRotaryFurnace.hitCheck} ({@code :106-115}). {@code getRotation(DOWN)} → {@code getClockWise}. */
+    protected boolean hitCheck(Direction dir, int coreX, int coreY, int coreZ, int exDir, int exRot, int exY,
+                               int hitX, int hitY, int hitZ) {
+        Direction turn = dir.getClockWise();
+        int iX = coreX + dir.getStepX() * exDir + turn.getStepX() * exRot;
+        int iY = coreY + exY;
+        int iZ = coreZ + dir.getStepZ() * exDir + turn.getStepZ() * exRot;
+        return iX == hitX && iZ == hitZ && iY == hitY;
     }
 }
