@@ -50,7 +50,7 @@ import java.util.List;
  * {@code setTankType(5)} retypes {@code tank} + pseudo in/out from {@link IItemFluidIdentifier}
  * when {@link GasCentrifugeRecipes#FLUID_CONVERSIONS} has the type (UF6/PUF6/WATZ).
  * Slot 5 @ 91,15 / upgrade slot 6 Exact CE {@code ContainerMachineGasCent.java:48-51}.
- * {@code gui_centrifuge_gas.png} is not in this tree — do not invent it.
+ * GUI Exact CE {@code GUIMachineGasCent} on existing {@code gui_centrifuge_gas.png} 206×204.
  * <p>
  * <b>Scope trims from CE</b>: no looped centrifuge audio (same precedent as
  * {@code MachineRefineryBlockEntity}).
