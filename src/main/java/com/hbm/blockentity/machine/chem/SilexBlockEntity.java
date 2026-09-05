@@ -138,6 +138,12 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         return (currentFill * i) / MAX_FILL;
     }
 
+    /** Exact CE {@code TileEntitySILEX.handleButtonPacket} :137-141. */
+    public void voidContents() {
+        this.currentFill = 0;
+        this.current = null;
+    }
+
     /** CE {@code TileEntitySILEX.java:169-222}. */
     private void loadFluid() {
         FluidType type = tank.getTankType();
@@ -316,6 +322,11 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         buf.writeInt(progress);
         buf.writeUtf(mode.toString());
         tank.serialize(buf);
+        // CE TileEntitySILEX.java:116-119
+        if (this.current != null && this.current.item != null) {
+            buf.writeInt(BuiltInRegistries.ITEM.getId(this.current.item));
+            buf.writeInt(this.current.meta);
+        }
     }
 
     @Override
@@ -325,6 +336,12 @@ public class SilexBlockEntity extends MachineBaseBlockEntity
         progress = buf.readInt();
         mode = EnumWavelengths.valueOf(buf.readUtf());
         tank.deserialize(buf);
+        // CE TileEntitySILEX.java:131-134
+        if (currentFill > 0) {
+            current = new ComparableStack(BuiltInRegistries.ITEM.byId(buf.readInt()), 1, buf.readInt());
+        } else {
+            current = null;
+        }
     }
 
     @Override
