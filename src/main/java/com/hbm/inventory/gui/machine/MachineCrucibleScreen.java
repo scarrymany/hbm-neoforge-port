@@ -7,42 +7,34 @@ import com.hbm.inventory.material.Mats;
 import com.hbm.inventory.material.NTMMaterial;
 import com.hbm.inventory.recipes.CrucibleRecipe;
 import com.hbm.inventory.recipes.CrucibleRecipes;
+import com.hbm.main.MainRegistry;
 import com.hbm.packet.toserver.CrucibleControlPacket;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Ported (structurally, from CE's {@code GUICrucible}, canvas 176x214, read in full) as a plain
- * panel with hand-blit bars, following {@code MachineShredderScreen}'s established "no texture asset
- * exists yet for any Phase 2+ machine screen" convention (see that class's own javadoc). Progress
- * bar at {@code (126,82)} 33px, heat bar at {@code (126,91)} 33px, both horizontal fills - CE's exact
- * coordinates. The two vertical material-stack fill bars ({@code (62,97)}/{@code (17,97)}, 34px wide
- * x up to 79px tall, stacked bottom-up per material layer) are hand-blit solid-color rectangles keyed
- * off each material's {@code moltenColor} rather than CE's textured tank-fill sprite (no
- * {@code gui_crucible.png} exists in this port yet either).
- * <p>
- * <b>Recipe picker</b>: CE opens the shared, 331-line {@code GUIScreenRecipeSelector} popup (not
- * ported anywhere in this port yet - see {@code docs/phase7/crucible_core.md}'s "Recommended shape"
- * #7). This screen instead implements the recommended minimal Crucible-specific picker: left-click
- * the recipe-icon zone at {@code (106,80,18,18)} to cycle to the next registered recipe (wrapping),
- * right-click to clear back to "no recipe", both sent server-side via the new
- * {@link CrucibleControlPacket}/{@code IControlReceiver} pair. Hovering (not clicking) the same zone
- * shows the loaded recipe's full input/output printout via {@link CrucibleRecipe#print()}, or a
- * "click to set recipe" hint - matching CE's dual hover/click behavior on that same zone.
+ * Exact CE {@code GUICrucible} on existing {@code gui_crucible.png} 176×214.
+ * Progress 126,82 / heat 126,91 / stacks 62,97 + 17,97 / recipe icon 107,81.
+ * Selector stays the existing cycle ({@code CrucibleRecipes} is not {@code GenericRecipes}).
  */
 public class MachineCrucibleScreen extends GuiInfoContainer<MachineCrucibleMenu> {
 
-    private static final int RECIPE_ZONE_X = 106;
-    private static final int RECIPE_ZONE_Y = 80;
-    private static final int RECIPE_ZONE_SIZE = 18;
+    private static final ResourceLocation TEXTURE =
+            ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "textures/gui/processing/gui_crucible.png");
 
     public MachineCrucibleScreen(MachineCrucibleMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -55,58 +47,88 @@ public class MachineCrucibleScreen extends GuiInfoContainer<MachineCrucibleMenu>
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        guiGraphics.fill(x, y, x + imageWidth, y + imageHeight, 0xFF8B8B8B);
-        guiGraphics.fill(x + 1, y + 1, x + imageWidth - 1, y + imageHeight - 1, 0xFFC6C6C6);
+        guiGraphics.blit(TEXTURE, x, y, 0, 0, this.imageWidth, this.imageHeight);
 
         MachineCrucibleBlockEntity be = this.getMenu().be;
+        // CE GUICrucible.java:83-86
+        int pGauge = be.getProgress() * 33 / MachineCrucibleBlockEntity.processTime;
+        if (pGauge > 0) {
+            guiGraphics.blit(TEXTURE, x + 126, y + 82, 176, 0, pGauge, 5);
+        }
+        int hGauge = be.getHeat() * 33 / MachineCrucibleBlockEntity.maxHeat;
+        if (hGauge > 0) {
+            guiGraphics.blit(TEXTURE, x + 126, y + 91, 176, 5, hGauge, 5);
+        }
 
-        int pGauge = (int) (33L * be.getProgress() / MachineCrucibleBlockEntity.processTime);
-        if (pGauge > 0) guiGraphics.fill(x + 126, y + 82, x + 126 + pGauge, y + 87, 0xFF00A000);
+        CrucibleRecipe recipe = CrucibleRecipes.getRecipe(be.getRecipeName());
+        ItemStack icon = recipe != null ? recipe.icon() : templateFolder();
+        if (!icon.isEmpty()) {
+            guiGraphics.renderItem(icon, x + 107, y + 81);
+        }
 
-        int hGauge = (int) (33L * be.getHeat() / MachineCrucibleBlockEntity.maxHeat);
-        if (hGauge > 0) guiGraphics.fill(x + 126, y + 91, x + 126 + hGauge, y + 96, 0xFFFF4500);
-
-        // Recipe-select zone.
-        guiGraphics.fill(x + RECIPE_ZONE_X, y + RECIPE_ZONE_Y, x + RECIPE_ZONE_X + RECIPE_ZONE_SIZE, y + RECIPE_ZONE_Y + RECIPE_ZONE_SIZE, 0xFF4A4A4A);
-
-        drawStackBar(guiGraphics, be.getRecipeStack(), MachineCrucibleBlockEntity.recipeZCapacity, x + 62, y + 97);
-        drawStackBar(guiGraphics, be.getWasteStack(), MachineCrucibleBlockEntity.wasteZCapacity, x + 17, y + 97);
+        if (!be.getRecipeStack().isEmpty()) {
+            drawStack(guiGraphics, be.getRecipeStack(), MachineCrucibleBlockEntity.recipeZCapacity, x + 62, y + 97);
+        }
+        if (!be.getWasteStack().isEmpty()) {
+            drawStack(guiGraphics, be.getWasteStack(), MachineCrucibleBlockEntity.wasteZCapacity, x + 17, y + 97);
+        }
     }
 
-    /** CE: {@code GUICrucible.drawStack} (textured) - re-expressed as solid-color rectangles per material layer, keyed off {@link NTMMaterial#moltenColor}. */
-    private void drawStackBar(GuiGraphics guiGraphics, List<Mats.MaterialStack> stack, int capacity, int x, int bottomY) {
+    /** Exact CE {@code GUICrucible.drawStack} :110-142. */
+    private void drawStack(GuiGraphics guiGraphics, List<Mats.MaterialStack> stack, int capacity, int x, int bottomY) {
         if (stack.isEmpty() || capacity <= 0) return;
 
         int lastHeight = 0;
         int lastQuant = 0;
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
 
         for (Mats.MaterialStack sta : stack) {
-            int targetHeight = (int) (79L * (lastQuant + sta.amount) / capacity);
+            int targetHeight = (lastQuant + sta.amount) * 79 / capacity;
             if (lastHeight == targetHeight) continue;
 
-            int color = 0xFF000000 | (sta.material.moltenColor & 0xFFFFFF);
-            guiGraphics.fill(x, bottomY - targetHeight, x + 34, bottomY - lastHeight, color);
+            int offset = sta.material.smeltable == NTMMaterial.SmeltingBehavior.ADDITIVE ? 34 : 0;
+            int hex = sta.material.moltenColor;
+            float r = ((hex >> 16) & 0xFF) / 255F;
+            float g = ((hex >> 8) & 0xFF) / 255F;
+            float b = (hex & 0xFF) / 255F;
+            int h = targetHeight - lastHeight;
+            int blitY = bottomY - targetHeight;
+            int v = 89 - targetHeight;
+
+            guiGraphics.setColor(r, g, b, 1F);
+            guiGraphics.blit(TEXTURE, x, blitY, 176 + offset, v, 34, h);
+            guiGraphics.setColor(1F, 1F, 1F, 0.3F);
+            guiGraphics.blit(TEXTURE, x, blitY, 176 + offset, v, 34, h);
 
             lastQuant += sta.amount;
             lastHeight = targetHeight;
         }
+
+        guiGraphics.setColor(1F, 1F, 1F, 1F);
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableBlend();
     }
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        super.renderLabels(guiGraphics, mouseX, mouseY);
+        // CE GUICrucible.java:72-73 — inventory label only
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
 
         MachineCrucibleBlockEntity be = this.getMenu().be;
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 16, topPos + 17, 36, 81, mouseX, mouseY,
+                stackTooltip(be.getWasteStack()));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 61, topPos + 17, 36, 81, mouseX, mouseY,
+                stackTooltip(be.getRecipeStack()));
 
-        drawCustomInfoStat(guiGraphics, mouseX, mouseY, 16, 17, 36, 81, mouseX, mouseY, stackTooltip(be.getWasteStack()));
-        drawCustomInfoStat(guiGraphics, mouseX, mouseY, 61, 17, 36, 81, mouseX, mouseY, stackTooltip(be.getRecipeStack()));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 125, topPos + 81, 34, 7, mouseX, mouseY,
+                Component.literal(String.format(Locale.US, "%,d", be.getProgress())
+                        + " / " + String.format(Locale.US, "%,d", MachineCrucibleBlockEntity.processTime) + "TU"));
+        drawCustomInfoStat(guiGraphics, mouseX, mouseY, leftPos + 125, topPos + 90, 34, 7, mouseX, mouseY,
+                Component.literal(String.format(Locale.US, "%,d", be.getHeat())
+                        + " / " + String.format(Locale.US, "%,d", MachineCrucibleBlockEntity.maxHeat) + "TU"));
 
-        drawCustomInfoStat(guiGraphics, mouseX, mouseY, 126, 82, 33, 5, mouseX, mouseY,
-                Component.literal(be.getProgress() + " / " + MachineCrucibleBlockEntity.processTime + " TU"));
-        drawCustomInfoStat(guiGraphics, mouseX, mouseY, 126, 91, 33, 5, mouseX, mouseY,
-                Component.literal(be.getHeat() + " / " + MachineCrucibleBlockEntity.maxHeat + " TU"));
-
-        if (RECIPE_ZONE_X <= mouseX && RECIPE_ZONE_X + RECIPE_ZONE_SIZE > mouseX && RECIPE_ZONE_Y < mouseY && RECIPE_ZONE_Y + RECIPE_ZONE_SIZE >= mouseY) {
+        if (isHovered(mouseX, mouseY, 106, 80, 18, 18)) {
             CrucibleRecipe loaded = CrucibleRecipes.getRecipe(be.getRecipeName());
             List<Component> tip = loaded != null
                     ? loaded.print()
@@ -125,14 +147,17 @@ public class MachineCrucibleScreen extends GuiInfoContainer<MachineCrucibleMenu>
             lines.add(Component.empty()
                     .append(sta.material.getName())
                     .append(": ")
-                    .append(Mats.formatAmount(sta.amount, Screen.hasShiftDown())).withStyle(ChatFormatting.YELLOW));
+                    .append(Mats.formatAmount(sta.amount, Screen.hasShiftDown()))
+                    .withStyle(ChatFormatting.YELLOW));
         }
         return lines;
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isHovered(mouseX, mouseY, RECIPE_ZONE_X, RECIPE_ZONE_Y, RECIPE_ZONE_SIZE, RECIPE_ZONE_SIZE)) {
+        // CE GUICrucible.java:66-68 opens GenericRecipes selector — CrucibleRecipes is the
+        // existing Map table, not GenericRecipes. Keep the already-landed cycle + CrucibleControlPacket.
+        if (isHovered(mouseX, mouseY, 106, 80, 18, 18)) {
             click();
 
             List<String> names = CrucibleRecipes.getRecipeNames();
@@ -149,5 +174,10 @@ public class MachineCrucibleScreen extends GuiInfoContainer<MachineCrucibleMenu>
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private static ItemStack templateFolder() {
+        return new ItemStack(BuiltInRegistries.ITEM.get(
+                ResourceLocation.fromNamespaceAndPath(MainRegistry.MODID, "template_folder")));
     }
 }
