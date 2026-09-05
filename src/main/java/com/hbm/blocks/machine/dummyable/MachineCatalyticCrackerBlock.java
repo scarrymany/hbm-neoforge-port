@@ -4,8 +4,11 @@ import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.machine.dummyable.DummyableProcessBlockEntities;
 import com.hbm.blockentity.machine.dummyable.MachineCatalyticCrackerBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.blocks.ILookOverlay;
 import com.hbm.handler.MultiblockHandlerXR;
+import com.hbm.inventory.fluid.tank.FluidTankNTM;
 import com.hbm.items.machine.IItemFluidIdentifier;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -20,10 +23,16 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import org.jetbrains.annotations.Nullable;
 
-/** CE {@code MachineCatalyticCracker} — Dummyable {0,0,3,3,2,3} offset 3. Real tank GUI (CE was overlay). */
-public class MachineCatalyticCrackerBlock extends BlockDummyable {
+import java.util.ArrayList;
+import java.util.List;
+
+/** CE {@code MachineCatalyticCracker} — Dummyable {0,0,3,3,2,3} offset 3. printHook Exact CE {@code :130-147}. */
+public class MachineCatalyticCrackerBlock extends BlockDummyable implements ILookOverlay {
 
     public MachineCatalyticCrackerBlock(Properties properties) {
         super(properties);
@@ -101,5 +110,26 @@ public class MachineCatalyticCrackerBlock extends BlockDummyable {
         makeExtra(level, core.relative(dir, 2).relative(rot.getOpposite(), 3));
         makeExtra(level, core.relative(dir.getOpposite(), 2).relative(rot, 2));
         makeExtra(level, core.relative(dir.getOpposite(), 2).relative(rot.getOpposite(), 3));
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void printHook(RenderGuiEvent.Pre event, Level world, BlockPos pos) {
+        // Exact CE MachineCatalyticCracker.java:130-147 — i<2 green input, rest red output, fill/max no %,d
+        BlockPos core = findCore(world, pos);
+        if (core == null) return;
+        if (!(world.getBlockEntity(core) instanceof MachineCatalyticCrackerBlockEntity cracker)) return;
+
+        List<Component> text = new ArrayList<>();
+        List<FluidTankNTM> tanks = cracker.getAllTanks();
+        for (int i = 0; i < tanks.size(); i++) {
+            FluidTankNTM tank = tanks.get(i);
+            text.add(Component.literal(i < 2 ? "-> " : "<- ")
+                    .withStyle(i < 2 ? ChatFormatting.GREEN : ChatFormatting.RED)
+                    .append(Component.empty().withStyle(ChatFormatting.RESET)
+                            .append(tank.getTankType().getLocalizedName())
+                            .append(Component.literal(": " + tank.getFill() + "/" + tank.getMaxFill() + "mB"))));
+        }
+        ILookOverlay.printGeneric(event, Component.translatable(getDescriptionId()), 0xffff00, 0x404000, text);
     }
 }
