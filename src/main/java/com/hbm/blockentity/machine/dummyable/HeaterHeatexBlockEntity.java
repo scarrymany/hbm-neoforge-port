@@ -6,6 +6,7 @@ import com.hbm.api.tile.IHeatSource;
 import com.hbm.blockentity.ITickableBE;
 import com.hbm.blockentity.MachineBaseBlockEntity;
 import com.hbm.blocks.BlockDummyable;
+import com.hbm.interfaces.IControlReceiver;
 import com.hbm.inventory.container.machine.dummyable.HeaterHeatexMenu;
 import com.hbm.inventory.fluid.Fluids;
 import com.hbm.inventory.fluid.tank.FluidTankNTM;
@@ -23,6 +24,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,7 +38,7 @@ import java.util.List;
  */
 public class HeaterHeatexBlockEntity extends MachineBaseBlockEntity
         implements IHeatSource, IFluidStandardTransceiverMK2, ITickableBE, MenuProvider,
-        IRORValueProvider {
+        IControlReceiver, IRORValueProvider {
 
     public final FluidTankNTM hot;
     public final FluidTankNTM cold;
@@ -94,14 +96,23 @@ public class HeaterHeatexBlockEntity extends MachineBaseBlockEntity
         heatEnergy += (int) (trait.heatEnergy * ops * trait.getEfficiency(CoolingType.HEATEXCHANGER));
     }
 
-    public void bumpCool(int delta) {
-        amountToCool = Math.max(1, Math.min(hot.getMaxFill(), amountToCool + delta));
-        setChanged();
+    @Override
+    public boolean hasPermission(Player player) {
+        // Exact CE TileEntityHeaterHeatex.java:273-275
+        return player.distanceToSqr(worldPosition.getX() + 0.5D, worldPosition.getY() + 0.5D, worldPosition.getZ() + 0.5D) < 256.0D;
     }
 
-    public void bumpDelay(int delta) {
-        tickDelay = Math.max(1, Math.min(20, tickDelay + delta));
+    /** Exact CE {@code TileEntityHeaterHeatex.receiveControl} :278-282. */
+    @Override
+    public void receiveControl(CompoundTag data) {
+        if (data.contains("toCool")) {
+            this.amountToCool = Mth.clamp(data.getInt("toCool"), 1, hot.getMaxFill());
+        }
+        if (data.contains("delay")) {
+            this.tickDelay = Math.max(data.getInt("delay"), 1);
+        }
         setChanged();
+        dataChanged();
     }
 
     public DirPos[] getConPos() {
