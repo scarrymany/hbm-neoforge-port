@@ -39,6 +39,8 @@ import com.hbm.items.machine.Phase11ProcessItems;
 import com.hbm.items.machine.ItemBreedingRod;
 import com.hbm.items.machine.ItemPWRFuel;
 import com.hbm.items.machine.ItemPileRodMK2;
+import com.hbm.items.machine.PWRDepletedFuelItems;
+import com.hbm.items.machine.PWRHotFuelItems;
 import com.hbm.items.machine.ItemWatzPellet;
 import com.hbm.items.machine.ItemZirnoxRod;
 import com.hbm.items.machine.ItemZirnoxRodDepleted;
@@ -701,27 +703,24 @@ public class HazardRegistry {
         registerOtherFuel(MachineItems.PLATE_FUEL_RA226BE.get(), rabe * billet, pobe * nugget * 3, false);
         registerOtherFuel(MachineItems.PLATE_FUEL_PU238BE.get(), pube * billet, pube * nugget * 1, false);
 
-        // ItemPWRFuel: all 15 EnumPWRFuel values (CE's registerPWRFuel calls). Only the fresh
-        // pwr_fuel_* item exists in this port so far - MachineItems.registerPwrFuel()'s own comment
-        // notes pwr_fuel_hot/pwr_fuel_depleted are separate CE byproduct-marker items sharing this
-        // same enum, out of that class's scope and not yet registered here - so only the fresh item's
-        // base RADIATION level (CE's un-multiplied "baseRad" argument) is bound; the *10 hot/depleted
-        // tiers are a follow-up once those items exist.
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEU).get(), new HazardData().addEntry(RADIATION, uf * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEU233).get(), new HazardData().addEntry(RADIATION, u233 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEU235).get(), new HazardData().addEntry(RADIATION, u235 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEN).get(), new HazardData().addEntry(RADIATION, npf * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEN237).get(), new HazardData().addEntry(RADIATION, np237 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MOX).get(), new HazardData().addEntry(RADIATION, mox * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEP).get(), new HazardData().addEntry(RADIATION, purg * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEP239).get(), new HazardData().addEntry(RADIATION, pu239 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEP241).get(), new HazardData().addEntry(RADIATION, pu241 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.MEA).get(), new HazardData().addEntry(RADIATION, amrg * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HEA242).get(), new HazardData().addEntry(RADIATION, am242 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HES326).get(), new HazardData().addEntry(RADIATION, sa326 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.HES327).get(), new HazardData().addEntry(RADIATION, sa327 * billet * 2));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.BFB_AM_MIX).get(), new HazardData().addEntry(RADIATION, amrg * billet));
-        HazardSystem.register(MachineItems.PWR_FUEL.get(ItemPWRFuel.EnumPWRFuel.BFB_PU241).get(), new HazardData().addEntry(RADIATION, pu241 * billet));
+        // Exact CE HazardRegistry.java:474-488 / registerPWRFuel :547-551.
+        // Fresh already bound; leftover hot (*10 + HOT 5) + depleted (*10) now that
+        // PWRHotFuelItems / PWRDepletedFuelItems exist. No invent art.
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEU, uf * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEU233, u233 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEU235, u235 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEN, npf * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEN237, np237 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MOX, mox * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEP, purg * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEP239, pu239 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEP241, pu241 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.MEA, amrg * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HEA242, am242 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HES326, sa326 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.HES327, sa327 * billet * 2);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.BFB_AM_MIX, amrg * billet);
+        registerPWRFuel(ItemPWRFuel.EnumPWRFuel.BFB_PU241, pu241 * billet);
 
         // ItemPileRodMK2: 8 of EnumPileRod's 9 values - CE binds exactly these 8 (to its own
         // ModItems.pile_rod field, a CE naming quirk for what is actually the MK2 rod); ZR is never
@@ -844,6 +843,15 @@ public class HazardRegistry {
     // ==================== items_machine hazard-wiring helpers (CE Pattern E, ported near-verbatim; Item
     // parameters take the already-resolved concrete item via the items area's own DeferredItem<Item>.get()
     // accessors instead of CE's meta-variant overloads) ====================
+
+    /** Exact CE {@code HazardRegistry.java:547-551}. */
+    private static void registerPWRFuel(final ItemPWRFuel.EnumPWRFuel fuel, final float baseRad) {
+        HazardSystem.register(MachineItems.PWR_FUEL.get(fuel).get(), new HazardData().addEntry(RADIATION, baseRad));
+        HazardSystem.register(PWRHotFuelItems.HOT_FUEL.get(fuel).get(),
+                new HazardData().addEntry(RADIATION, baseRad * 10F).addEntry(HOT, 5F));
+        HazardSystem.register(PWRDepletedFuelItems.DEPLETED.get(fuel).get(),
+                new HazardData().addEntry(RADIATION, baseRad * 10F));
+    }
 
     private static void registerBreedingRodRadiation(final ItemBreedingRod.BreedingRodType type, final float base) {
         HazardSystem.register(MachineItems.BREEDING_ROD_SINGLE.get(type).get(), new HazardData().addEntry(RADIATION, base));
