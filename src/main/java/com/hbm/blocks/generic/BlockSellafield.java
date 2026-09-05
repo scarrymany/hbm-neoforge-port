@@ -59,7 +59,8 @@ public class BlockSellafield extends Block {
         if (stack == null || stack.isEmpty()) return 0;
         BlockItemStateProperties props = stack.get(DataComponents.BLOCK_STATE);
         if (props == null) return 0;
-        return props.get(LEVEL).orElse(0);
+        Integer v = props.get(LEVEL);
+        return v != null ? v : 0;
     }
 
     /** CE {@code new ItemStack(sellafield, 1, meta)}. */
