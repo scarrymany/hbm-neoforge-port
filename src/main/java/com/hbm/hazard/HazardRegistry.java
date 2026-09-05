@@ -608,16 +608,27 @@ public class HazardRegistry {
                 }))));
         HazardSystem.register(SpecialItems.DEMON_CORE_CLOSED.get(), new HazardData().addEntry(RADIATION, 100_000F));
 
-        // nuclear_waste_long_* (5 WasteClass variants) / nuclear_waste_short_* (8 WasteClass
-        // variants): CE binds nuclear_waste_long flat to RADIATION 5F and nuclear_waste_short flat to
-        // RADIATION 30F + HOT 5F with no per-material variation; applied identically across every
-        // WasteClass this port flattened CE's single metadata-multi field into.
+        // nuclear_waste_long_* (5 WasteClass) / nuclear_waste_short_* (8 WasteClass).
+        // Exact CE :211-218 — flat per form, no per-material variation.
         for (final ItemWasteLong.WasteClass wasteClass : ItemWasteLong.WasteClass.VALUES) {
-            HazardSystem.register(SpecialItems.nuclearWasteLong(wasteClass).get(), new HazardData().addEntry(RADIATION, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLong(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLongTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLongDepleted(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.5F));
+            HazardSystem.register(SpecialItems.nuclearWasteLongDepletedTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.05F));
         }
         for (final ItemWasteShort.WasteClass wasteClass : ItemWasteShort.WasteClass.VALUES) {
             HazardSystem.register(SpecialItems.nuclearWasteShort(wasteClass).get(),
                     new HazardData().addEntry(RADIATION, 30F).addEntry(HOT, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteShortTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 3F).addEntry(HOT, 5F));
+            HazardSystem.register(SpecialItems.nuclearWasteShortDepleted(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 3F));
+            HazardSystem.register(SpecialItems.nuclearWasteShortDepletedTiny(wasteClass).get(),
+                    new HazardData().addEntry(RADIATION, 0.3F));
         }
 
         // hazard_wiring_complete: items_machine fuel/rod/pellet family
