@@ -1,8 +1,13 @@
 package com.hbm.blocks.machine;
 
 import com.hbm.api.energymk2.IEnergyConnectorBlock;
+import com.hbm.blocks.ITooltipProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item.TooltipContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -11,6 +16,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 
+import java.util.List;
+
 /**
  * Directional "wire" block that chains {@link CapacitorBlock} instances into one virtual bank,
  * ported from CE's {@code com.hbm.blocks.machine.MachineCapacitorBus} (read in full). No block
@@ -18,8 +25,9 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
  * {@link com.hbm.blockentity.machine.CapacitorBlockEntity#updateEntity()}'s bus-chain walk and by
  * {@link IEnergyConnectorBlock#canConnect} (used for cable-visual rendering by anything that queries
  * it, matching that interface's own javadoc).
+ * addStandardInfo Exact CE {@code MachineCapacitorBus.java:42-44}.
  */
-public class CapacitorBusBlock extends Block implements IEnergyConnectorBlock {
+public class CapacitorBusBlock extends Block implements IEnergyConnectorBlock, ITooltipProvider {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
@@ -52,5 +60,11 @@ public class CapacitorBusBlock extends Block implements IEnergyConnectorBlock {
     @Override
     public boolean canConnect(BlockGetter level, BlockPos pos, Direction dir) {
         return level.getBlockState(pos).getValue(FACING) == dir;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        // Exact CE MachineCapacitorBus.java:42-44 — addStandardInfo via existing block.hbm.capacitor_bus.desc
+        addStandardInfo(tooltip);
     }
 }
